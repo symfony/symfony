@@ -57,9 +57,6 @@ class BasicAuthenticationListener extends AbstractListener
         $this->ignoreFailure = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         return null !== $request->headers->get('PHP_AUTH_USER');

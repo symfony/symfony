@@ -26,9 +26,6 @@ trait LegacyEncoderTrait
      */
     private $hasher;
 
-    /**
-     * {@inheritdoc}
-     */
     public function encodePassword(string $raw, ?string $salt): string
     {
         try {
@@ -38,17 +35,11 @@ trait LegacyEncoderTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isPasswordValid(string $encoded, string $raw, ?string $salt): bool
     {
         return $this->hasher->verify($encoded, $raw, $salt);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function needsRehash(string $encoded): bool
     {
         return $this->hasher->needsRehash($encoded);

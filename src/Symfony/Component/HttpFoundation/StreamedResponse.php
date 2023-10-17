@@ -112,8 +112,6 @@ class StreamedResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return $this
      *
      * @throws \LogicException when the content is not null
@@ -129,9 +127,6 @@ class StreamedResponse extends Response
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContent()
     {
         return false;

@@ -83,9 +83,6 @@ class GenericRuntime implements RuntimeInterface
         $this->options = $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResolver(callable $callable, \ReflectionFunction $reflector = null): ResolverInterface
     {
         if (!$callable instanceof \Closure) {
@@ -117,9 +114,6 @@ class GenericRuntime implements RuntimeInterface
         return new ClosureResolver($callable, $arguments);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRunner(?object $application): RunnerInterface
     {
         if (null === $application) {

@@ -42,9 +42,6 @@ class RecursiveValidator implements ValidatorInterface
         $this->objectInitializers = $objectInitializers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function startContext($root = null)
     {
         return new RecursiveContextualValidator(
@@ -55,9 +52,6 @@ class RecursiveValidator implements ValidatorInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function inContext(ExecutionContextInterface $context)
     {
         return new RecursiveContextualValidator(
@@ -68,25 +62,16 @@ class RecursiveValidator implements ValidatorInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadataFor($object)
     {
         return $this->metadataFactory->getMetadataFor($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasMetadataFor($object)
     {
         return $this->metadataFactory->hasMetadataFor($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, $constraints = null, $groups = null)
     {
         return $this->startContext($value)
@@ -94,9 +79,6 @@ class RecursiveValidator implements ValidatorInterface
             ->getViolations();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateProperty(object $object, string $propertyName, $groups = null)
     {
         return $this->startContext($object)
@@ -104,9 +86,6 @@ class RecursiveValidator implements ValidatorInterface
             ->getViolations();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null)
     {
         // If a class name is passed, take $value as root

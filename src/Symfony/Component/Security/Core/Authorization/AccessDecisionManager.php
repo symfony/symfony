@@ -84,11 +84,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $this->strategy = $strategy ?? new AffirmativeStrategy();
     }
 
-    /**
-     * @param bool $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
-     *
-     * {@inheritdoc}
-     */
     public function decide(TokenInterface $token, array $attributes, $object = null/* , bool $allowMultipleAttributes = false */)
     {
         $allowMultipleAttributes = 3 < \func_num_args() && func_get_arg(3);

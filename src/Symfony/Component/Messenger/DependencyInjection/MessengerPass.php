@@ -46,9 +46,6 @@ class MessengerPass implements CompilerPassInterface
         $this->receiverTag = $receiverTag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $busIds = [];

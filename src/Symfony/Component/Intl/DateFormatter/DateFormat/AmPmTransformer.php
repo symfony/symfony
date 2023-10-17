@@ -22,25 +22,17 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  */
 class AmPmTransformer extends Transformer
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function format(\DateTime $dateTime, int $length): string
     {
         return $dateTime->format('A');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReverseMatchingRegExp(int $length): string
     {
         return 'AM|PM';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function extractDateOptions(string $matched, int $length): array
     {
         return [

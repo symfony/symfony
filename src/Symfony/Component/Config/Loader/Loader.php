@@ -28,17 +28,11 @@ abstract class Loader implements LoaderInterface
         $this->env = $env;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResolver()
     {
         return $this->resolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setResolver(LoaderResolverInterface $resolver)
     {
         $this->resolver = $resolver;

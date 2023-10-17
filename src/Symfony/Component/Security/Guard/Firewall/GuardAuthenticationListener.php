@@ -71,9 +71,6 @@ class GuardAuthenticationListener extends AbstractListener
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         if (null !== $this->logger) {

@@ -26,9 +26,6 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
      */
     abstract protected function getRedisConnection(): object;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new RedisStore($this->getRedisConnection());

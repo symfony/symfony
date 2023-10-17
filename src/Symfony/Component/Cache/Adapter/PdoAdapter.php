@@ -101,9 +101,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         parent::__construct($namespace, $defaultLifetime);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getItem($key)
     {
         if (isset($this->dbalAdapter)) {
@@ -113,9 +110,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::getItem($key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getItems(array $keys = [])
     {
         if (isset($this->dbalAdapter)) {
@@ -125,9 +119,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::getItems($keys);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function hasItem($key)
     {
         if (isset($this->dbalAdapter)) {
@@ -137,9 +128,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::hasItem($key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function deleteItem($key)
     {
         if (isset($this->dbalAdapter)) {
@@ -149,9 +137,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::deleteItem($key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function deleteItems(array $keys)
     {
         if (isset($this->dbalAdapter)) {
@@ -161,9 +146,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::deleteItems($keys);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function clear(string $prefix = '')
     {
         if (isset($this->dbalAdapter)) {
@@ -173,9 +155,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::clear($prefix);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         if (isset($this->dbalAdapter)) {
@@ -185,9 +164,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::get($key, $callback, $beta, $metadata);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function delete(string $key): bool
     {
         if (isset($this->dbalAdapter)) {
@@ -197,9 +173,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::delete($key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function save(CacheItemInterface $item)
     {
         if (isset($this->dbalAdapter)) {
@@ -209,9 +182,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::save($item);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function saveDeferred(CacheItemInterface $item)
     {
         if (isset($this->dbalAdapter)) {
@@ -221,9 +191,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::saveDeferred($item);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setLogger(LoggerInterface $logger): void
     {
         if (isset($this->dbalAdapter)) {
@@ -235,9 +202,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         parent::setLogger($logger);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function commit()
     {
         if (isset($this->dbalAdapter)) {
@@ -247,9 +211,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return parent::commit();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function reset()
     {
         if (isset($this->dbalAdapter)) {
@@ -321,9 +282,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prune()
     {
         if (isset($this->dbalAdapter)) {
@@ -355,9 +313,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids)
     {
         $connection = $this->getConnection();
@@ -401,9 +356,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id)
     {
         $connection = $this->getConnection();
@@ -418,9 +370,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return (bool) $stmt->fetchColumn();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace)
     {
         $conn = $this->getConnection();
@@ -443,9 +392,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids)
     {
         $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
@@ -459,9 +405,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime)
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {

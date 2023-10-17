@@ -37,9 +37,6 @@ class CacheLoader extends Loader
         $this->dir = $dir;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(TemplateReferenceInterface $template)
     {
         $key = hash('sha256', $template->getLogicalName());
@@ -74,9 +71,6 @@ class CacheLoader extends Loader
         return new FileStorage($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFresh(TemplateReferenceInterface $template, int $time)
     {
         return $this->loader->isFresh($template, $time);

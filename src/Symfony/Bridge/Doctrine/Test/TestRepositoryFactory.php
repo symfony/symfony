@@ -31,8 +31,6 @@ if ((new \ReflectionMethod(RepositoryFactory::class, 'getRepository'))->hasRetur
     trait GetRepositoryTrait
     {
         /**
-         * {@inheritdoc}
-         *
          * @return ObjectRepository
          */
         public function getRepository(EntityManagerInterface $entityManager, $entityName)

@@ -30,9 +30,6 @@ class MessageLoggerListener implements EventSubscriberInterface, ResetInterface
         $this->events = new MessageEvents();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->events = new MessageEvents();

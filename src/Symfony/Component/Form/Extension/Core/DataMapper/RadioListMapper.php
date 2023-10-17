@@ -25,9 +25,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class RadioListMapper implements DataMapperInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function mapDataToForms($choice, iterable $radios)
     {
         if (\is_array($radios)) {
@@ -44,9 +42,6 @@ class RadioListMapper implements DataMapperInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function mapFormsToData(iterable $radios, &$choice)
     {
         if (\is_array($radios)) {

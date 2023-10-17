@@ -35,17 +35,11 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         $this->messages = $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDomains()
     {
         $domains = [];
@@ -60,9 +54,6 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         return array_values($domains);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all(string $domain = null)
     {
         if (null !== $domain) {
@@ -88,17 +79,11 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         return $allMessages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(string $id, string $translation, string $domain = 'messages')
     {
         $this->add([$id => $translation], $domain);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $id, string $domain = 'messages')
     {
         if (isset($this->messages[$domain][$id]) || isset($this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id])) {
@@ -112,17 +97,11 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function defines(string $id, string $domain = 'messages')
     {
         return isset($this->messages[$domain][$id]) || isset($this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $id, string $domain = 'messages')
     {
         if (isset($this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id])) {
@@ -140,9 +119,6 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         return $id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function replace(array $messages, string $domain = 'messages')
     {
         unset($this->messages[$domain], $this->messages[$domain.self::INTL_DOMAIN_SUFFIX]);
@@ -150,9 +126,6 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         $this->add($messages, $domain);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function add(array $messages, string $domain = 'messages')
     {
         $altDomain = str_ends_with($domain, self::INTL_DOMAIN_SUFFIX) ? substr($domain, 0, -\strlen(self::INTL_DOMAIN_SUFFIX)) : $domain.self::INTL_DOMAIN_SUFFIX;
@@ -166,9 +139,6 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addCatalogue(MessageCatalogueInterface $catalogue)
     {
         if ($catalogue->getLocale() !== $this->locale) {
@@ -193,9 +163,6 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addFallbackCatalogue(MessageCatalogueInterface $catalogue)
     {
         // detect circular references
@@ -225,33 +192,21 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFallbackCatalogue()
     {
         return $this->fallbackCatalogue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResources()
     {
         return array_values($this->resources);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addResource(ResourceInterface $resource)
     {
         $this->resources[$resource->__toString()] = $resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadata(string $key = '', string $domain = 'messages')
     {
         if ('' == $domain) {
@@ -271,17 +226,11 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setMetadata(string $key, $value, string $domain = 'messages')
     {
         $this->metadata[$domain][$key] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteMetadata(string $key = '', string $domain = 'messages')
     {
         if ('' == $domain) {

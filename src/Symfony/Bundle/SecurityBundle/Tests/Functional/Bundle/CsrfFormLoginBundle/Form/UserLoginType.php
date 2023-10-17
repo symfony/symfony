@@ -36,9 +36,6 @@ class UserLoginType extends AbstractType
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -71,9 +68,6 @@ class UserLoginType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         /* Note: the form's csrf_token_id must correspond to that for the form login

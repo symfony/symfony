@@ -35,9 +35,6 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
         $this->passwordHashers = $passwordHashers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPasswordHasher($user): PasswordHasherInterface
     {
         $hasherKey = null;

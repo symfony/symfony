@@ -21,9 +21,6 @@ class TestExtension extends Extension implements PrependExtensionInterface
 {
     private $customConfig;
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = $this->getConfiguration($configs, $container);
@@ -32,17 +29,11 @@ class TestExtension extends Extension implements PrependExtensionInterface
         $container->setAlias('test.annotation_reader', new Alias('annotation_reader', true));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepend(ContainerBuilder $container)
     {
         $container->prependExtensionConfig('test', ['custom' => 'foo']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         return new Configuration($this->customConfig);

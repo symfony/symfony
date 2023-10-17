@@ -46,11 +46,6 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param bool $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
-     */
     public function decide(TokenInterface $token, array $attributes, $object = null/* , bool $allowMultipleAttributes = false */): bool
     {
         $currentDecisionLog = [

@@ -59,9 +59,6 @@ class PhpFileLoader extends FileLoader
         return $collection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($resource, string $type = null)
     {
         return \is_string($resource) && 'php' === pathinfo($resource, \PATHINFO_EXTENSION) && (!$type || 'php' === $type);

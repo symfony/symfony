@@ -42,9 +42,6 @@ class PhpFileLoader extends FileLoader
         $this->generator = $generator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load($resource, string $type = null)
     {
         // the container and loader variables are exposed to the included file below
@@ -74,9 +71,6 @@ class PhpFileLoader extends FileLoader
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($resource, string $type = null)
     {
         if (!\is_string($resource)) {

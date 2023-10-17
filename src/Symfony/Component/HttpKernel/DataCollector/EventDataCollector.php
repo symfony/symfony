@@ -36,9 +36,6 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->currentRequest = $this->requestStack && $this->requestStack->getMainRequest() !== $request ? $request : null;
@@ -127,9 +124,6 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
         return $this->data['orphaned_events'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'events';

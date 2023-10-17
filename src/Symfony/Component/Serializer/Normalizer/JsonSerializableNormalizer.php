@@ -21,9 +21,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
  */
 class JsonSerializableNormalizer extends AbstractNormalizer
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function normalize($object, string $format = null, array $context = [])
     {
         if ($this->isCircularReference($object, $context)) {
@@ -41,33 +39,21 @@ class JsonSerializableNormalizer extends AbstractNormalizer
         return $this->serializer->normalize($object->jsonSerialize(), $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof \JsonSerializable;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         throw new LogicException(sprintf('Cannot denormalize with "%s".', \JsonSerializable::class));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

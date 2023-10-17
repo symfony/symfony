@@ -103,8 +103,6 @@ class OrderedHashMapIterator implements \Iterator
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     #[\ReturnTypeWillChange]
@@ -113,9 +111,6 @@ class OrderedHashMapIterator implements \Iterator
         return $this->current;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function next(): void
     {
         ++$this->cursor;
@@ -130,8 +125,6 @@ class OrderedHashMapIterator implements \Iterator
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     #[\ReturnTypeWillChange]
@@ -146,17 +139,11 @@ class OrderedHashMapIterator implements \Iterator
         return key($array);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function valid(): bool
     {
         return null !== $this->key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rewind(): void
     {
         $this->cursor = 0;

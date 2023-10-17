@@ -51,9 +51,6 @@ class LintCommand extends Command
         $this->isReadableProvider = $isReadableProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this

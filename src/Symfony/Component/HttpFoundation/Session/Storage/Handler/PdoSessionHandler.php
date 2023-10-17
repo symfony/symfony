@@ -318,9 +318,6 @@ class PdoSessionHandler extends AbstractSessionHandler
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDestroy(string $sessionId)
     {
         // delete the record associated with this id
@@ -339,9 +336,6 @@ class PdoSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite(string $sessionId, string $data)
     {
         $maxlifetime = (int) \ini_get('session.gc_maxlifetime');

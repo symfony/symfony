@@ -204,25 +204,16 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfig()
     {
         return $this->config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPropertyPath()
     {
         if ($this->propertyPath || $this->propertyPath = $this->config->getPropertyPath()) {
@@ -248,9 +239,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->propertyPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRequired()
     {
         if (null === $this->parent || $this->parent->isRequired()) {
@@ -260,9 +248,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDisabled()
     {
         if (null === $this->parent || !$this->parent->isDisabled()) {
@@ -272,9 +257,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParent(FormInterface $parent = null)
     {
         if ($this->submitted) {
@@ -290,33 +272,21 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoot()
     {
         return $this->parent ? $this->parent->getRoot() : $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRoot()
     {
         return null === $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setData($modelData)
     {
         // If the form is submitted while disabled, it is set to submitted, but the data is not
@@ -396,9 +366,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getData()
     {
         if ($this->inheritData) {
@@ -420,9 +387,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->modelData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNormData()
     {
         if ($this->inheritData) {
@@ -444,9 +408,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->normData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getViewData()
     {
         if ($this->inheritData) {
@@ -468,17 +429,11 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->viewData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExtraData()
     {
         return $this->extraData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function initialize()
     {
         if (null !== $this->parent) {
@@ -495,9 +450,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handleRequest($request = null)
     {
         $this->config->getRequestHandler()->handleRequest($this, $request);
@@ -505,9 +457,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function submit($submittedData, bool $clearMissing = true)
     {
         if ($this->submitted) {
@@ -684,9 +633,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addError(FormError $error)
     {
         if (null === $error->getOrigin()) {
@@ -702,33 +648,21 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isSubmitted()
     {
         return $this->submitted;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isSynchronized()
     {
         return null === $this->transformationFailure;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTransformationFailure()
     {
         return $this->transformationFailure;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEmpty()
     {
         foreach ($this->children as $child) {
@@ -756,9 +690,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isValid()
     {
         if (!$this->submitted) {
@@ -786,9 +717,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->parent && method_exists($this->parent, 'getClickedButton') ? $this->parent->getClickedButton() : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getErrors(bool $deep = false, bool $flatten = true)
     {
         $errors = $this->errors;
@@ -820,9 +748,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return new FormErrorIterator($this, $errors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearErrors(bool $deep = false): self
     {
         $this->errors = [];
@@ -839,17 +764,11 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all()
     {
         return iterator_to_array($this->children);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function add($child, string $type = null, array $options = [])
     {
         if ($this->submitted) {
@@ -918,9 +837,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove(string $name)
     {
         if ($this->submitted) {
@@ -938,17 +854,11 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $name)
     {
         return isset($this->children[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $name)
     {
         if (isset($this->children[$name])) {
@@ -1042,9 +952,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return \count($this->children);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createView(FormView $parent = null)
     {
         if (null === $parent && $this->parent) {

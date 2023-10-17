@@ -42,57 +42,36 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
         $this->initializableExtractors = $initializableExtractors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProperties(string $class, array $context = []): ?array
     {
         return $this->extract($this->listExtractors, 'getProperties', [$class, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract($this->descriptionExtractors, 'getShortDescription', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract($this->descriptionExtractors, 'getLongDescription', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         return $this->extract($this->typeExtractors, 'getTypes', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isReadable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract($this->accessExtractors, 'isReadable', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isWritable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract($this->accessExtractors, 'isWritable', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isInitializable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract($this->initializableExtractors, 'isInitializable', [$class, $property, $context]);

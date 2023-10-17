@@ -62,9 +62,6 @@ class FormRegistry implements FormRegistryInterface
         $this->resolvedTypeFactory = $resolvedTypeFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getType(string $name)
     {
         if (!isset($this->types[$name])) {
@@ -126,9 +123,6 @@ class FormRegistry implements FormRegistryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasType(string $name)
     {
         if (isset($this->types[$name])) {
@@ -144,9 +138,6 @@ class FormRegistry implements FormRegistryInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeGuesser()
     {
         if (false === $this->guesser) {
@@ -166,9 +157,6 @@ class FormRegistry implements FormRegistryInterface
         return $this->guesser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExtensions()
     {
         return $this->extensions;

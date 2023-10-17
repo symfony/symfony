@@ -51,17 +51,11 @@ class RetryTillSaveStore implements BlockingStoreInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         $this->decorated->save($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function waitAndSave(Key $key)
     {
         $retry = 0;
@@ -81,25 +75,16 @@ class RetryTillSaveStore implements BlockingStoreInterface, LoggerAwareInterface
         throw new LockConflictedException();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         $this->decorated->putOffExpiration($key, $ttl);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         $this->decorated->delete($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key)
     {
         return $this->decorated->exists($key);

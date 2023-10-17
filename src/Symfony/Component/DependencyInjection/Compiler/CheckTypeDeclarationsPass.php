@@ -75,9 +75,6 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         $this->skippedIds = $skippedIds;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue($value, bool $isRoot = false)
     {
         if (isset($this->skippedIds[$this->currentId])) {

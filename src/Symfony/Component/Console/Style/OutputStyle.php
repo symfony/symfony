@@ -30,9 +30,6 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
         $this->output = $output;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function newLine(int $count = 1)
     {
         $this->output->write(str_repeat(\PHP_EOL, $count));
@@ -46,97 +43,61 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
         return new ProgressBar($this->output, $max);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function write($messages, bool $newline = false, int $type = self::OUTPUT_NORMAL)
     {
         $this->output->write($messages, $newline, $type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function writeln($messages, int $type = self::OUTPUT_NORMAL)
     {
         $this->output->writeln($messages, $type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setVerbosity(int $level)
     {
         $this->output->setVerbosity($level);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getVerbosity()
     {
         return $this->output->getVerbosity();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDecorated(bool $decorated)
     {
         $this->output->setDecorated($decorated);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDecorated()
     {
         return $this->output->isDecorated();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
         $this->output->setFormatter($formatter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormatter()
     {
         return $this->output->getFormatter();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isQuiet()
     {
         return $this->output->isQuiet();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isVerbose()
     {
         return $this->output->isVerbose();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isVeryVerbose()
     {
         return $this->output->isVeryVerbose();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDebug()
     {
         return $this->output->isDebug();

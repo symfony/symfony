@@ -35,57 +35,36 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         return ($this->receiver ?? $this->getReceiver())->get();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFromQueues(array $queueNames): iterable
     {
         return ($this->receiver ?? $this->getReceiver())->getFromQueues($queueNames);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         ($this->receiver ?? $this->getReceiver())->ack($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         ($this->receiver ?? $this->getReceiver())->reject($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
         return ($this->sender ?? $this->getSender())->send($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setup(): void
     {
         $this->connection->setup();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
         return ($this->receiver ?? $this->getReceiver())->getMessageCount();

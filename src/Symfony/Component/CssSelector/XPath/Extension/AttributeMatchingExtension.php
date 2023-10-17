@@ -26,9 +26,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  */
 class AttributeMatchingExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getAttributeMatchingTranslators(): array
     {
         return [
@@ -109,9 +107,6 @@ class AttributeMatchingExtension extends AbstractExtension
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'attribute-matching';

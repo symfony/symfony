@@ -128,9 +128,6 @@ class NativeSessionStorage implements SessionStorageInterface
         return $this->saveHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function start()
     {
         if ($this->started) {
@@ -198,41 +195,26 @@ class NativeSessionStorage implements SessionStorageInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->saveHandler->getId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setId(string $id)
     {
         $this->saveHandler->setId($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->saveHandler->getName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setName(string $name)
     {
         $this->saveHandler->setName($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function regenerate(bool $destroy = false, int $lifetime = null)
     {
         // Cannot regenerate the session ID for non-active sessions.
@@ -266,9 +248,6 @@ class NativeSessionStorage implements SessionStorageInterface
         return $isRegenerated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save()
     {
         // Store a copy so we can restore the bags in case the session was not left empty
@@ -308,9 +287,6 @@ class NativeSessionStorage implements SessionStorageInterface
         $this->started = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear()
     {
         // clear out the bags
@@ -325,9 +301,6 @@ class NativeSessionStorage implements SessionStorageInterface
         $this->loadSession();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerBag(SessionBagInterface $bag)
     {
         if ($this->started) {
@@ -337,9 +310,6 @@ class NativeSessionStorage implements SessionStorageInterface
         $this->bags[$bag->getName()] = $bag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBag(string $name)
     {
         if (!isset($this->bags[$name])) {
@@ -374,9 +344,6 @@ class NativeSessionStorage implements SessionStorageInterface
         return $this->metadataBag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isStarted()
     {
         return $this->started;

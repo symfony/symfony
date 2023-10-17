@@ -65,9 +65,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $this->objectInitializers = $objectInitializers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function atPath(string $path)
     {
         $this->defaultPropertyPath = $this->context->getPropertyPath($path);
@@ -75,9 +72,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, $constraints = null, $groups = null)
     {
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
@@ -163,9 +157,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         throw new RuntimeException(sprintf('Cannot validate values of type "%s" automatically. Please provide a constraint.', get_debug_type($value)));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateProperty(object $object, string $propertyName, $groups = null)
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
@@ -207,9 +198,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null)
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($objectOrClass);
@@ -260,9 +248,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getViolations()
     {
         return $this->context->getViolations();

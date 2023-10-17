@@ -17,9 +17,6 @@ namespace Symfony\Component\Messenger\Handler;
 interface BatchHandlerInterface
 {
     /**
-     * @param Acknowledger|null $ack The function to call to ack/nack the $message.
-     *                               The message should be handled synchronously when null.
-     *
      * @return mixed The number of pending messages in the batch if $ack is not null,
      *               the result from handling the message otherwise
      */

@@ -215,8 +215,6 @@ class ValidatorBuilder
     /**
      * Enables annotation based constraint mapping.
      *
-     * @param bool $skipDoctrineAnnotations
-     *
      * @return $this
      */
     public function enableAnnotationMapping(/* bool $skipDoctrineAnnotations = true */)

@@ -32,25 +32,17 @@ use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
  */
 class PropertyNormalizer extends AbstractObjectNormalizer
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function supportsNormalization($data, string $format = null)
     {
         return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
         return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;
@@ -75,9 +67,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isAllowedAttribute($classOrObject, string $attribute, string $format = null, array $context = [])
     {
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
@@ -96,9 +85,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractAttributes(object $object, string $format = null, array $context = [])
     {
         $reflectionObject = new \ReflectionObject($object);
@@ -117,9 +103,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         return array_unique($attributes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
     {
         try {
@@ -151,9 +134,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         return $reflectionProperty->getValue($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
     {
         try {

@@ -114,8 +114,6 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return TValue
      */
     #[\ReturnTypeWillChange]
@@ -129,8 +127,6 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return void
      */
     #[\ReturnTypeWillChange]
@@ -153,8 +149,6 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return void
      */
     #[\ReturnTypeWillChange]

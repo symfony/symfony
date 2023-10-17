@@ -31,8 +31,6 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
     use DenormalizerAwareTrait;
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NotNormalizableValueException
      */
     public function denormalize($data, string $type, string $format = null, array $context = []): array
@@ -65,9 +63,6 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         if (null === $this->denormalizer) {
@@ -79,8 +74,6 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated call setDenormalizer() instead
      */
     public function setSerializer(SerializerInterface $serializer)
@@ -96,9 +89,6 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
         $this->setDenormalizer($serializer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->denormalizer instanceof CacheableSupportsMethodInterface && $this->denormalizer->hasCacheableSupportsMethod();

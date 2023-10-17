@@ -68,9 +68,6 @@ class LocalizedController implements ServiceSubscriberInterface
         return (new Response('<html><body>Homepage</body></html>'))->setPublic();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices(): array
     {
         return [

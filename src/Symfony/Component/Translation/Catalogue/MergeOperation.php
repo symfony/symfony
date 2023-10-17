@@ -24,9 +24,7 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  */
 class MergeOperation extends AbstractOperation
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     protected function processDomain(string $domain)
     {
         $this->messages[$domain] = [

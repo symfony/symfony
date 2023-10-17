@@ -70,9 +70,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         $item = $this->getItem($key);
@@ -90,17 +87,12 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         return $item->get();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(string $key): bool
     {
         return $this->deleteItem($key);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function hasItem($key)
@@ -120,9 +112,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         return isset($this->expiries[$key]) && !$this->deleteItem($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem($key)
     {
         if (!$isHit = $this->hasItem($key)) {
@@ -139,9 +128,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         return (self::$createCacheItem)($key, $value, $isHit);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItems(array $keys = [])
     {
         \assert(self::validateKeys($keys));
@@ -150,8 +136,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function deleteItem($key)
@@ -163,8 +147,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function deleteItems(array $keys)
@@ -177,8 +159,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function save(CacheItemInterface $item)
@@ -232,8 +212,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function saveDeferred(CacheItemInterface $item)
@@ -242,8 +220,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function commit()
@@ -252,8 +228,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function clear(string $prefix = '')
@@ -301,9 +275,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         return $values;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->clear();

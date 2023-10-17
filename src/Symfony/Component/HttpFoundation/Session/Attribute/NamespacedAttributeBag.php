@@ -35,9 +35,6 @@ class NamespacedAttributeBag extends AttributeBag
         parent::__construct($storageKey);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $name)
     {
         // reference mismatch: if fixed, re-introduced in array_key_exists; keep as it is
@@ -51,9 +48,6 @@ class NamespacedAttributeBag extends AttributeBag
         return \array_key_exists($name, $attributes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $name, $default = null)
     {
         // reference mismatch: if fixed, re-introduced in array_key_exists; keep as it is
@@ -67,9 +61,6 @@ class NamespacedAttributeBag extends AttributeBag
         return \array_key_exists($name, $attributes) ? $attributes[$name] : $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(string $name, $value)
     {
         $attributes = &$this->resolveAttributePath($name, true);
@@ -77,9 +68,6 @@ class NamespacedAttributeBag extends AttributeBag
         $attributes[$name] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove(string $name)
     {
         $retval = null;

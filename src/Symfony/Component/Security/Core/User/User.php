@@ -56,33 +56,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         return $this->getUserIdentifier();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles(): array
     {
         return $this->roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt(): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUsername(): string
     {
         trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
@@ -150,9 +138,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         return $this->enabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials()
     {
     }
@@ -162,9 +147,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         return $this->extraFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEqualTo(UserInterface $user): bool
     {
         if (!$user instanceof self) {

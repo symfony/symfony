@@ -36,9 +36,6 @@ class PropertyPathAccessor implements DataAccessorInterface
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getValue($data, FormInterface $form)
     {
         if (null === $propertyPath = $form->getPropertyPath()) {
@@ -48,9 +45,6 @@ class PropertyPathAccessor implements DataAccessorInterface
         return $this->getPropertyValue($data, $propertyPath);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValue(&$data, $propertyValue, FormInterface $form): void
     {
         if (null === $propertyPath = $form->getPropertyPath()) {
@@ -70,17 +64,11 @@ class PropertyPathAccessor implements DataAccessorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isReadable($data, FormInterface $form): bool
     {
         return null !== $form->getPropertyPath();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isWritable($data, FormInterface $form): bool
     {
         return null !== $form->getPropertyPath();

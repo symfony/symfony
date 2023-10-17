@@ -30,9 +30,6 @@ final class AliasDeprecatedPublicServicesPass extends AbstractRecursivePass
         $this->tagName = $tagName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue($value, bool $isRoot = false)
     {
         if ($value instanceof Reference && isset($this->aliases[$id = (string) $value])) {
@@ -42,9 +39,6 @@ final class AliasDeprecatedPublicServicesPass extends AbstractRecursivePass
         return parent::processValue($value, $isRoot);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         foreach ($container->findTaggedServiceIds($this->tagName) as $id => $tags) {

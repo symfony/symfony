@@ -35,9 +35,6 @@ abstract class Descriptor implements DescriptorInterface
      */
     protected $output;
 
-    /**
-     * {@inheritdoc}
-     */
     public function describe(OutputInterface $output, $object, array $options = [])
     {
         $this->output = $output;

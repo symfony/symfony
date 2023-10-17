@@ -29,9 +29,7 @@ use Twig\TokenParser\AbstractTokenParser;
  */
 final class DumpTokenParser extends AbstractTokenParser
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function parse(Token $token): Node
     {
         $values = null;
@@ -43,9 +41,6 @@ final class DumpTokenParser extends AbstractTokenParser
         return new DumpNode($this->parser->getVarName(), $values, $token->getLine(), $this->getTag());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTag(): string
     {
         return 'dump';

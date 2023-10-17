@@ -68,9 +68,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode($data, string $format, array $context = [])
     {
         $encoderIgnoredNodeTypes = $context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
@@ -94,9 +91,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         return $dom->saveXML($ignorePiNode ? $dom->documentElement : null);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decode(string $data, string $format, array $context = [])
     {
         if ('' === trim($data)) {
@@ -162,17 +156,11 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         return array_merge($this->parseXmlAttributes($rootNode, $context), ['#' => $rootNode->nodeValue]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsEncoding(string $format)
     {
         return self::FORMAT === $format;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDecoding(string $format)
     {
         return self::FORMAT === $format;

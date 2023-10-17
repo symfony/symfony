@@ -44,9 +44,6 @@ class EmailValidator extends ConstraintValidator
         $this->defaultMode = $defaultMode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Email) {

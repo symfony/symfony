@@ -28,17 +28,11 @@ class ServiceClosureArgument implements ArgumentInterface
         $this->values = [$reference];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getValues()
     {
         return $this->values;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValues(array $values)
     {
         if ([0] !== array_keys($values) || !($values[0] instanceof Reference || null === $values[0])) {

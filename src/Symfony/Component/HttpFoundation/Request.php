@@ -764,8 +764,6 @@ class Request
      * like whether the session is started or not. It is just a way to check if this Request
      * is associated with a Session instance.
      *
-     * @param bool $skipIfUninitialized When true, ignores factories injected by `setSessionFactory`
-     *
      * @return bool
      */
     public function hasSession(/* bool $skipIfUninitialized = false */)

@@ -76,9 +76,6 @@ class ContextListener extends AbstractListener
         $this->sessionTrackerEnabler = $sessionTrackerEnabler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         return null; // always run authenticate() lazily with lazy firewalls

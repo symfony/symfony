@@ -29,9 +29,6 @@ class PostgreSqlDbalStoreTest extends AbstractStoreTestCase
     use ExpectDeprecationTrait;
     use SharedLockStoreTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         if (!getenv('POSTGRES_HOST')) {

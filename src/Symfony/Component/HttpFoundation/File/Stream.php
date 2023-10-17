@@ -19,8 +19,6 @@ namespace Symfony\Component\HttpFoundation\File;
 class Stream extends File
 {
     /**
-     * {@inheritdoc}
-     *
      * @return int|false
      */
     #[\ReturnTypeWillChange]

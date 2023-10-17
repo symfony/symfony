@@ -44,17 +44,11 @@ class MemcachedStoreTest extends AbstractStoreTestCase
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClockDelay()
     {
         return 1000000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         $memcached = new \Memcached();

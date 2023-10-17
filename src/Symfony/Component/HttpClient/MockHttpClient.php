@@ -59,9 +59,6 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         $this->responseFactory = $responseFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         [$url, $options] = $this->prepareRequest($method, $url, $options, $this->defaultOptions, true);
@@ -87,9 +84,6 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         return MockResponse::fromRequest($method, $url, $options, $response);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof ResponseInterface) {
@@ -106,9 +100,6 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         return $this->requestsCount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function withOptions(array $options): self
     {
         $clone = clone $this;

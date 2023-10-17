@@ -201,9 +201,6 @@ class BinaryFileResponse extends Response
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepare(Request $request)
     {
         if ($this->isInformational() || $this->isEmpty()) {
@@ -316,9 +313,6 @@ class BinaryFileResponse extends Response
         return $lastModified->format('D, d M Y H:i:s').' GMT' === $header;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function sendContent()
     {
         try {
@@ -370,8 +364,6 @@ class BinaryFileResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \LogicException when the content is not null
      */
     public function setContent(?string $content)
@@ -383,9 +375,6 @@ class BinaryFileResponse extends Response
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContent()
     {
         return false;

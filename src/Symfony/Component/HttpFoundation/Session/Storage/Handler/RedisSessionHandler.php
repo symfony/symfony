@@ -66,17 +66,11 @@ class RedisSessionHandler extends AbstractSessionHandler
         $this->ttl = $options['ttl'] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doRead(string $sessionId): string
     {
         return $this->redis->get($this->prefix.$sessionId) ?: '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite(string $sessionId, string $data): bool
     {
         $result = $this->redis->setEx($this->prefix.$sessionId, (int) ($this->ttl ?? \ini_get('session.gc_maxlifetime')), $data);
@@ -84,9 +78,6 @@ class RedisSessionHandler extends AbstractSessionHandler
         return $result && !$result instanceof ErrorInterface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDestroy(string $sessionId): bool
     {
         static $unlink = true;
@@ -106,9 +97,6 @@ class RedisSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[\ReturnTypeWillChange]
     public function close(): bool
     {
@@ -116,8 +104,6 @@ class RedisSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return int|false
      */
     #[\ReturnTypeWillChange]

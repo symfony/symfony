@@ -67,9 +67,6 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         $this->eventDispatcher = $dispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function authenticate(TokenInterface $token)
     {
         $lastException = null;

@@ -22,8 +22,6 @@ namespace Symfony\Component\Security\Core\User;
 final class InMemoryUser extends User
 {
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since Symfony 5.3
      */
     public function isAccountNonExpired(): bool
@@ -34,8 +32,6 @@ final class InMemoryUser extends User
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since Symfony 5.3
      */
     public function isAccountNonLocked(): bool
@@ -46,8 +42,6 @@ final class InMemoryUser extends User
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since Symfony 5.3
      */
     public function isCredentialsNonExpired(): bool

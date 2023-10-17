@@ -64,9 +64,6 @@ class UrlPackage extends Package
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUrl(string $path)
     {
         if ($this->isAbsoluteUrl($path)) {

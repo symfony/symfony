@@ -304,9 +304,6 @@ class Application implements ResetInterface
         return $exitCode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
     }

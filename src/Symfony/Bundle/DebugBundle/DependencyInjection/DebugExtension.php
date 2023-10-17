@@ -30,9 +30,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  */
 class DebugExtension extends Extension
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
@@ -98,17 +96,11 @@ class DebugExtension extends Extension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getXsdValidationBasePath()
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/debug';

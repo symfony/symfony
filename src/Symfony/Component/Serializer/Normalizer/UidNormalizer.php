@@ -36,8 +36,6 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param AbstractUid $object
      */
     public function normalize($object, string $format = null, array $context = [])
@@ -56,17 +54,11 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
         throw new LogicException(sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null): bool
     {
         return $data instanceof AbstractUid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         try {
@@ -82,17 +74,11 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return is_a($type, AbstractUid::class, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

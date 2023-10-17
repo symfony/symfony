@@ -19,9 +19,7 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class AccountExpiredException extends AccountStatusException
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getMessageKey()
     {
         return 'Account has expired.';

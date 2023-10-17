@@ -34,8 +34,6 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      *
      * @throws InvalidArgumentException
@@ -49,25 +47,17 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
         return $object->format($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof \DateInterval;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \DateInterval
      *
      * @throws InvalidArgumentException
@@ -119,9 +109,6 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
         return \DateInterval::class === $type;

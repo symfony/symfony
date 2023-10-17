@@ -59,41 +59,26 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         $this->parent = $parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return $this->innerType->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInnerType()
     {
         return $this->innerType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeExtensions()
     {
         return $this->typeExtensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createBuilder(FormFactoryInterface $factory, string $name, array $options = [])
     {
         try {
@@ -111,17 +96,11 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         return $builder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createView(FormInterface $form, FormView $parent = null)
     {
         return $this->newView($parent);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (null !== $this->parent) {
@@ -135,9 +114,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if (null !== $this->parent) {
@@ -151,9 +127,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (null !== $this->parent) {
@@ -168,9 +141,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOptionsResolver()
     {
         if (null === $this->optionsResolver) {

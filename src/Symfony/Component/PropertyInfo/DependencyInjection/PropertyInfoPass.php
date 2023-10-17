@@ -46,9 +46,6 @@ class PropertyInfoPass implements CompilerPassInterface
         $this->initializableExtractorTag = $initializableExtractorTag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->propertyInfoService)) {

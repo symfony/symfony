@@ -35,9 +35,6 @@ class ResolveHotPathPass extends AbstractRecursivePass
         $this->tagName = $tagName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         try {
@@ -48,9 +45,6 @@ class ResolveHotPathPass extends AbstractRecursivePass
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue($value, bool $isRoot = false)
     {
         if ($value instanceof ArgumentInterface) {

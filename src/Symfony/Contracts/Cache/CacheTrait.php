@@ -26,8 +26,6 @@ class_exists(InvalidArgumentException::class);
 trait CacheTrait
 {
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
@@ -35,9 +33,6 @@ trait CacheTrait
         return $this->doGet($this, $key, $callback, $beta, $metadata);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(string $key): bool
     {
         return $this->deleteItem($key);

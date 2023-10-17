@@ -26,9 +26,6 @@ final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterfac
         $this->className = $className;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(WorkflowInterface $workflow, object $subject): bool
     {
         return $subject instanceof $this->className;

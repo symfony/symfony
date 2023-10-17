@@ -98,9 +98,6 @@ class DoctrineDbalStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         $key->reduceLifetime($this->initialTtl);
@@ -140,9 +137,6 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, $ttl)
     {
         if ($ttl < 1) {
@@ -174,9 +168,6 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         $this->conn->delete($this->table, [
@@ -185,9 +176,6 @@ class DoctrineDbalStore implements PersistingStoreInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key)
     {
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = ? AND $this->tokenCol = ? AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";

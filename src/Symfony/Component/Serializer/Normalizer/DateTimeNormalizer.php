@@ -48,8 +48,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      *
      * @throws InvalidArgumentException
@@ -71,17 +69,12 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         return $object->format($dateTimeFormat);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof \DateTimeInterface;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \DateTimeInterface
      *
      * @throws NotNormalizableValueException
@@ -133,17 +126,11 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
         return isset(self::SUPPORTED_TYPES[$type]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

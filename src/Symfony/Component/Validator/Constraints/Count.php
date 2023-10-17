@@ -44,8 +44,6 @@ class Count extends Constraint
     public $divisibleBy;
 
     /**
-     * {@inheritdoc}
-     *
      * @param int|array|null $exactly The expected exact count or a set of options
      */
     public function __construct(

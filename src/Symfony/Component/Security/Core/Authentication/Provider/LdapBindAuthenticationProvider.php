@@ -61,9 +61,6 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
         $this->queryString = $queryString;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function retrieveUser(string $userIdentifier, UsernamePasswordToken $token)
     {
         if (AuthenticationProviderInterface::USERNAME_NONE_PROVIDED === $userIdentifier) {
@@ -80,9 +77,6 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
     {
         // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0

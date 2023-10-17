@@ -36,9 +36,6 @@ class CachePoolPrunerPass implements CompilerPassInterface
         $this->cachePoolTag = $cachePoolTag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->cacheCommandServiceId)) {

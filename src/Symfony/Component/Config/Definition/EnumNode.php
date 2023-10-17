@@ -38,9 +38,6 @@ class EnumNode extends ScalarNode
         return $this->values;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function finalizeValue($value)
     {
         $value = parent::finalizeValue($value);
@@ -55,9 +52,6 @@ class EnumNode extends ScalarNode
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function allowPlaceholders(): bool
     {
         return false;

@@ -44,97 +44,61 @@ abstract class Output implements OutputInterface
         $this->formatter->setDecorated($decorated);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
         $this->formatter = $formatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormatter()
     {
         return $this->formatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDecorated(bool $decorated)
     {
         $this->formatter->setDecorated($decorated);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDecorated()
     {
         return $this->formatter->isDecorated();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setVerbosity(int $level)
     {
         $this->verbosity = $level;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getVerbosity()
     {
         return $this->verbosity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isQuiet()
     {
         return self::VERBOSITY_QUIET === $this->verbosity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isVerbose()
     {
         return self::VERBOSITY_VERBOSE <= $this->verbosity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isVeryVerbose()
     {
         return self::VERBOSITY_VERY_VERBOSE <= $this->verbosity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDebug()
     {
         return self::VERBOSITY_DEBUG <= $this->verbosity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function writeln($messages, int $options = self::OUTPUT_NORMAL)
     {
         $this->write($messages, true, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function write($messages, bool $newline = false, int $options = self::OUTPUT_NORMAL)
     {
         if (!is_iterable($messages)) {

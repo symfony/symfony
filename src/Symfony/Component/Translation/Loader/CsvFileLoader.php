@@ -24,9 +24,6 @@ class CsvFileLoader extends FileLoader
     private $enclosure = '"';
     private $escape = '\\';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadResource(string $resource)
     {
         $messages = [];

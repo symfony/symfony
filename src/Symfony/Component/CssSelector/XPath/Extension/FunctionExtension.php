@@ -30,9 +30,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  */
 class FunctionExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getFunctionTranslators(): array
     {
         return [
@@ -161,9 +159,6 @@ class FunctionExtension extends AbstractExtension
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'function';

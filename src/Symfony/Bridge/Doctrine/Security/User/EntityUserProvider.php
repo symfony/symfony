@@ -47,9 +47,6 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         $this->property = $property;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadUserByUsername(string $username)
     {
         trigger_deprecation('symfony/doctrine-bridge', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
@@ -87,9 +84,6 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user)
     {
         $class = $this->getClass();
@@ -125,17 +119,12 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $refreshedUser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsClass(string $class)
     {
         return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @final
      */
     public function upgradePassword($user, string $newHashedPassword): void

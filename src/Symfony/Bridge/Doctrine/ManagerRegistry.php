@@ -30,8 +30,6 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
     protected $container;
 
     /**
-     * {@inheritdoc}
-     *
      * @return object
      */
     protected function getService($name)
@@ -40,8 +38,6 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return void
      */
     protected function resetService($name)

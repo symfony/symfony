@@ -42,9 +42,6 @@ class ContainerControllerResolver extends ControllerResolver
         return parent::createController($controller);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function instantiateController(string $class)
     {
         $class = ltrim($class, '\\');

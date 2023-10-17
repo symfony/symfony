@@ -73,9 +73,6 @@ class MockArraySessionStorage implements SessionStorageInterface
         $this->data = $array;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function start()
     {
         if ($this->started) {
@@ -91,9 +88,6 @@ class MockArraySessionStorage implements SessionStorageInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function regenerate(bool $destroy = false, int $lifetime = null)
     {
         if (!$this->started) {
@@ -106,17 +100,11 @@ class MockArraySessionStorage implements SessionStorageInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setId(string $id)
     {
         if ($this->started) {
@@ -126,25 +114,16 @@ class MockArraySessionStorage implements SessionStorageInterface
         $this->id = $id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save()
     {
         if (!$this->started || $this->closed) {
@@ -155,9 +134,6 @@ class MockArraySessionStorage implements SessionStorageInterface
         $this->started = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear()
     {
         // clear out the bags
@@ -172,17 +148,11 @@ class MockArraySessionStorage implements SessionStorageInterface
         $this->loadSession();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerBag(SessionBagInterface $bag)
     {
         $this->bags[$bag->getName()] = $bag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBag(string $name)
     {
         if (!isset($this->bags[$name])) {
@@ -196,9 +166,6 @@ class MockArraySessionStorage implements SessionStorageInterface
         return $this->bags[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isStarted()
     {
         return $this->started;

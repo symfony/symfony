@@ -40,9 +40,6 @@ class SendMessageMiddleware implements MiddlewareInterface
         $this->logger = new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $context = [

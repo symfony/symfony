@@ -31,9 +31,6 @@ final class NotTaggedControllerValueResolver implements ArgumentValueResolverInt
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         $controller = $request->attributes->get('_controller');
@@ -55,9 +52,6 @@ final class NotTaggedControllerValueResolver implements ArgumentValueResolverInt
         return false === $this->container->has($controller);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         if (\is_array($controller = $request->attributes->get('_controller'))) {

@@ -18,9 +18,7 @@ namespace Symfony\Component\HttpKernel\ControllerMetadata;
  */
 final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function createArgumentMetadata($controller): array
     {
         $arguments = [];

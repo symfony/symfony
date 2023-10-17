@@ -23,9 +23,7 @@ use Symfony\Component\HttpKernel\Log\Logger;
  */
 class LoggerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function process(ContainerBuilder $container)
     {
         $container->setAlias(LoggerInterface::class, 'logger')

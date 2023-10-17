@@ -23,9 +23,7 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class IcuResFileLoader implements LoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function load($resource, string $locale, string $domain = 'messages')
     {
         if (!stream_is_local($resource)) {

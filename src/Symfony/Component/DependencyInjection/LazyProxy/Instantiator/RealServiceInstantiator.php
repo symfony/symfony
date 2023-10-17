@@ -23,9 +23,7 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class RealServiceInstantiator implements InstantiatorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator)
     {
         return $realInstantiator();

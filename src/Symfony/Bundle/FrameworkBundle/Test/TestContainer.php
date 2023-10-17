@@ -37,33 +37,22 @@ class TestContainer extends Container
         $this->privateServicesLocatorId = $privateServicesLocatorId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compile()
     {
         $this->getPublicContainer()->compile();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCompiled(): bool
     {
         return $this->getPublicContainer()->isCompiled();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterBag(): ParameterBagInterface
     {
         return $this->getPublicContainer()->getParameterBag();
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array|bool|float|int|string|\UnitEnum|null
      */
     public function getParameter(string $name)
@@ -71,73 +60,46 @@ class TestContainer extends Container
         return $this->getPublicContainer()->getParameter($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameter(string $name): bool
     {
         return $this->getPublicContainer()->hasParameter($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParameter(string $name, $value)
     {
         $this->getPublicContainer()->setParameter($name, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(string $id, $service)
     {
         $this->getPublicContainer()->set($id, $service);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $id): bool
     {
         return $this->getPublicContainer()->has($id) || $this->getPrivateContainer()->has($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $id, int $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1): ?object
     {
         return $this->getPrivateContainer()->has($id) ? $this->getPrivateContainer()->get($id) : $this->getPublicContainer()->get($id, $invalidBehavior);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function initialized(string $id): bool
     {
         return $this->getPublicContainer()->initialized($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         // ignore the call
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceIds(): array
     {
         return $this->getPublicContainer()->getServiceIds();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRemovedIds(): array
     {
         return $this->getPublicContainer()->getRemovedIds();

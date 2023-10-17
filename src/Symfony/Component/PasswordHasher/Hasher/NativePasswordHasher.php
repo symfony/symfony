@@ -110,9 +110,6 @@ final class NativePasswordHasher implements PasswordHasherInterface
         return password_verify($plainPassword, $hashedPassword);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function needsRehash(string $hashedPassword): bool
     {
         return password_needs_rehash($hashedPassword, $this->algorithm, $this->options);

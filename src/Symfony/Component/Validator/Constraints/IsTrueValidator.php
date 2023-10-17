@@ -20,9 +20,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class IsTrueValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof IsTrue) {

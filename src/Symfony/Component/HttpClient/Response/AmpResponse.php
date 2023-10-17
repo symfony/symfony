@@ -135,9 +135,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInfo(string $type = null)
     {
         return null !== $type ? $this->info[$type] ?? null : $this->info;
@@ -166,9 +163,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private static function schedule(self $response, array &$runningResponses): void
     {
         if (isset($runningResponses[0])) {
@@ -184,8 +178,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param AmpClientState $multi
      */
     private static function perform(ClientState $multi, array &$responses = null): void
@@ -206,8 +198,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param AmpClientState $multi
      */
     private static function select(ClientState $multi, float $timeout): int

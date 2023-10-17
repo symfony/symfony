@@ -35,17 +35,11 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
         $this->links = $that->links;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLinks(): array
     {
         return array_values($this->links);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLinksByRel($rel): array
     {
         $links = [];
@@ -60,8 +54,6 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return static
      */
     public function withLink(LinkInterface $link)
@@ -73,8 +65,6 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return static
      */
     public function withoutLink(LinkInterface $link)

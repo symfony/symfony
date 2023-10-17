@@ -42,9 +42,6 @@ class ElementNode extends AbstractNode
         return $this->element;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSpecificity(): Specificity
     {
         return new Specificity(0, 0, $this->element ? 1 : 0);

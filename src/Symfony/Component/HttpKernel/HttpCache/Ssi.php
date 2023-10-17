@@ -21,17 +21,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Ssi extends AbstractSurrogate
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getName()
     {
         return 'ssi';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addSurrogateControl(Response $response)
     {
         if (str_contains($response->getContent(), '<!--#include')) {
@@ -39,17 +34,11 @@ class Ssi extends AbstractSurrogate
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function renderIncludeTag(string $uri, string $alt = null, bool $ignoreErrors = true, string $comment = '')
     {
         return sprintf('<!--#include virtual="%s" -->', $uri);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(Request $request, Response $response)
     {
         $type = $response->headers->get('Content-Type');

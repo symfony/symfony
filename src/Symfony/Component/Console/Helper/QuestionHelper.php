@@ -84,9 +84,6 @@ class QuestionHelper extends Helper
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'question';

@@ -30,9 +30,6 @@ class ChainCacheClearer implements CacheClearerInterface
         $this->clearers = $clearers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(string $cacheDir)
     {
         foreach ($this->clearers as $clearer) {

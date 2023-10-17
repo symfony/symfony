@@ -34,9 +34,6 @@ class BasicAuthenticationEntryPoint implements AuthenticationEntryPointInterface
         $this->realmName = $realmName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $response = new Response();

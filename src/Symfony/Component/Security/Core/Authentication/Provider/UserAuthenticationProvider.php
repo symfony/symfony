@@ -52,9 +52,6 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
         $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
@@ -107,9 +104,6 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
         return $authenticatedToken;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(TokenInterface $token)
     {
         return $token instanceof UsernamePasswordToken && $this->providerKey === $token->getFirewallName();

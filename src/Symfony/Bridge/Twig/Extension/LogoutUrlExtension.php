@@ -29,9 +29,6 @@ final class LogoutUrlExtension extends AbstractExtension
         $this->generator = $generator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [

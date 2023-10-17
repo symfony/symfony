@@ -37,65 +37,41 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         return ($this->receiver ?? $this->getReceiver())->get();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         ($this->receiver ?? $this->getReceiver())->ack($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         ($this->receiver ?? $this->getReceiver())->reject($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
         return ($this->receiver ?? $this->getReceiver())->getMessageCount();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all(int $limit = null): iterable
     {
         return ($this->receiver ?? $this->getReceiver())->all($limit);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function find($id): ?Envelope
     {
         return ($this->receiver ?? $this->getReceiver())->find($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
         return ($this->sender ?? $this->getSender())->send($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setup(): void
     {
         $this->connection->setup();

@@ -29,9 +29,6 @@ class HelpCommand extends Command
 {
     private $command;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->ignoreValidationErrors();
@@ -64,9 +61,6 @@ EOF
         $this->command = $command;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (null === $this->command) {

@@ -35,9 +35,6 @@ class DataMapper implements DataMapperInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function mapDataToForms($data, iterable $forms): void
     {
         if (\is_array($forms)) {
@@ -61,9 +58,6 @@ class DataMapper implements DataMapperInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function mapFormsToData(iterable $forms, &$data): void
     {
         if (\is_array($forms)) {

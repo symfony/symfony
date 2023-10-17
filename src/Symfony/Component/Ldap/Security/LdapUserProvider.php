@@ -62,9 +62,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         $this->extraFields = $extraFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadUserByUsername(string $username)
     {
         trigger_deprecation('symfony/ldap', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
@@ -115,9 +112,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         return $this->loadUser($identifier, $entry);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user)
     {
         if (!$user instanceof LdapUser) {
@@ -128,8 +122,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @final
      */
     public function upgradePassword($user, string $newHashedPassword): void
@@ -151,9 +143,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsClass(string $class)
     {
         return LdapUser::class === $class;

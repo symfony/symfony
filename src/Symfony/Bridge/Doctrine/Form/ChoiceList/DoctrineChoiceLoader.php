@@ -49,9 +49,6 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
         $this->objectLoader = $objectLoader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadChoices(): iterable
     {
         return $this->objectLoader

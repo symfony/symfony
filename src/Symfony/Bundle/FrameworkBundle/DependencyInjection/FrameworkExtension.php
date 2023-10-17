@@ -647,9 +647,6 @@ class FrameworkExtension extends Extension
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
         return new Configuration($container->getParameter('kernel.debug'));
@@ -2698,9 +2695,6 @@ class FrameworkExtension extends Extension
         return $trustedHeaders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getXsdValidationBasePath()
     {
         return \dirname(__DIR__).'/Resources/config/schema';

@@ -55,9 +55,6 @@ class DoctrineDataCollector extends DataCollector
         $this->loggers[$name] = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data = [
@@ -134,17 +131,11 @@ class DoctrineDataCollector extends DataCollector
         return $time;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'db';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCasters()
     {
         return parent::getCasters() + [

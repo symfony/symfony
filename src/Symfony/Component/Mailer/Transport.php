@@ -58,11 +58,6 @@ class Transport
 
     private $factories;
 
-    /**
-     * @param EventDispatcherInterface|null $dispatcher
-     * @param HttpClientInterface|null      $client
-     * @param LoggerInterface|null          $logger
-     */
     public static function fromDsn(string $dsn/* , EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null */): TransportInterface
     {
         $dispatcher = 2 <= \func_num_args() ? func_get_arg(1) : null;
@@ -74,11 +69,6 @@ class Transport
         return $factory->fromString($dsn);
     }
 
-    /**
-     * @param EventDispatcherInterface|null $dispatcher
-     * @param HttpClientInterface|null      $client
-     * @param LoggerInterface|null          $logger
-     */
     public static function fromDsns(array $dsns/* , EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null */): TransportInterface
     {
         $dispatcher = 2 <= \func_num_args() ? func_get_arg(1) : null;
@@ -177,10 +167,6 @@ class Transport
     }
 
     /**
-     * @param EventDispatcherInterface|null $dispatcher
-     * @param HttpClientInterface|null      $client
-     * @param LoggerInterface|null          $logger
-     *
      * @return \Traversable<int, TransportFactoryInterface>
      */
     public static function getDefaultFactories(/* EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null */): iterable

@@ -40,17 +40,11 @@ abstract class AbstractToken implements TokenInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoleNames(): array
     {
         return $this->roleNames;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUsername(/* $legacy = true */)
     {
         if (1 === \func_num_args() && false === func_get_arg(0)) {
@@ -66,9 +60,6 @@ abstract class AbstractToken implements TokenInterface
         return (string) $this->user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUserIdentifier(): string
     {
         // method returns "null" in non-legacy mode if not overridden
@@ -85,17 +76,11 @@ abstract class AbstractToken implements TokenInterface
         return (string) $this->user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUser()
     {
         return $this->user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUser($user)
     {
         if (!($user instanceof UserInterface || (\is_object($user) && method_exists($user, '__toString')) || \is_string($user))) {
@@ -134,8 +119,6 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since Symfony 5.4
      */
     public function isAuthenticated()
@@ -147,9 +130,6 @@ abstract class AbstractToken implements TokenInterface
         return $this->authenticated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAuthenticated(bool $authenticated)
     {
         if (2 > \func_num_args() || func_get_arg(1)) {
@@ -159,9 +139,6 @@ abstract class AbstractToken implements TokenInterface
         $this->authenticated = $authenticated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials()
     {
         if ($this->getUser() instanceof UserInterface) {
@@ -210,33 +187,21 @@ abstract class AbstractToken implements TokenInterface
         [$this->user, $this->authenticated, , $this->attributes, $this->roleNames] = $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAttributes()
     {
         return $this->attributes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAttributes(array $attributes)
     {
         $this->attributes = $attributes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasAttribute(string $name)
     {
         return \array_key_exists($name, $this->attributes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAttribute(string $name)
     {
         if (!\array_key_exists($name, $this->attributes)) {
@@ -246,17 +211,11 @@ abstract class AbstractToken implements TokenInterface
         return $this->attributes[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAttribute(string $name, $value)
     {
         $this->attributes[$name] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString()
     {
         $class = static::class;

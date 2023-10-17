@@ -19,17 +19,12 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class NotEqualToValidator extends AbstractComparisonValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     protected function compareValues($value1, $value2)
     {
         return $value1 != $value2;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getErrorCode()
     {
         return NotEqualTo::IS_EQUAL_ERROR;

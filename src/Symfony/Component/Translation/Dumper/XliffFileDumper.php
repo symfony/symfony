@@ -21,9 +21,7 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class XliffFileDumper extends FileDumper
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function formatCatalogue(MessageCatalogue $messages, string $domain, array $options = [])
     {
         $xliffVersion = '1.2';
@@ -47,9 +45,6 @@ class XliffFileDumper extends FileDumper
         throw new InvalidArgumentException(sprintf('No support implemented for dumping XLIFF version "%s".', $xliffVersion));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtension()
     {
         return 'xlf';

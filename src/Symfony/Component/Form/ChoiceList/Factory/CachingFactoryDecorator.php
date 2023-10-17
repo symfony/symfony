@@ -82,10 +82,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed $value
-     * @param mixed $filter
      */
     public function createListFromChoices(iterable $choices, $value = null/* , $filter = null */)
     {
@@ -123,10 +120,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed $value
-     * @param mixed $filter
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null/* , $filter = null */)
     {
@@ -166,14 +160,11 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed $preferredChoices
      * @param mixed $label
      * @param mixed $index
      * @param mixed $groupBy
      * @param mixed $attr
-     * @param mixed $labelTranslationParameters
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/* , $labelTranslationParameters = [] */)
     {

@@ -47,8 +47,6 @@ class Length extends Constraint
     public $allowEmptyString = false;
 
     /**
-     * {@inheritdoc}
-     *
      * @param int|array|null $exactly The expected exact length or a set of options
      */
     public function __construct(

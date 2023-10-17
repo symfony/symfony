@@ -36,17 +36,11 @@ class ProxyDumper implements DumperInterface
         $this->classGenerator = new BaseGeneratorStrategy();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isProxyCandidate(Definition $definition): bool
     {
         return ($definition->isLazy() || $definition->hasTag('proxy')) && $this->proxyGenerator->getProxifiedClass($definition);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProxyFactoryCode(Definition $definition, string $id, string $factoryCode): string
     {
         $instantiation = 'return';
@@ -74,9 +68,6 @@ class ProxyDumper implements DumperInterface
 EOF;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProxyCode(Definition $definition): string
     {
         $code = $this->classGenerator->generate($this->generateProxyClass($definition));

@@ -433,8 +433,6 @@ class PhpStanOmittedParamTagTypeDocBlock
 {
     /**
      * The type is omitted here to ensure that the extractor doesn't choke on missing types.
-     *
-     * @param $omittedTagType
      */
     public function setOmittedType(array $omittedTagType)
     {

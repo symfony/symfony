@@ -44,9 +44,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         $this->tokenProvider = $tokenProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function cancelCookie(Request $request)
     {
         // Delete cookie on the client
@@ -61,9 +58,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processAutoLoginCookie(array $cookieParts, Request $request)
     {
         if (2 !== \count($cookieParts)) {
@@ -117,9 +111,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
         $series = base64_encode(random_bytes(64));

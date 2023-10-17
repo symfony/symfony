@@ -60,9 +60,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode($data, string $format, array $context = [])
     {
         $handle = fopen('php://temp,', 'w+');
@@ -126,17 +123,11 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsEncoding(string $format)
     {
         return self::FORMAT === $format;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decode(string $data, string $format, array $context = [])
     {
         $handle = fopen('php://temp', 'r+');
@@ -212,9 +203,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         return $result[0];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDecoding(string $format)
     {
         return self::FORMAT === $format;

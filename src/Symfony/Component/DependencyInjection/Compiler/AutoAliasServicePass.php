@@ -22,9 +22,6 @@ class AutoAliasServicePass implements CompilerPassInterface
 {
     private $privateAliases = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         foreach ($container->findTaggedServiceIds('auto_alias') as $serviceId => $tags) {

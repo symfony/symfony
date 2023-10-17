@@ -36,9 +36,6 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     private $expressionLanguage;
     private $inExpression = false;
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;

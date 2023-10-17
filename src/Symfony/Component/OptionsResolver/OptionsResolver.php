@@ -431,10 +431,6 @@ class OptionsResolver implements Options
      * passed to the closure is the value of the option after validating it
      * and before normalizing it.
      *
-     * @param string          $package The name of the composer package that is triggering the deprecation
-     * @param string          $version The version of the package that introduced the deprecation
-     * @param string|\Closure $message The deprecation message to use
-     *
      * @return $this
      */
     public function setDeprecated(string $option/* , string $package, string $version, $message = 'The option "%name%" is deprecated.' */): self

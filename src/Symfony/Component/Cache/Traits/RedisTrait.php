@@ -387,9 +387,6 @@ trait RedisTrait
         return $redis;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids)
     {
         if (!$ids) {
@@ -423,17 +420,11 @@ trait RedisTrait
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id)
     {
         return (bool) $this->redis->exists($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace)
     {
         if ($this->redis instanceof \Predis\ClientInterface) {
@@ -495,9 +486,6 @@ trait RedisTrait
         return $cleared;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids)
     {
         if (!$ids) {
@@ -532,9 +520,6 @@ trait RedisTrait
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime)
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {

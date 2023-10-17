@@ -54,9 +54,6 @@ class RedisStore implements SharedLockStoreInterface
         $this->initialTtl = $initialTtl;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         $script = '
@@ -102,9 +99,6 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveRead(Key $key)
     {
         $script = '
@@ -145,9 +139,6 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         $script = '
@@ -188,9 +179,6 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         $script = '
@@ -221,9 +209,6 @@ class RedisStore implements SharedLockStoreInterface
         $this->evaluate($script, (string) $key, [$this->getUniqueToken($key)]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key)
     {
         $script = '

@@ -58,17 +58,11 @@ class BundleEntryReader implements BundleEntryReaderInterface
         $this->localeAliases = $localeAliases;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function read(string $path, string $locale)
     {
         return $this->reader->read($path, $locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function readEntry(string $path, string $locale, array $indices, bool $fallback = true)
     {
         $entry = null;

@@ -42,17 +42,11 @@ class PdoStoreTest extends AbstractStoreTestCase
         @unlink(self::$dbFile);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClockDelay()
     {
         return 1000000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new PdoStore('sqlite:'.self::$dbFile);

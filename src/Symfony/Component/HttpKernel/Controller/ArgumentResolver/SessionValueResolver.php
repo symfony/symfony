@@ -23,9 +23,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 final class SessionValueResolver implements ArgumentValueResolverInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         if (!$request->hasSession()) {
@@ -40,9 +38,6 @@ final class SessionValueResolver implements ArgumentValueResolverInterface
         return $request->getSession() instanceof $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield $request->getSession();

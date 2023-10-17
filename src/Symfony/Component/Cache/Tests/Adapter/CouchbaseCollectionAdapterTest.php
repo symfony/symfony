@@ -44,9 +44,6 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         if (!CouchbaseCollectionAdapter::isSupported()) {

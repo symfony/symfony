@@ -37,8 +37,6 @@ class Expression extends Constraint
     public $values = [];
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|ExpressionObject|array $expression The expression to evaluate or an array of options
      */
     public function __construct(
@@ -67,33 +65,21 @@ class Expression extends Constraint
         $this->values = $values ?? $this->values;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption()
     {
         return 'expression';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredOptions()
     {
         return ['expression'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTargets()
     {
         return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validatedBy()
     {
         return 'validator.expression';

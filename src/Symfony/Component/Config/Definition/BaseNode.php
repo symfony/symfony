@@ -197,11 +197,6 @@ abstract class BaseNode implements NodeInterface
      * Sets this node as deprecated.
      *
      * @param string $package The name of the composer package that is triggering the deprecation
-     * @param string $version The version of the package that introduced the deprecation
-     * @param string $message the deprecation message to use
-     *
-     * You can use %node% and %path% placeholders in your message to display,
-     * respectively, the node name and its complete path
      */
     public function setDeprecated(?string $package/* , string $version, string $message = 'The child node "%node%" at path "%path%" is deprecated.' */)
     {
@@ -261,9 +256,6 @@ abstract class BaseNode implements NodeInterface
         $this->finalValidationClosures = $closures;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRequired()
     {
         return $this->required;
@@ -309,17 +301,11 @@ abstract class BaseNode implements NodeInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath()
     {
         if (null !== $this->parent) {
@@ -329,9 +315,6 @@ abstract class BaseNode implements NodeInterface
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     final public function merge($leftSide, $rightSide)
     {
         if (!$this->allowOverwrite) {
@@ -370,9 +353,6 @@ abstract class BaseNode implements NodeInterface
         return $this->mergeValues($leftSide, $rightSide);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     final public function normalize($value)
     {
         $value = $this->preNormalize($value);
@@ -432,9 +412,6 @@ abstract class BaseNode implements NodeInterface
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     final public function finalize($value)
     {
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {

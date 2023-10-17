@@ -23,9 +23,6 @@ final class EmailHasHeader extends Constraint
         $this->headerName = $headerName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('has header "%s"', $this->headerName);
@@ -33,8 +30,6 @@ final class EmailHasHeader extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function matches($message): bool
     {
@@ -47,8 +42,6 @@ final class EmailHasHeader extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($message): string
     {

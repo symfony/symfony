@@ -80,9 +80,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         return new static($file, $fallbackPool);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         if (null === $this->values) {
@@ -113,9 +110,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem($key)
     {
         if (!\is_string($key)) {
@@ -145,9 +139,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         return (self::$createCacheItem)($key, $value, $isHit);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItems(array $keys = [])
     {
         foreach ($keys as $key) {
@@ -163,8 +154,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function hasItem($key)
@@ -180,8 +169,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function deleteItem($key)
@@ -197,8 +184,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function deleteItems(array $keys)
@@ -229,8 +214,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function save(CacheItemInterface $item)
@@ -243,8 +226,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function saveDeferred(CacheItemInterface $item)
@@ -257,8 +238,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function commit()
@@ -267,8 +246,6 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function clear(string $prefix = '')

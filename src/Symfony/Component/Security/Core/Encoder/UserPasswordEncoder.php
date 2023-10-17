@@ -34,9 +34,6 @@ class UserPasswordEncoder implements UserPasswordEncoderInterface
         $this->encoderFactory = $encoderFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encodePassword(UserInterface $user, string $plainPassword)
     {
         $encoder = $this->encoderFactory->getEncoder($user);
@@ -53,9 +50,6 @@ class UserPasswordEncoder implements UserPasswordEncoderInterface
         return $encoder->encodePassword($plainPassword, $user->getSalt());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isPasswordValid(UserInterface $user, string $raw)
     {
         if (null === $user->getPassword()) {
@@ -67,9 +61,6 @@ class UserPasswordEncoder implements UserPasswordEncoderInterface
         return $encoder->isPasswordValid($user->getPassword(), $raw, $user->getSalt());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function needsRehash(UserInterface $user): bool
     {
         if (null === $user->getPassword()) {

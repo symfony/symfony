@@ -80,9 +80,6 @@ class ChoiceType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $unknownValues = [];
@@ -234,9 +231,6 @@ class ChoiceType extends AbstractType
         }, 256);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $choiceTranslationDomain = $options['choice_translation_domain'];
@@ -293,9 +287,6 @@ class ChoiceType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['expanded']) {
@@ -313,9 +304,6 @@ class ChoiceType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $emptyData = function (Options $options) {
@@ -411,9 +399,6 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'choice';

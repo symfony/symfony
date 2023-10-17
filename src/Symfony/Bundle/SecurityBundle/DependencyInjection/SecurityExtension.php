@@ -1127,9 +1127,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $this->userProviderFactories[] = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getXsdValidationBasePath()
     {
         return __DIR__.'/../Resources/config/schema';

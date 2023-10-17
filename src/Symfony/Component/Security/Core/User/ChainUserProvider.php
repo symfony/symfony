@@ -46,9 +46,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         return $this->providers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadUserByUsername(string $username)
     {
         trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
@@ -78,9 +75,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         throw $ex;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user)
     {
         $supportedUserFound = false;
@@ -111,9 +105,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsClass(string $class)
     {
         foreach ($this->providers as $provider) {
@@ -127,8 +118,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
 
     /**
      * @param PasswordAuthenticatedUserInterface $user
-     *
-     * {@inheritdoc}
      */
     public function upgradePassword($user, string $newHashedPassword): void
     {

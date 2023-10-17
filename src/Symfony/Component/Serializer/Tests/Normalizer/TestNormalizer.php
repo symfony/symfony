@@ -20,17 +20,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class TestNormalizer implements NormalizerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function normalize($object, string $format = null, array $context = [])
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null): bool
     {
         return true;

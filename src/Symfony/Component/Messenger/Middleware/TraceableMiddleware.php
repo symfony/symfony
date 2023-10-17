@@ -32,9 +32,6 @@ class TraceableMiddleware implements MiddlewareInterface
         $this->eventCategory = $eventCategory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $stack = new TraceableStack($stack, $this->stopwatch, $this->busName, $this->eventCategory);
@@ -66,9 +63,6 @@ class TraceableStack implements StackInterface
         $this->eventCategory = $eventCategory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function next(): MiddlewareInterface
     {
         if (null !== $this->currentEvent && $this->stopwatch->isStarted($this->currentEvent)) {

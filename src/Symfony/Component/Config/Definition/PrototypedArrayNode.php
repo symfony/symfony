@@ -91,9 +91,6 @@ class PrototypedArrayNode extends ArrayNode
         $this->defaultValue = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasDefaultValue()
     {
         return true;
@@ -162,9 +159,6 @@ class PrototypedArrayNode extends ArrayNode
         throw new Exception('A prototyped array node cannot have concrete children.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function finalizeValue($value)
     {
         if (false === $value) {
@@ -191,8 +185,6 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws DuplicateKeyException
      */
     protected function normalizeValue($value)
@@ -259,9 +251,6 @@ class PrototypedArrayNode extends ArrayNode
         return $normalized;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function mergeValues($leftSide, $rightSide)
     {
         if (false === $rightSide) {

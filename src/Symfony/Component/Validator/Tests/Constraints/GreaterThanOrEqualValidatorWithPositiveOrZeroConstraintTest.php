@@ -26,9 +26,6 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
         return new PositiveOrZero();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -42,9 +39,6 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [

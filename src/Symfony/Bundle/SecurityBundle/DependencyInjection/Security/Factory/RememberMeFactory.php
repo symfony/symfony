@@ -186,9 +186,6 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         return 'remember_me';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getPriority(): int
     {
         return self::PRIORITY;
@@ -349,9 +346,6 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         return new Reference($tokenVerifierId, ContainerInterface::NULL_ON_INVALID_REFERENCE);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepend(ContainerBuilder $container)
     {
         $rememberMeSecureDefault = false;

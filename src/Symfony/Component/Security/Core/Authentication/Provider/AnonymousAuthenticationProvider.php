@@ -43,9 +43,6 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
         $this->secret = $secret;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
@@ -59,9 +56,6 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
         return $token;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(TokenInterface $token)
     {
         return $token instanceof AnonymousToken;

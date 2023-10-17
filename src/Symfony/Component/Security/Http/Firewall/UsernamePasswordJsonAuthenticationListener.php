@@ -94,9 +94,6 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function authenticate(RequestEvent $event)
     {
         $request = $event->getRequest();

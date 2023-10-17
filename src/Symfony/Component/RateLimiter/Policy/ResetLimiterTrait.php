@@ -28,9 +28,6 @@ trait ResetLimiterTrait
 
     private $id;
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset(): void
     {
         try {

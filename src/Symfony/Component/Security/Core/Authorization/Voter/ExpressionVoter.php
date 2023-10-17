@@ -49,9 +49,6 @@ class ExpressionVoter implements CacheableVoterInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
         $result = VoterInterface::ACCESS_ABSTAIN;

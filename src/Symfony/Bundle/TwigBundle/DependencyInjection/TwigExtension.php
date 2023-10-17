@@ -193,9 +193,6 @@ class TwigExtension extends Extension
         return $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getXsdValidationBasePath()
     {
         return __DIR__.'/../Resources/config/schema';

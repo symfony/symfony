@@ -38,9 +38,6 @@ final class PropertyInfoConstructorPass implements CompilerPassInterface
         $this->tag = $tag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->service)) {

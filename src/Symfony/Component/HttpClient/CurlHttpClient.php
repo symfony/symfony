@@ -86,8 +86,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     /**
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
-     *
-     * {@inheritdoc}
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
@@ -313,9 +311,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host), CurlClientState::$curlVersion['version_number']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof CurlResponse) {

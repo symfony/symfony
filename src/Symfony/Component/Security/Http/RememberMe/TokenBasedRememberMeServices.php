@@ -30,9 +30,7 @@ trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecate
  */
 class TokenBasedRememberMeServices extends AbstractRememberMeServices
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     protected function processAutoLoginCookie(array $cookieParts, Request $request)
     {
         if (4 !== \count($cookieParts)) {
@@ -76,9 +74,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
         $user = $token->getUser();

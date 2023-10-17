@@ -48,8 +48,6 @@ class Bic extends Constraint
     public $ibanPropertyPath;
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|PropertyPathInterface|null $ibanPropertyPath
      */
     public function __construct(array $options = null, string $message = null, string $iban = null, $ibanPropertyPath = null, string $ibanMessage = null, array $groups = null, $payload = null)

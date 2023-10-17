@@ -95,57 +95,36 @@ class ConstraintViolation implements ConstraintViolationInterface
         return $class.$propertyPath.":\n    ".$this->getMessage().$code;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageTemplate()
     {
         return (string) $this->messageTemplate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameters()
     {
         return $this->parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPlural()
     {
         return $this->plural;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessage()
     {
         return $this->message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoot()
     {
         return $this->root;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPropertyPath()
     {
         return (string) $this->propertyPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvalidValue()
     {
         return $this->invalidValue;
@@ -171,9 +150,6 @@ class ConstraintViolation implements ConstraintViolationInterface
         return $this->cause;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCode()
     {
         return $this->code;

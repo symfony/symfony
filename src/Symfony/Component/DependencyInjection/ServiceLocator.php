@@ -34,8 +34,6 @@ class ServiceLocator implements ServiceProviderInterface
     private $container;
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     public function get(string $id)

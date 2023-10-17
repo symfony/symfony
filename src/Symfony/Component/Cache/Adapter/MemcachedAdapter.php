@@ -231,9 +231,6 @@ class MemcachedAdapter extends AbstractAdapter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime)
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {
@@ -252,9 +249,6 @@ class MemcachedAdapter extends AbstractAdapter
         return $this->checkResultCode($this->getClient()->setMulti($encodedValues, $lifetime)) ? $failed : false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids)
     {
         try {
@@ -273,17 +267,11 @@ class MemcachedAdapter extends AbstractAdapter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id)
     {
         return false !== $this->getClient()->get(self::encodeKey($id)) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids)
     {
         $ok = true;
@@ -297,9 +285,6 @@ class MemcachedAdapter extends AbstractAdapter
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace)
     {
         return '' === $namespace && $this->getClient()->flush();

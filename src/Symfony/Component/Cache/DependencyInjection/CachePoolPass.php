@@ -56,9 +56,6 @@ class CachePoolPass implements CompilerPassInterface
         $this->messageHandlerId = $messageHandlerId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if ($container->hasParameter('cache.prefix.seed')) {

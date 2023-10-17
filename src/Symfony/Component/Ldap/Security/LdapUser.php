@@ -47,33 +47,21 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->entry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles(): array
     {
         return $this->roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt(): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUsername(): string
     {
         trigger_deprecation('symfony/ldap', '5.3', 'Method "%s()" is deprecated and will be removed in 6.0, use getUserIdentifier() instead.', __METHOD__);
@@ -86,9 +74,6 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->username;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials()
     {
         $this->password = null;
@@ -104,9 +89,6 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         $this->password = $password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEqualTo(UserInterface $user): bool
     {
         if (!$user instanceof self) {

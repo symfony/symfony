@@ -133,41 +133,26 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getLoginUrl(): string
     {
         return $this->loginUrl;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultSuccessRedirectUrl()
     {
         return $this->defaultSuccessRedirectUrl;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCredentials(Request $request)
     {
         return 'credentials';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
     {
         return $userProvider->loadUserByUsername($credentials);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkCredentials($credentials, UserInterface $user): bool
     {
         return true;

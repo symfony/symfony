@@ -22,9 +22,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  */
 class YearTransformer extends Transformer
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function format(\DateTime $dateTime, int $length): string
     {
         if (2 === $length) {
@@ -34,17 +32,11 @@ class YearTransformer extends Transformer
         return $this->padLeft($dateTime->format('Y'), $length);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReverseMatchingRegExp(int $length): string
     {
         return 2 === $length ? '\d{2}' : '\d{1,4}';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function extractDateOptions(string $matched, int $length): array
     {
         return [

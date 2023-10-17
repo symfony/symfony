@@ -27,9 +27,6 @@ final class EmailAddressContains extends Constraint
         $this->expectedValue = $expectedValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('contains address "%s" with value "%s"', $this->headerName, $this->expectedValue);
@@ -37,8 +34,6 @@ final class EmailAddressContains extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function matches($message): bool
     {
@@ -64,8 +59,6 @@ final class EmailAddressContains extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($message): string
     {

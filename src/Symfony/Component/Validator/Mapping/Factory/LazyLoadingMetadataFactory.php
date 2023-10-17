@@ -136,9 +136,6 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasMetadataFor($value)
     {
         if (!\is_object($value) && !\is_string($value)) {

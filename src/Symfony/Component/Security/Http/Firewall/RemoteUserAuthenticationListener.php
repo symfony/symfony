@@ -39,9 +39,6 @@ class RemoteUserAuthenticationListener extends AbstractPreAuthenticatedListener
         $this->userKey = $userKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getPreAuthenticatedData(Request $request)
     {
         if (!$request->server->has($this->userKey)) {

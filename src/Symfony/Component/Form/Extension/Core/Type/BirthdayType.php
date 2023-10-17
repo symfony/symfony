@@ -17,9 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BirthdayType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -34,17 +32,11 @@ class BirthdayType extends AbstractType
         $resolver->setAllowedTypes('years', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return DateType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'birthday';

@@ -28,9 +28,6 @@ class DelegatingLoader extends Loader
         $this->resolver = $resolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load($resource, string $type = null)
     {
         if (false === $loader = $this->resolver->resolve($resource, $type)) {
@@ -40,9 +37,6 @@ class DelegatingLoader extends Loader
         return $loader->load($resource, $type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($resource, string $type = null)
     {
         return false !== $this->resolver->resolve($resource, $type);

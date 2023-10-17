@@ -26,9 +26,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class ChoiceValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Choice) {

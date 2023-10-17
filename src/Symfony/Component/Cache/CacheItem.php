@@ -33,17 +33,12 @@ final class CacheItem implements ItemInterface
     protected $poolHash;
     protected $isTaggable = false;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getKey(): string
     {
         return $this->key;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     public function get()
@@ -51,17 +46,12 @@ final class CacheItem implements ItemInterface
         return $this->value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isHit(): bool
     {
         return $this->isHit;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return $this
      */
     public function set($value): self
@@ -72,8 +62,6 @@ final class CacheItem implements ItemInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return $this
      */
     public function expiresAt($expiration): self
@@ -90,8 +78,6 @@ final class CacheItem implements ItemInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return $this
      */
     public function expiresAfter($time): self
@@ -109,9 +95,6 @@ final class CacheItem implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function tag($tags): ItemInterface
     {
         if (!$this->isTaggable) {
@@ -140,9 +123,6 @@ final class CacheItem implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadata(): array
     {
         return $this->metadata;

@@ -36,8 +36,6 @@ class DateTime extends Constraint
     public $message = 'This value is not a valid datetime.';
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|array|null $format
      */
     public function __construct($format = null, string $message = null, array $groups = null, $payload = null, array $options = [])

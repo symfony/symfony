@@ -163,9 +163,6 @@ class IbanValidator extends ConstraintValidator
         'YT' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Iban) {

@@ -58,10 +58,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed $value
-     * @param mixed $filter
      *
      * @return ChoiceListInterface
      */
@@ -99,10 +96,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed $value
-     * @param mixed $filter
      *
      * @return ChoiceListInterface
      */
@@ -140,14 +134,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed $preferredChoices
      * @param mixed $label
      * @param mixed $index
      * @param mixed $groupBy
      * @param mixed $attr
-     * @param mixed $labelTranslationParameters
      *
      * @return ChoiceListView
      */

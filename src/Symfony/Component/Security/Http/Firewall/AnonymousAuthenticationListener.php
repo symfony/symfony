@@ -47,9 +47,6 @@ class AnonymousAuthenticationListener extends AbstractListener
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         return null; // always run authenticate() lazily with lazy firewalls

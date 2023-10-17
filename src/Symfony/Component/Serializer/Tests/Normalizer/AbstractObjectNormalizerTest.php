@@ -640,8 +640,6 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
     private $serializer;
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NotNormalizableValueException
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
@@ -656,18 +654,12 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return str_ends_with($type, '[]')
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setSerializer(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;

@@ -25,9 +25,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class CheckboxListMapper implements DataMapperInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function mapDataToForms($choices, iterable $checkboxes)
     {
         if (\is_array($checkboxes)) {
@@ -48,9 +46,6 @@ class CheckboxListMapper implements DataMapperInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function mapFormsToData(iterable $checkboxes, &$choices)
     {
         if (\is_array($checkboxes)) {

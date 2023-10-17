@@ -59,9 +59,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         $this->constraint = $constraint;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function atPath(string $path)
     {
         $this->propertyPath = PropertyPath::append($this->propertyPath, $path);
@@ -69,9 +66,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParameter(string $key, string $value)
     {
         $this->parameters[$key] = $value;
@@ -79,9 +73,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
@@ -89,9 +80,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setTranslationDomain(string $translationDomain)
     {
         $this->translationDomain = $translationDomain;
@@ -99,9 +87,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setInvalidValue($invalidValue)
     {
         $this->invalidValue = $invalidValue;
@@ -109,9 +94,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPlural(int $number)
     {
         $this->plural = $number;
@@ -119,9 +101,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setCode(?string $code)
     {
         $this->code = $code;
@@ -129,9 +108,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setCause($cause)
     {
         $this->cause = $cause;
@@ -139,9 +115,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addViolation()
     {
         if (null === $this->plural) {

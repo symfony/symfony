@@ -37,9 +37,6 @@ class PropertyPathMapper implements DataMapperInterface
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function mapDataToForms($data, iterable $forms)
     {
         $empty = null === $data || [] === $data;
@@ -60,9 +57,6 @@ class PropertyPathMapper implements DataMapperInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function mapFormsToData(iterable $forms, &$data)
     {
         if (null === $data) {

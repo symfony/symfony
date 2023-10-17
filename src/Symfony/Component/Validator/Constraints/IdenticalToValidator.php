@@ -19,17 +19,12 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class IdenticalToValidator extends AbstractComparisonValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     protected function compareValues($value1, $value2)
     {
         return $value1 === $value2;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getErrorCode()
     {
         return IdenticalTo::NOT_IDENTICAL_ERROR;

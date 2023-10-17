@@ -65,9 +65,6 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
         return $record;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLogs(Request $request = null)
     {
         if (null !== $request) {
@@ -81,9 +78,6 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
         return array_merge(...array_values($this->records));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function countErrors(Request $request = null)
     {
         if (null !== $request) {
@@ -93,18 +87,12 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
         return array_sum($this->errorCount);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear()
     {
         $this->records = [];
         $this->errorCount = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->clear();

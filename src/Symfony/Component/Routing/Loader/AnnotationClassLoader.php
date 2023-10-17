@@ -236,24 +236,15 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($resource, string $type = null)
     {
         return \is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || 'annotation' === $type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setResolver(LoaderResolverInterface $resolver)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResolver()
     {
     }

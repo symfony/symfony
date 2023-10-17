@@ -39,9 +39,6 @@ class ContainerDebugCommand extends Command
     protected static $defaultName = 'debug:container';
     protected static $defaultDescription = 'Display current services for an application';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -116,9 +113,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

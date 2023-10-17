@@ -38,25 +38,16 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {
     private static $setterAccessibleCache = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null)
     {
         return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
         return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;
@@ -91,9 +82,6 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractAttributes(object $object, string $format = null, array $context = [])
     {
         $reflectionObject = new \ReflectionObject($object);
@@ -115,9 +103,6 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return $attributes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
     {
         $ucfirsted = ucfirst($attribute);
@@ -140,9 +125,6 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
     {
         $setter = 'set'.ucfirst($attribute);

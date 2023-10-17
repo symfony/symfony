@@ -32,17 +32,11 @@ class CombinedStoreTest extends AbstractStoreTestCase
     use ExpiringStoreTestTrait;
     use SharedLockStoreTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClockDelay()
     {
         return 250000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379]));

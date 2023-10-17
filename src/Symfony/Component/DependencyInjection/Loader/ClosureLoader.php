@@ -31,17 +31,11 @@ class ClosureLoader extends Loader
         parent::__construct($env);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load($resource, string $type = null)
     {
         return $resource($this->container, $this->env);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($resource, string $type = null)
     {
         return $resource instanceof \Closure;

@@ -30,9 +30,6 @@ class ExpressionLanguageSyntaxValidator extends ConstraintValidator
         $this->expressionLanguage = $expressionLanguage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate($expression, Constraint $constraint): void
     {
         if (!$constraint instanceof ExpressionLanguageSyntax) {

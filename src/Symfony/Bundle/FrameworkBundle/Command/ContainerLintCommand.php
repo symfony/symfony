@@ -37,9 +37,6 @@ final class ContainerLintCommand extends Command
      */
     private $containerBuilder;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -48,9 +45,6 @@ final class ContainerLintCommand extends Command
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

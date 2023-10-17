@@ -611,7 +611,6 @@ class Filesystem
      *
      * @param string $prefix The prefix of the generated temporary filename
      *                       Note: Windows uses only the first three characters of prefix
-     * @param string $suffix The suffix of the generated temporary filename
      *
      * @return string The new temporary filename (with path), or throw an exception on failure
      */
@@ -702,7 +701,6 @@ class Filesystem
      * Appends content to an existing file.
      *
      * @param string|resource $content The content to append
-     * @param bool            $lock    Whether the file should be locked when writing to it
      *
      * @throws IOException If the file is not writable
      */

@@ -26,8 +26,6 @@ namespace Symfony\Component\Form\Util;
 class InheritDataAwareIterator extends \IteratorIterator implements \RecursiveIterator
 {
     /**
-     * {@inheritdoc}
-     *
      * @return static
      */
     #[\ReturnTypeWillChange]

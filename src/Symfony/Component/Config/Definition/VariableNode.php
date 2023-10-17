@@ -33,17 +33,11 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
         $this->defaultValue = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasDefaultValue()
     {
         return $this->defaultValueSet;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultValue()
     {
         $v = $this->defaultValue;
@@ -61,24 +55,15 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
         $this->allowEmptyValue = $boolean;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function validateType($value)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function finalizeValue($value)
     {
         // deny environment variables only when using custom validators
@@ -106,17 +91,11 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function normalizeValue($value)
     {
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function mergeValues($leftSide, $rightSide)
     {
         return $rightSide;

@@ -54,9 +54,6 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
         $this->userProvider = $userProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
     {
         $currentUser = $token->getUser();
@@ -109,9 +106,6 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function retrieveUser(string $userIdentifier, UsernamePasswordToken $token)
     {
         $user = $token->getUser();

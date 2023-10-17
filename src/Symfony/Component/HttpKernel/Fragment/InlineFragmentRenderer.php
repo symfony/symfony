@@ -135,9 +135,6 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         return $subRequest;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'inline';

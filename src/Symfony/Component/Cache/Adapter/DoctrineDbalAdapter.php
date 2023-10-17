@@ -127,9 +127,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureSchema(Schema $schema, Connection $forConnection): void
     {
         // only update the schema for this connection
@@ -144,9 +141,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $this->addTableToSchema($schema);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prune(): bool
     {
         $deleteSql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= ?";
@@ -167,9 +161,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids): iterable
     {
         $now = time();
@@ -204,9 +195,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id): bool
     {
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = ? AND ($this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ?)";
@@ -221,9 +209,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         return (bool) $result->fetchOne();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace): bool
     {
         if ('' === $namespace) {
@@ -244,9 +229,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids): bool
     {
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN (?)";
@@ -258,9 +240,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime)
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {

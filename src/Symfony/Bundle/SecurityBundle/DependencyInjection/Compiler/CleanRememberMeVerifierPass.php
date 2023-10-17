@@ -21,9 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class CleanRememberMeVerifierPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('cache.system')) {

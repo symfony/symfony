@@ -35,8 +35,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameters.
      *
-     * @param string|null $key The name of the parameter to return or null to get them all
-     *
      * @return array
      */
     public function all(/* string $key = null */)

@@ -63,9 +63,6 @@ class MetadataBag implements SessionBagInterface
         $this->updateThreshold = $updateThreshold;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function initialize(array &$array)
     {
         $this->meta = &$array;
@@ -105,9 +102,6 @@ class MetadataBag implements SessionBagInterface
         $this->stampCreated($lifetime);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStorageKey()
     {
         return $this->storageKey;
@@ -133,18 +127,12 @@ class MetadataBag implements SessionBagInterface
         return $this->lastUsed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear()
     {
         // nothing to do
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->name;

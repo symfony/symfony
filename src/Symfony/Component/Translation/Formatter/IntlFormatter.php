@@ -23,9 +23,6 @@ class IntlFormatter implements IntlFormatterInterface
     private $hasMessageFormatter;
     private $cache = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function formatIntl(string $message, string $locale, array $parameters = []): string
     {
         // MessageFormatter constructor throws an exception if the message is empty

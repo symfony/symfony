@@ -35,9 +35,6 @@ final class FragmentUriGenerator implements FragmentUriGeneratorInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function generate(ControllerReference $controller, Request $request = null, bool $absolute = false, bool $strict = true, bool $sign = true): string
     {
         if (null === $request && (null === $this->requestStack || null === $request = $this->requestStack->getCurrentRequest())) {

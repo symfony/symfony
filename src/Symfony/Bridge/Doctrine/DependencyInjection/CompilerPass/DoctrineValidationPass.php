@@ -28,9 +28,6 @@ class DoctrineValidationPass implements CompilerPassInterface
         $this->managerType = $managerType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $this->updateValidatorMappingFiles($container, 'xml', 'xml');

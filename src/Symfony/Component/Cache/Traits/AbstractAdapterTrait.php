@@ -94,8 +94,6 @@ trait AbstractAdapterTrait
     abstract protected function doSave(array $values, int $lifetime);
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function hasItem($key)
@@ -116,8 +114,6 @@ trait AbstractAdapterTrait
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function clear(string $prefix = '')
@@ -157,8 +153,6 @@ trait AbstractAdapterTrait
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function deleteItem($key)
@@ -167,8 +161,6 @@ trait AbstractAdapterTrait
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function deleteItems(array $keys)
@@ -206,9 +198,6 @@ trait AbstractAdapterTrait
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem($key)
     {
         $id = $this->getId($key);
@@ -233,9 +222,6 @@ trait AbstractAdapterTrait
         return (self::$createCacheItem)($key, null, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItems(array $keys = [])
     {
         $ids = [];
@@ -262,8 +248,6 @@ trait AbstractAdapterTrait
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function save(CacheItemInterface $item)
@@ -277,8 +261,6 @@ trait AbstractAdapterTrait
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function saveDeferred(CacheItemInterface $item)
@@ -311,9 +293,6 @@ trait AbstractAdapterTrait
         return $wasEnabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         if ($this->deferred) {

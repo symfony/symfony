@@ -89,8 +89,6 @@ class Image extends File
     public $corruptedMessage = 'The image file is corrupted.';
 
     /**
-     * {@inheritdoc}
-     *
      * @param int|float $maxRatio
      * @param int|float $minRatio
      * @param int|float $minPixels

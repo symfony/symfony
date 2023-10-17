@@ -41,9 +41,6 @@ class CacheCollectorPass implements CompilerPassInterface
         $this->cachePoolRecorderInnerSuffix = $cachePoolRecorderInnerSuffix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->dataCollectorCacheId)) {

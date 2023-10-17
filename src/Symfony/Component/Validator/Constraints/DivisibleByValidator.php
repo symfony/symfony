@@ -20,9 +20,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class DivisibleByValidator extends AbstractComparisonValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     protected function compareValues($value1, $value2)
     {
         if (!is_numeric($value1)) {
@@ -52,9 +50,6 @@ class DivisibleByValidator extends AbstractComparisonValidator
         return sprintf('%.12e', $value2) === sprintf('%.12e', $remainder);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getErrorCode()
     {
         return DivisibleBy::NOT_DIVISIBLE_BY;

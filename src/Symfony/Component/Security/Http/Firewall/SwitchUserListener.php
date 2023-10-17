@@ -70,9 +70,6 @@ class SwitchUserListener extends AbstractListener
         $this->stateless = $stateless;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         // usernames can be falsy

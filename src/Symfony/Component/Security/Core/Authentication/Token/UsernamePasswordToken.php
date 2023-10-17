@@ -52,9 +52,6 @@ class UsernamePasswordToken extends AbstractToken
         parent::setAuthenticated(\count($roles) > 0, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAuthenticated(bool $isAuthenticated)
     {
         if ($isAuthenticated) {
@@ -64,9 +61,6 @@ class UsernamePasswordToken extends AbstractToken
         parent::setAuthenticated(false, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCredentials()
     {
         trigger_deprecation('symfony/security-core', '5.4', 'Method "%s" is deprecated.', __METHOD__);
@@ -95,9 +89,6 @@ class UsernamePasswordToken extends AbstractToken
         return $this->getProviderKey(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials()
     {
         parent::eraseCredentials();
@@ -105,17 +96,11 @@ class UsernamePasswordToken extends AbstractToken
         $this->credentials = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __serialize(): array
     {
         return [$this->credentials, $this->firewallName, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __unserialize(array $data): void
     {
         [$this->credentials, $this->firewallName, $parentData] = $data;

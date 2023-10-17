@@ -36,9 +36,6 @@ class SendersLocator implements SendersLocatorInterface
         $this->sendersLocator = $sendersLocator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSenders(Envelope $envelope): iterable
     {
         $seen = [];

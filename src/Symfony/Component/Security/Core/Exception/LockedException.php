@@ -19,9 +19,7 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class LockedException extends AccountStatusException
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getMessageKey()
     {
         return 'Account is locked.';

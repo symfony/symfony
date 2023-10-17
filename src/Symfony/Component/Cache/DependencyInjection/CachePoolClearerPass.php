@@ -31,9 +31,6 @@ class CachePoolClearerPass implements CompilerPassInterface
         $this->cachePoolClearerTag = $cachePoolClearerTag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $container->getParameterBag()->remove('cache.prefix.seed');

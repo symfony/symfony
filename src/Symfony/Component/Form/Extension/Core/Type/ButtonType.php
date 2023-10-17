@@ -21,25 +21,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ButtonType extends BaseType implements ButtonTypeInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getParent()
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'button';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);

@@ -18,17 +18,12 @@ namespace Symfony\Component\Lock\Strategy;
  */
 class UnanimousStrategy implements StrategyInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function isMet(int $numberOfSuccess, int $numberOfItems)
     {
         return $numberOfSuccess === $numberOfItems;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function canBeMet(int $numberOfFailure, int $numberOfItems)
     {
         return 0 === $numberOfFailure;

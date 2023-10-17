@@ -50,9 +50,6 @@ class SerializerErrorRenderer implements ErrorRendererInterface
         $this->debug = $debug;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function render(\Throwable $exception): FlattenException
     {
         $headers = ['Vary' => 'Accept'];

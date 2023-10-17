@@ -39,25 +39,16 @@ class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return self::PRIORITY;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPosition(): string
     {
         return 'form';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getKey(): string
     {
         return 'json-login';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
         $provider = 'security.authentication.provider.dao.'.$id;
@@ -71,25 +62,16 @@ class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $provider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getListenerId(): string
     {
         return 'security.authentication.listener.json';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isRememberMeAware(array $config): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
     {
         $listenerId = $this->getListenerId();

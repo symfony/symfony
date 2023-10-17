@@ -40,9 +40,6 @@ class FileType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Ensure that submitted data is always an uploaded file or an array of some
@@ -84,9 +81,6 @@ class FileType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['multiple']) {
@@ -100,17 +94,11 @@ class FileType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['multipart'] = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $dataClass = null;
@@ -138,9 +126,6 @@ class FileType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'file';

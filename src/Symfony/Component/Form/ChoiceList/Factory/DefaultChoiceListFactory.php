@@ -30,11 +30,7 @@ use Symfony\Component\Translation\TranslatableMessage;
  */
 class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @param callable|null $filter
-     */
+    
     public function createListFromChoices(iterable $choices, callable $value = null/* , callable $filter = null */)
     {
         $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
@@ -51,11 +47,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ArrayChoiceList($choices, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param callable|null $filter
-     */
     public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null/* , callable $filter = null */)
     {
         $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
@@ -67,11 +58,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new LazyChoiceList($loader, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param array|callable $labelTranslationParameters The parameters used to translate the choice labels
-     */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null/* , $labelTranslationParameters = [] */)
     {
         $labelTranslationParameters = \func_num_args() > 6 ? func_get_arg(6) : [];

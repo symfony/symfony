@@ -82,8 +82,6 @@ class ConsoleFormatter implements FormatterInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     public function formatBatch(array $records)
@@ -96,8 +94,6 @@ class ConsoleFormatter implements FormatterInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     public function format(array $record)

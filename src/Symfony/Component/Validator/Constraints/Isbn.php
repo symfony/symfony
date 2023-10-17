@@ -48,8 +48,6 @@ class Isbn extends Constraint
     public $message;
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|array|null $type The ISBN standard to validate or a set of options
      */
     public function __construct(
@@ -76,9 +74,6 @@ class Isbn extends Constraint
         $this->bothIsbnMessage = $bothIsbnMessage ?? $this->bothIsbnMessage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption()
     {
         return 'type';

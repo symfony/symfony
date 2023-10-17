@@ -28,9 +28,6 @@ class ProxyDumperTest extends TestCase
      */
     protected $dumper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->dumper = new ProxyDumper();

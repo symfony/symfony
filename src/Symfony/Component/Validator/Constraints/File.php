@@ -61,8 +61,6 @@ class File extends Constraint
     protected $maxSize;
 
     /**
-     * {@inheritdoc}
-     *
      * @param int|string|null      $maxSize
      * @param string[]|string|null $mimeTypes
      */

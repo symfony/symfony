@@ -32,9 +32,6 @@ class Adapter implements AdapterInterface
         $this->config = $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConnection()
     {
         if (null === $this->connection) {
@@ -44,9 +41,6 @@ class Adapter implements AdapterInterface
         return $this->connection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntryManager()
     {
         if (null === $this->entryManager) {
@@ -56,17 +50,11 @@ class Adapter implements AdapterInterface
         return $this->entryManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createQuery(string $dn, string $query, array $options = [])
     {
         return new Query($this->getConnection(), $dn, $query, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function escape(string $subject, string $ignore = '', int $flags = 0)
     {
         $value = ldap_escape($subject, $ignore, $flags);

@@ -59,9 +59,6 @@ class Ulid extends AbstractUid
         return $ulid[0] <= '7';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function fromString(string $ulid): parent
     {
         if (36 === \strlen($ulid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $ulid)) {

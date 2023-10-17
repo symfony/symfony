@@ -36,9 +36,6 @@ class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
         $this->targetUrl = $targetUrl;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function onLogoutSuccess(Request $request)
     {
         return $this->httpUtils->createRedirectResponse($request, $this->targetUrl);

@@ -89,9 +89,6 @@ class ConsoleSectionOutput extends StreamOutput
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite(string $message, bool $newline)
     {
         if (!$this->isDecorated()) {

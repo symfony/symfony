@@ -76,9 +76,6 @@ class Workflow implements WorkflowInterface
         $this->eventsToDispatch = $eventsToDispatch;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMarking(object $subject, array $context = [])
     {
         $marking = $this->markingStore->getMarking($subject);
@@ -122,9 +119,6 @@ class Workflow implements WorkflowInterface
         return $marking;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function can(object $subject, string $transitionName)
     {
         $transitions = $this->definition->getTransitions();
@@ -145,9 +139,6 @@ class Workflow implements WorkflowInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildTransitionBlockerList(object $subject, string $transitionName): TransitionBlockerList
     {
         $transitions = $this->definition->getTransitions();
@@ -181,9 +172,6 @@ class Workflow implements WorkflowInterface
         return $transitionBlockerList;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(object $subject, string $transitionName, array $context = [])
     {
         $marking = $this->getMarking($subject, $context);
@@ -249,9 +237,6 @@ class Workflow implements WorkflowInterface
         return $marking;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEnabledTransitions(object $subject)
     {
         $enabledTransitions = [];
@@ -286,33 +271,21 @@ class Workflow implements WorkflowInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition()
     {
         return $this->definition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMarkingStore()
     {
         return $this->markingStore;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadataStore(): MetadataStoreInterface
     {
         return $this->definition->getMetadataStore();

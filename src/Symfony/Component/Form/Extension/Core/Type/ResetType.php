@@ -21,17 +21,12 @@ use Symfony\Component\Form\ButtonTypeInterface;
  */
 class ResetType extends AbstractType implements ButtonTypeInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getParent()
     {
         return ButtonType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'reset';

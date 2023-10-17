@@ -60,9 +60,6 @@ class ArgvInput extends Input
         $this->tokens = $tokens;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function parse()
     {
         $parseOptions = true;
@@ -263,9 +260,6 @@ class ArgvInput extends Input
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFirstArgument()
     {
         $isOption = false;
@@ -298,9 +292,6 @@ class ArgvInput extends Input
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameterOption($values, bool $onlyParams = false)
     {
         $values = (array) $values;
@@ -323,9 +314,6 @@ class ArgvInput extends Input
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterOption($values, $default = false, bool $onlyParams = false)
     {
         $values = (array) $values;

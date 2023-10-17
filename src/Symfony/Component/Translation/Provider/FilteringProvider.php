@@ -37,9 +37,6 @@ class FilteringProvider implements ProviderInterface
         return (string) $this->provider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $this->provider->write($translatorBag);

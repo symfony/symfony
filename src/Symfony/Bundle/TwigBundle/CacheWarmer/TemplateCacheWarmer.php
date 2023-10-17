@@ -36,8 +36,6 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string[] A list of template files to preload on PHP 7.4+
      */
     public function warmUp(string $cacheDir)
@@ -70,17 +68,11 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
         return $files;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isOptional()
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

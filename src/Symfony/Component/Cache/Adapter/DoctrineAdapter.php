@@ -32,18 +32,12 @@ class DoctrineAdapter extends AbstractAdapter
         $provider->setNamespace($namespace);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         parent::reset();
         $this->provider->setNamespace($this->provider->getNamespace());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids)
     {
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', parent::class.'::handleUnserializeCallback');
@@ -67,17 +61,11 @@ class DoctrineAdapter extends AbstractAdapter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id)
     {
         return $this->provider->contains($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace)
     {
         $namespace = $this->provider->getNamespace();
@@ -87,9 +75,6 @@ class DoctrineAdapter extends AbstractAdapter
             : $this->provider->flushAll();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids)
     {
         $ok = true;
@@ -100,9 +85,6 @@ class DoctrineAdapter extends AbstractAdapter
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime)
     {
         return $this->provider->saveMultiple($values, $lifetime);

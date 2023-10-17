@@ -42,25 +42,16 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
         $this->collectedData = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadataFor($value)
     {
         return $this->validator->getMetadataFor($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasMetadataFor($value)
     {
         return $this->validator->hasMetadataFor($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, $constraints = null, $groups = null)
     {
         $violations = $this->validator->validate($value, $constraints, $groups);
@@ -102,33 +93,21 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
         return $violations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateProperty(object $object, string $propertyName, $groups = null)
     {
         return $this->validator->validateProperty($object, $propertyName, $groups);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null)
     {
         return $this->validator->validatePropertyValue($objectOrClass, $propertyName, $value, $groups);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function startContext()
     {
         return $this->validator->startContext();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function inContext(ExecutionContextInterface $context)
     {
         return $this->validator->inContext($context);

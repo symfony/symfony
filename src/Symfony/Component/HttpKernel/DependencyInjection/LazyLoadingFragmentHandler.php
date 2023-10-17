@@ -36,9 +36,6 @@ class LazyLoadingFragmentHandler extends FragmentHandler
         parent::__construct($requestStack, [], $debug);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function render($uri, string $renderer = 'inline', array $options = [])
     {
         if (!isset($this->initialized[$renderer]) && $this->container->has($renderer)) {

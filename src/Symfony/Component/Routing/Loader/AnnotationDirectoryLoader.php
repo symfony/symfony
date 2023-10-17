@@ -71,9 +71,6 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
         return $collection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($resource, string $type = null)
     {
         if ('annotation' === $type) {

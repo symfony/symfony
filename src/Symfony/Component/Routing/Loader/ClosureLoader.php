@@ -36,9 +36,6 @@ class ClosureLoader extends Loader
         return $closure($this->env);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($resource, string $type = null)
     {
         return $resource instanceof \Closure && (!$type || 'closure' === $type);

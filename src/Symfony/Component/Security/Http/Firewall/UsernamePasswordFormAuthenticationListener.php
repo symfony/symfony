@@ -56,9 +56,6 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         $this->csrfTokenManager = $csrfTokenManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function requiresAuthentication(Request $request)
     {
         if ($this->options['post_only'] && !$request->isMethod('POST')) {
@@ -68,9 +65,6 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         return parent::requiresAuthentication($request);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function attemptAuthentication(Request $request)
     {
         if (null !== $this->csrfTokenManager) {

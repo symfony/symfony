@@ -25,9 +25,6 @@ class InspectUlidCommand extends Command
     protected static $defaultName = 'ulid:inspect';
     protected static $defaultDescription = 'Inspect a ULID';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -46,9 +43,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);

@@ -34,9 +34,6 @@ class ResettableServicePass implements CompilerPassInterface
         $this->tagName = $tagName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->has('services_resetter')) {

@@ -19,17 +19,12 @@ namespace Symfony\Component\Form\ChoiceList\Loader;
  */
 class IntlCallbackChoiceLoader extends CallbackChoiceLoader
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function loadChoicesForValues(array $values, callable $value = null)
     {
         return parent::loadChoicesForValues(array_filter($values), $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadValuesForChoices(array $choices, callable $value = null)
     {
         $choices = array_filter($choices);

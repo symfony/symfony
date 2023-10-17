@@ -47,9 +47,6 @@ class RememberMeToken extends AbstractToken
         parent::setAuthenticated(true, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAuthenticated(bool $authenticated)
     {
         if ($authenticated) {
@@ -88,9 +85,6 @@ class RememberMeToken extends AbstractToken
         return $this->secret;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCredentials()
     {
         trigger_deprecation('symfony/security-core', '5.4', 'Method "%s()" is deprecated.', __METHOD__);
@@ -98,17 +92,11 @@ class RememberMeToken extends AbstractToken
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __serialize(): array
     {
         return [$this->secret, $this->firewallName, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __unserialize(array $data): void
     {
         [$this->secret, $this->firewallName, $parentData] = $data;

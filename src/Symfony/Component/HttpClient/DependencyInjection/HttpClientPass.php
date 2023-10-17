@@ -30,9 +30,6 @@ final class HttpClientPass implements CompilerPassInterface
         $this->clientTag = $clientTag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('data_collector.http_client')) {

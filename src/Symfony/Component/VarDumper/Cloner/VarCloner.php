@@ -19,9 +19,6 @@ class VarCloner extends AbstractCloner
     private static $gid;
     private static $arrayCache = [];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClone($var)
     {
         $len = 1;                       // Length of $queue

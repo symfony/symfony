@@ -40,9 +40,6 @@ class MailerHandler extends AbstractProcessingHandler
         $this->messageTemplate = $messageTemplate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handleBatch(array $records): void
     {
         $messages = [];
@@ -59,9 +56,6 @@ class MailerHandler extends AbstractProcessingHandler
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function write(array $record): void
     {
         $this->send((string) $record['formatted'], [$record]);

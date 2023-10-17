@@ -41,9 +41,6 @@ class ValidateRequestListener implements EventSubscriberInterface
         $request->getHost();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

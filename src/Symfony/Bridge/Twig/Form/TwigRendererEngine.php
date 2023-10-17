@@ -37,9 +37,6 @@ class TwigRendererEngine extends AbstractRendererEngine
         $this->environment = $environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function renderBlock(FormView $view, $resource, string $blockName, array $variables = [])
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];

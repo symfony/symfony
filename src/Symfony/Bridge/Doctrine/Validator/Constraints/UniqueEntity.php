@@ -40,8 +40,6 @@ class UniqueEntity extends Constraint
     ];
 
     /**
-     * {@inheritdoc}
-     *
      * @param array|string $fields the combination of fields that must contain unique values or a set of options
      */
     public function __construct(
@@ -89,9 +87,6 @@ class UniqueEntity extends Constraint
         return $this->service;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTargets()
     {
         return self::CLASS_CONSTRAINT;

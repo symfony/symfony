@@ -32,9 +32,6 @@ class AboutCommand extends Command
     protected static $defaultName = 'about';
     protected static $defaultDescription = 'Display information about the current project';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -49,9 +46,6 @@ EOT
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

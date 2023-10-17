@@ -94,9 +94,6 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         return new Response(sprintf('<hx:include src="%s"%s>%s</hx:include>', $uri, $renderedAttributes, $content));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'hinclude';

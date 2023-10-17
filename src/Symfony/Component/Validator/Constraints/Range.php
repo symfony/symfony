@@ -60,8 +60,6 @@ class Range extends Constraint
     public $deprecatedMaxMessageSet = false;
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|PropertyPathInterface|null $minPropertyPath
      * @param string|PropertyPathInterface|null $maxPropertyPath
      */

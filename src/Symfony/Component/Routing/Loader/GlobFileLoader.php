@@ -21,9 +21,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class GlobFileLoader extends FileLoader
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function load($resource, string $type = null)
     {
         $collection = new RouteCollection();
@@ -37,9 +35,6 @@ class GlobFileLoader extends FileLoader
         return $collection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($resource, string $type = null)
     {
         return 'glob' === $type;

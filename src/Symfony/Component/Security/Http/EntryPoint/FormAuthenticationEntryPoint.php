@@ -45,9 +45,6 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
         $this->useForward = $useForward;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function start(Request $request, AuthenticationException $authException = null)
     {
         if ($this->useForward) {

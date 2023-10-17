@@ -54,8 +54,6 @@ class HttpKernelBrowser extends AbstractBrowser
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Request $request
      *
      * @return Response
@@ -72,8 +70,6 @@ class HttpKernelBrowser extends AbstractBrowser
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Request $request
      *
      * @return string
@@ -128,8 +124,6 @@ EOF;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return Request
      */
     protected function filterRequest(DomRequest $request)
@@ -190,8 +184,6 @@ EOF;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Response $response
      *
      * @return DomResponse

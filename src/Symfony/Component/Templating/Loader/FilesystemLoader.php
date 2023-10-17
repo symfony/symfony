@@ -31,9 +31,6 @@ class FilesystemLoader extends Loader
         $this->templatePathPatterns = (array) $templatePathPatterns;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(TemplateReferenceInterface $template)
     {
         $file = $template->get('name');
@@ -72,9 +69,6 @@ class FilesystemLoader extends Loader
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFresh(TemplateReferenceInterface $template, int $time)
     {
         if (false === $storage = $this->load($template)) {

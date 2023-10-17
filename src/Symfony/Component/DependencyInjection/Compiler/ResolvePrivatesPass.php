@@ -22,9 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ResolvePrivatesPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function process(ContainerBuilder $container)
     {
         foreach ($container->getDefinitions() as $id => $definition) {

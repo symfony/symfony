@@ -54,9 +54,6 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         return 250000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new MongoDbStore(self::getMongoClient(), [

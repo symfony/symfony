@@ -105,9 +105,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->resetServices = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function boot()
     {
         if (true === $this->booted) {
@@ -136,9 +133,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->booted = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reboot(?string $warmupDir)
     {
         $this->shutdown();
@@ -146,9 +140,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->boot();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function terminate(Request $request, Response $response)
     {
         if (false === $this->booted) {
@@ -160,9 +151,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shutdown()
     {
         if (false === $this->booted) {
@@ -181,9 +169,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->resetServices = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true)
     {
         if (!$this->booted) {
@@ -215,17 +200,11 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return $this->container->get('http_kernel');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBundles()
     {
         return $this->bundles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBundle(string $name)
     {
         if (!isset($this->bundles[$name])) {
@@ -235,9 +214,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return $this->bundles[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function locateResource(string $name)
     {
         if ('@' !== $name[0]) {
@@ -262,17 +238,11 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         throw new \InvalidArgumentException(sprintf('Unable to find file "%s".', $name));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEnvironment()
     {
         return $this->environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDebug()
     {
         return $this->debug;
@@ -305,9 +275,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return $this->projectDir;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContainer()
     {
         if (!$this->container) {
@@ -325,42 +292,27 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         file_put_contents(($this->warmupDir ?: $this->getBuildDir()).'/annotations.map', sprintf('<?php return %s;', var_export($annotatedClasses, true)));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStartTime()
     {
         return $this->debug && null !== $this->startTime ? $this->startTime : -\INF;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCacheDir()
     {
         return $this->getProjectDir().'/var/cache/'.$this->environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBuildDir(): string
     {
         // Returns $this->getCacheDir() for backward compatibility
         return $this->getCacheDir();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLogDir()
     {
         return $this->getProjectDir().'/var/log';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCharset()
     {
         return 'UTF-8';

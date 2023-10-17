@@ -36,9 +36,6 @@ class HtmlExtension extends AbstractExtension
             ->setFlag(NodeExtension::ATTRIBUTE_NAME_IN_LOWER_CASE, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPseudoClassTranslators(): array
     {
         return [
@@ -53,9 +50,6 @@ class HtmlExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctionTranslators(): array
     {
         return [
@@ -177,9 +171,6 @@ class HtmlExtension extends AbstractExtension
         return $xpath->addCondition('0');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'html';

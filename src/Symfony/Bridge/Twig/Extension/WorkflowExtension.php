@@ -32,9 +32,6 @@ final class WorkflowExtension extends AbstractExtension
         $this->workflowRegistry = $workflowRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [

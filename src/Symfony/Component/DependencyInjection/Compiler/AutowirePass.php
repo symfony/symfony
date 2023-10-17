@@ -64,9 +64,6 @@ class AutowirePass extends AbstractRecursivePass
         };
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $this->defaultArgument->bag = $container->getParameterBag();
@@ -87,9 +84,6 @@ class AutowirePass extends AbstractRecursivePass
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue($value, bool $isRoot = false)
     {
         try {

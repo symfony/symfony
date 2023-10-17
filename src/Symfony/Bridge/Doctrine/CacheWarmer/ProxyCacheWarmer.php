@@ -42,8 +42,6 @@ class ProxyCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string[] A list of files to preload on PHP 7.4+
      */
     public function warmUp(string $cacheDir)

@@ -122,9 +122,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __sleep()
     {
         $parentProperties = parent::__sleep();
@@ -143,9 +140,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClassName()
     {
         return $this->name;
@@ -372,25 +366,16 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasPropertyMetadata(string $property)
     {
         return \array_key_exists($property, $this->members);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPropertyMetadata(string $property)
     {
         return $this->members[$property] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConstrainedProperties()
     {
         return array_keys($this->members);
@@ -428,17 +413,11 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasGroupSequence()
     {
         return $this->groupSequence && \count($this->groupSequence->groups) > 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getGroupSequence()
     {
         return $this->groupSequence;
@@ -476,17 +455,11 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         $this->groupSequenceProvider = $active;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isGroupSequenceProvider()
     {
         return $this->groupSequenceProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCascadingStrategy()
     {
         return $this->cascadingStrategy;

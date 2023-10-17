@@ -35,9 +35,6 @@ class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
         $this->ignorePasswordCase = $ignorePasswordCase;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hash(string $plainPassword, string $salt = null): string
     {
         if ($this->isPasswordTooLong($plainPassword)) {

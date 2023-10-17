@@ -236,7 +236,6 @@ abstract class IntlDateFormatter
      * Not supported. Formats an object.
      *
      * @param mixed  $format
-     * @param string $locale
      *
      * @return string The formatted value
      *

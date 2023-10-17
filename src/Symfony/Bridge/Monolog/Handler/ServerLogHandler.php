@@ -22,9 +22,6 @@ if (trait_exists(FormattableHandlerTrait::class)) {
     {
         use ServerLogHandlerTrait;
 
-        /**
-         * {@inheritdoc}
-         */
         protected function getDefaultFormatter(): FormatterInterface
         {
             return new VarDumperFormatter();
@@ -35,9 +32,6 @@ if (trait_exists(FormattableHandlerTrait::class)) {
     {
         use ServerLogHandlerTrait;
 
-        /**
-         * {@inheritdoc}
-         */
         protected function getDefaultFormatter()
         {
             return new VarDumperFormatter();
@@ -69,9 +63,6 @@ trait ServerLogHandlerTrait
         $this->context = stream_context_create($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(array $record): bool
     {
         if (!$this->isHandling($record)) {
@@ -111,9 +102,6 @@ trait ServerLogHandlerTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultFormatter(): FormatterInterface
     {
         return new VarDumperFormatter();

@@ -23,9 +23,6 @@ final class CrawlerSelectorExists extends Constraint
         $this->selector = $selector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('matches selector "%s"', $this->selector);
@@ -33,8 +30,6 @@ final class CrawlerSelectorExists extends Constraint
 
     /**
      * @param Crawler $crawler
-     *
-     * {@inheritdoc}
      */
     protected function matches($crawler): bool
     {
@@ -43,8 +38,6 @@ final class CrawlerSelectorExists extends Constraint
 
     /**
      * @param Crawler $crawler
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($crawler): string
     {

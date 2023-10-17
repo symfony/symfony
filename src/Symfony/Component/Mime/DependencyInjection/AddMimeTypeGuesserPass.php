@@ -35,9 +35,6 @@ class AddMimeTypeGuesserPass implements CompilerPassInterface
         $this->mimeTypeGuesserTag = $mimeTypeGuesserTag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if ($container->has($this->mimeTypesService)) {

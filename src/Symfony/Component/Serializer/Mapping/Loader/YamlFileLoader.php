@@ -34,9 +34,6 @@ class YamlFileLoader extends FileLoader
      */
     private $classes;
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadClassMetadata(ClassMetadataInterface $classMetadata)
     {
         if (null === $this->classes) {

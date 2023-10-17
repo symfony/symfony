@@ -31,16 +31,10 @@ abstract class Bundle implements BundleInterface
     protected $path;
     private $namespace;
 
-    /**
-     * {@inheritdoc}
-     */
     public function boot()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shutdown()
     {
     }
@@ -89,9 +83,6 @@ abstract class Bundle implements BundleInterface
         return $this->extension ?: null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNamespace()
     {
         if (null === $this->namespace) {
@@ -101,9 +92,6 @@ abstract class Bundle implements BundleInterface
         return $this->namespace;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath()
     {
         if (null === $this->path) {

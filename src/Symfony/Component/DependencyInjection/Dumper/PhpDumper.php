@@ -101,9 +101,6 @@ class PhpDumper extends Dumper
     private $proxyDumper;
     private $hasProxyDumper = false;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(ContainerBuilder $container)
     {
         if (!$container->isCompiled()) {

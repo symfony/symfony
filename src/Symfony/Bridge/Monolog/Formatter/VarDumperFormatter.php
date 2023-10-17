@@ -27,8 +27,6 @@ class VarDumperFormatter implements FormatterInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     public function format(array $record)
@@ -40,8 +38,6 @@ class VarDumperFormatter implements FormatterInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     public function formatBatch(array $records)

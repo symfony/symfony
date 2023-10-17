@@ -89,9 +89,6 @@ class LogoutListener extends AbstractListener
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         return $this->requiresLogout($request);

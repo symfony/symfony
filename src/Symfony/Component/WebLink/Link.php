@@ -58,41 +58,27 @@ class Link implements EvolvableLinkInterface
         $this->href = $href;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHref(): string
     {
         return $this->href;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isTemplated(): bool
     {
         return $this->hrefIsTemplated($this->href);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRels(): array
     {
         return array_values($this->rel);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAttributes(): array
     {
         return $this->attributes;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return static
      */
     public function withHref($href)
@@ -104,8 +90,6 @@ class Link implements EvolvableLinkInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return static
      */
     public function withRel($rel)
@@ -117,8 +101,6 @@ class Link implements EvolvableLinkInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return static
      */
     public function withoutRel($rel)
@@ -130,8 +112,6 @@ class Link implements EvolvableLinkInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|\Stringable|int|float|bool|string[] $value
      *
      * @return static
@@ -145,8 +125,6 @@ class Link implements EvolvableLinkInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return static
      */
     public function withoutAttribute($attribute)

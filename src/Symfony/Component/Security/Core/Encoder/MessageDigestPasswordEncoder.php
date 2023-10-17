@@ -49,9 +49,6 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
         $this->iterations = $iterations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encodePassword(string $raw, ?string $salt)
     {
         if ($this->isPasswordTooLong($raw)) {
@@ -73,9 +70,6 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
         return $this->encodeHashAsBase64 ? base64_encode($digest) : bin2hex($digest);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isPasswordValid(string $encoded, string $raw, ?string $salt)
     {
         if (\strlen($encoded) !== $this->encodedLength || str_contains($encoded, '$')) {

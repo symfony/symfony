@@ -35,9 +35,6 @@ trait CommonResponseTrait
     private $offset = 0;
     private $jsonData;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContent(bool $throw = true): string
     {
         if ($this->initializer) {
@@ -75,9 +72,6 @@ trait CommonResponseTrait
         return stream_get_contents($this->content);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toArray(bool $throw = true): array
     {
         if ('' === $content = $this->getContent($throw)) {
@@ -110,9 +104,6 @@ trait CommonResponseTrait
         return $content;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toStream(bool $throw = true)
     {
         if ($throw) {

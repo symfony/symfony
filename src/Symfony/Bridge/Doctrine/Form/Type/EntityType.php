@@ -59,9 +59,6 @@ class EntityType extends DoctrineType
         return new ORMQueryBuilderLoader($queryBuilder);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'entity';

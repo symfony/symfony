@@ -31,9 +31,6 @@ class Collection implements CollectionInterface
         $this->search = $search;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toArray()
     {
         if (null === $this->entries) {

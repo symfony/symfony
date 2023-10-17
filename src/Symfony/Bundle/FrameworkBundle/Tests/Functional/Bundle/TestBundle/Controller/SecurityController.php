@@ -30,9 +30,6 @@ class SecurityController implements ServiceSubscriberInterface
         return new Response('Welcome '.$this->container->get('security.token_storage')->getToken()->getUserIdentifier().'!');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices(): array
     {
         return [

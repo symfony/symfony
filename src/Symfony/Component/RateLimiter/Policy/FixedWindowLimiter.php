@@ -87,9 +87,6 @@ final class FixedWindowLimiter implements LimiterInterface
         return $reservation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function consume(int $tokens = 1): RateLimit
     {
         try {

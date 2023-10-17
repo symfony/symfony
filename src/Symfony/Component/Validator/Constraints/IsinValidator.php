@@ -23,9 +23,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class IsinValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Isin) {

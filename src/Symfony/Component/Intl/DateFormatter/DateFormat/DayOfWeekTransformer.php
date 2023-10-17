@@ -22,9 +22,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  */
 class DayOfWeekTransformer extends Transformer
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function format(\DateTime $dateTime, int $length): string
     {
         $dayOfWeek = $dateTime->format('l');
@@ -40,9 +38,6 @@ class DayOfWeekTransformer extends Transformer
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReverseMatchingRegExp(int $length): string
     {
         switch ($length) {
@@ -57,9 +52,6 @@ class DayOfWeekTransformer extends Transformer
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function extractDateOptions(string $matched, int $length): array
     {
         return [];

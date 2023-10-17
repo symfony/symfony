@@ -106,9 +106,6 @@ abstract class AbstractAuthenticationListener extends AbstractListener
         $this->rememberMeServices = $rememberMeServices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         return $this->requiresAuthentication($request);

@@ -34,41 +34,26 @@ class ResolvedTypeDataCollectorProxy implements ResolvedFormTypeInterface
         $this->dataCollector = $dataCollector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return $this->proxiedType->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return $this->proxiedType->getParent();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInnerType()
     {
         return $this->proxiedType->getInnerType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeExtensions()
     {
         return $this->proxiedType->getTypeExtensions();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createBuilder(FormFactoryInterface $factory, string $name, array $options = [])
     {
         $builder = $this->proxiedType->createBuilder($factory, $name, $options);
@@ -79,33 +64,21 @@ class ResolvedTypeDataCollectorProxy implements ResolvedFormTypeInterface
         return $builder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createView(FormInterface $form, FormView $parent = null)
     {
         return $this->proxiedType->createView($form, $parent);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->proxiedType->buildForm($builder, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $this->proxiedType->buildView($view, $form, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $this->proxiedType->finishView($view, $form, $options);
@@ -130,9 +103,6 @@ class ResolvedTypeDataCollectorProxy implements ResolvedFormTypeInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOptionsResolver()
     {
         return $this->proxiedType->getOptionsResolver();

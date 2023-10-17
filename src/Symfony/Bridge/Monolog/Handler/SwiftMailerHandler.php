@@ -53,9 +53,6 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
         $this->instantFlush = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function send($content, array $records): void
     {
         parent::send($content, $records);
@@ -65,9 +62,6 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset(): void
     {
         $this->flushMemorySpool();

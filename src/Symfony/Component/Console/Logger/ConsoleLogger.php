@@ -60,8 +60,6 @@ class ConsoleLogger extends AbstractLogger
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return void
      */
     public function log($level, $message, array $context = [])

@@ -184,9 +184,6 @@ class Router implements RouterInterface, RequestMatcherInterface
         return $this->options[$key];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRouteCollection()
     {
         if (null === $this->collection) {
@@ -196,9 +193,6 @@ class Router implements RouterInterface, RequestMatcherInterface
         return $this->collection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setContext(RequestContext $context)
     {
         $this->context = $context;
@@ -211,9 +205,6 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContext()
     {
         return $this->context;
@@ -227,25 +218,16 @@ class Router implements RouterInterface, RequestMatcherInterface
         $this->configCacheFactory = $configCacheFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH)
     {
         return $this->getGenerator()->generate($name, $parameters, $referenceType);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function match(string $pathinfo)
     {
         return $this->getMatcher()->match($pathinfo);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function matchRequest(Request $request)
     {
         $matcher = $this->getMatcher();

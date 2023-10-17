@@ -32,9 +32,6 @@ class ResolveBindingsPass extends AbstractRecursivePass
     private $unusedBindings = [];
     private $errorMessages = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $this->usedBindings = $container->getRemovedBindingIds();
@@ -90,9 +87,6 @@ class ResolveBindingsPass extends AbstractRecursivePass
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue($value, bool $isRoot = false)
     {
         if ($value instanceof TypedReference && $value->getType() === (string) $value) {

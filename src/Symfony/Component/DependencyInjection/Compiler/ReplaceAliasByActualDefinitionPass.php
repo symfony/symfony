@@ -103,9 +103,6 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
         $this->replacements = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue($value, bool $isRoot = false)
     {
         if ($value instanceof Reference && isset($this->replacements[$referenceId = (string) $value])) {

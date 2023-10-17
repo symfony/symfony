@@ -77,9 +77,6 @@ class DescriptorHelper extends Helper
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'descriptor';

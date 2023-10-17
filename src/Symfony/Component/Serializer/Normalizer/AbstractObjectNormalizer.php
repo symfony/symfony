@@ -134,17 +134,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $this->objectClassResolver = $objectClassResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null)
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize($object, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
@@ -259,9 +253,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return $this->classMetadataFactory->getMetadataFor($objectOrClass)->getAttributesMetadata()[$attribute] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
@@ -339,17 +330,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {

@@ -61,8 +61,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token and $exceptionOnNoToken is set to true
      */
     final public function isGranted($attribute, $subject = null): bool

@@ -22,17 +22,12 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 final class VariadicValueResolver implements ArgumentValueResolverInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         return $argument->isVariadic() && $request->attributes->has($argument->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         $values = $request->attributes->get($argument->getName());

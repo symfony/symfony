@@ -37,9 +37,6 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         $this->tracedRequests = new \ArrayObject();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $content = null;
@@ -69,9 +66,6 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         return new TraceableResponse($this->client, $this->client->request($method, $url, $options), $content, null === $this->stopwatch ? null : $this->stopwatch->start("$method $url", 'http_client'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof TraceableResponse) {
@@ -97,9 +91,6 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         $this->tracedRequests->exchangeArray([]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLogger(LoggerInterface $logger): void
     {
         if ($this->client instanceof LoggerAwareInterface) {
@@ -107,9 +98,6 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function withOptions(array $options): self
     {
         $clone = clone $this;

@@ -50,8 +50,6 @@ class CardScheme extends Constraint
     public $schemes;
 
     /**
-     * {@inheritdoc}
-     *
      * @param array|string $schemes The schemes to validate against or a set of options
      */
     public function __construct($schemes, string $message = null, array $groups = null, $payload = null, array $options = [])

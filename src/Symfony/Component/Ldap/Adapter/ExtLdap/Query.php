@@ -73,9 +73,6 @@ class Query extends AbstractQuery
         $this->results = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function execute()
     {
         if (null === $this->results) {

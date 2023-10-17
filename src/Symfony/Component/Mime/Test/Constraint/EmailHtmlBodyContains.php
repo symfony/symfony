@@ -24,17 +24,12 @@ final class EmailHtmlBodyContains extends Constraint
         $this->expectedText = $expectedText;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('contains "%s"', $this->expectedText);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param RawMessage $message
      */
     protected function matches($message): bool
@@ -47,8 +42,6 @@ final class EmailHtmlBodyContains extends Constraint
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param RawMessage $message
      */
     protected function failureDescription($message): string

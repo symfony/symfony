@@ -97,9 +97,6 @@ class PdoStore implements PersistingStoreInterface
         $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         if (isset($this->dbalStore)) {
@@ -135,9 +132,6 @@ class PdoStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         if (isset($this->dbalStore)) {
@@ -169,9 +163,6 @@ class PdoStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         if (isset($this->dbalStore)) {
@@ -188,9 +179,6 @@ class PdoStore implements PersistingStoreInterface
         $stmt->execute();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key)
     {
         if (isset($this->dbalStore)) {

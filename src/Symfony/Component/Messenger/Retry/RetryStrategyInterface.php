@@ -20,14 +20,10 @@ use Symfony\Component\Messenger\Envelope;
  */
 interface RetryStrategyInterface
 {
-    /**
-     * @param \Throwable|null $throwable The cause of the failed handling
-     */
+    
     public function isRetryable(Envelope $message/* , \Throwable $throwable = null */): bool;
 
     /**
-     * @param \Throwable|null $throwable The cause of the failed handling
-     *
      * @return int The time to delay/wait in milliseconds
      */
     public function getWaitingTime(Envelope $message/* , \Throwable $throwable = null */): int;

@@ -34,9 +34,6 @@ class ArrayInput extends Input
         parent::__construct($definition);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFirstArgument()
     {
         foreach ($this->parameters as $param => $value) {
@@ -50,9 +47,6 @@ class ArrayInput extends Input
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameterOption($values, bool $onlyParams = false)
     {
         $values = (array) $values;
@@ -74,9 +68,6 @@ class ArrayInput extends Input
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterOption($values, $default = false, bool $onlyParams = false)
     {
         $values = (array) $values;
@@ -124,9 +115,6 @@ class ArrayInput extends Input
         return implode(' ', $params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function parse()
     {
         foreach ($this->parameters as $key => $value) {

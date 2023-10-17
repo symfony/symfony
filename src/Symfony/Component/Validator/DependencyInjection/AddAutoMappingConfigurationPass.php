@@ -35,9 +35,6 @@ class AddAutoMappingConfigurationPass implements CompilerPassInterface
         $this->tag = $tag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasParameter('validator.auto_mapping') || !$container->hasDefinition($this->validatorBuilderService)) {

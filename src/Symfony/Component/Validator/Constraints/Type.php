@@ -32,8 +32,6 @@ class Type extends Constraint
     public $type;
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|array $type One ore multiple types to validate against or a set of options
      */
     public function __construct($type, string $message = null, array $groups = null, $payload = null, array $options = [])
@@ -49,17 +47,11 @@ class Type extends Constraint
         $this->message = $message ?? $this->message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption()
     {
         return 'type';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredOptions()
     {
         return ['type'];

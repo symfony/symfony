@@ -27,9 +27,6 @@ final class BrowserHasCookie extends Constraint
         $this->domain = $domain;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         $str = sprintf('has cookie "%s"', $this->name);
@@ -45,8 +42,6 @@ final class BrowserHasCookie extends Constraint
 
     /**
      * @param AbstractBrowser $browser
-     *
-     * {@inheritdoc}
      */
     protected function matches($browser): bool
     {
@@ -55,8 +50,6 @@ final class BrowserHasCookie extends Constraint
 
     /**
      * @param AbstractBrowser $browser
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($browser): string
     {

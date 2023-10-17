@@ -104,9 +104,6 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue($value, bool $isRoot = false)
     {
         if ($value instanceof ArgumentInterface) {

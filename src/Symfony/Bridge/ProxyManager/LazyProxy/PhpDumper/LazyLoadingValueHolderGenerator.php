@@ -20,9 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class LazyLoadingValueHolderGenerator extends BaseGenerator
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function generate(\ReflectionClass $originalClass, ClassGenerator $classGenerator, array $proxyOptions = []): void
     {
         parent::generate($originalClass, $classGenerator, $proxyOptions);

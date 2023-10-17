@@ -31,8 +31,6 @@ interface ChoiceListFactoryInterface
      * The callable receives the choice as only argument.
      * Null may be passed when the choice list contains the empty value.
      *
-     * @param callable|null $filter The callable filtering the choices
-     *
      * @return ChoiceListInterface
      */
     public function createListFromChoices(iterable $choices, callable $value = null/* , callable $filter = null */);
@@ -43,8 +41,6 @@ interface ChoiceListFactoryInterface
      * Optionally, a callable can be passed for generating the choice values.
      * The callable receives the choice as only argument.
      * Null may be passed when the choice list contains the empty value.
-     *
-     * @param callable|null $filter The callable filtering the choices
      *
      * @return ChoiceListInterface
      */
@@ -80,7 +76,6 @@ interface ChoiceListFactoryInterface
      * @param callable|false|null $label                      The callable generating the choice labels;
      *                                                        pass false to discard the label
      * @param array|callable|null $attr                       The callable generating the HTML attributes
-     * @param array|callable      $labelTranslationParameters The parameters used to translate the choice labels
      *
      * @return ChoiceListView
      */

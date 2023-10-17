@@ -141,9 +141,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         $this->writeInfoExtractor = $writeInfoExtractor ?? new ReflectionExtractor(['set'], null, null, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getValue($objectOrArray, $propertyPath)
     {
         $zval = [
@@ -161,9 +158,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         return $propertyValues[\count($propertyValues) - 1][self::VALUE];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
         if (\is_object($objectOrArray) && false === strpbrk((string) $propertyPath, '.[')) {
@@ -280,9 +274,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isReadable($objectOrArray, $propertyPath)
     {
         if (!$propertyPath instanceof PropertyPathInterface) {
@@ -303,9 +294,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isWritable($objectOrArray, $propertyPath)
     {
         $propertyPath = $this->getPropertyPath($propertyPath);

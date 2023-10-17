@@ -34,9 +34,6 @@ class CompiledUrlMatcherDumper extends MatcherDumper
      */
     private $expressionLanguageProviders = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function dump(array $options = [])
     {
         return <<<EOF

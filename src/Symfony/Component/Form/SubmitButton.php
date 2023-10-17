@@ -20,9 +20,6 @@ class SubmitButton extends Button implements ClickableInterface
 {
     private $clicked = false;
 
-    /**
-     * {@inheritdoc}
-     */
     public function isClicked()
     {
         return $this->clicked;

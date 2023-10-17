@@ -48,9 +48,6 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         $this->twig = $twig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function extract($resource, MessageCatalogue $catalogue)
     {
         foreach ($this->extractFiles($resource) as $file) {
@@ -62,9 +59,6 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPrefix(string $prefix)
     {
         $this->prefix = $prefix;
@@ -92,9 +86,6 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         return $this->isFile($file) && 'twig' === pathinfo($file, \PATHINFO_EXTENSION);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractFromDirectory($directory)
     {
         $finder = new Finder();

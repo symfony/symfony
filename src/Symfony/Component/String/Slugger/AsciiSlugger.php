@@ -79,25 +79,16 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         $this->symbolsMap = $symbolsMap ?? $this->symbolsMap;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLocale($locale)
     {
         $this->defaultLocale = $locale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLocale()
     {
         return $this->defaultLocale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function slug(string $string, string $separator = '-', string $locale = null): AbstractUnicodeString
     {
         $locale = $locale ?? $this->defaultLocale;

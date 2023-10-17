@@ -45,9 +45,6 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
         $this->providerKey = $providerKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
@@ -76,9 +73,6 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
         return $authenticatedToken;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(TokenInterface $token)
     {
         return $token instanceof PreAuthenticatedToken && $this->providerKey === $token->getFirewallName();

@@ -135,8 +135,6 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * Returns false when autodetection failed, an array of the completed information otherwise.
      *
-     * @param string|null $bundleDir The bundle directory path
-     *
      * @return array|false
      */
     protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container/* , string $bundleDir = null */)
@@ -463,8 +461,6 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Relative path from the bundle root to the directory where mapping files reside.
-     *
-     * @param string|null $bundleDir The bundle directory path
      *
      * @return string
      */

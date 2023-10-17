@@ -44,9 +44,6 @@ class XliffLintCommand extends BaseLintCommand
         parent::__construct(null, $directoryIteratorProvider, $isReadableProvider);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         parent::configure();

@@ -29,8 +29,6 @@ abstract class AbstractComparison extends Constraint
     public $propertyPath;
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed $value the value to compare or a set of options
      */
     public function __construct($value = null, $propertyPath = null, string $message = null, array $groups = null, $payload = null, array $options = [])
@@ -59,9 +57,6 @@ abstract class AbstractComparison extends Constraint
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption()
     {
         return 'value';

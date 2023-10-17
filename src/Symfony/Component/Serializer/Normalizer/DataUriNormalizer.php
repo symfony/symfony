@@ -46,8 +46,6 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function normalize($object, string $format = null, array $context = [])
@@ -73,9 +71,6 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
         return sprintf('data:%s;base64,%s', $mimeType, base64_encode($data));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof \SplFileInfo;
@@ -119,17 +114,11 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
         throw new InvalidArgumentException(sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileObject" or "Symfony\Component\HttpFoundation\File\File".', $type));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
         return isset(self::SUPPORTED_TYPES[$type]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

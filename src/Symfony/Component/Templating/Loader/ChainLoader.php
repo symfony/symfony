@@ -37,9 +37,6 @@ class ChainLoader extends Loader
         $this->loaders[] = $loader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(TemplateReferenceInterface $template)
     {
         foreach ($this->loaders as $loader) {
@@ -51,9 +48,6 @@ class ChainLoader extends Loader
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFresh(TemplateReferenceInterface $template, int $time)
     {
         foreach ($this->loaders as $loader) {

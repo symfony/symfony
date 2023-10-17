@@ -43,9 +43,6 @@ class PropertyMetadata extends MemberMetadata
         parent::__construct($class, $name, $name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPropertyValue($object)
     {
         $reflProperty = $this->getReflectionMember($object);
@@ -70,9 +67,6 @@ class PropertyMetadata extends MemberMetadata
         return $reflProperty->getValue($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function newReflectionMember($objectOrClassName)
     {
         $originalClass = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);

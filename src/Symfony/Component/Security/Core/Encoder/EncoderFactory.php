@@ -35,9 +35,6 @@ class EncoderFactory implements EncoderFactoryInterface
         $this->encoders = $encoders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEncoder($user)
     {
         $encoderKey = null;

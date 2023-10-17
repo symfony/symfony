@@ -19,17 +19,12 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class GreaterThanValidator extends AbstractComparisonValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     protected function compareValues($value1, $value2)
     {
         return null === $value2 || $value1 > $value2;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getErrorCode()
     {
         return GreaterThan::TOO_LOW_ERROR;

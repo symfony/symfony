@@ -31,17 +31,11 @@ class StaticVersionStrategy implements VersionStrategyInterface
         $this->format = $format ?: '%s?%s';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getVersion(string $path)
     {
         return $this->version;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function applyVersion(string $path)
     {
         $versionized = sprintf($this->format, ltrim($path, '/'), $this->getVersion($path));

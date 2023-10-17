@@ -21,9 +21,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class AutowireRequiredMethodsPass extends AbstractRecursivePass
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     protected function processValue($value, bool $isRoot = false)
     {
         $value = parent::processValue($value, $isRoot);

@@ -33,9 +33,6 @@ class DateValidator extends ConstraintValidator
         return checkdate($month, $day, $year);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Date) {

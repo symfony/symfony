@@ -25,9 +25,6 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {
     private $serviceLocatorContextIds = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $this->serviceLocatorContextIds = [];

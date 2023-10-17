@@ -30,17 +30,11 @@ class FactoryCommandLoader implements CommandLoaderInterface
         $this->factories = $factories;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $name)
     {
         return isset($this->factories[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $name)
     {
         if (!isset($this->factories[$name])) {
@@ -52,9 +46,6 @@ class FactoryCommandLoader implements CommandLoaderInterface
         return $factory();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNames()
     {
         return array_keys($this->factories);

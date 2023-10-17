@@ -30,17 +30,11 @@ class ParameterBag implements ParameterBagInterface
         $this->add($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear()
     {
         $this->parameters = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function add(array $parameters)
     {
         foreach ($parameters as $key => $value) {
@@ -48,17 +42,11 @@ class ParameterBag implements ParameterBagInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all()
     {
         return $this->parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $name)
     {
         if (!\array_key_exists($name, $this->parameters)) {
@@ -96,33 +84,21 @@ class ParameterBag implements ParameterBagInterface
         return $this->parameters[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(string $name, $value)
     {
         $this->parameters[$name] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $name)
     {
         return \array_key_exists($name, $this->parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove(string $name)
     {
         unset($this->parameters[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve()
     {
         if ($this->resolved) {
@@ -232,9 +208,6 @@ class ParameterBag implements ParameterBagInterface
         return $this->resolved;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function escapeValue($value)
     {
         if (\is_string($value)) {
@@ -253,9 +226,6 @@ class ParameterBag implements ParameterBagInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unescapeValue($value)
     {
         if (\is_string($value)) {

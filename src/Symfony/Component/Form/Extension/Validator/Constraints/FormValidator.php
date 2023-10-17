@@ -29,9 +29,6 @@ class FormValidator extends ConstraintValidator
      */
     private $resolvedGroups;
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate($form, Constraint $formConstraint)
     {
         if (!$formConstraint instanceof Form) {

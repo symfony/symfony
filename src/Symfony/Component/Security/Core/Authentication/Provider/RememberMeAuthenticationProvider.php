@@ -41,9 +41,6 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
         $this->providerKey = $providerKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
@@ -69,9 +66,6 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
         return $authenticatedToken;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(TokenInterface $token)
     {
         return $token instanceof RememberMeToken && $token->getFirewallName() === $this->providerKey;

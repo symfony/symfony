@@ -40,8 +40,6 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function normalize($object, string $format = null, array $context = [])
@@ -106,17 +104,11 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
         return $result + ['violations' => $violations];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof ConstraintViolationListInterface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

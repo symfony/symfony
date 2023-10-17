@@ -52,17 +52,11 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         @unlink(self::$dbFile);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClockDelay()
     {
         return 1000000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         $config = new Configuration();

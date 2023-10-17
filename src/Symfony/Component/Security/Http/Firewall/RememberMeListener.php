@@ -56,9 +56,6 @@ class RememberMeListener extends AbstractListener
         $this->sessionStrategy = $sessionStrategy ?? new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         return null; // always run authenticate() lazily with lazy firewalls

@@ -29,9 +29,6 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
             && !$token instanceof AnonymousToken && (!method_exists($token, 'isAuthenticated') || $token->isAuthenticated(false));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAnonymous(TokenInterface $token = null/* , $deprecation = true */)
     {
         if (1 === \func_num_args() || false !== func_get_arg(1)) {
@@ -41,17 +38,11 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
         return $token instanceof AnonymousToken || ($token && !$token->getUser());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRememberMe(TokenInterface $token = null)
     {
         return $token && $token instanceof RememberMeToken;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFullFledged(TokenInterface $token = null)
     {
         return $token && !$this->isAnonymous($token, false) && !$this->isRememberMe($token);

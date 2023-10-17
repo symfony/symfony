@@ -63,9 +63,6 @@ class InMemoryUserProvider implements UserProviderInterface
         $this->users[$userIdentifier] = $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadUserByUsername(string $username)
     {
         trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
@@ -81,9 +78,6 @@ class InMemoryUserProvider implements UserProviderInterface
         return new InMemoryUser(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), $user->getPassword(), $user->getRoles(), $user->isEnabled());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user)
     {
         if (!$user instanceof InMemoryUser && !$user instanceof User) {
@@ -112,9 +106,6 @@ class InMemoryUserProvider implements UserProviderInterface
         return new InMemoryUser($userIdentifier, $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsClass(string $class)
     {
         // @deprecated since Symfony 5.3

@@ -39,8 +39,6 @@ trait ServiceLocatorTrait
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function has(string $id)
@@ -49,8 +47,6 @@ trait ServiceLocatorTrait
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed
      */
     public function get(string $id)
@@ -75,9 +71,6 @@ trait ServiceLocatorTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProvidedServices(): array
     {
         if (null === $this->providedTypes) {

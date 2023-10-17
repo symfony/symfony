@@ -30,9 +30,6 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
 
     private $extensionConfig = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $this->extensionConfig = [];

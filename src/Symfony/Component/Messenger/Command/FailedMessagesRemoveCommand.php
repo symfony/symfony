@@ -29,9 +29,6 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
     protected static $defaultName = 'messenger:failed:remove';
     protected static $defaultDescription = 'Remove given messages from the failure transport';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -53,9 +50,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);

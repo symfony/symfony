@@ -57,9 +57,6 @@ class JsonEncode implements EncoderInterface
         return $encodedJson;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsEncoding(string $format)
     {
         return JsonEncoder::FORMAT === $format;

@@ -38,8 +38,6 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string[]
      */
     public function warmUp(string $cacheDir)
@@ -81,9 +79,6 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
         $generator->build($configuration);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isOptional()
     {
         return true;

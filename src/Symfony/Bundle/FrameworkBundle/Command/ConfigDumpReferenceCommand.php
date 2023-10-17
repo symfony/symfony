@@ -38,9 +38,6 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
     protected static $defaultName = 'config:dump-reference';
     protected static $defaultDescription = 'Dump the default configuration for an extension';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -75,8 +72,6 @@ EOF
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -24,17 +24,12 @@ use Symfony\Component\Validator\Exception\LogicException;
  */
 class BlackHoleMetadataFactory implements MetadataFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getMetadataFor($value)
     {
         throw new LogicException('This class does not support metadata.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasMetadataFor($value)
     {
         return false;

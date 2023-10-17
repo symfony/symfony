@@ -33,9 +33,6 @@ class ContainerCommandLoader implements CommandLoaderInterface
         $this->commandMap = $commandMap;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $name)
     {
         if (!$this->has($name)) {
@@ -45,17 +42,11 @@ class ContainerCommandLoader implements CommandLoaderInterface
         return $this->container->get($this->commandMap[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $name)
     {
         return isset($this->commandMap[$name]) && $this->container->has($this->commandMap[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNames()
     {
         return array_keys($this->commandMap);

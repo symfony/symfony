@@ -781,9 +781,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceIds()
     {
         return array_map('strval', array_unique(array_merge(array_keys($this->getDefinitions()), array_keys($this->aliasDefinitions), parent::getServiceIds())));
@@ -1609,9 +1606,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return str_replace(['/', '+'], ['.', '_'], $hash);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getEnv(string $name)
     {
         $value = parent::getEnv($name);

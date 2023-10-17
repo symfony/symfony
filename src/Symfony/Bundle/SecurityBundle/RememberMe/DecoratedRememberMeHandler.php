@@ -31,25 +31,16 @@ final class DecoratedRememberMeHandler implements RememberMeHandlerInterface
         $this->handler = $handler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function createRememberMeCookie(UserInterface $user): void
     {
         $this->handler->createRememberMeCookie($user);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function consumeRememberMeCookie(RememberMeDetails $rememberMeDetails): UserInterface
     {
         return $this->handler->consumeRememberMeCookie($rememberMeDetails);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function clearRememberMeCookie(): void
     {
         $this->handler->clearRememberMeCookie();

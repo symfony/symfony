@@ -37,8 +37,6 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function normalize($object, string $format = null, array $context = [])
@@ -64,17 +62,11 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, string $format = null): bool
     {
         return $data instanceof FlattenException;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

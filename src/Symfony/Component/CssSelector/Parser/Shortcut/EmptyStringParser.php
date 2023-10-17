@@ -31,9 +31,7 @@ use Symfony\Component\CssSelector\Parser\ParserInterface;
  */
 class EmptyStringParser implements ParserInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function parse(string $source): array
     {
         // Matches an empty string

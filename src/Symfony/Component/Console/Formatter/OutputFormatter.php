@@ -85,41 +85,26 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         $this->styleStack = new OutputFormatterStyleStack();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDecorated(bool $decorated)
     {
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDecorated()
     {
         return $this->decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setStyle(string $name, OutputFormatterStyleInterface $style)
     {
         $this->styles[strtolower($name)] = $style;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasStyle(string $name)
     {
         return isset($this->styles[strtolower($name)]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStyle(string $name)
     {
         if (!$this->hasStyle($name)) {
@@ -129,17 +114,11 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         return $this->styles[strtolower($name)];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function format(?string $message)
     {
         return $this->formatAndWrap($message, 0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function formatAndWrap(?string $message, int $width)
     {
         if (null === $message) {

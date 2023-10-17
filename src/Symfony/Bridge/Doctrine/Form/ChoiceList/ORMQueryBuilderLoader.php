@@ -41,17 +41,11 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         $this->queryBuilder = $queryBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities()
     {
         return $this->queryBuilder->getQuery()->execute();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntitiesByIds(string $identifier, array $values)
     {
         if (null !== $this->queryBuilder->getMaxResults() || 0 < (int) $this->queryBuilder->getFirstResult()) {

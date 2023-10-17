@@ -47,9 +47,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         $this->setFormFactory($factory);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function add($child, string $type = null, array $options = [])
     {
         if ($this->locked) {
@@ -80,9 +77,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create($name, string $type = null, array $options = [])
     {
         if ($this->locked) {
@@ -100,9 +94,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get($name)
     {
         if ($this->locked) {
@@ -120,9 +111,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         throw new InvalidArgumentException(sprintf('The child with the name "%s" does not exist.', $name));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove($name)
     {
         if ($this->locked) {
@@ -134,9 +122,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has($name)
     {
         if ($this->locked) {
@@ -146,9 +131,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         return isset($this->unresolvedChildren[$name]) || isset($this->children[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all()
     {
         if ($this->locked) {
@@ -173,9 +155,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         return \count($this->children);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormConfig()
     {
         /** @var $config self */
@@ -187,9 +166,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         return $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getForm()
     {
         if ($this->locked) {
@@ -214,8 +190,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Traversable<string, FormBuilderInterface>
      */
     #[\ReturnTypeWillChange]

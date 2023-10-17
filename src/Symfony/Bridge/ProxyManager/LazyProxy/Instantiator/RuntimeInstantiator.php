@@ -35,9 +35,6 @@ class RuntimeInstantiator implements InstantiatorInterface
         $this->factory = new LazyLoadingValueHolderFactory($config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator)
     {
         return $this->factory->createProxy(

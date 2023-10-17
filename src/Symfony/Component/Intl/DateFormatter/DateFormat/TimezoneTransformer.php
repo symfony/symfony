@@ -25,8 +25,6 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 class TimezoneTransformer extends Transformer
 {
     /**
-     * {@inheritdoc}
-     *
      * @throws NotImplementedException When time zone is different than UTC or GMT (Etc/GMT)
      */
     public function format(\DateTime $dateTime, int $length): string
@@ -62,17 +60,11 @@ class TimezoneTransformer extends Transformer
         return sprintf('GMT%s%d', $offset >= 0 ? '+' : '', $offset / 100);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReverseMatchingRegExp(int $length): string
     {
         return 'GMT[+-]\d{2}:?\d{2}';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function extractDateOptions(string $matched, int $length): array
     {
         return [

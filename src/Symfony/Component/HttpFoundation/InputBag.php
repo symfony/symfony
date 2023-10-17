@@ -42,9 +42,6 @@ final class InputBag extends ParameterBag
         return $this === $value ? $default : $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all(string $key = null): array
     {
         return parent::all($key);
@@ -83,9 +80,6 @@ final class InputBag extends ParameterBag
         $this->parameters[$key] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function filter(string $key, $default = null, int $filter = \FILTER_DEFAULT, $options = [])
     {
         $value = $this->has($key) ? $this->all()[$key] : $default;

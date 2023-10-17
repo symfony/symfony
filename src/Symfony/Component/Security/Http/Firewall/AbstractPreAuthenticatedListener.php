@@ -56,9 +56,6 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         try {

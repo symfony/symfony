@@ -33,17 +33,11 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function render($name, array $parameters = [])
     {
         return $this->getEngine($name)->render($name, $parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function stream($name, array $parameters = [])
     {
         $engine = $this->getEngine($name);
@@ -54,9 +48,6 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         $engine->stream($name, $parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists($name)
     {
         return $this->getEngine($name)->exists($name);
@@ -67,9 +58,6 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         $this->engines[] = $engine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($name)
     {
         try {

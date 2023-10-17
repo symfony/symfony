@@ -90,41 +90,26 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $this->defaultLocale = $defaultLocale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setContext(RequestContext $context)
     {
         $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContext()
     {
         return $this->context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setStrictRequirements(?bool $enabled)
     {
         $this->strictRequirements = $enabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isStrictRequirements()
     {
         return $this->strictRequirements;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH)
     {
         $route = null;

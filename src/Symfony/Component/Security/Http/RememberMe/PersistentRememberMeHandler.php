@@ -46,9 +46,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         $this->tokenVerifier = $tokenVerifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createRememberMeCookie(UserInterface $user): void
     {
         $series = random_bytes(66);
@@ -106,9 +103,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         $this->createCookie($rememberMeDetails->withValue($series.':'.$tokenValue));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearRememberMeCookie(): void
     {
         parent::clearRememberMeCookie();

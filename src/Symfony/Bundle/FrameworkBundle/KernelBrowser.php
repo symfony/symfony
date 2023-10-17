@@ -34,9 +34,6 @@ class KernelBrowser extends HttpKernelBrowser
     private $profiler = false;
     private $reboot = true;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(KernelInterface $kernel, array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
         parent::__construct($kernel, $server, $history, $cookieJar);
@@ -156,8 +153,6 @@ class KernelBrowser extends HttpKernelBrowser
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Request $request
      *
      * @return Response
@@ -184,8 +179,6 @@ class KernelBrowser extends HttpKernelBrowser
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Request $request
      *
      * @return Response

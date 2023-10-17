@@ -60,9 +60,6 @@ class WebProfilerExtension extends ProfilerExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [
@@ -109,9 +106,6 @@ class WebProfilerExtension extends ProfilerExtension
         return '<span class="dump-inline">'.strtr($message, $replacements).'</span>';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'profiler';

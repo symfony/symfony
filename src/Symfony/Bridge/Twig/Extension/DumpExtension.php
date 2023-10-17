@@ -35,9 +35,6 @@ final class DumpExtension extends AbstractExtension
         $this->dumper = $dumper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [
@@ -45,9 +42,6 @@ final class DumpExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTokenParsers(): array
     {
         return [new DumpTokenParser()];

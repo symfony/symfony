@@ -48,9 +48,6 @@ class AuthenticatedVoter implements CacheableVoterInterface
         $this->authenticationTrustResolver = $authenticationTrustResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
         if ($attributes === [self::PUBLIC_ACCESS]) {

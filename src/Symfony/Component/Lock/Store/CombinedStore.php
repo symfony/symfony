@@ -54,9 +54,6 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         $successCount = 0;
@@ -129,9 +126,6 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
         throw new LockConflictedException();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         $successCount = 0;
@@ -173,9 +167,6 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
         throw new LockConflictedException();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         foreach ($this->stores as $store) {
@@ -187,9 +178,6 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key)
     {
         $successCount = 0;

@@ -39,9 +39,6 @@ final class ArgumentResolver implements ArgumentResolverInterface
         $this->argumentValueResolvers = $argumentValueResolvers ?: self::getDefaultArgumentValueResolvers();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getArguments(Request $request, callable $controller): array
     {
         $arguments = [];

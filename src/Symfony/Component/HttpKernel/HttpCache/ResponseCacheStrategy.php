@@ -53,9 +53,6 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
         'expires' => null,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function add(Response $response)
     {
         ++$this->embeddedResponses;
@@ -92,9 +89,6 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
         $this->storeRelativeAgeDirective('expires', $expires >= 0 ? $expires : null, 0, $isHeuristicallyCacheable);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update(Response $response)
     {
         // if we have no embedded Response, do nothing

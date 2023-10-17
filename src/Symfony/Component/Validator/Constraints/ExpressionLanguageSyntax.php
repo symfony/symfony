@@ -41,9 +41,6 @@ class ExpressionLanguageSyntax extends Constraint
         $this->allowedVariables = $allowedVariables ?? $this->allowedVariables;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validatedBy()
     {
         return $this->service ?? static::class.'Validator';

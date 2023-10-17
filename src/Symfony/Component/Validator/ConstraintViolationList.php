@@ -61,17 +61,11 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         return $string;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function add(ConstraintViolationInterface $violation)
     {
         $this->violations[] = $violation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addAll(ConstraintViolationListInterface $otherList)
     {
         foreach ($otherList as $violation) {
@@ -79,9 +73,6 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(int $offset)
     {
         if (!isset($this->violations[$offset])) {
@@ -91,33 +82,22 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         return $this->violations[$offset];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(int $offset)
     {
         return isset($this->violations[$offset]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(int $offset, ConstraintViolationInterface $violation)
     {
         $this->violations[$offset] = $violation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove(int $offset)
     {
         unset($this->violations[$offset]);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \ArrayIterator<int, ConstraintViolationInterface>
      */
     #[\ReturnTypeWillChange]
@@ -145,8 +125,6 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return ConstraintViolationInterface
      */
     #[\ReturnTypeWillChange]
@@ -156,8 +134,6 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return void
      */
     #[\ReturnTypeWillChange]
@@ -171,8 +147,6 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return void
      */
     #[\ReturnTypeWillChange]

@@ -72,17 +72,11 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         $this->consoleFormatterOptions = $consoleFormatterOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isHandling(array $record): bool
     {
         return $this->updateLevel() && parent::isHandling($record);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(array $record): bool
     {
         // we have to update the logging level each time because the verbosity of the
@@ -130,9 +124,6 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         $this->close();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -141,18 +132,12 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function write(array $record): void
     {
         // at this point we've determined for sure that we want to output the record, so use the output's own verbosity
         $this->output->write((string) $record['formatted'], false, $this->output->getVerbosity());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultFormatter(): FormatterInterface
     {
         if (!class_exists(CliDumper::class)) {

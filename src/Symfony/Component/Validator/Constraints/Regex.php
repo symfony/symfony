@@ -36,8 +36,6 @@ class Regex extends Constraint
     public $normalizer;
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|array $pattern The pattern to evaluate or an array of options
      */
     public function __construct(
@@ -68,17 +66,11 @@ class Regex extends Constraint
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption()
     {
         return 'pattern';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredOptions()
     {
         return ['pattern'];

@@ -30,9 +30,6 @@ class AutoExpireFlashBag implements FlashBagInterface
         $this->storageKey = $storageKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->name;
@@ -43,9 +40,6 @@ class AutoExpireFlashBag implements FlashBagInterface
         $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function initialize(array &$flashes)
     {
         $this->flashes = &$flashes;
@@ -57,33 +51,21 @@ class AutoExpireFlashBag implements FlashBagInterface
         $this->flashes['new'] = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function add(string $type, $message)
     {
         $this->flashes['new'][$type][] = $message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function peek(string $type, array $default = [])
     {
         return $this->has($type) ? $this->flashes['display'][$type] : $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function peekAll()
     {
         return \array_key_exists('display', $this->flashes) ? $this->flashes['display'] : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $type, array $default = [])
     {
         $return = $default;
@@ -100,9 +82,6 @@ class AutoExpireFlashBag implements FlashBagInterface
         return $return;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all()
     {
         $return = $this->flashes['display'];
@@ -111,49 +90,31 @@ class AutoExpireFlashBag implements FlashBagInterface
         return $return;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAll(array $messages)
     {
         $this->flashes['new'] = $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(string $type, $messages)
     {
         $this->flashes['new'][$type] = (array) $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $type)
     {
         return \array_key_exists($type, $this->flashes['display']) && $this->flashes['display'][$type];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function keys()
     {
         return array_keys($this->flashes['display']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStorageKey()
     {
         return $this->storageKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear()
     {
         return $this->all();

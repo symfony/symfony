@@ -35,9 +35,6 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
         return LessThanOrEqual::TOO_HIGH_ERROR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -57,9 +54,6 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -68,9 +62,6 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [

@@ -78,9 +78,6 @@ final class MimeTypes implements MimeTypesInterface
         array_unshift($this->guessers, $guesser);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExtensions(string $mimeType): array
     {
         if ($this->extensions) {
@@ -90,9 +87,6 @@ final class MimeTypes implements MimeTypesInterface
         return $extensions ?? self::MAP[$mimeType] ?? self::MAP[$lcMimeType ?? strtolower($mimeType)] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMimeTypes(string $ext): array
     {
         if ($this->mimeTypes) {
@@ -102,9 +96,6 @@ final class MimeTypes implements MimeTypesInterface
         return $mimeTypes ?? self::REVERSE_MAP[$ext] ?? self::REVERSE_MAP[$lcExt ?? strtolower($ext)] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isGuesserSupported(): bool
     {
         foreach ($this->guessers as $guesser) {

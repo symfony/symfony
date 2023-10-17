@@ -38,9 +38,6 @@ class ConfigDebugCommand extends AbstractConfigCommand
     protected static $defaultName = 'debug:config';
     protected static $defaultDescription = 'Dump the current configuration for an extension';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -67,9 +64,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

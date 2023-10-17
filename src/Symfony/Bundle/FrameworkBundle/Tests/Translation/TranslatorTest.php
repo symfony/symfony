@@ -420,9 +420,7 @@ class TranslatorTest extends TestCase
 
 class TranslatorWithInvalidLocale extends Translator
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getLocale(): string
     {
         return 'invalid locale';

@@ -21,9 +21,7 @@ namespace Symfony\Component\Templating;
  */
 class TemplateNameParser implements TemplateNameParserInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     public function parse($name)
     {
         if ($name instanceof TemplateReferenceInterface) {

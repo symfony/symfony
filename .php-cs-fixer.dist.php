@@ -38,6 +38,7 @@ return (new PhpCsFixer\Config())
         'modernize_strpos' => true,
         'get_class_to_class_keyword' => true,
         'nullable_type_declaration' => true,
+        // 'get_class_to_class_keyword' => true, // to be enabled when Bridge/PhpUnit will require PHP 8+
     ])
     ->setRiskyAllowed(true)
     ->setFinder(
@@ -55,6 +56,9 @@ return (new PhpCsFixer\Config())
                 'Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/',
                 'Symfony/Component/Intl/Resources/data/',
             ])
+            // explicit tests for ommited @param type, against `no_superfluous_phpdoc_tags`
+            ->notPath('Symfony/Component/PropertyInfo/Tests/Extractor/PhpDocExtractorTest.php')
+            ->notPath('Symfony/Component/PropertyInfo/Tests/Extractor/PhpStanExtractorTest.php')
             // Support for older PHPunit version
             ->notPath('Symfony/Bridge/PhpUnit/SymfonyTestsListener.php')
             ->notPath('#Symfony/Bridge/PhpUnit/.*Mock\.php#')

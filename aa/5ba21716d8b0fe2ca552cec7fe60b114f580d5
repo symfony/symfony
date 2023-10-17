@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by fbourigault at 2023-10-10T20:34:34Z
+
+> Here are some comment, and my review as a patch :)
+>
+> Now that we have this, I'm wondering about each warmers: are they doing something for build-time or compilte-time? what's their purpose, etc; E.g `CompiledClassMetadataFactory` added in #29117 by @fbourigault is never wired? We should likely investigate this in a follow up PR this and the others too.
+
+Sadly, I never finished the framework integration of `CompiledClassMetadataFactory` :( Sadly I no longer have time to work on this topic anytime soon. It would be awesome if someone want to contribute the integration.

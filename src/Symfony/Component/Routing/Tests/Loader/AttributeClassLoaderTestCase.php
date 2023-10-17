@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Alias;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AbstractClassController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\BazClass;
@@ -40,16 +40,10 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RequirementsWitho
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithEnv;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithPrefixController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\Utf8ActionControllers;
-use Symfony\Component\Routing\Tests\Fixtures\TraceableAnnotationClassLoader;
 
-class AnnotationClassLoaderTest extends TestCase
+abstract class AttributeClassLoaderTestCase extends TestCase
 {
-    private AnnotationClassLoader $loader;
-
-    protected function setUp(string $env = null): void
-    {
-        $this->loader = new TraceableAnnotationClassLoader($env);
-    }
+    protected AttributeClassLoader $loader;
 
     /**
      * @dataProvider provideTestSupportsChecksResource
@@ -74,7 +68,6 @@ class AnnotationClassLoaderTest extends TestCase
 
     public function testSupportsChecksTypeIfSpecified()
     {
-        $this->assertTrue($this->loader->supports('class', 'annotation'), '->supports() checks the resource type if specified');
         $this->assertTrue($this->loader->supports('class', 'attribute'), '->supports() checks the resource type if specified');
         $this->assertFalse($this->loader->supports('class', 'foo'), '->supports() checks the resource type if specified');
     }
@@ -330,5 +323,4 @@ class AnnotationClassLoaderTest extends TestCase
 
         $this->assertSame('symfony_component_routing_tests_fixtures_attributefixtures_encodingclass_routeàction', $defaultName);
     }
-
 }

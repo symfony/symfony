@@ -17,16 +17,17 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * AnnotationFileLoader loads routing information from annotations set
+ * AttributeFileLoader loads routing information from attributes set
  * on a PHP class and its methods.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
-class AnnotationFileLoader extends FileLoader
+class AttributeFileLoader extends FileLoader
 {
-    protected AnnotationClassLoader $loader;
+    protected $loader;
 
-    public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
+    public function __construct(FileLocatorInterface $locator, AttributeClassLoader $loader)
     {
         if (!\function_exists('token_get_all')) {
             throw new \LogicException('The Tokenizer extension is required for the routing annotation loaders.');
@@ -64,6 +65,10 @@ class AnnotationFileLoader extends FileLoader
 
     public function supports(mixed $resource, string $type = null): bool
     {
+        if ('annotation' === $type) {
+            trigger_deprecation('symfony/routing', '6.4', 'The "annotation" route type is deprecated, use the "attribute" route type instead.');
+        }
+
         return \is_string($resource) && 'php' === pathinfo($resource, \PATHINFO_EXTENSION) && (!$type || \in_array($type, ['annotation', 'attribute'], true));
     }
 
@@ -133,4 +138,8 @@ class AnnotationFileLoader extends FileLoader
 
         return false;
     }
+}
+
+if (!class_exists(AnnotationFileLoader::class, false)) {
+    class_alias(AttributeFileLoader::class, AnnotationFileLoader::class);
 }

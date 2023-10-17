@@ -61,7 +61,7 @@
         "symfony/http-foundation": "<6.4",
         "symfony/http-kernel": "<6.4",
         "symfony/mime": "<6.4",
-        "symfony/serializer": "<6.2",
+        "symfony/serializer": "<6.4",
         "symfony/translation": "<6.4",
         "symfony/workflow": "<6.4"
     },

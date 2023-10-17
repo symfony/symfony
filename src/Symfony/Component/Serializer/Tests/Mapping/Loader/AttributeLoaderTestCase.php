@@ -47,7 +47,6 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 <<<<<<<< HEAD:src/Symfony/Component/Serializer/Tests/Mapping/Loader/AnnotationLoaderTest.php
-class AnnotationLoaderTest extends TestCase
 ========
 abstract class AttributeLoaderTestCase extends TestCase
 >>>>>>>> 6.4:src/Symfony/Component/Serializer/Tests/Mapping/Loader/AttributeLoaderTestCase.php
@@ -227,28 +226,7 @@ abstract class AttributeLoaderTestCase extends TestCase
         self::assertSame(['a'], $attributesMetadata['baz']->getGroups());
     }
 
-<<<<<<<< HEAD:src/Symfony/Component/Serializer/Tests/Mapping/Loader/AnnotationLoaderTest.php
-    public function testLoadWithInvalidAttribute()
-    {
-        $this->expectException(MappingException::class);
-        $this->expectExceptionMessage('Could not instantiate attribute "Symfony\Component\Serializer\Annotation\Groups" on "Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy::myMethod()".');
-========
-    /**
-     * @group legacy
-     */
-    public function testExpectedDeprecationOnLoadAnnotationsCall()
-    {
-        $this->expectDeprecation('Since symfony/serializer 6.4: Method "Symfony\Component\Serializer\Mapping\Loader\AttributeLoader::loadAnnotations()" is deprecated without replacement.');
-        $this->loader->loadAnnotations(new \ReflectionClass(\stdClass::class));
-    }
-
     abstract protected function createLoader(): AttributeLoader;
->>>>>>>> 6.4:src/Symfony/Component/Serializer/Tests/Mapping/Loader/AttributeLoaderTestCase.php
-
-        $classMetadata = new ClassMetadata(BadAttributeDummy::class);
-
-        $this->loader->loadClassMetadata($classMetadata);
-    }
 
     protected function getLoaderForContextMapping(): AnnotationLoader
     {

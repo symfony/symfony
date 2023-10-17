@@ -58,6 +58,10 @@ CHANGELOG
  * Change `framework.asset_mapper.importmap_polyfill` from a URL to the name of an item in the importmap
  * Provide `$buildDir` when running `CacheWarmer` to build read-only resources
  * Add the global `--profile` option to the console to enable profiling commands
+ * Deprecate the `routing.loader.annotation` service, use the `routing.loader.attribute` service instead
+ * Deprecate the `routing.loader.annotation.directory` service, use the `routing.loader.attribute.directory` service instead
+ * Deprecate the `routing.loader.annotation.file` service, use the `routing.loader.attribute.file` service instead
+ * Deprecate `AnnotatedRouteControllerLoader`, use `AttributeRouteControllerLoader` instead
 
 6.3
 ---

@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -751,7 +751,7 @@ class SerializerTest extends TestCase
 
     public function testUnionTypeDeserializable()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $serializer = new Serializer(
             [
@@ -783,7 +783,7 @@ class SerializerTest extends TestCase
 
     public function testUnionTypeDeserializableWithoutAllowedExtraAttributes()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $serializer = new Serializer(
             [
@@ -838,7 +838,7 @@ class SerializerTest extends TestCase
 
     private function serializerWithClassDiscriminator()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         return new Serializer([new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))], ['json' => new JsonEncoder()]);
     }
@@ -1324,7 +1324,7 @@ class SerializerTest extends TestCase
 
     public function testCollectDenormalizationErrorsWithWrongPropertyWithoutConstruct()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $reflectionExtractor = new ReflectionExtractor();
         $propertyInfoExtractor = new PropertyInfoExtractor([], [$reflectionExtractor], [], [], []);
 
@@ -1409,7 +1409,7 @@ class SerializerTest extends TestCase
     {
         return [
             [null],
-            [new ClassMetadataFactory(new AnnotationLoader())],
+            [new ClassMetadataFactory(new AttributeLoader())],
         ];
     }
 

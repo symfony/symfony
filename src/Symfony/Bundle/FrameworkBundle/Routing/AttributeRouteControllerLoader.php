@@ -11,21 +11,24 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Route;
 
 /**
- * AnnotatedRouteControllerLoader is an implementation of AnnotationClassLoader
+ * AttributeRouteControllerLoader is an implementation of AttributeClassLoader
  * that sets the '_controller' default based on the class and method names.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
-class AnnotatedRouteControllerLoader extends AnnotationClassLoader
+class AttributeRouteControllerLoader extends AttributeClassLoader
 {
     /**
      * Configures the _controller default parameter of a given Route instance.
+     *
+     * @return void
      */
-    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot)
     {
         if ('__invoke' === $method->getName()) {
             $route->setDefault('_controller', $class->getName());
@@ -47,4 +50,8 @@ class AnnotatedRouteControllerLoader extends AnnotationClassLoader
 
         return str_replace('__', '_', $name);
     }
+}
+
+if (!class_exists(AnnotatedRouteControllerLoader::class, false)) {
+    class_alias(AttributeRouteControllerLoader::class, AnnotatedRouteControllerLoader::class);
 }

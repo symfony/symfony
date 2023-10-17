@@ -16,7 +16,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Serializer\Command\DebugCommand;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Tests\Dummy\DummyClassOne;
 
 /**
@@ -26,7 +26,7 @@ class DebugCommandTest extends TestCase
 {
     public function testOutputWithClassArgument()
     {
-        $command = new DebugCommand(new ClassMetadataFactory(new AnnotationLoader()));
+        $command = new DebugCommand(new ClassMetadataFactory(new AttributeLoader()));
 
         $tester = new CommandTester($command);
         $tester->execute(['class' => DummyClassOne::class], ['decorated' => false]);

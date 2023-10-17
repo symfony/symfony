@@ -9,11 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses;
+namespace Symfony\Component\Routing\Tests\Fixtures\AttributedClasses;
 
-class BazClass
+class FooClass
 {
-    public function __invoke()
-    {
-    }
 }

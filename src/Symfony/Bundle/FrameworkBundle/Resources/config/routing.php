@@ -15,7 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
-use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
+use Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader;
 use Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader;
 use Symfony\Bundle\FrameworkBundle\Routing\RedirectableCompiledUrlMatcher;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -24,8 +24,8 @@ use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
-use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Routing\Loader\AttributeDirectoryLoader;
+use Symfony\Component\Routing\Loader\AttributeFileLoader;
 use Symfony\Component\Routing\Loader\ContainerLoader;
 use Symfony\Component\Routing\Loader\DirectoryLoader;
 use Symfony\Component\Routing\Loader\GlobFileLoader;
@@ -92,25 +92,34 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('routing.loader')
 
-        ->set('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
+        ->set('routing.loader.attribute', AttributeRouteControllerLoader::class)
             ->args([
                 '%kernel.environment%',
             ])
             ->tag('routing.loader', ['priority' => -10])
 
-        ->set('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
+        ->alias('routing.loader.annotation', 'routing.loader.attribute')
+            ->deprecate('symfony/routing', '6.4', 'The "%alias_id%" service is deprecated, use the "routing.loader.attribute" service instead.')
+
+        ->set('routing.loader.attribute.directory', AttributeDirectoryLoader::class)
             ->args([
                 service('file_locator'),
-                service('routing.loader.annotation'),
+                service('routing.loader.attribute'),
             ])
             ->tag('routing.loader', ['priority' => -10])
 
-        ->set('routing.loader.annotation.file', AnnotationFileLoader::class)
+        ->alias('routing.loader.annotation.directory', 'routing.loader.attribute.directory')
+            ->deprecate('symfony/routing', '6.4', 'The "%alias_id%" service is deprecated, use the "routing.loader.attribute.directory" service instead.')
+
+        ->set('routing.loader.attribute.file', AttributeFileLoader::class)
             ->args([
                 service('file_locator'),
-                service('routing.loader.annotation'),
+                service('routing.loader.attribute'),
             ])
             ->tag('routing.loader', ['priority' => -10])
+
+        ->alias('routing.loader.annotation.file', 'routing.loader.attribute.file')
+            ->deprecate('symfony/routing', '6.4', 'The "%alias_id%" service is deprecated, use the "routing.loader.attribute.file" service instead.')
 
         ->set('routing.loader.psr4', Psr4DirectoryLoader::class)
             ->args([

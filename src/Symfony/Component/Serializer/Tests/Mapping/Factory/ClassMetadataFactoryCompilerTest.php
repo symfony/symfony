@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Mapping\Factory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryCompiler;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathDummy;
@@ -37,7 +37,7 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
 
     public function testItDumpMetadata()
     {
-        $classMetatadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetatadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $dummyMetadata = $classMetatadataFactory->getMetadataFor(Dummy::class);
         $maxDepthDummyMetadata = $classMetatadataFactory->getMetadataFor(MaxDepthDummy::class);

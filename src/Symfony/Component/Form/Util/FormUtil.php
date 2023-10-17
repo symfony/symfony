@@ -41,4 +41,29 @@ class FormUtil
         // not considered to be empty, ever.
         return null === $data || '' === $data;
     }
+
+    /**
+     * Recursively replaces or appends elements of the first array with elements
+     * of second array. If the key is an integer, the values will be appended to
+     * the new array; otherwise, the value from the second array will replace
+     * the one from the first array.
+     */
+    public static function mergeParamsAndFiles(array $params, array $files): array
+    {
+        $result = [];
+
+        foreach ($params as $key => $value) {
+            if (\is_array($value) && \is_array($files[$key] ?? null)) {
+                $value = self::mergeParamsAndFiles($value, $files[$key]);
+                unset($files[$key]);
+            }
+            if (\is_int($key)) {
+                $result[] = $value;
+            } else {
+                $result[$key] = $value;
+            }
+        }
+
+        return array_merge($result, $files);
+    }
 }

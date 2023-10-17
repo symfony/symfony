@@ -18,14 +18,12 @@ use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyThirdChild;
-use Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadMethodContextDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyParent;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyPromotedProperties;
@@ -46,19 +44,16 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-<<<<<<<< HEAD:src/Symfony/Component/Serializer/Tests/Mapping/Loader/AnnotationLoaderTest.php
-========
-abstract class AttributeLoaderTestCase extends TestCase
->>>>>>>> 6.4:src/Symfony/Component/Serializer/Tests/Mapping/Loader/AttributeLoaderTestCase.php
+class AttributeLoaderTest extends TestCase
 {
     use ContextMappingTestTrait;
     use ExpectDeprecationTrait;
 
-    private AnnotationLoader $loader;
+    protected AttributeLoader $loader;
 
     protected function setUp(): void
     {
-        $this->loader = new AnnotationLoader();
+        $this->loader = new AttributeLoader();
     }
 
     public function testInterface()
@@ -226,9 +221,7 @@ abstract class AttributeLoaderTestCase extends TestCase
         self::assertSame(['a'], $attributesMetadata['baz']->getGroups());
     }
 
-    abstract protected function createLoader(): AttributeLoader;
-
-    protected function getLoaderForContextMapping(): AnnotationLoader
+    protected function getLoaderForContextMapping(): AttributeLoader
     {
         return $this->loader;
     }

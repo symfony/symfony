@@ -1858,9 +1858,9 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = [];
         if (isset($config['enable_attributes']) && $config['enable_attributes']) {
-            $annotationLoader = new Definition(AttributeLoader::class);
+            $attributeLoader = new Definition(AttributeLoader::class);
 
-            $serializerLoaders[] = $annotationLoader;
+            $serializerLoaders[] = $attributeLoader;
         }
 
         $fileRecorder = function ($extension, $path) use (&$serializerLoaders) {

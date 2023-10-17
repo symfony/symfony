@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 
-class AttributeLoaderWithAttributesTest extends AttributeLoaderTestCase
+class AttributeLoaderWithAttributesTest extends AttributeLoaderTest
 {
     protected function createLoader(): AttributeLoader
     {

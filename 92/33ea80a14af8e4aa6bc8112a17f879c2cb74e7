@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-17T09:48:57Z
+
+> There's one thing I'm not comfortable with in this class, it's `string $publicPrefix = '/assets/'`.
+
+~I agree, but how could we mimic an external CDN on localhost ? :|~ (missread, sorry)
+
+How would you handle that ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-17T09:53:56Z
+
+The routing component is the one that can deal with this. IIRC, it uses `RequestContext` to do so.
+Instead of hardcoding the prefix, maybe we could let the routing component match the request and act on that?
+That'd require ppl to define a route in their apps (thanks to a recipe that should be easy). Then, this listener would act when the request has an attribute  (`_controller`?) that matches some convention to trigger it.
+WDYT? /cc @weaverryan
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-17T10:01:43Z
+
+> Instead of hardcoding the prefix
+
+It's just a default value... the instance from the container uses the "asset_mapper.public_prefix"
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-17T13:07:11Z
+
+> The routing component is the one that can deal with this. IIRC, it uses RequestContext to do so.
+Instead of hardcoding the prefix, maybe we could let the routing component match the request and act on that?
+
+I'm not sure there's a problem - the logic for checking to see if this controller should be used is:
+
+```php
+$pathInfo = $event->getRequest()->getPathInfo();
+if (!str_starts_with($pathInfo, $this->publicPrefix)) {
+    return;
+}
+```
+
+So the `pathInfo` removes the subdirectory for the comparison. I just tested with a subdirectory, and the paths all seem fine - but let me know if you still see some risk.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-17T13:11:30Z
+
+Thanks for checking :rocket:

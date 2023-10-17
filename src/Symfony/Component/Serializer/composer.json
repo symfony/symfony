@@ -39,7 +39,7 @@
         "symfony/property-info": "^5.4.24|^6.2.11|^7.0",
         "symfony/translation-contracts": "^2.5|^3",
         "symfony/uid": "^5.4|^6.0|^7.0",
-        "symfony/validator": "^5.4|^6.0|^7.0",
+        "symfony/validator": "^6.4|^7.0",
         "symfony/var-dumper": "^5.4|^6.0|^7.0",
         "symfony/var-exporter": "^5.4|^6.0|^7.0",
         "symfony/yaml": "^5.4|^6.0|^7.0"
@@ -51,6 +51,7 @@
         "symfony/dependency-injection": "<5.4",
         "symfony/property-access": "<5.4",
         "symfony/property-info": "<5.4.24|>=6,<6.2.11",
+        "symfony/validator": "<6.4",
         "symfony/uid": "<5.4",
         "symfony/yaml": "<5.4"
     },

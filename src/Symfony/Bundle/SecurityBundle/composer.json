@@ -45,7 +45,7 @@
         "symfony/ldap": "^5.4|^6.0|^7.0",
         "symfony/process": "^5.4|^6.0|^7.0",
         "symfony/rate-limiter": "^5.4|^6.0|^7.0",
-        "symfony/serializer": "^5.4|^6.0|^7.0",
+        "symfony/serializer": "^6.4|^7.0",
         "symfony/translation": "^5.4|^6.0|^7.0",
         "symfony/twig-bundle": "^5.4|^6.0|^7.0",
         "symfony/twig-bridge": "^5.4|^6.0|^7.0",

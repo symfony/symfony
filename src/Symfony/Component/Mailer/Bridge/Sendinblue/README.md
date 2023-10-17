@@ -20,7 +20,7 @@ With API, you can use custom headers.
 
 ```php
 $params = ['param1' => 'foo', 'param2' => 'bar'];
-$json = json_encode(['"custom_header_1' => 'custom_value_1']);
+$json = json_encode(['custom_header_1' => 'custom_value_1']);
 
 $email = new Email();
 $email
@@ -35,7 +35,7 @@ $email
 ;
 ```
 
-This example allow you to set :
+This example allow you to set:
 
  * templateId
  * params
@@ -44,7 +44,7 @@ This example allow you to set :
     * sender.ip
     * X-Mailin-Custom
 
-For more informations, you can refer to [Sendinblue API documentation](https://developers.sendinblue.com/reference#sendtransacemail).
+For more information, you can refer to [Sendinblue API documentation](https://developers.sendinblue.com/reference#sendtransacemail).
 
 Resources
 ---------

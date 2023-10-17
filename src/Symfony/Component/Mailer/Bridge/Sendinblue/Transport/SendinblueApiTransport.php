@@ -65,7 +65,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
         }
 
         if (201 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? $response->getContent(false)).sprintf(' (code %d).', $statusCode), $response);
         }
 
         $sentMessage->setMessageId($result['messageId']);

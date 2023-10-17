@@ -121,9 +121,9 @@ class Profiler implements ResetInterface
     /**
      * Finds profiler tokens for the given criteria.
      *
-     * @param int|null      $limit The maximum number of tokens to return
-     * @param string|null   $start The start date to search from
-     * @param string|null   $end   The end date to search to
+     * @param int|null      $limit  The maximum number of tokens to return
+     * @param string|null   $start  The start date to search from
+     * @param string|null   $end    The end date to search to
      * @param \Closure|null $filter A filter to apply on the list of tokens
      *
      * @see https://php.net/datetime.formats for the supported date/time formats

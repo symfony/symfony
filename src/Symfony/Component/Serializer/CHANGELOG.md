@@ -11,6 +11,7 @@ CHANGELOG
  * JsonDecode: Add `json_decode_detailed_errors` option
  * Make `ProblemNormalizer` give details about Messenger's `ValidationFailedException`
  * Add `XmlEncoder::CDATA_WRAPPING` context option
+ * Add support for union collection value types in `ArrayDenormalizer`
 
 6.3
 ---

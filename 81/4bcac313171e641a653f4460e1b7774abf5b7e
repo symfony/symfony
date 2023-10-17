@@ -1,0 +1,233 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-29T19:07:02Z
+
+Hey!
+
+I think @Seb33300 has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-09-13T16:13:06Z
+
+Rebased, this PR is now reviewable.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-10-22T12:28:06Z
+
+I've pushed a new implementation to use a `_virtual` request attribute instead of a virtual request type.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-10-22T14:21:03Z
+
+I've added support for profiling commands interrupted by signals.
+I've updated the PR description and added a screenshot as well.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-10-26T07:39:14Z
+
+@HeahDude did not find time to test on a personal project it but just a raw comment:
+
+given you screenshot in PR desc, is it possible to have the command with its arguments/options being copy on click?
+like by default the url of the request giving the current profile we are redirected to the url, here we mimic the logic but with the console, thus having the cli il the clipboard
+
+<img width="581" alt="197962426-c85e9f2b-89f6-4312-8e79-1de4ecaa5d19" src="https://user-images.githubusercontent.com/1358361/197963508-5ce6a789-1297-4b11-91d5-02d79a46b7a1.png">
+
+ℹ️ also I do not know if it is feasible, if the "server" is symfony cli, copy something like:
+
+- `symfony console app-delete-user -v`
+
+instead of
+
+- `bin/console app-delete-user -v`
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2022-11-22T14:47:45Z
+
+This would be very useful. Would a similar abstraction become possible for profiling messages processed by the messenger?
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-11-22T15:25:04Z
+
+> This would be very useful. Would a similar abstraction become possible for profiling messages processed by the messenger?
+
+@Jeroeny as per PR desc `Future scopes`, I think yes
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2022-11-27T16:42:26Z
+
+> ℹ️ also I do not know if it is feasible, if the "server" is symfony cli, copy something like:
+>
+> * `symfony console app-delete-user -v`
+>
+> instead of
+>
+> * `bin/console app-delete-user -v`
+
+I think now you can thanks to https://github.com/symfony-cli/symfony-cli/pull/231
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-01-13T12:36:24Z
+
+This is an amazing contribution @HeahDude. I hope this is reviewed and merged soon 🙏
+
+I have some ideas related to the UI of this feature. If you agree, I'd prefer to merge this PR and then I can open a new PR with the proposed UI changes to discuss about them.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2023-03-24T10:49:08Z
+
+Hey, first party CLI profiler support sounds awesome!
+
+I have been using a hacky solution to get CLI/Messenger profiles: https://github.com/sourceability/instrumentation/blob/1.0.1/src/Profiler/SymfonyProfiler.php
+
+Which is really really useful with https://github.com/sourceability/console-toolbar-bundle that [renders](https://github.com/sourceability/console-toolbar-bundle/blob/0.1.13/src/Console/ProfilerToolbarRenderer.php#L104) the profiler toolbar within the terminal.
+There is a video demo in https://github.com/Sylius/Sylius/pull/12711
+
+<img width="1242" alt="118685271-3f385080-b803-11eb-95f0-7d68c0e96857" src="https://user-images.githubusercontent.com/611271/227500328-dcdb2dbd-1fe6-4133-904b-cbb24fd56e49.png">
+<img width="1242" alt="118682929-321a6200-b801-11eb-8390-90e2c7056c95" src="https://user-images.githubusercontent.com/611271/227500728-f35947d2-dc26-472b-a280-87f12af5bae2.png">
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-03-27T16:05:26Z
+
+I want this as well. I think targeting 6.4 is fine, we'll need to adapt the way commands are tracked to take the upcoming Console changes into account anyway.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-06-19T10:53:00Z
+
+I'd like this to be one of the main new features of **Symfony 7** _(more exactly, 6.4 and 7.0)_.
+
+Please, let's work together to make this mergeable. Later, I'll send a PR to propose some design tweaks so we can iterate on that too. Thanks!
+
+---------------------------------------------------------------------------
+
+by 94noni at 2023-06-19T13:54:50Z
+
+Count me in for another round of review/local testing if needed!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2023-09-17T16:55:19Z
+
+> @HeahDude did not find time to test on a personal project it but just a raw comment:
+>
+> given you screenshot in PR desc, is it possible to have the command with its arguments/options being copy on click? like by default the url of the request giving the current profile we are redirected to the url, here we mimic the logic but with the console, thus having the cli il the clipboard
+>
+> <img alt="197962426-c85e9f2b-89f6-4312-8e79-1de4ecaa5d19" width="581" src="https://user-images.githubusercontent.com/1358361/197963508-5ce6a789-1297-4b11-91d5-02d79a46b7a1.png">
+>
+> ℹ️ also I do not know if it is feasible, if the "server" is symfony cli, copy something like:
+>
+> * `symfony console app-delete-user -v`
+>
+> instead of
+>
+> * `bin/console app-delete-user -v`
+
+-------
+I've added support for supporting Symfony CLI detection:
+<img width="857" alt="Screenshot 2023-09-17 at 6 53 40 PM" src="https://github.com/symfony/symfony/assets/10107633/27334be7-4900-4f96-865c-92c8aa6bba06">
+Copy/pasting the command could be done in another PR, I guess we have enough features in this one to review 😅.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2023-09-17T17:05:42Z
+
+The PR is rebased, updated with minor fixes and while getting rid of most limitations from the description which is updated as well.
+
+Following a discussion with @fabpot at the Symfony Live last March, I've dropped the semantic configuration in favor of a global `--profile` option for opt-in profiling.
+
+The console profiler is still compatible with the `only_exceptions` config that allows to profile only if the option is set AND if an error occurs, should we drop support for this config as well?
+
+Also, I've leveraged the new `SignalMap` to display proper labels for handled signals in the profiler page:
+<img width="1216" alt="Screenshot 2023-09-16 at 3 19 38 PM" src="https://github.com/symfony/symfony/assets/10107633/da308a91-6546-4276-9767-20d5d2372a2c">
+
+The exiting logic of handled signals prevents to profile a command when that occurs because signals listeners are run before the command handle them. So I added a dispatch of `console.terminate` event in those cases which works pretty well.
+But I guess it is a feature on its own, maybe to be extracted in another PR, WDYT?
+
+I'm ready for another round of testing and reviews :), thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-09-18T14:45:27Z
+
+> The console profiler is still compatible with the `only_exceptions` config that allows to profile only if the option is set AND if an error occurs, should we drop support for this config as well?
+
+I would drop this :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-09-26T19:11:20Z
+
+I love this feature, and IMHO the code is close to being good enough for inclusion in 6.4, but relying on a custom "HTTP" request emulation layer is definitely a hack.
+
+In a future iteration, couldn't we make the debug context independent from an HTTP request? For instance, we could introduce a `DebugContextInterface` that will be implemented by `Request` as well as by new specialized classes that will not inherit from everything related to HTTP such as `CliDebugContext`, `MessengerDebugContext`...).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-10-11T07:32:01Z
+
+What about @dunglas comments?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2023-10-11T07:57:07Z
+
+@fabpot all comments addressed, PR rebased, and changelogs updated :).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-10-11T09:52:39Z
+
+As discussed privately, this feature is so useful that it should not have to build on hacks.
+The doors it opens make it worth being implemented it in a way that does not imply to make CLI commands act as HTTP requests; as it goes against the core design of the Console component.
+
+Basically, we think it's time to reconsider https://github.com/symfony/symfony/pull/14809#issuecomment-313340589 and make the web profiler a standalone component that works in non-HTTP contexts, based on the work started there. Also, that component and its integration should probably be named [Inspector instead](https://github.com/symfony/symfony/issues/34042) of WebProfiler.
+
+If we agree then this PR can be closed so that @HeahDude and I can work towards the above goal.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2023-10-12T11:10:34Z
+
+Last commit makes `DebugRequestStack` internal, and removes its type-hint from everywhere.
+The introduced code of this PR is debug only, all final and internal.
+We're free to merge it as is in 6.4 and rework it altogether for 7.1 :).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-10-13T09:54:56Z
+
+https://github.com/symfony/symfony/pull/52038 has been merged - rebase unlocked.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2023-10-13T10:13:09Z
+
+Rebased and squashed.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2023-10-14T13:56:45Z
+
+The « deprecation » label can be removed :).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-17T12:37:42Z
+
+LGTM after a few changes I just pushed, but I agree with @stof it'd be great to get rid of this strange event-dispatcher + listener logic to start/stop sections. Doable in this PR?

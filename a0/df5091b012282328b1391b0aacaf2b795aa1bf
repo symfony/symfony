@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-03T07:33:31Z
+
+Or should this be fixed inside HeaderUtils::split() method?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-03T08:30:21Z
+
+I guess we have similar bugs in other places using `HeaderUtils::split` with multiple separator (i.e. all of them). That's because HeaderUtils considers that all separators are list separators. But `=` is a key-value separator.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-03T14:24:01Z
+
+So do you have a proposal on where to fix this?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-03T14:55:18Z
+
+Well, HeaderUtils should be the place to fix it, but not sure we can fix it with the existing signature (unless we hardcode a special behavior for `=`).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-06T14:24:58Z
+
+The bug is clearly in HeaderUtils, see
+https://github.com/symfony/symfony/blob/adcd3d06d078c86618ec3b27892e474483c63895/src/Symfony/Component/HttpFoundation/Tests/HeaderUtilsTest.php#L48
+
+`foo_cookie=foo==` is correctly parsed while `foo_cookie=foo=` isn't
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-06T16:02:03Z
+
+Will check on Monday 👍🏻
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-09T11:03:49Z
+
+Review please
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-17T09:28:03Z
+
+Thank you Nicolas!! 👏

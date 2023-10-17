@@ -62,9 +62,30 @@ trait ConstructorArgumentsTestTrait
         ];
 
         $normalizer = $this->getDenormalizerForConstructArguments();
+        try {
+            $normalizer->denormalize($data, ConstructorArgumentsObject::class);
+            self::fail(sprintf('Failed asserting that exception of type "%s" is thrown.', MissingConstructorArgumentsException::class));
+        } catch (MissingConstructorArgumentsException $e) {
+            self::assertSame(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$bar", "$baz".', ConstructorArgumentsObject::class), $e->getMessage());
+            self::assertSame(['bar', 'baz'], $e->getMissingConstructorArguments());
+        }
+    }
 
-        $this->expectException(MissingConstructorArgumentsException::class);
-        $this->expectExceptionMessage('Cannot create an instance of "'.ConstructorArgumentsObject::class.'" from serialized data because its constructor requires parameter "bar" to be present.');
-        $normalizer->denormalize($data, ConstructorArgumentsObject::class);
+    public function testExceptionsAreCollectedForConstructorWithMissingData()
+    {
+        $data = [
+            'foo' => 10,
+        ];
+
+        $exceptions = [];
+
+        $normalizer = $this->getDenormalizerForConstructArguments();
+        $normalizer->denormalize($data, ConstructorArgumentsObject::class, null, [
+            'not_normalizable_value_exceptions' => &$exceptions,
+        ]);
+
+        self::assertCount(2, $exceptions);
+        self::assertSame('Failed to create object because the class misses the "bar" property.', $exceptions[0]->getMessage());
+        self::assertSame('Failed to create object because the class misses the "baz" property.', $exceptions[1]->getMessage());
     }
 }

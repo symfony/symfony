@@ -348,7 +348,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             }
 
             $constructorParameters = $constructor->getParameters();
-
+            $missingConstructorArguments = [];
             $params = [];
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
@@ -401,7 +401,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     $params[] = null;
                 } else {
                     if (!isset($context['not_normalizable_value_exceptions'])) {
-                        throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name), 0, null, [$constructorParameter->name]);
+                        $missingConstructorArguments[] = $constructorParameter->name;
+                        continue;
                     }
 
                     $exception = NotNormalizableValueException::createForUnexpectedDataType(
@@ -412,23 +413,25 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         true
                     );
                     $context['not_normalizable_value_exceptions'][] = $exception;
-
-                    return $reflectionClass->newInstanceWithoutConstructor();
                 }
             }
 
-            if ($constructor->isConstructor()) {
-                try {
-                    return $reflectionClass->newInstanceArgs($params);
-                } catch (\TypeError $th) {
-                    if (!isset($context['not_normalizable_value_exceptions'])) {
-                        throw $th;
-                    }
+            if ($missingConstructorArguments) {
+                throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$%s".', $class, implode('", "$', $missingConstructorArguments)), 0, null, $missingConstructorArguments);
+            }
 
-                    return $reflectionClass->newInstanceWithoutConstructor();
-                }
-            } else {
+            if (!$constructor->isConstructor()) {
                 return $constructor->invokeArgs(null, $params);
+            }
+
+            try {
+                return $reflectionClass->newInstanceArgs($params);
+            } catch (\TypeError $e) {
+                if (!isset($context['not_normalizable_value_exceptions'])) {
+                    throw $e;
+                }
+
+                return $reflectionClass->newInstanceWithoutConstructor();
             }
         }
 

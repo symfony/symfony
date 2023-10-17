@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-17T08:45:47Z
+
+As Brevo is the 1:1 replacement for Sendinblue after their rebranding, can you please also update Mailer/Brevo and Notifier/Brevo bridges? Thanks
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-17T08:47:25Z
+
+@OskarStark done in https://github.com/symfony/symfony/pull/52096 as the Brevo transports only exist in the 6.4 branch, not in 5.4

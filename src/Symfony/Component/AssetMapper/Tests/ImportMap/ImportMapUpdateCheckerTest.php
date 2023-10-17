@@ -19,6 +19,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
 use Symfony\Component\AssetMapper\ImportMap\PackageUpdateInfo;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 class ImportMapUpdateCheckerTest extends TestCase
@@ -187,18 +188,18 @@ class ImportMapUpdateCheckerTest extends TestCase
     {
         $this->assertSame('GET', $method);
         $map = [
-            'https://registry.npmjs.org/@hotwired/stimulus' => new MockResponse(json_encode([
+            'https://registry.npmjs.org/@hotwired/stimulus' => new JsonMockResponse([
                 'dist-tags' => ['latest' => '4.0.1'], // Major update
-            ])),
-            'https://registry.npmjs.org/json5' => new MockResponse(json_encode([
+            ]),
+            'https://registry.npmjs.org/json5' => new JsonMockResponse([
                 'dist-tags' => ['latest' => '1.2.0'], // Minor update
-            ])),
-            'https://registry.npmjs.org/bootstrap' => new MockResponse(json_encode([
+            ]),
+            'https://registry.npmjs.org/bootstrap' => new JsonMockResponse([
                 'dist-tags' => ['latest' => '5.3.2'], // Patch update
-            ])),
-            'https://registry.npmjs.org/lodash' => new MockResponse(json_encode([
+            ]),
+            'https://registry.npmjs.org/lodash' => new JsonMockResponse([
                 'dist-tags' => ['latest' => '4.17.21'], // no update
-            ])),
+            ]),
         ];
 
         return $map[$url] ?? new MockResponse('Not found', ['http_code' => 404]);

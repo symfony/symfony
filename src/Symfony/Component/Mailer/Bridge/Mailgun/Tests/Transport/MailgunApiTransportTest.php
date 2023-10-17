@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunApiTransport;
 use Symfony\Component\Mailer\Envelope;
@@ -135,7 +136,7 @@ class MailgunApiTransportTest extends TestCase
             $this->assertStringContainsString('"Fabien" <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
 
-            return new MockResponse(json_encode(['id' => 'foobar']), [
+            return new JsonMockResponse(['id' => 'foobar'], [
                 'http_code' => 200,
             ]);
         });
@@ -164,7 +165,7 @@ class MailgunApiTransportTest extends TestCase
             $this->assertStringContainsString("Content-Disposition: form-data; name=\"o:tag\"\r\n\r\npassword-reset\r\n", $content);
             $this->assertStringContainsString("Content-Disposition: form-data; name=\"o:tag\"\r\n\r\nproduct-name\r\n", $content);
 
-            return new MockResponse(json_encode(['id' => 'foobar2']), [
+            return new JsonMockResponse(['id' => 'foobar2'], [
                 'http_code' => 200,
             ]);
         });
@@ -192,11 +193,8 @@ class MailgunApiTransportTest extends TestCase
             $this->assertSame('https://api.mailgun.net:8984/v3/symfony/messages', $url);
             $this->assertStringContainsStringIgnoringCase('Authorization: Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
-            return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
+            return new JsonMockResponse(['message' => 'i\'m a teapot'], [
                 'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
             ]);
         });
         $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us', $client);

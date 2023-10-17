@@ -20,7 +20,7 @@
         "symfony/mailer": "^5.4.21|^6.2.7"
     },
     "require-dev": {
-        "symfony/http-client": "^5.4|^6.0",
+        "symfony/http-client": "^6.3",
         "symfony/webhook": "^6.4"
     },
     "conflict": {

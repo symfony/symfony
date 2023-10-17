@@ -13,7 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunHttpTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
@@ -71,7 +71,7 @@ class MailgunHttpTransportTest extends TestCase
             $this->assertStringContainsString('From: Fabien <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
 
-            return new MockResponse(json_encode(['id' => 'foobar']), [
+            return new JsonMockResponse(['id' => 'foobar'], [
                 'http_code' => 200,
             ]);
         });
@@ -96,11 +96,8 @@ class MailgunHttpTransportTest extends TestCase
             $this->assertSame('https://api.mailgun.net:8984/v3/symfony/messages.mime', $url);
             $this->assertStringContainsString('Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
-            return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
+            return new JsonMockResponse(['message' => 'i\'m a teapot'], [
                 'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
             ]);
         });
         $transport = new MailgunHttpTransport('ACCESS_KEY', 'symfony', 'us', $client);

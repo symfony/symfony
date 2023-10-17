@@ -13,7 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Brevo\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -91,11 +91,8 @@ class BrevoApiTransportTest extends TestCase
             $this->assertSame('https://api.brevo.com:8984/v3/smtp/email', $url);
             $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
-            return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
+            return new JsonMockResponse(['message' => 'i\'m a teapot'], [
                 'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
             ]);
         });
 
@@ -120,7 +117,7 @@ class BrevoApiTransportTest extends TestCase
             $this->assertSame('https://api.brevo.com:8984/v3/smtp/email', $url);
             $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
-            return new MockResponse(json_encode(['messageId' => 'foobar']), [
+            return new JsonMockResponse(['messageId' => 'foobar'], [
                 'http_code' => 201,
             ]);
         });
@@ -165,7 +162,7 @@ class BrevoApiTransportTest extends TestCase
             $this->assertSame('info@xn--kltetechnik-xyz-0kb.de', $body['sender']['email']);
             $this->assertSame('Kältetechnik Xyz', $body['sender']['name']);
 
-            return new MockResponse(json_encode(['messageId' => 'foobar']), [
+            return new JsonMockResponse(['messageId' => 'foobar'], [
                 'http_code' => 201,
             ]);
         });

@@ -230,6 +230,42 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
+    public function testMergeParamsAndFilesMultiple($method)
+    {
+        $form = $this->createForm('param1', $method, true);
+        $form->add($this->createBuilder('field1', false, ['allow_file_upload' => true, 'multiple' => true])->getForm());
+        $file1 = $this->getUploadedFile();
+        $file2 = $this->getUploadedFile();
+
+        $this->setRequestData($method, [
+            'param1' => [
+                'field1' => [
+                    'foo',
+                    'bar',
+                    'baz',
+                ],
+            ],
+        ], [
+            'param1' => [
+                'field1' => [
+                    $file1,
+                    $file2,
+                ],
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+        $data = $form->get('field1')->getData();
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertIsArray($data);
+        $this->assertCount(5, $data);
+        $this->assertSame(['foo', 'bar', 'baz', $file1, $file2], $data);
+    }
+
+    /**
+     * @dataProvider methodExceptGetProvider
+     */
     public function testParamTakesPrecedenceOverFile($method)
     {
         $form = $this->createForm('param1', $method);

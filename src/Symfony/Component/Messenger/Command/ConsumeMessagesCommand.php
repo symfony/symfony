@@ -271,7 +271,7 @@ EOF
 
         $this->worker->stop();
 
-        return 0;
+        return false;
     }
 
     private function convertToBytes(string $memoryLimit): int

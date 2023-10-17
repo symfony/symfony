@@ -71,4 +71,22 @@ trait ConstructorArgumentsTestTrait
             self::assertSame(['bar', 'baz'], $e->getMissingConstructorArguments());
         }
     }
+
+    public function testExceptionsAreCollectedForConstructorWithMissingData()
+    {
+        $data = [
+            'foo' => 10,
+        ];
+
+        $exceptions = [];
+
+        $normalizer = $this->getDenormalizerForConstructArguments();
+        $normalizer->denormalize($data, ConstructorArgumentsObject::class, null, [
+            'not_normalizable_value_exceptions' => &$exceptions,
+        ]);
+
+        self::assertCount(2, $exceptions);
+        self::assertSame('Failed to create object because the class misses the "bar" property.', $exceptions[0]->getMessage());
+        self::assertSame('Failed to create object because the class misses the "baz" property.', $exceptions[1]->getMessage());
+    }
 }

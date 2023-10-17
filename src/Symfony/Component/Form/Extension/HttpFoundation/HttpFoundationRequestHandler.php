@@ -15,6 +15,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
+use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -95,7 +96,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             }
 
             if (\is_array($params) && \is_array($files)) {
-                $data = array_replace_recursive($params, $files);
+                $data = FormUtil::mergeParamsAndFiles($params, $files);
             } else {
                 $data = $params ?: $files;
             }

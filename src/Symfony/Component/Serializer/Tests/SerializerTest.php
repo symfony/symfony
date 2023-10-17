@@ -68,6 +68,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TrueBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\UpcomingDenormalizerInterface as DenormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\UpcomingNormalizerInterface as NormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\WithTypedConstructor;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
 
@@ -1207,6 +1208,85 @@ class SerializerTest extends TestCase
                 'path' => 'bool',
                 'useMessageForUser' => false,
                 'message' => 'The type of the "bool" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php80WithPromotedTypedConstructor" must be one of "bool" ("string" given).',
+            ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    'unknown',
+                ],
+                'path' => null,
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the class misses the "string" property.',
+            ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    'unknown',
+                ],
+                'path' => null,
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the class misses the "int" property.',
+            ],
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
+    }
+
+    public function testCollectDenormalizationErrorsWithInvalidConstructorTypes()
+    {
+        $json = '{"string": "some string", "bool": "bool", "int": true}';
+
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+
+        $serializer = new Serializer(
+            [new ObjectNormalizer(null, null, null, $extractor)],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize($json, WithTypedConstructor::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $this->assertInstanceOf(WithTypedConstructor::class, $object = $th->getData());
+
+        $this->assertSame('some string', $object->string);
+        $this->assertTrue($object->bool);
+        $this->assertSame(1, $object->int);
+
+        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
+            return [
+                'currentType' => $e->getCurrentType(),
+                'expectedTypes' => $e->getExpectedTypes(),
+                'path' => $e->getPath(),
+                'useMessageForUser' => $e->canUseMessageForUser(),
+                'message' => $e->getMessage(),
+            ];
+        }, $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'string',
+                'expectedTypes' => [
+                    0 => 'bool',
+                ],
+                'path' => 'bool',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "bool" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\WithTypedConstructor" must be one of "bool" ("string" given).',
+            ],
+            [
+                'currentType' => 'bool',
+                'expectedTypes' => [
+                    0 => 'int',
+                ],
+                'path' => 'int',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "int" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\WithTypedConstructor" must be one of "int" ("bool" given).',
             ],
         ];
 

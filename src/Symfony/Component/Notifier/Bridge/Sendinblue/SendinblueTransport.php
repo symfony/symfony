@@ -77,7 +77,7 @@ final class SendinblueTransport extends AbstractTransport
         if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException('Unable to send the SMS: '.$error['message'], $response);
+            throw new TransportException('Unable to send the SMS: '.($error['message'] ?? $response->getContent(false)), $response);
         }
 
         $success = $response->toArray(false);

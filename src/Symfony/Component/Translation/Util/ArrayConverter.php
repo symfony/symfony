@@ -96,7 +96,10 @@ class ArrayConverter
         }
     }
 
-    private static function getKeyParts(string $key)
+    /**
+     * @return string[]
+     */
+    private static function getKeyParts(string $key): array
     {
         $parts = explode('.', $key);
         $partsCount = \count($parts);

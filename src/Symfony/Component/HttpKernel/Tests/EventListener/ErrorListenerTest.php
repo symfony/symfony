@@ -244,6 +244,19 @@ class ErrorListenerTest extends TestCase
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
     }
 
+    public function testTerminating()
+    {
+        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel->expects($this->never())->method('handle');
+
+        $request = Request::create('/');
+
+        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'), true);
+        $listener->onKernelException($event);
+    }
+
     /**
      * @dataProvider controllerProvider
      */

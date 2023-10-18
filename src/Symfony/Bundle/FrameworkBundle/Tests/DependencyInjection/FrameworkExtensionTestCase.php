@@ -505,7 +505,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('workflows_enabled');
 
-        $this->assertTrue($container->hasDefinition('.workflow.registry'));
+        $this->assertTrue($container->hasDefinition('workflow.registry'));
         $this->assertTrue($container->hasDefinition('console.command.workflow_dump'));
     }
 

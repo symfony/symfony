@@ -409,16 +409,6 @@ diff --git a/src/Symfony/Component/HttpKernel/KernelInterface.php b/src/Symfony/
 +    public function shutdown(): void;
  
      /**
-diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
---- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-+++ b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-@@ -324,5 +324,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
-      * @return void
-      */
--    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
-+    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
- 
-     /**
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php

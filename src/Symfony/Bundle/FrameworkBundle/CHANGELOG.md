@@ -24,6 +24,10 @@ CHANGELOG
  * Make the `framework.validation.email_validation_mode` config option default to `html5`
  * Remove the `framework.validation.enable_annotations` config option, use `framework.validation.enable_attributes` instead
  * Remove the `framework.serializer.enable_annotations` config option, use `framework.serializer.enable_attributes` instead
+ * Remove the `routing.loader.annotation` service, use the `routing.loader.attribute` service instead
+ * Remove the `routing.loader.annotation.directory` service, use the `routing.loader.attribute.directory` service instead
+ * Remove the `routing.loader.annotation.file` service, use the `routing.loader.attribute.file` service instead
+ * Remove `AnnotatedRouteControllerLoader`, use `AttributeRouteControllerLoader` instead
 
 6.4
 ---

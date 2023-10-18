@@ -59,17 +59,6 @@ class AttributeDirectoryLoaderTest extends TestCase
         $this->assertFalse($this->loader->supports($fixturesDir, 'foo'), '->supports() checks the resource type if specified');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testSupportsAnnotations()
-    {
-        $fixturesDir = __DIR__.'/../Fixtures';
-
-        $this->expectDeprecation('Since symfony/routing 6.4: The "annotation" route type is deprecated, use the "attribute" route type instead.');
-        $this->assertTrue($this->loader->supports($fixturesDir, 'annotation'), '->supports() checks the resource type if specified');
-    }
-
     public function testItSupportsAnyAttribute()
     {
         $this->assertTrue($this->loader->supports(__DIR__.'/../Fixtures/even-with-not-existing-folder', 'attribute'));

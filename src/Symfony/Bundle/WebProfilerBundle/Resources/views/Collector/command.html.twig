@@ -75,7 +75,7 @@
                         <p>No arguments were set</p>
                     </div>
                 {% else %}
-                    {% include '@WebProfiler/Profiler/table.html.twig' with { data: collector.arguments, labels: ['Argument', 'Value'], maxDepth: 2 } only %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.arguments, labels: ['Argument', 'Value'], maxDepth: 2 }, with_context=false) }}
                 {% endif %}
 
                 <h3>Options</h3>
@@ -85,7 +85,7 @@
                         <p>No options were set</p>
                     </div>
                 {% else %}
-                    {% include '@WebProfiler/Profiler/table.html.twig' with { data: collector.options, labels: ['Option', 'Value'], maxDepth: 2 } only %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.options, labels: ['Option', 'Value'], maxDepth: 2 }, with_context=false) }}
                 {% endif %}
 
                 {% if collector.interactive %}
@@ -100,7 +100,7 @@
                             <p>No inputs were set</p>
                         </div>
                     {% else %}
-                        {% include '@WebProfiler/Profiler/table.html.twig' with { data: collector.interactiveInputs, labels: ['Input', 'Value'], maxDepth: 2 } only %}
+                        {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.interactiveInputs, labels: ['Input', 'Value'], maxDepth: 2 }, with_context=false) }}
                     {% endif %}
                 {% endif %}
 
@@ -111,7 +111,7 @@
                         <p>No application inputs are set</p>
                     </div>
                 {% else %}
-                    {% include '@WebProfiler/Profiler/table.html.twig' with { data: collector.applicationInputs, labels: ['Input', 'Value'], maxDepth: 2 } only %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.applicationInputs, labels: ['Input', 'Value'], maxDepth: 2 }, with_context=false) }}
                 {% endif %}
             </div>
         </div>

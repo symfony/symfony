@@ -6,6 +6,7 @@
             "choice_attr",
             "choice_filter",
             "choice_label",
+            "choice_lazy",
             "choice_loader",
             "choice_name",
             "choice_translation_domain",

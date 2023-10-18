@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
@@ -2276,5 +2277,112 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertSame('10', $view['choice_two']->vars['choices'][0]->value);
         $this->assertSame('20', $view['choice_two']->vars['choices'][1]->value);
         $this->assertSame('30', $view['choice_two']->vars['choices'][2]->value);
+    }
+
+    public function testChoiceLazyThrowsWhenChoiceLoaderIsNotSet()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "choice_lazy" option can only be used if the "choice_loader" option is set.');
+
+        $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_lazy' => true,
+        ]);
+    }
+
+    public function testChoiceLazyLoadsAndRendersNothingWhenNoDataSet()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_loader' => new CallbackChoiceLoader(fn () => ['a' => 'A', 'b' => 'B']),
+            'choice_lazy' => true,
+        ]);
+
+        $this->assertNull($form->getData());
+
+        $view = $form->createView();
+        $this->assertArrayHasKey('choices', $view->vars);
+        $this->assertSame([], $view->vars['choices']);
+    }
+
+    public function testChoiceLazyLoadsAndRendersOnlyDataSetViaDefault()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, 'A', [
+            'choice_loader' => new CallbackChoiceLoader(fn () => ['a' => 'A', 'b' => 'B']),
+            'choice_lazy' => true,
+        ]);
+
+        $this->assertSame('A', $form->getData());
+
+        $view = $form->createView();
+        $this->assertArrayHasKey('choices', $view->vars);
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame('A', $view->vars['choices'][0]->value);
+    }
+
+    public function testChoiceLazyLoadsAndRendersOnlyDataSetViaSubmit()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_loader' => new CallbackChoiceLoader(fn () => ['a' => 'A', 'b' => 'B']),
+            'choice_lazy' => true,
+        ]);
+
+        $form->submit('B');
+        $this->assertSame('B', $form->getData());
+
+        $view = $form->createView();
+        $this->assertArrayHasKey('choices', $view->vars);
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame('B', $view->vars['choices'][0]->value);
+    }
+
+    public function testChoiceLazyErrorWhenInvalidSubmitData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_loader' => new CallbackChoiceLoader(fn () => ['a' => 'A', 'b' => 'B']),
+            'choice_lazy' => true,
+        ]);
+
+        $form->submit('invalid');
+        $this->assertNull($form->getData());
+
+        $view = $form->createView();
+        $this->assertArrayHasKey('choices', $view->vars);
+        $this->assertCount(0, $view->vars['choices']);
+        $this->assertCount(1, $form->getErrors());
+        $this->assertSame('ERROR: The selected choice is invalid.', trim((string) $form->getErrors()));
+    }
+
+    public function testChoiceLazyMultipleWithDefaultData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['A', 'B'], [
+            'choice_loader' => new CallbackChoiceLoader(fn () => ['a' => 'A', 'b' => 'B', 'c' => 'C']),
+            'choice_lazy' => true,
+            'multiple' => true,
+        ]);
+
+        $this->assertSame(['A', 'B'], $form->getData());
+
+        $view = $form->createView();
+        $this->assertArrayHasKey('choices', $view->vars);
+        $this->assertCount(2, $view->vars['choices']);
+        $this->assertSame('A', $view->vars['choices'][0]->value);
+        $this->assertSame('B', $view->vars['choices'][1]->value);
+    }
+
+    public function testChoiceLazyMultipleWithSubmittedData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_loader' => new CallbackChoiceLoader(fn () => ['a' => 'A', 'b' => 'B', 'c' => 'C']),
+            'choice_lazy' => true,
+            'multiple' => true,
+        ]);
+
+        $form->submit(['B', 'C']);
+        $this->assertSame(['B', 'C'], $form->getData());
+
+        $view = $form->createView();
+        $this->assertArrayHasKey('choices', $view->vars);
+        $this->assertCount(2, $view->vars['choices']);
+        $this->assertSame('B', $view->vars['choices'][0]->value);
+        $this->assertSame('C', $view->vars['choices'][1]->value);
     }
 }

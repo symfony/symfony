@@ -30,6 +30,7 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringCastableIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
+use Symfony\Component\Form\ChoiceList\Loader\LazyChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\RuntimeException;
@@ -1757,5 +1758,129 @@ class EntityTypeTest extends BaseTypeTestCase
 
         $this->assertSame('Foo', $view['entity_two']->vars['choices']['Foo']->value);
         $this->assertSame('Bar', $view['entity_two']->vars['choices']['Bar']->value);
+    }
+
+    public function testEmptyChoicesWhenLazy()
+    {
+        if (!class_exists(LazyChoiceLoader::class)) {
+            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
+        }
+
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'choice_lazy' => true,
+            ])
+            ->createView()
+        ;
+
+        $this->assertCount(0, $view['entity_one']->vars['choices']);
+    }
+
+    public function testLoadedChoicesWhenLazyAndBoundData()
+    {
+        if (!class_exists(LazyChoiceLoader::class)) {
+            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
+        }
+
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE, ['entity_one' => $entity1])
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'choice_lazy' => true,
+            ])
+            ->createView()
+        ;
+
+        $this->assertCount(1, $view['entity_one']->vars['choices']);
+        $this->assertSame('1', $view['entity_one']->vars['choices'][1]->value);
+    }
+
+    public function testLoadedChoicesWhenLazyAndSubmittedData()
+    {
+        if (!class_exists(LazyChoiceLoader::class)) {
+            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
+        }
+
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'choice_lazy' => true,
+            ])
+            ->submit(['entity_one' => '2'])
+            ->createView()
+        ;
+
+        $this->assertCount(1, $view['entity_one']->vars['choices']);
+        $this->assertSame('2', $view['entity_one']->vars['choices'][2]->value);
+    }
+
+    public function testEmptyChoicesWhenLazyAndEmptyDataIsSubmitted()
+    {
+        if (!class_exists(LazyChoiceLoader::class)) {
+            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
+        }
+
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE, ['entity_one' => $entity1])
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'choice_lazy' => true,
+            ])
+            ->submit([])
+            ->createView()
+        ;
+
+        $this->assertCount(0, $view['entity_one']->vars['choices']);
+    }
+
+    public function testErrorOnSubmitInvalidValuesWhenLazyAndCustomQueryBuilder()
+    {
+        if (!class_exists(LazyChoiceLoader::class)) {
+            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
+        }
+
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+        $qb = $this->em
+            ->createQueryBuilder()
+            ->select('e')
+            ->from(self::SINGLE_IDENT_CLASS, 'e')
+            ->where('e.id = 2')
+        ;
+
+        $form = $this->factory->create(FormTypeTest::TESTED_TYPE, ['entity_one' => $entity2])
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'query_builder' => $qb,
+                'choice_lazy' => true,
+            ])
+            ->submit(['entity_one' => '1'])
+        ;
+        $view = $form->createView();
+
+        $this->assertCount(0, $view['entity_one']->vars['choices']);
+        $this->assertCount(1, $errors = $form->getErrors(true));
+        $this->assertSame('The selected choice is invalid.', $errors->current()->getMessage());
     }
 }

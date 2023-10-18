@@ -1771,4 +1771,108 @@ class EntityTypeTest extends BaseTypeTestCase
         $this->assertSame('Foo', $view['entity_two']->vars['choices']['Foo']->value);
         $this->assertSame('Bar', $view['entity_two']->vars['choices']['Bar']->value);
     }
+
+    public function testEmptyChoicesWhenLazy()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'extra_lazy' => true,
+            ])
+            ->createView()
+        ;
+
+        $this->assertCount(0, $view['entity_one']->vars['choices']);
+    }
+
+    public function testLoadedChoicesWhenLazyAndBoundData()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE, ['entity_one' => $entity1])
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'extra_lazy' => true,
+            ])
+            ->createView()
+        ;
+
+        $this->assertCount(1, $view['entity_one']->vars['choices']);
+        $this->assertSame('1', $view['entity_one']->vars['choices'][1]->value);
+    }
+
+    public function testLoadedChoicesWhenLazyAndSubmittedData()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'extra_lazy' => true,
+            ])
+            ->submit(['entity_one' => '2'])
+            ->createView()
+        ;
+
+        $this->assertCount(1, $view['entity_one']->vars['choices']);
+        $this->assertSame('2', $view['entity_one']->vars['choices'][2]->value);
+    }
+
+    public function testEmptyChoicesWhenLazyAndEmptyDataIsSubmitted()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE, ['entity_one' => $entity1])
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'extra_lazy' => true,
+            ])
+            ->submit([])
+            ->createView()
+        ;
+
+        $this->assertCount(0, $view['entity_one']->vars['choices']);
+    }
+
+    public function testErrorOnSubmitInvalidValuesWhenLazyAndCustomQueryBuilder()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+        $qb = $this->em
+            ->createQueryBuilder()
+            ->select('e')
+            ->from(self::SINGLE_IDENT_CLASS, 'e')
+            ->where('e.id = 2')
+        ;
+
+        $form = $this->factory->create(FormTypeTest::TESTED_TYPE, ['entity_one' => $entity2])
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'query_builder' => $qb,
+                'extra_lazy' => true,
+            ])
+            ->submit(['entity_one' => '1'])
+        ;
+        $view = $form->createView();
+
+        $this->assertCount(0, $view['entity_one']->vars['choices']);
+        $this->assertCount(1, $errors = $form->getErrors(true));
+        $this->assertSame('The selected choice is invalid.', $errors->current()->getMessage());
+    }
 }

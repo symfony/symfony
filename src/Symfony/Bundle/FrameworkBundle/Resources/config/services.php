@@ -48,7 +48,6 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpKernel\UriSigner as HttpKernelUriSigner;
 use Symfony\Component\Runtime\Runner\Symfony\HttpKernelRunner;
 use Symfony\Component\Runtime\Runner\Symfony\ResponseRunner;
 use Symfony\Component\Runtime\SymfonyRuntime;
@@ -158,8 +157,6 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.secret'),
             ])
         ->alias(UriSigner::class, 'uri_signer')
-        ->alias(HttpKernelUriSigner::class, 'uri_signer')
-            ->deprecate('symfony/framework-bundle', '6.4', 'The "%alias_id%" alias is deprecated, use "'.UriSigner::class.'" instead.')
 
         ->set('config_cache_factory', ResourceCheckerConfigCacheFactory::class)
             ->args([

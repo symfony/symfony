@@ -45,16 +45,6 @@ class DelayedMessageHandlingException extends RuntimeException implements Wrappe
         parent::__construct($message, 0, $exceptions[array_key_first($exceptions)]);
     }
 
-    /**
-     * @deprecated since Symfony 6.4, use {@see self::getWrappedExceptions()} instead
-     */
-    public function getExceptions(): array
-    {
-        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions()" instead.', __METHOD__, self::class);
-
-        return $this->exceptions;
-    }
-
     public function getEnvelope(): Envelope
     {
         return $this->envelope;

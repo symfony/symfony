@@ -375,6 +375,8 @@ Messenger
  * Remove `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
  * Rename `Symfony\Component\Messenger\Transport\InMemoryTransport` and `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` to
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory` respectively
+ * Remove `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
+   and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
 
 Mime
 ----
@@ -414,6 +416,8 @@ Security
  * Add parameter `string $badgeFqcn = null` to `Passport::addBadge()`
  * Add parameter `int $lifetime = null` to `LoginLinkHandlerInterface::createLoginLink()`
  * Require explicit argument when calling `TokenStorage::setToken()`
+ * Change argument `$lastUsed` of `TokenProviderInterface::updateToken()` to accept `DateTimeInterface`
+ * Throw when calling the constructor of `DefaultLoginRateLimiter` with an empty secret
 
 SecurityBundle
 --------------

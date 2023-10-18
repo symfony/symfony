@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\AttributeDirectoryLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AttributedClasses\BarClass;
@@ -23,8 +22,6 @@ use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
 class AttributeDirectoryLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private AttributeDirectoryLoader $loader;
     private TraceableAttributeClassLoader $classLoader;
 

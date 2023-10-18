@@ -45,31 +45,4 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
     {
         return $this->envelope;
     }
-
-    /**
-     * @deprecated since Symfony 6.4, use {@see self::getWrappedExceptions()} instead
-     *
-     * @return \Throwable[]
-     */
-    public function getNestedExceptions(): array
-    {
-        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions()" instead.', __METHOD__, self::class);
-
-        return $this->exceptions;
-    }
-
-    /**
-     * @deprecated since Symfony 6.4, use {@see self::getWrappedExceptions()} instead
-     */
-    public function getNestedExceptionOfClass(string $exceptionClassName): array
-    {
-        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions()" instead.', __METHOD__, self::class);
-
-        return array_values(
-            array_filter(
-                $this->exceptions,
-                fn ($exception) => is_a($exception, $exceptionClassName)
-            )
-        );
-    }
 }

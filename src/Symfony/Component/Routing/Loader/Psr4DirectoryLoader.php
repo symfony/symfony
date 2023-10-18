@@ -48,7 +48,7 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
 
     public function supports(mixed $resource, string $type = null): bool
     {
-        return ('attribute' === $type || 'annotation' === $type) && \is_array($resource) && isset($resource['path'], $resource['namespace']);
+        return 'attribute' === $type && \is_array($resource) && isset($resource['path'], $resource['namespace']);
     }
 
     public function forDirectory(string $currentDirectory): static

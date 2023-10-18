@@ -213,6 +213,11 @@ Templating
 
  * The component is deprecated and will be removed in 7.0, use [Twig](https://twig.symfony.com) instead
 
+Translator
+----------
+
+ * [BC Break] Add argument `$buildDir` to `DataCollectorTranslator::warmUp()`
+
 Validator
 ---------
 

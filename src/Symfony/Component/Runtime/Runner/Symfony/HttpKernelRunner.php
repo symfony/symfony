@@ -24,13 +24,14 @@ class HttpKernelRunner implements RunnerInterface
     public function __construct(
         private readonly HttpKernelInterface $kernel,
         private readonly Request $request,
+        private readonly bool $debug = false,
     ) {
     }
 
     public function run(): int
     {
         $response = $this->kernel->handle($this->request);
-        $response->send();
+        $response->send(!$this->debug);
 
         if ($this->kernel instanceof TerminableInterface) {
             $this->kernel->terminate($this->request, $response);

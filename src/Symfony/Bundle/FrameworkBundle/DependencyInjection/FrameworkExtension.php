@@ -49,6 +49,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\DataCollector\CommandDataCollector;
 use Symfony\Component\Console\Debug\CliRequest;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
@@ -900,6 +901,10 @@ class FrameworkExtension extends Extension
 
         if (!$container->getParameter('kernel.debug') || !class_exists(CliRequest::class) || !$container->has('debug.stopwatch')) {
             $container->removeDefinition('console_profiler_listener');
+        }
+
+        if (!class_exists(CommandDataCollector::class)) {
+            $container->removeDefinition('.data_collector.command');
         }
     }
 

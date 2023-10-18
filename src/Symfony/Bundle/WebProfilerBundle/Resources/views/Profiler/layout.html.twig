@@ -9,13 +9,13 @@
             {% if profile is defined %}
                 {% set request_collector = profile.collectors.request|default(false) %}
 
-                {% include '@WebProfiler/Profiler/_%s_summary.html.twig'|format(profile_type) with {
+                {{ include('@WebProfiler/Profiler/_%s_summary.html.twig'|format(profile_type), {
                     profile: profile,
                     command_collector: profile.collectors.command|default(false) ,
                     request_collector: request_collector,
                     request: request,
                     token: token
-                } only %}
+                }, with_context=false) }}
             {% endif %}
         {% endblock %}
     </div>

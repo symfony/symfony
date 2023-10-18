@@ -131,7 +131,7 @@ class SymfonyRuntime extends GenericRuntime
     public function getRunner(?object $application): RunnerInterface
     {
         if ($application instanceof HttpKernelInterface) {
-            return new HttpKernelRunner($application, Request::createFromGlobals());
+            return new HttpKernelRunner($application, Request::createFromGlobals(), $this->options['debug'] ?? false);
         }
 
         if ($application instanceof Response) {

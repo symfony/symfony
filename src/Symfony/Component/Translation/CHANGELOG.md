@@ -12,6 +12,7 @@ CHANGELOG
 
  * Give current locale to `LocaleSwitcher::runWithLocale()`'s callback
  * Add `--as-tree` option to `translation:pull` command to write YAML messages as a tree-like structure
+ * [BC BREAK] Add argument `$buildDir` to `DataCollectorTranslator::warmUp()`
 
 6.3
 ---

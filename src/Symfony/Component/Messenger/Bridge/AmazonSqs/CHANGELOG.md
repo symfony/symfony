@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `AddFifoStampMiddleware` to help adding `AmazonSqsFifoStamp`
+
 6.1
 ---
 

@@ -71,17 +71,13 @@ abstract class Composite extends Constraint
 
                 throw new ConstraintDefinitionException(sprintf('The value "%s" is not an instance of Constraint in constraint "%s".', $constraint, static::class));
             }
-
-            if ($constraint instanceof Valid) {
-                throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint "%s". You can only declare the Valid constraint directly on a field or method.', static::class));
-            }
         }
 
         if (!isset(((array) $this)['groups'])) {
             $mergedGroups = [];
 
             foreach ($nestedConstraints as $constraint) {
-                foreach ($constraint->groups as $group) {
+                foreach ($constraint->groups ?? [self::DEFAULT_GROUP] as $group) {
                     $mergedGroups[$group] = true;
                 }
             }

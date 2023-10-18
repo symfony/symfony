@@ -139,12 +139,13 @@ EOT
         foreach ($allAssets as $asset) {
             // $asset->getPublicPath() will start with a "/"
             $targetPath = $publicDir.$asset->publicPath;
-
-            if (!is_dir($dir = \dirname($targetPath))) {
-                $this->filesystem->mkdir($dir);
+            if (null !== $asset->content) {
+                // The original content has been modified by the AssetMapperCompiler
+                $this->filesystem->dumpFile($targetPath, $asset->content);
+            } else {
+                $this->filesystem->copy($asset->sourcePath, $targetPath, true);
             }
 
-            $this->filesystem->dumpFile($targetPath, $asset->content);
             $manifest[$asset->logicalPath] = $asset->publicPath;
         }
         ksort($manifest);

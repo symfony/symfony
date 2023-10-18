@@ -37,13 +37,12 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
 
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
     {
-        if (\in_array($logicalPath, $this->assetsBeingCreated, true)) {
+        if (isset($this->assetsBeingCreated[$logicalPath])) {
             throw new CircularAssetsException(sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
         }
+        $this->assetsBeingCreated[$logicalPath] = $logicalPath;
 
         if (!isset($this->assetsCache[$logicalPath])) {
-            $this->assetsBeingCreated[] = $logicalPath;
-
             $isVendor = $this->isVendor($sourcePath);
             $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath), isVendor: $isVendor);
 
@@ -54,7 +53,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
                 $asset->sourcePath,
                 $asset->publicPathWithoutDigest,
                 $this->getPublicPath($asset),
-                $this->calculateContent($asset),
+                $this->compileContent($asset),
                 $digest,
                 $isPredigested,
                 $isVendor,
@@ -64,9 +63,9 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
             );
 
             $this->assetsCache[$logicalPath] = $asset;
-
-            array_pop($this->assetsBeingCreated);
         }
+
+        unset($this->assetsBeingCreated[$logicalPath]);
 
         return $this->assetsCache[$logicalPath];
     }
@@ -83,15 +82,20 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
             return [$matches[1], true];
         }
 
+        // Use the compiled content if any
+        if (null !== $content = $this->compileContent($asset)) {
+            return [hash('xxh128', $content), false];
+        }
+
         return [
-            hash('xxh128', $this->calculateContent($asset)),
+            hash_file('xxh128', $asset->sourcePath),
             false,
         ];
     }
 
-    private function calculateContent(MappedAsset $asset): string
+    private function compileContent(MappedAsset $asset): ?string
     {
-        if (isset($this->fileContentsCache[$asset->logicalPath])) {
+        if (\array_key_exists($asset->logicalPath, $this->fileContentsCache)) {
             return $this->fileContentsCache[$asset->logicalPath];
         }
 
@@ -99,12 +103,14 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
             throw new RuntimeException(sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
         }
 
+        if (!$this->compiler->supports($asset)) {
+            return $this->fileContentsCache[$asset->logicalPath] = null;
+        }
+
         $content = file_get_contents($asset->sourcePath);
         $content = $this->compiler->compile($content, $asset);
 
-        $this->fileContentsCache[$asset->logicalPath] = $content;
-
-        return $content;
+        return $this->fileContentsCache[$asset->logicalPath] = $content;
     }
 
     private function getPublicPath(MappedAsset $asset): ?string

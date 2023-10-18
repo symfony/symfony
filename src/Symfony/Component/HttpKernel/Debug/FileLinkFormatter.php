@@ -17,6 +17,10 @@ trigger_deprecation('symfony/http-kernel', '6.4', 'The "%s" class is deprecated,
 
 class_exists(ErrorHandlerFileLinkFormatter::class);
 
+if (!class_exists(FileLinkFormatter::class, false)) {
+    class_alias(ErrorHandlerFileLinkFormatter::class, FileLinkFormatter::class);
+}
+
 if (false) {
     /**
      * @deprecated since Symfony 6.4, use FileLinkFormatter from the ErrorHandler component instead

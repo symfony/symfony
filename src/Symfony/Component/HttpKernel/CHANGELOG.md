@@ -17,6 +17,7 @@ CHANGELOG
  * Deprecate `FileLinkFormatter`, use `FileLinkFormatter` from the ErrorHandler component instead
  * Add argument `$buildDir` to `WarmableInterface`
  * Add argument `$filter` to `Profiler::find()` and `FileProfilerStorage::find()`
+ * Add argument `$mapEmpty` to `MapQueryString` and `MapRequestPayload` for always attempting denormalization with empty query and request payload
 
 6.3
 ---

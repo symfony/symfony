@@ -32,6 +32,7 @@ class MapRequestPayload extends ValueResolver
         public readonly string|GroupSequence|array|null $validationGroups = null,
         string $resolver = RequestPayloadValueResolver::class,
         public readonly int $validationFailedStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY,
+        public bool $mapEmpty = false,
     ) {
         parent::__construct($resolver);
     }

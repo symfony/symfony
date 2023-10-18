@@ -1,21 +1,6 @@
 <div id="header">
     <h1><a href="{{ path('_profiler_home') }}">{{ source('@WebProfiler/Icon/symfony.svg') }} Symfony Profiler</a></h1>
 
-    <div class="sf-tabs" data-processed="true">
-        <div class="tab-navigation">
-            <span class="tab-control{{ 'request' == profile_type ? ' active' }}">
-                <a href="{{ path('_profiler_search_results', {token: 'empty', limit: 10}) }}">
-                    HTTP Requests
-                </a>
-            </span>
-            <span class="tab-control{{ 'command' == profile_type ? ' active' }}">
-                <a href="{{ path('_profiler_search_results', {token: 'empty', limit: 10, type: 'command'}) }}">
-                    Console Commands
-                </a>
-            </span>
-        </div>
-    </div>
-
     <div class="search">
         <form method="get" action="https://symfony.com/search" target="_blank">
             <div class="form-row">

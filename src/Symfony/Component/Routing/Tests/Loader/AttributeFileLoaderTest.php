@@ -84,17 +84,6 @@ class AttributeFileLoaderTest extends TestCase
         $this->assertFalse($this->loader->supports($fixture, 'foo'), '->supports() checks the resource type if specified');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testSupportsAnnotations()
-    {
-        $fixture = __DIR__.'/../Fixtures/annotated.php';
-
-        $this->expectDeprecation('Since symfony/routing 6.4: The "annotation" route type is deprecated, use the "attribute" route type instead.');
-        $this->assertTrue($this->loader->supports($fixture, 'annotation'), '->supports() checks the resource type if specified');
-    }
-
     public function testLoadAttributesClassAfterComma()
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamAfterCommaController.php'));

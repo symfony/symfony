@@ -248,7 +248,7 @@ FrameworkBundle
  * Change default of some config options:
 
    | option                                       | default Symfony <7.0       | default in Symfony 7.0+                                                     |
-   | -------------------------------------------- | -------------------------- | --------------------------------------------------------------------------- |
+   |----------------------------------------------|----------------------------|-----------------------------------------------------------------------------|
    | `framework.http_method_override`             | `true`                     | `false`                                                                     |
    | `framework.handle_all_throwables`            | `false`                    | `true`                                                                      |
    | `framework.php_errors.log`                   | `'%kernel.debug%'`         | `true`                                                                      |
@@ -260,6 +260,10 @@ FrameworkBundle
    | `framework.validation.email_validation_mode` | `'loose'`                  | `'html5'`                                                                   |
  * Remove the `framework.validation.enable_annotations` config option, use `framework.validation.enable_attributes` instead
  * Remove the `framework.serializer.enable_annotations` config option, use `framework.serializer.enable_attributes` instead
+ * Remove the `routing.loader.annotation` service, use the `routing.loader.attribute` service instead
+ * Remove the `routing.loader.annotation.directory` service, use the `routing.loader.attribute.directory` service instead
+ * Remove the `routing.loader.annotation.file` service, use the `routing.loader.attribute.file` service instead
+ * Remove `AnnotatedRouteControllerLoader`, use `AttributeRouteControllerLoader` instead
 
 HttpFoundation
 --------------
@@ -400,7 +404,9 @@ Routing
 
  * Add parameter `array $routeParameters` to `UrlMatcher::handleRouteRequirements()`
  * Remove Doctrine annotations support in favor of native attributes. Use `Symfony\Component\Routing\Annotation\Route` as native attribute now
- * Change the constructor signature of `AnnotationClassLoader` to `__construct(?string $env = null)`, passing an annotation reader as first argument is not supported anymore
+ * Remove `AnnotationClassLoader`, use `AttributeClassLoader` instead
+ * Remove `AnnotationDirectoryLoader`, use `AttributeDirectoryLoader` instead
+ * Remove `AnnotationFileLoader`, use `AttributeFileLoader` instead
 
 Security
 --------

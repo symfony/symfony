@@ -6,7 +6,9 @@ CHANGELOG
 
  * Add argument `$routeParameters` to `UrlMatcher::handleRouteRequirements()`
  * Remove Doctrine annotations support in favor of native attributes
- * Change the constructor signature of `AnnotationClassLoader` to `__construct(?string $env = null)`, passing an annotation reader as first argument is not supported anymore
+ * Remove `AnnotationClassLoader`, use `AttributeClassLoader` instead
+ * Remove `AnnotationDirectoryLoader`, use `AttributeDirectoryLoader` instead
+ * Remove `AnnotationFileLoader`, use `AttributeFileLoader` instead
 
 6.4
 ---

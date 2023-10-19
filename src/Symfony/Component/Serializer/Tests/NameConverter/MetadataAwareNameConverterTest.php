@@ -168,7 +168,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Found SerializedName and SerializedPath annotations on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
+        $this->expectExceptionMessage('Found SerializedName and SerializedPath attributes on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
         $nameConverter->denormalize('foo', NestedPathAndName::class);
     }
 
@@ -177,7 +177,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Found SerializedName and SerializedPath annotations on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
+        $this->expectExceptionMessage('Found SerializedName and SerializedPath attributes on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
         $nameConverter->normalize('foo', NestedPathAndName::class);
     }
 }

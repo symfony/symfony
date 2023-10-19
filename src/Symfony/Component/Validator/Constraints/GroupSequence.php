@@ -77,7 +77,6 @@ class GroupSequence
      */
     public function __construct(array $groups)
     {
-        // Support for Doctrine annotations
         $this->groups = $groups['value'] ?? $groups;
     }
 }

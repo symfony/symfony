@@ -325,7 +325,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $notConverted = $attribute;
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
                 if (isset($nestedData[$notConverted]) && !isset($originalNestedData[$attribute])) {
-                    throw new LogicException(sprintf('Duplicate values for key "%s" found. One value is set via the SerializedPath annotation: "%s", the other one is set via the SerializedName annotation: "%s".', $notConverted, implode('->', $nestedAttributes[$notConverted]->getElements()), $attribute));
+                    throw new LogicException(sprintf('Duplicate values for key "%s" found. One value is set via the SerializedPath attribute: "%s", the other one is set via the SerializedName attribute: "%s".', $notConverted, implode('->', $nestedAttributes[$notConverted]->getElements()), $attribute));
                 }
             }
 
@@ -729,7 +729,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * Returns all attributes with a SerializedPath annotation and the respective path.
+     * Returns all attributes with a SerializedPath attribute and the respective path.
      */
     private function getNestedAttributes(string $class): array
     {

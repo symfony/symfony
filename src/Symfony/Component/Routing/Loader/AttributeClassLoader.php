@@ -69,8 +69,6 @@ abstract class AttributeClassLoader implements LoaderInterface
     }
 
     /**
-     * Loads from annotations from a class.
-     *
      * @throws \InvalidArgumentException When route can't be parsed
      */
     public function load(mixed $class, string $type = null): RouteCollection
@@ -81,7 +79,7 @@ abstract class AttributeClassLoader implements LoaderInterface
 
         $class = new \ReflectionClass($class);
         if ($class->isAbstract()) {
-            throw new \InvalidArgumentException(sprintf('Annotations from class "%s" cannot be read as it is abstract.', $class->getName()));
+            throw new \InvalidArgumentException(sprintf('Attributes from class "%s" cannot be read as it is abstract.', $class->getName()));
         }
 
         $globals = $this->getGlobals($class);

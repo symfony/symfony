@@ -187,7 +187,7 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testDenormalizeWithNestedAttributesDuplicateKeys()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Duplicate values for key "quux" found. One value is set via the SerializedPath annotation: "one->four", the other one is set via the SerializedName annotation: "notquux".');
+        $this->expectExceptionMessage('Duplicate values for key "quux" found. One value is set via the SerializedPath attribute: "one->four", the other one is set via the SerializedName attribute: "notquux".');
         $normalizer = new AbstractObjectNormalizerWithMetadata();
         $data = [
             'one' => [

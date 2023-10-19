@@ -319,7 +319,10 @@ abstract class AttributeClassLoader implements LoaderInterface
         return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
     }
 
-    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
+    /**
+     * @return void
+     */
+    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
 
     /**
      * @return iterable<int, RouteAnnotation>

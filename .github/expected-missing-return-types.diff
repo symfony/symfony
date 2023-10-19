@@ -266,14 +266,7 @@ diff --git a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvid
 +    public function deleteTokenBySeries(string $series): void
      {
          $sql = 'DELETE FROM rememberme_token WHERE series=:series';
-@@ -83,5 +83,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
-      * @return void
-      */
--    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
-+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void
-     {
-         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
-@@ -105,5 +105,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -100,5 +100,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token)

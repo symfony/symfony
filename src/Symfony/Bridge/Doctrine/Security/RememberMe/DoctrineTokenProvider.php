@@ -77,12 +77,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $this->conn->executeStatement($sql, $paramValues, $paramTypes);
     }
 
-    /**
-     * @param \DateTimeInterface $lastUsed Accepting only DateTime is deprecated since Symfony 6.4
-     *
-     * @return void
-     */
-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
         $paramValues = [

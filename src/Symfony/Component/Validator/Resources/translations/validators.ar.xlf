@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>يجب أن تكون قيمة netmask بين {{ min }} و {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>اسم الملف طويل جدا. يجب أن يحتوي على {{ filename_max_length }} حرف أو أقل.|اسم الملف طويل جدا. يجب أن يحتوي على {{ filename_max_length }} أحرف أو أقل.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>قوة كلمة المرور منخفضة للغاية. يرجى استخدام كلمة مرور أقوى.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>تحتوي هذه القيمة على أحرف غير مسموح بها بواسطة مستوى التقييد الحالي.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>لا يسمح باستخدام أحرف غير مرئية.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>لا يسمح بخلط الأرقام من نصوص مختلفة.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>لا يسمح باستخدام أحرف التراكب المخفية.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

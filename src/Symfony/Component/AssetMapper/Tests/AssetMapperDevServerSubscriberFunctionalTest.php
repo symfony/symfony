@@ -12,7 +12,7 @@
 namespace Symfony\Component\AssetMapper\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\AssetMapper\Tests\fixtures\AssetMapperTestAppKernel;
+use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
 
 class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
 {

@@ -96,6 +96,6 @@ class PlantUmlDumperTest extends TestCase
 
     private function getFixturePath($name, $transitionType): string
     {
-        return __DIR__.'/../fixtures/puml/'.$transitionType.'/'.$name.'.puml';
+        return __DIR__ . '/../Fixtures/puml/' .$transitionType.'/'.$name.'.puml';
     }
 }

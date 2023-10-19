@@ -38,15 +38,15 @@ class ImportMapManagerTest extends TestCase
     private ImportMapManager $importMapManager;
 
     private Filesystem $filesystem;
-    private static string $writableRoot = __DIR__.'/../fixtures/importmaps_for_writing';
+    private static string $writableRoot = __DIR__ . '/../Fixtures/importmaps_for_writing';
 
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing')) {
+        if (!file_exists(__DIR__ . '/../Fixtures/importmaps_for_writing')) {
             $this->filesystem->mkdir(self::$writableRoot);
         }
-        if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing/assets')) {
+        if (!file_exists(__DIR__ . '/../Fixtures/importmaps_for_writing/assets')) {
             $this->filesystem->mkdir(self::$writableRoot.'/assets');
         }
     }

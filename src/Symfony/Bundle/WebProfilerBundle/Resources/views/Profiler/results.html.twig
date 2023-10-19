@@ -38,6 +38,21 @@
 {% block sidebar_shortcuts_links %}{% endblock %}
 
 {% block panel %}
+    <div class="sf-tabs" data-processed="true">
+        <div class="tab-navigation" role="tablist">
+            <button class="tab-control {{ 'request' == profile_type ? 'active' }}" role="tab" {{ 'request' == profile_type ? 'aria-selected="true"' : 'tabindex="-1"' }} >
+                <a href="{{ path('_profiler_search_results', {token: 'empty', limit: 10}) }}">
+                    HTTP Requests
+                </a>
+            </button>
+            <button class="tab-control {{ 'command' == profile_type ? 'active' }}" role="tab" {{ 'command' == profile_type ? 'aria-selected="true"' : 'tabindex="-1"' }}>
+                <a href="{{ path('_profiler_search_results', {token: 'empty', limit: 10, type: 'command'}) }}">
+                    Console Commands
+                </a>
+            </button>
+        </div>
+    </div>
+
     <h2>{{ tokens ? tokens|length : 'No' }} results found</h2>
 
     {% if tokens %}

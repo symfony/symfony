@@ -14,11 +14,14 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -30,6 +33,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -40,6 +44,11 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstCh
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyString;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithNotNormalizable;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrBool;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrNull;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithStringObject;
 
 class AbstractObjectNormalizerTest extends TestCase
 {
@@ -452,6 +461,60 @@ class AbstractObjectNormalizerTest extends TestCase
         $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory)]);
 
         $this->assertSame(['foo' => 'foo'], $serializer->normalize(new ObjectDummyWithIgnoreAnnotationAndPrivateProperty()));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testDenormalizeUntypedFormat()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['value' => ''], DummyWithObjectOrNull::class, 'xml');
+
+        $this->assertEquals(new DummyWithObjectOrNull(null), $actual);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testDenormalizeUntypedFormatNotNormalizable()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $serializer = new Serializer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $serializer->denormalize(['value' => 'test'], DummyWithNotNormalizable::class, 'xml');
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testDenormalizeUntypedFormatMissingArg()
+    {
+        $this->expectException(MissingConstructorArgumentsException::class);
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $serializer->denormalize(['value' => 'invalid'], DummyWithObjectOrNull::class, 'xml');
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testDenormalizeUntypedFormatScalar()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['value' => 'false'], DummyWithObjectOrBool::class, 'xml');
+
+        $this->assertEquals(new DummyWithObjectOrBool(false), $actual);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testDenormalizeUntypedStringObject()
+    {
+        $serializer = new Serializer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['value' => ''], DummyWithStringObject::class, 'xml');
+
+        $this->assertEquals(new DummyWithStringObject(new DummyString()), $actual);
+        $this->assertEquals('', $actual->value->value);
     }
 }
 

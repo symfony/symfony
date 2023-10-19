@@ -17,6 +17,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -62,6 +63,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberThree;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumProperty;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrNull;
 use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
@@ -816,6 +818,17 @@ class SerializerTest extends TestCase
         $actual = $serializer->deserialize('{"false":false}', FalseBuiltInDummy::class, 'json');
 
         $this->assertEquals(new FalseBuiltInDummy(), $actual);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testDeserializeUntypedFormat()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))], ['csv' => new CsvEncoder()]);
+        $actual = $serializer->deserialize('value'.\PHP_EOL.',', DummyWithObjectOrNull::class, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]);
+
+        $this->assertEquals(new DummyWithObjectOrNull(null), $actual);
     }
 
     private function serializerWithClassDiscriminator()

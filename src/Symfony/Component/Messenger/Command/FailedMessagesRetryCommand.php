@@ -124,7 +124,10 @@ EOF
         }
 
         $this->retrySpecificIds($failureTransportName, $ids, $io, $shouldForce);
-        $io->success('All done!');
+
+        if (!$this->shouldStop) {
+            $io->success('All done!');
+        }
 
         return 0;
     }
@@ -255,6 +258,10 @@ EOF
 
             $singleReceiver = new SingleMessageReceiver($receiver, $envelope);
             $this->runWorker($failureTransportName, $singleReceiver, $io, $shouldForce);
+
+            if ($this->shouldStop) {
+                break;
+            }
         }
     }
 

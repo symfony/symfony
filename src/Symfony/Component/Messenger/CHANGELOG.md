@@ -12,6 +12,8 @@ CHANGELOG
    `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Remove `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
+   and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
 
 6.4
 ---

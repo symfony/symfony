@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection;
 
-use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -91,8 +90,8 @@ abstract class AbstractDoctrineExtension extends Extension
                 if (!$mappingConfig) {
                     continue;
                 }
-            } elseif (!$mappingConfig['type']) {
-                $mappingConfig['type'] = $this->detectMappingType($mappingConfig['dir'], $container);
+            } else {
+                $mappingConfig['type'] ??= 'attribute';
             }
 
             $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);
@@ -154,7 +153,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         if (!$bundleConfig['dir']) {
-            if (\in_array($bundleConfig['type'], ['annotation', 'staticphp', 'attribute'])) {
+            if (\in_array($bundleConfig['type'], ['staticphp', 'attribute'])) {
                 $bundleConfig['dir'] = $bundleClassDir.'/'.$this->getMappingObjectDefaultName();
             } else {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory($bundleDir);
@@ -187,21 +186,8 @@ abstract class AbstractDoctrineExtension extends Extension
             if ($container->hasDefinition($mappingService)) {
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args = $mappingDriverDef->getArguments();
-                if ('annotation' == $driverType) {
-                    $args[1] = array_merge(array_values($driverPaths), $args[1]);
-                } else {
-                    $args[0] = array_merge(array_values($driverPaths), $args[0]);
-                }
+                $args[0] = array_merge(array_values($driverPaths), $args[0]);
                 $mappingDriverDef->setArguments($args);
-            } elseif ('attribute' === $driverType) {
-                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
-                    array_values($driverPaths),
-                ]);
-            } elseif ('annotation' == $driverType) {
-                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
-                    new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
-                    array_values($driverPaths),
-                ]);
             } else {
                 $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
                     array_values($driverPaths),
@@ -237,8 +223,8 @@ abstract class AbstractDoctrineExtension extends Extension
             throw new \InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
-        if (!\in_array($mappingConfig['type'], ['xml', 'yml', 'annotation', 'php', 'staticphp', 'attribute'])) {
-            throw new \InvalidArgumentException(sprintf('Can only configure "xml", "yml", "annotation", "php", "staticphp" or "attribute" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName.'_metadata_driver')));
+        if (!\in_array($mappingConfig['type'], ['xml', 'yml', 'php', 'staticphp', 'attribute'])) {
+            throw new \InvalidArgumentException(sprintf('Can only configure "xml", "yml", "php", "staticphp" or "attribute" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName.'_metadata_driver')));
         }
     }
 
@@ -264,8 +250,8 @@ abstract class AbstractDoctrineExtension extends Extension
             }
             $container->fileExists($resource, false);
 
-            if ($container->fileExists($discoveryPath = $dir.'/'.$this->getMappingObjectDefaultName(), false)) {
-                return $this->detectMappingType($discoveryPath, $container);
+            if ($container->fileExists($dir.'/'.$this->getMappingObjectDefaultName(), false)) {
+                return 'attribute';
             }
 
             return null;
@@ -273,41 +259,6 @@ abstract class AbstractDoctrineExtension extends Extension
         $container->fileExists($dir.'/'.$configPath, false);
 
         return $driver;
-    }
-
-    /**
-     * Detects what mapping type to use for the supplied directory.
-     *
-     * @return string A mapping type 'attribute' or 'annotation'
-     */
-    private function detectMappingType(string $directory, ContainerBuilder $container): string
-    {
-        $type = 'attribute';
-
-        $glob = new GlobResource($directory, '*', true);
-        $container->addResource($glob);
-
-        $quotedMappingObjectName = preg_quote($this->getMappingObjectDefaultName(), '/');
-
-        foreach ($glob as $file) {
-            $content = file_get_contents($file);
-
-            if (
-                preg_match('/^#\[.*'.$quotedMappingObjectName.'\b/m', $content)
-                || preg_match('/^#\[.*Embeddable\b/m', $content)
-            ) {
-                break;
-            }
-            if (
-                preg_match('/^(?: \*|\/\*\*) @.*'.$quotedMappingObjectName.'\b/m', $content)
-                || preg_match('/^(?: \*|\/\*\*) @.*Embeddable\b/m', $content)
-            ) {
-                $type = 'annotation';
-                break;
-            }
-        }
-
-        return $type;
     }
 
     /**

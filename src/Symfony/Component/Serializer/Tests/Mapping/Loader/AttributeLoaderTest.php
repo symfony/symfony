@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
@@ -47,7 +46,6 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 class AttributeLoaderTest extends TestCase
 {
     use ContextMappingTestTrait;
-    use ExpectDeprecationTrait;
 
     protected AttributeLoader $loader;
 

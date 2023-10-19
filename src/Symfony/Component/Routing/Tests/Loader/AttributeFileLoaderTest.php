@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\AttributeFileLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AttributedClasses\FooClass;
@@ -29,8 +28,6 @@ use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
 class AttributeFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private AttributeFileLoader $loader;
     private TraceableAttributeClassLoader $classLoader;
 

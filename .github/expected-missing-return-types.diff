@@ -45,16 +45,6 @@ diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/
 +    protected function filterResponse(object $response): Response
      {
          return $response;
-diff --git a/src/Symfony/Component/Clock/ClockAwareTrait.php b/src/Symfony/Component/Clock/ClockAwareTrait.php
---- a/src/Symfony/Component/Clock/ClockAwareTrait.php
-+++ b/src/Symfony/Component/Clock/ClockAwareTrait.php
-@@ -33,5 +33,5 @@ trait ClockAwareTrait
-      * @return DatePoint
-      */
--    protected function now(): \DateTimeImmutable
-+    protected function now(): DatePoint
-     {
-         $now = ($this->clock ??= new Clock())->now();
 diff --git a/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php b/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
 --- a/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
 +++ b/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
@@ -409,6 +399,23 @@ diff --git a/src/Symfony/Component/HttpKernel/KernelInterface.php b/src/Symfony/
 +    public function shutdown(): void;
  
      /**
+diff --git a/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php b/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php
+--- a/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php
++++ b/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php
+@@ -226,5 +226,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+      * @return string
+      */
+-    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
++    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
+     {
+         $name = str_replace('\\', '_', $class->name).'_'.$method->name;
+@@ -325,5 +325,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+      * @return void
+      */
+-    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
++    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
+ 
+     /**
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 +++ b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
@@ -426,14 +433,14 @@ diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/Token
 +    public function deleteTokenBySeries(string $series): void;
  
      /**
-@@ -46,5 +46,5 @@ interface TokenProviderInterface
+@@ -44,5 +44,5 @@ interface TokenProviderInterface
       * @throws TokenNotFoundException if the token is not found
       */
--    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed);
-+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed): void;
+-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed);
++    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void;
  
      /**
-@@ -53,4 +53,4 @@ interface TokenProviderInterface
+@@ -51,4 +51,4 @@ interface TokenProviderInterface
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token);

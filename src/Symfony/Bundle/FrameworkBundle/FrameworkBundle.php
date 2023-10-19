@@ -95,12 +95,7 @@ class FrameworkBundle extends Bundle
 
         $handler = ErrorHandler::register(null, false);
 
-        // When upgrading an existing Symfony application from 6.2 to 6.3, and
-        // the cache is warmed up, the service is not available yet, so we need
-        // to check if it exists.
-        if ($this->container->has('debug.error_handler_configurator')) {
-            $this->container->get('debug.error_handler_configurator')->configure($handler);
-        }
+        $this->container->get('debug.error_handler_configurator')->configure($handler);
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();

@@ -392,12 +392,11 @@ class Response
      *
      * @return $this
      */
-    public function send(/* bool $flush = true */): static
+    public function send(bool $flush = true): static
     {
         $this->sendHeaders();
         $this->sendContent();
 
-        $flush = 1 <= \func_num_args() ? func_get_arg(0) : true;
         if (!$flush) {
             return $this;
         }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+* Add `AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION` for scalar type transformation
+
 7.0
 ---
 

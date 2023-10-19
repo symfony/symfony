@@ -561,4 +561,15 @@ class HtmlSanitizerAllTest extends TestCase
             yield $case[0] => $case;
         }
     }
+
+    public function testUnlimitedLength()
+    {
+        $sanitizer = new HtmlSanitizer((new HtmlSanitizerConfig())->withMaxInputLength(-1));
+
+        $input = str_repeat('a', 10_000_000);
+
+        $sanitized = $sanitizer->sanitize($input);
+
+        $this->assertSame(\strlen($input), \strlen($sanitized));
+    }
 }

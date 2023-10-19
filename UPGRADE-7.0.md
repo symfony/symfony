@@ -300,6 +300,7 @@ HttpKernel
  * Remove `UriSigner`, use `UriSigner` from the HttpFoundation component instead
  * Remove `Kernel::stripComments()`
  * Add argument `$filter` to `Profiler::find()` and `FileProfilerStorage::find()`
+ * Remove `UriSigner`, use `UriSigner` from the HttpFoundation component instead
 
 Lock
 ----

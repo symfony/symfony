@@ -16,6 +16,7 @@ CHANGELOG
  * Remove `UriSigner`, use `UriSigner` from the HttpFoundation component instead
  * Add argument `$buildDir` to `WarmableInterface`
  * Add argument `$filter` to `Profiler::find()` and `FileProfilerStorage::find()`
+ * Remove `UriSigner`, use `UriSigner` from the HttpFoundation component instead
 
 6.4
 ---

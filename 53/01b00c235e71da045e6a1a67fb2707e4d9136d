@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-19T14:09:46Z
+
+What about `withMaxInputLength(PHP_INT_MAX)`? Isn't this risky practice?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-10-19T14:14:16Z
+
+> What about `withMaxInputLength(PHP_INT_MAX)`? Isn't this risky practice?
+
+I did that in my app (still on 6.3 😅) But If feels more natural to disable the feature completely if you don't want it.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-19T14:35:47Z
+
+@tgalopin there is no phpdoc at all in `HtmlSanitizerConfig` that would explain the reason to have a limit though.

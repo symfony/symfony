@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Command;
 
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -28,9 +29,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'importmap:require', description: 'Require JavaScript packages')]
 final class ImportMapRequireCommand extends Command
 {
+    use VersionProblemCommandTrait;
+
     public function __construct(
         private readonly ImportMapManager $importMapManager,
         private readonly string $projectDir,
+        private readonly ImportMapVersionChecker $importMapVersionChecker,
     ) {
         parent::__construct();
     }
@@ -108,6 +112,9 @@ EOT
         }
 
         $newPackages = $this->importMapManager->require($packages);
+
+        $this->renderVersionProblems($this->importMapVersionChecker, $output);
+
         if (1 === \count($newPackages)) {
             $newPackage = $newPackages[0];
             $message = sprintf('Package "%s" added to importmap.php', $newPackage->importName);

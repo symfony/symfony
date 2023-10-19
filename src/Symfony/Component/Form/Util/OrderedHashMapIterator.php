@@ -32,7 +32,7 @@ class OrderedHashMapIterator implements \Iterator
     private int $cursorId;
     /** @var array<int, int> */
     private array $managedCursors;
-    private string|null $key = null;
+    private ?string $key = null;
     /** @var TValue|null */
     private mixed $current = null;
 

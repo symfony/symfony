@@ -37,6 +37,7 @@ return (new PhpCsFixer\Config())
         'header_comment' => ['header' => $fileHeaderComment],
         'modernize_strpos' => true,
         'get_class_to_class_keyword' => true,
+        'nullable_type_declaration' => true,
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

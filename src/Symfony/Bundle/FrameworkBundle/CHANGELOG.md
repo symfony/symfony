@@ -38,6 +38,10 @@ CHANGELOG
  * Deprecate the `routing.loader.annotation.directory` service, use the `routing.loader.attribute.directory` service instead
  * Deprecate the `routing.loader.annotation.file` service, use the `routing.loader.attribute.file` service instead
  * Deprecate `AnnotatedRouteControllerLoader`, use `AttributeRouteControllerLoader` instead
+ * Deprecate `AddExpressionLanguageProvidersPass`, use `Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass` instead
+ * Deprecate `DataCollectorTranslatorPass`, use `Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass` instead
+ * Deprecate `LoggingTranslatorPass`, use `Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass` instead
+ * Deprecate `WorkflowGuardListenerPass`, use `Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass` instead
 
 6.3
 ---

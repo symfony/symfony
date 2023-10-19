@@ -62,10 +62,10 @@
         "symfony/serializer": "^6.4|^7.0",
         "symfony/stopwatch": "^5.4|^6.0|^7.0",
         "symfony/string": "^5.4|^6.0|^7.0",
-        "symfony/translation": "^6.2.8|^7.0",
+        "symfony/translation": "^6.4|^7.0",
         "symfony/twig-bundle": "^5.4|^6.0|^7.0",
         "symfony/validator": "^6.4|^7.0",
-        "symfony/workflow": "^5.4|^6.0|^7.0",
+        "symfony/workflow": "^6.4|^7.0",
         "symfony/yaml": "^5.4|^6.0|^7.0",
         "symfony/property-info": "^5.4|^6.0|^7.0",
         "symfony/uid": "^5.4|^6.0|^7.0",
@@ -96,12 +96,12 @@
         "symfony/security-csrf": "<5.4",
         "symfony/security-core": "<5.4",
         "symfony/stopwatch": "<5.4",
-        "symfony/translation": "<6.2.8",
+        "symfony/translation": "<6.4",
         "symfony/twig-bridge": "<5.4",
         "symfony/twig-bundle": "<5.4",
         "symfony/validator": "<6.4",
         "symfony/web-profiler-bundle": "<5.4",
-        "symfony/workflow": "<5.4"
+        "symfony/workflow": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },

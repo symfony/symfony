@@ -99,6 +99,7 @@ DoctrineBridge
  * Deprecate not constructing `DoctrineDataCollector` with an instance of `DebugDataHolder`
  * Deprecate `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * Deprecate `ContainerAwareLoader`, use dependency injection in your fixtures instead
+ * [BC Break] Change argument `$lastUsed` of `DoctrineTokenProvider::updateToken()` to accept `DateTimeInterface`
 
 DomCrawler
 ----------

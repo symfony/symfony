@@ -80,7 +80,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         }
 
         if (null !== $attributesMetadata[$propertyName]->getSerializedName() && null !== $attributesMetadata[$propertyName]->getSerializedPath()) {
-            throw new LogicException(sprintf('Found SerializedName and SerializedPath annotations on property "%s" of class "%s".', $propertyName, $class));
+            throw new LogicException(sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $propertyName, $class));
         }
 
         return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
@@ -124,7 +124,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             }
 
             if (null !== $metadata->getSerializedName() && null !== $metadata->getSerializedPath()) {
-                throw new LogicException(sprintf('Found SerializedName and SerializedPath annotations on property "%s" of class "%s".', $name, $class));
+                throw new LogicException(sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $name, $class));
             }
 
             $metadataGroups = $metadata->getGroups();

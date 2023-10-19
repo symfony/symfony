@@ -23,7 +23,7 @@ class SerializedNameTest extends TestCase
     public function testNotAStringSerializedNameParameter()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" must be a non-empty string.');
+        $this->expectExceptionMessage('Parameter given to "Symfony\Component\Serializer\Annotation\SerializedName" must be a non-empty string.');
 
         new SerializedName('');
     }

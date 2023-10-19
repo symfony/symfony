@@ -30,7 +30,7 @@ class AttributeFileLoader extends FileLoader
     public function __construct(FileLocatorInterface $locator, AttributeClassLoader $loader)
     {
         if (!\function_exists('token_get_all')) {
-            throw new \LogicException('The Tokenizer extension is required for the routing annotation loaders.');
+            throw new \LogicException('The Tokenizer extension is required for the routing attribute loader.');
         }
 
         parent::__construct($locator);
@@ -39,7 +39,7 @@ class AttributeFileLoader extends FileLoader
     }
 
     /**
-     * Loads from annotations from a file.
+     * Loads from attributes from a file.
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */

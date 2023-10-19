@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by ahmedyakoubi at 2023-10-04T19:10:36Z
+
+why not installing the missing dependency automatically instead of doing it manually?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-04T19:26:21Z
+
+> why not installing the missing dependency automatically instead of doing it manually?
+
+They *will* be installed automatically when you first require the package - e.g. `importmap:require bootstrap` will also grab `@popper/core`. So, if you ever see the `but it is not in the importmap.php` message from this PR, something has gone wrong or you've removed something by hand :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-17T01:19:15Z
+
+~~Failing tests coming from #50734~~
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-18T13:07:02Z
+
+@stof I'd love your thoughts on this PR now. A few notes:
+
+A) I do think this PR is important, so that your dependency versions don't drift away from each other. We're not building a full-blown package manager, but this seems like a pragmatic precaution.
+
+B) I think i've covered the npm-specific version constraint differences nicely
+
+C) In practice, it seems that when some packages are published, their dependencies in `package.json` change to *exact* versions. An example is vue - notice `@vue/runtime-dom` in https://registry.npmjs.org/vue/3.3.0 is listed at exactly 3.3.0. This isn't a problem, it just looks a bit odd and I wanted to mention it (and thought you might have even more insight).
+
+But, I do still think this PR is ready to go
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-18T13:22:54Z
+
+For C, it is a choice of each package maintainer.
+Some JS maintainers prefer to require exact versions of their dependencies. Unlike in composer, this does not create a dependency hell as the npm ecosystem does not require a flat dependency list in the installed dependencies with a single version of each package (Composer requires that for PHP package because PHP defines all classes in the same global scope so you cannot have 2 different version of the same package loaded. But JS works with a concept of modules exporting things, not with a shared naming scope).
+There are mostly 2 cases there:
+- several related packages from the same maintainer having a shared release cycle (often in a mono-repo): exact version constraint avoids the need to deal with the case of having an updated version of one package while others are not updated. Especially useful when the public API of one package actually relies on the other package
+- dependencies on unrelated packages. For those, I don't have an argument in favor of it (as I'm actually in the other side there). The big drawback is that this requires actively monitoring releases of the dependencies to update them even when they release patch versions instead of relying on semver)
+
+Note that the fact that the JS ecosystem does not require flat dependencies means that it might be impossible to resolve dependencies in a flat way (and doing that requires a composer-like solver anyway and would fail in cases of a dependency hell). And this means that your installer should be able to support the case of having several versions of the same package to respect constraints otherwise it might cause issues.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-18T13:30:13Z
+
+That's exactly the insight I was hoping for! 🙏
+
+> Note that the fact that the JS ecosystem does not require flat dependencies means that it might be impossible to resolve dependencies in a flat way. And this means that your installer should be able to support the case of having several versions of the same package to respect constraints otherwise it might cause issues
+
+I think this is possible, via the importmap [scopes](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap#scoped_module_specifier_maps). But I'd like to see if we actually need this. The consequence is that, right now, the system will work in the simple, "flat dependencies" kind of way. And I think that's fine. This PR would at least help users discover this potential problem more readily, then we can chat in the future about solving it.

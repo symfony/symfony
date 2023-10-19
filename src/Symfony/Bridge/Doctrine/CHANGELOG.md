@@ -22,6 +22,7 @@ CHANGELOG
  * Deprecate `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * Deprecate `ContainerAwareLoader`, use dependency injection in your fixtures instead
  * Always pass the `Request` object to `EntityValueResolver`'s expression
+ * [BC BREAK] Change argument `$lastUsed` of `DoctrineTokenProvider::updateToken()` to accept `DateTimeInterface`
 
 6.3
 ---

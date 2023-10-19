@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+        "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
         "symfony/config": "^6.4|^7.0",
@@ -24,7 +25,6 @@
         "symfony/yaml": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",
         "symfony/dependency-injection": "^6.4|^7.0",
-        "symfony/deprecation-contracts": "^2.5|^3",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {

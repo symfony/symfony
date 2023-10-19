@@ -25,6 +25,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
+use Symfony\Bundle\FeatureFlagsBundle\Strategy\CustomStrategy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
@@ -53,6 +54,7 @@ use Symfony\Component\Console\DataCollector\CommandDataCollector;
 use Symfony\Component\Console\Debug\CliRequest;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -70,6 +72,10 @@ use Symfony\Component\Dotenv\Command\DebugCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\FeatureFlags\Feature;
+use Symfony\Component\FeatureFlags\FeatureChecker;
+use Symfony\Component\FeatureFlags\Provider\ProviderInterface;
+use Symfony\Component\FeatureFlags\Strategy\StrategyInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Glob;
 use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExtension;
@@ -139,6 +145,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Routing\Router;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
@@ -256,6 +263,7 @@ class FrameworkExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         // warmup config enabled
+        $this->readConfigEnabled('feature_flags', $container, $config['feature_flags']);
         $this->readConfigEnabled('translator', $container, $config['translator']);
         $this->readConfigEnabled('property_access', $container, $config['property_access']);
         $this->readConfigEnabled('profiler', $container, $config['profiler']);
@@ -562,6 +570,13 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
+        }
+
+        if ($this->readConfigEnabled('feature_flags', $container, $config['feature_flags'])) {
+            if (!class_exists(FeatureChecker::class)) {
+                throw new LogicException('FeatureFlags support cannot be enabled as the FeatureFlags component is not installed. Try running "composer require symfony/feature-flags".');
+            }
+            $this->registerFeatureFlagsConfiguration($config['feature_flags'], $container, $loader);
         }
 
         $this->addAnnotatedClassesToCompile([
@@ -879,6 +894,10 @@ class FrameworkExtension extends Extension
 
         if ($this->isInitializedConfigEnabled('serializer') && $config['collect_serializer_data']) {
             $loader->load('serializer_debug.php');
+        }
+
+        if ($this->isInitializedConfigEnabled('feature_flags')) {
+            $loader->load('feature_flags_debug.php');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
@@ -2972,6 +2991,69 @@ class FrameworkExtension extends Extension
             if ('default' !== $sanitizerName) {
                 $container->registerAliasForArgument($sanitizerId, HtmlSanitizerInterface::class, $sanitizerName);
             }
+        }
+    }
+
+    private function registerFeatureFlagsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        $loader->load('feature_flags.php');
+
+        $container->registerForAutoconfiguration(ProviderInterface::class)
+            ->addTag('feature_flags.feature_provider')
+        ;
+        $features = [];
+        foreach ($config['features'] as $featureName => $featureConfig) {
+            $features[$featureName] = new ServiceClosureArgument((new Definition(Feature::class))
+                ->setShared(false)
+                ->setArguments([
+                    $featureName,
+                    $featureConfig['description'],
+                    $featureConfig['default'],
+                    new Reference($featureConfig['strategy']),
+                ]))
+            ;
+        }
+        $container->getDefinition('feature_flags.provider.lazy_in_memory')
+            ->setArgument('$features', $features)
+        ;
+
+        $container->registerForAutoconfiguration(StrategyInterface::class)
+            ->addTag('feature_flags.feature_strategy')
+        ;
+
+        foreach ($config['strategies'] as $strategyName => $strategyConfig) {
+            ['type' => $type, 'with' => $with] = $strategyConfig;
+
+            $definition = new ChildDefinition("feature_flags.abstract_strategy.{$type}");
+            $definition = match ($type) {
+                'date' => $definition->setArguments([
+                    '$since' => new Definition(\DateTimeImmutable::class, [$with['since']]),
+                    '$until' => new Definition(\DateTimeImmutable::class, [$with['until']]),
+                    '$includeSince' => $with['includeSince'],
+                    '$includeUntil' => $with['includeUntil'],
+                ]),
+                'env' => $definition->setArguments(['$envName' => $with['name']]),
+                'request_header' => $definition->setArguments(['$headerName' => $with['name']]),
+                'request_query' => $definition->setArguments(['$queryParameterName' => $with['name']]),
+                'request_attribute' => $definition->setArguments(['$attributeName' => $with['name']]), // Check if RequestStack class exists
+                'priority', 'affirmative', 'unanimous' => $definition->setArguments([
+                    '$strategies' => array_map(
+                        static fn (string $referencedStrategyName): Reference => new Reference($referencedStrategyName), // @phpstan-ignore-line
+                        (array) $with['strategies'],
+                    ),
+                ]),
+                'not' => $definition->setArguments([
+                    '$inner' => new Reference($with['strategy']), // @phpstan-ignore-line
+                ]),
+                'grant', 'deny', => $definition,
+                default => new ChildDefinition($type),
+            };
+
+            $container->setDefinition($strategyName, $definition)->addTag('feature_flags.feature_strategy');
+        }
+
+        if (ContainerBuilder::willBeAvailable('symfony/routing', Router::class, ['symfony/framework-bundle', 'symfony/routing'])) {
+            $loader->load('feature_flags_routing.php');
         }
     }
 

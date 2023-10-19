@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config http-method-override="false" handle-all-throwables="true">
+        <framework:annotations enabled="false" />
+        <framework:php-errors log="true" />
+        <framework:feature-flags>
+            <framework:strategies name="date.feature-strategy" type="date">
+                <framework:with since="-2 days" />
+            </framework:strategies>
+            <framework:strategies name="env.feature-strategy" type="env">
+                <framework:with name="SOME_ENV" />
+            </framework:strategies>
+            <framework:strategies name="request_header.feature-strategy" type="request_header">
+                <framework:with name="SOME-HEADER-NAME" />
+            </framework:strategies>
+            <framework:strategies name="request_query.feature-strategy" type="request_query">
+                <framework:with name="some_query_parameter" />
+            </framework:strategies>
+            <framework:strategies name="request_attribute.feature-strategy" type="request_attribute">
+                <framework:with name="some_request_attribute" />
+            </framework:strategies>
+            <framework:strategies name="priority.feature-strategy" type="priority">
+                <framework:with>
+                    <framework:strategies>grant.feature-strategy></framework:strategies>
+                    <framework:strategies>env.feature-strategy></framework:strategies>
+                </framework:with>
+            </framework:strategies>
+            <framework:strategies name="affirmative.feature-strategy" type="affirmative">
+                <framework:with>
+                    <framework:strategies>grant.feature-strategy></framework:strategies>
+                    <framework:strategies>env.feature-strategy></framework:strategies>
+                </framework:with>
+            </framework:strategies>
+            <framework:strategies name="unanimous.feature-strategy" type="unanimous">
+                <framework:with>
+                    <framework:strategies>grant.feature-strategy></framework:strategies>
+                    <framework:strategies>env.feature-strategy></framework:strategies>
+                </framework:with>
+            </framework:strategies>
+            <framework:strategies name="not.feature-strategy" type="not">
+                <framework:with strategy="grant.feature-strategy" />
+            </framework:strategies>
+            <framework:strategies name="grant.feature-strategy" type="grant" />
+            <framework:strategies name="deny.feature-strategy" type="deny" />
+        </framework:feature-flags>
+    </framework:config>
+</container>

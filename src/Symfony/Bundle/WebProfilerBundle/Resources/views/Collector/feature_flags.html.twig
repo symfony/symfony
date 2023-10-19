@@ -1,0 +1,125 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block page_title 'Feature Flags' %}
+
+{% block toolbar %}
+    {% if 0 < collector.checks|length %}
+        {% set icon %}
+            <img alt="Feature Flags" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABVElEQVRIie2UO0oEURBFzxM/YGroAgQNxETUwEzwiytQ8/GzAhfhEnQNYqaJ4IyCv1QjERQjB1HEQDkGU8qzmRkHNJwLTcOtqtNVr6sb2mrrX6X2qOvqsfpi63qJmjW1O2emDN4P7AHDQAW4BpaznEpcCRgHxsLfAR4z7xKYTyndFTu/VKvqtNqnXkR3VXW6zrQzETtTuwre+Y9J1I2AFeHWg2d1s5Gz2sxDPVHLGfxVfVLLjeBZ7XExL7wKQEd4g8AVsA8MAIvAB/DrA4AjYKiR15mZK8BbwA+A3hbg3003j9ZGelen1A51O86x8iu5VntUxyvnxnoAlzL4YdxnmsDnIqfUzPta0wv1I4Kbapf6EGs32wBeVU/VzoJ39rWmxQ9tFxgBboBbYDJjnlB76QmYAEapnf1WwTsHFlJK9/VG7lZXY2WfbV3PUVOy8Ktoq62/6xORLdg+h+zBmgAAAABJRU5ErkJggg==" />
+            <span class="sf-toolbar-value">{{ collector.checks|length }}</span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-group">
+                <div class="sf-toolbar-info-piece">
+                    <b>Checks</b>
+                    {% for check in collector.checks %}
+                        <span class="sf-toolbar-status sf-toolbar-status-{{ check['result'] ? 'green' : 'red' }}">
+                            {{ check['feature'] }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.checks|length is same as(0) ? 'disabled' }}">
+        <span class="icon"><img alt="Feature Flags" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABVElEQVRIie2UO0oEURBFzxM/YGroAgQNxETUwEzwiytQ8/GzAhfhEnQNYqaJ4IyCv1QjERQjB1HEQDkGU8qzmRkHNJwLTcOtqtNVr6sb2mrrX6X2qOvqsfpi63qJmjW1O2emDN4P7AHDQAW4BpaznEpcCRgHxsLfAR4z7xKYTyndFTu/VKvqtNqnXkR3VXW6zrQzETtTuwre+Y9J1I2AFeHWg2d1s5Gz2sxDPVHLGfxVfVLLjeBZ7XExL7wKQEd4g8AVsA8MAIvAB/DrA4AjYKiR15mZK8BbwA+A3hbg3003j9ZGelen1A51O86x8iu5VntUxyvnxnoAlzL4YdxnmsDnIqfUzPta0wv1I4Kbapf6EGs32wBeVU/VzoJ39rWmxQ9tFxgBboBbYDJjnlB76QmYAEapnf1WwTsHFlJK9/VG7lZXY2WfbV3PUVOy8Ktoq62/6xORLdg+h+zBmgAAAABJRU5ErkJggg==" /></span>
+        <strong>Feature Flags</strong>
+    </span>
+{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    <style>
+        tr.feature-check {
+            position: relative;
+        }
+        tr.feature-check > td:first-child:before {
+            border-radius: 0;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+        tr.feature-check-grant > td:first-child:before {
+            background: var(--green-500);
+        }
+        tr.feature-check-deny > td:first-child:before {
+            background: var(--red-500);
+        }
+        .badge {
+            color: var(--white);
+            display: inline-block;
+            text-align: center;
+            min-width: 60px;
+        }
+        .badge.badge-grant {
+            background-color: var(--green-500);
+        }
+        .badge.badge-deny {
+            background-color: var(--red-500);
+        }
+        .badge.badge-abstain {
+            background-color: var(--gray-500);
+        }
+        .strategy-class {
+            color: var(--color-muted);
+            font-style: italic;
+        }
+    </style>
+{% endblock %}
+
+{% block panel %}
+    <h2>Feature checks</h2>
+    {% if collector.checks|length > 0 %}
+        <table>
+            <thead>
+            <tr>
+                <th>Feature</th>
+                <th>Strategies</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for check in collector.checks %}
+                {% set result = check['result'] ? 'grant' : 'deny' %}
+                <tr class="feature-check feature-check-{{ result }}">
+                    <td>{{ check['feature'] }}</td>
+                    <td>
+                        <span class="badge badge-{{ result }}">
+                            {{ result|capitalize }}
+                            {%- if check['computes'] is empty %}
+                                (unknown)
+                            {% elseif (check['computes']|first).result.name|lower is same as 'abstain' %}
+                                (default)
+                            {% endif %}
+                        </span>
+                        {% for compute in check['computes'] %}
+                            <div>
+                                {{ _self.indent(compute['level']) }}
+                                <span class="badge badge-{{ compute['result'].name|lower }}">{{ compute['result'].name }}</span>
+                                {{ compute['strategyId'] }}
+                                <span class="strategy-class">{{ compute['strategyClass']|abbr_class }}</span>
+                            </div>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>No features checked</p>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% macro indent(level) %}
+    {%- for i in 0..level -%}&nbsp;{% endfor %}L
+{% endmacro %}

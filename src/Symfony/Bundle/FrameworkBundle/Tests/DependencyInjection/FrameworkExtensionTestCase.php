@@ -44,6 +44,8 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\FeatureFlags\FeatureChecker;
+use Symfony\Component\FeatureFlags\Strategy\StrategyInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
@@ -2287,6 +2289,45 @@ abstract class FrameworkExtensionTestCase extends TestCase
             ['You cannot use the "webhook transport" service since the Serializer component is not enabled. Try setting "framework.serializer.enabled" to true.'],
             $container->getDefinition('webhook.body_configurator.json')->getErrors()
         );
+    }
+
+    public function testFeatureFlags()
+    {
+        if (!class_exists(FeatureChecker::class)) {
+            $this->markTestSkipped('FeatureFlags not available.');
+        }
+
+        $container = $this->createContainerFromFile('feature_flags');
+
+        $expectedServiceIds = [
+            'date.feature-strategy',
+            'env.feature-strategy',
+            'request_header.feature-strategy',
+            'request_query.feature-strategy',
+            'request_attribute.feature-strategy',
+            'priority.feature-strategy',
+            'affirmative.feature-strategy',
+            'unanimous.feature-strategy',
+            'not.feature-strategy',
+            'grant.feature-strategy',
+            'deny.feature-strategy',
+        ];
+        foreach ($expectedServiceIds as $expectedServiceId) {
+            $this->assertTrue($container->hasDefinition($expectedServiceId));
+
+            $serviceDefinition = $container->getDefinition($expectedServiceId);
+            $this->assertTrue(
+                $serviceDefinition->hasTag('feature_flags.feature_strategy'),
+                "'{$expectedServiceId}' does not have the tag.",
+            );
+        }
+
+        $registeredForAutoconfiguration = $container->getAutoconfiguredInstanceof();
+
+        self::assertArrayHasKey(StrategyInterface::class, $registeredForAutoconfiguration);
+        $tags = $registeredForAutoconfiguration[StrategyInterface::class]->getTags();
+
+        self::assertArrayHasKey('feature_flags.feature_strategy', $tags);
     }
 
     protected function createContainer(array $data = [])

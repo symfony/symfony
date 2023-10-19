@@ -19,13 +19,13 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 class NovuOptions implements MessageOptionsInterface
 {
     public function __construct(
-        private readonly string|null $subscriberId = null,
-        private readonly string|null $firstName = null,
-        private readonly string|null $lastName = null,
-        private readonly string|null $email = null,
-        private readonly string|null $phone = null,
-        private readonly string|null $avatar = null,
-        private readonly string|null $locale = null,
+        private readonly ?string $subscriberId = null,
+        private readonly ?string $firstName = null,
+        private readonly ?string $lastName = null,
+        private readonly ?string $email = null,
+        private readonly ?string $phone = null,
+        private readonly ?string $avatar = null,
+        private readonly ?string $locale = null,
         private readonly array $options = [],
     ) {
     }

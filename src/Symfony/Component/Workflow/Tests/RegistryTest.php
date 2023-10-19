@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Exception\InvalidArgumentException;
@@ -22,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class RegistryTest extends TestCase
 {
-    private $registry;
+    private Registry $registry;
 
     protected function setUp(): void
     {
@@ -31,11 +32,6 @@ class RegistryTest extends TestCase
         $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class), $this->createMock(EventDispatcherInterface::class), 'workflow1'), $this->createWorkflowSupportStrategy(Subject1::class));
         $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class), $this->createMock(EventDispatcherInterface::class), 'workflow2'), $this->createWorkflowSupportStrategy(Subject2::class));
         $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class), $this->createMock(EventDispatcherInterface::class), 'workflow3'), $this->createWorkflowSupportStrategy(Subject2::class));
-    }
-
-    protected function tearDown(): void
-    {
-        $this->registry = null;
     }
 
     public function testHasWithMatch()
@@ -108,13 +104,11 @@ class RegistryTest extends TestCase
         $this->assertCount(0, $workflows);
     }
 
-    private function createWorkflowSupportStrategy($supportedClassName)
+    private function createWorkflowSupportStrategy($supportedClassName): MockObject&WorkflowSupportStrategyInterface
     {
         $strategy = $this->createMock(WorkflowSupportStrategyInterface::class);
         $strategy->expects($this->any())->method('supports')
-            ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
-                return $subject instanceof $supportedClassName;
-            });
+            ->willReturnCallback(fn ($workflow, $subject) => $subject instanceof $supportedClassName);
 
         return $strategy;
     }

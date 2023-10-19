@@ -14,7 +14,7 @@
         {# Attribute "required" is not supported #}
         {%- set required = false -%}
     {%- endif -%}
-    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    <input type="{{ type }}" {{ block('widget_attributes') }}{% if value is not empty %} value="{{ value }}"{% endif %}>
 {%- endblock form_widget_simple -%}
 
 {%- block form_widget_compound -%}
@@ -61,7 +61,7 @@
     {%- endif -%}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {%- if placeholder is not none -%}
-            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+            <option value=""{% if placeholder_attr|default({}) %}{% with { attr: placeholder_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
         {%- endif -%}
         {%- if preferred_choices|length > 0 -%}
             {% set options = preferred_choices %}
@@ -91,11 +91,11 @@
 {%- endblock choice_widget_options -%}
 
 {%- block checkbox_widget -%}
-    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}>
 {%- endblock checkbox_widget -%}
 
 {%- block radio_widget -%}
-    <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}>
 {%- endblock radio_widget -%}
 
 {%- block datetime_widget -%}
@@ -290,33 +290,37 @@
         {% if required -%}
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
         {%- endif -%}
-        {% if label is empty -%}
-            {%- if label_format is not empty -%}
-                {% set label = label_format|replace({
-                    '%name%': name,
-                    '%id%': id,
-                }) %}
-            {%- else -%}
-                {% set label = name|humanize %}
-            {%- endif -%}
-        {%- endif -%}
         <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>
-            {%- if translation_domain is same as(false) -%}
-                {%- if label_html is same as(false) -%}
-                    {{- label -}}
-                {%- else -%}
-                    {{- label|raw -}}
-                {%- endif -%}
-            {%- else -%}
-                {%- if label_html is same as(false) -%}
-                    {{- label|trans(label_translation_parameters, translation_domain) -}}
-                {%- else -%}
-                    {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
-                {%- endif -%}
-            {%- endif -%}
+            {{- block('form_label_content') -}}
         </{{ element|default('label') }}>
     {%- endif -%}
 {%- endblock form_label -%}
+
+{%- block form_label_content -%}
+    {%- if label is empty -%}
+        {%- if label_format is not empty -%}
+            {% set label = label_format|replace({
+                '%name%': name,
+                '%id%': id,
+            }) %}
+        {%- else -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+    {%- endif -%}
+    {%- if translation_domain is same as(false) -%}
+        {%- if label_html is same as(false) -%}
+            {{- label -}}
+        {%- else -%}
+            {{- label|raw -}}
+        {%- endif -%}
+    {%- else -%}
+        {%- if label_html is same as(false) -%}
+            {{- label|trans(label_translation_parameters, translation_domain) -}}
+        {%- else -%}
+            {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
+        {%- endif -%}
+    {%- endif -%}
+{%- endblock form_label_content -%}
 
 {%- block button_label -%}{%- endblock -%}
 
@@ -325,23 +329,27 @@
 {% block form_help -%}
     {%- if help is not empty -%}
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
-        <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
-            {%- if translation_domain is same as(false) -%}
-                {%- if help_html is same as(false) -%}
-                    {{- help -}}
-                {%- else -%}
-                    {{- help|raw -}}
-                {%- endif -%}
-            {%- else -%}
-                {%- if help_html is same as(false) -%}
-                    {{- help|trans(help_translation_parameters, translation_domain) -}}
-                {%- else -%}
-                    {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
-                {%- endif -%}
-            {%- endif -%}
-        </p>
+        <{{ element|default('div') }} id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+            {{- block('form_help_content') -}}
+        </{{ element|default('div') }}>
     {%- endif -%}
 {%- endblock form_help %}
+
+{% block form_help_content -%}
+    {%- if translation_domain is same as(false) -%}
+        {%- if help_html is same as(false) -%}
+            {{- help -}}
+        {%- else -%}
+            {{- help|raw -}}
+        {%- endif -%}
+    {%- else -%}
+        {%- if help_html is same as(false) -%}
+            {{- help|trans(help_translation_parameters, translation_domain) -}}
+        {%- else -%}
+            {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
+        {%- endif -%}
+    {%- endif -%}
+{%- endblock form_help_content %}
 
 {# Rows #}
 
@@ -394,7 +402,7 @@
     {%- endif -%}
     <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{{ block('attributes') }}{% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
-        <input type="hidden" name="_method" value="{{ method }}" />
+        <input type="hidden" name="_method" value="{{ method }}">
     {%- endif -%}
 {%- endblock form_start -%}
 
@@ -432,7 +440,7 @@
         {%- endif -%}
 
         {%- if form_method != method -%}
-            <input type="hidden" name="_method" value="{{ method }}" />
+            <input type="hidden" name="_method" value="{{ method }}">
         {%- endif -%}
     {% endif -%}
 {% endblock form_rest %}

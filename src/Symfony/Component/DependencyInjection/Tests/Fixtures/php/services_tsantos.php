@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -40,8 +40,6 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
         ];
     }
 
@@ -50,7 +48,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \TSantos\Serializer\EventEmitterSerializer
      */
-    protected function getTsantosSerializerService()
+    protected static function getTsantosSerializerService($container)
     {
         $a = new \TSantos\Serializer\NormalizerRegistry();
 
@@ -59,7 +57,7 @@ class ProjectServiceContainer extends Container
         $c = new \TSantos\Serializer\EventDispatcher\EventDispatcher();
         $c->addSubscriber(new \TSantos\SerializerBundle\EventListener\StopwatchListener(new \Symfony\Component\Stopwatch\Stopwatch(true)));
 
-        $this->services['tsantos_serializer'] = $instance = new \TSantos\Serializer\EventEmitterSerializer(new \TSantos\Serializer\Encoder\JsonEncoder(), $a, $c);
+        $container->services['tsantos_serializer'] = $instance = new \TSantos\Serializer\EventEmitterSerializer(new \TSantos\Serializer\Encoder\JsonEncoder(), $a, $c);
 
         $b->setSerializer($instance);
         $d = new \TSantos\Serializer\Normalizer\JsonNormalizer();

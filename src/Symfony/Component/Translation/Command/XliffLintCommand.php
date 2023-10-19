@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -31,35 +32,32 @@ use Symfony\Component\Translation\Util\XliffUtils;
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
+#[AsCommand(name: 'lint:xliff', description: 'Lint an XLIFF file and outputs encountered errors')]
 class XliffLintCommand extends Command
 {
-    protected static $defaultName = 'lint:xliff';
-    protected static $defaultDescription = 'Lint an XLIFF file and outputs encountered errors';
-
-    private $format;
-    private $displayCorrectFiles;
-    private $directoryIteratorProvider;
-    private $isReadableProvider;
-    private $requireStrictFileNames;
+    private string $format;
+    private bool $displayCorrectFiles;
+    private ?\Closure $directoryIteratorProvider;
+    private ?\Closure $isReadableProvider;
+    private bool $requireStrictFileNames;
 
     public function __construct(string $name = null, callable $directoryIteratorProvider = null, callable $isReadableProvider = null, bool $requireStrictFileNames = true)
     {
         parent::__construct($name);
 
-        $this->directoryIteratorProvider = $directoryIteratorProvider;
-        $this->isReadableProvider = $isReadableProvider;
+        $this->directoryIteratorProvider = null === $directoryIteratorProvider ? null : $directoryIteratorProvider(...);
+        $this->isReadableProvider = null === $isReadableProvider ? null : $isReadableProvider(...);
         $this->requireStrictFileNames = $requireStrictFileNames;
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     protected function configure()
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
-            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format')
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())))
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints an XLIFF file and outputs to STDOUT
 the first encountered syntax error.
@@ -82,7 +80,7 @@ EOF
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $filenames = (array) $input->getArgument('filename');
@@ -156,21 +154,17 @@ EOF
         return ['file' => $file, 'valid' => 0 === \count($errors), 'messages' => $errors];
     }
 
-    private function display(SymfonyStyle $io, array $files)
+    private function display(SymfonyStyle $io, array $files): int
     {
-        switch ($this->format) {
-            case 'txt':
-                return $this->displayTxt($io, $files);
-            case 'json':
-                return $this->displayJson($io, $files);
-            case 'github':
-                return $this->displayTxt($io, $files, true);
-            default:
-                throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $this->format));
-        }
+        return match ($this->format) {
+            'txt' => $this->displayTxt($io, $files),
+            'json' => $this->displayJson($io, $files),
+            'github' => $this->displayTxt($io, $files, true),
+            default => throw new InvalidArgumentException(sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
+        };
     }
 
-    private function displayTxt(SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false)
+    private function displayTxt(SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false): int
     {
         $countFiles = \count($filesInfo);
         $erroredFiles = 0;
@@ -186,9 +180,7 @@ EOF
                     // general document errors have a '-1' line number
                     $line = -1 === $error['line'] ? null : $error['line'];
 
-                    if ($githubReporter) {
-                        $githubReporter->error($error['message'], $info['file'], $line, null !== $line ? $error['column'] : null);
-                    }
+                    $githubReporter?->error($error['message'], $info['file'], $line, null !== $line ? $error['column'] : null);
 
                     return null === $line ? $error['message'] : sprintf('Line %d, Column %d: %s', $line, $error['column'], $error['message']);
                 }, $info['messages']));
@@ -204,7 +196,7 @@ EOF
         return min($erroredFiles, 1);
     }
 
-    private function displayJson(SymfonyStyle $io, array $filesInfo)
+    private function displayJson(SymfonyStyle $io, array $filesInfo): int
     {
         $errors = 0;
 
@@ -220,7 +212,10 @@ EOF
         return min($errors, 1);
     }
 
-    private function getFiles(string $fileOrDirectory)
+    /**
+     * @return iterable<\SplFileInfo>
+     */
+    private function getFiles(string $fileOrDirectory): iterable
     {
         if (is_file($fileOrDirectory)) {
             yield new \SplFileInfo($fileOrDirectory);
@@ -237,14 +232,15 @@ EOF
         }
     }
 
-    private function getDirectoryIterator(string $directory)
+    /**
+     * @return iterable<\SplFileInfo>
+     */
+    private function getDirectoryIterator(string $directory): iterable
     {
-        $default = function ($directory) {
-            return new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
-                \RecursiveIteratorIterator::LEAVES_ONLY
-            );
-        };
+        $default = fn ($directory) => new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
 
         if (null !== $this->directoryIteratorProvider) {
             return ($this->directoryIteratorProvider)($directory, $default);
@@ -253,11 +249,9 @@ EOF
         return $default($directory);
     }
 
-    private function isReadable(string $fileOrDirectory)
+    private function isReadable(string $fileOrDirectory): bool
     {
-        $default = function ($fileOrDirectory) {
-            return is_readable($fileOrDirectory);
-        };
+        $default = fn ($fileOrDirectory) => is_readable($fileOrDirectory);
 
         if (null !== $this->isReadableProvider) {
             return ($this->isReadableProvider)($fileOrDirectory, $default);
@@ -280,7 +274,12 @@ EOF
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestOptionValuesFor('format')) {
-            $suggestions->suggestValues(['txt', 'json', 'github']);
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
         }
+    }
+
+    private function getAvailableFormatOptions(): array
+    {
+        return ['txt', 'json', 'github'];
     }
 }

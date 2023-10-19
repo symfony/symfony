@@ -16,16 +16,16 @@ namespace Symfony\Component\PropertyAccess;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
+ * @method bool isNullSafe(int $index) Returns whether the element at the given index is null safe. Not implementing it is deprecated since Symfony 6.2
+ *
  * @extends \Traversable<int, string>
  */
-interface PropertyPathInterface extends \Traversable
+interface PropertyPathInterface extends \Traversable, \Stringable
 {
     /**
      * Returns the string representation of the property path.
-     *
-     * @return string
      */
-    public function __toString();
+    public function __toString(): string;
 
     /**
      * Returns the length of the property path, i.e. the number of elements.

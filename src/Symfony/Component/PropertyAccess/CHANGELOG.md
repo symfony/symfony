@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Allow escaping `.` and `[` with `\` in `PropertyPath`
+
+6.2
+---
+
+ * Deprecate calling `PropertyAccessorBuilder::setCacheItemPool()` without arguments
+ * Added method `isNullSafe()` to `PropertyPathInterface`, implementing the interface without implementing this method
+   is deprecated
+ * Add support for the null-coalesce operator in property paths
+
+6.0
+---
+
+ * make `PropertyAccessor::__construct()` accept a combination of bitwise flags as first and second arguments
+
 5.3.0
 -----
 

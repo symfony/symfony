@@ -19,13 +19,15 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @extends BaseDateTimeTransformer<string>
  */
 class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 {
-    private $dateFormat;
-    private $timeFormat;
-    private $pattern;
-    private $calendar;
+    private int $dateFormat;
+    private int $timeFormat;
+    private ?string $pattern;
+    private int $calendar;
 
     /**
      * @see BaseDateTimeTransformer::formats for available format options
@@ -43,13 +45,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
-        if (null === $dateFormat) {
-            $dateFormat = \IntlDateFormatter::MEDIUM;
-        }
-
-        if (null === $timeFormat) {
-            $timeFormat = \IntlDateFormatter::SHORT;
-        }
+        $dateFormat ??= \IntlDateFormatter::MEDIUM;
+        $timeFormat ??= \IntlDateFormatter::SHORT;
 
         if (!\in_array($dateFormat, self::$formats, true)) {
             throw new UnexpectedTypeException($dateFormat, implode('", "', self::$formats));
@@ -70,12 +67,10 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return string
-     *
      * @throws TransformationFailedException if the given value is not a \DateTimeInterface
      *                                       or if the date could not be transformed
      */
-    public function transform($dateTime)
+    public function transform(mixed $dateTime): string
     {
         if (null === $dateTime) {
             return '';
@@ -97,14 +92,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a localized date string/array into a normalized date.
      *
-     * @param string|array $value Localized date string/array
-     *
-     * @return \DateTime|null
+     * @param string $value Localized date string
      *
      * @throws TransformationFailedException if the given value is not a string,
      *                                       if the date could not be parsed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): ?\DateTime
     {
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
@@ -163,11 +156,9 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param bool $ignoreTimezone Use UTC regardless of the configured timezone
      *
-     * @return \IntlDateFormatter
-     *
      * @throws TransformationFailedException in case the date formatter cannot be constructed
      */
-    protected function getIntlDateFormatter(bool $ignoreTimezone = false)
+    protected function getIntlDateFormatter(bool $ignoreTimezone = false): \IntlDateFormatter
     {
         $dateFormat = $this->dateFormat;
         $timeFormat = $this->timeFormat;
@@ -190,10 +181,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Checks if the pattern contains only a date.
-     *
-     * @return bool
      */
-    protected function isPatternDateOnly()
+    protected function isPatternDateOnly(): bool
     {
         if (null === $this->pattern) {
             return false;

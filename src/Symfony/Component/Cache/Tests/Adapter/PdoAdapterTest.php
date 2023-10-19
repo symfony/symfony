@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
@@ -20,12 +19,12 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
  */
 class PdoAdapterTest extends AdapterTestCase
 {
-    protected static $dbFile;
+    protected static string $dbFile;
 
     public static function setUpBeforeClass(): void
     {
         if (!\extension_loaded('pdo_sqlite')) {
-            throw new SkippedTestSuiteError('Extension pdo_sqlite required.');
+            self::markTestSkipped('Extension pdo_sqlite required.');
         }
 
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
@@ -48,9 +47,7 @@ class PdoAdapterTest extends AdapterTestCase
     {
         $pdo = new \PDO('sqlite:'.self::$dbFile);
 
-        $getCacheItemCount = function () use ($pdo) {
-            return (int) $pdo->query('SELECT COUNT(*) FROM cache_items')->fetch(\PDO::FETCH_COLUMN);
-        };
+        $getCacheItemCount = fn () => (int) $pdo->query('SELECT COUNT(*) FROM cache_items')->fetch(\PDO::FETCH_COLUMN);
 
         $this->assertSame(0, $getCacheItemCount());
 
@@ -101,7 +98,6 @@ class PdoAdapterTest extends AdapterTestCase
         $o = new \ReflectionObject($cache);
 
         $getPdoConn = $o->getMethod('getConnection');
-        $getPdoConn->setAccessible(true);
 
         /** @var \PDOStatement $select */
         $select = $getPdoConn->invoke($cache)->prepare('SELECT 1 FROM cache_items WHERE item_id LIKE :id');

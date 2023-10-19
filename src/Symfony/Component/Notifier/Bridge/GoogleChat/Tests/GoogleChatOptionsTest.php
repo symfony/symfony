@@ -16,6 +16,9 @@ use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatOptions;
 
 final class GoogleChatOptionsTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testToArray()
     {
         $options = new GoogleChatOptions();
@@ -28,6 +31,47 @@ final class GoogleChatOptionsTest extends TestCase
             'text' => 'Pizza Bot',
             'cards' => [
                 ['header' => ['Pizza Bot Customer Support']],
+            ],
+        ];
+
+        $this->assertSame($expected, $options->toArray());
+    }
+
+    public function testToArrayWithCardV2()
+    {
+        $options = new GoogleChatOptions();
+
+        $cardV2 = [
+            'header' => [
+                'title' => 'Sasha',
+                'subtitle' => 'Software Engineer',
+                'imageUrl' => 'https://developers.google.com/chat/images/quickstart-app-avatar.png',
+                'imageType' => 'CIRCLE',
+                'imageAltText' => 'Avatar for Sasha',
+            ],
+            'sections' => [
+                [
+                    'header' => 'Contact Info',
+                    'collapsible' => true,
+                    'widgets' => [
+                        'decoratedText' => [
+                            'startIcon' => ['knownIcon' => 'EMAIL'],
+                            'text' => 'sasha@example.com',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $options
+            ->text('Hello Bot')
+            ->cardV2($cardV2)
+        ;
+
+        $expected = [
+            'text' => 'Hello Bot',
+            'cardsV2' => [
+                $cardV2,
             ],
         ];
 

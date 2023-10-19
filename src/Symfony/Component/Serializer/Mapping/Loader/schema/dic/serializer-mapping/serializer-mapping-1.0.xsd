@@ -81,6 +81,13 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="serialized-path">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1" />
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="ignore" type="xsd:boolean" />
     </xsd:complexType>
 

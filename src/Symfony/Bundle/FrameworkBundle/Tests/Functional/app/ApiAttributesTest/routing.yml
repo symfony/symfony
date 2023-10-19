@@ -1,0 +1,7 @@
+map_query_string:
+    path: /map-query-string.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapQueryStringController
+
+map_request_body:
+    path: /map-request-body.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestPayloadController

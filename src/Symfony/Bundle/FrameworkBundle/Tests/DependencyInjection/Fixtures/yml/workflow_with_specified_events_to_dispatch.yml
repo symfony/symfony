@@ -1,11 +1,15 @@
 framework:
+    annotations: false
+    http_method_override: false
+    handle_all_throwables: true
+    php_errors:
+        log: true
     workflows:
         my_workflow:
             type: state_machine
             initial_marking: one
             events_to_dispatch: ['workflow.leave', 'workflow.completed']
             marking_store:
-                type: method
                 property: state
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase

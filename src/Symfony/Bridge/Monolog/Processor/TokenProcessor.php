@@ -18,20 +18,16 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
  * @author Igor Timoshenko <igor.timoshenko@i.ua>
+ *
+ * @final since Symfony 6.1
  */
 class TokenProcessor extends AbstractTokenProcessor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getKey(): string
     {
         return 'token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getToken(): ?TokenInterface
     {
         return $this->tokenStorage->getToken();

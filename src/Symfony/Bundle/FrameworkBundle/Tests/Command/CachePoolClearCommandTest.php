@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePoolClearCommandTest extends TestCase
 {
-    private $cachePool;
+    private CacheItemPoolInterface $cachePool;
 
     protected function setUp(): void
     {
@@ -52,10 +52,7 @@ class CachePoolClearCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @return MockObject&KernelInterface
-     */
-    private function getKernel(): KernelInterface
+    private function getKernel(): MockObject&KernelInterface
     {
         $container = $this->createMock(ContainerInterface::class);
 

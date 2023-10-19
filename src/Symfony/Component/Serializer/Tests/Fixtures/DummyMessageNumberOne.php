@@ -20,8 +20,6 @@ class DummyMessageNumberOne implements DummyMessageInterface
 {
     public $one;
 
-    /**
-     * @Groups({"two"})
-     */
+    #[Groups(['two'])]
     public $two;
 }

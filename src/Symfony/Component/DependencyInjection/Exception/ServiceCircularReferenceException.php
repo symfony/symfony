@@ -18,8 +18,8 @@ namespace Symfony\Component\DependencyInjection\Exception;
  */
 class ServiceCircularReferenceException extends RuntimeException
 {
-    private $serviceId;
-    private $path;
+    private string $serviceId;
+    private array $path;
 
     public function __construct(string $serviceId, array $path, \Throwable $previous = null)
     {
@@ -29,11 +29,17 @@ class ServiceCircularReferenceException extends RuntimeException
         $this->path = $path;
     }
 
+    /**
+     * @return string
+     */
     public function getServiceId()
     {
         return $this->serviceId;
     }
 
+    /**
+     * @return array
+     */
     public function getPath()
     {
         return $this->path;

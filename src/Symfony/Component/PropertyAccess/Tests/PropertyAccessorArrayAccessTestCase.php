@@ -18,10 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 abstract class PropertyAccessorArrayAccessTestCase extends TestCase
 {
-    /**
-     * @var PropertyAccessor
-     */
-    protected $propertyAccessor;
+    protected PropertyAccessor $propertyAccessor;
 
     protected function setUp(): void
     {

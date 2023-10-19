@@ -28,9 +28,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 class ScalarNode extends VariableNode
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    protected function validateType($value)
+    protected function validateType(mixed $value)
     {
         if (!\is_scalar($value) && null !== $value) {
             $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "scalar", but got "%s".', $this->getPath(), get_debug_type($value)));
@@ -43,10 +43,7 @@ class ScalarNode extends VariableNode
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function isValueEmpty($value)
+    protected function isValueEmpty(mixed $value): bool
     {
         // assume environment variables are never empty (which in practice is likely to be true during runtime)
         // not doing so breaks many configs that are valid today
@@ -57,9 +54,6 @@ class ScalarNode extends VariableNode
         return null === $value || '' === $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValidPlaceholderTypes(): array
     {
         return ['bool', 'int', 'float', 'string'];

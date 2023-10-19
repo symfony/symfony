@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
@@ -23,6 +22,7 @@ use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 
 /**
@@ -32,19 +32,13 @@ class HandleMessageMiddleware implements MiddlewareInterface
 {
     use LoggerAwareTrait;
 
-    private $handlersLocator;
-    private $allowNoHandlers;
-
-    public function __construct(HandlersLocatorInterface $handlersLocator, bool $allowNoHandlers = false)
-    {
-        $this->handlersLocator = $handlersLocator;
-        $this->allowNoHandlers = $allowNoHandlers;
-        $this->logger = new NullLogger();
+    public function __construct(
+        private HandlersLocatorInterface $handlersLocator,
+        private bool $allowNoHandlers = false,
+    ) {
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NoHandlerForMessageException When no handler is found and $allowNoHandlers is false
      */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
@@ -53,7 +47,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
         $message = $envelope->getMessage();
 
         $context = [
-            'class' => \get_class($message),
+            'class' => $message::class,
         ];
 
         $exceptions = [];
@@ -80,7 +74,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                         $ackStamp->ack($envelope, $e);
                     });
 
-                    $result = $handler($message, $ack);
+                    $result = $this->callHandler($handler, $message, $ack, $envelope->last(HandlerArgumentsStamp::class));
 
                     if (!\is_int($result) || 0 > $result) {
                         throw new LogicException(sprintf('A handler implementing BatchHandlerInterface must return the size of the current batch as a positive integer, "%s" returned from "%s".', \is_int($result) ? $result : get_debug_type($result), get_debug_type($batchHandler)));
@@ -94,12 +88,12 @@ class HandleMessageMiddleware implements MiddlewareInterface
                         $result = $ack->getResult();
                     }
                 } else {
-                    $result = $handler($message);
+                    $result = $this->callHandler($handler, $message, null, $envelope->last(HandlerArgumentsStamp::class));
                 }
 
                 $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $result);
                 $envelope = $envelope->with($handledStamp);
-                $this->logger->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
+                $this->logger?->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {
                 $exceptions[] = $e;
             }
@@ -123,7 +117,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $context['class']));
             }
 
-            $this->logger->info('No handler for message {class}', $context);
+            $this->logger?->info('No handler for message {class}', $context);
         }
 
         if (\count($exceptions)) {
@@ -143,5 +137,18 @@ class HandleMessageMiddleware implements MiddlewareInterface
         }
 
         return false;
+    }
+
+    private function callHandler(callable $handler, object $message, ?Acknowledger $ack, ?HandlerArgumentsStamp $handlerArgumentsStamp): mixed
+    {
+        $arguments = [$message];
+        if (null !== $ack) {
+            $arguments[] = $ack;
+        }
+        if (null !== $handlerArgumentsStamp) {
+            $arguments = [...$arguments, ...$handlerArgumentsStamp->getAdditionalArguments()];
+        }
+
+        return $handler(...$arguments);
     }
 }

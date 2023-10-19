@@ -23,9 +23,9 @@ use Symfony\Component\Mailer\Exception\TransportException;
  */
 final class ProcessStream extends AbstractStream
 {
-    private $command;
+    private string $command;
 
-    public function setCommand(string $command)
+    public function setCommand(string $command): void
     {
         $this->command = $command;
     }

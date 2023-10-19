@@ -27,7 +27,7 @@ use Symfony\Component\Mime\RawMessage;
  */
 class PostmarkSmtpTransport extends EsmtpTransport
 {
-    private $messageStream;
+    private ?string $messageStream = null;
 
     public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -76,7 +76,7 @@ class PostmarkSmtpTransport extends EsmtpTransport
     /**
      * @return $this
      */
-    public function setMessageStream(string $messageStream): self
+    public function setMessageStream(string $messageStream): static
     {
         $this->messageStream = $messageStream;
 

@@ -14,10 +14,11 @@ class RoutingConfig
     private $_usedProperties = [];
 
     /**
-     * @param ParamConfigurator|list<mixed|ParamConfigurator> $value
+     * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
+     *
      * @return $this
      */
-    public function senders($value): self
+    public function senders(ParamConfigurator|array $value): static
     {
         $this->_usedProperties['senders'] = true;
         $this->senders = $value;

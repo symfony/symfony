@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -20,30 +21,29 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\Form\Console\Helper\DescriptorHelper;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Form\FormTypeInterface;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter as LegacyFileLinkFormatter;
 
 /**
  * A console command for retrieving information about form types.
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
+#[AsCommand(name: 'debug:form', description: 'Display form type information')]
 class DebugCommand extends Command
 {
-    protected static $defaultName = 'debug:form';
-    protected static $defaultDescription = 'Display form type information';
+    private FormRegistryInterface $formRegistry;
+    private array $namespaces;
+    private array $types;
+    private array $extensions;
+    private array $guessers;
+    private FileLinkFormatter|LegacyFileLinkFormatter|null $fileLinkFormatter;
 
-    private $formRegistry;
-    private $namespaces;
-    private $types;
-    private $extensions;
-    private $guessers;
-    private $fileLinkFormatter;
-
-    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [], array $extensions = [], array $guessers = [], FileLinkFormatter $fileLinkFormatter = null)
+    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [], array $extensions = [], array $guessers = [], FileLinkFormatter|LegacyFileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 
@@ -56,7 +56,7 @@ class DebugCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     protected function configure()
     {
@@ -65,9 +65,8 @@ class DebugCommand extends Command
                 new InputArgument('class', InputArgument::OPTIONAL, 'The form type class'),
                 new InputArgument('option', InputArgument::OPTIONAL, 'The form type option'),
                 new InputOption('show-deprecated', null, InputOption::VALUE_NONE, 'Display deprecated options in form types'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt or json)', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays information about form types.
 
@@ -100,10 +99,7 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -130,7 +126,7 @@ EOF
                 $object = $resolvedType->getOptionsResolver();
 
                 if (!$object->isDefined($option)) {
-                    $message = sprintf('Option "%s" is not defined in "%s".', $option, \get_class($resolvedType->getInnerType()));
+                    $message = sprintf('Option "%s" is not defined in "%s".', $option, $resolvedType->getInnerType()::class);
 
                     if ($alternatives = $this->findAlternatives($option, $object->getDefinedOptions())) {
                         if (1 === \count($alternatives)) {
@@ -211,9 +207,8 @@ EOF
     {
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
-        $loadTypesRefMethod->setAccessible(true);
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-        $coreTypes = array_map(function (FormTypeInterface $type) { return \get_class($type); }, $coreTypes);
+        $coreTypes = array_map(static fn (FormTypeInterface $type) => $type::class, $coreTypes);
         sort($coreTypes);
 
         return $coreTypes;
@@ -246,7 +241,7 @@ EOF
         }
 
         $threshold = 1e3;
-        $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
+        $alternatives = array_filter($alternatives, static fn ($lev) => $lev < 2 * $threshold);
         ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);
@@ -267,8 +262,7 @@ EOF
         }
 
         if ($input->mustSuggestOptionValuesFor('format')) {
-            $helper = new DescriptorHelper();
-            $suggestions->suggestValues($helper->getFormats());
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
         }
     }
 
@@ -288,5 +282,10 @@ EOF
 
         $resolvedType = $this->formRegistry->getType($class);
         $suggestions->suggestValues($resolvedType->getOptionsResolver()->getDefinedOptions());
+    }
+
+    private function getAvailableFormatOptions(): array
+    {
+        return (new DescriptorHelper())->getFormats();
     }
 }

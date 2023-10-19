@@ -27,17 +27,11 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DecoratorServicePass extends AbstractRecursivePass
 {
-    private $innerId = '.inner';
+    protected bool $skipScalars = true;
 
-    public function __construct(?string $innerId = '.inner')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/dependency-injection', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->innerId = $innerId;
-    }
-
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         $definitions = new \SplPriorityQueue();
@@ -50,6 +44,7 @@ class DecoratorServicePass extends AbstractRecursivePass
             $definitions->insert([$id, $definition], [$decorated[2], --$order]);
         }
         $decoratingDefinitions = [];
+        $decoratedIds = [];
 
         $tagsToKeep = $container->hasParameter('container.behavior_describing_tags')
             ? $container->getParameter('container.behavior_describing_tags')
@@ -66,6 +61,7 @@ class DecoratorServicePass extends AbstractRecursivePass
                 $renamedId = $id.'.inner';
             }
 
+            $decoratedIds[$inner] ??= $renamedId;
             $this->currentId = $renamedId;
             $this->processValue($definition);
 
@@ -95,7 +91,7 @@ class DecoratorServicePass extends AbstractRecursivePass
                 throw new ServiceNotFoundException($inner, $id);
             }
 
-            if ($decoratedDefinition && $decoratedDefinition->isSynthetic()) {
+            if ($decoratedDefinition?->isSynthetic()) {
                 throw new InvalidArgumentException(sprintf('A synthetic service cannot be decorated: service "%s" cannot decorate "%s".', $id, $inner));
             }
 
@@ -120,11 +116,15 @@ class DecoratorServicePass extends AbstractRecursivePass
 
             $container->setAlias($inner, $id)->setPublic($public);
         }
+
+        foreach ($decoratingDefinitions as $inner => $definition) {
+            $definition->addTag('container.decorator', ['id' => $inner, 'inner' => $decoratedIds[$inner]]);
+        }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
-        if ($value instanceof Reference && $this->innerId === (string) $value) {
+        if ($value instanceof Reference && '.inner' === (string) $value) {
             return new Reference($this->currentId, $value->getInvalidBehavior());
         }
 

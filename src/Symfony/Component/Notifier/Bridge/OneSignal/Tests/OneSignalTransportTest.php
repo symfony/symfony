@@ -21,7 +21,6 @@ use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -30,10 +29,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class OneSignalTransportTest extends TransportTestCase
 {
-    /**
-     * @return OneSignalTransport
-     */
-    public static function createTransport(HttpClientInterface $client = null, string $recipientId = null): TransportInterface
+    public static function createTransport(HttpClientInterface $client = null, string $recipientId = null): OneSignalTransport
     {
         return new OneSignalTransport('9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'api_key', $recipientId, $client ?? new MockHttpClient());
     }
@@ -76,11 +72,6 @@ final class OneSignalTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testUnsupportedWithoutRecipientId()
-    {
-        $this->assertFalse(self::createTransport()->supports(new PushMessage('Hello', 'World')));
-    }
-
     public function testSendThrowsWithoutRecipient()
     {
         $transport = self::createTransport();
@@ -101,9 +92,7 @@ final class OneSignalTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['errors' => ['Message Notifications must have English language content']]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 
@@ -123,9 +112,7 @@ final class OneSignalTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['id' => '', 'recipients' => 0, 'errors' => ['All included players are not subscribed']]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 

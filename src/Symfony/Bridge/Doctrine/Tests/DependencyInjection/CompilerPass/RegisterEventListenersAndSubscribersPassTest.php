@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -22,6 +23,8 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class RegisterEventListenersAndSubscribersPassTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testExceptionOnAbstractTaggedSubscriber()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -56,7 +59,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
             ])
@@ -195,6 +197,9 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testProcessEventSubscribersWithMultipleConnections()
     {
         $container = $this->createBuilder(true);
@@ -232,6 +237,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             ])
         ;
 
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "d" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->process($container);
 
         $eventManagerDef = $container->getDefinition('doctrine.dbal.default_connection.event_manager');
@@ -279,6 +285,9 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testProcessEventSubscribersWithPriorities()
     {
         $container = $this->createBuilder();
@@ -312,6 +321,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             ])
         ;
 
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "d" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->process($container);
 
         $eventManagerDef = $container->getDefinition('doctrine.dbal.default_connection.event_manager');
@@ -341,6 +351,9 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testProcessEventSubscribersAndListenersWithPriorities()
     {
         $container = $this->createBuilder();
@@ -375,7 +388,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         ;
         $container
             ->register('f', 'stdClass')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
             ])
@@ -402,6 +414,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             ])
         ;
 
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "d" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
         $this->process($container);
 
         $eventManagerDef = $container->getDefinition('doctrine.dbal.default_connection.event_manager');
@@ -436,6 +449,42 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
                 'h' => new ServiceClosureArgument(new Reference('h')),
             ],
             $serviceLocatorDef->getArgument(0)
+        );
+    }
+
+    public function testSubscribersAreSkippedIfListenerDefinedForSameDefinition()
+    {
+        $container = $this->createBuilder();
+
+        $container
+            ->register('a', 'stdClass')
+            ->addTag('doctrine.event_listener', [
+                'event' => 'bar',
+                'priority' => 3,
+            ])
+        ;
+        $container
+            ->register('b', 'stdClass')
+            ->addTag('doctrine.event_listener', [
+                'event' => 'bar',
+            ])
+            ->addTag('doctrine.event_listener', [
+                'event' => 'foo',
+                'priority' => -5,
+            ])
+            ->addTag('doctrine.event_subscriber')
+        ;
+        $this->process($container);
+
+        $eventManagerDef = $container->getDefinition('doctrine.dbal.default_connection.event_manager');
+
+        $this->assertEquals(
+            [
+                [['bar'], 'a'],
+                [['bar'], 'b'],
+                [['foo'], 'b'],
+            ],
+            $eventManagerDef->getArgument(1)
         );
     }
 

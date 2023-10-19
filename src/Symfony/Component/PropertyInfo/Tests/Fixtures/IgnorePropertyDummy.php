@@ -19,14 +19,9 @@ use Symfony\Component\Serializer\Annotation\Ignore;
  */
 class IgnorePropertyDummy
 {
-    /**
-     * @Groups({"a"})
-     */
+    #[Groups(['a'])]
     public $visibleProperty;
 
-    /**
-     * @Groups({"a"})
-     * @Ignore
-     */
+    #[Groups(['a']), Ignore]
     private $ignoredProperty;
 }

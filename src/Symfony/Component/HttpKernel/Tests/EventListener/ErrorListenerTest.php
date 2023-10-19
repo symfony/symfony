@@ -13,10 +13,13 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
+use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -40,10 +43,8 @@ class ErrorListenerTest extends TestCase
         $logger = new TestLogger();
         $l = new ErrorListener('foo', $logger);
 
-        $_logger = new \ReflectionProperty(\get_class($l), 'logger');
-        $_logger->setAccessible(true);
-        $_controller = new \ReflectionProperty(\get_class($l), 'controller');
-        $_controller->setAccessible(true);
+        $_logger = new \ReflectionProperty($l::class, 'logger');
+        $_controller = new \ReflectionProperty($l::class, 'controller');
 
         $this->assertSame($logger, $_logger->getValue($l));
         $this->assertSame('foo', $_controller->getValue($l));
@@ -95,7 +96,11 @@ class ErrorListenerTest extends TestCase
         }
 
         $this->assertEquals(3, $logger->countErrors());
-        $this->assertCount(3, $logger->getLogs('critical'));
+        $logs = $logger->getLogs('critical');
+        $this->assertCount(3, $logs);
+        $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[0]);
+        $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[1]);
+        $this->assertStringStartsWith('Exception thrown when handling an exception (RuntimeException: bar at ErrorListenerTest.php line', $logs[2]);
     }
 
     public function testHandleWithLoggerAndCustomConfiguration()
@@ -119,6 +124,70 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogs('warning'));
     }
 
+    public function testHandleWithLogLevelAttribute()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new ChildOfWarningWithLogLevelAttribute());
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger);
+
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('critical'));
+        $this->assertCount(1, $logger->getLogs('warning'));
+    }
+
+    public function testHandleWithLogLevelAttributeAndCustomConfiguration()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WarningWithLogLevelAttribute());
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger, false, [
+            WarningWithLogLevelAttribute::class => [
+                'log_level' => 'info',
+                'status_code' => 401,
+            ],
+        ]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('warning'));
+        $this->assertCount(1, $logger->getLogs('info'));
+    }
+
+    /**
+     * @dataProvider exceptionWithAttributeProvider
+     */
+    public function testHandleHttpAttribute(\Throwable $exception, int $expectedStatusCode, array $expectedHeaders)
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
+        $l = new ErrorListener('not used');
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo', $expectedStatusCode, $expectedHeaders), $event->getResponse());
+    }
+
+    public function testHandleCustomConfigurationAndHttpAttribute()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WithGeneralAttribute());
+        $l = new ErrorListener('not used', null, false, [
+            WithGeneralAttribute::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+            ],
+        ]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo', 401), $event->getResponse());
+    }
+
     public static function provider()
     {
         if (!class_exists(Request::class)) {
@@ -140,9 +209,7 @@ class ErrorListenerTest extends TestCase
         $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
 
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
-            return new Response($request->getRequestFormat());
-        });
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(fn (Request $request) => new Response($request->getRequestFormat()));
 
         $request = Request::create('/');
         $request->setRequestFormat('xml');
@@ -158,9 +225,7 @@ class ErrorListenerTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
-            return new Response($request->getRequestFormat());
-        });
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(fn (Request $request) => new Response($request->getRequestFormat()));
 
         $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class), true);
 
@@ -204,9 +269,7 @@ class ErrorListenerTest extends TestCase
 
     public static function controllerProvider()
     {
-        yield [function (FlattenException $exception) {
-            return new Response('OK: '.$exception->getMessage());
-        }];
+        yield [fn (FlattenException $exception) => new Response('OK: '.$exception->getMessage())];
 
         yield [function ($exception) {
             static::assertInstanceOf(FlattenException::class, $exception);
@@ -214,9 +277,14 @@ class ErrorListenerTest extends TestCase
             return new Response('OK: '.$exception->getMessage());
         }];
 
-        yield [function (\Throwable $exception) {
-            return new Response('OK: '.$exception->getMessage());
-        }];
+        yield [fn (\Throwable $exception) => new Response('OK: '.$exception->getMessage())];
+    }
+
+    public static function exceptionWithAttributeProvider()
+    {
+        yield [new WithCustomUserProvidedAttribute(), 208, ['name' => 'value']];
+        yield [new WithGeneralAttribute(), 412, ['some' => 'thing']];
+        yield [new ChildOfWithGeneralAttribute(), 412, ['some' => 'thing']];
     }
 }
 
@@ -247,4 +315,46 @@ class TestKernelThatThrowsException implements HttpKernelInterface
     {
         throw new \RuntimeException('bar');
     }
+}
+
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class UserProvidedHttpStatusCodeAttribute extends WithHttpStatus
+{
+    public function __construct(array $headers = [])
+    {
+        parent::__construct(
+            Response::HTTP_ALREADY_REPORTED,
+            $headers
+        );
+    }
+}
+
+#[UserProvidedHttpStatusCodeAttribute(headers: [
+    'name' => 'value',
+])]
+class WithCustomUserProvidedAttribute extends \Exception
+{
+}
+
+#[WithHttpStatus(
+    statusCode: Response::HTTP_PRECONDITION_FAILED,
+    headers: [
+        'some' => 'thing',
+    ]
+)]
+class WithGeneralAttribute extends \Exception
+{
+}
+
+class ChildOfWithGeneralAttribute extends WithGeneralAttribute
+{
+}
+
+#[WithLogLevel(LogLevel::WARNING)]
+class WarningWithLogLevelAttribute extends \Exception
+{
+}
+
+class ChildOfWarningWithLogLevelAttribute extends WarningWithLogLevelAttribute
+{
 }

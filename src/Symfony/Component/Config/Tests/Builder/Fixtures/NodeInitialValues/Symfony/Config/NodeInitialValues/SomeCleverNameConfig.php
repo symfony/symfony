@@ -20,7 +20,7 @@ class SomeCleverNameConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function first($value): self
+    public function first($value): static
     {
         $this->_usedProperties['first'] = true;
         $this->first = $value;
@@ -33,7 +33,7 @@ class SomeCleverNameConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function second($value): self
+    public function second($value): static
     {
         $this->_usedProperties['second'] = true;
         $this->second = $value;
@@ -46,7 +46,7 @@ class SomeCleverNameConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function third($value): self
+    public function third($value): static
     {
         $this->_usedProperties['third'] = true;
         $this->third = $value;

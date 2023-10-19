@@ -21,6 +21,9 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class IntlCaster
 {
+    /**
+     * @return array
+     */
     public static function castMessageFormatter(\MessageFormatter $c, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -31,6 +34,9 @@ class IntlCaster
         return self::castError($c, $a);
     }
 
+    /**
+     * @return array
+     */
     public static function castNumberFormatter(\NumberFormatter $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
     {
         $a += [
@@ -108,6 +114,9 @@ class IntlCaster
         return self::castError($c, $a);
     }
 
+    /**
+     * @return array
+     */
     public static function castIntlTimeZone(\IntlTimeZone $c, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -125,6 +134,9 @@ class IntlCaster
         return self::castError($c, $a);
     }
 
+    /**
+     * @return array
+     */
     public static function castIntlCalendar(\IntlCalendar $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
     {
         $a += [
@@ -142,6 +154,9 @@ class IntlCaster
         return self::castError($c, $a);
     }
 
+    /**
+     * @return array
+     */
     public static function castIntlDateFormatter(\IntlDateFormatter $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
     {
         $a += [

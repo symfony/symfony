@@ -32,19 +32,21 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
     use TransportResponseTrait;
 
-    private $multi;
+    private CurlClientState $multi;
+
+    /**
+     * @var resource
+     */
     private $debugBuffer;
 
     /**
-     * @param \CurlHandle|resource|string $ch
-     *
      * @internal
      */
-    public function __construct(CurlClientState $multi, $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null, int $curlVersion = null)
+    public function __construct(CurlClientState $multi, \CurlHandle|string $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null, int $curlVersion = null, string $originalUrl = null)
     {
         $this->multi = $multi;
 
-        if (\is_resource($ch) || $ch instanceof \CurlHandle) {
+        if ($ch instanceof \CurlHandle) {
             $this->handle = $ch;
             $this->debugBuffer = fopen('php://temp', 'w+');
             if (0x074000 === $curlVersion) {
@@ -65,7 +67,8 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->info['http_method'] = $method;
         $this->info['user_data'] = $options['user_data'] ?? null;
         $this->info['max_duration'] = $options['max_duration'] ?? null;
-        $this->info['start_time'] = $this->info['start_time'] ?? microtime(true);
+        $this->info['start_time'] ??= microtime(true);
+        $this->info['original_url'] = $originalUrl ?? $this->info['url'] ?? curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL);
         $info = &$this->info;
         $headers = &$this->headers;
         $debugBuffer = $this->debugBuffer;
@@ -100,7 +103,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 }
 
                 $lastExpiry = end($multi->pauseExpiries);
-                $multi->pauseExpiries[(int) $ch] = $duration += microtime(true);
+                $multi->pauseExpiries[(int) $ch] = $duration += hrtime(true) / 1E9;
                 if (false !== $lastExpiry && $lastExpiry > $duration) {
                     asort($multi->pauseExpiries);
                 }
@@ -154,7 +157,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         });
 
         $this->initializer = static function (self $response) {
-            $waitFor = curl_getinfo($ch = $response->handle, \CURLINFO_PRIVATE);
+            $waitFor = curl_getinfo($response->handle, \CURLINFO_PRIVATE);
 
             return 'H' === $waitFor[0];
         };
@@ -190,10 +193,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getInfo(string $type = null)
+    public function getInfo(string $type = null): mixed
     {
         if (!$info = $this->finalInfo) {
             $info = array_merge($this->info, curl_getinfo($this->handle));
@@ -221,9 +221,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         return null !== $type ? $info[$type] ?? null : $info;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContent(bool $throw = true): string
     {
         $performing = $this->multi->performing;
@@ -245,15 +242,12 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
             $this->doDestruct();
         } finally {
-            if (\is_resource($this->handle) || $this->handle instanceof \CurlHandle) {
+            if ($this->handle instanceof \CurlHandle) {
                 curl_setopt($this->handle, \CURLOPT_VERBOSE, false);
             }
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private static function schedule(self $response, array &$runningResponses): void
     {
         if (isset($runningResponses[$i = (int) $response->multi->handle])) {
@@ -262,7 +256,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             $runningResponses[$i] = [$response->multi, [$response->id => $response]];
         }
 
-        if ('_0' === curl_getinfo($ch = $response->handle, \CURLINFO_PRIVATE)) {
+        if ('_0' === curl_getinfo($response->handle, \CURLINFO_PRIVATE)) {
             // Response already completed
             $response->multi->handlesActivity[$response->id][] = null;
             $response->multi->handlesActivity[$response->id][] = null !== $response->info['error'] ? new TransportException($response->info['error']) : null;
@@ -270,8 +264,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param CurlClientState $multi
      */
     private static function perform(ClientState $multi, array &$responses = null): void
@@ -329,19 +321,12 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param CurlClientState $multi
      */
     private static function select(ClientState $multi, float $timeout): int
     {
-        if (\PHP_VERSION_ID < 70211) {
-            // workaround https://bugs.php.net/76480
-            $timeout = min($timeout, 0.01);
-        }
-
         if ($multi->pauseExpiries) {
-            $now = microtime(true);
+            $now = hrtime(true) / 1E9;
 
             foreach ($multi->pauseExpiries as $id => $pauseExpiry) {
                 if ($now < $pauseExpiry) {
@@ -359,7 +344,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             return $selected;
         }
 
-        if ($multi->pauseExpiries && 0 < $timeout -= microtime(true) - $now) {
+        if ($multi->pauseExpiries && 0 < $timeout -= hrtime(true) / 1E9 - $now) {
             usleep((int) (1E6 * $timeout));
         }
 

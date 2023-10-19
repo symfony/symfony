@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
-use phpDocumentor\Reflection\DocBlock\StandardTagFactory;
-use phpDocumentor\Reflection\DocBlock\Tags\InvalidTag;
-use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypeDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
@@ -28,10 +26,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class PhpDocExtractorTest extends TestCase
 {
-    /**
-     * @var PhpDocExtractor
-     */
-    private $extractor;
+    private PhpDocExtractor $extractor;
 
     protected function setUp(): void
     {
@@ -41,7 +36,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, array $type = null, $shortDescription, $longDescription)
+    public function testExtract($property, ?array $type, $shortDescription, $longDescription)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
@@ -58,8 +53,8 @@ class PhpDocExtractorTest extends TestCase
         return [
             'pub' => ['pub', null, null],
             'stat' => ['stat', null, null],
-            'foo' => ['foo', self::isPhpDocumentorV5() ? 'Foo.' : null, null],
-            'bar' => ['bar', self::isPhpDocumentorV5() ? 'Bar.' : null, null],
+            'foo' => ['foo', 'Foo.', null],
+            'bar' => ['bar', 'Bar.', null],
         ];
     }
 
@@ -102,9 +97,9 @@ class PhpDocExtractorTest extends TestCase
                 null,
                 null,
             ],
-            ['bal', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')], null, null],
+            ['bal', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')], null, null],
             ['parent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')], null, null],
-            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))], null, null],
             ['nestedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, false)))], null, null],
             ['mixedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, null)], null, null],
             ['a', [new Type(Type::BUILTIN_TYPE_INT)], 'A.', null],
@@ -116,40 +111,19 @@ class PhpDocExtractorTest extends TestCase
             ['dt', [new Type(Type::BUILTIN_TYPE_TRUE)], null, null],
             ['df', [new Type(Type::BUILTIN_TYPE_FALSE)], null, null],
             ['e', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))], null, null],
-            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))], null, null],
             ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)], 'Nullable array.', null],
             ['h', [new Type(Type::BUILTIN_TYPE_STRING, true)], null, null],
             ['i', [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT, true)], null, null],
-            ['j', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTime')], null, null],
+            ['j', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTimeImmutable')], null, null],
             ['nullableCollectionOfNonNullableElements', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_INT, false))], null, null],
             ['donotexist', null, null, null],
             ['staticGetter', null, null, null],
             ['staticSetter', null, null, null],
-            ['emptyVar', null, self::isPhpDocumentorV5() ? 'This should not be removed.' : null, null],
-            [
-                'arrayWithKeys',
-                self::isPhpDocumentorV5() ? [
-                    new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING)),
-                ] : null,
-                null,
-                null,
-            ],
-            [
-                'arrayOfMixed',
-                self::isPhpDocumentorV5() ? [
-                    new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), null),
-                ] : null,
-                null,
-                null,
-            ],
-            [
-                'listOfStrings',
-                self::isPhpDocumentorV5() ? [
-                    new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)),
-                ] : null,
-                null,
-                null,
-            ],
+            ['emptyVar', null, 'This should not be removed.', null],
+            ['arrayWithKeys', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING))], null, null],
+            ['arrayOfMixed', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), null)], null, null],
+            ['listOfStrings', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))], null, null],
             ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], null, null],
         ];
     }
@@ -157,12 +131,8 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider provideCollectionTypes
      */
-    public function testExtractCollection($property, array $type = null, $shortDescription, $longDescription)
+    public function testExtractCollection($property, ?array $type, $shortDescription, $longDescription)
     {
-        if (!class_exists(Collection::class)) {
-            $this->markTestSkipped('Collections are not implemented in current phpdocumentor/type-resolver version');
-        }
-
         $this->testExtract($property, $type, $shortDescription, $longDescription);
     }
 
@@ -249,9 +219,9 @@ class PhpDocExtractorTest extends TestCase
                 null,
                 null,
             ],
-            ['bal', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')], null, null],
+            ['bal', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')], null, null],
             ['parent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')], null, null],
-            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))], null, null],
             ['nestedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, false)))], null, null],
             ['mixedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, null)], null, null],
             ['a', null, 'A.', null],
@@ -259,11 +229,11 @@ class PhpDocExtractorTest extends TestCase
             ['c', [new Type(Type::BUILTIN_TYPE_BOOL, true)], null, null],
             ['d', [new Type(Type::BUILTIN_TYPE_BOOL)], null, null],
             ['e', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))], null, null],
-            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))], null, null],
             ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)], 'Nullable array.', null],
             ['h', [new Type(Type::BUILTIN_TYPE_STRING, true)], null, null],
             ['i', [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT, true)], null, null],
-            ['j', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTime')], null, null],
+            ['j', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTimeImmutable')], null, null],
             ['nullableCollectionOfNonNullableElements', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_INT, false))], null, null],
             ['nonNullableCollectionOfNullableElements', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_INT, true))], null, null],
             ['nullableCollectionOfMultipleNonNullableElementTypes', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, new Type(Type::BUILTIN_TYPE_INT), [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)])], null, null],
@@ -292,9 +262,9 @@ class PhpDocExtractorTest extends TestCase
                 null,
                 null,
             ],
-            ['bal', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')], null, null],
+            ['bal', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')], null, null],
             ['parent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')], null, null],
-            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))], null, null],
             ['nestedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, false)))], null, null],
             ['mixedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, null)], null, null],
             ['a', null, 'A.', null],
@@ -306,7 +276,7 @@ class PhpDocExtractorTest extends TestCase
             ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)], 'Nullable array.', null],
             ['h', [new Type(Type::BUILTIN_TYPE_STRING, true)], null, null],
             ['i', [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT, true)], null, null],
-            ['j', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTime')], null, null],
+            ['j', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTimeImmutable')], null, null],
             ['nullableCollectionOfNonNullableElements', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_INT, false))], null, null],
             ['donotexist', null, null, null],
             ['staticGetter', null, null, null],
@@ -419,16 +389,6 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'scalar')], $this->extractor->getTypes(PseudoTypeDummy::class, 'unknownPseudoType'));
     }
 
-    protected static function isPhpDocumentorV5()
-    {
-        if (class_exists(InvalidTag::class)) {
-            return true;
-        }
-
-        return (new \ReflectionMethod(StandardTagFactory::class, 'create'))
-            ->hasReturnType();
-    }
-
     /**
      * @dataProvider constructorTypesProvider
      */
@@ -446,6 +406,45 @@ class PhpDocExtractorTest extends TestCase
             ['dateTime', null],
             ['ddd', null],
             ['mixed', null],
+        ];
+    }
+
+    /**
+     * @dataProvider pseudoTypesProvider
+     */
+    public function testPseudoTypes($property, array $type)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypesDummy', $property));
+    }
+
+    public static function pseudoTypesProvider(): array
+    {
+        return [
+            ['classString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['classStringGeneric', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['htmlEscapedString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['lowercaseString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['nonEmptyLowercaseString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['nonEmptyString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['numericString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['traitString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['positiveInt', [new Type(Type::BUILTIN_TYPE_INT, false, null)]],
+        ];
+    }
+
+    /**
+     * @dataProvider promotedPropertyProvider
+     */
+    public function testExtractPromotedProperty(string $property, ?array $types)
+    {
+        $this->assertEquals($types, $this->extractor->getTypes(Php80Dummy::class, $property));
+    }
+
+    public static function promotedPropertyProvider(): array
+    {
+        return [
+            ['promoted', null],
+            ['promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
         ];
     }
 }

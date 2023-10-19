@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 class FragmentHandlerTest extends TestCase
 {
-    private $requestStack;
+    private RequestStack $requestStack;
 
     protected function setUp(): void
     {

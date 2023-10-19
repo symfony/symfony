@@ -23,15 +23,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Pierre Tondereau <pierre.tondereau@gmail.com>
+ *
+ * @deprecated since Symfony 6.3, use BrevoTransport instead
  */
 final class SendinblueTransport extends AbstractTransport
 {
     protected const HOST = 'api.sendinblue.com';
 
-    private $apiKey;
-    private $sender;
+    private string $apiKey;
+    private string $sender;
 
-    public function __construct(string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->sender = $sender;
@@ -57,7 +59,7 @@ final class SendinblueTransport extends AbstractTransport
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/transactionalSMS/sms', [
             'json' => [
-                'sender' => $this->sender,
+                'sender' => $message->getFrom() ?: $this->sender,
                 'recipient' => $message->getPhone(),
                 'content' => $message->getSubject(),
             ],

@@ -29,7 +29,7 @@ class HttplugPromiseTest extends TestCase
 
         $promise1 = $mkPromise('result');
         $promise2 = $promise1->then($mkPromise);
-        $promise3 = $promise2->then(function ($result) { return $result; });
+        $promise3 = $promise2->then(fn ($result) => $result);
 
         $this->assertSame('result', $promise3->wait());
     }

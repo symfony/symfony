@@ -23,19 +23,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResettableServicePass implements CompilerPassInterface
 {
-    private $tagName;
-
-    public function __construct(string $tagName = 'kernel.reset')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/http-kernel', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->tagName = $tagName;
-    }
-
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function process(ContainerBuilder $container)
     {
@@ -45,12 +34,12 @@ class ResettableServicePass implements CompilerPassInterface
 
         $services = $methods = [];
 
-        foreach ($container->findTaggedServiceIds($this->tagName, true) as $id => $tags) {
+        foreach ($container->findTaggedServiceIds('kernel.reset', true) as $id => $tags) {
             $services[$id] = new Reference($id, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE);
 
             foreach ($tags as $attributes) {
                 if (!isset($attributes['method'])) {
-                    throw new RuntimeException(sprintf('Tag "%s" requires the "method" attribute to be set.', $this->tagName));
+                    throw new RuntimeException(sprintf('Tag "kernel.reset" requires the "method" attribute to be set on service "%s".', $id));
                 }
 
                 if (!isset($methods[$id])) {

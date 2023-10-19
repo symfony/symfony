@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/service-contracts": "^1|^2|^3"
+        "php": ">=8.1",
+        "symfony/service-contracts": "^2.5|^3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Stopwatch\\": "" },

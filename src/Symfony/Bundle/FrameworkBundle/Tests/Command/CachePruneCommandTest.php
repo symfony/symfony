@@ -45,15 +45,10 @@ class CachePruneCommandTest extends TestCase
 
     private function getEmptyRewindableGenerator(): RewindableGenerator
     {
-        return new RewindableGenerator(function () {
-            return new \ArrayIterator([]);
-        }, 0);
+        return new RewindableGenerator(fn () => new \ArrayIterator([]), 0);
     }
 
-    /**
-     * @return MockObject&KernelInterface
-     */
-    private function getKernel(): KernelInterface
+    private function getKernel(): MockObject&KernelInterface
     {
         $container = $this->createMock(ContainerInterface::class);
 
@@ -71,10 +66,7 @@ class CachePruneCommandTest extends TestCase
         return $kernel;
     }
 
-    /**
-     * @return MockObject&PruneableInterface
-     */
-    private function getPruneableInterfaceMock(): PruneableInterface
+    private function getPruneableInterfaceMock(): MockObject&PruneableInterface
     {
         $pruneable = $this->createMock(PruneableInterface::class);
         $pruneable

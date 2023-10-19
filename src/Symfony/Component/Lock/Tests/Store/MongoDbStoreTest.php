@@ -13,7 +13,6 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use MongoDB\Client;
 use MongoDB\Driver\Exception\ConnectionTimeoutException;
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -33,14 +32,14 @@ class MongoDbStoreTest extends AbstractStoreTestCase
     public static function setupBeforeClass(): void
     {
         if (!class_exists(\MongoDB\Client::class)) {
-            throw new SkippedTestSuiteError('The mongodb/mongodb package is required.');
+            self::markTestSkipped('The mongodb/mongodb package is required.');
         }
 
         $client = self::getMongoClient();
         try {
             $client->listDatabases();
         } catch (ConnectionTimeoutException $e) {
-            throw new SkippedTestSuiteError('MongoDB server not found.');
+            self::markTestSkipped('MongoDB server not found.');
         }
     }
 
@@ -54,9 +53,6 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         return 250000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new MongoDbStore(self::getMongoClient(), [
@@ -122,7 +118,6 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $storeReflection = new \ReflectionObject($store);
 
         $optionsProperty = $storeReflection->getProperty('options');
-        $optionsProperty->setAccessible(true);
         $options = $optionsProperty->getValue($store);
 
         $this->assertSame('test_uri', $options['database']);
@@ -161,7 +156,6 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $storeReflection = new \ReflectionObject($store);
 
         $uriProperty = $storeReflection->getProperty('uri');
-        $uriProperty->setAccessible(true);
         $uri = $uriProperty->getValue($store);
         $this->assertSame($driverUri, $uri);
     }

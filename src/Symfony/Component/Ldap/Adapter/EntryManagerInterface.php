@@ -25,6 +25,8 @@ interface EntryManagerInterface
     /**
      * Adds a new entry in the Ldap server.
      *
+     * @return $this
+     *
      * @throws NotBoundException
      * @throws LdapException
      */
@@ -32,6 +34,8 @@ interface EntryManagerInterface
 
     /**
      * Updates an entry from the Ldap server.
+     *
+     * @return $this
      *
      * @throws NotBoundException
      * @throws LdapException
@@ -41,6 +45,8 @@ interface EntryManagerInterface
     /**
      * Moves an entry on the Ldap server.
      *
+     * @return $this
+     *
      * @throws NotBoundException
      * @throws LdapException
      */
@@ -49,6 +55,8 @@ interface EntryManagerInterface
     /**
      * Renames an entry on the Ldap server.
      *
+     * @return $this
+     *
      * @throws NotBoundException
      * @throws LdapException
      */
@@ -56,6 +64,8 @@ interface EntryManagerInterface
 
     /**
      * Removes an entry from the Ldap server.
+     *
+     * @return $this
      *
      * @throws NotBoundException
      * @throws LdapException

@@ -24,12 +24,12 @@ class_exists(ParsedExpression::class);
  */
 class ExpressionLanguage
 {
-    private $cache;
-    private $lexer;
-    private $parser;
-    private $compiler;
+    private CacheItemPoolInterface $cache;
+    private Lexer $lexer;
+    private Parser $parser;
+    private Compiler $compiler;
 
-    protected $functions = [];
+    protected array $functions = [];
 
     /**
      * @param ExpressionFunctionProviderInterface[] $providers
@@ -45,36 +45,24 @@ class ExpressionLanguage
 
     /**
      * Compiles an expression source code.
-     *
-     * @param Expression|string $expression The expression to compile
-     *
-     * @return string
      */
-    public function compile($expression, array $names = [])
+    public function compile(Expression|string $expression, array $names = []): string
     {
         return $this->getCompiler()->compile($this->parse($expression, $names)->getNodes())->getSource();
     }
 
     /**
      * Evaluate an expression.
-     *
-     * @param Expression|string $expression The expression to compile
-     *
-     * @return mixed
      */
-    public function evaluate($expression, array $values = [])
+    public function evaluate(Expression|string $expression, array $values = []): mixed
     {
         return $this->parse($expression, array_keys($values))->getNodes()->evaluate($this->functions, $values);
     }
 
     /**
      * Parses an expression.
-     *
-     * @param Expression|string $expression The expression to parse
-     *
-     * @return ParsedExpression
      */
-    public function parse($expression, array $names)
+    public function parse(Expression|string $expression, array $names): ParsedExpression
     {
         if ($expression instanceof ParsedExpression) {
             return $expression;
@@ -103,12 +91,11 @@ class ExpressionLanguage
     /**
      * Validates the syntax of an expression.
      *
-     * @param Expression|string $expression The expression to validate
-     * @param array|null        $names      The list of acceptable variable names in the expression, or null to accept any names
+     * @param array|null $names The list of acceptable variable names in the expression, or null to accept any names
      *
      * @throws SyntaxError When the passed expression is invalid
      */
-    public function lint($expression, ?array $names): void
+    public function lint(Expression|string $expression, ?array $names): void
     {
         if ($expression instanceof ParsedExpression) {
             return;
@@ -123,24 +110,32 @@ class ExpressionLanguage
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
      *
+     * @return void
+     *
      * @throws \LogicException when registering a function after calling evaluate(), compile() or parse()
      *
      * @see ExpressionFunction
      */
     public function register(string $name, callable $compiler, callable $evaluator)
     {
-        if (null !== $this->parser) {
+        if (isset($this->parser)) {
             throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
         }
 
         $this->functions[$name] = ['compiler' => $compiler, 'evaluator' => $evaluator];
     }
 
+    /**
+     * @return void
+     */
     public function addFunction(ExpressionFunction $function)
     {
         $this->register($function->getName(), $function->getCompiler(), $function->getEvaluator());
     }
 
+    /**
+     * @return void
+     */
     public function registerProvider(ExpressionFunctionProviderInterface $provider)
     {
         foreach ($provider->getFunctions() as $function) {
@@ -148,34 +143,40 @@ class ExpressionLanguage
         }
     }
 
+    /**
+     * @return void
+     */
     protected function registerFunctions()
     {
         $this->addFunction(ExpressionFunction::fromPhp('constant'));
+
+        $this->addFunction(new ExpressionFunction('enum',
+            static fn ($str): string => sprintf("(\constant(\$v = (%s))) instanceof \UnitEnum ? \constant(\$v) : throw new \TypeError(\sprintf('The string \"%%s\" is not the name of a valid enum case.', \$v))", $str),
+            static function ($arguments, $str): \UnitEnum {
+                $value = \constant($str);
+
+                if (!$value instanceof \UnitEnum) {
+                    throw new \TypeError(sprintf('The string "%s" is not the name of a valid enum case.', $str));
+                }
+
+                return $value;
+            }
+        ));
     }
 
     private function getLexer(): Lexer
     {
-        if (null === $this->lexer) {
-            $this->lexer = new Lexer();
-        }
-
-        return $this->lexer;
+        return $this->lexer ??= new Lexer();
     }
 
     private function getParser(): Parser
     {
-        if (null === $this->parser) {
-            $this->parser = new Parser($this->functions);
-        }
-
-        return $this->parser;
+        return $this->parser ??= new Parser($this->functions);
     }
 
     private function getCompiler(): Compiler
     {
-        if (null === $this->compiler) {
-            $this->compiler = new Compiler($this->functions);
-        }
+        $this->compiler ??= new Compiler($this->functions);
 
         return $this->compiler->reset();
     }

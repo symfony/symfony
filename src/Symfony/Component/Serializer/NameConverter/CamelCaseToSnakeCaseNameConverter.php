@@ -18,23 +18,17 @@ namespace Symfony\Component\Serializer\NameConverter;
  */
 class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
 {
-    private $attributes;
-    private $lowerCamelCase;
-
     /**
      * @param array|null $attributes     The list of attributes to rename or null for all attributes
      * @param bool       $lowerCamelCase Use lowerCamelCase style
      */
-    public function __construct(array $attributes = null, bool $lowerCamelCase = true)
-    {
-        $this->attributes = $attributes;
-        $this->lowerCamelCase = $lowerCamelCase;
+    public function __construct(
+        private ?array $attributes = null,
+        private bool $lowerCamelCase = true,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function normalize(string $propertyName)
+    public function normalize(string $propertyName): string
     {
         if (null === $this->attributes || \in_array($propertyName, $this->attributes)) {
             return strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($propertyName)));
@@ -43,14 +37,9 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
         return $propertyName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize(string $propertyName)
+    public function denormalize(string $propertyName): string
     {
-        $camelCasedName = preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
-            return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
-        }, $propertyName);
+        $camelCasedName = preg_replace_callback('/(^|_|\.)+(.)/', fn ($match) => ('.' === $match[1] ? '_' : '').strtoupper($match[2]), $propertyName);
 
         if ($this->lowerCamelCase) {
             $camelCasedName = lcfirst($camelCasedName);

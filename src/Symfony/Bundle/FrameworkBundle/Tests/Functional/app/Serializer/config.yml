@@ -2,6 +2,7 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
+    http_method_override: false
     serializer:
         enabled: true
         default_context:
@@ -36,6 +37,10 @@ services:
 
     serializer.normalizer.uid.alias:
         alias: serializer.normalizer.uid
+        public: true
+
+    serializer.normalizer.translatable.alias:
+        alias: serializer.normalizer.translatable
         public: true
 
     serializer.normalizer.property.alias:

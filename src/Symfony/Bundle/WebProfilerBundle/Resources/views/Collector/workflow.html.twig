@@ -1,0 +1,62 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block menu %}
+    <span class="label {{ collector.workflows|length == 0 ? 'disabled' }}">
+        <span class="icon">
+            {{ source('@WebProfiler/Icon/workflow.svg') }}
+        </span>
+        <strong>Workflow</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Workflow</h2>
+
+    {% if collector.workflows|length == 0 %}
+        <div class="empty empty-panel">
+            <p>There are no workflows configured.</p>
+        </div>
+    {% else %}
+        <script type="module">
+            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+            mermaid.initialize({
+                flowchart: { useMaxWidth: false },
+                securityLevel: 'loose',
+            });
+            // We do not load all mermaid diagrams at once, but only when the tab is opened
+            // This is because mermaid diagrams are in a tab, and cannot be renderer with a
+            // "good size" if they are not visible
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('.tab').forEach((el) => {
+                    const observer = new MutationObserver(() => {
+                        if (!el.classList.contains('block')) {
+                            return;
+                        }
+                        const mEl = el.querySelector('.sf-mermaid');
+                        if (mEl.dataset.processed) {
+                            return;
+                        }
+                        mermaid.run({
+                            nodes: [mEl],
+                        });
+                    });
+                    observer.observe(el, { attributeFilter: ['class'] });
+                });
+            });
+        </script>
+
+        <h2>Definitions</h2>
+        <div class="sf-tabs js-tabs">
+            {% for name, data in collector.workflows %}
+                <div class="tab">
+                    <h3 class="tab-title">{{ name }}</h3>
+                    <div class="tab-content">
+                        <pre class="sf-mermaid">
+                            {{ data.dump|raw }}
+                        </pre>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

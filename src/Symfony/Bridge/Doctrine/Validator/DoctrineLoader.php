@@ -33,24 +33,18 @@ final class DoctrineLoader implements LoaderInterface
 {
     use AutoMappingTrait;
 
-    private $entityManager;
-    private $classValidatorRegexp;
-
-    public function __construct(EntityManagerInterface $entityManager, string $classValidatorRegexp = null)
-    {
-        $this->entityManager = $entityManager;
-        $this->classValidatorRegexp = $classValidatorRegexp;
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ?string $classValidatorRegexp = null,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $className = $metadata->getClassName();
         try {
             $doctrineMetadata = $this->entityManager->getClassMetadata($className);
-        } catch (MappingException|OrmMappingException $exception) {
+        } catch (MappingException|OrmMappingException) {
             return false;
         }
 

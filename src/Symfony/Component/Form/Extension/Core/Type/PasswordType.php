@@ -14,13 +14,12 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PasswordType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -30,33 +29,23 @@ class PasswordType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'always_empty' => true,
             'trim' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'The password is invalid.';
-            },
+            'invalid_message' => 'The password is invalid.',
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'password';
     }

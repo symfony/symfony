@@ -15,10 +15,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
 use Symfony\Component\VarDumper\Caster\ClassStub;
@@ -30,25 +30,32 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 final class TraceableAuthenticator implements AuthenticatorInterface, InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {
-    private $authenticator;
-    private $passport;
-    private $duration;
-    private $stub;
+    private ?Passport $passport = null;
+    private ?float $duration = null;
+    private ClassStub|string $stub;
+    private ?bool $authenticated = null;
 
-    public function __construct(AuthenticatorInterface $authenticator)
+    public function __construct(private AuthenticatorInterface $authenticator)
     {
-        $this->authenticator = $authenticator;
     }
 
     public function getInfo(): array
     {
-        $class = \get_class($this->authenticator instanceof GuardBridgeAuthenticator ? $this->authenticator->getGuardAuthenticator() : $this->authenticator);
-
         return [
             'supports' => true,
             'passport' => $this->passport,
             'duration' => $this->duration,
-            'stub' => $this->stub ?? $this->stub = class_exists(ClassStub::class) ? new ClassStub($class) : $class,
+            'stub' => $this->stub ??= class_exists(ClassStub::class) ? new ClassStub($this->authenticator::class) : $this->authenticator::class,
+            'authenticated' => $this->authenticated,
+            'badges' => array_map(
+                static function (BadgeInterface $badge): array {
+                    return [
+                        'stub' => class_exists(ClassStub::class) ? new ClassStub($badge::class) : $badge::class,
+                        'resolved' => $badge->isResolved(),
+                    ];
+                },
+                $this->passport?->getBadges() ?? [],
+            ),
         ];
     }
 
@@ -57,7 +64,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
         return $this->authenticator->supports($request);
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
         $startTime = microtime(true);
         $this->passport = $this->authenticator->authenticate($request);
@@ -66,23 +73,22 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
         return $this->passport;
     }
 
-    public function createToken(PassportInterface $passport, string $firewallName): TokenInterface
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        return method_exists($this->authenticator, 'createToken') ? $this->authenticator->createToken($passport, $firewallName) : $this->authenticator->createAuthenticatedToken($passport, $firewallName);
-    }
-
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-    {
-        return $this->authenticator->createAuthenticatedToken($passport, $firewallName);
+        return $this->authenticator->createToken($passport, $firewallName);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $this->authenticated = true;
+
         return $this->authenticator->onAuthenticationSuccess($request, $token, $firewallName);
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
+        $this->authenticated = false;
+
         return $this->authenticator->onAuthenticationFailure($request, $exception);
     }
 
@@ -105,7 +111,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
         return $this->authenticator;
     }
 
-    public function __call($method, $args)
+    public function __call($method, $args): mixed
     {
         return $this->authenticator->{$method}(...$args);
     }

@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Allow enum values in `EnumNode`
+
+6.2
+---
+
+ * Deprecate calling `NodeBuilder::setParent()` without any arguments
+ * Add a more accurate typehint in generated PHP config
+
+6.1
+---
+
+ * Allow using environment variables in `EnumNode`
+ * Add Node's information in generated Config
+ * Add `DefinitionFileLoader` class to load a TreeBuilder definition from an external file
+ * Add `DefinitionConfigurator` helper
+
+6.0
+---
+
+ * Remove `BaseNode::getDeprecationMessage()`
+
 5.3.0
 -----
 

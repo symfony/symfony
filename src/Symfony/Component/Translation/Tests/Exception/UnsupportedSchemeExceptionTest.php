@@ -42,7 +42,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         $dsn = new Dsn(sprintf('%s://localhost', $scheme));
 
         $this->assertSame(
-            sprintf('Unable to synchronize translations via "%s" as the provider is not installed; try running "composer require %s".', $scheme, $package),
+            sprintf('Unable to synchronize translations via "%s" as the provider is not installed. Try running "composer require %s".', $scheme, $package),
             (new UnsupportedSchemeException($dsn))->getMessage()
         );
     }

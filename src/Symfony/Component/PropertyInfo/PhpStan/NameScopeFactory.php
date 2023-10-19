@@ -22,7 +22,7 @@ final class NameScopeFactory
 {
     public function create(string $calledClassName, string $declaringClassName = null): NameScope
     {
-        $declaringClassName = $declaringClassName ?? $calledClassName;
+        $declaringClassName ??= $calledClassName;
 
         $path = explode('\\', $calledClassName);
         $calledClassName = array_pop($path);

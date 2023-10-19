@@ -26,7 +26,7 @@ use Symfony\Component\Translation\Command\XliffLintCommand;
  */
 class XliffLintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testLintCorrectFile()
     {
@@ -172,7 +172,7 @@ EOF;
     public function testPassingClosureAndCallableToConstructor()
     {
         $command = new XliffLintCommand('translation:xliff:lint',
-            \Closure::fromCallable([$this, 'testPassingClosureAndCallableToConstructor']),
+            $this->testPassingClosureAndCallableToConstructor(...),
             [$this, 'testPassingClosureAndCallableToConstructor']
         );
 

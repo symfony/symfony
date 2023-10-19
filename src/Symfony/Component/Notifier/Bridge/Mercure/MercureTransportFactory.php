@@ -17,14 +17,13 @@ use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
 final class MercureTransportFactory extends AbstractTransportFactory
 {
-    private $registry;
+    private HubRegistry $registry;
 
     public function __construct(HubRegistry $registry)
     {
@@ -33,10 +32,7 @@ final class MercureTransportFactory extends AbstractTransportFactory
         $this->registry = $registry;
     }
 
-    /**
-     * @return MercureTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MercureTransport
     {
         if ('mercure' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'mercure', $this->getSupportedSchemes());
@@ -47,7 +43,7 @@ final class MercureTransportFactory extends AbstractTransportFactory
 
         try {
             $hub = $this->registry->getHub($hubId);
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
             throw new IncompleteDsnException(sprintf('Hub "%s" not found. Did you mean one of: "%s"?', $hubId, implode('", "', array_keys($this->registry->all()))));
         }
 

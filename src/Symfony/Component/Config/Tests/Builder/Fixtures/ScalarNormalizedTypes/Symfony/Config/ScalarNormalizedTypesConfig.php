@@ -24,10 +24,11 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     private $_usedProperties = [];
 
     /**
-     * @param ParamConfigurator|list<mixed|ParamConfigurator> $value
+     * @param ParamConfigurator|list<ParamConfigurator|mixed>|string $value
+     *
      * @return $this
      */
-    public function simpleArray($value): self
+    public function simpleArray(ParamConfigurator|string|array $value): static
     {
         $this->_usedProperties['simpleArray'] = true;
         $this->simpleArray = $value;
@@ -36,10 +37,9 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
-     * @param ParamConfigurator|array $value
      * @return $this
      */
-    public function keyedArray(string $name, $value): self
+    public function keyedArray(string $name, ParamConfigurator|string|array $value): static
     {
         $this->_usedProperties['keyedArray'] = true;
         $this->keyedArray[$name] = $value;
@@ -48,9 +48,13 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
+     * @template TValue
+     * @param TValue $value
+     * @default {"enabled":null}
      * @return \Symfony\Config\ScalarNormalizedTypes\ObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\ObjectConfig : static)
      */
-    public function object($value = [])
+    public function object(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\ObjectConfig|static
     {
         if (!\is_array($value)) {
             $this->_usedProperties['object'] = true;
@@ -70,9 +74,12 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
+     * @template TValue
+     * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig : static)
      */
-    public function listObject($value = [])
+    public function listObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig|static
     {
         $this->_usedProperties['listObject'] = true;
         if (!\is_array($value)) {
@@ -85,9 +92,12 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
+     * @template TValue
+     * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig : static)
      */
-    public function keyedListObject(string $class, $value = [])
+    public function keyedListObject(string $class, mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig|static
     {
         if (!\is_array($value)) {
             $this->_usedProperties['keyedListObject'] = true;
@@ -145,13 +155,13 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
 
         if (array_key_exists('list_object', $value)) {
             $this->_usedProperties['listObject'] = true;
-            $this->listObject = array_map(function ($v) { return \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig($v) : $v; }, $value['list_object']);
+            $this->listObject = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig($v) : $v, $value['list_object']);
             unset($value['list_object']);
         }
 
         if (array_key_exists('keyed_list_object', $value)) {
             $this->_usedProperties['keyedListObject'] = true;
-            $this->keyedListObject = array_map(function ($v) { return \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig($v) : $v; }, $value['keyed_list_object']);
+            $this->keyedListObject = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig($v) : $v, $value['keyed_list_object']);
             unset($value['keyed_list_object']);
         }
 
@@ -179,10 +189,10 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
             $output['object'] = $this->object instanceof \Symfony\Config\ScalarNormalizedTypes\ObjectConfig ? $this->object->toArray() : $this->object;
         }
         if (isset($this->_usedProperties['listObject'])) {
-            $output['list_object'] = array_map(function ($v) { return $v instanceof \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig ? $v->toArray() : $v; }, $this->listObject);
+            $output['list_object'] = array_map(fn ($v) => $v instanceof \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig ? $v->toArray() : $v, $this->listObject);
         }
         if (isset($this->_usedProperties['keyedListObject'])) {
-            $output['keyed_list_object'] = array_map(function ($v) { return $v instanceof \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig ? $v->toArray() : $v; }, $this->keyedListObject);
+            $output['keyed_list_object'] = array_map(fn ($v) => $v instanceof \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig ? $v->toArray() : $v, $this->keyedListObject);
         }
         if (isset($this->_usedProperties['nested'])) {
             $output['nested'] = $this->nested->toArray();

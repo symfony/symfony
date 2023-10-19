@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -31,13 +32,12 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  *
  * @final
  */
+#[AsCommand(name: 'debug:event-dispatcher', description: 'Display configured listeners for an application')]
 class EventDispatcherDebugCommand extends Command
 {
     private const DEFAULT_DISPATCHER = 'event_dispatcher';
 
-    protected static $defaultName = 'debug:event-dispatcher';
-    protected static $defaultDescription = 'Display configured listeners for an application';
-    private $dispatchers;
+    private ContainerInterface $dispatchers;
 
     public function __construct(ContainerInterface $dispatchers)
     {
@@ -46,19 +46,15 @@ class EventDispatcherDebugCommand extends Command
         $this->dispatchers = $dispatchers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
                 new InputArgument('event', InputArgument::OPTIONAL, 'An event name or a part of the event name'),
                 new InputOption('dispatcher', null, InputOption::VALUE_REQUIRED, 'To view events of a specific event dispatcher', self::DEFAULT_DISPATCHER),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured listeners:
 
@@ -73,8 +69,6 @@ EOF
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -144,7 +138,7 @@ EOF
         }
 
         if ($input->mustSuggestOptionValuesFor('format')) {
-            $suggestions->suggestValues((new DescriptorHelper())->getFormats());
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
         }
     }
 
@@ -160,5 +154,10 @@ EOF
         }
 
         return $output;
+    }
+
+    private function getAvailableFormatOptions(): array
+    {
+        return (new DescriptorHelper())->getFormats();
     }
 }

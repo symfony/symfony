@@ -24,6 +24,8 @@ interface ParameterBagInterface
     /**
      * Clears all parameters.
      *
+     * @return void
+     *
      * @throws LogicException if the ParameterBagInterface cannot be cleared
      */
     public function clear();
@@ -31,76 +33,68 @@ interface ParameterBagInterface
     /**
      * Adds parameters to the service container parameters.
      *
+     * @return void
+     *
      * @throws LogicException if the parameter cannot be added
      */
     public function add(array $parameters);
 
     /**
      * Gets the service container parameters.
-     *
-     * @return array
      */
-    public function all();
+    public function all(): array;
 
     /**
      * Gets a service container parameter.
      *
-     * @return array|bool|string|int|float|\UnitEnum|null
-     *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
-    public function get(string $name);
+    public function get(string $name): array|bool|string|int|float|\UnitEnum|null;
 
     /**
      * Removes a parameter.
+     *
+     * @return void
      */
     public function remove(string $name);
 
     /**
      * Sets a service container parameter.
      *
-     * @param array|bool|string|int|float|\UnitEnum|null $value The parameter value
+     * @return void
      *
      * @throws LogicException if the parameter cannot be set
      */
-    public function set(string $name, $value);
+    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value);
 
     /**
      * Returns true if a parameter name is defined.
-     *
-     * @return bool
      */
-    public function has(string $name);
+    public function has(string $name): bool;
 
     /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
+     *
+     * @return void
      */
     public function resolve();
 
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @param mixed $value A value
+     * @return mixed
      *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      */
-    public function resolveValue($value);
+    public function resolveValue(mixed $value);
 
     /**
      * Escape parameter placeholders %.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    public function escapeValue($value);
+    public function escapeValue(mixed $value): mixed;
 
     /**
      * Unescape parameter placeholders %.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    public function unescapeValue($value);
+    public function unescapeValue(mixed $value): mixed;
 }

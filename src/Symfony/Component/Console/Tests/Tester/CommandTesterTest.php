@@ -24,8 +24,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTesterTest extends TestCase
 {
-    protected $command;
-    protected $tester;
+    protected Command $command;
+    protected CommandTester $tester;
 
     protected function setUp(): void
     {
@@ -36,12 +36,6 @@ class CommandTesterTest extends TestCase
 
         $this->tester = new CommandTester($this->command);
         $this->tester->execute(['foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->command = null;
-        $this->tester = null;
     }
 
     public function testExecute()

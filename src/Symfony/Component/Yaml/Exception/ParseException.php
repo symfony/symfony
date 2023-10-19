@@ -18,10 +18,10 @@ namespace Symfony\Component\Yaml\Exception;
  */
 class ParseException extends RuntimeException
 {
-    private $parsedFile;
-    private $parsedLine;
-    private $snippet;
-    private $rawMessage;
+    private ?string $parsedFile;
+    private int $parsedLine;
+    private ?string $snippet;
+    private string $rawMessage;
 
     /**
      * @param string      $message    The error message
@@ -43,16 +43,16 @@ class ParseException extends RuntimeException
 
     /**
      * Gets the snippet of code near the error.
-     *
-     * @return string
      */
-    public function getSnippet()
+    public function getSnippet(): string
     {
         return $this->snippet;
     }
 
     /**
      * Sets the snippet of code near the error.
+     *
+     * @return void
      */
     public function setSnippet(string $snippet)
     {
@@ -65,16 +65,16 @@ class ParseException extends RuntimeException
      * Gets the filename where the error occurred.
      *
      * This method returns null if a string is parsed.
-     *
-     * @return string
      */
-    public function getParsedFile()
+    public function getParsedFile(): string
     {
         return $this->parsedFile;
     }
 
     /**
      * Sets the filename where the error occurred.
+     *
+     * @return void
      */
     public function setParsedFile(string $parsedFile)
     {
@@ -85,16 +85,16 @@ class ParseException extends RuntimeException
 
     /**
      * Gets the line where the error occurred.
-     *
-     * @return int
      */
-    public function getParsedLine()
+    public function getParsedLine(): int
     {
         return $this->parsedLine;
     }
 
     /**
      * Sets the line where the error occurred.
+     *
+     * @return void
      */
     public function setParsedLine(int $parsedLine)
     {
@@ -103,12 +103,12 @@ class ParseException extends RuntimeException
         $this->updateRepr();
     }
 
-    private function updateRepr()
+    private function updateRepr(): void
     {
         $this->message = $this->rawMessage;
 
         $dot = false;
-        if ('.' === substr($this->message, -1)) {
+        if (str_ends_with($this->message, '.')) {
             $this->message = substr($this->message, 0, -1);
             $dot = true;
         }

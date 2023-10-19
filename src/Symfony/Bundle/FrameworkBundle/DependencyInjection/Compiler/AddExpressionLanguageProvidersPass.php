@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class AddExpressionLanguageProvidersPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function process(ContainerBuilder $container)
     {

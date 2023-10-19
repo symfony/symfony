@@ -21,10 +21,12 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
+use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 
 class YamlFileLoaderTest extends TestCase
 {
@@ -36,7 +38,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
 
         $r = new \ReflectionProperty($loader, 'classes');
-        $r->setAccessible(true);
         $this->assertSame([], $r->getValue($loader));
     }
 
@@ -135,6 +136,19 @@ class YamlFileLoaderTest extends TestCase
 
         $expected = new ClassMetadata(Entity::class);
         $expected->addPropertyConstraint('firstName', new Range(['max' => \PHP_INT_MAX]));
+
+        $this->assertEquals($expected, $metadata);
+    }
+
+    public function testLoadClassMetadataWithRequiredArguments()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping-required-arg.yml');
+        $metadata = new ClassMetadata(Entity_81::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata(Entity_81::class);
+        $expected->addPropertyConstraint('title', new ConstraintWithRequiredArgument('X'));
 
         $this->assertEquals($expected, $metadata);
     }

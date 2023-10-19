@@ -11,8 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Psr\Clock\ClockInterface as PsrClockInterface;
+use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
 use Symfony\Component\Console\ConsoleEvents;
@@ -26,7 +31,11 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface as EventDispatcherInterfaceComponentAlias;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
@@ -39,7 +48,7 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpKernel\UriSigner;
+use Symfony\Component\HttpKernel\UriSigner as HttpKernelUriSigner;
 use Symfony\Component\Runtime\Runner\Symfony\HttpKernelRunner;
 use Symfony\Component\Runtime\Runner\Symfony\ResponseRunner;
 use Symfony\Component\Runtime\SymfonyRuntime;
@@ -73,6 +82,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('event_dispatcher.dispatcher', ['name' => 'event_dispatcher'])
         ->alias(EventDispatcherInterfaceComponentAlias::class, 'event_dispatcher')
         ->alias(EventDispatcherInterface::class, 'event_dispatcher')
+        ->alias(PsrEventDispatcherInterface::class, 'event_dispatcher')
 
         ->set('http_kernel', HttpKernel::class)
             ->public()
@@ -81,6 +91,7 @@ return static function (ContainerConfigurator $container) {
                 service('controller_resolver'),
                 service('request_stack'),
                 service('argument_resolver'),
+                false,
             ])
             ->tag('container.hot_path')
             ->tag('container.preload', ['class' => HttpKernelRunner::class])
@@ -124,11 +135,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.no_preload')
 
         ->set('cache_clearer', ChainCacheClearer::class)
-            ->public()
             ->args([
                 tagged_iterator('kernel.cache_clearer'),
             ])
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->set('kernel')
             ->synthetic()
@@ -136,8 +145,6 @@ return static function (ContainerConfigurator $container) {
         ->alias(KernelInterface::class, 'kernel')
 
         ->set('filesystem', Filesystem::class)
-            ->public()
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
         ->alias(Filesystem::class, 'filesystem')
 
         ->set('file_locator', FileLocator::class)
@@ -151,6 +158,8 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.secret'),
             ])
         ->alias(UriSigner::class, 'uri_signer')
+        ->alias(HttpKernelUriSigner::class, 'uri_signer')
+            ->deprecate('symfony/framework-bundle', '6.4', 'The "%alias_id%" alias is deprecated, use "'.UriSigner::class.'" instead.')
 
         ->set('config_cache_factory', ResourceCheckerConfigCacheFactory::class)
             ->args([
@@ -204,6 +213,14 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('routing.expression_language_function', ['function' => 'env'])
 
+        ->set('container.get_routing_condition_service', \Closure::class)
+            ->public()
+            ->factory([\Closure::class, 'fromCallable'])
+            ->args([
+                [tagged_locator('routing.condition_service', 'alias'), 'get'],
+            ])
+            ->tag('routing.expression_language_function', ['function' => 'service'])
+
         // inherit from this service to lazily access env vars
         ->set('container.env', LazyString::class)
             ->abstract()
@@ -214,5 +231,15 @@ return static function (ContainerConfigurator $container) {
         ->set('config_builder.warmer', ConfigBuilderCacheWarmer::class)
             ->args([service(KernelInterface::class), service('logger')->nullOnInvalid()])
             ->tag('kernel.cache_warmer')
+
+        ->set('clock', Clock::class)
+        ->alias(ClockInterface::class, 'clock')
+        ->alias(PsrClockInterface::class, 'clock')
+
+        // register as abstract and excluded, aka not-autowirable types
+        ->set(LoaderInterface::class)->abstract()->tag('container.excluded')
+        ->set(Request::class)->abstract()->tag('container.excluded')
+        ->set(Response::class)->abstract()->tag('container.excluded')
+        ->set(SessionInterface::class)->abstract()->tag('container.excluded')
     ;
 };

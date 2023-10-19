@@ -25,7 +25,6 @@ class FileLocatorTest extends TestCase
         $loader = new FileLocator([]);
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('isAbsolutePath');
-        $m->setAccessible(true);
 
         $this->assertTrue($m->invoke($loader, $path), '->isAbsolutePath() returns true for an absolute path');
     }

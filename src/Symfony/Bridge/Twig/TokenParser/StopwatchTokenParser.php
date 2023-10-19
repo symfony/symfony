@@ -24,7 +24,7 @@ use Twig\TokenParser\AbstractTokenParser;
  */
 final class StopwatchTokenParser extends AbstractTokenParser
 {
-    protected $stopwatchIsAvailable;
+    private bool $stopwatchIsAvailable;
 
     public function __construct(bool $stopwatchIsAvailable)
     {
@@ -42,7 +42,7 @@ final class StopwatchTokenParser extends AbstractTokenParser
         $stream->expect(Token::BLOCK_END_TYPE);
 
         // {% endstopwatch %}
-        $body = $this->parser->subparse([$this, 'decideStopwatchEnd'], true);
+        $body = $this->parser->subparse($this->decideStopwatchEnd(...), true);
         $stream->expect(Token::BLOCK_END_TYPE);
 
         if ($this->stopwatchIsAvailable) {

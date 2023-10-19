@@ -15,6 +15,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -41,7 +42,7 @@ class ConsoleHandlerTest extends TestCase
     public function testIsHandling()
     {
         $handler = new ConsoleHandler();
-        $this->assertFalse($handler->isHandling([]), '->isHandling returns false when no output is set');
+        $this->assertFalse($handler->isHandling(RecordFactory::create()), '->isHandling returns false when no output is set');
     }
 
     /**
@@ -56,7 +57,7 @@ class ConsoleHandlerTest extends TestCase
             ->willReturn($verbosity)
         ;
         $handler = new ConsoleHandler($output, true, $map);
-        $this->assertSame($isHandling, $handler->isHandling(['level' => $level]),
+        $this->assertSame($isHandling, $handler->isHandling(RecordFactory::create($level)),
             '->isHandling returns correct value depending on console verbosity and log level'
         );
 
@@ -77,15 +78,7 @@ class ConsoleHandlerTest extends TestCase
             ->with($log, false);
         $handler = new ConsoleHandler($realOutput, true, $map);
 
-        $infoRecord = [
-            'message' => 'My info message',
-            'context' => [],
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'channel' => 'app',
-            'datetime' => new \DateTime('2013-05-29 16:21:54'),
-            'extra' => [],
-        ];
+        $infoRecord = RecordFactory::create($level, 'My info message', 'app', datetime: new \DateTimeImmutable('2013-05-29 16:21:54'));
         $this->assertFalse($handler->handle($infoRecord), 'The handler finished handling the log.');
     }
 
@@ -123,10 +116,10 @@ class ConsoleHandlerTest extends TestCase
             )
         ;
         $handler = new ConsoleHandler($output);
-        $this->assertFalse($handler->isHandling(['level' => Logger::NOTICE]),
+        $this->assertFalse($handler->isHandling(RecordFactory::create(Logger::NOTICE)),
             'when verbosity is set to quiet, the handler does not handle the log'
         );
-        $this->assertTrue($handler->isHandling(['level' => Logger::NOTICE]),
+        $this->assertTrue($handler->isHandling(RecordFactory::create(Logger::NOTICE)),
             'since the verbosity of the output increased externally, the handler is now handling the log'
         );
     }
@@ -157,15 +150,7 @@ class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler(null, false);
         $handler->setOutput($output);
 
-        $infoRecord = [
-            'message' => 'My info message',
-            'context' => [],
-            'level' => Logger::INFO,
-            'level_name' => Logger::getLevelName(Logger::INFO),
-            'channel' => 'app',
-            'datetime' => new \DateTime('2013-05-29 16:21:54'),
-            'extra' => [],
-        ];
+        $infoRecord = RecordFactory::create(Logger::INFO, 'My info message', 'app', datetime: new \DateTimeImmutable('2013-05-29 16:21:54'));
 
         $this->assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
     }

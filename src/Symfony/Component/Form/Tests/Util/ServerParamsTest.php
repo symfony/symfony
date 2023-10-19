@@ -70,7 +70,7 @@ class ServerParamsTest extends TestCase
 
 class DummyServerParams extends ServerParams
 {
-    private $size;
+    private string $size;
 
     public function __construct($size)
     {

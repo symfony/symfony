@@ -20,8 +20,8 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
 {
     use DateTimeEqualsTrait;
 
-    protected $dateTime;
-    protected $dateTimeWithoutSeconds;
+    protected \DateTime $dateTime;
+    protected \DateTime $dateTimeWithoutSeconds;
 
     protected function setUp(): void
     {
@@ -29,12 +29,6 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
 
         $this->dateTime = new \DateTime('2010-02-03 04:05:06 UTC');
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
-    }
-
-    protected function tearDown(): void
-    {
-        $this->dateTime = null;
-        $this->dateTimeWithoutSeconds = null;
     }
 
     public static function allProvider()

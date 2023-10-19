@@ -25,9 +25,7 @@ class ParserTest extends TestCase
     {
         $parser = new Parser();
 
-        $this->assertEquals($representation, array_map(function (SelectorNode $node) {
-            return (string) $node->getTree();
-        }, $parser->parse($source)));
+        $this->assertEquals($representation, array_map(fn (SelectorNode $node) => (string) $node->getTree(), $parser->parse($source)));
     }
 
     /** @dataProvider getParserExceptionTestData */
@@ -148,6 +146,12 @@ class ParserTest extends TestCase
             // unicode escape: \20 ==  (space)
             ['*[aval="\'\20  \'"]', ['Attribute[Element[*][aval = \'\'  \'\']]']],
             ["*[aval=\"'\\20\r\n '\"]", ['Attribute[Element[*][aval = \'\'  \'\']]']],
+            [':scope > foo', ['CombinedSelector[Pseudo[Element[*]:scope] > Element[foo]]']],
+            [':scope > foo bar > div', ['CombinedSelector[CombinedSelector[CombinedSelector[Pseudo[Element[*]:scope] > Element[foo]] <followed> Element[bar]] > Element[div]]']],
+            [':scope > #foo #bar', ['CombinedSelector[CombinedSelector[Pseudo[Element[*]:scope] > Hash[Element[*]#foo]] <followed> Hash[Element[*]#bar]]']],
+            [':scope', ['Pseudo[Element[*]:scope]']],
+            ['foo bar, :scope > div', ['CombinedSelector[Element[foo] <followed> Element[bar]]', 'CombinedSelector[Pseudo[Element[*]:scope] > Element[div]]']],
+            ['foo bar,:scope > div', ['CombinedSelector[Element[foo] <followed> Element[bar]]', 'CombinedSelector[Pseudo[Element[*]:scope] > Element[div]]']],
         ];
     }
 
@@ -178,6 +182,7 @@ class ParserTest extends TestCase
             [':lang(fr', SyntaxErrorException::unexpectedToken('an argument', new Token(Token::TYPE_FILE_END, '', 8))->getMessage()],
             [':contains("foo', SyntaxErrorException::unclosedString(10)->getMessage()],
             ['foo!', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '!', 3))->getMessage()],
+            [':scope > div :scope header', SyntaxErrorException::notAtTheStartOfASelector('scope')->getMessage()],
         ];
     }
 

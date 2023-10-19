@@ -19,14 +19,14 @@ use Twig\Extension\RuntimeExtensionInterface;
  */
 final class SerializerRuntime implements RuntimeExtensionInterface
 {
-    private $serializer;
+    private SerializerInterface $serializer;
 
     public function __construct(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
     }
 
-    public function serialize($data, string $format = 'json', array $context = []): string
+    public function serialize(mixed $data, string $format = 'json', array $context = []): string
     {
         return $this->serializer->serialize($data, $format, $context);
     }

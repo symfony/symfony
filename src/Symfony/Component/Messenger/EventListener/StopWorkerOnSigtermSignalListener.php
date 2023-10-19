@@ -12,40 +12,19 @@
 namespace Symfony\Component\Messenger\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Event\WorkerStartedEvent;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
+
+trigger_deprecation('symfony/messenger', '6.3', '"%s" is deprecated, use the "%s" instead.', StopWorkerOnSigtermSignalListener::class, SignalableCommandInterface::class);
 
 /**
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @deprecated since Symfony 6.3, use the {@see SignalableCommandInterface} instead
  */
-class StopWorkerOnSigtermSignalListener implements EventSubscriberInterface
+class StopWorkerOnSigtermSignalListener extends StopWorkerOnSignalsListener
 {
-    private $logger;
-
     public function __construct(LoggerInterface $logger = null)
     {
-        $this->logger = $logger;
-    }
-
-    public function onWorkerStarted(WorkerStartedEvent $event): void
-    {
-        pcntl_signal(\SIGTERM, function () use ($event) {
-            if (null !== $this->logger) {
-                $this->logger->info('Received SIGTERM signal.', ['transport_names' => $event->getWorker()->getMetadata()->getTransportNames()]);
-            }
-
-            $event->getWorker()->stop();
-        });
-    }
-
-    public static function getSubscribedEvents()
-    {
-        if (!\function_exists('pcntl_signal')) {
-            return [];
-        }
-
-        return [
-            WorkerStartedEvent::class => ['onWorkerStarted', 100],
-        ];
+        parent::__construct(\defined('SIGTERM') ? [\SIGTERM] : [], $logger);
     }
 }

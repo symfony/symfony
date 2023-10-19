@@ -39,23 +39,14 @@ class MermaidDumper implements DumperInterface
         self::TRANSITION_TYPE_WORKFLOW,
     ];
 
-    /**
-     * @var string
-     */
-    private $direction;
-
-    /**
-     * @var string
-     */
-    private $transitionType;
+    private string $direction;
+    private string $transitionType;
 
     /**
      * Just tracking the transition id is in some cases inaccurate to
      * get the link's number for styling purposes.
-     *
-     * @var int
      */
-    private $linkCount;
+    private int $linkCount = 0;
 
     public function __construct(string $transitionType, string $direction = self::DIRECTION_LEFT_TO_RIGHT)
     {
@@ -82,7 +73,7 @@ class MermaidDumper implements DumperInterface
                 $place,
                 $meta->getPlaceMetadata($place),
                 \in_array($place, $definition->getInitialPlaces()),
-                null !== $marking && $marking->has($place)
+                $marking?->has($place) ?? false
             );
 
             $output[] = $placeNode;
@@ -111,21 +102,9 @@ class MermaidDumper implements DumperInterface
                     $to = $placeNameMap[$to];
 
                     if (self::TRANSITION_TYPE_STATEMACHINE === $this->transitionType) {
-                        $transitionOutput = $this->styleStatemachineTransition(
-                            $from,
-                            $to,
-                            $transitionId,
-                            $transitionLabel,
-                            $transitionMeta
-                        );
+                        $transitionOutput = $this->styleStateMachineTransition($from, $to, $transitionLabel, $transitionMeta);
                     } else {
-                        $transitionOutput = $this->styleWorkflowTransition(
-                            $from,
-                            $to,
-                            $transitionId,
-                            $transitionLabel,
-                            $transitionMeta
-                        );
+                        $transitionOutput = $this->styleWorkflowTransition($from, $to, $transitionId, $transitionLabel, $transitionMeta);
                     }
 
                     foreach ($transitionOutput as $line) {
@@ -196,7 +175,7 @@ class MermaidDumper implements DumperInterface
      * Replace double quotes with the mermaid escape syntax and
      * ensure all other characters are properly escaped.
      */
-    private function escape(string $label)
+    private function escape(string $label): string
     {
         $label = str_replace('"', '#quot;', $label);
 
@@ -217,13 +196,8 @@ class MermaidDumper implements DumperInterface
         }
     }
 
-    private function styleStatemachineTransition(
-        string $from,
-        string $to,
-        int $transitionId,
-        string $transitionLabel,
-        array $transitionMeta
-    ): array {
+    private function styleStateMachineTransition(string $from, string $to, string $transitionLabel, array $transitionMeta): array
+    {
         $transitionOutput = [sprintf('%s-->|%s|%s', $from, str_replace("\n", ' ', $this->escape($transitionLabel)), $to)];
 
         $linkStyle = $this->styleLink($transitionMeta);
@@ -236,13 +210,8 @@ class MermaidDumper implements DumperInterface
         return $transitionOutput;
     }
 
-    private function styleWorkflowTransition(
-        string $from,
-        string $to,
-        int $transitionId,
-        string $transitionLabel,
-        array $transitionMeta
-    ) {
+    private function styleWorkflowTransition(string $from, string $to, int $transitionId, string $transitionLabel, array $transitionMeta): array
+    {
         $transitionOutput = [];
 
         $transitionLabel = $this->escape($transitionLabel);

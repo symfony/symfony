@@ -18,6 +18,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TextType extends AbstractType implements DataTransformerInterface
 {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // When empty_data is explicitly set to an empty string,
@@ -31,7 +34,7 @@ class TextType extends AbstractType implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -40,27 +43,18 @@ class TextType extends AbstractType implements DataTransformerInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'text';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transform($data)
+    public function transform(mixed $data): mixed
     {
         // Model data should not be transformed
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function reverseTransform($data)
+    public function reverseTransform(mixed $data): mixed
     {
         return $data ?? '';
     }

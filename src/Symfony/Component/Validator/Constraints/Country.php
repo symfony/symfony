@@ -26,9 +26,14 @@ class Country extends Constraint
 {
     public const NO_SUCH_COUNTRY_ERROR = '8f900c12-61bd-455d-9398-996cd040f7f0';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NO_SUCH_COUNTRY_ERROR => 'NO_SUCH_COUNTRY_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This value is not a valid country.';
     public $alpha3 = false;
@@ -38,7 +43,7 @@ class Country extends Constraint
         string $message = null,
         bool $alpha3 = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
         if (!class_exists(Countries::class)) {
             throw new LogicException('The Intl component is required to use the Country constraint. Try running "composer require symfony/intl".');

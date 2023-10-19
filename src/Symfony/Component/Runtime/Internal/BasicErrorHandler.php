@@ -24,7 +24,7 @@ class BasicErrorHandler
 
         if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             ini_set('display_errors', $debug);
-        } elseif (!filter_var(\ini_get('log_errors'), \FILTER_VALIDATE_BOOLEAN) || \ini_get('error_log')) {
+        } elseif (!filter_var(\ini_get('log_errors'), \FILTER_VALIDATE_BOOL) || \ini_get('error_log')) {
             // CLI - display errors only if they're not already logged to STDERR
             ini_set('display_errors', 1);
         }

@@ -18,42 +18,29 @@ namespace Symfony\Component\HttpKernel\Exception;
  */
 class HttpException extends \RuntimeException implements HttpExceptionInterface
 {
-    private $statusCode;
-    private $headers;
+    private int $statusCode;
+    private array $headers;
 
-    public function __construct(int $statusCode, ?string $message = '', \Throwable $previous = null, array $headers = [], ?int $code = 0)
+    public function __construct(int $statusCode, string $message = '', \Throwable $previous = null, array $headers = [], int $code = 0)
     {
-        if (null === $message) {
-            trigger_deprecation('symfony/http-kernel', '5.3', 'Passing null as $message to "%s()" is deprecated, pass an empty string instead.', __METHOD__);
-
-            $message = '';
-        }
-        if (null === $code) {
-            trigger_deprecation('symfony/http-kernel', '5.3', 'Passing null as $code to "%s()" is deprecated, pass 0 instead.', __METHOD__);
-
-            $code = 0;
-        }
-
         $this->statusCode = $statusCode;
         $this->headers = $headers;
 
         parent::__construct($message, $code, $previous);
     }
 
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
 
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
 
     /**
-     * Set response headers.
-     *
-     * @param array $headers Response headers
+     * @return void
      */
     public function setHeaders(array $headers)
     {

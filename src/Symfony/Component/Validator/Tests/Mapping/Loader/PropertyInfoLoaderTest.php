@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderNoAutoMappingEntity;
 use Symfony\Component\Validator\Validation;
@@ -92,8 +92,7 @@ class PropertyInfoLoaderTest extends TestCase
         $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
 
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(true)
-            ->addDefaultDoctrineAnnotationReader()
+            ->enableAttributeMapping()
             ->addLoader($propertyInfoLoader)
             ->getValidator()
         ;
@@ -205,7 +204,7 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertSame($expected, $propertyInfoLoader->loadClassMetadata($classMetadata));
     }
 
-    public static function regexpProvider()
+    public static function regexpProvider(): array
     {
         return [
             [false, null],
@@ -231,8 +230,7 @@ class PropertyInfoLoaderTest extends TestCase
 
         $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(true)
-            ->addDefaultDoctrineAnnotationReader()
+            ->enableAttributeMapping()
             ->addLoader($propertyInfoLoader)
             ->getValidator()
         ;

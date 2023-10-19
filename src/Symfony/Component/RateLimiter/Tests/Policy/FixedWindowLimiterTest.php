@@ -25,7 +25,7 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  */
 class FixedWindowLimiterTest extends TestCase
 {
-    private $storage;
+    private InMemoryStorage $storage;
 
     protected function setUp(): void
     {
@@ -110,6 +110,20 @@ class FixedWindowLimiterTest extends TestCase
         $window = new Window('id', 300, 100, $serverOneClock);
         $this->assertSame(100, $window->getAvailableTokens($serverTwoClock));
         $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
+    }
+
+    public function testPeekConsume()
+    {
+        $limiter = $this->createLimiter();
+
+        $limiter->consume(9);
+
+        // peek by consuming 0 tokens twice (making sure peeking doesn't claim a token)
+        for ($i = 0; $i < 2; ++$i) {
+            $rateLimit = $limiter->consume(0);
+            $this->assertSame(10, $rateLimit->getLimit());
+            $this->assertTrue($rateLimit->isAccepted());
+        }
     }
 
     public static function provideConsumeOutsideInterval(): \Generator

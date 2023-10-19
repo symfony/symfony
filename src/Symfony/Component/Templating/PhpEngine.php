@@ -17,12 +17,16 @@ use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\StringStorage;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', PhpEngine::class);
+
 /**
  * PhpEngine is an engine able to render PHP templates.
  *
  * @implements \ArrayAccess<string, HelperInterface>
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 class PhpEngine implements EngineInterface, \ArrayAccess
 {
@@ -41,8 +45,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected $globals = [];
     protected $parser;
 
-    private $evalTemplate;
-    private $evalParameters;
+    private Storage $evalTemplate;
+    private array $evalParameters;
 
     /**
      * @param HelperInterface[] $helpers An array of helper instances
@@ -61,11 +65,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \InvalidArgumentException if the template does not exist
      */
-    public function render($name, array $parameters = [])
+    public function render(string|TemplateReferenceInterface $name, array $parameters = []): string
     {
         $storage = $this->load($name);
         $key = hash('sha256', serialize($storage));
@@ -93,24 +95,18 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         return $content;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function exists($name)
+    public function exists(string|TemplateReferenceInterface $name): bool
     {
         try {
             $this->load($name);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             return false;
         }
 
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($name)
+    public function supports(string|TemplateReferenceInterface $name): bool
     {
         $template = $this->parser->parse($name);
 
@@ -120,11 +116,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Evaluates a template.
      *
-     * @return string|false
-     *
      * @throws \InvalidArgumentException
      */
-    protected function evaluate(Storage $template, array $parameters = [])
+    protected function evaluate(Storage $template, array $parameters = []): string|false
     {
         $this->evalTemplate = $template;
         $this->evalParameters = $parameters;
@@ -141,22 +135,22 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         $view = $this;
         if ($this->evalTemplate instanceof FileStorage) {
             extract($this->evalParameters, \EXTR_SKIP);
-            $this->evalParameters = null;
+            unset($this->evalParameters);
 
             ob_start();
             require $this->evalTemplate;
 
-            $this->evalTemplate = null;
+            unset($this->evalTemplate);
 
             return ob_get_clean();
         } elseif ($this->evalTemplate instanceof StringStorage) {
             extract($this->evalParameters, \EXTR_SKIP);
-            $this->evalParameters = null;
+            unset($this->evalParameters);
 
             ob_start();
             eval('; ?>'.$this->evalTemplate.'<?php ;');
 
-            $this->evalTemplate = null;
+            unset($this->evalTemplate);
 
             return ob_get_clean();
         }
@@ -167,41 +161,25 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets a helper value.
      *
-     * @param string $name The helper name
-     *
-     * @return HelperInterface
-     *
      * @throws \InvalidArgumentException if the helper is not defined
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($name)
+    public function offsetGet(mixed $name): HelperInterface
     {
         return $this->get($name);
     }
 
     /**
      * Returns true if the helper is defined.
-     *
-     * @param string $name The helper name
-     *
-     * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($name)
+    public function offsetExists(mixed $name): bool
     {
         return isset($this->helpers[$name]);
     }
 
     /**
      * Sets a helper.
-     *
-     * @param HelperInterface $name  The helper instance
-     * @param string          $value An alias
-     *
-     * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($name, $value)
+    public function offsetSet(mixed $name, mixed $value): void
     {
         $this->set($name, $value);
     }
@@ -209,14 +187,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Removes a helper.
      *
-     * @param string $name The helper name
-     *
-     * @return void
-     *
      * @throws \LogicException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($name)
+    public function offsetUnset(mixed $name): void
     {
         throw new \LogicException(sprintf('You can\'t unset a helper (%s).', $name));
     }
@@ -225,6 +198,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * Adds some helpers.
      *
      * @param HelperInterface[] $helpers An array of helper
+     *
+     * @return void
      */
     public function addHelpers(array $helpers)
     {
@@ -237,6 +212,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * Sets the helpers.
      *
      * @param HelperInterface[] $helpers An array of helper
+     *
+     * @return void
      */
     public function setHelpers(array $helpers)
     {
@@ -244,6 +221,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         $this->addHelpers($helpers);
     }
 
+    /**
+     * @return void
+     */
     public function set(HelperInterface $helper, string $alias = null)
     {
         $this->helpers[$helper->getName()] = $helper;
@@ -256,10 +236,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Returns true if the helper if defined.
-     *
-     * @return bool
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return isset($this->helpers[$name]);
     }
@@ -267,11 +245,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets a helper value.
      *
-     * @return HelperInterface
-     *
      * @throws \InvalidArgumentException if the helper is not defined
      */
-    public function get(string $name)
+    public function get(string $name): HelperInterface
     {
         if (!isset($this->helpers[$name])) {
             throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
@@ -282,6 +258,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Decorates the current template with another one.
+     *
+     * @return void
      */
     public function extend(string $template)
     {
@@ -290,12 +268,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Escapes a string by using the current charset.
-     *
-     * @param mixed $value A variable to escape
-     *
-     * @return mixed
      */
-    public function escape($value, string $context = 'html')
+    public function escape(mixed $value, string $context = 'html'): mixed
     {
         if (is_numeric($value)) {
             return $value;
@@ -316,6 +290,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Sets the charset to use.
+     *
+     * @return void
      */
     public function setCharset(string $charset)
     {
@@ -331,16 +307,16 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets the current charset.
-     *
-     * @return string
      */
-    public function getCharset()
+    public function getCharset(): string
     {
         return $this->charset;
     }
 
     /**
      * Adds an escaper for the given context.
+     *
+     * @return void
      */
     public function setEscaper(string $context, callable $escaper)
     {
@@ -351,11 +327,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets an escaper for a given context.
      *
-     * @return callable
-     *
      * @throws \InvalidArgumentException
      */
-    public function getEscaper(string $context)
+    public function getEscaper(string $context): callable
     {
         if (!isset($this->escapers[$context])) {
             throw new \InvalidArgumentException(sprintf('No registered escaper for context "%s".', $context));
@@ -365,19 +339,17 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * @param mixed $value
+     * @return void
      */
-    public function addGlobal(string $name, $value)
+    public function addGlobal(string $name, mixed $value)
     {
         $this->globals[$name] = $value;
     }
 
     /**
      * Returns the assigned globals.
-     *
-     * @return array
      */
-    public function getGlobals()
+    public function getGlobals(): array
     {
         return $this->globals;
     }
@@ -398,6 +370,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * For each function there is a define to avoid problems with strings being
      * incorrectly specified.
+     *
+     * @return void
      */
     protected function initializeEscapers()
     {
@@ -412,11 +386,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @return string
                  */
-                function ($value) use ($flags) {
-                    // Numbers and Boolean values get turned into strings which can cause problems
-                    // with type comparisons (e.g. === or is_int() etc).
-                    return \is_string($value) ? htmlspecialchars($value, $flags, $this->getCharset(), false) : $value;
-                },
+                fn ($value) => // Numbers and Boolean values get turned into strings which can cause problems
+// with type comparisons (e.g. === or is_int() etc).
+\is_string($value) ? htmlspecialchars($value, $flags, $this->getCharset(), false) : $value,
 
             'js' =>
                 /**
@@ -463,10 +435,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets the loader associated with this engine.
-     *
-     * @return LoaderInterface
      */
-    public function getLoader()
+    public function getLoader(): LoaderInterface
     {
         return $this->loader;
     }
@@ -474,13 +444,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Loads the given template.
      *
-     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
-     *
-     * @return Storage
-     *
      * @throws \InvalidArgumentException if the template cannot be found
      */
-    protected function load($name)
+    protected function load(string|TemplateReferenceInterface $name): Storage
     {
         $template = $this->parser->parse($name);
 

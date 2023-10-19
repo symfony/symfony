@@ -30,15 +30,8 @@ class JsonSerializableNormalizerTest extends TestCase
 {
     use CircularReferenceTestTrait;
 
-    /**
-     * @var JsonSerializableNormalizer
-     */
-    private $normalizer;
-
-    /**
-     * @var MockObject&JsonSerializerNormalizer
-     */
-    private $serializer;
+    private JsonSerializableNormalizer $normalizer;
+    private MockObject&JsonSerializerNormalizer $serializer;
 
     protected function setUp(): void
     {

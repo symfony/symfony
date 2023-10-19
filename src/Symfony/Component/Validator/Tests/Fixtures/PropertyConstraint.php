@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraint;
 
 class PropertyConstraint extends Constraint
 {
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }

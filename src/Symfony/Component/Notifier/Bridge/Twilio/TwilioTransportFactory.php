@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Twilio;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class TwilioTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return TwilioTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): TwilioTransport
     {
         $scheme = $dsn->getScheme();
 

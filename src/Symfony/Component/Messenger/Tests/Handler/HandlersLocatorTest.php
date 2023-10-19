@@ -56,6 +56,29 @@ class HandlersLocatorTest extends TestCase
             new Envelope(new DummyMessage('Body'), [new ReceivedStamp('transportName')])
         )));
     }
+
+    public function testItReturnsOnlyHandlersMatchingMessageNamespace()
+    {
+        $firstHandler = $this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
+        $secondHandler = $this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
+
+        $locator = new HandlersLocator([
+            str_replace('DummyMessage', '*', DummyMessage::class) => [
+                $first = new HandlerDescriptor($firstHandler, ['alias' => 'one']),
+            ],
+            str_replace('Fixtures\\DummyMessage', '*', DummyMessage::class) => [
+                $second = new HandlerDescriptor($secondHandler, ['alias' => 'two']),
+            ],
+        ]);
+
+        $first->getName();
+        $second->getName();
+
+        $this->assertEquals([
+            $first,
+            $second,
+        ], iterator_to_array($locator->getHandlers(new Envelope(new DummyMessage('Body')))));
+    }
 }
 
 class HandlersLocatorTestCallable

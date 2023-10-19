@@ -20,14 +20,13 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class FormFieldRegistry
 {
-    private $fields = [];
-
-    private $base = '';
+    private array $fields = [];
+    private string $base = '';
 
     /**
      * Adds a field to the registry.
      */
-    public function add(FormField $field)
+    public function add(FormField $field): void
     {
         $segments = $this->getSegments($field->getName());
 
@@ -49,7 +48,7 @@ class FormFieldRegistry
     /**
      * Removes a field based on the fully qualified name and its children from the registry.
      */
-    public function remove(string $name)
+    public function remove(string $name): void
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -70,7 +69,7 @@ class FormFieldRegistry
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function &get(string $name)
+    public function &get(string $name): FormField|array
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -94,7 +93,7 @@ class FormFieldRegistry
             $this->get($name);
 
             return true;
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             return false;
         }
     }
@@ -102,11 +101,9 @@ class FormFieldRegistry
     /**
      * Set the value of a field based on the fully qualified name and its children.
      *
-     * @param mixed $value The value
-     *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function set(string $name, $value)
+    public function set(string $name, mixed $value): void
     {
         $target = &$this->get($name);
         if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {

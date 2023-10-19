@@ -28,9 +28,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ViolationMapper implements ViolationMapperInterface
 {
-    private $formRenderer;
-    private $translator;
-    private $allowNonSynchronized = false;
+    private ?FormRendererInterface $formRenderer;
+    private ?TranslatorInterface $translator;
+    private bool $allowNonSynchronized = false;
 
     public function __construct(FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
     {
@@ -39,7 +39,7 @@ class ViolationMapper implements ViolationMapperInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false)
     {
@@ -153,7 +153,7 @@ class ViolationMapper implements ViolationMapperInterface
             $message = $violation->getMessage();
             $messageTemplate = $violation->getMessageTemplate();
 
-            if (false !== strpos($message, '{{ label }}') || false !== strpos($messageTemplate, '{{ label }}')) {
+            if (str_contains($message, '{{ label }}') || str_contains($messageTemplate, '{{ label }}')) {
                 $form = $scope;
 
                 do {
@@ -179,8 +179,8 @@ class ViolationMapper implements ViolationMapperInterface
                 if (false !== $label) {
                     if (null === $label && null !== $this->formRenderer) {
                         $label = $this->formRenderer->humanize($scope->getName());
-                    } elseif (null === $label) {
-                        $label = $scope->getName();
+                    } else {
+                        $label ??= $scope->getName();
                     }
 
                     if (null !== $this->translator) {

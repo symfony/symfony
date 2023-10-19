@@ -28,9 +28,9 @@ use Symfony\Component\Process\Process;
  */
 class ProcessTest extends TestCase
 {
-    private static $phpBin;
-    private static $process;
-    private static $sigchild;
+    private static string $phpBin;
+    private static ?Process $process = null;
+    private static bool $sigchild;
 
     public static function setUpBeforeClass(): void
     {
@@ -154,7 +154,7 @@ class ProcessTest extends TestCase
     {
         $p = $this->getProcess('echo foo');
         $p->start();
-        $this->assertFalse($p->waitUntil(function () { return false; }));
+        $this->assertFalse($p->waitUntil(fn () => false));
     }
 
     public function testAllOutputIsActuallyReadOnTermination()
@@ -175,7 +175,6 @@ class ProcessTest extends TestCase
 
         // Don't call Process::run nor Process::wait to avoid any read of pipes
         $h = new \ReflectionProperty($p, 'process');
-        $h->setAccessible(true);
         $h = $h->getValue($p);
         $s = @proc_get_status($h);
 
@@ -199,6 +198,20 @@ class ProcessTest extends TestCase
         $process->wait();
 
         $this->assertSame('foo'.\PHP_EOL, $data);
+    }
+
+    public function testReadSupportIsDisabledWithoutCallback()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Pass the callback to the "Process::start" method or call enableOutput to use a callback with "Process::wait".');
+
+        $process = $this->getProcess('echo foo');
+        // disabling output + not passing a callback to start() => read support disabled
+        $process->disableOutput();
+        $process->start();
+        $process->wait(function ($type, $buffer) use (&$data) {
+            $data .= $buffer;
+        });
     }
 
     /**
@@ -567,7 +580,6 @@ class ProcessTest extends TestCase
         $process = $this->getProcess('');
         $r = new \ReflectionObject($process);
         $p = $r->getProperty('exitcode');
-        $p->setAccessible(true);
 
         $p->setValue($process, 2);
         $this->assertEquals('Misuse of shell builtins', $process->getExitCodeText());
@@ -1524,7 +1536,7 @@ class ProcessTest extends TestCase
         $process->wait();
         $this->assertFalse($process->isRunning());
 
-        if ('\\' !== \DIRECTORY_SEPARATOR && !\Closure::bind(function () { return $this->isSigchildEnabled(); }, $process, $process)()) {
+        if ('\\' !== \DIRECTORY_SEPARATOR && !\Closure::bind(fn () => $this->isSigchildEnabled(), $process, $process)()) {
             $this->assertSame(0, $process->getExitCode());
         }
     }
@@ -1554,11 +1566,7 @@ class ProcessTest extends TestCase
         $this->assertFalse($process->isRunning());
     }
 
-    /**
-     * @param string|array $commandline
-     * @param mixed        $input
-     */
-    private function getProcess($commandline, string $cwd = null, array $env = null, $input = null, ?int $timeout = 60): Process
+    private function getProcess(string|array $commandline, string $cwd = null, array $env = null, mixed $input = null, ?int $timeout = 60): Process
     {
         if (\is_string($commandline)) {
             $process = Process::fromShellCommandline($commandline, $cwd, $env, $input, $timeout);
@@ -1566,9 +1574,7 @@ class ProcessTest extends TestCase
             $process = new Process($commandline, $cwd, $env, $input, $timeout);
         }
 
-        if (self::$process) {
-            self::$process->stop(0);
-        }
+        self::$process?->stop(0);
 
         return self::$process = $process;
     }

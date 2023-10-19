@@ -1,11 +1,41 @@
 CHANGELOG
 =========
 
-5.4.21
-------
+6.4
+---
+
+ * Add DSN parameter `peer_fingerprint` to verify TLS certificate fingerprint
+
+6.3
+---
+
+ * Add `MessageEvent::reject()` to allow rejecting an email before sending it
+ * Change the default port for the `mailgun+smtp` transport from 465 to 587
+ * Add `$authenticators` parameter in `EsmtpTransport` constructor and `EsmtpTransport::setAuthenticators()`
+  to allow overriding of default eSMTP authenticators
+
+6.2.7
+-----
 
  * [BC BREAK] The following data providers for `TransportFactoryTestCase` are now static:
   `supportsProvider()`, `createProvider()`, `unsupportedSchemeProvider()`and `incompleteDsnProvider()`
+
+6.2
+---
+
+ * Add a `mailer:test` command
+ * Add `SentMessageEvent` and `FailedMessageEvent` events
+
+6.1
+---
+
+ * Make `start()` and `stop()` methods public on `SmtpTransport`
+ * Improve extensibility of `EsmtpTransport`
+
+6.0
+---
+
+ * The `HttpTransportException` class takes a string at first argument
 
 5.4
 ---

@@ -21,10 +21,10 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 final class Dumper
 {
-    private $output;
-    private $dumper;
-    private $cloner;
-    private $handler;
+    private OutputInterface $output;
+    private ?CliDumper $dumper;
+    private ?ClonerInterface $cloner;
+    private \Closure $handler;
 
     public function __construct(OutputInterface $output, CliDumper $dumper = null, ClonerInterface $cloner = null)
     {
@@ -34,30 +34,23 @@ final class Dumper
 
         if (class_exists(CliDumper::class)) {
             $this->handler = function ($var): string {
-                $dumper = $this->dumper ?? $this->dumper = new CliDumper(null, null, CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);
+                $dumper = $this->dumper ??= new CliDumper(null, null, CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);
                 $dumper->setColors($this->output->isDecorated());
 
-                return rtrim($dumper->dump(($this->cloner ?? $this->cloner = new VarCloner())->cloneVar($var)->withRefHandles(false), true));
+                return rtrim($dumper->dump(($this->cloner ??= new VarCloner())->cloneVar($var)->withRefHandles(false), true));
             };
         } else {
-            $this->handler = function ($var): string {
-                switch (true) {
-                    case null === $var:
-                        return 'null';
-                    case true === $var:
-                        return 'true';
-                    case false === $var:
-                        return 'false';
-                    case \is_string($var):
-                        return '"'.$var.'"';
-                    default:
-                        return rtrim(print_r($var, true));
-                }
+            $this->handler = fn ($var): string => match (true) {
+                null === $var => 'null',
+                true === $var => 'true',
+                false === $var => 'false',
+                \is_string($var) => '"'.$var.'"',
+                default => rtrim(print_r($var, true)),
             };
         }
     }
 
-    public function __invoke($var): string
+    public function __invoke(mixed $var): string
     {
         return ($this->handler)($var);
     }

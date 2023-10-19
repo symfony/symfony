@@ -14,6 +14,9 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Log\Logger;
 
 /**
@@ -24,18 +27,30 @@ use Symfony\Component\HttpKernel\Log\Logger;
 class LoggerPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function process(ContainerBuilder $container)
     {
-        $container->setAlias(LoggerInterface::class, 'logger')
-            ->setPublic(false);
+        $container->setAlias(LoggerInterface::class, 'logger');
 
         if ($container->has('logger')) {
             return;
         }
 
+        if ($debug = $container->getParameter('kernel.debug')) {
+            // Build an expression that will be equivalent to `!in_array(PHP_SAPI, ['cli', 'phpdbg'])`
+            $debug = (new Definition('bool'))
+                ->setFactory('in_array')
+                ->setArguments([
+                    (new Definition('string'))->setFactory('constant')->setArguments(['PHP_SAPI']),
+                    ['cli', 'phpdbg'],
+                ]);
+            $debug = (new Definition('bool'))
+                ->setFactory('in_array')
+                ->setArguments([$debug, [false]]);
+        }
+
         $container->register('logger', Logger::class)
-            ->setPublic(false);
+            ->setArguments([null, null, null, new Reference(RequestStack::class), $debug]);
     }
 }

@@ -70,7 +70,7 @@ class CacheMetadataFactoryTest extends TestCase
         $anonymousObject = new class() {
         };
 
-        $metadata = new ClassMetadata(\get_class($anonymousObject));
+        $metadata = new ClassMetadata($anonymousObject::class);
         $decorated = $this->createMock(ClassMetadataFactoryInterface::class);
         $decorated
             ->expects($this->once())

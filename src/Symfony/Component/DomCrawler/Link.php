@@ -18,11 +18,14 @@ namespace Symfony\Component\DomCrawler;
  */
 class Link extends AbstractUriElement
 {
-    protected function getRawUri()
+    protected function getRawUri(): string
     {
         return $this->node->getAttribute('href');
     }
 
+    /**
+     * @return void
+     */
     protected function setNode(\DOMElement $node)
     {
         if ('a' !== $node->nodeName && 'area' !== $node->nodeName && 'link' !== $node->nodeName) {

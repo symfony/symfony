@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Notifier;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Event\MessageEvent;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -25,15 +23,15 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 final class Texter implements TexterInterface
 {
-    private $transport;
-    private $bus;
-    private $dispatcher;
+    private TransportInterface $transport;
+    private ?MessageBusInterface $bus;
+    private ?EventDispatcherInterface $dispatcher;
 
     public function __construct(TransportInterface $transport, MessageBusInterface $bus = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->transport = $transport;
         $this->bus = $bus;
-        $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     public function __toString(): string
@@ -52,9 +50,7 @@ final class Texter implements TexterInterface
             return $this->transport->send($message);
         }
 
-        if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(new MessageEvent($message, true));
-        }
+        $this->dispatcher?->dispatch(new MessageEvent($message, true));
 
         $this->bus->dispatch($message);
 

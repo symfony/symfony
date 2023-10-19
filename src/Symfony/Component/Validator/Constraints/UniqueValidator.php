@@ -22,13 +22,15 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class UniqueValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Unique) {
             throw new UnexpectedTypeException($constraint, Unique::class);
         }
+
+        $fields = (array) $constraint->fields;
 
         if (null === $value) {
             return;
@@ -41,6 +43,10 @@ class UniqueValidator extends ConstraintValidator
         $collectionElements = [];
         $normalizer = $this->getNormalizer($constraint);
         foreach ($value as $element) {
+            if ($fields && !$element = $this->reduceElementKeys($fields, $element)) {
+                continue;
+            }
+
             $element = $normalizer($element);
 
             if (\in_array($element, $collectionElements, true)) {
@@ -58,11 +64,24 @@ class UniqueValidator extends ConstraintValidator
     private function getNormalizer(Unique $unique): callable
     {
         if (null === $unique->normalizer) {
-            return static function ($value) {
-                return $value;
-            };
+            return static fn ($value) => $value;
         }
 
         return $unique->normalizer;
+    }
+
+    private function reduceElementKeys(array $fields, array $element): array
+    {
+        $output = [];
+        foreach ($fields as $field) {
+            if (!\is_string($field)) {
+                throw new UnexpectedTypeException($field, 'string');
+            }
+            if (\array_key_exists($field, $element)) {
+                $output[$field] = $element[$field];
+            }
+        }
+
+        return $output;
     }
 }

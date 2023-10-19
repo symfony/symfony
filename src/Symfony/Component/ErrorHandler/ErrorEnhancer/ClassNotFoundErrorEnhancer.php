@@ -21,9 +21,6 @@ use Symfony\Component\ErrorHandler\Error\FatalError;
  */
 class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function enhance(\Throwable $error): ?\Throwable
     {
         // Some specific versions of PHP produce a fatal error when extending a not found class.
@@ -143,7 +140,7 @@ class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
         ];
 
         if ($prefix) {
-            $candidates = array_filter($candidates, function ($candidate) use ($prefix) { return 0 === strpos($candidate, $prefix); });
+            $candidates = array_filter($candidates, fn ($candidate) => str_starts_with($candidate, $prefix));
         }
 
         // We cannot use the autoloader here as most of them use require; but if the class
@@ -155,9 +152,17 @@ class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
             }
         }
 
+        // Symfony may ship some polyfills, like "Normalizer". But if the Intl
+        // extension is already installed, the next require_once will fail with
+        // a compile error because the class is already defined. And this one
+        // does not throw a Throwable. So it's better to skip it here.
+        if (str_contains($file, 'Resources/stubs')) {
+            return null;
+        }
+
         try {
             require_once $file;
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return null;
         }
 

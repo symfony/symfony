@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePoolDeleteCommandTest extends TestCase
 {
-    private $cachePool;
+    private MockObject&CacheItemPoolInterface $cachePool;
 
     protected function setUp(): void
     {
@@ -106,10 +106,7 @@ class CachePoolDeleteCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @return MockObject&KernelInterface
-     */
-    private function getKernel(): KernelInterface
+    private function getKernel(): MockObject&KernelInterface
     {
         $container = $this->createMock(ContainerInterface::class);
 

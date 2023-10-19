@@ -21,9 +21,6 @@ class InMemoryStoreTest extends AbstractStoreTestCase
 {
     use SharedLockStoreTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new InMemoryStore();

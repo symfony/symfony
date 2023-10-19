@@ -64,7 +64,7 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
 
         if (array_key_exists('bar', $value)) {
             $this->_usedProperties['bar'] = true;
-            $this->bar = array_map(function ($v) { return new \Symfony\Config\ArrayExtraKeys\BarConfig($v); }, $value['bar']);
+            $this->bar = array_map(fn ($v) => new \Symfony\Config\ArrayExtraKeys\BarConfig($v), $value['bar']);
             unset($value['bar']);
         }
 
@@ -86,7 +86,7 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
             $output['foo'] = $this->foo->toArray();
         }
         if (isset($this->_usedProperties['bar'])) {
-            $output['bar'] = array_map(function ($v) { return $v->toArray(); }, $this->bar);
+            $output['bar'] = array_map(fn ($v) => $v->toArray(), $this->bar);
         }
         if (isset($this->_usedProperties['baz'])) {
             $output['baz'] = $this->baz->toArray();

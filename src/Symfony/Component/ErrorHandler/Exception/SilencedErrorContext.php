@@ -20,10 +20,10 @@ class SilencedErrorContext implements \JsonSerializable
 {
     public $count = 1;
 
-    private $severity;
-    private $file;
-    private $line;
-    private $trace;
+    private int $severity;
+    private string $file;
+    private int $line;
+    private array $trace;
 
     public function __construct(int $severity, string $file, int $line, array $trace = [], int $count = 1)
     {

@@ -26,10 +26,12 @@ class TranslationWriter implements TranslationWriterInterface
     /**
      * @var array<string, DumperInterface>
      */
-    private $dumpers = [];
+    private array $dumpers = [];
 
     /**
      * Adds a dumper to the writer.
+     *
+     * @return void
      */
     public function addDumper(string $format, DumperInterface $dumper)
     {
@@ -38,10 +40,8 @@ class TranslationWriter implements TranslationWriterInterface
 
     /**
      * Obtains the list of supported formats.
-     *
-     * @return array
      */
-    public function getFormats()
+    public function getFormats(): array
     {
         return array_keys($this->dumpers);
     }
@@ -51,6 +51,8 @@ class TranslationWriter implements TranslationWriterInterface
      *
      * @param string $format  The format to use to dump the messages
      * @param array  $options Options that are passed to the dumper
+     *
+     * @return void
      *
      * @throws InvalidArgumentException
      */

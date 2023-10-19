@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Translation;
 
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Extractor\AbstractFileExtractor;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
@@ -29,19 +30,15 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
 {
     /**
      * Default domain for found messages.
-     *
-     * @var string
      */
-    private $defaultDomain = 'messages';
+    private string $defaultDomain = 'messages';
 
     /**
      * Prefix for found message.
-     *
-     * @var string
      */
-    private $prefix = '';
+    private string $prefix = '';
 
-    private $twig;
+    private Environment $twig;
 
     public function __construct(Environment $twig)
     {
@@ -49,30 +46,33 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function extract($resource, MessageCatalogue $catalogue)
     {
         foreach ($this->extractFiles($resource) as $file) {
             try {
                 $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
-            } catch (Error $e) {
+            } catch (Error) {
                 // ignore errors, these should be fixed by using the linter
             }
         }
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function setPrefix(string $prefix)
     {
         $this->prefix = $prefix;
     }
 
+    /**
+     * @return void
+     */
     protected function extractTemplate(string $template, MessageCatalogue $catalogue)
     {
-        $visitor = $this->twig->getExtension('Symfony\Bridge\Twig\Extension\TranslationExtension')->getTranslationNodeVisitor();
+        $visitor = $this->twig->getExtension(TranslationExtension::class)->getTranslationNodeVisitor();
         $visitor->enable();
 
         $this->twig->parse($this->twig->tokenize(new Source($template, '')));
@@ -84,18 +84,12 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         $visitor->disable();
     }
 
-    /**
-     * @return bool
-     */
-    protected function canBeExtracted(string $file)
+    protected function canBeExtracted(string $file): bool
     {
         return $this->isFile($file) && 'twig' === pathinfo($file, \PATHINFO_EXTENSION);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function extractFromDirectory($directory)
+    protected function extractFromDirectory($directory): iterable
     {
         $finder = new Finder();
 

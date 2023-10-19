@@ -16,14 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.1",
         "psr/log": "^1|^2|^3",
-        "symfony/var-dumper": "^4.4|^5.0|^6.0"
+        "symfony/var-dumper": "^5.4|^6.0|^7.0"
     },
     "require-dev": {
-        "symfony/http-kernel": "^4.4|^5.0|^6.0",
-        "symfony/serializer": "^4.4|^5.0|^6.0",
-        "symfony/deprecation-contracts": "^2.1|^3"
+        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/serializer": "^5.4|^6.0|^7.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
+    },
+    "conflict": {
+        "symfony/deprecation-contracts": "<2.5",
+        "symfony/http-kernel": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ErrorHandler\\": "" },

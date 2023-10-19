@@ -56,7 +56,7 @@ class FailedMessageEventTest extends TestCase
         $clientMock = $this->createMock(HttpClientInterface::class);
 
         $transport = new class($clientMock, $eventDispatcherMock) extends AbstractTransport {
-            public $exception;
+            public NullTransportException $exception;
 
             public function __construct($client, EventDispatcherInterface $dispatcher = null)
             {

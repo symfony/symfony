@@ -19,7 +19,7 @@ class ListObjectConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function name($value): self
+    public function name($value): static
     {
         $this->_usedProperties['name'] = true;
         $this->name = $value;
@@ -28,10 +28,11 @@ class ListObjectConfig
     }
 
     /**
-     * @param ParamConfigurator|list<mixed|ParamConfigurator> $value
+     * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
+     *
      * @return $this
      */
-    public function data($value): self
+    public function data(ParamConfigurator|array $value): static
     {
         $this->_usedProperties['data'] = true;
         $this->data = $value;

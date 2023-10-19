@@ -31,22 +31,22 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class JsonManifestVersionStrategy implements VersionStrategyInterface
 {
-    private $manifestPath;
-    private $manifestData;
-    private $httpClient;
-    private $strictMode;
+    private string $manifestPath;
+    private array $manifestData;
+    private ?HttpClientInterface $httpClient;
+    private bool $strictMode;
 
     /**
      * @param string $manifestPath Absolute path to the manifest file
      * @param bool   $strictMode   Throws an exception for unknown paths
      */
-    public function __construct(string $manifestPath, HttpClientInterface $httpClient = null, $strictMode = false)
+    public function __construct(string $manifestPath, HttpClientInterface $httpClient = null, bool $strictMode = false)
     {
         $this->manifestPath = $manifestPath;
         $this->httpClient = $httpClient;
         $this->strictMode = $strictMode;
 
-        if (null === $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
+        if (null === $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && str_starts_with($scheme, 'http')) {
             throw new LogicException(sprintf('The "%s" class needs an HTTP client to use a remote manifest. Try running "composer require symfony/http-client".', self::class));
         }
     }
@@ -56,20 +56,20 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
      * the version is. Instead, this returns the path to the
      * versioned file.
      */
-    public function getVersion(string $path)
+    public function getVersion(string $path): string
     {
         return $this->applyVersion($path);
     }
 
-    public function applyVersion(string $path)
+    public function applyVersion(string $path): string
     {
         return $this->getManifestPath($path) ?: $path;
     }
 
     private function getManifestPath(string $path): ?string
     {
-        if (null === $this->manifestData) {
-            if (null !== $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
+        if (!isset($this->manifestData)) {
+            if (null !== $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && str_starts_with($scheme, 'http')) {
                 try {
                     $this->manifestData = $this->httpClient->request('GET', $this->manifestPath, [
                         'headers' => ['accept' => 'application/json'],
@@ -84,9 +84,10 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
                     throw new RuntimeException(sprintf('Asset manifest file "%s" does not exist. Did you forget to build the assets with npm or yarn?', $this->manifestPath));
                 }
 
-                $this->manifestData = json_decode(file_get_contents($this->manifestPath), true);
-                if (0 < json_last_error()) {
-                    throw new RuntimeException(sprintf('Error parsing JSON from asset manifest file "%s": ', $this->manifestPath).json_last_error_msg());
+                try {
+                    $this->manifestData = json_decode(file_get_contents($this->manifestPath), true, flags: \JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new RuntimeException(sprintf('Error parsing JSON from asset manifest file "%s": ', $this->manifestPath).$e->getMessage(), previous: $e);
                 }
             }
         }

@@ -3,6 +3,7 @@ imports:
     - { resource: services.yml }
 
 framework:
+    http_method_override: false
     fragments: ~
 
 twig:

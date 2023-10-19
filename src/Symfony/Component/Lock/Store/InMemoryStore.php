@@ -23,9 +23,12 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  */
 class InMemoryStore implements SharedLockStoreInterface
 {
-    private $locks = [];
-    private $readLocks = [];
+    private array $locks = [];
+    private array $readLocks = [];
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         $hashKey = (string) $key;
@@ -54,6 +57,9 @@ class InMemoryStore implements SharedLockStoreInterface
         $this->locks[$hashKey] = $token;
     }
 
+    /**
+     * @return void
+     */
     public function saveRead(Key $key)
     {
         $hashKey = (string) $key;
@@ -78,11 +84,17 @@ class InMemoryStore implements SharedLockStoreInterface
         $this->readLocks[$hashKey][$token] = true;
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, memory locks forever.
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $hashKey = (string) $key;
@@ -94,7 +106,7 @@ class InMemoryStore implements SharedLockStoreInterface
         }
     }
 
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $hashKey = (string) $key;
         $token = $this->getUniqueToken($key);

@@ -993,9 +993,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['April,15,2003', 'April 15, 2003', '/(\w+) (\d+), (\d+)/i', '${1},$2,$3'],
             ['5/27/1999', '1999-5-27', '/(19|20)(\d{2})-(\d{1,2})-(\d{1,2})/', '\3/\4/\1\2'],
             ['Copyright 2000', 'Copyright 1999', '([0-9]+)', '2000'],
-            ['hello world! this is a test', 'HELLO WORLD! THIS is a test', '/\b([A-Z]+)\b/', function ($word) {
-                return strtolower($word[1]);
-            }],
+            ['hello world! this is a test', 'HELLO WORLD! THIS is a test', '/\b([A-Z]+)\b/', fn ($word) => strtolower($word[1])],
             ['COPYRIGHT 1999', 'Copyright 1999', '/[a-z]/', function ($matches) {
                 foreach ($matches as $match) {
                     return strtoupper($match);

@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\Storage\Storage;
 
+/**
+ * @group legacy
+ */
 class FileStorageTest extends TestCase
 {
     public function testGetContent()

@@ -19,12 +19,12 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input;
  */
 final class DateInput extends AbstractInput
 {
-    private $options = [];
+    private array $options = [];
 
     /**
      * @return $this
      */
-    public function includeTime(bool $includeTime): self
+    public function includeTime(bool $includeTime): static
     {
         $this->options['includeTime'] = $includeTime;
 

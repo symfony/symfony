@@ -16,13 +16,13 @@ use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA;
 
 class EntityParent implements EntityInterfaceA
 {
-    protected $firstName;
+    protected string $firstName;
     private $internal;
     private $data = 'Data';
     private $child;
 
     #[NotNull]
-    protected $other;
+    protected ?int $other;
 
     public function getData()
     {

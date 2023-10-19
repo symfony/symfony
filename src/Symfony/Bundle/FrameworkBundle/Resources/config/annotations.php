@@ -12,10 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -24,13 +22,8 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('annotations.reader', AnnotationReader::class)
-            ->call('addGlobalIgnoredName', [
-                'required',
-                service('annotations.dummy_registry')->nullOnInvalid(), // dummy arg to register class_exists as annotation loader only when required
-            ])
-
-        ->set('annotations.dummy_registry', AnnotationRegistry::class)
-            ->call('registerUniqueLoader', ['class_exists'])
+            ->call('addGlobalIgnoredName', ['required']) // @deprecated since Symfony 6.3
+            ->deprecate('symfony/framework-bundle', '6.4', 'The "%service_id%" service is deprecated without replacement.')
 
         ->set('annotations.cached_reader', PsrCachedReader::class)
             ->args([
@@ -40,6 +33,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('annotations.cached_reader')
             ->tag('container.do_not_inline')
+            ->deprecate('symfony/framework-bundle', '6.4', 'The "%service_id%" service is deprecated without replacement.')
 
         ->set('annotations.filesystem_cache_adapter', FilesystemAdapter::class)
             ->args([
@@ -47,13 +41,7 @@ return static function (ContainerConfigurator $container) {
                 0,
                 abstract_arg('Cache-Directory'),
             ])
-
-        ->set('annotations.filesystem_cache', DoctrineProvider::class)
-            ->factory([DoctrineProvider::class, 'wrap'])
-            ->args([
-                service('annotations.filesystem_cache_adapter'),
-            ])
-            ->deprecate('symfony/framework-bundle', '5.4', '"%service_id% is deprecated"')
+            ->deprecate('symfony/framework-bundle', '6.4', 'The "%service_id%" service is deprecated without replacement.')
 
         ->set('annotations.cache_warmer', AnnotationsCacheWarmer::class)
             ->args([
@@ -61,7 +49,9 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.cache_dir').'/annotations.php',
                 '#^Symfony\\\\(?:Component\\\\HttpKernel\\\\|Bundle\\\\FrameworkBundle\\\\Controller\\\\(?!.*Controller$))#',
                 param('kernel.debug'),
+                false,
             ])
+            ->deprecate('symfony/framework-bundle', '6.4', 'The "%service_id%" service is deprecated without replacement.')
 
         ->set('annotations.cache_adapter', PhpArrayAdapter::class)
             ->factory([PhpArrayAdapter::class, 'create'])
@@ -70,14 +60,12 @@ return static function (ContainerConfigurator $container) {
                 service('cache.annotations'),
             ])
             ->tag('container.hot_path')
-
-        ->set('annotations.cache', DoctrineProvider::class)
-            ->factory([DoctrineProvider::class, 'wrap'])
-            ->args([
-                service('annotations.cache_adapter'),
-            ])
-            ->deprecate('symfony/framework-bundle', '5.4', '"%service_id% is deprecated"')
+            ->deprecate('symfony/framework-bundle', '6.4', 'The "%service_id%" service is deprecated without replacement.')
 
         ->alias('annotation_reader', 'annotations.reader')
-        ->alias(Reader::class, 'annotation_reader');
+            ->deprecate('symfony/framework-bundle', '6.4', 'The "%alias_id%" service alias is deprecated without replacement.')
+
+        ->alias(Reader::class, 'annotation_reader')
+            ->deprecate('symfony/framework-bundle', '6.4', 'The "%alias_id%" service alias is deprecated without replacement.')
+    ;
 };

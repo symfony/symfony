@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -20,8 +19,6 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 
 class ResolveChildDefinitionsPassTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -288,23 +285,23 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $configurator = $container->getDefinition('sibling')->getConfigurator();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($configurator[0]));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', $configurator[0]::class);
         $this->assertSame('parentClass', $configurator[0]->getClass());
 
         $factory = $container->getDefinition('sibling')->getFactory();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($factory[0]));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', $factory[0]::class);
         $this->assertSame('parentClass', $factory[0]->getClass());
 
         $argument = $container->getDefinition('sibling')->getArgument(0);
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($argument));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', $argument::class);
         $this->assertSame('parentClass', $argument->getClass());
 
         $properties = $container->getDefinition('sibling')->getProperties();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($properties['prop']));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', $properties['prop']::class);
         $this->assertSame('parentClass', $properties['prop']->getClass());
 
         $methodCalls = $container->getDefinition('sibling')->getMethodCalls();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($methodCalls[0][1][0]));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', $methodCalls[0][1][0]::class);
         $this->assertSame('parentClass', $methodCalls[0][1][0]->getClass());
     }
 
@@ -335,28 +332,6 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $this->assertTrue($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDecoratedServiceCanOverwriteDeprecatedParentStatus()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Passing a null message to un-deprecate a node is deprecated.');
-
-        $container = new ContainerBuilder();
-        $container->register('deprecated_parent')
-            ->setDeprecated(true)
-        ;
-
-        $container->setDefinition('decorated_deprecated_parent', new ChildDefinition('deprecated_parent'))
-            ->setDeprecated(false)
-        ;
-
-        $this->process($container);
-
-        $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
     public function testProcessResolvesAliases()

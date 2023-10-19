@@ -54,7 +54,7 @@ class ProxyAdapterTest extends AdapterTestCase
 
 class TestingArrayAdapter extends ArrayAdapter
 {
-    private $item;
+    private CacheItemInterface $item;
 
     public function __construct(CacheItemInterface $item)
     {

@@ -61,7 +61,7 @@ class ConstraintValidatorTest extends TestCase
 
 final class TestFormatValueConstraintValidator extends ConstraintValidator
 {
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
     }
 
@@ -73,7 +73,7 @@ final class TestFormatValueConstraintValidator extends ConstraintValidator
 
 final class TestToStringObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'ccc';
     }

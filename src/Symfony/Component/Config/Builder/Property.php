@@ -20,12 +20,12 @@ namespace Symfony\Component\Config\Builder;
  */
 class Property
 {
-    private $name;
-    private $originalName;
-    private $array = false;
-    private $scalarsAllowed = false;
-    private $type = null;
-    private $content;
+    private string $name;
+    private string $originalName;
+    private bool $array = false;
+    private bool $scalarsAllowed = false;
+    private ?string $type = null;
+    private ?string $content = null;
 
     public function __construct(string $originalName, string $name)
     {
@@ -48,12 +48,12 @@ class Property
         $this->array = false;
         $this->type = $type;
 
-        if ('|scalar' === substr($type, -7)) {
+        if (str_ends_with($type, '|scalar')) {
             $this->scalarsAllowed = true;
             $this->type = $type = substr($type, 0, -7);
         }
 
-        if ('[]' === substr($type, -2)) {
+        if (str_ends_with($type, '[]')) {
             $this->array = true;
             $this->type = substr($type, 0, -2);
         }

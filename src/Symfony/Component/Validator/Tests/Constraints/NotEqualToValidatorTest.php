@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\NotEqualToValidator;
  */
 class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): NotEqualToValidator
     {
         return new NotEqualToValidator();
     }
@@ -35,9 +35,6 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return NotEqualTo::IS_EQUAL_ERROR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -51,9 +48,6 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -61,9 +55,6 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [

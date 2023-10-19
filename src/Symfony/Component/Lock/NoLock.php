@@ -26,7 +26,7 @@ final class NoLock implements LockInterface
         return true;
     }
 
-    public function refresh(float $ttl = null)
+    public function refresh(float $ttl = null): void
     {
     }
 
@@ -35,7 +35,7 @@ final class NoLock implements LockInterface
         return true;
     }
 
-    public function release()
+    public function release(): void
     {
     }
 

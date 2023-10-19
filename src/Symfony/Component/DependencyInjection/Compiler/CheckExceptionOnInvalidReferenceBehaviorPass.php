@@ -23,10 +23,12 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {
-    private $serviceLocatorContextIds = [];
+    protected bool $skipScalars = true;
+
+    private array $serviceLocatorContextIds = [];
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function process(ContainerBuilder $container)
     {
@@ -37,13 +39,13 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         }
 
         try {
-            return parent::process($container);
+            parent::process($container);
         } finally {
             $this->serviceLocatorContextIds = [];
         }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Reference) {
             return parent::processValue($value, $isRoot);
@@ -90,12 +92,12 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
     {
         $alternatives = [];
         foreach ($this->container->getServiceIds() as $knownId) {
-            if ('' === $knownId || '.' === $knownId[0]) {
+            if ('' === $knownId || '.' === $knownId[0] || $knownId === $this->currentId) {
                 continue;
             }
 
             $lev = levenshtein($id, $knownId);
-            if ($lev <= \strlen($id) / 3 || false !== strpos($knownId, $id)) {
+            if ($lev <= \strlen($id) / 3 || str_contains($knownId, $id)) {
                 $alternatives[] = $knownId;
             }
         }

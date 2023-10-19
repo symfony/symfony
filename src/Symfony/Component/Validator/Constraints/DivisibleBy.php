@@ -22,9 +22,14 @@ class DivisibleBy extends AbstractComparison
 {
     public const NOT_DIVISIBLE_BY = '6d99d6c3-1464-4ccf-bdc7-14d083cf455c';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NOT_DIVISIBLE_BY => 'NOT_DIVISIBLE_BY',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This value should be a multiple of {{ compared_value }}.';
 }

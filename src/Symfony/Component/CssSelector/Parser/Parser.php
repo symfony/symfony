@@ -19,7 +19,7 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\Tokenizer;
  * CSS selector parser.
  *
  * This component is a port of the Python cssselect library,
- * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ * which is copyright Ian Bicking, @see https://github.com/scrapy/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  *
@@ -27,16 +27,13 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\Tokenizer;
  */
 class Parser implements ParserInterface
 {
-    private $tokenizer;
+    private Tokenizer $tokenizer;
 
     public function __construct(Tokenizer $tokenizer = null)
     {
         $this->tokenizer = $tokenizer ?? new Tokenizer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function parse(string $source): array
     {
         $reader = new Reader($source);
@@ -60,9 +57,7 @@ class Parser implements ParserInterface
             }
         }
 
-        $joined = trim(implode('', array_map(function (Token $token) {
-            return $token->getValue();
-        }, $tokens)));
+        $joined = trim(implode('', array_map(fn (Token $token) => $token->getValue(), $tokens)));
 
         $int = function ($string) {
             if (!is_numeric($string)) {
@@ -197,7 +192,18 @@ class Parser implements ParserInterface
 
                 if (!$stream->getPeek()->isDelimiter(['('])) {
                     $result = new Node\PseudoNode($result, $identifier);
-
+                    if ('Pseudo[Element[*]:scope]' === $result->__toString()) {
+                        $used = \count($stream->getUsed());
+                        if (!(2 === $used
+                           || 3 === $used && $stream->getUsed()[0]->isWhiteSpace()
+                           || $used >= 3 && $stream->getUsed()[$used - 3]->isDelimiter([','])
+                           || $used >= 4
+                                && $stream->getUsed()[$used - 3]->isWhiteSpace()
+                                && $stream->getUsed()[$used - 4]->isDelimiter([','])
+                        )) {
+                            throw SyntaxErrorException::notAtTheStartOfASelector('scope');
+                        }
+                    }
                     continue;
                 }
 
@@ -242,7 +248,7 @@ class Parser implements ParserInterface
                         }
                     }
 
-                    if (empty($arguments)) {
+                    if (!$arguments) {
                         throw SyntaxErrorException::unexpectedToken('at least one argument', $next);
                     }
 

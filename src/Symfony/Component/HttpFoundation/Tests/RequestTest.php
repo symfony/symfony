@@ -81,12 +81,31 @@ class RequestTest extends TestCase
         $this->assertFalse($isNoCache);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetContentType()
     {
+        $this->expectDeprecation('Since symfony/http-foundation 6.2: The "Symfony\Component\HttpFoundation\Request::getContentType()" method is deprecated, use "getContentTypeFormat()" instead.');
         $request = new Request();
+
         $contentType = $request->getContentType();
 
         $this->assertNull($contentType);
+    }
+
+    public function testGetContentTypeFormat()
+    {
+        $request = new Request();
+        $this->assertNull($request->getContentTypeFormat());
+
+        $server = ['HTTP_CONTENT_TYPE' => 'application/json'];
+        $request = new Request([], [], [], [], [], $server);
+        $this->assertEquals('json', $request->getContentTypeFormat());
+
+        $server = ['HTTP_CONTENT_TYPE' => 'text/html'];
+        $request = new Request([], [], [], [], [], $server);
+        $this->assertEquals('html', $request->getContentTypeFormat());
     }
 
     public function testSetDefaultLocale()
@@ -1281,6 +1300,20 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $req->toArray());
     }
 
+    public function testGetPayload()
+    {
+        $req = new Request([], [], [], [], [], [], json_encode(['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], $req->getPayload()->all());
+        $req->getPayload()->set('new', 'key');
+        $this->assertSame(['foo' => 'bar'], $req->getPayload()->all());
+
+        $req = new Request([], ['foo' => 'bar'], [], [], [], [], json_encode(['baz' => 'qux']));
+        $this->assertSame(['foo' => 'bar'], $req->getPayload()->all());
+
+        $req = new Request([], [], [], [], [], [], '');
+        $this->assertSame([], $req->getPayload()->all());
+    }
+
     /**
      * @dataProvider provideOverloadedMethods
      */
@@ -1914,7 +1947,6 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $me = new \ReflectionMethod($request, 'getUrlencodedPrefix');
-        $me->setAccessible(true);
 
         $this->assertSame($expect, $me->invoke($request, $string, $prefix));
     }
@@ -1937,7 +1969,6 @@ class RequestTest extends TestCase
     {
         $class = new \ReflectionClass(Request::class);
         $property = $class->getProperty('httpMethodParameterOverride');
-        $property->setAccessible(true);
         $property->setValue(null, false);
     }
 
@@ -2175,9 +2206,7 @@ class RequestTest extends TestCase
 
     public function testFactory()
     {
-        Request::setFactory(function (array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null) {
-            return new NewRequest();
-        });
+        Request::setFactory(fn (array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null) => new NewRequest());
 
         $this->assertEquals('foo', Request::create('/')->getFoo());
 
@@ -2383,9 +2412,7 @@ class RequestTest extends TestCase
      */
     public function testNonstandardRequests($requestUri, $queryString, $expectedPathInfo, $expectedUri, $expectedBasePath = '', $expectedBaseUrl = null)
     {
-        if (null === $expectedBaseUrl) {
-            $expectedBaseUrl = $expectedBasePath;
-        }
+        $expectedBaseUrl ??= $expectedBasePath;
 
         $server = [
             'HTTP_HOST' => 'host:8080',
@@ -2523,6 +2550,23 @@ class RequestTest extends TestCase
         $this->assertSame($result, Request::getTrustedProxies());
     }
 
+    public function testTrustedValuesCache()
+    {
+        $request = Request::create('http://example.com/');
+        $request->server->set('REMOTE_ADDR', '3.3.3.3');
+        $request->headers->set('X_FORWARDED_FOR', '1.1.1.1, 2.2.2.2');
+        $request->headers->set('X_FORWARDED_PROTO', 'https');
+
+        $this->assertFalse($request->isSecure());
+
+        Request::setTrustedProxies(['3.3.3.3', '2.2.2.2'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
+        $this->assertTrue($request->isSecure());
+
+        // Header is changed, cache must not be hit now
+        $request->headers->set('X_FORWARDED_PROTO', 'http');
+        $this->assertFalse($request->isSecure());
+    }
+
     public static function trustedProxiesRemoteAddr()
     {
         return [
@@ -2591,21 +2635,20 @@ class RequestTest extends TestCase
         ];
     }
 
-    /**
-     * @group legacy
-     */
-    public function testXForwarededAllConstantDeprecated()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 5.2: The "HEADER_X_FORWARDED_ALL" constant is deprecated, use either "HEADER_X_FORWARDED_FOR | HEADER_X_FORWARDED_HOST | HEADER_X_FORWARDED_PORT | HEADER_X_FORWARDED_PROTO" or "HEADER_X_FORWARDED_AWS_ELB" or "HEADER_X_FORWARDED_TRAEFIK" constants instead.');
-
-        Request::setTrustedProxies([], Request::HEADER_X_FORWARDED_ALL);
-    }
-
     public function testReservedFlags()
     {
         foreach ((new \ReflectionClass(Request::class))->getConstants() as $constant => $value) {
             $this->assertNotSame(0b10000000, $value, sprintf('The constant "%s" should not use the reserved value "0b10000000".', $constant));
         }
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testInvalidUriCreationDeprecated()
+    {
+        $this->expectDeprecation('Since symfony/http-foundation 6.3: Calling "Symfony\Component\HttpFoundation\Request::create()" with an invalid URI is deprecated.');
+        Request::create('/invalid-path:123');
     }
 }
 

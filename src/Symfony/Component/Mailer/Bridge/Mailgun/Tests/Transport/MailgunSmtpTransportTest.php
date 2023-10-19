@@ -32,7 +32,6 @@ class MailgunSmtpTransportTest extends TestCase
 
         $transport = new MailgunSmtpTransport('user', 'password');
         $method = new \ReflectionMethod(MailgunSmtpTransport::class, 'addMailgunHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(3, $email->getHeaders()->toArray());

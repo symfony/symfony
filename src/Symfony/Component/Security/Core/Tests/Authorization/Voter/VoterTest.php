@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class VoterTest extends TestCase
 {
-    protected $token;
+    protected TokenInterface $token;
 
     protected function setUp(): void
     {

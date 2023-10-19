@@ -28,10 +28,10 @@ final class GitterTransport extends AbstractTransport
 {
     protected const HOST = 'api.gitter.im';
 
-    private $token;
-    private $roomId;
+    private string $token;
+    private string $roomId;
 
-    public function __construct(string $token, string $roomId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, string $roomId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->roomId = $roomId;

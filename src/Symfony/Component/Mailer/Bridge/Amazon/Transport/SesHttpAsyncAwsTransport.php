@@ -18,6 +18,7 @@ use AsyncAws\Ses\ValueObject\Destination;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Message;
@@ -86,6 +87,13 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
         if (($message->getOriginalMessage() instanceof Message)
             && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
             $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
+        }
+        if ($message->getOriginalMessage() instanceof Message) {
+            foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
+                if ($header instanceof MetadataHeader) {
+                    $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+                }
+            }
         }
 
         return new SendEmailRequest($request);

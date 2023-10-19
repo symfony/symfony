@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\MessageBird\Tests;
 
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class MessageBirdTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return MessageBirdTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): MessageBirdTransportFactory
     {
         return new MessageBirdTransportFactory();
     }

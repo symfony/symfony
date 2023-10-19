@@ -16,14 +16,14 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class FixedDataTransformer implements DataTransformerInterface
 {
-    private $mapping;
+    private array $mapping;
 
     public function __construct(array $mapping)
     {
         $this->mapping = $mapping;
     }
 
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (!\array_key_exists($value, $this->mapping)) {
             throw new TransformationFailedException(sprintf('No mapping for value "%s"', $value));
@@ -32,7 +32,7 @@ class FixedDataTransformer implements DataTransformerInterface
         return $this->mapping[$value];
     }
 
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         $result = array_search($value, $this->mapping, true);
 

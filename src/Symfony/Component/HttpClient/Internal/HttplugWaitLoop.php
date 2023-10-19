@@ -30,10 +30,10 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class HttplugWaitLoop
 {
-    private $client;
-    private $promisePool;
-    private $responseFactory;
-    private $streamFactory;
+    private HttpClientInterface $client;
+    private ?\SplObjectStorage $promisePool;
+    private ResponseFactoryInterface $responseFactory;
+    private StreamFactoryInterface $streamFactory;
 
     /**
      * @param \SplObjectStorage<ResponseInterface, array{Psr7RequestInterface, Promise}>|null $promisePool
@@ -57,7 +57,7 @@ final class HttplugWaitLoop
         if (0.0 === $remainingDuration = $maxDuration) {
             $idleTimeout = 0.0;
         } elseif (null !== $maxDuration) {
-            $startTime = microtime(true);
+            $startTime = hrtime(true) / 1E9;
             $idleTimeout = max(0.0, min($maxDuration / 5, $idleTimeout ?? $maxDuration));
         }
 
@@ -100,7 +100,7 @@ final class HttplugWaitLoop
                 }
 
                 check_duration:
-                if (null !== $maxDuration && $idleTimeout && $idleTimeout > $remainingDuration = max(0.0, $maxDuration - microtime(true) + $startTime)) {
+                if (null !== $maxDuration && $idleTimeout && $idleTimeout > $remainingDuration = max(0.0, $maxDuration - hrtime(true) / 1E9 + $startTime)) {
                     $idleTimeout = $remainingDuration / 5;
                     break;
                 }

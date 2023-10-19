@@ -12,7 +12,7 @@
         <import resource="container1.xml"/>
     </imports>
 
-    <sec:config enable-authenticator-manager="true">
+    <sec:config>
         <sec:password_hasher class="JMS\FooBundle\Entity\User7" algorithm="bcrypt" cost="15" />
     </sec:config>
 

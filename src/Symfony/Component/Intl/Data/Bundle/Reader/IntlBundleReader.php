@@ -23,17 +23,14 @@ use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
  */
 class IntlBundleReader implements BundleReaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function read(string $path, string $locale)
+    public function read(string $path, string $locale): mixed
     {
         // Point for future extension: Modify this class so that it works also
         // if the \ResourceBundle class is not available.
         try {
             // Never enable fallback. We want to know if a bundle cannot be found
             $bundle = new \ResourceBundle($locale, $path, false);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $bundle = null;
         }
 

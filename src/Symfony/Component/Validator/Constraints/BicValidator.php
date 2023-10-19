@@ -56,7 +56,7 @@ class BicValidator extends ConstraintValidator
         'EA' => 'ES', // Ceuta and Melilla
     ];
 
-    private $propertyAccessor;
+    private ?PropertyAccessor $propertyAccessor;
 
     public function __construct(PropertyAccessor $propertyAccessor = null)
     {
@@ -64,9 +64,9 @@ class BicValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Bic) {
             throw new UnexpectedTypeException($constraint, Bic::class);
@@ -76,7 +76,7 @@ class BicValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -159,7 +159,7 @@ class BicValidator extends ConstraintValidator
     {
         if (null === $this->propertyAccessor) {
             if (!class_exists(PropertyAccess::class)) {
-                throw new LogicException('Unable to use property path as the Symfony PropertyAccess component is not installed.');
+                throw new LogicException('Unable to use property path as the Symfony PropertyAccess component is not installed. Try running "composer require symfony/property-access".');
             }
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }

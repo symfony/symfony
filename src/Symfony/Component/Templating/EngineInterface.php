@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', EngineInterface::class);
+
 /**
  * EngineInterface is the interface each engine must implement.
  *
@@ -27,38 +29,27 @@ namespace Symfony\Component\Templating;
  * the template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 interface EngineInterface
 {
     /**
      * Renders a template.
      *
-     * @param string|TemplateReferenceInterface $name       A template name or a TemplateReferenceInterface instance
-     * @param array                             $parameters An array of parameters to pass to the template
-     *
-     * @return string
-     *
      * @throws \RuntimeException if the template cannot be rendered
      */
-    public function render($name, array $parameters = []);
+    public function render(string|TemplateReferenceInterface $name, array $parameters = []): string;
 
     /**
      * Returns true if the template exists.
      *
-     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
-     *
-     * @return bool
-     *
      * @throws \RuntimeException if the engine cannot handle the template name
      */
-    public function exists($name);
+    public function exists(string|TemplateReferenceInterface $name): bool;
 
     /**
      * Returns true if this class is able to render the given template.
-     *
-     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
-     *
-     * @return bool
      */
-    public function supports($name);
+    public function supports(string|TemplateReferenceInterface $name): bool;
 }

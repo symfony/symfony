@@ -16,7 +16,7 @@ use Symfony\Component\Console\Question\Question;
 
 class QuestionTest extends TestCase
 {
-    private $question;
+    private Question $question;
 
     protected function setUp(): void
     {
@@ -62,7 +62,7 @@ class QuestionTest extends TestCase
     public function testSetHiddenWithAutocompleterCallback()
     {
         $this->question->setAutocompleterCallback(
-            function (string $input): array { return []; }
+            fn (string $input): array => []
         );
 
         $this->expectException(\LogicException::class);
@@ -76,7 +76,7 @@ class QuestionTest extends TestCase
     public function testSetHiddenWithNoAutocompleterCallback()
     {
         $this->question->setAutocompleterCallback(
-            function (string $input): array { return []; }
+            fn (string $input): array => []
         );
         $this->question->setAutocompleterCallback(null);
 
@@ -187,7 +187,7 @@ class QuestionTest extends TestCase
 
     public function testGetSetAutocompleterCallback()
     {
-        $callback = function (string $input): array { return []; };
+        $callback = fn (string $input): array => [];
 
         $this->question->setAutocompleterCallback($callback);
         self::assertSame($callback, $this->question->getAutocompleterCallback());
@@ -208,7 +208,7 @@ class QuestionTest extends TestCase
         );
 
         $this->question->setAutocompleterCallback(
-            function (string $input): array { return []; }
+            fn (string $input): array => []
         );
     }
 
@@ -220,7 +220,7 @@ class QuestionTest extends TestCase
         $exception = null;
         try {
             $this->question->setAutocompleterCallback(
-                function (string $input): array { return []; }
+                fn (string $input): array => []
             );
         } catch (\Exception $exception) {
             // Do nothing
@@ -232,7 +232,7 @@ class QuestionTest extends TestCase
     public static function providerGetSetValidator()
     {
         return [
-            [function ($input) { return $input; }],
+            [fn ($input) => $input],
             [null],
         ];
     }
@@ -288,7 +288,7 @@ class QuestionTest extends TestCase
 
     public function testGetSetNormalizer()
     {
-        $normalizer = function ($input) { return $input; };
+        $normalizer = fn ($input) => $input;
         $this->question->setNormalizer($normalizer);
         self::assertSame($normalizer, $this->question->getNormalizer());
     }

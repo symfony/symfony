@@ -18,14 +18,17 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class MattermostOptions implements MessageOptionsInterface
 {
-    private $options;
+    private array $options;
 
     public function __construct(array $options = [])
     {
         $this->options = $options;
     }
 
-    public function recipient(string $id): self
+    /**
+     * @return $this
+     */
+    public function recipient(string $id): static
     {
         $this->options['recipient_id'] = $id;
 

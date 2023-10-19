@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Allow an array to be passed as the first argument to the `importmap()` Twig function
+ * Add `TemplatedEmail::locale()` to set the locale for the email rendering
+ * Add `AppVariable::getEnabledLocales()` to retrieve the enabled locales
+ * Add `impersonation_path()` and `impersonation_url()` Twig functions
+
+6.3
+---
+
+ * Add `AppVariable::getLocale()` to retrieve the current locale when using the `LocaleSwitcher`
+
+6.2
+---
+
+ * Add `form_label_content` and `form_help_content` block to form themes
+ * Add `#[Template()]` to describe how to render arrays returned by controllers
+ * Add support for toggle buttons in Bootstrap 5 form theme
+ * Add `app.current_route` and `app.current_route_parameters` variables
+
+6.1
+---
+
+ * Wrap help messages on form elements in `div` instead of `p`
+
 5.4
 ---
 

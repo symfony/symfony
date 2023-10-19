@@ -28,11 +28,11 @@ class DoctrineInitializer implements ObjectInitializerInterface
         $this->registry = $registry;
     }
 
+    /**
+     * @return void
+     */
     public function initialize(object $object)
     {
-        $manager = $this->registry->getManagerForClass(\get_class($object));
-        if (null !== $manager) {
-            $manager->initializeObject($object);
-        }
+        $this->registry->getManagerForClass($object::class)?->initializeObject($object);
     }
 }

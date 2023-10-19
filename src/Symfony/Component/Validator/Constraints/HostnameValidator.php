@@ -31,7 +31,10 @@ class HostnameValidator extends ConstraintValidator
         'test',
     ];
 
-    public function validate($value, Constraint $constraint)
+    /**
+     * @return void
+     */
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Hostname) {
             throw new UnexpectedTypeException($constraint, Hostname::class);
@@ -41,7 +44,7 @@ class HostnameValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -64,6 +67,6 @@ class HostnameValidator extends ConstraintValidator
 
     private function hasValidTld(string $domain): bool
     {
-        return false !== strpos($domain, '.') && !\in_array(substr($domain, strrpos($domain, '.') + 1), self::RESERVED_TLDS, true);
+        return str_contains($domain, '.') && !\in_array(substr($domain, strrpos($domain, '.') + 1), self::RESERVED_TLDS, true);
     }
 }

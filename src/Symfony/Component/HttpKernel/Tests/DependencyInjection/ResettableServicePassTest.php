@@ -68,7 +68,7 @@ class ResettableServicePassTest extends TestCase
     public function testMissingMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set.');
+        $this->expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set on service "Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService".');
         $container = new ContainerBuilder();
         $container->register(ResettableService::class)
             ->addTag('kernel.reset');

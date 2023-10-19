@@ -1,0 +1,25 @@
+{
+    "Metadata": {
+      "example": "value",
+      "example_2": "value"
+    },
+    "RecordType": "SpamComplaint",
+    "ID": 42,
+    "Type": "SpamComplaint",
+    "TypeCode": 100001,
+    "Name": "Spam complaint",
+    "Tag": "Test",
+    "MessageID": "00000000-0000-0000-0000-000000000000",
+    "ServerID": 1234,
+    "MessageStream": "outbound",
+    "Description": "The subscriber explicitly marked this message as spam.",
+    "Details": "Test spam complaint details",
+    "Email": "john@example.com",
+    "From": "sender@example.com",
+    "BouncedAt": "2022-09-02T14:29:57Z",
+    "DumpAvailable": true,
+    "Inactive": true,
+    "CanActivate": false,
+    "Subject": "Test subject",
+    "Content": "Test content"
+}

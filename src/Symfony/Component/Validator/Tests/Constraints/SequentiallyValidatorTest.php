@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Validation;
 
 class SequentiallyValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): SequentiallyValidator
     {
         return new SequentiallyValidator();
     }

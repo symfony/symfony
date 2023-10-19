@@ -47,11 +47,13 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
     use HttpClientTrait;
     use LoggerAwareTrait;
 
-    private $defaultOptions = self::OPTIONS_DEFAULTS;
-    private static $emptyDefaults = self::OPTIONS_DEFAULTS;
+    public const OPTIONS_DEFAULTS = HttpClientInterface::OPTIONS_DEFAULTS + [
+        'crypto_method' => \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+    ];
 
-    /** @var AmpClientState */
-    private $multi;
+    private array $defaultOptions = self::OPTIONS_DEFAULTS;
+    private static array $emptyDefaults = self::OPTIONS_DEFAULTS;
+    private AmpClientState $multi;
 
     /**
      * @param array         $defaultOptions     Default requests' options
@@ -64,7 +66,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
      */
     public function __construct(array $defaultOptions = [], callable $clientConfigurator = null, int $maxHostConnections = 6, int $maxPendingPushes = 50)
     {
-        $this->defaultOptions['buffer'] = $this->defaultOptions['buffer'] ?? \Closure::fromCallable([__CLASS__, 'shouldBuffer']);
+        $this->defaultOptions['buffer'] ??= self::shouldBuffer(...);
 
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);
@@ -75,8 +77,6 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
 
     /**
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
-     *
-     * {@inheritdoc}
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
@@ -89,10 +89,10 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         }
 
         if ($options['bindto']) {
-            if (0 === strpos($options['bindto'], 'if!')) {
+            if (str_starts_with($options['bindto'], 'if!')) {
                 throw new TransportException(__CLASS__.' cannot bind to network interfaces, use e.g. CurlHttpClient instead.');
             }
-            if (0 === strpos($options['bindto'], 'host!')) {
+            if (str_starts_with($options['bindto'], 'host!')) {
                 $options['bindto'] = substr($options['bindto'], 5);
             }
         }
@@ -102,7 +102,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         }
 
         if (!isset($options['normalized_headers']['user-agent'])) {
-            $options['headers'][] = 'User-Agent: Symfony HttpClient/Amp';
+            $options['headers'][] = 'User-Agent: Symfony HttpClient (Amp)';
         }
 
         if (0 < $options['max_duration']) {
@@ -120,11 +120,11 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         $request = new Request(implode('', $url), $method);
 
         if ($options['http_version']) {
-            switch ((float) $options['http_version']) {
-                case 1.0: $request->setProtocolVersions(['1.0']); break;
-                case 1.1: $request->setProtocolVersions(['1.1', '1.0']); break;
-                default: $request->setProtocolVersions(['2', '1.1', '1.0']); break;
-            }
+            $request->setProtocolVersions(match ((float) $options['http_version']) {
+                1.0 => ['1.0'],
+                1.1 => ['1.1', '1.0'],
+                default => ['2', '1.1', '1.0'],
+            });
         }
 
         foreach ($options['headers'] as $v) {
@@ -148,21 +148,16 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         return new AmpResponse($this->multi, $request, $options, $this->logger);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof AmpResponse) {
             $responses = [$responses];
-        } elseif (!is_iterable($responses)) {
-            throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of AmpResponse objects, "%s" given.', __METHOD__, get_debug_type($responses)));
         }
 
         return new ResponseStream(AmpResponse::stream($responses, $timeout));
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->multi->dnsCache = [];
 
@@ -170,9 +165,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
             foreach ($pushedResponses as [$pushedUrl, $pushDeferred]) {
                 $pushDeferred->fail(new CancelledException());
 
-                if ($this->logger) {
-                    $this->logger->debug(sprintf('Unused pushed response: "%s"', $pushedUrl));
-                }
+                $this->logger?->debug(sprintf('Unused pushed response: "%s"', $pushedUrl));
             }
         }
 

@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures;
 
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/defaults', locale: 'g_locale', format: 'g_format')]
+#[Route(path: '/defaults', methods: ['GET'], schemes: ['https'], locale: 'g_locale', format: 'g_format')]
 class GlobalDefaultsClass
 {
     #[Route(path: '/specific-locale', name: 'specific_locale', locale: 's_locale')]
@@ -23,6 +23,16 @@ class GlobalDefaultsClass
 
     #[Route(path: '/specific-format', name: 'specific_format', format: 's_format')]
     public function format()
+    {
+    }
+
+    #[Route(path: '/redundant-method', name: 'redundant_method',  methods: ['GET'])]
+    public function redundantMethod()
+    {
+    }
+
+    #[Route(path: '/redundant-scheme', name: 'redundant_scheme', schemes: ['https'])]
+    public function redundantScheme()
     {
     }
 }

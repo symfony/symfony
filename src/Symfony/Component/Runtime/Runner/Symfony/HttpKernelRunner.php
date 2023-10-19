@@ -21,19 +21,17 @@ use Symfony\Component\Runtime\RunnerInterface;
  */
 class HttpKernelRunner implements RunnerInterface
 {
-    private $kernel;
-    private $request;
-
-    public function __construct(HttpKernelInterface $kernel, Request $request)
-    {
-        $this->kernel = $kernel;
-        $this->request = $request;
+    public function __construct(
+        private readonly HttpKernelInterface $kernel,
+        private readonly Request $request,
+        private readonly bool $debug = false,
+    ) {
     }
 
     public function run(): int
     {
         $response = $this->kernel->handle($this->request);
-        $response->send();
+        $response->send(!$this->debug);
 
         if ($this->kernel instanceof TerminableInterface) {
             $this->kernel->terminate($this->request, $response);

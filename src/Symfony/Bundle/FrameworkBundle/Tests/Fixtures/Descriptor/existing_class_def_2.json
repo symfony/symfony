@@ -7,6 +7,8 @@
     "abstract": false,
     "autowire": false,
     "autoconfigure": false,
+    "deprecated": false,
     "file": null,
-    "tags": []
+    "tags": [],
+    "usages": []
 }

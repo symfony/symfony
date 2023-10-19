@@ -11,12 +11,12 @@
 
 namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
+use Doctrine\Deprecations\Deprecation as DoctrineDeprecation;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Metadata\Api\Groups;
 use PHPUnit\Util\Test;
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
-use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 class_exists(Groups::class);
@@ -62,13 +62,22 @@ class Deprecation
      */
     public function __construct($message, array $trace, $file, $languageDeprecation = false)
     {
-        if (isset($trace[2]['class']) && \in_array($trace[2]['class'], [DebugClassLoader::class, LegacyDebugClassLoader::class], true)) {
+        if (DebugClassLoader::class === ($trace[2]['class'] ?? '')) {
             $this->triggeringClass = $trace[2]['args'][0];
         }
 
-        if (isset($trace[2]['function']) && 'trigger_deprecation' === $trace[2]['function']) {
-            $file = $trace[2]['file'];
-            array_splice($trace, 1, 1);
+        switch ($trace[2]['function'] ?? '') {
+            case 'trigger_deprecation':
+                $file = $trace[2]['file'];
+                array_splice($trace, 1, 1);
+                break;
+
+            case 'delegateTriggerToBackend':
+                if (DoctrineDeprecation::class === ($trace[2]['class'] ?? '')) {
+                    $file = $trace[3]['file'];
+                    array_splice($trace, 1, 2);
+                }
+                break;
         }
 
         $this->trace = $trace;
@@ -89,7 +98,7 @@ class Deprecation
             }
 
             if ('trigger_error' === $trace[$j]['function'] && !isset($trace[$j]['class'])) {
-                if (\in_array($trace[1 + $j]['class'], [DebugClassLoader::class, LegacyDebugClassLoader::class], true)) {
+                if (DebugClassLoader::class === $trace[1 + $j]['class']) {
                     $class = $trace[1 + $j]['args'][0];
                     $this->triggeringFile = isset($trace[1 + $j]['args'][1]) ? realpath($trace[1 + $j]['args'][1]) : (new \ReflectionClass($class))->getFileName();
                     $this->getOriginalFilesStack();
@@ -356,9 +365,6 @@ class Deprecation
             if (class_exists(DebugClassLoader::class, false)) {
                 self::$vendors[] = \dirname((new \ReflectionClass(DebugClassLoader::class))->getFileName());
             }
-            if (class_exists(LegacyDebugClassLoader::class, false)) {
-                self::$vendors[] = \dirname((new \ReflectionClass(LegacyDebugClassLoader::class))->getFileName());
-            }
             foreach (get_declared_classes() as $class) {
                 if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
                     $r = new \ReflectionClass($class);
@@ -385,7 +391,7 @@ class Deprecation
         return self::$vendors;
     }
 
-    private static function addSourcePathsFromPrefixes(array $prefixesByNamespace, array $paths)
+    private static function addSourcePathsFromPrefixes(array $prefixesByNamespace, array $paths): array
     {
         foreach ($prefixesByNamespace as $prefixes) {
             foreach ($prefixes as $prefix) {

@@ -21,9 +21,9 @@ use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
  */
 class Compiler
 {
-    private $passConfig;
-    private $log = [];
-    private $serviceReferenceGraph;
+    private PassConfig $passConfig;
+    private array $log = [];
+    private ServiceReferenceGraph $serviceReferenceGraph;
 
     public function __construct()
     {
@@ -31,22 +31,19 @@ class Compiler
         $this->serviceReferenceGraph = new ServiceReferenceGraph();
     }
 
-    /**
-     * @return PassConfig
-     */
-    public function getPassConfig()
+    public function getPassConfig(): PassConfig
     {
         return $this->passConfig;
     }
 
-    /**
-     * @return ServiceReferenceGraph
-     */
-    public function getServiceReferenceGraph()
+    public function getServiceReferenceGraph(): ServiceReferenceGraph
     {
         return $this->serviceReferenceGraph;
     }
 
+    /**
+     * @return void
+     */
     public function addPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
         $this->passConfig->addPass($pass, $type, $priority);
@@ -54,26 +51,27 @@ class Compiler
 
     /**
      * @final
+     *
+     * @return void
      */
     public function log(CompilerPassInterface $pass, string $message)
     {
         if (str_contains($message, "\n")) {
-            $message = str_replace("\n", "\n".\get_class($pass).': ', trim($message));
+            $message = str_replace("\n", "\n".$pass::class.': ', trim($message));
         }
 
-        $this->log[] = \get_class($pass).': '.$message;
+        $this->log[] = $pass::class.': '.$message;
     }
 
-    /**
-     * @return array
-     */
-    public function getLog()
+    public function getLog(): array
     {
         return $this->log;
     }
 
     /**
      * Run the Compiler and process all Passes.
+     *
+     * @return void
      */
     public function compile(ContainerBuilder $container)
     {
@@ -90,7 +88,6 @@ class Compiler
 
                 if ($msg !== $resolvedMsg = $container->resolveEnvPlaceholders($msg, null, $usedEnvs)) {
                     $r = new \ReflectionProperty($prev, 'message');
-                    $r->setAccessible(true);
                     $r->setValue($prev, $resolvedMsg);
                 }
             } while ($prev = $prev->getPrevious());

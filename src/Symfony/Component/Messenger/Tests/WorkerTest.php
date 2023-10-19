@@ -12,13 +12,16 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
@@ -41,7 +44,8 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -67,10 +71,25 @@ class WorkerTest extends TestCase
                 return $envelopes[] = $envelope;
             });
 
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+        $dispatcher = new class() implements EventDispatcherInterface {
+            private StopWorkerOnMessageLimitListener $listener;
 
-        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
+            public function __construct()
+            {
+                $this->listener = new StopWorkerOnMessageLimitListener(2);
+            }
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerRunningEvent) {
+                    $this->listener->onWorkerRunning($event);
+                }
+
+                return $event;
+            }
+        };
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
 
         $this->assertSame($apiMessage, $envelopes[0]->getMessage());
@@ -94,7 +113,7 @@ class WorkerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
-        $worker = new Worker(['transport1' => $receiver], $bus, $dispatcher);
+        $worker = new Worker(['transport1' => $receiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
 
         $this->assertSame(1, $receiver->getRejectCount());
@@ -109,7 +128,7 @@ class WorkerTest extends TestCase
         $dispatcher->addSubscriber(new ResetServicesListener(new ServicesResetter(new \ArrayIterator([$resettableReceiver]), ['reset'])));
 
         $bus = $this->createMock(MessageBusInterface::class);
-        $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
+        $worker = new Worker([$resettableReceiver], $bus, $dispatcher, clock: new MockClock());
         $worker->stop();
         $worker->run();
         $this->assertTrue($resettableReceiver->hasBeenReset());
@@ -127,7 +146,7 @@ class WorkerTest extends TestCase
         });
 
         $bus = $this->createMock(MessageBusInterface::class);
-        $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
+        $worker = new Worker([$resettableReceiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
         $this->assertTrue($resettableReceiver->hasBeenReset());
     }
@@ -144,7 +163,7 @@ class WorkerTest extends TestCase
             $event->getWorker()->stop();
         });
 
-        $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
+        $worker = new Worker([$resettableReceiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
         $this->assertFalse($resettableReceiver->hasBeenReset());
     }
@@ -163,7 +182,7 @@ class WorkerTest extends TestCase
             $event->getWorker()->stop();
         });
 
-        $worker = new Worker([$receiver], $bus, $dispatcher);
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
     }
 
@@ -197,7 +216,26 @@ class WorkerTest extends TestCase
                 return $event;
             });
 
-        $worker = new Worker([$receiver], $bus, $eventDispatcher);
+        $worker = new Worker([$receiver], $bus, $eventDispatcher, clock: new MockClock());
+        $worker->run();
+    }
+
+    public function testWorkerWithoutDispatcher()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $worker = new Worker([$receiver], $bus, clock: new MockClock());
+
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->willReturnCallback(static function () use ($worker, $envelope) {
+                $worker->stop();
+
+                return $envelope;
+            });
+
         $worker->run();
     }
 
@@ -232,7 +270,7 @@ class WorkerTest extends TestCase
                 return $event;
             });
 
-        $worker = new Worker([$receiver], $bus, $eventDispatcher);
+        $worker = new Worker([$receiver], $bus, $eventDispatcher, clock: new MockClock());
         $worker->run();
     }
 
@@ -249,7 +287,7 @@ class WorkerTest extends TestCase
             $event->getWorker()->stop();
         });
 
-        $worker = new Worker(['dummyReceiver' => $receiver], $bus, $dispatcher);
+        $worker = new Worker(['dummyReceiver' => $receiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run(['queues' => ['queue1', 'queue2']]);
 
         $workerMetadata = $worker->getMetadata();
@@ -276,16 +314,10 @@ class WorkerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(5));
 
-        $worker = new Worker([$receiver], $bus, $dispatcher);
-        $startTime = microtime(true);
-        // sleep .1 after each idle
-        $worker->run(['sleep' => 100000]);
-
-        $duration = microtime(true) - $startTime;
-        // wait time should be .3 seconds
-        // use .29 & .31 for timing "wiggle room"
-        $this->assertGreaterThanOrEqual(.29, $duration);
-        $this->assertLessThan(.31, $duration);
+        $clock = new MockClock('2023-03-19 14:00:00+00:00');
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: $clock);
+        $worker->run(['sleep' => 1000000]);
+        $this->assertEquals(new \DateTimeImmutable('2023-03-19 14:00:03+00:00'), $clock->now());
     }
 
     public function testWorkerWithMultipleReceivers()
@@ -331,7 +363,7 @@ class WorkerTest extends TestCase
         $dispatcher->addListener(WorkerMessageReceivedEvent::class, function (WorkerMessageReceivedEvent $event) use (&$processedEnvelopes) {
             $processedEnvelopes[] = $event->getEnvelope();
         });
-        $worker = new Worker([$receiver1, $receiver2, $receiver3], $bus, $dispatcher);
+        $worker = new Worker([$receiver1, $receiver2, $receiver3], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
 
         // make sure they were processed in the correct order
@@ -356,7 +388,7 @@ class WorkerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
-        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run(['queues' => ['foo']]);
     }
 
@@ -367,7 +399,7 @@ class WorkerTest extends TestCase
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
-        $worker = new Worker(['transport1' => $receiver1, 'transport2' => $receiver2], $bus);
+        $worker = new Worker(['transport1' => $receiver1, 'transport2' => $receiver2], $bus, clock: new MockClock());
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf('Receiver for "transport2" does not implement "%s".', QueueReceiverInterface::class));
         $worker->run(['queues' => ['foo']]);
@@ -392,11 +424,46 @@ class WorkerTest extends TestCase
 
         $eventDispatcher->addListener(WorkerMessageReceivedEvent::class, $listener);
 
-        $worker = new Worker([$receiver], $bus, $eventDispatcher);
+        $worker = new Worker([$receiver], $bus, $eventDispatcher, clock: new MockClock());
         $worker->run();
 
         $envelope = current($receiver->getAcknowledgedEnvelopes());
-        $this->assertCount(1, $envelope->all(\get_class($stamp)));
+        $this->assertCount(1, $envelope->all($stamp::class));
+    }
+
+    public function testWorkerRateLimitMessages()
+    {
+        $envelope = [
+            new Envelope(new DummyMessage('message1')),
+            new Envelope(new DummyMessage('message2')),
+        ];
+        $receiver = new DummyReceiver([$envelope]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->method('dispatch')->willReturnArgument(0);
+
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+
+        $rateLimitCount = 0;
+        $listener = function (WorkerRateLimitedEvent $event) use (&$rateLimitCount) {
+            ++$rateLimitCount;
+            $event->getLimiter()->reset(); // Reset limiter to continue test
+        };
+        $eventDispatcher->addListener(WorkerRateLimitedEvent::class, $listener);
+
+        $rateLimitFactory = new RateLimiterFactory([
+            'id' => 'bus',
+            'policy' => 'fixed_window',
+            'limit' => 1,
+            'interval' => '1 minute',
+        ], new InMemoryStorage());
+
+        $worker = new Worker(['bus' => $receiver], $bus, $eventDispatcher, null, ['bus' => $rateLimitFactory], new MockClock());
+        $worker->run();
+
+        $this->assertCount(2, $receiver->getAcknowledgedEnvelopes());
+        $this->assertEquals(1, $rateLimitCount);
     }
 
     public function testWorkerShouldLogOnStop()
@@ -404,7 +471,7 @@ class WorkerTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('info')->with('Stopping worker.');
-        $worker = new Worker([], $bus, new EventDispatcher(), $logger);
+        $worker = new Worker([], $bus, new EventDispatcher(), $logger, clock: new MockClock());
 
         $worker->stop();
     }
@@ -440,7 +507,7 @@ class WorkerTest extends TestCase
             }
         });
 
-        $worker = new Worker([$receiver], $bus, $dispatcher);
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
@@ -476,7 +543,7 @@ class WorkerTest extends TestCase
             }
         });
 
-        $worker = new Worker([$receiver], $bus, $dispatcher);
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
@@ -506,7 +573,7 @@ class WorkerTest extends TestCase
             $this->assertSame(0, $receiver->getAcknowledgeCount());
         });
 
-        $worker = new Worker([$receiver], $bus, $dispatcher);
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
@@ -515,11 +582,11 @@ class WorkerTest extends TestCase
 
 class DummyReceiver implements ReceiverInterface
 {
-    private $deliveriesOfEnvelopes;
-    private $acknowledgedEnvelopes;
-    private $rejectedEnvelopes;
-    private $acknowledgeCount = 0;
-    private $rejectCount = 0;
+    private array $deliveriesOfEnvelopes;
+    private array $acknowledgedEnvelopes = [];
+    private array $rejectedEnvelopes = [];
+    private int $acknowledgeCount = 0;
+    private int $rejectCount = 0;
 
     /**
      * @param Envelope[][] $deliveriesOfEnvelopes
@@ -576,14 +643,14 @@ class DummyBatchHandler implements BatchHandlerInterface
 {
     use BatchHandlerTrait;
 
-    public $processedMessages;
+    public array $processedMessages;
 
     public function __invoke(DummyMessage $message, Acknowledger $ack = null)
     {
         return $this->handle($message, $ack);
     }
 
-    private function shouldFlush()
+    private function shouldFlush(): bool
     {
         return 2 <= \count($this->jobs);
     }
@@ -600,9 +667,9 @@ class DummyBatchHandler implements BatchHandlerInterface
 
 class ResettableDummyReceiver extends DummyReceiver implements ResetInterface
 {
-    private $hasBeenReset = false;
+    private bool $hasBeenReset = false;
 
-    public function reset()
+    public function reset(): void
     {
         $this->hasBeenReset = true;
     }

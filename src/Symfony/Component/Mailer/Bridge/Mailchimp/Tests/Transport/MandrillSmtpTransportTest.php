@@ -30,7 +30,6 @@ class MandrillSmtpTransportTest extends TestCase
 
         $transport = new MandrillSmtpTransport('user', 'password');
         $method = new \ReflectionMethod(MandrillSmtpTransport::class, 'addMandrillHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(3, $email->getHeaders()->toArray());

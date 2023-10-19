@@ -19,12 +19,15 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
@@ -32,7 +35,13 @@ class ConfigurationTest extends TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [['secret' => 's3cr3t']]);
+        $config = $processor->processConfiguration(new Configuration(true), [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'secret' => 's3cr3t',
+            'serializer' => ['default_context' => ['foo' => 'bar']],
+        ]]);
 
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
@@ -56,7 +65,12 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $processor->processConfiguration(
             new Configuration(true),
-            [['session' => ['name' => $sessionName]]]
+            [[
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'session' => ['name' => $sessionName, 'cookie_secure' => 'auto', 'cookie_samesite' => 'lax'],
+            ]]
         );
     }
 
@@ -76,7 +90,12 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [['assets' => null]]);
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'assets' => null,
+        ]]);
 
         $defaultConfig = [
             'enabled' => true,
@@ -93,6 +112,34 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($defaultConfig, $config['assets']);
     }
 
+    public function testAssetMapperCanBeEnabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'asset_mapper' => null,
+        ]]);
+
+        $defaultConfig = [
+            'enabled' => true,
+            'paths' => [],
+            'excluded_patterns' => [],
+            'server' => true,
+            'public_prefix' => '/assets/',
+            'missing_import_mode' => 'warn',
+            'extensions' => [],
+            'importmap_path' => '%kernel.project_dir%/importmap.php',
+            'importmap_polyfill' => 'es-module-shims',
+            'vendor_dir' => '%kernel.project_dir%/assets/vendor',
+            'importmap_script_attributes' => [],
+        ];
+
+        $this->assertEquals($defaultConfig, $config['asset_mapper']);
+    }
+
     /**
      * @dataProvider provideValidAssetsPackageNameConfigurationTests
      */
@@ -102,6 +149,9 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'assets' => [
                     'packages' => [
                         $packageName => [],
@@ -134,6 +184,9 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, [
                 [
+                    'http_method_override' => false,
+                    'handle_all_throwables' => true,
+                    'php_errors' => ['log' => true],
                     'assets' => $assetConfig,
                 ],
             ]);
@@ -142,15 +195,13 @@ class ConfigurationTest extends TestCase
     public static function provideInvalidAssetConfigurationTests()
     {
         // helper to turn config into embedded package config
-        $createPackageConfig = function (array $packageConfig) {
-            return [
-                'base_urls' => '//example.com',
-                'version' => 1,
-                'packages' => [
-                    'foo' => $packageConfig,
-                ],
-            ];
-        };
+        $createPackageConfig = fn (array $packageConfig) => [
+            'base_urls' => '//example.com',
+            'version' => 1,
+            'packages' => [
+                'foo' => $packageConfig,
+            ],
+        ];
 
         $config = [
             'version' => 1,
@@ -183,6 +234,9 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => $lockConfig,
             ],
         ]);
@@ -243,11 +297,17 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => [
                     'payload' => 'flock',
                 ],
             ],
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => [
                     'payload' => 'semaphore',
                 ],
@@ -265,6 +325,60 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider provideValidSemaphoreConfigurationTests
+     */
+    public function testValidSemaphoreConfiguration($semaphoreConfig, $processedConfig)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'semaphore' => $semaphoreConfig,
+            ],
+        ]);
+
+        $this->assertArrayHasKey('semaphore', $config);
+
+        $this->assertEquals($processedConfig, $config['semaphore']);
+    }
+
+    public static function provideValidSemaphoreConfigurationTests()
+    {
+        yield [null, ['enabled' => true, 'resources' => []]];
+
+        yield ['redis://default', ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+        yield [['foo' => 'redis://foo', 'bar' => 'redis://bar'], ['enabled' => true, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['default' => 'redis://default'], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+
+        yield [['enabled' => false, 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+        yield [['enabled' => false, 'foo' => 'redis://foo', 'bar' => 'redis://bar'], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['enabled' => false, 'default' => 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+
+        yield [['resources' => 'redis://default'], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+        yield [['resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']], ['enabled' => true, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['resources' => ['default' => 'redis://default']], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+
+        yield [['enabled' => false, 'resources' => 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+        yield [['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['enabled' => false, 'resources' => ['default' => 'redis://default']], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+
+        // xml
+
+        yield [['resource' => ['redis://default']], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+        yield [['resource' => ['redis://default', ['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['default' => 'redis://default', 'foo' => 'redis://default']]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['foo' => 'redis://default']]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'redis://default'], ['name' => 'bar', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['foo' => 'redis://default', 'bar' => 'redis://default']]];
+
+        yield [['enabled' => false, 'resource' => ['redis://default']], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+        yield [['enabled' => false, 'resource' => ['redis://default', ['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['default' => 'redis://default', 'foo' => 'redis://default']]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['foo' => 'redis://default']]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://foo'], ['name' => 'bar', 'value' => 'redis://bar']]], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+    }
+
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
@@ -275,6 +389,9 @@ class ConfigurationTest extends TestCase
 
         $processor->processConfiguration($configuration, [
             'framework' => [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => null,
                     'buses' => [
@@ -292,6 +409,9 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => 'existing_bus',
                     'buses' => [
@@ -306,6 +426,9 @@ class ConfigurationTest extends TestCase
                 ],
             ],
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'buses' => [
                         'common_bus' => [
@@ -322,19 +445,19 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(
             [
                 'existing_bus' => [
-                    'default_middleware' => true,
+                    'default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'existing_bus.middleware', 'arguments' => []],
                     ],
                 ],
                 'common_bus' => [
-                    'default_middleware' => false,
+                    'default_middleware' => ['enabled' => false, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'common_bus.new_middleware', 'arguments' => []],
                     ],
                 ],
                 'new_bus' => [
-                    'default_middleware' => true,
+                    'default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'new_bus.middleware', 'arguments' => []],
                     ],
@@ -354,6 +477,9 @@ class ConfigurationTest extends TestCase
 
         $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => 'foo',
                     'buses' => [
@@ -371,7 +497,12 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
 
         $config = $processor->processConfiguration($configuration, [
-            ['lock' => ['enabled' => false]],
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'lock' => ['enabled' => false],
+            ],
         ]);
 
         $this->assertFalse($config['lock']['enabled']);
@@ -386,15 +517,22 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
 
         $processor->processConfiguration($configuration, [
-            ['lock' => ['enabled' => true]],
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'lock' => ['enabled' => true],
+            ],
         ]);
     }
 
     protected static function getBundleDefaultConfig()
     {
         return [
-            'http_method_override' => true,
-            'ide' => null,
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'trust_x_sendfile_type_header' => false,
+            'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',
             'enabled_locales' => [],
             'set_locale_from_accept_language' => false,
@@ -415,7 +553,6 @@ class ConfigurationTest extends TestCase
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
                 ],
-                'legacy_error_messages' => true,
             ],
             'esi' => ['enabled' => false],
             'ssi' => ['enabled' => false],
@@ -427,11 +564,11 @@ class ConfigurationTest extends TestCase
             'profiler' => [
                 'enabled' => false,
                 'only_exceptions' => false,
-                'only_master_requests' => false,
                 'only_main_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
                 'collect_parameter' => null,
+                'collect_serializer_data' => false,
             ],
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -441,7 +578,6 @@ class ConfigurationTest extends TestCase
                 'formatter' => 'translator.formatter.default',
                 'paths' => [],
                 'default_path' => '%kernel.project_dir%/translations',
-                'enabled_locales' => [],
                 'pseudo_localization' => [
                     'enabled' => false,
                     'accents' => true,
@@ -454,7 +590,7 @@ class ConfigurationTest extends TestCase
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),
-                'enable_annotations' => !class_exists(FullStack::class),
+                'enable_attributes' => !class_exists(FullStack::class),
                 'static_method' => ['loadValidatorMetadata'],
                 'translation_domain' => 'validators',
                 'mapping' => [
@@ -473,9 +609,9 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'serializer' => [
-                'default_context' => [],
-                'enabled' => !class_exists(FullStack::class),
-                'enable_annotations' => !class_exists(FullStack::class),
+                'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
+                'enabled' => true,
+                'enable_attributes' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
             ],
             'property_access' => [
@@ -495,12 +631,12 @@ class ConfigurationTest extends TestCase
                 'http_port' => 80,
                 'https_port' => 443,
                 'strict_requirements' => true,
-                'utf8' => null,
+                'utf8' => true,
+                'cache_dir' => '%kernel.cache_dir%',
             ],
             'session' => [
                 'enabled' => false,
-                'storage_id' => 'session.storage.native',
-                'storage_factory_id' => null,
+                'storage_factory_id' => 'session.storage.factory.native',
                 'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
                 'cookie_samesite' => null,
@@ -522,6 +658,19 @@ class ConfigurationTest extends TestCase
                 'packages' => [],
                 'json_manifest_path' => null,
                 'strict_mode' => false,
+            ],
+            'asset_mapper' => [
+                'enabled' => !class_exists(FullStack::class),
+                'paths' => [],
+                'excluded_patterns' => [],
+                'server' => true,
+                'public_prefix' => '/assets/',
+                'missing_import_mode' => 'warn',
+                'extensions' => [],
+                'importmap_path' => '%kernel.project_dir%/importmap.php',
+                'importmap_polyfill' => 'es-module-shims',
+                'vendor_dir' => '%kernel.project_dir%/assets/vendor',
+                'importmap_script_attributes' => [],
             ],
             'cache' => [
                 'pools' => [],
@@ -553,6 +702,11 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
             ],
+            'semaphore' => [
+                'enabled' => !class_exists(FullStack::class),
+                'resources' => [
+                ],
+            ],
             'messenger' => [
                 'enabled' => !class_exists(FullStack::class) && interface_exists(MessageBusInterface::class),
                 'routing' => [],
@@ -566,8 +720,9 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
                 'default_bus' => null,
-                'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
-                'reset_on_message' => null,
+                'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
+                'reset_on_message' => true,
+                'stop_worker_on_signals' => [],
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [
@@ -583,6 +738,7 @@ class ConfigurationTest extends TestCase
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
+                'message_bus' => null,
                 'chatter_transports' => [],
                 'texter_transports' => [],
                 'channel_policy' => [],
@@ -600,6 +756,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'debug' => '%kernel.debug%',
                 'private_headers' => [],
+                'skip_response_headers' => [],
             ],
             'rate_limiter' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class),
@@ -611,7 +768,22 @@ class ConfigurationTest extends TestCase
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 6,
             ],
+            'html_sanitizer' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),
+                'sanitizers' => [],
+            ],
+            'scheduler' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(SchedulerTransportFactory::class),
+            ],
             'exceptions' => [],
+            'webhook' => [
+                'enabled' => false,
+                'routing' => [],
+                'message_bus' => 'messenger.default_bus',
+            ],
+            'remote-event' => [
+                'enabled' => false,
+            ],
         ];
     }
 }

@@ -24,13 +24,10 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TokenStorage implements TokenStorageInterface, ResetInterface
 {
-    private $token;
-    private $initializer;
+    private ?TokenInterface $token = null;
+    private ?\Closure $initializer = null;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         if ($initializer = $this->initializer) {
             $this->initializer = null;
@@ -41,18 +38,17 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function setToken(TokenInterface $token = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/security-core', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
+
         if ($token) {
             // ensure any initializer is called
             $this->getToken();
-
-            // @deprecated since Symfony 5.3
-            if (!method_exists($token, 'getUserIdentifier')) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "getUserIdentifier(): string" in token class "%s" is deprecated. This method will replace "getUsername()" in Symfony 6.0.', get_debug_type($token));
-            }
         }
 
         $this->initializer = null;
@@ -61,9 +57,12 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
 
     public function setInitializer(?callable $initializer): void
     {
-        $this->initializer = $initializer;
+        $this->initializer = null === $initializer ? null : $initializer(...);
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->setToken(null);

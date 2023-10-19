@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests\SupportStrategy;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
 use Symfony\Component\Workflow\Workflow;
@@ -31,7 +32,7 @@ class InstanceOfSupportStrategyTest extends TestCase
         $this->assertFalse($strategy->supports($this->createWorkflow(), new Subject1()));
     }
 
-    private function createWorkflow()
+    private function createWorkflow(): MockObject&Workflow
     {
         return $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()

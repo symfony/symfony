@@ -29,7 +29,7 @@ class WeekType extends AbstractType
     ];
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -84,7 +84,7 @@ class WeekType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -96,19 +96,15 @@ class WeekType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $compound = function (Options $options) {
-            return 'single_text' !== $options['widget'];
-        };
+        $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 
-        $placeholderDefault = function (Options $options) {
-            return $options['required'] ? null : '';
-        };
+        $placeholderDefault = static fn (Options $options) => $options['required'] ? null : '';
 
-        $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
+        $placeholderNormalizer = static function (Options $options, $placeholder) use ($placeholderDefault) {
             if (\is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
@@ -124,7 +120,7 @@ class WeekType extends AbstractType
             ];
         };
 
-        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+        $choiceTranslationDomainNormalizer = static function (Options $options, $choiceTranslationDomain) {
             if (\is_array($choiceTranslationDomain)) {
                 $default = false;
 
@@ -146,23 +142,17 @@ class WeekType extends AbstractType
             'widget' => 'single_text',
             'input' => 'array',
             'placeholder' => $placeholderDefault,
-            'html5' => static function (Options $options) {
-                return 'single_text' === $options['widget'];
-            },
+            'html5' => static fn (Options $options) => 'single_text' === $options['widget'],
             'error_bubbling' => false,
-            'empty_data' => function (Options $options) {
-                return $options['compound'] ? [] : '';
-            },
+            'empty_data' => static fn (Options $options) => $options['compound'] ? [] : '',
             'compound' => $compound,
             'choice_translation_domain' => false,
-            'invalid_message' => static function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true) ? $previousValue : 'Please enter a valid week.';
-            },
+            'invalid_message' => 'Please enter a valid week.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
-        $resolver->setNormalizer('html5', function (Options $options, $html5) {
+        $resolver->setNormalizer('html5', static function (Options $options, $html5) {
             if ($html5 && 'single_text' !== $options['widget']) {
                 throw new LogicException(sprintf('The "widget" option of "%s" must be set to "single_text" when the "html5" option is enabled.', self::class));
             }
@@ -185,10 +175,7 @@ class WeekType extends AbstractType
         $resolver->setAllowedTypes('weeks', 'int[]');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'week';
     }

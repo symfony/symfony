@@ -32,11 +32,48 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 {
-    private $tokenProvider;
-    private $tokenVerifier;
+    private TokenProviderInterface $tokenProvider;
+    private ?TokenVerifierInterface $tokenVerifier;
 
-    public function __construct(TokenProviderInterface $tokenProvider, string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null, TokenVerifierInterface $tokenVerifier = null)
+    /**
+     * @param UserProviderInterface       $userProvider
+     * @param RequestStack                $requestStack
+     * @param array                       $options
+     * @param LoggerInterface|null        $logger
+     * @param TokenVerifierInterface|null $tokenVerifier
+     */
+    public function __construct(TokenProviderInterface $tokenProvider, #[\SensitiveParameter] $userProvider, $requestStack, $options, $logger = null, $tokenVerifier = null)
     {
+        if (\is_string($userProvider)) {
+            trigger_deprecation('symfony/security-http', '6.3', 'Calling "%s()" with the secret as the second argument is deprecated. The argument will be dropped in 7.0.', __CLASS__);
+
+            $userProvider = $requestStack;
+            $requestStack = $options;
+            $options = $logger;
+            $logger = $tokenVerifier;
+            $tokenVerifier = \func_num_args() > 6 ? func_get_arg(6) : null;
+        }
+
+        if (!$userProvider instanceof UserProviderInterface) {
+            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be an instance of "%s", "%s" given.', __CLASS__, UserProviderInterface::class, get_debug_type($userProvider)));
+        }
+
+        if (!$requestStack instanceof RequestStack) {
+            throw new \TypeError(sprintf('Argument 3 passed to "%s()" must be an instance of "%s", "%s" given.', __CLASS__, RequestStack::class, get_debug_type($userProvider)));
+        }
+
+        if (!\is_array($options)) {
+            throw new \TypeError(sprintf('Argument 4 passed to "%s()" must be an array, "%s" given.', __CLASS__, get_debug_type($userProvider)));
+        }
+
+        if (null !== $logger && !$logger instanceof LoggerInterface) {
+            throw new \TypeError(sprintf('Argument 5 passed to "%s()" must be an instance of "%s", "%s" given.', __CLASS__, LoggerInterface::class, get_debug_type($userProvider)));
+        }
+
+        if (null !== $tokenVerifier && !$tokenVerifier instanceof TokenVerifierInterface) {
+            throw new \TypeError(sprintf('Argument 6 passed to "%s()" must be an instance of "%s", "%s" given.', __CLASS__, TokenVerifierInterface::class, get_debug_type($userProvider)));
+        }
+
         parent::__construct($userProvider, $requestStack, $options, $logger);
 
         if (!$tokenVerifier && $tokenProvider instanceof TokenVerifierInterface) {
@@ -46,15 +83,12 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         $this->tokenVerifier = $tokenVerifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createRememberMeCookie(UserInterface $user): void
     {
         $series = random_bytes(66);
         $tokenValue = strtr(base64_encode(substr($series, 33)), '+/=', '-_~');
         $series = strtr(base64_encode(substr($series, 0, 33)), '+/=', '-_~');
-        $token = new PersistentToken(\get_class($user), method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), $series, $tokenValue, new \DateTime());
+        $token = new PersistentToken($user::class, $user->getUserIdentifier(), $series, $tokenValue, new \DateTimeImmutable());
 
         $this->tokenProvider->createNewToken($token);
         $this->createCookie(RememberMeDetails::fromPersistentToken($token, time() + $this->options['lifetime']));
@@ -88,7 +122,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
     public function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void
     {
         [$lastUsed, $series, $tokenValue, $class] = explode(':', $rememberMeDetails->getValue(), 4);
-        $persistentToken = new PersistentToken($class, $rememberMeDetails->getUserIdentifier(), $series, $tokenValue, new \DateTime('@'.$lastUsed));
+        $persistentToken = new PersistentToken($class, $rememberMeDetails->getUserIdentifier(), $series, $tokenValue, new \DateTimeImmutable('@'.$lastUsed));
 
         // if a token was regenerated less than a minute ago, there is no need to regenerate it
         // if multiple concurrent requests reauthenticate a user we do not want to update the token several times
@@ -98,17 +132,12 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 
         $tokenValue = strtr(base64_encode(random_bytes(33)), '+/=', '-_~');
         $tokenLastUsed = new \DateTime();
-        if ($this->tokenVerifier) {
-            $this->tokenVerifier->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
-        }
+        $this->tokenVerifier?->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
         $this->tokenProvider->updateToken($series, $tokenValue, $tokenLastUsed);
 
         $this->createCookie($rememberMeDetails->withValue($series.':'.$tokenValue));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearRememberMeCookie(): void
     {
         parent::clearRememberMeCookie();

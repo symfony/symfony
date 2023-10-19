@@ -24,40 +24,36 @@ interface SessionStorageInterface
     /**
      * Starts the session.
      *
-     * @return bool
-     *
      * @throws \RuntimeException if something goes wrong starting the session
      */
-    public function start();
+    public function start(): bool;
 
     /**
      * Checks if the session is started.
-     *
-     * @return bool
      */
-    public function isStarted();
+    public function isStarted(): bool;
 
     /**
      * Returns the session ID.
-     *
-     * @return string
      */
-    public function getId();
+    public function getId(): string;
 
     /**
      * Sets the session ID.
+     *
+     * @return void
      */
     public function setId(string $id);
 
     /**
      * Returns the session name.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Sets the session name.
+     *
+     * @return void
      */
     public function setName(string $name);
 
@@ -86,11 +82,9 @@ interface SessionStorageInterface
      *                           to expire with browser session. Time is in seconds, and is
      *                           not a Unix timestamp.
      *
-     * @return bool
-     *
      * @throws \RuntimeException If an error occurs while regenerating this storage
      */
-    public function regenerate(bool $destroy = false, int $lifetime = null);
+    public function regenerate(bool $destroy = false, int $lifetime = null): bool;
 
     /**
      * Force the session to be saved and closed.
@@ -100,6 +94,8 @@ interface SessionStorageInterface
      * a real PHP session would interfere with testing, in which case
      * it should actually persist the session data if required.
      *
+     * @return void
+     *
      * @throws \RuntimeException if the session is saved without being started, or if the session
      *                           is already closed
      */
@@ -107,25 +103,24 @@ interface SessionStorageInterface
 
     /**
      * Clear all session data in memory.
+     *
+     * @return void
      */
     public function clear();
 
     /**
      * Gets a SessionBagInterface by name.
      *
-     * @return SessionBagInterface
-     *
      * @throws \InvalidArgumentException If the bag does not exist
      */
-    public function getBag(string $name);
+    public function getBag(string $name): SessionBagInterface;
 
     /**
      * Registers a SessionBagInterface for use.
+     *
+     * @return void
      */
     public function registerBag(SessionBagInterface $bag);
 
-    /**
-     * @return MetadataBag
-     */
-    public function getMetadataBag();
+    public function getMetadataBag(): MetadataBag;
 }

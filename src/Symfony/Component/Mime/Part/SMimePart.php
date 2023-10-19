@@ -19,25 +19,16 @@ use Symfony\Component\Mime\Header\Headers;
 class SMimePart extends AbstractPart
 {
     /** @internal */
-    protected $_headers;
+    protected Headers $_headers;
 
-    private $body;
-    private $type;
-    private $subtype;
-    private $parameters;
+    private iterable|string $body;
+    private string $type;
+    private string $subtype;
+    private array $parameters;
 
-    /**
-     * @param iterable|string $body
-     */
-    public function __construct($body, string $type, string $subtype, array $parameters)
+    public function __construct(iterable|string $body, string $type, string $subtype, array $parameters)
     {
-        unset($this->_headers);
-
         parent::__construct();
-
-        if (!\is_string($body) && !is_iterable($body)) {
-            throw new \TypeError(sprintf('The body of "%s" must be a string or a iterable (got "%s").', self::class, get_debug_type($body)));
-        }
 
         $this->body = $body;
         $this->type = $type;
@@ -114,7 +105,6 @@ class SMimePart extends AbstractPart
     public function __wakeup(): void
     {
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');
-        $r->setAccessible(true);
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
     }

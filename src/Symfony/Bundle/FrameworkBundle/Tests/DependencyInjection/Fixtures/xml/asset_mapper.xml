@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config http-method-override="false" handle-all-throwables="true">
+        <framework:annotations enabled="false" />
+        <framework:php-errors log="true" />
+        <framework:asset-mapper
+            enabled="true"
+            server="true"
+            public-prefix="/assets_path/"
+            missing-import-mode="strict"
+            importmap-path="%kernel.project_dir%/importmap.php"
+            importmap-polyfill="https://cdn.example.com/polyfill.js"
+            vendor-dir="%kernel.project_dir%/assets/vendor"
+        >
+            <framework:path>assets/</framework:path>
+            <framework:path namespace="my_namespace">assets2/</framework:path>
+            <framework:excluded-pattern>*/assets/build/*</framework:excluded-pattern>
+            <framework:extension extension="zip">application/zip</framework:extension>
+            <framework:importmap-script-attribute key="data-turbo-track">reload</framework:importmap-script-attribute>
+        </framework:asset-mapper>
+    </framework:config>
+</container>

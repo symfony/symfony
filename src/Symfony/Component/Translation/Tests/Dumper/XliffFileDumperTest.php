@@ -128,4 +128,23 @@ class XliffFileDumperTest extends TestCase
             $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
         );
     }
+
+    public function testDumpCatalogueWithXliffExtension()
+    {
+        $catalogue = new MessageCatalogue('en_US');
+        $catalogue->add([
+            'foo' => 'bar',
+            'key' => '',
+            'key.with.cdata' => '<source> & <target>',
+        ]);
+        $catalogue->setMetadata('foo', ['notes' => [['priority' => 1, 'from' => 'bar', 'content' => 'baz']]]);
+        $catalogue->setMetadata('key', ['notes' => [['content' => 'baz'], ['content' => 'qux']]]);
+
+        $dumper = new XliffFileDumper('xliff');
+
+        $this->assertStringEqualsFile(
+            __DIR__.'/../fixtures/resources-clean.xliff',
+            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR'])
+        );
+    }
 }

@@ -14,15 +14,15 @@ namespace Symfony\Component\String\Resources;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\String\Exception\RuntimeException;
 use Symfony\Component\VarExporter\VarExporter;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @internal
  */
 final class WcswidthDataGenerator
 {
-    private $outDir;
-
-    private $client;
+    private string $outDir;
+    private HttpClientInterface $client;
 
     public function __construct(string $outDir)
     {
@@ -104,9 +104,7 @@ EOT;
             return [hexdec($start), hexdec($end)];
         }, $rawData);
 
-        usort($data, static function (array $a, array $b): int {
-            return $a[0] - $b[0];
-        });
+        usort($data, static fn (array $a, array $b): int => $a[0] - $b[0]);
 
         return $data;
     }

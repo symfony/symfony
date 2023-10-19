@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Relay\Relay;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
@@ -27,8 +28,8 @@ use Symfony\Component\Messenger\Transport\Serialization\Serializer;
  */
 class RedisExtIntegrationTest extends TestCase
 {
-    private $redis;
-    private $connection;
+    private \Redis|Relay|null $redis = null;
+    private ?Connection $connection = null;
 
     protected function setUp(): void
     {
@@ -37,8 +38,8 @@ class RedisExtIntegrationTest extends TestCase
         }
 
         try {
-            $this->redis = new \Redis();
-            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], $this->redis);
+            $this->redis = $this->createRedisClient();
+            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null], $this->redis);
             $this->connection->cleanup();
             $this->connection->setup();
         } catch (\Exception $e) {
@@ -146,7 +147,7 @@ class RedisExtIntegrationTest extends TestCase
     public function testConnectionBelowRedeliverTimeout()
     {
         // lower redeliver timeout and claim interval
-        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], $this->redis);
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null], $this->redis);
 
         $connection->cleanup();
         $connection->setup();
@@ -174,7 +175,8 @@ class RedisExtIntegrationTest extends TestCase
         // lower redeliver timeout and claim interval
         $connection = Connection::fromDsn(
             getenv('MESSENGER_REDIS_DSN'),
-            ['redeliver_timeout' => 0, 'claim_interval' => 500, 'delete_after_ack' => true],
+            ['redeliver_timeout' => 0, 'claim_interval' => 500, 'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null],
+
             $this->redis
         );
 
@@ -218,15 +220,60 @@ class RedisExtIntegrationTest extends TestCase
         $connection->ack($message['id']);
     }
 
+    public function testSentinel()
+    {
+        if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
+            $this->markTestSkipped('REDIS_SENTINEL_HOSTS env var is not defined.');
+        }
+
+        if (!getenv('MESSENGER_REDIS_SENTINEL_MASTER')) {
+            $this->markTestSkipped('MESSENGER_REDIS_SENTINEL_MASTER env var is not defined.');
+        }
+
+        $dsn = 'redis:?host['.str_replace(' ', ']&host[', $hosts).']';
+
+        $connection = Connection::fromDsn($dsn,
+            ['delete_after_ack' => true,
+             'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+            ], $this->redis);
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame([
+            'message' => json_encode([
+                'body' => '1',
+                'headers' => [],
+            ]),
+        ], $message['data']);
+        $connection->reject($message['id']);
+        $connection->cleanup();
+    }
+
+    public function testLazySentinel()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'),
+            ['lazy' => true,
+             'delete_after_ack' => true,
+             'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+            ], $this->redis);
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame([
+            'message' => json_encode([
+                'body' => '1',
+                'headers' => [],
+            ]),
+        ], $message['data']);
+        $connection->reject($message['id']);
+        $connection->cleanup();
+    }
+
     public function testLazyCluster()
     {
         $this->skipIfRedisClusterUnavailable();
 
-        $connection = new Connection(
-            ['lazy' => true],
-            ['host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))],
-            ['delete_after_ack' => true]
-        );
+        $connection = new Connection(['lazy' => true, 'host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))]);
 
         $connection->add('1', []);
         $this->assertNotEmpty($message = $connection->get());
@@ -242,8 +289,8 @@ class RedisExtIntegrationTest extends TestCase
 
     public function testLazy()
     {
-        $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', ['delete_after_ack' => true], $redis);
+        $redis = $this->createRedisClient();
+        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', [], $redis);
 
         $connection->add('1', []);
         $this->assertNotEmpty($message = $connection->get());
@@ -259,9 +306,9 @@ class RedisExtIntegrationTest extends TestCase
 
     public function testDbIndex()
     {
-        $redis = new \Redis();
+        $redis = $this->createRedisClient();
 
-        Connection::fromDsn('redis://localhost/queue?dbindex=2', ['delete_after_ack' => true], $redis);
+        Connection::fromDsn('redis://localhost/queue?dbindex=2', [], $redis);
 
         $this->assertSame(2, $redis->getDbNum());
     }
@@ -272,18 +319,16 @@ class RedisExtIntegrationTest extends TestCase
 
         $hosts = explode(' ', getenv('REDIS_CLUSTER_HOSTS'));
 
-        $dsn = array_map(function ($host) {
-            return 'redis://'.$host;
-        }, $hosts);
+        $dsn = array_map(fn ($host) => 'redis://'.$host, $hosts);
         $dsn = implode(',', $dsn);
 
-        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['delete_after_ack' => true]));
+        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null]));
     }
 
     public function testJsonError()
     {
-        $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/json-error', ['delete_after_ack' => true], $redis);
+        $redis = $this->createRedisClient();
+        $connection = Connection::fromDsn('redis://localhost/json-error', [], $redis);
         try {
             $connection->add("\xB1\x31", []);
         } catch (TransportException $e) {
@@ -294,9 +339,9 @@ class RedisExtIntegrationTest extends TestCase
 
     public function testGetNonBlocking()
     {
-        $redis = new \Redis();
+        $redis = $this->createRedisClient();
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['sentinel_master' => null], $redis);
 
         $this->assertNull($connection->get()); // no message, should return null immediately
         $connection->add('1', []);
@@ -307,8 +352,8 @@ class RedisExtIntegrationTest extends TestCase
 
     public function testGetAfterReject()
     {
-        $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true], $redis);
+        $redis = $this->createRedisClient();
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null], $redis);
 
         $connection->add('1', []);
         $connection->add('2', []);
@@ -316,7 +361,8 @@ class RedisExtIntegrationTest extends TestCase
         $failing = $connection->get();
         $connection->reject($failing['id']);
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true]);
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null]);
+
         $this->assertNotNull($connection->get());
 
         $redis->del('messenger-rejectthenget');
@@ -346,10 +392,30 @@ class RedisExtIntegrationTest extends TestCase
         $this->assertEquals('Hi2', $message->getMessage());
     }
 
+    public function testItCountMessages()
+    {
+        $this->assertSame(0, $this->connection->getMessageCount());
+
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
+
+        $this->assertSame(3, $this->connection->getMessageCount());
+
+        $message = $this->connection->get();
+        $this->connection->ack($message['id']);
+
+        $this->assertSame(2, $this->connection->getMessageCount());
+
+        $message = $this->connection->get();
+        $this->connection->reject($message['id']);
+
+        $this->assertSame(1, $this->connection->getMessageCount());
+    }
+
     private function getConnectionGroup(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('group');
-        $property->setAccessible(true);
 
         return $property->getValue($connection);
     }
@@ -357,7 +423,6 @@ class RedisExtIntegrationTest extends TestCase
     private function getConnectionStream(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('stream');
-        $property->setAccessible(true);
 
         return $property->getValue($connection);
     }
@@ -369,5 +434,10 @@ class RedisExtIntegrationTest extends TestCase
         } catch (\Exception $e) {
             self::markTestSkipped($e->getMessage());
         }
+    }
+
+    protected function createRedisClient(): \Redis|Relay
+    {
+        return new \Redis();
     }
 }

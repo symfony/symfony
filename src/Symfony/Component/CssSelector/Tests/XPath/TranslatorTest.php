@@ -219,6 +219,8 @@ HTML
             ['e + f', "e/following-sibling::*[(name() = 'f') and (position() = 1)]"],
             ['e ~ f', 'e/following-sibling::f'],
             ['div#container p', "div[@id = 'container']/descendant-or-self::*/p"],
+            [':scope > div[dataimg="<testmessage>"]', "*[1]/div[@dataimg = '<testmessage>']"],
+            [':scope', '*[1]'],
         ];
     }
 
@@ -411,6 +413,9 @@ HTML
             ['div[class|=dialog]', 50], // ? Seems right
             ['div[class!=madeup]', 243], // ? Seems right
             ['div[class~=dialog]', 51], // ? Seems right
+            [':scope > div', 1],
+            [':scope > div > div[class=dialog]', 1],
+            [':scope > div div', 242],
         ];
     }
 }

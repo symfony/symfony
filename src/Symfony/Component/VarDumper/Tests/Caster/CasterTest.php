@@ -22,7 +22,7 @@ class CasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    private static $referenceArray = [
+    private static array $referenceArray = [
         'null' => null,
         'empty' => false,
         'public' => 'pub',

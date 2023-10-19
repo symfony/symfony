@@ -12,11 +12,15 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +39,8 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class KernelTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected function tearDown(): void
     {
         try {
@@ -99,7 +105,7 @@ class KernelTest extends TestCase
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr(\get_class($kernel->getContainer()), 0, 16);
+        $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr($kernel->getContainer()::class, 0, 16);
         $this->assertTrue(unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta'));
         $this->assertFileExists($containerDir);
         $this->assertFileDoesNotExist($containerDir.'.legacy');
@@ -243,9 +249,13 @@ class KernelTest extends TestCase
 
     /**
      * @dataProvider getStripCommentsCodes
+     *
+     * @group legacy
      */
     public function testStripComments(string $source, string $expected)
     {
+        $this->expectDeprecation('Since symfony/http-kernel 6.4: Method "Symfony\Component\HttpKernel\Kernel::stripComments()" is deprecated without replacement.');
+
         $output = Kernel::stripComments($source);
 
         // Heredocs are preserved, making the output mixing Unix and Windows line
@@ -491,7 +501,7 @@ EOF
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerClass = \get_class($kernel->getContainer());
+        $containerClass = $kernel->getContainer()::class;
         $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
         unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
 
@@ -513,7 +523,7 @@ EOF
     public function testKernelExtension()
     {
         $kernel = new class() extends CustomProjectDirKernel implements ExtensionInterface {
-            public function load(array $configs, ContainerBuilder $container)
+            public function load(array $configs, ContainerBuilder $container): void
             {
                 $container->setParameter('test.extension-registered', true);
             }
@@ -523,10 +533,7 @@ EOF
                 return '';
             }
 
-            /**
-             * @return string|false
-             */
-            public function getXsdValidationBasePath()
+            public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }
@@ -555,6 +562,7 @@ EOF
         $kernel->boot();
 
         $this->assertTrue($kernel->warmedUp);
+        $this->assertSame($kernel->getBuildDir(), $kernel->warmedUpBuildDir);
     }
 
     public function testServicesResetter()
@@ -626,6 +634,45 @@ EOF
     }
 
     /**
+     * @group legacy
+     */
+    public function testKernelWithParameterDeprecation()
+    {
+        $kernel = new class('test', true) extends Kernel {
+            public function __construct(string $env, bool $debug)
+            {
+                $this->container = new ContainerBuilder(new ParameterBag(['container.dumper.inline_factories' => true, 'container.dumper.inline_class_loader' => true]));
+                parent::__construct($env, $debug);
+            }
+
+            public function registerBundles(): iterable
+            {
+                return [];
+            }
+
+            public function registerContainerConfiguration(LoaderInterface $loader): void
+            {
+            }
+
+            public function boot(): void
+            {
+                $this->container->compile();
+                parent::dumpContainer(new ConfigCache(tempnam(sys_get_temp_dir(), 'symfony-kernel-deprecated-parameter'), true), $this->container, Container::class, $this->getContainerBaseClass());
+            }
+
+            public function getContainerClass(): string
+            {
+                return parent::getContainerClass();
+            }
+        };
+
+        $this->expectDeprecation('Since symfony/http-kernel 6.3: Parameter "container.dumper.inline_factories" is deprecated, use ".container.dumper.inline_factories" instead.');
+        $this->expectDeprecation('Since symfony/http-kernel 6.3: Parameter "container.dumper.inline_class_loader" is deprecated, use ".container.dumper.inline_class_loader" instead.');
+
+        $kernel->boot();
+    }
+
+    /**
      * Returns a mock for the BundleInterface.
      */
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null): BundleInterface
@@ -645,7 +692,7 @@ EOF
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->willReturn($bundleName ?? \get_class($bundle))
+            ->willReturn($bundleName ?? $bundle::class)
         ;
 
         $bundle
@@ -689,9 +736,9 @@ EOF
 
 class TestKernel implements HttpKernelInterface
 {
-    public $terminateCalled = false;
+    public bool $terminateCalled = false;
 
-    public function terminate()
+    public function terminate(): void
     {
         $this->terminateCalled = true;
     }
@@ -708,17 +755,16 @@ class TestKernel implements HttpKernelInterface
 
 class CustomProjectDirKernel extends Kernel implements WarmableInterface
 {
-    public $warmedUp = false;
-    private $baseDir;
-    private $buildContainer;
-    private $httpKernel;
+    public bool $warmedUp = false;
 
-    public function __construct(\Closure $buildContainer = null, HttpKernelInterface $httpKernel = null, $env = 'custom')
-    {
+    public ?string $warmedUpBuildDir = null;
+
+    public function __construct(
+        private readonly ?\Closure $buildContainer = null,
+        private readonly ?HttpKernelInterface $httpKernel = null,
+        $env = 'custom',
+    ) {
         parent::__construct($env, true);
-
-        $this->buildContainer = $buildContainer;
-        $this->httpKernel = $httpKernel;
     }
 
     public function registerBundles(): iterable
@@ -726,7 +772,7 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return [];
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
 
@@ -735,14 +781,15 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return __DIR__.'/Fixtures';
     }
 
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, string $buildDir = null): array
     {
         $this->warmedUp = true;
+        $this->warmedUpBuildDir = $buildDir;
 
         return [];
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         if ($build = $this->buildContainer) {
             $build($container);
@@ -763,7 +810,7 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
         Kernel::__construct('pass', true);
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->setParameter('test.processed', true);
     }

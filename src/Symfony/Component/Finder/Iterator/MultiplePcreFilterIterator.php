@@ -27,9 +27,9 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
     protected $noMatchRegexps = [];
 
     /**
-     * @param \Iterator $iterator        The Iterator to filter
-     * @param string[]  $matchPatterns   An array of patterns that need to match
-     * @param string[]  $noMatchPatterns An array of patterns that need to not match
+     * @param \Iterator<TKey, TValue> $iterator        The Iterator to filter
+     * @param string[]                $matchPatterns   An array of patterns that need to match
+     * @param string[]                $noMatchPatterns An array of patterns that need to not match
      */
     public function __construct(\Iterator $iterator, array $matchPatterns, array $noMatchPatterns)
     {
@@ -50,10 +50,8 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
      * If there is no regexps defined in the class, this method will accept the string.
      * Such case can be handled by child classes before calling the method if they want to
      * apply a different behavior.
-     *
-     * @return bool
      */
-    protected function isAccepted(string $string)
+    protected function isAccepted(string $string): bool
     {
         // should at least not match one rule to exclude
         foreach ($this->noMatchRegexps as $regex) {
@@ -79,10 +77,8 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
 
     /**
      * Checks whether the string is a regex.
-     *
-     * @return bool
      */
-    protected function isRegex(string $str)
+    protected function isRegex(string $str): bool
     {
         $availableModifiers = 'imsxuADU';
 
@@ -110,8 +106,6 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
 
     /**
      * Converts string into regexp.
-     *
-     * @return string
      */
-    abstract protected function toRegex(string $str);
+    abstract protected function toRegex(string $str): string;
 }

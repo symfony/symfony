@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class LazyResponseException extends \Exception implements ExceptionInterface
 {
-    private $response;
+    private Response $response;
 
     public function __construct(Response $response)
     {

@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -27,9 +28,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class ChoiceValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Choice) {
             throw new UnexpectedTypeException($constraint, Choice::class);
@@ -60,12 +61,12 @@ class ChoiceValidator extends ConstraintValidator
         }
 
         if (true !== $constraint->strict) {
-            throw new \RuntimeException('The "strict" option of the Choice constraint should not be used.');
+            throw new RuntimeException('The "strict" option of the Choice constraint should not be used.');
         }
 
         if ($constraint->multiple) {
             foreach ($value as $_value) {
-                if (!\in_array($_value, $choices, true)) {
+                if ($constraint->match xor \in_array($_value, $choices, true)) {
                     $this->context->buildViolation($constraint->multipleMessage)
                         ->setParameter('{{ value }}', $this->formatValue($_value))
                         ->setParameter('{{ choices }}', $this->formatValues($choices))
@@ -98,7 +99,7 @@ class ChoiceValidator extends ConstraintValidator
 
                 return;
             }
-        } elseif (!\in_array($value, $choices, true)) {
+        } elseif ($constraint->match xor \in_array($value, $choices, true)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setParameter('{{ choices }}', $this->formatValues($choices))

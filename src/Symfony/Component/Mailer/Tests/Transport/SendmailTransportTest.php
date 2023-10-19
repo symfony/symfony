@@ -21,10 +21,7 @@ class SendmailTransportTest extends TestCase
 {
     private const FAKE_SENDMAIL = __DIR__.'/Fixtures/fake-sendmail.php -t';
 
-    /**
-     * @var string
-     */
-    private $argsPath;
+    private string $argsPath;
 
     protected function setUp(): void
     {

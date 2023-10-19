@@ -15,8 +15,12 @@ use Doctrine\DBAL\Logging\SQLLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
+trigger_deprecation('symfony/doctrine-bridge', '6.4', '"%s" is deprecated, use a middleware instead.', DbalLogger::class);
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use a middleware instead.
  */
 class DbalLogger implements SQLLogger
 {
@@ -32,36 +36,24 @@ class DbalLogger implements SQLLogger
         $this->stopwatch = $stopwatch;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return void
-     */
-    public function startQuery($sql, array $params = null, array $types = null)
+    public function startQuery($sql, array $params = null, array $types = null): void
     {
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->start('doctrine', 'doctrine');
-        }
+        $this->stopwatch?->start('doctrine', 'doctrine');
 
         if (null !== $this->logger) {
             $this->log($sql, null === $params ? [] : $this->normalizeParams($params));
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return void
-     */
-    public function stopQuery()
+    public function stopQuery(): void
     {
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->stop('doctrine');
-        }
+        $this->stopwatch?->stop('doctrine');
     }
 
     /**
      * Logs a message.
+     *
+     * @return void
      */
     protected function log(string $message, array $params)
     {

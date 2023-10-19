@@ -18,7 +18,7 @@ use Symfony\Component\RateLimiter\RateLimit;
  */
 class MaxWaitDurationExceededException extends \RuntimeException
 {
-    private $rateLimit;
+    private RateLimit $rateLimit;
 
     public function __construct(string $message, RateLimit $rateLimit, int $code = 0, \Throwable $previous = null)
     {

@@ -23,8 +23,8 @@ use Twig\TokenParser\TokenParserInterface;
  */
 final class StopwatchExtension extends AbstractExtension
 {
-    private $stopwatch;
-    private $enabled;
+    private ?Stopwatch $stopwatch;
+    private bool $enabled;
 
     public function __construct(Stopwatch $stopwatch = null, bool $enabled = true)
     {

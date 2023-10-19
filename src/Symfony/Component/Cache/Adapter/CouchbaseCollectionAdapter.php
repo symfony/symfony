@@ -29,9 +29,8 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
 {
     private const MAX_KEY_LENGTH = 250;
 
-    /** @var Collection */
-    private $connection;
-    private $marshaller;
+    private Collection $connection;
+    private MarshallerInterface $marshaller;
 
     public function __construct(Collection $connection, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
@@ -48,24 +47,17 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }
 
-    /**
-     * @param array|string $dsn
-     *
-     * @return Bucket|Collection
-     */
-    public static function createConnection($dsn, array $options = [])
+    public static function createConnection(#[\SensitiveParameter] array|string $dsn, array $options = []): Bucket|Collection
     {
         if (\is_string($dsn)) {
             $dsn = [$dsn];
-        } elseif (!\is_array($dsn)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be array or string, "%s" given.', __METHOD__, get_debug_type($dsn)));
         }
 
         if (!static::isSupported()) {
             throw new CacheException('Couchbase >= 3.0.0 < 4.0.0 is required.');
         }
 
-        set_error_handler(function ($type, $msg, $file, $line): bool { throw new \ErrorException($msg, 0, $type, $file, $line); });
+        set_error_handler(static fn ($type, $msg, $file, $line) => throw new \ErrorException($msg, 0, $type, $file, $line));
 
         $dsnPattern = '/^(?<protocol>couchbase(?:s)?)\:\/\/(?:(?<username>[^\:]+)\:(?<password>[^\@]{6,})@)?'
             .'(?<host>[^\:]+(?:\:\d+)?)(?:\/(?<bucketName>[^\/\?]+))(?:(?:\/(?<scopeName>[^\/]+))'
@@ -78,8 +70,8 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
             $password = $options['password'] ?? '';
 
             foreach ($dsn as $server) {
-                if (0 !== strpos($server, 'couchbase:')) {
-                    throw new InvalidArgumentException(sprintf('Invalid Couchbase DSN: "%s" does not start with "couchbase:".', $server));
+                if (!str_starts_with($server, 'couchbase:')) {
+                    throw new InvalidArgumentException('Invalid Couchbase DSN: it does not start with "couchbase:".');
                 }
 
                 preg_match($dsnPattern, $server, $matches);
@@ -139,16 +131,13 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         return $results;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids): array
     {
         $results = [];
         foreach ($ids as $id) {
             try {
                 $resultCouchbase = $this->connection->get($id);
-            } catch (DocumentNotFoundException $exception) {
+            } catch (DocumentNotFoundException) {
                 continue;
             }
 
@@ -160,25 +149,16 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         return $results;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave($id): bool
     {
         return $this->connection->exists($id)->exists();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear($namespace): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids): bool
     {
         $idsErrors = [];
@@ -189,17 +169,14 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
                 if (null === $result->mutationToken()) {
                     $idsErrors[] = $id;
                 }
-            } catch (DocumentNotFoundException $exception) {
+            } catch (DocumentNotFoundException) {
             }
         }
 
         return 0 === \count($idsErrors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doSave(array $values, $lifetime)
+    protected function doSave(array $values, $lifetime): array|bool
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;
@@ -212,7 +189,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         foreach ($values as $key => $value) {
             try {
                 $this->connection->upsert($key, $value, $upsertOptions);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 $ko[$key] = '';
             }
         }

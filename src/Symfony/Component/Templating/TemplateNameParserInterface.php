@@ -11,20 +11,20 @@
 
 namespace Symfony\Component\Templating;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', TemplateNameParserInterface::class);
+
 /**
  * TemplateNameParserInterface converts template names to TemplateReferenceInterface
  * instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 interface TemplateNameParserInterface
 {
     /**
      * Convert a template name to a TemplateReferenceInterface instance.
-     *
-     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
-     *
-     * @return TemplateReferenceInterface
      */
-    public function parse($name);
+    public function parse(string|TemplateReferenceInterface $name): TemplateReferenceInterface;
 }

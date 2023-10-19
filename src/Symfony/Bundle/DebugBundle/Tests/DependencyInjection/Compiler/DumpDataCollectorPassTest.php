@@ -17,6 +17,7 @@ use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 
 class DumpDataCollectorPassTest extends TestCase
 {
@@ -25,7 +26,7 @@ class DumpDataCollectorPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', [null, null, null, null]);
+        $definition = new Definition(DumpDataCollector::class, [null, null, null, null]);
         $container->setDefinition('data_collector.dump', $definition);
 
         $container->compile();
@@ -39,7 +40,7 @@ class DumpDataCollectorPassTest extends TestCase
         $container->addCompilerPass(new DumpDataCollectorPass());
         $requestStack = new RequestStack();
 
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', [null, null, null, $requestStack]);
+        $definition = new Definition(DumpDataCollector::class, [null, null, null, $requestStack]);
         $container->setDefinition('data_collector.dump', $definition);
         $container->setParameter('web_profiler.debug_toolbar.mode', WebDebugToolbarListener::ENABLED);
 
@@ -53,7 +54,7 @@ class DumpDataCollectorPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', [null, null, null, new RequestStack()]);
+        $definition = new Definition(DumpDataCollector::class, [null, null, null, new RequestStack()]);
         $container->setDefinition('data_collector.dump', $definition);
         $container->setParameter('web_profiler.debug_toolbar.mode', WebDebugToolbarListener::DISABLED);
 
@@ -67,7 +68,7 @@ class DumpDataCollectorPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', [null, null, null, new RequestStack()]);
+        $definition = new Definition(DumpDataCollector::class, [null, null, null, new RequestStack()]);
         $container->setDefinition('data_collector.dump', $definition);
 
         $container->compile();

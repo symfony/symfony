@@ -34,10 +34,7 @@ $container->set('session_factory', $sessionFactory);
 $listener = new SessionListener($container);
 
 $kernel = new class($r) implements HttpKernelInterface {
-    /**
-     * @var Response
-     */
-    private $response;
+    private Response $response;
 
     public function __construct(Response $response)
     {

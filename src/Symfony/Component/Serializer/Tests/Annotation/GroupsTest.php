@@ -26,24 +26,6 @@ class GroupsTest extends TestCase
         new Groups([]);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testEmptyGroupsParameterLegacy()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new Groups(['value' => []]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testNotAnArrayGroupsParameter()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new Groups(['value' => 12]);
-    }
-
     public function testInvalidGroupsParameter()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -58,29 +40,9 @@ class GroupsTest extends TestCase
         $this->assertEquals($validData, $groups->getGroups());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGroupsParametersLegacy()
-    {
-        $validData = ['a', 'b'];
-
-        $groups = new Groups(['value' => $validData]);
-        $this->assertEquals($validData, $groups->getGroups());
-    }
-
     public function testSingleGroup()
     {
         $groups = new Groups('a');
-        $this->assertEquals(['a'], $groups->getGroups());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSingleGroupLegacy()
-    {
-        $groups = new Groups(['value' => 'a']);
         $this->assertEquals(['a'], $groups->getGroups());
     }
 }

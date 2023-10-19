@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -242,17 +243,25 @@ class ApplicationTest extends TestCase
     {
         $container = $this->createMock(ContainerInterface::class);
 
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->expects($this->any())
+            ->method('push')
+        ;
+
         if ($useDispatcher) {
             $dispatcher = $this->createMock(EventDispatcherInterface::class);
             $dispatcher
                 ->expects($this->atLeastOnce())
                 ->method('dispatch')
             ;
-            $container
-                ->expects($this->atLeastOnce())
+
+            $container->expects($this->atLeastOnce())
                 ->method('get')
-                ->with($this->equalTo('event_dispatcher'))
-                ->willReturn($dispatcher);
+                ->willReturnMap([
+                    ['.virtual_request_stack', 2, $requestStack],
+                    ['event_dispatcher', 1, $dispatcher],
+                ])
+            ;
         }
 
         $container

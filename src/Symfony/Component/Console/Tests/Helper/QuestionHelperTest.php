@@ -286,9 +286,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
             $suggestionBase = $inputWords ? implode(' ', $inputWords).' ' : '';
 
             return array_map(
-                function ($word) use ($suggestionBase) {
-                    return $suggestionBase.$word.' ';
-                },
+                fn ($word) => $suggestionBase.$word.' ',
                 $knownWords
             );
         };
@@ -714,9 +712,6 @@ EOD;
         $this->assertEquals('not yet', $dialog->ask($this->createStreamableInputInterfaceMock(null, false), $this->createOutputInterface(), $question));
     }
 
-    /**
-     * @requires function mb_strwidth
-     */
     public function testChoiceOutputFormattingQuestionForUtf8Keys()
     {
         $question = 'Lorem ipsum?';
@@ -872,7 +867,6 @@ EOD;
             $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
         } finally {
             $reflection = new \ReflectionProperty(QuestionHelper::class, 'stty');
-            $reflection->setAccessible(true);
             $reflection->setValue(null, true);
         }
     }
@@ -958,7 +952,7 @@ EOD;
 
 class AutocompleteValues implements \IteratorAggregate
 {
-    private $values;
+    private array $values;
 
     public function __construct(array $values)
     {

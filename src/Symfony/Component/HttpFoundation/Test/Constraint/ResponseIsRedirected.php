@@ -16,9 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ResponseIsRedirected extends Constraint
 {
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return 'is redirected';
@@ -26,8 +23,6 @@ final class ResponseIsRedirected extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function matches($response): bool
     {
@@ -36,8 +31,6 @@ final class ResponseIsRedirected extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($response): string
     {
@@ -46,8 +39,6 @@ final class ResponseIsRedirected extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function additionalFailureDescription($response): string
     {

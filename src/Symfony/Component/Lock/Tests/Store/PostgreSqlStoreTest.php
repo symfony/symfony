@@ -38,9 +38,6 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         return $host;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         $host = $this->getPostgresHost();

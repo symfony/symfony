@@ -49,10 +49,8 @@ abstract class Guess
      *
      * One of VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE, MEDIUM_CONFIDENCE
      * and LOW_CONFIDENCE.
-     *
-     * @var int
      */
-    private $confidence;
+    private int $confidence;
 
     /**
      * Returns the guess most likely to be correct from a list of guesses.
@@ -61,10 +59,8 @@ abstract class Guess
      * returned guess is any of them.
      *
      * @param static[] $guesses An array of guesses
-     *
-     * @return static|null
      */
-    public static function getBestGuess(array $guesses)
+    public static function getBestGuess(array $guesses): ?static
     {
         $result = null;
         $maxConfidence = -1;
@@ -84,8 +80,8 @@ abstract class Guess
      */
     public function __construct(int $confidence)
     {
-        if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence &&
-            self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
+        if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence
+            && self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
             throw new InvalidArgumentException('The confidence should be one of the constants defined in Guess.');
         }
 
@@ -98,7 +94,7 @@ abstract class Guess
      * @return int One of the constants VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE,
      *             MEDIUM_CONFIDENCE and LOW_CONFIDENCE
      */
-    public function getConfidence()
+    public function getConfidence(): int
     {
         return $this->confidence;
     }

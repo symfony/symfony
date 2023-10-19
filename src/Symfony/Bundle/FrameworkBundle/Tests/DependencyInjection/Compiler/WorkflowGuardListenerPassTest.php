@@ -23,8 +23,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class WorkflowGuardListenerPassTest extends TestCase
 {
-    private $container;
-    private $compilerPass;
+    private ContainerBuilder $container;
+    private WorkflowGuardListenerPass $compilerPass;
 
     protected function setUp(): void
     {

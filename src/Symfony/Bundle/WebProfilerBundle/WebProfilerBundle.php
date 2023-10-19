@@ -18,6 +18,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class WebProfilerBundle extends Bundle
 {
+    /**
+     * @return void
+     */
     public function boot()
     {
         if ('prod' === $this->container->getParameter('kernel.environment')) {

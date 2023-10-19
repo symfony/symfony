@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -107,7 +108,7 @@ class SendgridApiTransportTest extends TestCase
         $email->from('foo@example.com')
             ->to('bar@example.com')
             // even if content doesn't include new lines, the base64 encoding performed later may add them
-            ->attach('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod', 'lorem.txt');
+            ->addPart(new DataPart('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod', 'lorem.txt'));
 
         $response = $this->createMock(ResponseInterface::class);
 
@@ -161,7 +162,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('headers', $payload);
@@ -183,7 +183,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('from', $payload);
@@ -211,7 +210,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('from', $payload);
@@ -227,10 +225,6 @@ class SendgridApiTransportTest extends TestCase
 
     public function testTagAndMetadataHeaders()
     {
-        if (!class_exists(TagHeader::class)) {
-            $this->markTestSkipped('This test requires symfony/mailer 5.1 or higher.');
-        }
-
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('category-one'));
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
@@ -239,7 +233,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('categories', $payload);

@@ -19,7 +19,7 @@ if ($r->getProperty('exporter')->isProtected()) {
     {
         use Legacy\ConstraintTraitForV7;
     }
-} elseif (\PHP_VERSION_ID < 70100 || !$r->getMethod('evaluate')->hasReturnType()) {
+} elseif (!$r->getMethod('evaluate')->hasReturnType()) {
     trait ConstraintTrait
     {
         use Legacy\ConstraintTraitForV8;

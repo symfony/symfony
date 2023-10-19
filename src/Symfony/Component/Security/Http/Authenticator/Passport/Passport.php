@@ -25,15 +25,15 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\Credentia
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class Passport implements UserPassportInterface
+class Passport
 {
     protected $user;
 
-    private $badges = [];
-    private $attributes = [];
+    private array $badges = [];
+    private array $attributes = [];
 
     /**
-     * @param CredentialsInterface $credentials the credentials to check for this authentication, use
+     * @param CredentialsInterface $credentials The credentials to check for this authentication, use
      *                                          SelfValidatingPassport if no credentials should be checked
      * @param BadgeInterface[]     $badges
      */
@@ -46,12 +46,9 @@ class Passport implements UserPassportInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUser(): UserInterface
     {
-        if (null === $this->user) {
+        if (!isset($this->user)) {
             if (!$this->hasBadge(UserBadge::class)) {
                 throw new \LogicException('Cannot get the Security user, no username or UserBadge configured for this passport.');
             }
@@ -69,11 +66,23 @@ class Passport implements UserPassportInterface
      * This method replaces the current badge if it is already set on this
      * passport.
      *
+     * @param string|null $badgeFqcn A FQCN to which the badge should be mapped to.
+     *                               This allows replacing a built-in badge by a custom one using
+     *                               e.g. addBadge(new MyCustomUserBadge(), UserBadge::class)
+     *
      * @return $this
      */
-    public function addBadge(BadgeInterface $badge): PassportInterface
+    public function addBadge(BadgeInterface $badge/* , string $badgeFqcn = null */): static
     {
-        $this->badges[\get_class($badge)] = $badge;
+        $badgeFqcn = $badge::class;
+        if (2 === \func_num_args()) {
+            $badgeFqcn = func_get_arg(1);
+            if (!\is_string($badgeFqcn)) {
+                throw new \LogicException(sprintf('Second argument of "%s" must be a string.', __METHOD__));
+            }
+        }
+
+        $this->badges[$badgeFqcn] = $badge;
 
         return $this;
     }
@@ -83,6 +92,13 @@ class Passport implements UserPassportInterface
         return isset($this->badges[$badgeFqcn]);
     }
 
+    /**
+     * @template TBadge of BadgeInterface
+     *
+     * @param class-string<TBadge> $badgeFqcn
+     *
+     * @return TBadge|null
+     */
     public function getBadge(string $badgeFqcn): ?BadgeInterface
     {
         return $this->badges[$badgeFqcn] ?? null;
@@ -96,20 +112,12 @@ class Passport implements UserPassportInterface
         return $this->badges;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setAttribute(string $name, $value): void
+    public function setAttribute(string $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
     }
 
-    /**
-     * @param mixed $default
-     *
-     * @return mixed
-     */
-    public function getAttribute(string $name, $default = null)
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
         return $this->attributes[$name] ?? $default;
     }

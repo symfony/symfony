@@ -46,9 +46,9 @@ class UrlValidator extends ConstraintValidator
         $~ixu';
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Url) {
             throw new UnexpectedTypeException($constraint, Url::class);
@@ -58,7 +58,7 @@ class UrlValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 

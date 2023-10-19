@@ -20,7 +20,7 @@ class MockAbstractRequestRateLimiter extends AbstractRequestRateLimiter
     /**
      * @var LimiterInterface[]
      */
-    private $limiters;
+    private array $limiters;
 
     public function __construct(array $limiters)
     {

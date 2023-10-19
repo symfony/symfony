@@ -31,13 +31,16 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class RdKafkaCaster
 {
+    /**
+     * @return array
+     */
     public static function castKafkaConsumer(KafkaConsumer $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
         try {
             $assignment = $c->getAssignment();
-        } catch (RdKafkaException $e) {
+        } catch (RdKafkaException) {
             $assignment = [];
         }
 
@@ -51,6 +54,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castTopic(Topic $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -62,6 +68,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castTopicPartition(TopicPartition $c, array $a)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -75,6 +84,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castMessage(Message $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -86,6 +98,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castConf(Conf $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -97,6 +112,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castTopicConf(TopicConf $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -108,6 +126,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castRdKafka(\RdKafka $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -121,6 +142,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castCollectionMetadata(CollectionMetadata $c, array $a, Stub $stub, bool $isNested)
     {
         $a += iterator_to_array($c);
@@ -128,6 +152,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castTopicMetadata(TopicMetadata $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -140,6 +167,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castPartitionMetadata(PartitionMetadata $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -153,6 +183,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castBrokerMetadata(BrokerMetadata $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -166,13 +199,16 @@ class RdKafkaCaster
         return $a;
     }
 
-    private static function extractMetadata($c)
+    /**
+     * @return array
+     */
+    private static function extractMetadata(KafkaConsumer|\RdKafka $c)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
         try {
             $m = $c->getMetadata(true, null, 500);
-        } catch (RdKafkaException $e) {
+        } catch (RdKafkaException) {
             return [];
         }
 

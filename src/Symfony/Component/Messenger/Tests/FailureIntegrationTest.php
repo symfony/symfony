@@ -22,14 +22,19 @@ use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
+use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -40,200 +45,14 @@ use Symfony\Component\Messenger\Worker;
 
 class FailureIntegrationTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
     public function testRequeueMechanism()
     {
         $transport1 = new DummyFailureTestSenderAndReceiver();
         $transport2 = new DummyFailureTestSenderAndReceiver();
         $failureTransport = new DummyFailureTestSenderAndReceiver();
-        $transports = [
-            'transport1' => $transport1,
-            'transport2' => $transport2,
-            'the_failure_transport' => $failureTransport,
-        ];
-
-        $locator = $this->createMock(ContainerInterface::class);
-        $locator->expects($this->any())
-            ->method('has')
-            ->willReturn(true);
-        $locator->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(function ($transportName) use ($transports) {
-                return $transports[$transportName];
-            });
-        $senderLocator = new SendersLocator(
-            [DummyMessage::class => ['transport1', 'transport2']],
-            $locator
-        );
-
-        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
-        $retryStrategyLocator->expects($this->any())
-            ->method('has')
-            ->willReturn(true);
-        $retryStrategyLocator->expects($this->any())
-            ->method('get')
-            ->willReturn(new MultiplierRetryStrategy(1));
-
-        // using to so we can lazily get the bus later and avoid circular problem
-        $transport1HandlerThatFails = new DummyTestHandler(true);
-        $allTransportHandlerThatWorks = new DummyTestHandler(false);
-        $transport2HandlerThatWorks = new DummyTestHandler(false);
-        $handlerLocator = new HandlersLocator([
-            DummyMessage::class => [
-                new HandlerDescriptor($transport1HandlerThatFails, [
-                    'from_transport' => 'transport1',
-                    'alias' => 'handler_that_fails',
-                ]),
-                new HandlerDescriptor($allTransportHandlerThatWorks, [
-                    'alias' => 'handler_that_works1',
-                ]),
-                new HandlerDescriptor($transport2HandlerThatWorks, [
-                    'from_transport' => 'transport2',
-                    'alias' => 'handler_that_works2',
-                ]),
-            ],
-        ]);
-
-        $dispatcher = new EventDispatcher();
-        $bus = new MessageBus([
-            new FailedMessageProcessingMiddleware(),
-            new SendMessageMiddleware($senderLocator),
-            new HandleMessageMiddleware($handlerLocator),
-        ]);
-        $dispatcher->addSubscriber(new AddErrorDetailsStampListener());
-        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
-        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener($failureTransport));
-        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
-
-        $runWorker = function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
-            $throwable = null;
-            $failedListener = function (WorkerMessageFailedEvent $event) use (&$throwable) {
-                $throwable = $event->getThrowable();
-            };
-            $dispatcher->addListener(WorkerMessageFailedEvent::class, $failedListener);
-
-            $worker = new Worker([$transportName => $transports[$transportName]], $bus, $dispatcher);
-
-            $worker->run();
-
-            $dispatcher->removeListener(WorkerMessageFailedEvent::class, $failedListener);
-
-            return $throwable;
-        };
-
-        // send the message
-        $envelope = new Envelope(new DummyMessage('API'));
-        $bus->dispatch($envelope);
-
-        // message has been sent
-        $this->assertCount(1, $transport1->getMessagesWaitingToBeReceived());
-        $this->assertCount(1, $transport2->getMessagesWaitingToBeReceived());
-        $this->assertCount(0, $failureTransport->getMessagesWaitingToBeReceived());
-
-        // receive the message - one handler will fail and the message
-        // will be sent back to transport1 to be retried
-        /*
-         * Receive the message from "transport1"
-         */
-        $throwable = $runWorker('transport1');
-        // make sure this is failing for the reason we think
-        $this->assertInstanceOf(HandlerFailedException::class, $throwable);
-        // handler for transport1 and all transports were called
-        $this->assertSame(1, $transport1HandlerThatFails->getTimesCalled());
-        $this->assertSame(1, $allTransportHandlerThatWorks->getTimesCalled());
-        $this->assertSame(0, $transport2HandlerThatWorks->getTimesCalled());
-        // one handler failed and the message is retried (resent to transport1)
-        $this->assertCount(1, $transport1->getMessagesWaitingToBeReceived());
-        $this->assertEmpty($failureTransport->getMessagesWaitingToBeReceived());
-
-        /*
-         * Receive the message for a (final) retry
-         */
-        $runWorker('transport1');
-        // only the "failed" handler is called a 2nd time
-        $this->assertSame(2, $transport1HandlerThatFails->getTimesCalled());
-        $this->assertSame(1, $allTransportHandlerThatWorks->getTimesCalled());
-        // handling fails again, message is sent to failure transport
-        $this->assertCount(0, $transport1->getMessagesWaitingToBeReceived());
-        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
-        /** @var Envelope $failedEnvelope */
-        $failedEnvelope = $failureTransport->getMessagesWaitingToBeReceived()[0];
-        /** @var SentToFailureTransportStamp $sentToFailureStamp */
-        $sentToFailureStamp = $failedEnvelope->last(SentToFailureTransportStamp::class);
-        $this->assertNotNull($sentToFailureStamp);
-        /** @var ErrorDetailsStamp $errorDetailsStamp */
-        $errorDetailsStamp = $failedEnvelope->last(ErrorDetailsStamp::class);
-        $this->assertNotNull($errorDetailsStamp);
-        $this->assertSame('Failure from call 2', $errorDetailsStamp->getExceptionMessage());
-
-        /*
-         * Failed message is handled, fails, and sent for a retry
-         */
-        $throwable = $runWorker('the_failure_transport');
-        // make sure this is failing for the reason we think
-        $this->assertInstanceOf(HandlerFailedException::class, $throwable);
-        // only the "failed" handler is called a 3rd time
-        $this->assertSame(3, $transport1HandlerThatFails->getTimesCalled());
-        $this->assertSame(1, $allTransportHandlerThatWorks->getTimesCalled());
-        // handling fails again, message is retried
-        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
-        // transport2 still only holds the original message
-        // a new message was never mistakenly delivered to it
-        $this->assertCount(1, $transport2->getMessagesWaitingToBeReceived());
-
-        /*
-         * Message is retried on failure transport then discarded
-         */
-        $runWorker('the_failure_transport');
-        // only the "failed" handler is called a 4th time
-        $this->assertSame(4, $transport1HandlerThatFails->getTimesCalled());
-        $this->assertSame(1, $allTransportHandlerThatWorks->getTimesCalled());
-        // handling fails again, message is discarded
-        $this->assertCount(0, $failureTransport->getMessagesWaitingToBeReceived());
-
-        /*
-         * Execute handlers on transport2
-         */
-        $runWorker('transport2');
-        // transport1 handler is not called again
-        $this->assertSame(4, $transport1HandlerThatFails->getTimesCalled());
-        // all transport handler is now called again
-        $this->assertSame(2, $allTransportHandlerThatWorks->getTimesCalled());
-        // transport1 handler called for the first time
-        $this->assertSame(1, $transport2HandlerThatWorks->getTimesCalled());
-        // all transport should be empty
-        $this->assertEmpty($transport1->getMessagesWaitingToBeReceived());
-        $this->assertEmpty($transport2->getMessagesWaitingToBeReceived());
-        $this->assertEmpty($failureTransport->getMessagesWaitingToBeReceived());
-
-        /*
-         * Dispatch the original message again
-         */
-        $bus->dispatch($envelope);
-        // handle the failing message so it goes into the failure transport
-        $runWorker('transport1');
-        $runWorker('transport1');
-        // now make the handler work!
-        $transport1HandlerThatFails->setShouldThrow(false);
-        $runWorker('the_failure_transport');
-        // the failure transport is empty because it worked
-        $this->assertEmpty($failureTransport->getMessagesWaitingToBeReceived());
-    }
-
-    public function testRequeueMechanismWithServiceLocator()
-    {
-        $transport1 = new DummyFailureTestSenderAndReceiver();
-        $transport2 = new DummyFailureTestSenderAndReceiver();
-        $failureTransport = new DummyFailureTestSenderAndReceiver();
         $sendersLocatorFailureTransport = new ServiceLocator([
-            'transport1' => function () use ($failureTransport) {
-                return $failureTransport;
-            },
-            'transport2' => function () use ($failureTransport) {
-                return $failureTransport;
-            },
+            'transport1' => fn () => $failureTransport,
+            'transport2' => fn () => $failureTransport,
         ]);
 
         $transports = [
@@ -248,9 +67,7 @@ class FailureIntegrationTest extends TestCase
             ->willReturn(true);
         $locator->expects($this->any())
             ->method('get')
-            ->willReturnCallback(function ($transportName) use ($transports) {
-                return $transports[$transportName];
-            });
+            ->willReturnCallback(fn ($transportName) => $transports[$transportName]);
         $senderLocator = new SendersLocator(
             [DummyMessage::class => ['transport1', 'transport2']],
             $locator
@@ -419,12 +236,8 @@ class FailureIntegrationTest extends TestCase
         $failureTransport2 = new DummyFailureTestSenderAndReceiver();
 
         $sendersLocatorFailureTransport = new ServiceLocator([
-            'transport1' => function () use ($failureTransport1) {
-                return $failureTransport1;
-            },
-            'transport2' => function () use ($failureTransport2) {
-                return $failureTransport2;
-            },
+            'transport1' => fn () => $failureTransport1,
+            'transport2' => fn () => $failureTransport2,
         ]);
 
         $transports = [
@@ -440,9 +253,7 @@ class FailureIntegrationTest extends TestCase
             ->willReturn(true);
         $locator->expects($this->any())
             ->method('get')
-            ->willReturnCallback(function ($transportName) use ($transports) {
-                return $transports[$transportName];
-            });
+            ->willReturnCallback(fn ($transportName) => $transports[$transportName]);
         $senderLocator = new SendersLocator(
             [DummyMessage::class => ['transport1', 'transport2']],
             $locator
@@ -548,11 +359,92 @@ class FailureIntegrationTest extends TestCase
         // After the message fails again, the message is discarded from the "the_failure_transport2"
         $this->assertCount(0, $failureTransport2->getMessagesWaitingToBeReceived());
     }
+
+    public function testStampsAddedByMiddlewaresDontDisappearWhenDelayedMessageFails()
+    {
+        $transport1 = new DummyFailureTestSenderAndReceiver();
+
+        $transports = [
+            'transport1' => $transport1,
+        ];
+
+        $locator = $this->createMock(ContainerInterface::class);
+        $locator->expects($this->any())
+            ->method('has')
+            ->willReturn(true);
+        $locator->expects($this->any())
+            ->method('get')
+            ->willReturnCallback(fn ($transportName) => $transports[$transportName]);
+        $senderLocator = new SendersLocator([], $locator);
+
+        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects($this->any())
+            ->method('has')
+            ->willReturn(true);
+        $retryStrategyLocator->expects($this->any())
+            ->method('get')
+            ->willReturn(new MultiplierRetryStrategy(1));
+
+        $syncHandlerThatFails = new DummyTestHandler(true);
+
+        $middlewareStack = new \ArrayIterator([
+            new AddBusNameStampMiddleware('some.bus'),
+            new DispatchAfterCurrentBusMiddleware(),
+            new SendMessageMiddleware($senderLocator),
+        ]);
+
+        $bus = new MessageBus($middlewareStack);
+
+        $transport1Handler = fn () => $bus->dispatch(new \stdClass(), [new DispatchAfterCurrentBusStamp()]);
+
+        $handlerLocator = new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($transport1Handler)],
+            \stdClass::class => [new HandlerDescriptor($syncHandlerThatFails)],
+        ]);
+
+        $middlewareStack->append(new HandleMessageMiddleware($handlerLocator));
+
+        $dispatcher = new EventDispatcher();
+
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $runWorker = function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
+            $throwable = null;
+            $failedListener = function (WorkerMessageFailedEvent $event) use (&$throwable) {
+                $throwable = $event->getThrowable();
+            };
+            $dispatcher->addListener(WorkerMessageFailedEvent::class, $failedListener);
+
+            $worker = new Worker([$transportName => $transports[$transportName]], $bus, $dispatcher);
+
+            $worker->run();
+
+            $dispatcher->removeListener(WorkerMessageFailedEvent::class, $failedListener);
+
+            return $throwable;
+        };
+
+        // Simulate receive from external source
+        $transport1->send(new Envelope(new DummyMessage('API')));
+
+        // Receive the message from "transport1"
+        $throwable = $runWorker('transport1');
+
+        $this->assertInstanceOf(DelayedMessageHandlingException::class, $throwable, $throwable->getMessage());
+        $this->assertSame(1, $syncHandlerThatFails->getTimesCalled());
+
+        $messagesWaiting = $transport1->getMessagesWaitingToBeReceived();
+
+        // Stamps should not be dropped on message that's queued for retry
+        $this->assertCount(1, $messagesWaiting);
+        $this->assertSame('some.bus', $messagesWaiting[0]->last(BusNameStamp::class)?->getBusName());
+    }
 }
 
 class DummyFailureTestSenderAndReceiver implements ReceiverInterface, SenderInterface
 {
-    private $messagesWaiting = [];
+    private array $messagesWaiting = [];
 
     public function get(): iterable
     {
@@ -591,8 +483,8 @@ class DummyFailureTestSenderAndReceiver implements ReceiverInterface, SenderInte
 
 class DummyTestHandler
 {
-    private $timesCalled = 0;
-    private $shouldThrow;
+    private int $timesCalled = 0;
+    private bool $shouldThrow;
 
     public function __construct(bool $shouldThrow)
     {

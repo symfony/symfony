@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -24,26 +25,24 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 class ConfigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
+    private KernelInterface $kernel;
 
     /**
      * Sets the Kernel associated with this Request.
      */
-    public function setKernel(KernelInterface $kernel = null)
+    public function setKernel(KernelInterface $kernel = null): void
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/http-kernel', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
+
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
-        $eom = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE);
-        $eol = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE);
+        $eom = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE);
+        $eol = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE);
 
         $this->data = [
             'token' => $response->headers->get('X-Debug-Token'),
@@ -60,15 +59,15 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'php_intl_locale' => class_exists(\Locale::class, false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a',
             'php_timezone' => date_default_timezone_get(),
             'xdebug_enabled' => \extension_loaded('xdebug'),
-            'apcu_enabled' => \extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN),
-            'zend_opcache_enabled' => \extension_loaded('Zend OPcache') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN),
+            'apcu_enabled' => \extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL),
+            'zend_opcache_enabled' => \extension_loaded('Zend OPcache') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL),
             'bundles' => [],
             'sapi_name' => \PHP_SAPI,
         ];
 
         if (isset($this->kernel)) {
             foreach ($this->kernel->getBundles() as $name => $bundle) {
-                $this->data['bundles'][$name] = new ClassStub(\get_class($bundle));
+                $this->data['bundles'][$name] = new ClassStub($bundle::class);
             }
         }
 
@@ -78,15 +77,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function reset()
-    {
-        $this->data = [];
-    }
-
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data = $this->cloneVar($this->data);
     }
@@ -108,9 +99,8 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     }
 
     /**
-     * Returns the state of the current Symfony release.
-     *
-     * @return string One of: unknown, dev, stable, eom, eol
+     * Returns the state of the current Symfony release
+     * as one of: unknown, dev, stable, eom, eol.
      */
     public function getSymfonyState(): string
     {
@@ -126,9 +116,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['symfony_minor_version'];
     }
 
-    /**
-     * Returns if the current Symfony version is a Long-Term Support one.
-     */
     public function isSymfonyLts(): bool
     {
         return $this->data['symfony_lts'];
@@ -168,9 +155,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['php_version_extra'] ?? null;
     }
 
-    /**
-     * @return int The PHP architecture as number of bits (e.g. 32 or 64)
-     */
     public function getPhpArchitecture(): int
     {
         return $this->data['php_architecture'];
@@ -199,17 +183,25 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return bool|string true if debug is enabled, false otherwise or a string if no kernel was set
      */
-    public function isDebug()
+    public function isDebug(): bool|string
     {
         return $this->data['debug'];
     }
 
     /**
-     * Returns true if the XDebug is enabled.
+     * Returns true if the Xdebug is enabled.
      */
-    public function hasXDebug(): bool
+    public function hasXdebug(): bool
     {
         return $this->data['xdebug_enabled'];
+    }
+
+    /**
+     * Returns true if the function xdebug_info is available.
+     */
+    public function hasXdebugInfo(): bool
+    {
+        return \function_exists('xdebug_info');
     }
 
     /**
@@ -228,7 +220,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['zend_opcache_enabled'];
     }
 
-    public function getBundles()
+    public function getBundles(): array|Data
     {
         return $this->data['bundles'];
     }
@@ -241,24 +233,16 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['sapi_name'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'config';
     }
 
-    /**
-     * Tries to retrieve information about the current Symfony version.
-     *
-     * @return string One of: dev, stable, eom, eol
-     */
     private function determineSymfonyState(): string
     {
-        $now = new \DateTime();
-        $eom = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->modify('last day of this month');
-        $eol = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE)->modify('last day of this month');
+        $now = new \DateTimeImmutable();
+        $eom = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->modify('last day of this month');
+        $eol = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE)->modify('last day of this month');
 
         if ($now > $eol) {
             $versionState = 'eol';

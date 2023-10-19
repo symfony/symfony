@@ -22,15 +22,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MarshallingSessionH
  */
 class MarshallingSessionHandlerTest extends TestCase
 {
-    /**
-     * @var MockObject|\SessionHandlerInterface
-     */
-    protected $handler;
-
-    /**
-     * @var MockObject|MarshallerInterface
-     */
-    protected $marshaller;
+    protected MockObject&\SessionHandlerInterface $handler;
+    protected MockObject&MarshallerInterface $marshaller;
 
     protected function setUp(): void
     {

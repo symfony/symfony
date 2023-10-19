@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -27,18 +28,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @final
  */
+#[AsCommand(name: 'about', description: 'Display information about the current project')]
 class AboutCommand extends Command
 {
-    protected static $defaultName = 'about';
-    protected static $defaultDescription = 'Display information about the current project';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command displays information about the current Symfony project.
 
@@ -49,9 +44,6 @@ EOT
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -75,7 +67,7 @@ EOT
             new TableSeparator(),
             ['<info>Kernel</>'],
             new TableSeparator(),
-            ['Type', \get_class($kernel)],
+            ['Type', $kernel::class],
             ['Environment', $kernel->getEnvironment()],
             ['Debug', $kernel->isDebug() ? 'true' : 'false'],
             ['Charset', $kernel->getCharset()],
@@ -88,9 +80,9 @@ EOT
             ['Version', \PHP_VERSION],
             ['Architecture', (\PHP_INT_SIZE * 8).' bits'],
             ['Intl locale', class_exists(\Locale::class, false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a'],
-            ['Timezone', date_default_timezone_get().' (<comment>'.(new \DateTime())->format(\DateTime::W3C).'</>)'],
-            ['OPcache', \extension_loaded('Zend OPcache') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'],
-            ['APCu', \extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'],
+            ['Timezone', date_default_timezone_get().' (<comment>'.(new \DateTimeImmutable())->format(\DateTimeInterface::W3C).'</>)'],
+            ['OPcache', \extension_loaded('Zend OPcache') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL) ? 'true' : 'false'],
+            ['APCu', \extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL) ? 'true' : 'false'],
             ['Xdebug', \extension_loaded('xdebug') ? 'true' : 'false'],
         ];
 
@@ -126,15 +118,15 @@ EOT
 
     private static function isExpired(string $date): bool
     {
-        $date = \DateTime::createFromFormat('d/m/Y', '01/'.$date);
+        $date = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.$date);
 
-        return false !== $date && new \DateTime() > $date->modify('last day of this month 23:59:59');
+        return false !== $date && new \DateTimeImmutable() > $date->modify('last day of this month 23:59:59');
     }
 
     private static function daysBeforeExpiration(string $date): string
     {
-        $date = \DateTime::createFromFormat('d/m/Y', '01/'.$date);
+        $date = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.$date);
 
-        return (new \DateTime())->diff($date->modify('last day of this month 23:59:59'))->format('in %R%a days');
+        return (new \DateTimeImmutable())->diff($date->modify('last day of this month 23:59:59'))->format('in %R%a days');
     }
 }

@@ -24,12 +24,16 @@ interface PersistingStoreInterface
     /**
      * Stores the resource if the semaphore is not full.
      *
+     * @return void
+     *
      * @throws SemaphoreAcquiringException
      */
     public function save(Key $key, float $ttlInSecond);
 
     /**
      * Removes a resource from the storage.
+     *
+     * @return void
      *
      * @throws SemaphoreReleasingException
      */
@@ -42,6 +46,8 @@ interface PersistingStoreInterface
 
     /**
      * Extends the TTL of a resource.
+     *
+     * @return void
      *
      * @throws SemaphoreExpiredException
      */

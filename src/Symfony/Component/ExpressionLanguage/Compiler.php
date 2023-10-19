@@ -20,14 +20,17 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Compiler implements ResetInterface
 {
-    private $source;
-    private $functions;
+    private string $source = '';
+    private array $functions;
 
     public function __construct(array $functions)
     {
         $this->functions = $functions;
     }
 
+    /**
+     * @return array
+     */
     public function getFunction(string $name)
     {
         return $this->functions[$name];
@@ -35,10 +38,8 @@ class Compiler implements ResetInterface
 
     /**
      * Gets the current PHP code after compilation.
-     *
-     * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return $this->source;
     }
@@ -46,7 +47,7 @@ class Compiler implements ResetInterface
     /**
      * @return $this
      */
-    public function reset()
+    public function reset(): static
     {
         $this->source = '';
 
@@ -58,13 +59,16 @@ class Compiler implements ResetInterface
      *
      * @return $this
      */
-    public function compile(Node\Node $node)
+    public function compile(Node\Node $node): static
     {
         $node->compile($this);
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function subcompile(Node\Node $node)
     {
         $current = $this->source;
@@ -83,7 +87,7 @@ class Compiler implements ResetInterface
      *
      * @return $this
      */
-    public function raw(string $string)
+    public function raw(string $string): static
     {
         $this->source .= $string;
 
@@ -95,7 +99,7 @@ class Compiler implements ResetInterface
      *
      * @return $this
      */
-    public function string(string $value)
+    public function string(string $value): static
     {
         $this->source .= sprintf('"%s"', addcslashes($value, "\0\t\"\$\\"));
 
@@ -105,11 +109,9 @@ class Compiler implements ResetInterface
     /**
      * Returns a PHP representation of a given value.
      *
-     * @param mixed $value The value to convert
-     *
      * @return $this
      */
-    public function repr($value)
+    public function repr(mixed $value): static
     {
         if (\is_int($value) || \is_float($value)) {
             if (false !== $locale = setlocale(\LC_NUMERIC, 0)) {

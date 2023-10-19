@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 class WorkflowGuardListenerPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function process(ContainerBuilder $container)
     {

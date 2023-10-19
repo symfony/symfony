@@ -29,18 +29,16 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
     /**
-     * @param OutputInterface|StyleInterface $output
+     * @return void
      */
-    protected function listBundles($output)
+    protected function listBundles(OutputInterface|StyleInterface $output)
     {
         $title = 'Available registered bundles with their extension alias if available';
         $headers = ['Bundle name', 'Extension alias'];
         $rows = [];
 
         $bundles = $this->getApplication()->getKernel()->getBundles();
-        usort($bundles, function ($bundleA, $bundleB) {
-            return strcmp($bundleA->getName(), $bundleB->getName());
-        });
+        usort($bundles, fn ($bundleA, $bundleB) => strcmp($bundleA->getName(), $bundleB->getName()));
 
         foreach ($bundles as $bundle) {
             $extension = $bundle->getContainerExtension();
@@ -57,10 +55,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
     }
 
-    /**
-     * @param OutputInterface|StyleInterface $output
-     */
-    protected function listNonBundleExtensions($output)
+    protected function listNonBundleExtensions(OutputInterface|StyleInterface $output): void
     {
         $title = 'Available registered non-bundle extension aliases';
         $headers = ['Extension alias'];
@@ -71,14 +66,14 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         $bundleExtensions = [];
         foreach ($kernel->getBundles() as $bundle) {
             if ($extension = $bundle->getContainerExtension()) {
-                $bundleExtensions[\get_class($extension)] = true;
+                $bundleExtensions[$extension::class] = true;
             }
         }
 
         $extensions = $this->getContainerBuilder($kernel)->getExtensions();
 
         foreach ($extensions as $alias => $extension) {
-            if (isset($bundleExtensions[\get_class($extension)])) {
+            if (isset($bundleExtensions[$extension::class])) {
                 continue;
             }
             $rows[] = [$alias];
@@ -98,10 +93,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
     }
 
-    /**
-     * @return ExtensionInterface
-     */
-    protected function findExtension(string $name)
+    protected function findExtension(string $name): ExtensionInterface
     {
         $bundles = $this->initializeBundles();
         $minScore = \INF;
@@ -167,7 +159,10 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         throw new LogicException($message);
     }
 
-    public function validateConfiguration(ExtensionInterface $extension, $configuration)
+    /**
+     * @return void
+     */
+    public function validateConfiguration(ExtensionInterface $extension, mixed $configuration)
     {
         if (!$configuration) {
             throw new \LogicException(sprintf('The extension with alias "%s" does not have its getConfiguration() method setup.', $extension->getAlias()));
@@ -178,7 +173,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
     }
 
-    private function initializeBundles()
+    private function initializeBundles(): array
     {
         // Re-build bundle manually to initialize DI extensions that can be extended by other bundles in their build() method
         // as this method is not called when the container is loaded from the cache.

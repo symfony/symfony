@@ -15,7 +15,6 @@ use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Edouard Lescot <edouard.lescot@gmail.com>
@@ -23,7 +22,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class MicrosoftTeamsTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MicrosoftTeamsTransport
     {
         $scheme = $dsn->getScheme();
 
@@ -34,7 +33,7 @@ final class MicrosoftTeamsTransportFactory extends AbstractTransportFactory
         $path = $dsn->getPath();
 
         if (null === $path) {
-            throw new IncompleteDsnException('Path is not set.', $dsn->getOriginalDsn());
+            throw new IncompleteDsnException('Path is not set.', 'microsoftteams://'.$dsn->getHost());
         }
 
         $host = $dsn->getHost();

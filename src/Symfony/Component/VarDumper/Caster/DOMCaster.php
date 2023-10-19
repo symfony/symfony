@@ -63,6 +63,9 @@ class DOMCaster
         \XML_NAMESPACE_DECL_NODE => 'XML_NAMESPACE_DECL_NODE',
     ];
 
+    /**
+     * @return array
+     */
     public static function castException(\DOMException $e, array $a, Stub $stub, bool $isNested)
     {
         $k = Caster::PREFIX_PROTECTED.'code';
@@ -73,6 +76,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castLength($dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -82,6 +88,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castImplementation(\DOMImplementation $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -92,6 +101,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castNode(\DOMNode $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -116,6 +128,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castNameSpaceNode(\DOMNameSpaceNode $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -132,6 +147,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castDocument(\DOMDocument $dom, array $a, Stub $stub, bool $isNested, int $filter = 0)
     {
         $a += [
@@ -166,6 +184,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castCharacterData(\DOMCharacterData $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -176,6 +197,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castAttr(\DOMAttr $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -189,6 +213,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castElement(\DOMElement $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -199,6 +226,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castText(\DOMText $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -208,43 +238,9 @@ class DOMCaster
         return $a;
     }
 
-    public static function castTypeinfo(\DOMTypeinfo $dom, array $a, Stub $stub, bool $isNested)
-    {
-        $a += [
-            'typeName' => $dom->typeName,
-            'typeNamespace' => $dom->typeNamespace,
-        ];
-
-        return $a;
-    }
-
-    public static function castDomError(\DOMDomError $dom, array $a, Stub $stub, bool $isNested)
-    {
-        $a += [
-            'severity' => $dom->severity,
-            'message' => $dom->message,
-            'type' => $dom->type,
-            'relatedException' => $dom->relatedException,
-            'related_data' => $dom->related_data,
-            'location' => $dom->location,
-        ];
-
-        return $a;
-    }
-
-    public static function castLocator(\DOMLocator $dom, array $a, Stub $stub, bool $isNested)
-    {
-        $a += [
-            'lineNumber' => $dom->lineNumber,
-            'columnNumber' => $dom->columnNumber,
-            'offset' => $dom->offset,
-            'relatedNode' => $dom->relatedNode,
-            'uri' => $dom->uri ? new LinkStub($dom->uri, $dom->lineNumber) : $dom->uri,
-        ];
-
-        return $a;
-    }
-
+    /**
+     * @return array
+     */
     public static function castDocumentType(\DOMDocumentType $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -259,6 +255,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castNotation(\DOMNotation $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -269,6 +268,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castEntity(\DOMEntity $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -283,6 +285,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castProcessingInstruction(\DOMProcessingInstruction $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -293,6 +298,9 @@ class DOMCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castXPath(\DOMXPath $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [

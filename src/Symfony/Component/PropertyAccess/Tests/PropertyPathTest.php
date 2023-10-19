@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -65,18 +64,6 @@ class PropertyPathTest extends TestCase
         new PropertyPath('');
     }
 
-    public function testPathCannotBeNull()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new PropertyPath(null);
-    }
-
-    public function testPathCannotBeFalse()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new PropertyPath(false);
-    }
-
     public function testZeroIsValidPropertyPath()
     {
         $propertyPath = new PropertyPath('0');
@@ -89,6 +76,34 @@ class PropertyPathTest extends TestCase
         $propertyPath = new PropertyPath('grandpa.parent.child');
 
         $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
+    }
+
+    public function testGetElementsWithEscapedDot()
+    {
+        $propertyPath = new PropertyPath('grandpa\.parent.child');
+
+        $this->assertEquals(['grandpa.parent', 'child'], $propertyPath->getElements());
+    }
+
+    public function testGetElementsWithEscapedArray()
+    {
+        $propertyPath = new PropertyPath('grandpa\[parent][child]');
+
+        $this->assertEquals(['grandpa[parent]', 'child'], $propertyPath->getElements());
+    }
+
+    public function testGetElementsWithDoubleEscapedDot()
+    {
+        $propertyPath = new PropertyPath('grandpa\\\.par\ent.\\\child');
+
+        $this->assertEquals(['grandpa\\', 'par\ent', '\\\child'], $propertyPath->getElements());
+    }
+
+    public function testGetElementsWithDoubleEscapedArray()
+    {
+        $propertyPath = new PropertyPath('grandpa\\\[par\ent][\\\child]');
+
+        $this->assertEquals(['grandpa\\', 'par\ent', '\\\child'], $propertyPath->getElements());
     }
 
     public function testGetParentWithIndex()

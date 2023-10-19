@@ -1,6 +1,50 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `SignalMap` to map signal value to its name
+ * Multi-line text in vertical tables is aligned properly
+ * The application can also catch errors with `Application::setCatchErrors(true)`
+ * Add `RunCommandMessage` and `RunCommandMessageHandler`
+ * Dispatch `ConsoleTerminateEvent` after an exit on signal handling and add `ConsoleTerminateEvent::getInterruptingSignal()`
+
+6.3
+---
+
+ * Add support for choosing exit code while handling signal, or to not exit at all
+ * Add `ProgressBar::setPlaceholderFormatter` to set a placeholder attached to a instance, instead of being global.
+ * Add `ReStructuredTextDescriptor`
+
+6.2
+---
+
+ * Improve truecolor terminal detection in some cases
+ * Add support for 256 color terminals (conversion from Ansi24 to Ansi8 if terminal is capable of it)
+ * Deprecate calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()`, `Question::setAutocompleterCallback/setValidator()`without any arguments
+ * Change the signature of `OutputFormatterStyleInterface::setForeground/setBackground()` to `setForeground/setBackground(?string)`
+ * Change the signature of `HelperInterface::setHelperSet()` to `setHelperSet(?HelperSet)`
+
+6.1
+---
+
+ * Add support to display table vertically when calling setVertical()
+ * Add method `__toString()` to `InputInterface`
+ * Added `OutputWrapper` to prevent truncated URL in `SymfonyStyle::createBlock`.
+ * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+ * Add suggested values for arguments and options in input definition, for input completion
+ * Add `$resumeAt` parameter to `ProgressBar#start()`, so that one can easily 'resume' progress on longer tasks, and still get accurate `getEstimate()` and `getRemaining()` results.
+
+6.0
+---
+
+ * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter and is final
+ * Remove `Helper::strlen()`, use `Helper::width()` instead
+ * Remove `Helper::strlenWithoutDecoration()`, use `Helper::removeDecoration()` instead
+ * `AddConsoleCommandPass` can not be configured anymore
+ * Remove `HelperSet::setCommand()` and `getCommand()` without replacement
+
 5.4
 ---
 

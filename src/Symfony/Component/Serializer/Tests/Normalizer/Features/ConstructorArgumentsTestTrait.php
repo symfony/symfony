@@ -67,6 +67,7 @@ trait ConstructorArgumentsTestTrait
             self::fail(sprintf('Failed asserting that exception of type "%s" is thrown.', MissingConstructorArgumentsException::class));
         } catch (MissingConstructorArgumentsException $e) {
             self::assertSame(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$bar", "$baz".', ConstructorArgumentsObject::class), $e->getMessage());
+            self::assertSame(ConstructorArgumentsObject::class, $e->getClass());
             self::assertSame(['bar', 'baz'], $e->getMissingConstructorArguments());
         }
     }

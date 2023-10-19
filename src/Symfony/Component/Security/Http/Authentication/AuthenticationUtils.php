@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Authentication;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * Extracts Security Errors from Request.
@@ -23,46 +23,40 @@ use Symfony\Component\Security\Core\Security;
  */
 class AuthenticationUtils
 {
-    private $requestStack;
+    private RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @return AuthenticationException|null
-     */
-    public function getLastAuthenticationError(bool $clearSession = true)
+    public function getLastAuthenticationError(bool $clearSession = true): ?AuthenticationException
     {
         $request = $this->getRequest();
         $authenticationException = null;
 
-        if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
-            $authenticationException = $request->attributes->get(Security::AUTHENTICATION_ERROR);
-        } elseif ($request->hasSession() && ($session = $request->getSession())->has(Security::AUTHENTICATION_ERROR)) {
-            $authenticationException = $session->get(Security::AUTHENTICATION_ERROR);
+        if ($request->attributes->has(SecurityRequestAttributes::AUTHENTICATION_ERROR)) {
+            $authenticationException = $request->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
+        } elseif ($request->hasSession() && ($session = $request->getSession())->has(SecurityRequestAttributes::AUTHENTICATION_ERROR)) {
+            $authenticationException = $session->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
 
             if ($clearSession) {
-                $session->remove(Security::AUTHENTICATION_ERROR);
+                $session->remove(SecurityRequestAttributes::AUTHENTICATION_ERROR);
             }
         }
 
         return $authenticationException;
     }
 
-    /**
-     * @return string
-     */
-    public function getLastUsername()
+    public function getLastUsername(): string
     {
         $request = $this->getRequest();
 
-        if ($request->attributes->has(Security::LAST_USERNAME)) {
-            return $request->attributes->get(Security::LAST_USERNAME, '');
+        if ($request->attributes->has(SecurityRequestAttributes::LAST_USERNAME)) {
+            return $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME, '');
         }
 
-        return $request->hasSession() ? $request->getSession()->get(Security::LAST_USERNAME, '') : '';
+        return $request->hasSession() ? $request->getSession()->get(SecurityRequestAttributes::LAST_USERNAME, '') : '';
     }
 
     /**

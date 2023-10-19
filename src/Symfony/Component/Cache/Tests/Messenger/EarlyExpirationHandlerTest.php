@@ -22,9 +22,6 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Cache\CallbackInterface;
 
-/**
- * @requires function Symfony\Component\DependencyInjection\ReverseContainer::__construct
- */
 class EarlyExpirationHandlerTest extends TestCase
 {
     public static function tearDownAfterClass(): void
@@ -42,7 +39,7 @@ class EarlyExpirationHandlerTest extends TestCase
         $item->set(234);
 
         $computationService = new class() implements CallbackInterface {
-            public function __invoke(CacheItemInterface $item, bool &$save)
+            public function __invoke(CacheItemInterface $item, bool &$save): mixed
             {
                 usleep(30000);
                 $item->expiresAfter(3600);
@@ -63,7 +60,7 @@ class EarlyExpirationHandlerTest extends TestCase
 
         $handler($msg);
 
-        $this->assertSame(123, $pool->get('foo', [$this, 'fail'], 0.0, $metadata));
+        $this->assertSame(123, $pool->get('foo', $this->fail(...), 0.0, $metadata));
 
         $this->assertGreaterThan(25, $metadata['ctime']);
         $this->assertGreaterThan(time(), $metadata['expiry']);

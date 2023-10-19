@@ -17,10 +17,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ResponseCookieValueSame extends Constraint
 {
-    private $name;
-    private $value;
-    private $path;
-    private $domain;
+    private string $name;
+    private string $value;
+    private string $path;
+    private ?string $domain;
 
     public function __construct(string $name, string $value, string $path = '/', string $domain = null)
     {
@@ -30,9 +30,6 @@ final class ResponseCookieValueSame extends Constraint
         $this->domain = $domain;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         $str = sprintf('has cookie "%s"', $this->name);
@@ -49,8 +46,6 @@ final class ResponseCookieValueSame extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function matches($response): bool
     {
@@ -64,8 +59,6 @@ final class ResponseCookieValueSame extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($response): string
     {
@@ -76,9 +69,7 @@ final class ResponseCookieValueSame extends Constraint
     {
         $cookies = $response->headers->getCookies();
 
-        $filteredCookies = array_filter($cookies, function (Cookie $cookie) {
-            return $cookie->getName() === $this->name && $cookie->getPath() === $this->path && $cookie->getDomain() === $this->domain;
-        });
+        $filteredCookies = array_filter($cookies, fn (Cookie $cookie) => $cookie->getName() === $this->name && $cookie->getPath() === $this->path && $cookie->getDomain() === $this->domain);
 
         return reset($filteredCookies) ?: null;
     }

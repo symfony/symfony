@@ -30,11 +30,11 @@ class DiscriminatorMap
         private readonly array $mapping,
     ) {
         if (empty($typeProperty)) {
-            throw new InvalidArgumentException(sprintf('Parameter "typeProperty" of annotation "%s" cannot be empty.', static::class));
+            throw new InvalidArgumentException(sprintf('Parameter "typeProperty" given to "%s" cannot be empty.', static::class));
         }
 
         if (empty($mapping)) {
-            throw new InvalidArgumentException(sprintf('Parameter "mapping" of annotation "%s" cannot be empty.', static::class));
+            throw new InvalidArgumentException(sprintf('Parameter "mapping" given to "%s" cannot be empty.', static::class));
         }
     }
 

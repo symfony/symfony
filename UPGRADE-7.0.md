@@ -264,6 +264,10 @@ FrameworkBundle
  * Remove the `routing.loader.annotation.directory` service, use the `routing.loader.attribute.directory` service instead
  * Remove the `routing.loader.annotation.file` service, use the `routing.loader.attribute.file` service instead
  * Remove `AnnotatedRouteControllerLoader`, use `AttributeRouteControllerLoader` instead
+ * Remove `AddExpressionLanguageProvidersPass`, use `Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass` instead
+ * Remove `DataCollectorTranslatorPass`, use `Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass` instead
+ * Remove `LoggingTranslatorPass`, use `Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass` instead
+ * Remove `WorkflowGuardListenerPass`, use `Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass` instead
 
 HttpFoundation
 --------------

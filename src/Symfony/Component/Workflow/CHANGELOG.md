@@ -19,6 +19,7 @@ CHANGELOG
  * Add PHP attributes to register listeners and guards
  * Deprecate `GuardEvent::getContext()` method that will be removed in 7.0
  * Revert: Mark `Symfony\Component\Workflow\Registry` as internal
+ * Add `WorkflowGuardListenerPass` (moved from `FrameworkBundle`)
 
 6.2
 ---

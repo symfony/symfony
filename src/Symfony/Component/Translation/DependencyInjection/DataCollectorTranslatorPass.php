@@ -9,18 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\Translation\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Translation\TranslatorBagInterface;
 
-trigger_deprecation('symfony/framework-bundle', '6.4', 'The "%s" class is deprecated, use "%s" instead.', DataCollectorTranslatorPass::class, \Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass::class);
-
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
- *
- * @deprecated since Symfony 6.4, use Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass instead.
  */
 class DataCollectorTranslatorPass implements CompilerPassInterface
 {

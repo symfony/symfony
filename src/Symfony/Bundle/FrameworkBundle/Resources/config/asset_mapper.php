@@ -34,6 +34,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageStorage;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
@@ -171,6 +172,12 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper.importmap.resolver'),
             ])
 
+        ->set('asset_mapper.importmap.version_checker', ImportMapVersionChecker::class)
+            ->args([
+                service('asset_mapper.importmap.config_reader'),
+                service('asset_mapper.importmap.remote_package_downloader'),
+            ])
+
         ->set('asset_mapper.importmap.resolver', JsDelivrEsmResolver::class)
             ->args([service('http_client')])
 
@@ -199,6 +206,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('asset_mapper.importmap.manager'),
                 param('kernel.project_dir'),
+                service('asset_mapper.importmap.version_checker'),
             ])
             ->tag('console.command')
 
@@ -207,7 +215,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command')
 
         ->set('asset_mapper.importmap.command.update', ImportMapUpdateCommand::class)
-            ->args([service('asset_mapper.importmap.manager')])
+            ->args([
+                service('asset_mapper.importmap.manager'),
+                service('asset_mapper.importmap.version_checker'),
+            ])
             ->tag('console.command')
 
         ->set('asset_mapper.importmap.command.install', ImportMapInstallCommand::class)

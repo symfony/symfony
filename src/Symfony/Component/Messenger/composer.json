@@ -18,7 +18,8 @@
     "require": {
         "php": ">=8.2",
         "psr/log": "^1|^2|^3",
-        "symfony/clock": "^6.4|^7.0"
+        "symfony/clock": "^6.4|^7.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
         "psr/cache": "^1.0|^2.0|^3.0",

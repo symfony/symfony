@@ -9,20 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\Translation\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
 use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @group legacy
- */
 class DataCollectorTranslatorPassTest extends TestCase
 {
     private ContainerBuilder $container;
@@ -34,7 +31,7 @@ class DataCollectorTranslatorPassTest extends TestCase
         $this->dataCollectorTranslatorPass = new DataCollectorTranslatorPass();
 
         $this->container->setParameter('translator_implementing_bag', Translator::class);
-        $this->container->setParameter('translator_not_implementing_bag', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag');
+        $this->container->setParameter('translator_not_implementing_bag', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithoutTranslatorBag');
 
         $this->container->register('translator.data_collector', DataCollectorTranslator::class)
             ->setDecoratedService('translator')
@@ -105,13 +102,13 @@ class DataCollectorTranslatorPassTest extends TestCase
     public static function getNotImplementingTranslatorBagInterfaceTranslatorClassNames()
     {
         return [
-            ['Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag'],
+            ['Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithoutTranslatorBag'],
             ['%translator_not_implementing_bag%'],
         ];
     }
 }
 
-class TranslatorWithTranslatorBag implements TranslatorInterface
+class TranslatorWithoutTranslatorBag implements TranslatorInterface
 {
     public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
     {

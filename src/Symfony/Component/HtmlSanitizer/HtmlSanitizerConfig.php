@@ -405,8 +405,16 @@ class HtmlSanitizerConfig
         return $clone;
     }
 
+    /**
+     * @param int $maxInputLength The maximum length of the input string in bytes
+     *                            -1 means no limit
+     */
     public function withMaxInputLength(int $maxInputLength): static
     {
+        if ($maxInputLength < -1) {
+            throw new \InvalidArgumentException(sprintf('The maximum input length must be greater than -1, "%d" given.', $maxInputLength));
+        }
+
         $clone = clone $this;
         $clone->maxInputLength = $maxInputLength;
 

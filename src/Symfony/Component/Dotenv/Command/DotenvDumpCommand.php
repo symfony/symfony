@@ -30,7 +30,7 @@ use Symfony\Component\Dotenv\Dotenv;
 final class DotenvDumpCommand extends Command
 {
     private string $projectDir;
-    private string|null $defaultEnv;
+    private ?string $defaultEnv;
 
     public function __construct(string $projectDir, string $defaultEnv = null)
     {

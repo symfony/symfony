@@ -4,11 +4,11 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>Qiymat noto'g'ri bo'lishi kerak.</target>
+                <target>Qiymat false bo'lishi kerak.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>Qiymat to'g'ri bo'lishi kerak.</target>
+                <target>Qiymat true bo'lishi kerak.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>Tanlangan qiymat to'g'ri emas.</target>
+                <target>Tanlangan qiymat yaroqli emas.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
-                <target>Belgilangan qiymatlarning bir yoki bir nechtasi noto'g'ri.</target>
+                <target>Belgilangan qiymatlarning bir yoki bir nechtasi yaroqsiz.</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
@@ -143,9 +143,9 @@
                 <target>Noto'g'ri til.</target>
             </trans-unit>
             <trans-unit id="39">
-                 <source>This value is not a valid locale.</source>
-                 <target>Ushbu qiymat mahalliy qiymat emas.</target>
-             </trans-unit>
+                <source>This value is not a valid locale.</source>
+                <target>Ushbu qiymat mahalliy qiymat emas.</target>
+            </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
                 <target>Mamlakat qiymati noto'g'ri.</target>
@@ -390,7 +390,7 @@
                 <source>This value should be a valid expression.</source>
                 <target>Ushbu qiymat to'g'ri ifoda bo'lishi kerak.</target>
             </trans-unit>
-             <trans-unit id="101">
+            <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
                 <target>Bu qiymat haqiqiy CSS rangi emas.</target>
             </trans-unit>
@@ -401,6 +401,30 @@
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Tarmoq niqobining qiymati {{ min }} va {{ max }} oralig'ida bo'lishi kerak.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Fayl nomi juda uzun. U {{ filename_max_length }} belgidan iborat boʻlishi kerak.|Fayl nomi juda uzun. U {{ filename_max_length }} ta belgidan iborat boʻlishi kerak.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Parol kuchi juda past. Iltimos, kuchliroq paroldan foydalaning.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Bu qiymat joriy cheklov darajasida ruxsat etilmagan belgilarni o'z ichiga oladi.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Ko'rinmas belgilardan foydalanish taqiqlangan.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Turli skriptlardagi raqamlarni aralashtirish taqiqlangan.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Yashirin qoplamali belgilardan foydalanish taqiqlangan.</target>
             </trans-unit>
         </body>
     </file>

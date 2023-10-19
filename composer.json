@@ -35,6 +35,7 @@
     "require": {
         "php": ">=8.2",
         "composer-runtime-api": ">=2.1",
+        "composer/semver": "^3.0",
         "ext-xml": "*",
         "doctrine/event-manager": "^2",
         "doctrine/persistence": "^3.1",

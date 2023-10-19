@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Command;
 
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,8 +27,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'importmap:update', description: 'Update JavaScript packages to their latest versions')]
 final class ImportMapUpdateCommand extends Command
 {
+    use VersionProblemCommandTrait;
+
     public function __construct(
-        protected readonly ImportMapManager $importMapManager,
+        private readonly ImportMapManager $importMapManager,
+        private readonly ImportMapVersionChecker $importMapVersionChecker,
     ) {
         parent::__construct();
     }
@@ -56,6 +60,8 @@ EOT
 
         $io = new SymfonyStyle($input, $output);
         $updatedPackages = $this->importMapManager->update($packages);
+
+        $this->renderVersionProblems($this->importMapVersionChecker, $output);
 
         if (0 < \count($packages)) {
             $io->success(sprintf(

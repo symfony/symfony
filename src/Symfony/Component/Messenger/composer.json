@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=8.1",
+        "ext-pcntl": "*",
         "psr/log": "^1|^2|^3",
         "symfony/clock": "^6.3|^7.0"
     },

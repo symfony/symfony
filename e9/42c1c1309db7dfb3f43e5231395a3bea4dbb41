@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-04T09:52:04Z
+
+Hey!
+
+I think @filkaris has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by tyx at 2022-12-13T08:14:25Z
+
+Hello there !
+
+I'll have some time soon to write some documentation but I'd like to be sure that the feature is interesting :D
+
+---------------------------------------------------------------------------
+
+by tyx at 2023-10-18T14:07:59Z
+
+> What are the pros/cons to use one interface instead of two? (and make the return type nullable)
+
+Hi @Nyholm  !
+
+In fact, deduplication is "optionnal" in sqs world. For example in our situation we rarely use it.
+
+According to the documentation
+
+> Providing the message deduplication ID
+The producer should provide message deduplication ID values for each message in the following scenarios:
+Messages sent with identical message bodies that Amazon SQS must treat as unique.
+Messages sent with identical content but different message attributes that Amazon SQS must treat as unique.
+Messages sent with different content (for example, retry counts included in the message body) that Amazon SQS must treat as duplicates.
+
+https://docs.aws.amazon.com/en_gb/AWSSimpleQueueService/latest/SQSDeveloperGuide/using-messagededuplicationid-property.html
+
+So 2 interfaces reduce the boilercode to write by the end user (aka empty method deduplicationId)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-10-18T14:17:11Z
+
+> So 2 interfaces reduce the boilercode to write by the end user
+
+Yeah, true. Thank you
+
+Please add a doc block and I am super happy with this PR.
+
+---------------------------------------------------------------------------
+
+by tyx at 2023-10-18T14:53:01Z
+
+Here it is ! I guess CI failure are unrelated to my PR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-19T13:09:32Z
+
+One last thing: please update the PR description to show how the middleware could be enabled.

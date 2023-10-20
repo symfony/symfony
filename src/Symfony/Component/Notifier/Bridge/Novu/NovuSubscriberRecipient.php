@@ -18,6 +18,19 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 class NovuSubscriberRecipient implements RecipientInterface
 {
+    /**
+     * @param array{
+     *            email?: array{
+     *                from?: string,
+     *                senderName?: string,
+     *                replyTo?: string,
+     *                cc?: string[],
+     *                bcc?: string[]
+     *            }|null
+     *        } $overrides
+     *
+     * @see https://docs.novu.co/channels/email/#sending-email-overrides
+     */
     public function __construct(
         private readonly string $subscriberId,
         private readonly ?string $firstName = null,
@@ -26,6 +39,7 @@ class NovuSubscriberRecipient implements RecipientInterface
         private readonly ?string $phone = null,
         private readonly ?string $avatar = null,
         private readonly ?string $locale = null,
+        private readonly array $overrides = [],
     ) {
     }
 
@@ -62,5 +76,10 @@ class NovuSubscriberRecipient implements RecipientInterface
     public function getLocale(): ?string
     {
         return $this->locale;
+    }
+
+    public function getOverrides(): array
+    {
+        return $this->overrides;
     }
 }

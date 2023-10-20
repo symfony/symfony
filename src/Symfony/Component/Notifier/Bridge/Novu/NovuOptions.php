@@ -18,6 +18,19 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 class NovuOptions implements MessageOptionsInterface
 {
+    /**
+     * @param array{
+     *            email?: array{
+     *                from?: string,
+     *                senderName?: string,
+     *                replyTo?: string,
+     *                cc?: string[],
+     *                bcc?: string[]
+     *            }|null
+     *        } $overrides
+     *
+     * @see https://docs.novu.co/channels/email/#sending-email-overrides
+     */
     public function __construct(
         private readonly ?string $subscriberId = null,
         private readonly ?string $firstName = null,
@@ -26,6 +39,7 @@ class NovuOptions implements MessageOptionsInterface
         private readonly ?string $phone = null,
         private readonly ?string $avatar = null,
         private readonly ?string $locale = null,
+        private readonly array $overrides = [],
         private readonly array $options = [],
     ) {
     }
@@ -39,6 +53,7 @@ class NovuOptions implements MessageOptionsInterface
             'phone' => $this->phone,
             'avatar' => $this->avatar,
             'locale' => $this->locale,
+            'overrides' => $this->overrides,
         ]);
     }
 

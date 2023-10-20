@@ -37,7 +37,7 @@ class NovuTransportTest extends TransportTestCase
 
     public static function supportedMessagesProvider(): iterable
     {
-        yield [new PushMessage('test', '{}', new NovuOptions(123, null, null, 'test@example.com', null, null, null, []))];
+        yield [new PushMessage('test', '{}', new NovuOptions(123, null, null, 'test@example.com', null, null, null, ['email' => ['from' => 'no-reply@example.com', 'senderName' => 'No-Reply']], []))];
     }
 
     public static function unsupportedMessagesProvider(): iterable
@@ -63,6 +63,6 @@ class NovuTransportTest extends TransportTestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/400: "subscriberId under property to is not configured"/');
 
-        $transport->send(new PushMessage('test', '{}', new NovuOptions(123, null, null, 'test@example.com', null, null, null, [])));
+        $transport->send(new PushMessage('test', '{}', new NovuOptions(123, null, null, 'test@example.com', null, null, null, ['email' => ['from' => 'no-reply@example.com', 'senderName' => 'No-Reply']], [])));
     }
 }

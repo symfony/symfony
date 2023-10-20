@@ -57,7 +57,7 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
                 break;
             }
             // short option
-            if (0 === strpos($cliArgument, '-c')) {
+            if (str_starts_with($cliArgument, '-c')) {
                 if ('-c' === $cliArgument && array_key_exists($cliArgumentIndex + 1, $argv)) {
                     $phpunitConfigFilename = $getPhpUnitConfig($argv[$cliArgumentIndex + 1]);
                 } else {

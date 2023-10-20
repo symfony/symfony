@@ -15,9 +15,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
+use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactoryInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
-use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
 class AssetMapperTest extends TestCase
 {
@@ -90,17 +90,21 @@ class AssetMapperTest extends TestCase
     {
         $dirs = ['dir1' => '', 'dir2' => '', 'dir3' => ''];
         $repository = new AssetMapperRepository($dirs, __DIR__.'/Fixtures');
-        $pathResolver = $this->createMock(PublicAssetsPathResolverInterface::class);
-        $pathResolver->expects($this->any())
-            ->method('getPublicFilesystemPath')
-            ->willReturn(__DIR__.'/Fixtures/test_public/final-assets');
+        $compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
+        $compiledConfigReader->expects($this->any())
+            ->method('configExists')
+            ->with(AssetMapper::MANIFEST_FILE_NAME)
+            ->willReturn(true);
+        $compiledConfigReader->expects($this->any())
+            ->method('loadConfig')
+            ->willReturn(['file4.js' => '/final-assets/file4.checksumfrommanifest.js']);
 
         $this->mappedAssetFactory = $this->createMock(MappedAssetFactoryInterface::class);
 
         return new AssetMapper(
             $repository,
             $this->mappedAssetFactory,
-            $pathResolver,
+            $compiledConfigReader,
         );
     }
 }

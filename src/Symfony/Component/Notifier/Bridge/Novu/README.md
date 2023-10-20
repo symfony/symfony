@@ -31,6 +31,7 @@ class NovuNotification extends Notification implements PushNotificationInterface
                 $recipient->getPhone(),
                 $recipient->getAvatar(),
                 $recipient->getLocale(),
+                $recipient->getOverrides(),
                 [],
             ),
         );
@@ -60,6 +61,12 @@ $this->notifier->send(
         null,
         null,
         null,
+        [
+            'email' => [
+                'from' => 'no-reply@toppy.nl',
+                'senderName' => 'No-Reply',
+            ],
+        ],
     ),
 );
 ```

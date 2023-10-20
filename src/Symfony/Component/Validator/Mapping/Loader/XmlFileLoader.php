@@ -201,6 +201,7 @@ class XmlFileLoader extends FileLoader
     private function loadClassMetadataFromXml(ClassMetadata $metadata, \SimpleXMLElement $classDescription): void
     {
         if (\count($classDescription->{'group-sequence-provider'}) > 0) {
+            $metadata->setGroupProvider($classDescription->{'group-sequence-provider'}[0]->value ?: null);
             $metadata->setGroupSequenceProvider(true);
         }
 

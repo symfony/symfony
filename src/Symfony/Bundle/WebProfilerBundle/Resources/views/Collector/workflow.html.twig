@@ -1,5 +1,102 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        dialog {
+            border: none;
+            border-radius: 6px;
+            box-shadow: var(--settings-modal-shadow);
+            max-width: 94%;
+            width: 1200px;
+        }
+
+        dialog::backdrop {
+            background: linear-gradient(
+                45deg,
+                rgb(18, 18, 20, 0.4),
+                rgb(17, 17, 20, 0.8)
+            );
+        }
+
+        dialog[open] {
+            animation: scale 0.3s ease normal;
+        }
+
+        dialog[open]::backdrop {
+            animation: backdrop 0.3s ease normal;
+        }
+
+        dialog.hide {
+            animation-direction: reverse;
+        }
+
+        dialog h2 {
+            margin-top: 0.2em
+        }
+
+        dialog i.cancel {
+            cursor: pointer;
+            padding: 0 5px;
+            float: right;
+        }
+
+        dialog table {
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+            margin: 0 0 1em 0;
+            margin-bottom: 1em;
+            padding: 0;
+            table-layout: fixed;
+        }
+
+        dialog table tr {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: .35em;
+        }
+
+        dialog table th,
+        dialog table td {
+            padding: .625em;
+            text-align: center;
+        }
+
+        dialog table th {
+            font-size: .85em;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+
+        dialog menu {
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            vertical-align: middle;
+            justify-content: center;
+        }
+
+        dialog menu small {
+            margin-right: auto;
+        }
+        dialog menu small i {
+            margin-right: 3px;
+        }
+
+        @keyframes scale {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes backdrop {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% if collector.callsCount > 0 %}
         {% set icon %}
@@ -40,6 +137,93 @@
                 flowchart: { useMaxWidth: false },
                 securityLevel: 'loose',
             });
+
+            {% for name, data in collector.workflows %}
+                window.showNodeDetails{{ collector.hash(name) }} = function (node) {
+                    const map = {{ data.listeners|json_encode|raw }};
+                    showNodeDetails(node, map);
+                };
+            {% endfor %}
+
+            const showNodeDetails = function (node, map) {
+                const dialog = document.getElementById('detailsDialog');
+
+                dialog.querySelector('tbody').innerHTML = '';
+                for (const [eventName, listeners] of Object.entries(map[node])) {
+                    listeners.forEach(listener => {
+                        const row = document.createElement('tr');
+
+                        const eventNameCode = document.createElement('code');
+                        eventNameCode.textContent = eventName;
+
+                        const eventNameCell = document.createElement('td');
+                        eventNameCell.appendChild(eventNameCode);
+                        row.appendChild(eventNameCell);
+
+                        const listenerDetailsCell = document.createElement('td');
+                        row.appendChild(listenerDetailsCell);
+
+                        let listenerDetails;
+                        const listenerDetailsCode = document.createElement('code');
+                        listenerDetailsCode.textContent = listener.title;
+                        if (listener.file) {
+                            const link = document.createElement('a');
+                            link.href = listener.file;
+                            link.appendChild(listenerDetailsCode);
+                            listenerDetails = link;
+                        } else {
+                            listenerDetails = listenerDetailsCode;
+                        }
+                        listenerDetailsCell.appendChild(listenerDetails);
+
+                        if (typeof listener.guardExpressions === 'object') {
+                            listenerDetailsCell.appendChild(document.createElement('br'));
+
+                            const guardExpressionsWrapper = document.createElement('span');
+                            guardExpressionsWrapper.appendChild(document.createTextNode('guard expressions: '));
+
+                            listener.guardExpressions.forEach((expression, index) => {
+                                if (index > 0) {
+                                    guardExpressionsWrapper.appendChild(document.createTextNode(', '));
+                                }
+
+                                const expressionCode = document.createElement('code');
+                                expressionCode.textContent = expression;
+                                guardExpressionsWrapper.appendChild(expressionCode);
+                            });
+
+                            listenerDetailsCell.appendChild(guardExpressionsWrapper);
+                        }
+
+                        dialog.querySelector('tbody').appendChild(row);
+                    });
+                };
+
+                if (dialog.dataset.processed) {
+                    dialog.showModal();
+                    return;
+                }
+
+                dialog.addEventListener('click', (e) => {
+                    const rect = dialog.getBoundingClientRect();
+
+                    const inDialog =
+                        rect.top <= e.clientY &&
+                        e.clientY <= rect.top + rect.height &&
+                        rect.left <= e.clientX &&
+                        e.clientX <= rect.left + rect.width;
+
+                    !inDialog && dialog.close();
+                });
+
+                dialog.querySelectorAll('.cancel').forEach(elt => {
+                    elt.addEventListener('click', () => dialog.close());
+                });
+
+                dialog.showModal();
+
+                dialog.dataset.processed = true;
+            };
             // We do not load all mermaid diagrams at once, but only when the tab is opened
             // This is because mermaid diagrams are in a tab, and cannot be renderer with a
             // "good size" if they are not visible
@@ -71,6 +255,9 @@
                         <h3>Definition</h3>
                         <pre class="sf-mermaid">
                             {{ data.dump|raw }}
+                            {% for nodeId, events in data.listeners %}
+                                click {{ nodeId }} showNodeDetails{{ collector.hash(name) }}
+                            {% endfor %}
                         </pre>
 
                         <h3>Calls</h3>
@@ -128,4 +315,26 @@
             {% endfor %}
         </div>
     {% endif %}
+
+    <dialog id="detailsDialog">
+        <h2>
+            Event listeners
+            <i class="cancel">×</i>
+        </h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>event</th>
+                    <th>listener</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <menu>
+            <small><i>⌨</i> <kbd>esc</kbd></small>
+            <button class="btn btn-sm cancel">Close</button>
+        </menu>
+    </dialog>
 {% endblock %}

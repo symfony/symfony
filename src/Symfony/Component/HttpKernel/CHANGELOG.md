@@ -27,6 +27,7 @@ CHANGELOG
  * Add argument `$validationFailedStatusCode` to `#[MapQueryString]` and `#[MapRequestPayload]`
  * Add argument `$debug` to `Logger`
  * Add class `DebugLoggerConfigurator`
+ * Add parameters `kernel.runtime_mode` and `kernel.runtime_mode.*`, all set from env var `APP_RUNTIME_MODE`
  * Deprecate `Kernel::stripComments()`
  * Support the `!` character at the beginning of a string as a negation operator in the url filter of the profiler
  * Deprecate `UriSigner`, use `UriSigner` from the HttpFoundation component instead

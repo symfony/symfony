@@ -171,6 +171,7 @@ use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\GroupProviderInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
@@ -636,6 +637,8 @@ class FrameworkExtension extends Extension
             ->addTag('serializer.normalizer');
         $container->registerForAutoconfiguration(ConstraintValidatorInterface::class)
             ->addTag('validator.constraint_validator');
+        $container->registerForAutoconfiguration(GroupProviderInterface::class)
+            ->addTag('validator.group_provider');
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
         $container->registerForAutoconfiguration(BatchHandlerInterface::class)
@@ -1157,7 +1160,7 @@ class FrameworkExtension extends Extension
             $container->setDefinition('debug.log_processor', $definition);
 
             $container->register('debug.debug_logger_configurator', DebugLoggerConfigurator::class)
-                ->setArguments([new Reference('debug.log_processor')]);
+                ->setArguments([new Reference('debug.log_processor'), '%kernel.runtime_mode.web%']);
         }
     }
 
@@ -1324,13 +1327,17 @@ class FrameworkExtension extends Extension
             ->setArgument(0, $paths)
             ->setArgument(2, $excludedPathPatterns);
 
-        $publicDirName = $this->getPublicDirectoryName($container);
         $container->getDefinition('asset_mapper.public_assets_path_resolver')
-            ->setArgument(1, $config['public_prefix'])
-            ->setArgument(2, $publicDirName);
+            ->setArgument(0, $config['public_prefix']);
 
-        $container->getDefinition('asset_mapper.command.compile')
-            ->setArgument(5, $publicDirName);
+        $publicDirectory = $this->getPublicDirectory($container);
+        $publicAssetsDirectory = rtrim($publicDirectory.'/'.ltrim($config['public_prefix'], '/'), '/');
+        $container->getDefinition('asset_mapper.local_public_assets_filesystem')
+            ->setArgument(0, $publicDirectory)
+        ;
+
+        $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')
+            ->setArgument(0, $publicAssetsDirectory);
 
         if (!$config['server']) {
             $container->removeDefinition('asset_mapper.dev_server_subscriber');
@@ -3025,11 +3032,12 @@ class FrameworkExtension extends Extension
         $config['enabled'] = $value;
     }
 
-    private function getPublicDirectoryName(ContainerBuilder $container): string
+    private function getPublicDirectory(ContainerBuilder $container): string
     {
-        $defaultPublicDir = 'public';
+        $projectDir = $container->getParameter('kernel.project_dir');
+        $defaultPublicDir = $projectDir.'/public';
 
-        $composerFilePath = $container->getParameter('kernel.project_dir').'/composer.json';
+        $composerFilePath = $projectDir.'/composer.json';
 
         if (!file_exists($composerFilePath)) {
             return $defaultPublicDir;
@@ -3038,6 +3046,6 @@ class FrameworkExtension extends Extension
         $container->addResource(new FileResource($composerFilePath));
         $composerConfig = json_decode(file_get_contents($composerFilePath), true);
 
-        return $composerConfig['extra']['public-dir'] ?? $defaultPublicDir;
+        return isset($composerConfig['extra']['public-dir']) ? $projectDir.'/'.$composerConfig['extra']['public-dir'] : $defaultPublicDir;
     }
 }

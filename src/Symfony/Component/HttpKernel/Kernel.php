@@ -409,7 +409,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         try {
             is_dir($buildDir) ?: mkdir($buildDir, 0777, true);
 
-            if ($lock = fopen($cachePath.'.lock', 'w')) {
+            if ($lock = fopen($cachePath.'.lock', 'w+')) {
                 if (!flock($lock, \LOCK_EX | \LOCK_NB, $wouldBlock) && !flock($lock, $wouldBlock ? \LOCK_SH : \LOCK_EX)) {
                     fclose($lock);
                     $lock = null;
@@ -552,6 +552,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
             'kernel.environment' => $this->environment,
             'kernel.runtime_environment' => '%env(default:kernel.environment:APP_RUNTIME_ENV)%',
+            'kernel.runtime_mode' => '%env(query_string:default:container.runtime_mode:APP_RUNTIME_MODE)%',
+            'kernel.runtime_mode.web' => '%env(bool:default::key:web:default:kernel.runtime_mode:)%',
+            'kernel.runtime_mode.cli' => '%env(not:default:kernel.runtime_mode.web:)%',
+            'kernel.runtime_mode.worker' => '%env(bool:default::key:worker:default:kernel.runtime_mode:)%',
             'kernel.debug' => $this->debug,
             'kernel.build_dir' => realpath($buildDir = $this->warmupDir ?: $this->getBuildDir()) ?: $buildDir,
             'kernel.cache_dir' => realpath($cacheDir = ($this->getCacheDir() === $this->getBuildDir() ? ($this->warmupDir ?: $this->getCacheDir()) : $this->getCacheDir())) ?: $cacheDir,

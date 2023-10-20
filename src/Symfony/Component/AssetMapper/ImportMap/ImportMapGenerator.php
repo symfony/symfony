@@ -12,9 +12,9 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\MappedAsset;
-use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
 /**
  * Provides data needed to write the importmap & preloads.
@@ -26,7 +26,7 @@ class ImportMapGenerator
 
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
-        private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
+        private readonly CompiledAssetMapperConfigReader $compiledConfigReader,
         private readonly ImportMapConfigReader $importMapConfigReader,
     ) {
     }
@@ -87,9 +87,8 @@ class ImportMapGenerator
      */
     public function getRawImportMapData(): array
     {
-        $dumpedImportMapPath = $this->assetsPathResolver->getPublicFilesystemPath().'/'.self::IMPORT_MAP_CACHE_FILENAME;
-        if (is_file($dumpedImportMapPath)) {
-            return json_decode(file_get_contents($dumpedImportMapPath), true, 512, \JSON_THROW_ON_ERROR);
+        if ($this->compiledConfigReader->configExists(self::IMPORT_MAP_CACHE_FILENAME)) {
+            return $this->compiledConfigReader->loadConfig(self::IMPORT_MAP_CACHE_FILENAME);
         }
 
         $allEntries = [];
@@ -122,9 +121,8 @@ class ImportMapGenerator
      */
     public function findEagerEntrypointImports(string $entryName): array
     {
-        $dumpedEntrypointPath = $this->assetsPathResolver->getPublicFilesystemPath().'/'.sprintf(self::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entryName);
-        if (is_file($dumpedEntrypointPath)) {
-            return json_decode(file_get_contents($dumpedEntrypointPath), true, 512, \JSON_THROW_ON_ERROR);
+        if ($this->compiledConfigReader->configExists(sprintf(self::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entryName))) {
+            return $this->compiledConfigReader->loadConfig(sprintf(self::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entryName));
         }
 
         $rootImportEntries = $this->importMapConfigReader->getEntries();
@@ -200,13 +198,6 @@ class ImportMapGenerator
         }
 
         return $currentImportEntries;
-    }
-
-    private function findRootImportMapEntry(string $moduleName): ?ImportMapEntry
-    {
-        $entries = $this->importMapConfigReader->getEntries();
-
-        return $entries->has($moduleName) ? $entries->get($moduleName) : null;
     }
 
     /**

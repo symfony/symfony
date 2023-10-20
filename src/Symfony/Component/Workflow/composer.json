@@ -26,6 +26,8 @@
         "psr/log": "^1|^2|^3",
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/event-dispatcher": "^6.4|^7.0",
+        "symfony/error-handler": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",
         "symfony/security-core": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0"

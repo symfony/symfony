@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by shyim at 2023-10-04T21:26:30Z
+
+looks pretty good. I am right now in Berlin for SymfonyLive. I will check next week and build something with flysystem :).
+
+But arent the most things breaking changes? 🤔
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-10-05T14:14:46Z
+
+> But arent the most things breaking changes? 🤔
+
+Indeed, but the component has been released as [experimental](https://symfony.com/doc/current/contributing/code/experimental.html) to allow for such changes if needed.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-05T15:05:36Z
+
+> Indeed, but the component has been released as [experimental](https://symfony.com/doc/current/contributing/code/experimental.html) to allow for such changes if needed.
+
+That's also why I'd like to get this in NOW for 6.4 - the component will be stable in 6.4, so making a change like this will be harder. We're already dipping a little beyond the 6.4 feature-freeze date :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-13T12:31:42Z
+
+@shyim While I think this PR is valid and should be merged, since you created the original issue, if you were able to validate that this gives you what you need, that would help :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-17T01:09:02Z
+
+~~Test failures in AssetMapper - but it looks like it's coming from #50734 - the `$this` variable in~~ https://github.com/symfony/symfony/blob/934aea0b32ed6caea3cf5e1e4bb4cbc05417b424/src/Symfony/Component/ErrorHandler/Resources/views/trace.html.php#L14 ~~is an instance of `HtmlErrorRenderer`~~
+
+Rebased and those tests are fixed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-10-20T05:46:29Z
+
+@weaverryan Can you rebase this one?

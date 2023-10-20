@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-19T13:59:09Z
+
+What about renaming those folders?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-19T14:06:21Z
+
+> What about renaming those folders?
+
+I didn't dare to suggest. Really.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-19T18:29:09Z
+
+@OskarStark there is the "rename" option. What do you think ?
+
+(if this pass, all in-progress PR will probably hate me)
+
+fabbot fails because there is an invalid json file (the same there was but the path has changed...)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-20T04:16:49Z
+
+Don't worry, they can rebase their PRs

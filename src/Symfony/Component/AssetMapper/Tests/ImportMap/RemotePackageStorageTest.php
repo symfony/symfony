@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class RemotePackageStorageTest extends TestCase
 {
     private Filesystem $filesystem;
-    private static string $writableRoot = __DIR__.'/../fixtures/importmaps_for_writing';
+    private static string $writableRoot = __DIR__ . '/../Fixtures/importmaps_for_writing';
 
     protected function setUp(): void
     {

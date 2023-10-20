@@ -116,19 +116,19 @@ EOF;
 
         $this->assertEquals($expectedCatalogue, $actualCatalogue);
 
-        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translatable.html.php';
+        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../Fixtures/extractor/translatable.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('translatable single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('translatable other-domain-test-no-params-short-array', 'not_messages'));
 
-        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translatable-fqn.html.php';
+        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../Fixtures/extractor/translatable-fqn.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('translatable-fqn single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('translatable-fqn other-domain-test-no-params-short-array', 'not_messages'));
 
-        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translatable-short.html.php';
+        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../Fixtures/extractor/translatable-short.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('translatable-short single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('translatable-short other-domain-test-no-params-short-array', 'not_messages'));
 
-        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translation.html.php';
+        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../Fixtures/extractor/translation.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
     }
@@ -139,7 +139,7 @@ EOF;
 
         $extractor = new PhpExtractor();
         $extractor->setPrefix('prefix');
-        $extractor->extract(__DIR__.'/../fixtures/extractor-7.3/translation.html.php', $catalogue);
+        $extractor->extract(__DIR__ . '/../Fixtures/extractor-7.3/translation.html.php', $catalogue);
 
         $expectedCatalogue = [
             'messages' => [
@@ -153,7 +153,7 @@ EOF;
 
     public static function resourcesProvider()
     {
-        $directory = __DIR__.'/../fixtures/extractor/';
+        $directory = __DIR__ . '/../Fixtures/extractor/';
         $phpFiles = [];
         $splFiles = [];
         foreach (new \DirectoryIterator($directory) as $fileInfo) {

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AssetMapper\Tests\fixtures;
+namespace Symfony\Component\AssetMapper\Tests\Fixtures;
 
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;

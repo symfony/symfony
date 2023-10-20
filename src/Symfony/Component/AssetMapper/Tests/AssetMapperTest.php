@@ -30,7 +30,7 @@ class AssetMapperTest extends TestCase
         $file1Asset = new MappedAsset('file1.css');
         $this->mappedAssetFactory->expects($this->once())
             ->method('createMappedAsset')
-            ->with('file1.css', realpath(__DIR__.'/fixtures/dir1/file1.css'))
+            ->with('file1.css', realpath(__DIR__.'/Fixtures/dir1/file1.css'))
             ->willReturn($file1Asset);
 
         $actualAsset = $assetMapper->getAsset('file1.css');
@@ -79,21 +79,21 @@ class AssetMapperTest extends TestCase
 
         $this->mappedAssetFactory->expects($this->once())
             ->method('createMappedAsset')
-            ->with('file1.css', realpath(__DIR__.'/fixtures/dir1/file1.css'))
+            ->with('file1.css', realpath(__DIR__.'/Fixtures/dir1/file1.css'))
             ->willReturn(new MappedAsset('file1.css'));
 
-        $asset = $assetMapper->getAssetFromSourcePath(__DIR__.'/fixtures/dir1/file1.css');
+        $asset = $assetMapper->getAssetFromSourcePath(__DIR__.'/Fixtures/dir1/file1.css');
         $this->assertSame('file1.css', $asset->logicalPath);
     }
 
     private function createAssetMapper(): AssetMapper
     {
         $dirs = ['dir1' => '', 'dir2' => '', 'dir3' => ''];
-        $repository = new AssetMapperRepository($dirs, __DIR__.'/fixtures');
+        $repository = new AssetMapperRepository($dirs, __DIR__.'/Fixtures');
         $pathResolver = $this->createMock(PublicAssetsPathResolverInterface::class);
         $pathResolver->expects($this->any())
             ->method('getPublicFilesystemPath')
-            ->willReturn(__DIR__.'/fixtures/test_public/final-assets');
+            ->willReturn(__DIR__.'/Fixtures/test_public/final-assets');
 
         $this->mappedAssetFactory = $this->createMock(MappedAssetFactoryInterface::class);
 

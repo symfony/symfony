@@ -14,7 +14,7 @@ namespace Symfony\Component\AssetMapper\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\AssetMapper\Event\PreAssetsCompileEvent;
-use Symfony\Component\AssetMapper\Tests\fixtures\AssetMapperTestAppKernel;
+use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -119,7 +119,7 @@ class AssetMapperCompileCommandTest extends TestCase
         $listenerCalled = false;
         $dispatcher->addListener(PreAssetsCompileEvent::class, function (PreAssetsCompileEvent $event) use (&$listenerCalled) {
             $listenerCalled = true;
-            $this->assertSame(realpath(__DIR__.'/../fixtures').'/public/assets', $event->getOutputDir());
+            $this->assertSame(realpath(__DIR__.'/../Fixtures').'/public/assets', $event->getOutputDir());
             $this->assertInstanceOf(OutputInterface::class, $event->getOutput());
         });
 

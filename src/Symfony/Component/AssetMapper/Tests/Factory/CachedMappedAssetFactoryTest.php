@@ -23,7 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class CachedMappedAssetFactoryTest extends TestCase
 {
     private Filesystem $filesystem;
-    private string $cacheDir = __DIR__.'/../fixtures/var/cache_for_mapped_asset_factory_test';
+    private string $cacheDir = __DIR__.'/../Fixtures/var/cache_for_mapped_asset_factory_test';
 
     protected function setUp(): void
     {
@@ -45,7 +45,7 @@ class CachedMappedAssetFactoryTest extends TestCase
             true
         );
 
-        $mappedAsset = new MappedAsset('file1.css', __DIR__.'/../fixtures/dir1/file1.css');
+        $mappedAsset = new MappedAsset('file1.css', __DIR__.'/../Fixtures/dir1/file1.css');
 
         $factory->expects($this->once())
             ->method('createMappedAsset')
@@ -59,12 +59,12 @@ class CachedMappedAssetFactoryTest extends TestCase
         $secondActualAsset = $cachedFactory->createMappedAsset('file1.css', '/anything/file1.css');
         $this->assertNotSame($mappedAsset, $secondActualAsset);
         $this->assertSame('file1.css', $secondActualAsset->logicalPath);
-        $this->assertSame(__DIR__.'/../fixtures/dir1/file1.css', $secondActualAsset->sourcePath);
+        $this->assertSame(__DIR__.'/../Fixtures/dir1/file1.css', $secondActualAsset->sourcePath);
     }
 
     public function testAssetIsNotBuiltWhenCached()
     {
-        $sourcePath = __DIR__.'/../fixtures/dir1/file1.css';
+        $sourcePath = __DIR__.'/../Fixtures/dir1/file1.css';
         $mappedAsset = new MappedAsset('file1.css', $sourcePath, content: 'cached content');
         $this->saveConfigCache($mappedAsset);
 
@@ -85,19 +85,19 @@ class CachedMappedAssetFactoryTest extends TestCase
 
     public function testAssetConfigCacheResourceContainsDependencies()
     {
-        $sourcePath = realpath(__DIR__.'/../fixtures/dir1/file1.css');
+        $sourcePath = realpath(__DIR__.'/../Fixtures/dir1/file1.css');
         $mappedAsset = new MappedAsset('file1.css', $sourcePath, content: 'cached content');
 
-        $dependentOnContentAsset = new MappedAsset('file3.css', realpath(__DIR__.'/../fixtures/dir2/file3.css'));
+        $dependentOnContentAsset = new MappedAsset('file3.css', realpath(__DIR__.'/../Fixtures/dir2/file3.css'));
 
-        $deeplyNestedAsset = new MappedAsset('file4.js', realpath(__DIR__.'/../fixtures/dir2/file4.js'));
+        $deeplyNestedAsset = new MappedAsset('file4.js', realpath(__DIR__.'/../Fixtures/dir2/file4.js'));
 
         $dependentOnContentAsset->addDependency($deeplyNestedAsset);
         $mappedAsset->addDependency($dependentOnContentAsset);
 
         // just adding any file as an example
-        $mappedAsset->addFileDependency(__DIR__.'/../fixtures/importmap.php');
-        $mappedAsset->addFileDependency(__DIR__.'/../fixtures/dir3');
+        $mappedAsset->addFileDependency(__DIR__.'/../Fixtures/importmap.php');
+        $mappedAsset->addFileDependency(__DIR__.'/../Fixtures/dir3');
 
         $factory = $this->createMock(MappedAssetFactoryInterface::class);
         $factory->expects($this->once())
@@ -116,7 +116,7 @@ class CachedMappedAssetFactoryTest extends TestCase
         $this->assertInstanceOf(FileResource::class, $configCacheMetadata[0]);
         $this->assertInstanceOf(DirectoryResource::class, $configCacheMetadata[1]);
         $this->assertInstanceOf(FileResource::class, $configCacheMetadata[2]);
-        $this->assertSame(realpath(__DIR__.'/../fixtures/importmap.php'), $configCacheMetadata[0]->getResource());
+        $this->assertSame(realpath(__DIR__.'/../Fixtures/importmap.php'), $configCacheMetadata[0]->getResource());
         $this->assertSame($mappedAsset->sourcePath, $configCacheMetadata[2]->getResource());
         $this->assertSame($dependentOnContentAsset->sourcePath, $configCacheMetadata[3]->getResource());
         $this->assertSame($deeplyNestedAsset->sourcePath, $configCacheMetadata[4]->getResource());

@@ -1,5 +1,22 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block toolbar %}
+    {% if collector.callsCount > 0 %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/workflow.svg') }}
+            <span class="sf-toolbar-value">{{ collector.callsCount }}</span>
+        {% endset %}
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Workflow Calls</b>
+                <span>{{ collector.callsCount }}</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+    {% endif %}
+{% endblock %}
+
 {% block menu %}
     <span class="label {{ collector.workflows|length == 0 ? 'disabled' }}">
         <span class="icon">
@@ -45,15 +62,67 @@
             });
         </script>
 
-        <h2>Definitions</h2>
         <div class="sf-tabs js-tabs">
             {% for name, data in collector.workflows %}
                 <div class="tab">
-                    <h3 class="tab-title">{{ name }}</h3>
+                    <h2 class="tab-title">{{ name }}{% if data.calls|length %} ({{ data.calls|length }}){% endif %}</h2>
+
                     <div class="tab-content">
+                        <h3>Definition</h3>
                         <pre class="sf-mermaid">
                             {{ data.dump|raw }}
                         </pre>
+
+                        <h3>Calls</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Call</th>
+                                    <th>Args</th>
+                                    <th>Return</th>
+                                    <th>Exception</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for call in data.calls %}
+                                    <tr>
+                                        <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                                        <td>
+                                            <code>{{ call.method }}()</code>
+                                            {% if call.previousMarking ?? null %}
+                                                <hr />
+                                                Previous marking:
+                                                {{ profiler_dump(call.previousMarking) }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ profiler_dump(call.args) }}
+                                        </td>
+                                        <td>
+                                            {% if call.return is defined %}
+                                                {% if call.return is same as true %}
+                                                    <code>true</code>
+                                                {% elseif call.return is same as false %}
+                                                    <code>false</code>
+                                                {% else %}
+                                                    {{ profiler_dump(call.return) }}
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if call.exception is defined %}
+                                                {{ profiler_dump(call.exception) }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ call.duration }}ms
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             {% endfor %}

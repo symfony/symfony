@@ -26,17 +26,17 @@ class ImportMapConfigReaderTest extends TestCase
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing')) {
-            $this->filesystem->mkdir(__DIR__.'/../fixtures/importmaps_for_writing');
+        if (!file_exists(__DIR__ . '/../Fixtures/importmaps_for_writing')) {
+            $this->filesystem->mkdir(__DIR__ . '/../Fixtures/importmaps_for_writing');
         }
-        if (!file_exists(__DIR__.'/../fixtures/importmaps_for_writing/assets')) {
-            $this->filesystem->mkdir(__DIR__.'/../fixtures/importmaps_for_writing/assets');
+        if (!file_exists(__DIR__ . '/../Fixtures/importmaps_for_writing/assets')) {
+            $this->filesystem->mkdir(__DIR__ . '/../Fixtures/importmaps_for_writing/assets');
         }
     }
 
     protected function tearDown(): void
     {
-        $this->filesystem->remove(__DIR__.'/../fixtures/importmaps_for_writing');
+        $this->filesystem->remove(__DIR__ . '/../Fixtures/importmaps_for_writing');
     }
 
     public function testGetEntriesAndWriteEntries()
@@ -63,7 +63,7 @@ return [
     ],
 ];
 EOF;
-        file_put_contents(__DIR__.'/../fixtures/importmaps_for_writing/importmap.php', $importMap);
+        file_put_contents(__DIR__ . '/../Fixtures/importmaps_for_writing/importmap.php', $importMap);
 
         $remotePackageStorage = $this->createMock(RemotePackageStorage::class);
         $remotePackageStorage->expects($this->any())
@@ -72,7 +72,7 @@ EOF;
                 return '/path/to/vendor/'.$packageModuleSpecifier.'.'.$type->value;
             });
         $reader = new ImportMapConfigReader(
-            __DIR__.'/../fixtures/importmaps_for_writing/importmap.php',
+            __DIR__ . '/../Fixtures/importmaps_for_writing/importmap.php',
             $remotePackageStorage,
         );
         $entries = $reader->getEntries();
@@ -100,18 +100,26 @@ EOF;
         $this->assertSame('package/with_file.js', $packageWithFileEntry->packageModuleSpecifier);
 
         // now save the original raw data from importmap.php and delete the file
-        $originalImportMapData = (static fn () => include __DIR__.'/../fixtures/importmaps_for_writing/importmap.php')();
-        unlink(__DIR__.'/../fixtures/importmaps_for_writing/importmap.php');
+        $originalImportMapData = (static fn () => include __DIR__ . '/../Fixtures/importmaps_for_writing/importmap.php')();
+        unlink(__DIR__ . '/../Fixtures/importmaps_for_writing/importmap.php');
         // dump the entries back to the file
         $reader->writeEntries($entries);
-        $newImportMapData = (static fn () => include __DIR__.'/../fixtures/importmaps_for_writing/importmap.php')();
+        $newImportMapData = (static fn () => include __DIR__ . '/../Fixtures/importmaps_for_writing/importmap.php')();
 
         $this->assertSame($originalImportMapData, $newImportMapData);
     }
 
     public function testGetRootDirectory()
     {
+        $configReader = new ImportMapConfigReader(__DIR__ . '/../Fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
+        $this->assertSame(__DIR__ . '/../Fixtures', $configReader->getRootDirectory());
+    }
+
+    public function testFindRootImportMapEntry()
+    {
         $configReader = new ImportMapConfigReader(__DIR__.'/../fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
-        $this->assertSame(__DIR__.'/../fixtures', $configReader->getRootDirectory());
+        $entry = $configReader->findRootImportMapEntry('file2');
+        $this->assertSame('file2', $entry->importName);
+        $this->assertSame('file2.js', $entry->path);
     }
 }

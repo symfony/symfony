@@ -69,6 +69,7 @@ use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
 use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
 
 // Help opcache.preload discover always-needed symbols
@@ -155,7 +156,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new CachePoolClearerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new CachePoolPrunerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $this->addCompilerPassIfExists($container, FormPass::class);
-        $container->addCompilerPass(new WorkflowGuardListenerPass());
+        $this->addCompilerPassIfExists($container, WorkflowGuardListenerPass::class);
         $container->addCompilerPass(new ResettableServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
@@ -176,6 +177,7 @@ class FrameworkBundle extends Bundle
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
             $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
+            $this->addCompilerPassIfExists($container, WorkflowDebugPass::class);
         }
     }
 

@@ -18,8 +18,8 @@ use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\MappedAsset;
 
@@ -32,8 +32,8 @@ class JavaScriptImportPathCompilerTest extends TestCase
     {
         $asset = new MappedAsset($sourceLogicalName, 'anything', '/assets/'.$sourceLogicalName);
 
-        $importMapManager = $this->createMock(ImportMapManager::class);
-        $importMapManager->expects($this->any())
+        $importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
+        $importMapConfigReader->expects($this->any())
             ->method('findRootImportMapEntry')
             ->willReturnCallback(function ($importName) {
                 return match ($importName) {
@@ -43,7 +43,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     default => null,
                 };
             });
-        $compiler = new JavaScriptImportPathCompiler($importMapManager);
+        $compiler = new JavaScriptImportPathCompiler($importMapConfigReader);
         // compile - and check that content doesn't change
         $this->assertSame($input, $compiler->compile($input, $asset, $this->createAssetMapper()));
         $actualImports = [];
@@ -311,7 +311,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('getAsset')
             ->willReturn($importedAsset);
 
-        $compiler = new JavaScriptImportPathCompiler($this->createMock(ImportMapManager::class));
+        $compiler = new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class));
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
     }
 
@@ -380,7 +380,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $compiler = new JavaScriptImportPathCompiler(
-            $this->createMock(ImportMapManager::class),
+            $this->createMock(ImportMapConfigReader::class),
             AssetCompilerInterface::MISSING_IMPORT_STRICT,
             $logger
         );
@@ -430,7 +430,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             });
 
         $asset = new MappedAsset('htmx.js', '/path/to/app.js');
-        $compiler = new JavaScriptImportPathCompiler($this->createMock(ImportMapManager::class));
+        $compiler = new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class));
         $content = '//** @type {import("./htmx").HtmxApi} */';
         $compiled = $compiler->compile($content, $asset, $assetMapper);
         // To form a good exception message, the compiler will check for the

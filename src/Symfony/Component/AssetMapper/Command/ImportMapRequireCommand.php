@@ -33,7 +33,6 @@ final class ImportMapRequireCommand extends Command
 
     public function __construct(
         private readonly ImportMapManager $importMapManager,
-        private readonly string $projectDir,
         private readonly ImportMapVersionChecker $importMapVersionChecker,
     ) {
         parent::__construct();

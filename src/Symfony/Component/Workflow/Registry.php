@@ -38,7 +38,7 @@ class Registry
         return false;
     }
 
-    public function get(object $subject, string $workflowName = null): Workflow
+    public function get(object $subject, string $workflowName = null): WorkflowInterface
     {
         $matched = [];
 

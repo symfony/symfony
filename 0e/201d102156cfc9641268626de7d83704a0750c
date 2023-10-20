@@ -1,0 +1,878 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2023-08-11T22:41:37Z
+
+Update:
+* 8.2, high-deps failures are normal until the PR gets merged into 7.0
+* appveyor failure is unrelated
+* Psalm warning are okay, nothing to do there.
+
+This is ready for review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-08-17T17:55:53Z
+
+Introduced `GroupProviderInterface` for DI optimization and adding the underlying object as argument for more dynamic possibilities. PR description updated with more details.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-08-17T17:57:00Z
+
+the next question is if we want to either deprecate `GroupSequenceProviderInterface` in favor of new `GroupProviderInterface`, or want to rename it to eg. `SelfProvidingGroupProviderInterface`, or keep 2 similar concepts
+
+my pref would be deprecating the current interface, in favor of the new more flexible one
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-08-17T18:23:37Z
+
+> the next question is if we want to either deprecate GroupSequenceProviderInterface in favor of new GroupProviderInterface, or want to rename it to eg. SelfProvidingGroupProviderInterface, or keep 2 similar concepts
+
+@ro0NL I was wondering the same thing, and I still see value in keeping the `GroupSequenceProviderInterface` for the self-provider for simple use-cases. About renaming it, I understand that their names are really close and it's not easy to remember which one should be used in each case without reading the documentation, so I'd be in favor of doing that in another PR if desired. Not sure about the impact though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-18T16:46:39Z
+
+Hi @yceruto :wave:
+
+About my proposal to use a container directly, here is a draft to do so for inspiration. I didn't go up to the end of it but you should be able to grasp the idea. As you'll see, this would remove a lot of code.
+
+<details>
+
+```diff
+diff --git a/src/Symfony/Bundle/FrameworkBundle/Resources/config/validator.php b/src/Symfony/Bundle/FrameworkBundle/Resources/config/validator.php
+index b188ad7718..adde2de238 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/Resources/config/validator.php
++++ b/src/Symfony/Bundle/FrameworkBundle/Resources/config/validator.php
+@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Constraints\NoSuspiciousCharactersValidator;
+ use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
+ use Symfony\Component\Validator\Constraints\WhenValidator;
+ use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
+-use Symfony\Component\Validator\ContainerGroupProviderFactory;
+ use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
+ use Symfony\Component\Validator\Validation;
+ use Symfony\Component\Validator\Validator\ValidatorInterface;
+@@ -43,8 +42,8 @@ return static function (ContainerConfigurator $container) {
+             ->call('setConstraintValidatorFactory', [
+                 service('validator.validator_factory'),
+             ])
+-            ->call('setGroupProviderFactory', [
+-                service('validator.group_provider_factory'),
++            ->call('setGroupProviderLocator', [
++                tagged_locator('validator.group_provider'),
+             ])
+             ->call('setTranslator', [
+                 service('translator')->ignoreOnInvalid(),
+@@ -73,11 +72,6 @@ return static function (ContainerConfigurator $container) {
+                 abstract_arg('Constraint validators locator'),
+             ])
+
+-        ->set('validator.group_provider_factory', ContainerGroupProviderFactory::class)
+-            ->args([
+-                abstract_arg('Group provider locator'),
+-            ])
+-
+         ->load('Symfony\Component\Validator\Constraints\\', $validatorsDir.'/*Validator.php')
+             ->exclude($validatorsDir.'/ExpressionLanguageSyntaxValidator.php')
+             ->abstract()
+diff --git a/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTestCase.php b/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTestCase.php
+index 3552b236c4..0bd0af0109 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTestCase.php
++++ b/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTestCase.php
+@@ -80,7 +80,6 @@ use Symfony\Component\Serializer\Serializer;
+ use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
+ use Symfony\Component\Translation\LocaleSwitcher;
+ use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
+-use Symfony\Component\Validator\DependencyInjection\AddGroupProvidersPass;
+ use Symfony\Component\Validator\Validation;
+ use Symfony\Component\Validator\Validator\ValidatorInterface;
+ use Symfony\Component\Validator\ValidatorBuilder;
+@@ -2391,7 +2390,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
+             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+         }
+         $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new LoggerPass()]);
+-        $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new AddGroupProvidersPass(), new TranslatorPass()]);
++        $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
+         $container->getCompilerPassConfig()->setAfterRemovingPasses([new AddAnnotationsCachedReaderPass()]);
+
+         if (!$compile) {
+diff --git a/src/Symfony/Component/Validator/Constraints/GroupSequenceProvider.php b/src/Symfony/Component/Validator/Constraints/GroupSequenceProvider.php
+index 16d19acee2..f5ae335595 100644
+--- a/src/Symfony/Component/Validator/Constraints/GroupSequenceProvider.php
++++ b/src/Symfony/Component/Validator/Constraints/GroupSequenceProvider.php
+@@ -23,10 +23,10 @@ namespace Symfony\Component\Validator\Constraints;
+ #[\Attribute(\Attribute::TARGET_CLASS)]
+ class GroupSequenceProvider
+ {
+-    public ?string $class = null;
++    public ?string $provider = null;
+
+-    public function __construct(array $options = [], string $class = null)
++    public function __construct(array $options = [], string $provider = null)
+     {
+-        $this->class = $options['class'] ?? $class;
++        $this->provider = $options['provider'] ?? $provider;
+     }
+ }
+diff --git a/src/Symfony/Component/Validator/ContainerGroupProviderFactory.php b/src/Symfony/Component/Validator/ContainerGroupProviderFactory.php
+deleted file mode 100644
+index ca36e1420e..0000000000
+--- a/src/Symfony/Component/Validator/ContainerGroupProviderFactory.php
++++ /dev/null
+@@ -1,52 +0,0 @@
+-<?php
+-
+-/*
+- * This file is part of the Symfony package.
+- *
+- * (c) Fabien Potencier <fabien@symfony.com>
+- *
+- * For the full copyright and license information, please view the LICENSE
+- * file that was distributed with this source code.
+- */
+-
+-namespace Symfony\Component\Validator;
+-
+-use Psr\Container\ContainerInterface;
+-use Symfony\Component\Validator\Constraints\GroupSequenceProvider;
+-use Symfony\Component\Validator\Exception\GroupDefinitionException;
+-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+-
+-/**
+- * Factory class leveraging a PSR-11 container to create or retrieve instances of validation group providers.
+- *
+- * @author Yonel Ceruto <yonelceruto@gmail.com>
+- */
+-class ContainerGroupProviderFactory implements GroupProviderFactoryInterface
+-{
+-    private array $providers = [];
+-
+-    public function __construct(private readonly ContainerInterface $container)
+-    {
+-    }
+-
+-    public function getInstance(string $class): GroupProviderInterface
+-    {
+-        if (!isset($this->providers[$class])) {
+-            if ($this->container->has($class)) {
+-                $this->providers[$class] = $this->container->get($class);
+-            } else {
+-                if (!class_exists($class)) {
+-                    throw new GroupDefinitionException(sprintf('Group provider "%s" does not exist or is not enabled as service. Check the "class" option in your constraint class "%s".', $class, GroupSequenceProvider::class));
+-                }
+-
+-                $this->providers[$class] = new $class();
+-            }
+-        }
+-
+-        if (!$this->providers[$class] instanceof GroupProviderInterface) {
+-            throw new UnexpectedTypeException($this->providers[$class], GroupProviderInterface::class);
+-        }
+-
+-        return $this->providers[$class];
+-    }
+-}
+diff --git a/src/Symfony/Component/Validator/DependencyInjection/AddGroupProvidersPass.php b/src/Symfony/Component/Validator/DependencyInjection/AddGroupProvidersPass.php
+deleted file mode 100644
+index 899347a333..0000000000
+--- a/src/Symfony/Component/Validator/DependencyInjection/AddGroupProvidersPass.php
++++ /dev/null
+@@ -1,46 +0,0 @@
+-<?php
+-
+-/*
+- * This file is part of the Symfony package.
+- *
+- * (c) Fabien Potencier <fabien@symfony.com>
+- *
+- * For the full copyright and license information, please view the LICENSE
+- * file that was distributed with this source code.
+- */
+-
+-namespace Symfony\Component\Validator\DependencyInjection;
+-
+-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+-use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
+-use Symfony\Component\DependencyInjection\ContainerBuilder;
+-use Symfony\Component\DependencyInjection\Reference;
+-
+-/**
+- * @author Yonel Ceruto <yonelceruto@gmail.com>
+- */
+-class AddGroupProvidersPass implements CompilerPassInterface
+-{
+-    public function process(ContainerBuilder $container): void
+-    {
+-        if (!$container->hasDefinition('validator.group_provider_factory')) {
+-            return;
+-        }
+-
+-        $providers = [];
+-        foreach ($container->findTaggedServiceIds('validator.group_provider', true) as $id => $attributes) {
+-            $definition = $container->getDefinition($id);
+-
+-            if (isset($attributes[0]['alias'])) {
+-                $providers[$attributes[0]['alias']] = new Reference($id);
+-            }
+-
+-            $providers[$definition->getClass()] = new Reference($id);
+-        }
+-
+-        $container
+-            ->getDefinition('validator.group_provider_factory')
+-            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $providers))
+-        ;
+-    }
+-}
+diff --git a/src/Symfony/Component/Validator/GroupProviderFactory.php b/src/Symfony/Component/Validator/GroupProviderFactory.php
+deleted file mode 100644
+index f908104230..0000000000
+--- a/src/Symfony/Component/Validator/GroupProviderFactory.php
++++ /dev/null
+@@ -1,29 +0,0 @@
+-<?php
+-
+-/*
+- * This file is part of the Symfony package.
+- *
+- * (c) Fabien Potencier <fabien@symfony.com>
+- *
+- * For the full copyright and license information, please view the LICENSE
+- * file that was distributed with this source code.
+- */
+-
+-namespace Symfony\Component\Validator;
+-
+-/**
+- * Factory class for creating or retrieving instances of validation group providers.
+- *
+- * @author Yonel Ceruto <yonelceruto@gmail.com>
+- */
+-class GroupProviderFactory implements GroupProviderFactoryInterface
+-{
+-    public function __construct(private array $providers = [])
+-    {
+-    }
+-
+-    public function getInstance(string $class): GroupProviderInterface
+-    {
+-        return $this->providers[$class] ??= new $class();
+-    }
+-}
+diff --git a/src/Symfony/Component/Validator/GroupProviderFactoryInterface.php b/src/Symfony/Component/Validator/GroupProviderFactoryInterface.php
+deleted file mode 100644
+index 003547f434..0000000000
+--- a/src/Symfony/Component/Validator/GroupProviderFactoryInterface.php
++++ /dev/null
+@@ -1,22 +0,0 @@
+-<?php
+-
+-/*
+- * This file is part of the Symfony package.
+- *
+- * (c) Fabien Potencier <fabien@symfony.com>
+- *
+- * For the full copyright and license information, please view the LICENSE
+- * file that was distributed with this source code.
+- */
+-
+-namespace Symfony\Component\Validator;
+-
+-/**
+- * Handles the creation of validation group providers.
+- *
+- * @author Yonel Ceruto <yonelceruto@gmail.com>
+- */
+-interface GroupProviderFactoryInterface
+-{
+-    public function getInstance(string $class): GroupProviderInterface;
+-}
+diff --git a/src/Symfony/Component/Validator/Mapping/ClassMetadata.php b/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
+index b5609ec92d..981035ff54 100644
+--- a/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
++++ b/src/Symfony/Component/Validator/Mapping/ClassMetadata.php
+@@ -89,9 +89,9 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
+     /**
+      * @internal This property is public in order to reduce the size of the
+      *           class' serialized representation. Do not access it. Use
+-     *           {@link getGroupProviderClass()} instead.
++     *           {@link getGroupProvider()} instead.
+      */
+-    public ?string $groupProviderClass = null;
++    public ?string $groupProvider = null;
+
+     /**
+      * The strategy for traversing traversable objects.
+@@ -130,7 +130,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
+             'getters',
+             'groupSequence',
+             'groupSequenceProvider',
+-            'groupProviderClass',
++            'groupProvider',
+             'members',
+             'name',
+             'properties',
+@@ -327,7 +327,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
+     public function mergeConstraints(self $source)
+     {
+         if ($source->isGroupSequenceProvider()) {
+-            $this->setGroupProviderClass($source->getGroupProviderClass());
++            $this->setGroupProvider($source->getGroupProvider());
+             $this->setGroupSequenceProvider(true);
+         }
+
+@@ -441,10 +441,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
+             throw new GroupDefinitionException('Defining a group sequence provider is not allowed with a static group sequence.');
+         }
+
+-        if (null === $this->groupProviderClass && !$this->getReflectionClass()->implementsInterface(GroupSequenceProviderInterface::class)) {
+-            throw new GroupDefinitionException(sprintf('Class "%s" must implement GroupSequenceProviderInterface.', $this->name));
+-        }
+-
+         $this->groupSequenceProvider = $active;
+     }
+
+@@ -453,14 +449,14 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
+         return $this->groupSequenceProvider;
+     }
+
+-    public function setGroupProviderClass(?string $class): void
++    public function setGroupProvider(?string $class): void
+     {
+-        $this->groupProviderClass = $class;
++        $this->groupProvider = $class;
+     }
+
+-    public function getGroupProviderClass(): ?string
++    public function getGroupProvider(): ?string
+     {
+-        return $this->groupProviderClass;
++        return $this->groupProvider;
+     }
+
+     public function getCascadingStrategy(): int
+diff --git a/src/Symfony/Component/Validator/Mapping/ClassMetadataInterface.php b/src/Symfony/Component/Validator/Mapping/ClassMetadataInterface.php
+index 624b55cc8d..6625e37e60 100644
+--- a/src/Symfony/Component/Validator/Mapping/ClassMetadataInterface.php
++++ b/src/Symfony/Component/Validator/Mapping/ClassMetadataInterface.php
+@@ -31,7 +31,7 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
+  * @see GroupSequenceProviderInterface
+  * @see TraversalStrategy
+  *
+- * @method string|null getGroupProviderClass()
++ * @method string|null getGroupProvider()
+  */
+ interface ClassMetadataInterface extends MetadataInterface
+ {
+diff --git a/src/Symfony/Component/Validator/Mapping/Loader/AnnotationLoader.php b/src/Symfony/Component/Validator/Mapping/Loader/AnnotationLoader.php
+index 41b0662d35..ebc1795f2c 100644
+--- a/src/Symfony/Component/Validator/Mapping/Loader/AnnotationLoader.php
++++ b/src/Symfony/Component/Validator/Mapping/Loader/AnnotationLoader.php
+@@ -51,7 +51,7 @@ class AnnotationLoader implements LoaderInterface
+             if ($constraint instanceof GroupSequence) {
+                 $metadata->setGroupSequence($constraint->groups);
+             } elseif ($constraint instanceof GroupSequenceProvider) {
+-                $metadata->setGroupProviderClass($constraint->class);
++                $metadata->setGroupProvider($constraint->provider);
+                 $metadata->setGroupSequenceProvider(true);
+             } elseif ($constraint instanceof Constraint) {
+                 $metadata->addConstraint($constraint);
+diff --git a/src/Symfony/Component/Validator/Mapping/Loader/XmlFileLoader.php b/src/Symfony/Component/Validator/Mapping/Loader/XmlFileLoader.php
+index a68f37009b..94d3f071e5 100644
+--- a/src/Symfony/Component/Validator/Mapping/Loader/XmlFileLoader.php
++++ b/src/Symfony/Component/Validator/Mapping/Loader/XmlFileLoader.php
+@@ -201,7 +201,7 @@ class XmlFileLoader extends FileLoader
+     private function loadClassMetadataFromXml(ClassMetadata $metadata, \SimpleXMLElement $classDescription): void
+     {
+         if (\count($classDescription->{'group-sequence-provider'}) > 0) {
+-            $metadata->setGroupProviderClass($classDescription->{'group-sequence-provider'}[0]->value ?: null);
++            $metadata->setGroupProvider($classDescription->{'group-sequence-provider'}[0]->value ?: null);
+             $metadata->setGroupSequenceProvider(true);
+         }
+
+diff --git a/src/Symfony/Component/Validator/Mapping/Loader/YamlFileLoader.php b/src/Symfony/Component/Validator/Mapping/Loader/YamlFileLoader.php
+index 131e6799a6..e610b45427 100644
+--- a/src/Symfony/Component/Validator/Mapping/Loader/YamlFileLoader.php
++++ b/src/Symfony/Component/Validator/Mapping/Loader/YamlFileLoader.php
+@@ -151,7 +151,7 @@ class YamlFileLoader extends FileLoader
+     {
+         if (isset($classDescription['group_sequence_provider'])) {
+             if (\is_string($classDescription['group_sequence_provider'])) {
+-                $metadata->setGroupProviderClass($classDescription['group_sequence_provider']);
++                $metadata->setGroupProvider($classDescription['group_sequence_provider']);
+             }
+             $metadata->setGroupSequenceProvider(
+                 (bool) $classDescription['group_sequence_provider']
+diff --git a/src/Symfony/Component/Validator/Tests/Constraints/GroupSequenceProviderTest.php b/src/Symfony/Component/Validator/Tests/Constraints/GroupSequenceProviderTest.php
+index 164e39fc96..e28399cd2c 100644
+--- a/src/Symfony/Component/Validator/Tests/Constraints/GroupSequenceProviderTest.php
++++ b/src/Symfony/Component/Validator/Tests/Constraints/GroupSequenceProviderTest.php
+@@ -21,13 +21,13 @@ class GroupSequenceProviderTest extends TestCase
+     {
+         $sequence = new GroupSequenceProvider(['class' => DummyGroupProvider::class]);
+
+-        $this->assertSame(DummyGroupProvider::class, $sequence->class);
++        $this->assertSame(DummyGroupProvider::class, $sequence->provider);
+     }
+
+     public function testCreateAttributeStyle()
+     {
+         $sequence = new GroupSequenceProvider(class: DummyGroupProvider::class);
+
+-        $this->assertSame(DummyGroupProvider::class, $sequence->class);
++        $this->assertSame(DummyGroupProvider::class, $sequence->provider);
+     }
+ }
+diff --git a/src/Symfony/Component/Validator/Tests/ContainerGroupProviderFactoryTest.php b/src/Symfony/Component/Validator/Tests/ContainerGroupProviderFactoryTest.php
+deleted file mode 100644
+index 2b0d4acf6f..0000000000
+--- a/src/Symfony/Component/Validator/Tests/ContainerGroupProviderFactoryTest.php
++++ /dev/null
+@@ -1,61 +0,0 @@
+-<?php
+-
+-/*
+- * This file is part of the Symfony package.
+- *
+- * (c) Fabien Potencier <fabien@symfony.com>
+- *
+- * For the full copyright and license information, please view the LICENSE
+- * file that was distributed with this source code.
+- */
+-
+-use PHPUnit\Framework\TestCase;
+-use Symfony\Component\DependencyInjection\Container;
+-use Symfony\Component\Validator\ContainerGroupProviderFactory;
+-use Symfony\Component\Validator\Exception\GroupDefinitionException;
+-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+-use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
+-
+-class ContainerGroupProviderFactoryTest extends TestCase
+-{
+-    public function testGetInstanceCreatesProvider()
+-    {
+-        $factory = new ContainerGroupProviderFactory(new Container());
+-        $this->assertInstanceOf(DummyGroupProvider::class, $factory->getInstance(DummyGroupProvider::class));
+-    }
+-
+-    public function testGetInstanceReturnsExistingProvider()
+-    {
+-        $factory = new ContainerGroupProviderFactory(new Container());
+-        $v1 = $factory->getInstance(DummyGroupProvider::class);
+-        $v2 = $factory->getInstance(DummyGroupProvider::class);
+-        $this->assertSame($v1, $v2);
+-    }
+-
+-    public function testGetInstanceReturnsService()
+-    {
+-        $provider = new DummyGroupProvider();
+-        $container = new Container();
+-        $container->set(DummyGroupProvider::class, $provider);
+-
+-        $factory = new ContainerGroupProviderFactory($container);
+-
+-        $this->assertSame($provider, $factory->getInstance(DummyGroupProvider::class));
+-    }
+-
+-    public function testGetInstanceProviderNotFound()
+-    {
+-        $this->expectException(GroupDefinitionException::class);
+-
+-        $factory = new ContainerGroupProviderFactory(new Container());
+-        $factory->getInstance('Unknown\\Class');
+-    }
+-
+-    public function testGetInstanceProviderDoNotImplementInterface()
+-    {
+-        $this->expectException(UnexpectedTypeException::class);
+-
+-        $factory = new ContainerGroupProviderFactory(new Container());
+-        $factory->getInstance(stdClass::class);
+-    }
+-}
+diff --git a/src/Symfony/Component/Validator/Tests/DependencyInjection/AddGroupProvidersPassTest.php b/src/Symfony/Component/Validator/Tests/DependencyInjection/AddGroupProvidersPassTest.php
+deleted file mode 100644
+index 73f9f59e61..0000000000
+--- a/src/Symfony/Component/Validator/Tests/DependencyInjection/AddGroupProvidersPassTest.php
++++ /dev/null
+@@ -1,78 +0,0 @@
+-<?php
+-
+-/*
+- * This file is part of the Symfony package.
+- *
+- * (c) Fabien Potencier <fabien@symfony.com>
+- *
+- * For the full copyright and license information, please view the LICENSE
+- * file that was distributed with this source code.
+- */
+-
+-namespace Symfony\Component\Validator\Tests\DependencyInjection;
+-
+-use PHPUnit\Framework\TestCase;
+-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+-use Symfony\Component\DependencyInjection\ContainerBuilder;
+-use Symfony\Component\DependencyInjection\Definition;
+-use Symfony\Component\DependencyInjection\Reference;
+-use Symfony\Component\DependencyInjection\ServiceLocator;
+-use Symfony\Component\Validator\DependencyInjection\AddGroupProvidersPass;
+-
+-class AddGroupProvidersPassTest extends TestCase
+-{
+-    public function testThatGroupProviderServicesAreProcessed()
+-    {
+-        $container = new ContainerBuilder();
+-        $groupProviderFactory = $container->register('validator.group_provider_factory')
+-            ->addArgument([]);
+-
+-        $container->register('my_group_provider_service1', Provider1::class)
+-            ->addTag('validator.group_provider', ['alias' => 'my_group_provider_alias1']);
+-        $container->register('my_group_provider_service2', Provider2::class)
+-            ->addTag('validator.group_provider');
+-
+-        $addGroupSequenceProvidersPass = new AddGroupProvidersPass();
+-        $addGroupSequenceProvidersPass->process($container);
+-
+-        $locator = $container->getDefinition((string) $groupProviderFactory->getArgument(0));
+-        $this->assertTrue(!$locator->isPublic() || $locator->isPrivate());
+-        $expected = (new Definition(ServiceLocator::class, [[
+-            Provider1::class => new ServiceClosureArgument(new Reference('my_group_provider_service1')),
+-            'my_group_provider_alias1' => new ServiceClosureArgument(new Reference('my_group_provider_service1')),
+-            Provider2::class => new ServiceClosureArgument(new Reference('my_group_provider_service2')),
+-        ]]))->addTag('container.service_locator')->setPublic(false);
+-        $this->assertEquals($expected, $locator->setPublic(false));
+-    }
+-
+-    public function testAbstractGroupProvider()
+-    {
+-        $this->expectException(\InvalidArgumentException::class);
+-        $this->expectExceptionMessage('The service "my_abstract_group_provider" tagged "validator.group_provider" must not be abstract.');
+-        $container = new ContainerBuilder();
+-        $container->register('validator.group_provider_factory')
+-            ->addArgument([]);
+-
+-        $container->register('my_abstract_group_provider')
+-            ->setAbstract(true)
+-            ->addTag('validator.group_provider');
+-
+-        $addGroupSequenceProvidersPass = new AddGroupProvidersPass();
+-        $addGroupSequenceProvidersPass->process($container);
+-    }
+-
+-    public function testThatCompilerPassIsIgnoredIfThereIsNoGroupProviderFactoryDefinition()
+-    {
+-        $container = new ContainerBuilder();
+-
+-        $definitionsBefore = \count($container->getDefinitions());
+-        $aliasesBefore = \count($container->getAliases());
+-
+-        $addGroupSequenceProvidersPass = new AddGroupProvidersPass();
+-        $addGroupSequenceProvidersPass->process($container);
+-
+-        // the container is untouched (i.e. no new definitions or aliases)
+-        $this->assertCount($definitionsBefore, $container->getDefinitions());
+-        $this->assertCount($aliasesBefore, $container->getAliases());
+-    }
+-}
+diff --git a/src/Symfony/Component/Validator/Tests/GroupProviderFactoryTest.php b/src/Symfony/Component/Validator/Tests/GroupProviderFactoryTest.php
+deleted file mode 100644
+index efd632784e..0000000000
+--- a/src/Symfony/Component/Validator/Tests/GroupProviderFactoryTest.php
++++ /dev/null
+@@ -1,30 +0,0 @@
+-<?php
+-
+-/*
+- * This file is part of the Symfony package.
+- *
+- * (c) Fabien Potencier <fabien@symfony.com>
+- *
+- * For the full copyright and license information, please view the LICENSE
+- * file that was distributed with this source code.
+- */
+-
+-use PHPUnit\Framework\TestCase;
+-use Symfony\Component\Validator\GroupProviderFactory;
+-use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
+-
+-class GroupProviderFactoryTest extends TestCase
+-{
+-    public function testGetInstance()
+-    {
+-        $factory = new GroupProviderFactory();
+-        $this->assertInstanceOf(DummyGroupProvider::class, $factory->getInstance(DummyGroupProvider::class));
+-    }
+-
+-    public function testPredefinedGetInstance()
+-    {
+-        $provider = new DummyGroupProvider();
+-        $factory = new GroupProviderFactory([DummyGroupProvider::class => $provider]);
+-        $this->assertSame($provider, $factory->getInstance(DummyGroupProvider::class));
+-    }
+-}
+diff --git a/src/Symfony/Component/Validator/Tests/Mapping/Loader/XmlFileLoaderTest.php b/src/Symfony/Component/Validator/Tests/Mapping/Loader/XmlFileLoaderTest.php
+index 8189a76b8e..5ba519ab19 100644
+--- a/src/Symfony/Component/Validator/Tests/Mapping/Loader/XmlFileLoaderTest.php
++++ b/src/Symfony/Component/Validator/Tests/Mapping/Loader/XmlFileLoaderTest.php
+@@ -128,7 +128,7 @@ class XmlFileLoaderTest extends TestCase
+         $this->assertEquals($expected, $metadata);
+     }
+
+-    public function testLoadGroupProviderClass()
++    public function testLoadGroupProvider()
+     {
+         $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
+         $metadata = new ClassMetadata(GroupProviderDto::class);
+@@ -136,7 +136,7 @@ class XmlFileLoaderTest extends TestCase
+         $loader->loadClassMetadata($metadata);
+
+         $expected = new ClassMetadata(GroupProviderDto::class);
+-        $expected->setGroupProviderClass(DummyGroupProvider::class);
++        $expected->setGroupProvider(DummyGroupProvider::class);
+         $expected->setGroupSequenceProvider(true);
+
+         $this->assertEquals($expected, $metadata);
+diff --git a/src/Symfony/Component/Validator/Tests/Mapping/Loader/YamlFileLoaderTest.php b/src/Symfony/Component/Validator/Tests/Mapping/Loader/YamlFileLoaderTest.php
+index fd31675f23..a5c983939b 100644
+--- a/src/Symfony/Component/Validator/Tests/Mapping/Loader/YamlFileLoaderTest.php
++++ b/src/Symfony/Component/Validator/Tests/Mapping/Loader/YamlFileLoaderTest.php
+@@ -168,7 +168,7 @@ class YamlFileLoaderTest extends TestCase
+         $this->assertEquals($expected, $metadata);
+     }
+
+-    public function testLoadGroupProviderClass()
++    public function testLoadGroupProvider()
+     {
+         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
+         $metadata = new ClassMetadata(GroupProviderDto::class);
+@@ -176,7 +176,7 @@ class YamlFileLoaderTest extends TestCase
+         $loader->loadClassMetadata($metadata);
+
+         $expected = new ClassMetadata(GroupProviderDto::class);
+-        $expected->setGroupProviderClass(DummyGroupProvider::class);
++        $expected->setGroupProvider(DummyGroupProvider::class);
+         $expected->setGroupSequenceProvider(true);
+
+         $this->assertEquals($expected, $metadata);
+diff --git a/src/Symfony/Component/Validator/Tests/Validator/RecursiveValidatorTest.php b/src/Symfony/Component/Validator/Tests/Validator/RecursiveValidatorTest.php
+index 4be5f8b3f2..7c0b22f9a1 100644
+--- a/src/Symfony/Component/Validator/Tests/Validator/RecursiveValidatorTest.php
++++ b/src/Symfony/Component/Validator/Tests/Validator/RecursiveValidatorTest.php
+@@ -1264,14 +1264,14 @@ class RecursiveValidatorTest extends TestCase
+         }
+     }
+
+-    public function testGroupProviderClass()
++    public function testGroupProvider()
+     {
+         $dto = new GroupProviderDto();
+
+         $metadata = new ClassMetadata($dto::class);
+         $metadata->addPropertyConstraint('firstName', new NotBlank(groups: ['foo']));
+         $metadata->addPropertyConstraint('lastName', new NotBlank(groups: ['foo']));
+-        $metadata->setGroupProviderClass(DummyGroupProvider::class);
++        $metadata->setGroupProvider(DummyGroupProvider::class);
+         $metadata->setGroupSequenceProvider(true);
+         $this->metadataFactory->addMetadata($metadata);
+
+diff --git a/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php b/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php
+index 1b9096468f..7ead3ad9a9 100644
+--- a/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php
++++ b/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php
+@@ -11,6 +11,7 @@
+
+ namespace Symfony\Component\Validator\Validator;
+
++use Psr\Container\ContainerInterface;
+ use Symfony\Component\Validator\Constraint;
+ use Symfony\Component\Validator\Constraints\Composite;
+ use Symfony\Component\Validator\Constraints\Existence;
+@@ -26,8 +27,6 @@ use Symfony\Component\Validator\Exception\RuntimeException;
+ use Symfony\Component\Validator\Exception\UnexpectedValueException;
+ use Symfony\Component\Validator\Exception\UnsupportedMetadataException;
+ use Symfony\Component\Validator\Exception\ValidatorException;
+-use Symfony\Component\Validator\GroupProviderFactory;
+-use Symfony\Component\Validator\GroupProviderFactoryInterface;
+ use Symfony\Component\Validator\Mapping\CascadingStrategy;
+ use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+@@ -52,14 +51,14 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
+     private MetadataFactoryInterface $metadataFactory;
+     private ConstraintValidatorFactoryInterface $validatorFactory;
+     private array $objectInitializers;
+-    private GroupProviderFactoryInterface $groupProviderFactory;
++    private ContainerInterface $groupProviderLocator;
+
+     /**
+      * Creates a validator for the given context.
+      *
+      * @param ObjectInitializerInterface[] $objectInitializers The object initializers
+      */
+-    public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], GroupProviderFactoryInterface $groupProviderFactory = new GroupProviderFactory())
++    public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], ContainerInterface $groupProviderLocator = null)
+     {
+         $this->context = $context;
+         $this->defaultPropertyPath = $context->getPropertyPath();
+@@ -67,7 +66,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
+         $this->metadataFactory = $metadataFactory;
+         $this->validatorFactory = $validatorFactory;
+         $this->objectInitializers = $objectInitializers;
+-        $this->groupProviderFactory = $groupProviderFactory;
++        $this->groupProviderLocator = $groupProviderLocator;
+     }
+
+     public function atPath(string $path): static
+@@ -440,8 +439,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
+                     $group = $metadata->getGroupSequence();
+                     $defaultOverridden = true;
+                 } elseif ($metadata->isGroupSequenceProvider()) {
+-                    if (null !== $groupProviderClass = $metadata->getGroupProviderClass()) {
+-                        $group = $this->groupProviderFactory->getInstance($groupProviderClass)->getGroups($object);
++                    if (null !== $groupProvider = $metadata->getGroupProvider()) {
++                        $group = $this->groupProviderLocator?->get($groupProvider)->getGroups($object);
+                     } else {
+                         // The group sequence is dynamically obtained from the validated
+                         // object
+diff --git a/src/Symfony/Component/Validator/Validator/RecursiveValidator.php b/src/Symfony/Component/Validator/Validator/RecursiveValidator.php
+index 2513621679..b24448ed0f 100644
+--- a/src/Symfony/Component/Validator/Validator/RecursiveValidator.php
++++ b/src/Symfony/Component/Validator/Validator/RecursiveValidator.php
+@@ -11,14 +11,13 @@
+
+ namespace Symfony\Component\Validator\Validator;
+
++use Psr\Container\ContainerInterface;
+ use Symfony\Component\Validator\Constraint;
+ use Symfony\Component\Validator\Constraints\GroupSequence;
+ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
+ use Symfony\Component\Validator\ConstraintViolationListInterface;
+ use Symfony\Component\Validator\Context\ExecutionContextFactoryInterface;
+ use Symfony\Component\Validator\Context\ExecutionContextInterface;
+-use Symfony\Component\Validator\GroupProviderFactory;
+-use Symfony\Component\Validator\GroupProviderFactoryInterface;
+ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+ use Symfony\Component\Validator\Mapping\MetadataInterface;
+ use Symfony\Component\Validator\ObjectInitializerInterface;
+@@ -34,20 +33,20 @@ class RecursiveValidator implements ValidatorInterface
+     protected $metadataFactory;
+     protected $validatorFactory;
+     protected $objectInitializers;
+-    protected GroupProviderFactoryInterface $groupProviderFactory;
++    protected ContainerInterface $groupProviderLocator;
+
+     /**
+      * Creates a new validator.
+      *
+      * @param ObjectInitializerInterface[] $objectInitializers The object initializers
+      */
+-    public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], GroupProviderFactoryInterface $groupProviderFactory = new GroupProviderFactory())
++    public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], ContainerInterface $groupProviderLocator = null)
+     {
+         $this->contextFactory = $contextFactory;
+         $this->metadataFactory = $metadataFactory;
+         $this->validatorFactory = $validatorFactory;
+         $this->objectInitializers = $objectInitializers;
+-        $this->groupProviderFactory = $groupProviderFactory;
++        $this->groupProviderLocator = $groupProviderLocator;
+     }
+
+     public function startContext(mixed $root = null): ContextualValidatorInterface
+@@ -57,7 +56,7 @@ class RecursiveValidator implements ValidatorInterface
+             $this->metadataFactory,
+             $this->validatorFactory,
+             $this->objectInitializers,
+-            $this->groupProviderFactory,
++            $this->groupProviderLocator,
+         );
+     }
+
+@@ -68,7 +67,7 @@ class RecursiveValidator implements ValidatorInterface
+             $this->metadataFactory,
+             $this->validatorFactory,
+             $this->objectInitializers,
+-            $this->groupProviderFactory,
++            $this->groupProviderLocator,
+         );
+     }
+
+diff --git a/src/Symfony/Component/Validator/ValidatorBuilder.php b/src/Symfony/Component/Validator/ValidatorBuilder.php
+index bab9f49fac..90f0dc1d74 100644
+--- a/src/Symfony/Component/Validator/ValidatorBuilder.php
++++ b/src/Symfony/Component/Validator/ValidatorBuilder.php
+@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
+ use Doctrine\Common\Annotations\PsrCachedReader;
+ use Doctrine\Common\Annotations\Reader;
+ use Psr\Cache\CacheItemPoolInterface;
++use Psr\Container\ContainerInterface;
+ use Symfony\Component\Cache\Adapter\ArrayAdapter;
+ use Symfony\Component\Validator\Context\ExecutionContextFactory;
+ use Symfony\Component\Validator\Exception\LogicException;
+@@ -53,7 +54,7 @@ class ValidatorBuilder
+     private bool $enableAttributeMapping = false;
+     private ?MetadataFactoryInterface $metadataFactory = null;
+     private ConstraintValidatorFactoryInterface $validatorFactory;
+-    private GroupProviderFactoryInterface $groupProviderFactory;
++    private ?ContainerInterface $groupProviderLocator;
+     private ?CacheItemPoolInterface $mappingCache = null;
+     private ?TranslatorInterface $translator = null;
+     private ?string $translationDomain = null;
+@@ -316,9 +317,9 @@ class ValidatorBuilder
+     /**
+      * @return $this
+      */
+-    public function setGroupProviderFactory(GroupProviderFactoryInterface $groupProviderFactory): static
++    public function setGroupProviderLocator(ContainerInterface $groupProviderLocator): static
+     {
+-        $this->groupProviderFactory = $groupProviderFactory;
++        $this->groupProviderLocator = $groupProviderLocator;
+
+         return $this;
+     }
+@@ -410,7 +411,6 @@ class ValidatorBuilder
+         }
+
+         $validatorFactory = $this->validatorFactory ?? new ConstraintValidatorFactory();
+-        $groupProviderFactory = $this->groupProviderFactory ?? new GroupProviderFactory();
+         $translator = $this->translator;
+
+         if (null === $translator) {
+@@ -426,7 +426,7 @@ class ValidatorBuilder
+
+         $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
+
+-        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers, $groupProviderFactory);
++        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers, $this->groupProviderLocator);
+     }
+
+     private function createAnnotationReader(): Reader
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-10-18T19:55:09Z
+
+Hi @nicolas-grekas! Thanks for this nice code suggestion. I see your idea does indeed simplify the proposal a lot, and I'm happy to ship it as is. However, I still have concerns about the standalone usage of the component. After your change proposal, the new feature will not work without a proper implementation (_in userland_) of the `ContainerInterface` for `GroupProviderLocator`, which looks a bit weird to me as we used to ship all artifacts for simple usage. Do you think this one is an exception?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-18T20:05:54Z
+
+I'm confident it's easy enough to create a container and that standalone usage is not an issue. We already have a few use cases that require this.
+
+Done:
+```php
+
+$container = new class($factories) implements ContainerInterface {
+    use ServiceLocatorTrait;
+}
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-10-18T22:43:18Z
+
+Simplification done, thanks @nicolas-grekas !

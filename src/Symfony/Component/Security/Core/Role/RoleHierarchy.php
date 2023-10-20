@@ -42,7 +42,7 @@ class RoleHierarchy implements RoleHierarchyInterface
 
     public function getReachableRoleNames(array $roles): array
     {
-        return \array_values(\array_unique($this->resolveReachableRoleNames($roles)));
+        return array_values(array_unique($this->resolveReachableRoleNames($roles)));
     }
 
     protected function buildRoleMap(): void

@@ -130,6 +130,13 @@ class ImportMapConfigReader
         EOF);
     }
 
+    public function findRootImportMapEntry(string $moduleName): ?ImportMapEntry
+    {
+        $entries = $this->getEntries();
+
+        return $entries->has($moduleName) ? $entries->get($moduleName) : null;
+    }
+
     public function createRemoteEntry(string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint): ImportMapEntry
     {
         $path = $this->remotePackageStorage->getDownloadPath($packageModuleSpecifier, $type);

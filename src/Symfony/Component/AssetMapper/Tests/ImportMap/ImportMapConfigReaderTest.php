@@ -114,4 +114,12 @@ EOF;
         $configReader = new ImportMapConfigReader(__DIR__ . '/../Fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
         $this->assertSame(__DIR__ . '/../Fixtures', $configReader->getRootDirectory());
     }
+
+    public function testFindRootImportMapEntry()
+    {
+        $configReader = new ImportMapConfigReader(__DIR__.'/../fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
+        $entry = $configReader->findRootImportMapEntry('file2');
+        $this->assertSame('file2', $entry->importName);
+        $this->assertSame('file2.js', $entry->path);
+    }
 }

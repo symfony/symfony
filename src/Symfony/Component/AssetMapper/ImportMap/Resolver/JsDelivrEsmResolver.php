@@ -26,7 +26,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     public const URL_PATTERN_DIST = self::URL_PATTERN_DIST_CSS.'/+esm';
     public const URL_PATTERN_ENTRYPOINT = 'https://data.jsdelivr.com/v1/packages/npm/%s@%s/entrypoints';
 
-    public const IMPORT_REGEX = '{from"/npm/([^@]*@?\S+?)@([^/]+)/\+esm"}';
+    public const IMPORT_REGEX = '{from"/npm/((?:@[^/]+/)?[^@]+)@([^/]+)/\+esm"}';
 
     private HttpClientInterface $httpClient;
 

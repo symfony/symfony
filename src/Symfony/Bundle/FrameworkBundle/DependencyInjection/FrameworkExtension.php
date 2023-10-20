@@ -1184,7 +1184,7 @@ class FrameworkExtension extends Extension
             $container->setDefinition('debug.log_processor', $definition);
 
             $container->register('debug.debug_logger_configurator', DebugLoggerConfigurator::class)
-                ->setArguments([new Reference('debug.log_processor')]);
+                ->setArguments([new Reference('debug.log_processor'), '%kernel.runtime_mode.web%']);
         }
     }
 

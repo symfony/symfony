@@ -32,6 +32,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'php'])
 
         ->set('debug.debug_handlers_listener', DebugHandlersListener::class)
+            ->args([null, param('kernel.runtime_mode.web')])
             ->tag('kernel.event_subscriber')
 
         ->set('debug.file_link_formatter', FileLinkFormatter::class)

@@ -121,4 +121,10 @@
     <group-sequence-provider />
 
   </class>
+
+  <class name="Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto">
+    <group-sequence-provider>
+      <value>Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider</value>
+    </group-sequence-provider>
+  </class>
 </constraint-mapping>

@@ -15,6 +15,7 @@ CHANGELOG
  * Deprecate `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
  * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
  * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Add `GroupProviderInterface` to implement validation group providers outside the underlying class
 
 6.3
 ---

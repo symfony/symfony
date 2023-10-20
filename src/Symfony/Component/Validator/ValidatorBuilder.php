@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -53,6 +54,7 @@ class ValidatorBuilder
     private bool $enableAttributeMapping = false;
     private ?MetadataFactoryInterface $metadataFactory = null;
     private ConstraintValidatorFactoryInterface $validatorFactory;
+    private ?ContainerInterface $groupProviderLocator = null;
     private ?CacheItemPoolInterface $mappingCache = null;
     private ?TranslatorInterface $translator = null;
     private ?string $translationDomain = null;
@@ -313,6 +315,16 @@ class ValidatorBuilder
     }
 
     /**
+     * @return $this
+     */
+    public function setGroupProviderLocator(ContainerInterface $groupProviderLocator): static
+    {
+        $this->groupProviderLocator = $groupProviderLocator;
+
+        return $this;
+    }
+
+    /**
      * Sets the translator used for translating violation messages.
      *
      * @return $this
@@ -414,7 +426,7 @@ class ValidatorBuilder
 
         $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
 
-        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
+        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers, $this->groupProviderLocator);
     }
 
     private function createAnnotationReader(): Reader

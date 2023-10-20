@@ -2298,6 +2298,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'kernel.project_dir' => __DIR__,
             'kernel.debug' => false,
             'kernel.environment' => 'test',
+            'kernel.runtime_mode.web' => true,
             'kernel.name' => 'kernel',
             'kernel.container_class' => 'testContainer',
             'container.build_hash' => 'Abc1234',

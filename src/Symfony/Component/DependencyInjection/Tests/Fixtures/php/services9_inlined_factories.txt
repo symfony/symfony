@@ -560,7 +560,7 @@ class ProjectServiceContainer extends Container
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     return;
 }
 

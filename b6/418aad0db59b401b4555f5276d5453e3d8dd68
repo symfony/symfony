@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-10-17T14:36:45Z
+
+shouldn't the error rendering depend on web_mode ? For a long-running server, we would want to provide the web error rendering.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-17T14:40:54Z
+
+> shouldn't the error rendering depend on web_mode
+
+yes, but it's too much work for me for now, could be handled later on (same for cache locking, see PR description)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-18T09:39:27Z
+
+PR updated. No special service anymore, only parameters. Here is the new description:
+
+Here, we ensure that the kernel always provides a new `kernel.runtime_mode` parameter. This parameter is an array derived by default from the `APP_RUNTIME_MODE` env var, using the `query_string` processor.
+
+This also creates 3 new parameters that should be the most common: `kernel.runtime_mode.web`, `kernel.runtime_mode.cli`, and `kernel.runtime_mode.worker`.
+
+A long-running server would typically set `APP_RUNTIME_MODE` to `web=1&worker=1` or `web=0&worker=1` when appropriate (eg https://github.com/php-runtime/frankenphp-symfony/ should do so when `FRANKENPHP_WORKER` is set.)

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-19T11:24:25Z
+
+Should i do something special for the Psalm alert ? The code is safe and "hash_file" will return a string, but Psalm has no way to know the file existence has just been tested.... and i don't want to check it twice in the code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-19T12:02:35Z
+
+Nope, you can ignore psalm, we didn't surrender to robots (yet) ;)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-19T12:05:36Z
+
+So all is ok for me :)

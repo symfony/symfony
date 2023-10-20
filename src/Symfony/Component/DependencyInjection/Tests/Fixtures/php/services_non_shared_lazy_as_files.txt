@@ -129,7 +129,7 @@ class Symfony_DI_PhpDumper_Service_Non_Shared_Lazy_As_File extends Container
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     return;
 }
 

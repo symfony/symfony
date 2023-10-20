@@ -38,7 +38,6 @@ return (new PhpCsFixer\Config())
         'modernize_strpos' => true,
         'get_class_to_class_keyword' => true,
         'nullable_type_declaration' => true,
-        // 'get_class_to_class_keyword' => true, // to be enabled when Bridge/PhpUnit will require PHP 8+
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

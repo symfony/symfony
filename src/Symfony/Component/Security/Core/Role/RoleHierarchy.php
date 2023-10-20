@@ -72,8 +72,8 @@ class RoleHierarchy implements RoleHierarchyInterface
 
             $this->map[$main] = array_unique($this->map[$main]);
 
-            if (str_contains($main, '*')) {
-                $this->rolePlaceholdersPatterns[$main] = sprintf('/%s/', strtr($main, ['*' => '[^\*]+']));
+            if (str_contains($main, '*') && false !== ($pattern = $this->getPlaceholderPattern($main))) {
+                $this->rolePlaceholdersPatterns[$main] = $pattern;
             }
         }
     }
@@ -115,5 +115,22 @@ class RoleHierarchy implements RoleHierarchyInterface
         }
 
         return $resolved;
+    }
+
+    /**
+     * Build the regex pattern for the given role:
+     *   - Replace valid wildcards with a non-wildcard matching pattern and
+     *   - Escape reserved regex characters.
+     *
+     * A valid wildcard is a * prefixed with _ and immediately followed by _ or EOL.
+     *
+     * @return string|false The regex pattern, or false if there is no valid wildcard in the role
+     */
+    private function getPlaceholderPattern(string $role): string|false
+    {
+        /** @var int $count */
+        $placeholderPattern = preg_replace(pattern: '/(?<=_)\\\\\*(?=_|$)/', replacement: '[^\*]*', subject: preg_quote($role), count: $count);
+
+        return ($count > 0) ? sprintf('/%s/', $placeholderPattern) : false;
     }
 }

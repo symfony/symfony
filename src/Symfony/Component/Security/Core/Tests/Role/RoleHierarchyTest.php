@@ -70,4 +70,19 @@ class RoleHierarchyTest extends TestCase
         $this->assertEquals(['ROLE_QUX_A', 'ROLE_QUX_BAZ'], $role->getReachableRoleNames(['ROLE_QUX_A']));
         $this->assertEquals(['ROLE_QUX_BAZ'], $role->getReachableRoleNames(['ROLE_QUX_BAZ']));
     }
+
+    public function testInvalidPlaceholderSyntaxAreNotResolved()
+    {
+        $role = new RoleHierarchy([
+            'ROLE_FOO*' => ['ROLE_FOOBAR'],
+            'ROLE_*FOO' => ['ROLE_FOOBAR'],
+            'ROLE_FOO_*BAR' => ['ROLE_FOOBAR'],
+            'ROLE_FOO*_BAR' => ['ROLE_FOOBAR'],
+        ]);
+
+        $this->assertEquals(['ROLE_FOOA'], $role->getReachableRoleNames(['ROLE_FOOA']));
+        $this->assertEquals(['ROLE_AFOO'], $role->getReachableRoleNames(['ROLE_AFOO']));
+        $this->assertEquals(['ROLE_FOO_ABAR'], $role->getReachableRoleNames(['ROLE_FOO_ABAR']));
+        $this->assertEquals(['ROLE_FOOA_BAR'], $role->getReachableRoleNames(['ROLE_FOOA_BAR']));
+    }
 }

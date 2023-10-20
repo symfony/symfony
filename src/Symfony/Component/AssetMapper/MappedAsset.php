@@ -24,7 +24,12 @@ final class MappedAsset
     public readonly string $publicPath;
     public readonly string $publicPathWithoutDigest;
     public readonly string $publicExtension;
-    public readonly string $content;
+
+    /**
+     * The final content of this asset, if different from the source.
+     */
+    public readonly ?string $content;
+
     public readonly string $digest;
     public readonly bool $isPredigested;
     public readonly bool $isVendor;
@@ -73,9 +78,7 @@ final class MappedAsset
             $this->publicPathWithoutDigest = $publicPathWithoutDigest;
             $this->publicExtension = pathinfo($publicPathWithoutDigest, \PATHINFO_EXTENSION);
         }
-        if (null !== $content) {
-            $this->content = $content;
-        }
+        $this->content = $content;
         if (null !== $digest) {
             $this->digest = $digest;
         }

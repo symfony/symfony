@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -131,17 +132,20 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
 
         $this->profiler?->disable();
 
-        $mediaType = $this->getMediaType($asset->publicPath);
-        $response = (new Response(
-            $asset->content,
-            headers: $mediaType ? ['Content-Type' => $mediaType] : [],
-        ))
+        if (null !== $asset->content) {
+            $response = new Response($asset->content);
+        } else {
+            $response = new BinaryFileResponse($asset->sourcePath, autoLastModified: false);
+        }
+        $response
             ->setPublic()
-            ->setMaxAge(604800)
+            ->setMaxAge(604800) // 1 week
             ->setImmutable()
             ->setEtag($asset->digest)
         ;
-
+        if ($mediaType = $this->getMediaType($asset->publicPath)) {
+            $response->headers->set('Content-Type', $mediaType);
+        }
         $response->headers->set('X-Assets-Dev', true);
 
         $event->setResponse($response);

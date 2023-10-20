@@ -89,7 +89,9 @@ final class Builder
                     ];
                     continue;
                 }
-                self::testEmoji($emoji, $locale);
+                if (!self::testEmoji($emoji, $locale, $emojiCodePoints)) {
+                    continue;
+                }
                 $codePointsCount = mb_strlen($emoji);
                 $mapsByLocale[$locale][$codePointsCount][$emoji] = $name;
             }
@@ -126,7 +128,9 @@ final class Builder
                 continue;
             }
             $emoji = $emojisCodePoints[$emojiCodePoints];
-            self::testEmoji($emoji, 'github');
+            if (!self::testEmoji($emoji, 'github', $emojiCodePoints)) {
+                continue;
+            }
             $codePointsCount = mb_strlen($emoji);
             $maps[$codePointsCount][$emoji] = ":$shortCode:";
         }
@@ -158,7 +162,9 @@ final class Builder
                 continue;
             }
             $emoji = $emojisCodePoints[$emojiCodePoints];
-            self::testEmoji($emoji, 'slack');
+            if (!self::testEmoji($emoji, 'slack', $emojiCodePoints)) {
+                continue;
+            }
             $codePointsCount = mb_strlen($emoji);
             $emojiSlackMaps[$codePointsCount][$emoji] = ":$shortCode:";
             foreach ($shortCodes as $short_name) {
@@ -172,8 +178,10 @@ final class Builder
     public static function buildStripRules(array $emojisCodePoints): iterable
     {
         $maps = [];
-        foreach ($emojisCodePoints as $emoji) {
-            self::testEmoji($emoji, 'strip');
+        foreach ($emojisCodePoints as $codePoints => $emoji) {
+            if (!self::testEmoji($emoji, 'strip', $codePoints)) {
+                continue;
+            }
             $codePointsCount = mb_strlen($emoji);
             $maps[$codePointsCount][$emoji] = '';
         }
@@ -214,11 +222,15 @@ final class Builder
         file_put_contents($file, preg_replace('/QUICK_CHECK = .*;/m', "QUICK_CHECK = {$quickCheck};", file_get_contents($file)));
     }
 
-    private static function testEmoji(string $emoji, string $locale): void
+    private static function testEmoji(string $emoji, string $locale, string $codePoints): bool
     {
         if (!Transliterator::createFromRules("\\$emoji > test ;")) {
-            throw new \RuntimeException(sprintf('Could not create transliterator for "%s" in "%s" locale. Error: "%s".', $emoji, $locale, intl_get_error_message()));
+            printf('Could not create transliterator for "%s" in "%s" locale. Code Point: "%s". Error: "%s".'."\n", $emoji, $locale, $codePoints, intl_get_error_message());
+
+            return false;
         }
+
+        return true;
     }
 
     private static function createRules(array $maps): array

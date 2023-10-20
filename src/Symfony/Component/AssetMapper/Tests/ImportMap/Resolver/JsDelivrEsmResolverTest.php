@@ -474,6 +474,14 @@ class JsDelivrEsmResolverTest extends TestCase
                 ['@vue/shared', '3.3.4'],
             ],
         ];
+
+        yield 'adjacent import and export statements' => [
+            'import e from"/npm/datatables.net@2.1.1/+esm";export{default}from"/npm/datatables.net@2.1.1/+esm";',
+            [
+                ['datatables.net', '2.1.1'],
+                ['datatables.net', '2.1.1'], // for the export syntax
+            ],
+        ];
     }
 
     private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, string $packageSpecifier = null): ImportMapEntry

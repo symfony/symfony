@@ -144,7 +144,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RoutingResolverPass());
-        $container->addCompilerPass(new DataCollectorTranslatorPass());
+        $this->addCompilerPassIfExists($container, DataCollectorTranslatorPass::class);
         $container->addCompilerPass(new ProfilerPass());
         // must be registered before removing private services as some might be listeners/subscribers
         // but as late as possible to get resolved parameters
@@ -157,7 +157,7 @@ class FrameworkBundle extends Bundle
         // twig.template_iterator definition
         $this->addCompilerPassIfExists($container, TranslatorPass::class, PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $this->addCompilerPassIfExists($container, TranslatorPathsPass::class, PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new LoggingTranslatorPass());
+        $this->addCompilerPassIfExists($container, LoggingTranslatorPass::class);
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $this->addCompilerPassIfExists($container, TranslationExtractorPass::class);
         $this->addCompilerPassIfExists($container, TranslationDumperPass::class);

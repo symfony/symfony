@@ -861,6 +861,7 @@ class FrameworkExtension extends Extension
         $loader->load('profiling.php');
         $loader->load('collectors.php');
         $loader->load('cache_debug.php');
+        $loader->load('console_debug.php');
 
         if ($this->isInitializedConfigEnabled('form')) {
             $loader->load('form_debug.php');
@@ -922,7 +923,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console_profiler_listener');
         }
 
-        if (!class_exists(CommandDataCollector::class)) {
+        if (!$container->getParameter('kernel.debug') || !class_exists(CliRequest::class) || !class_exists(CommandDataCollector::class)) {
             $container->removeDefinition('.data_collector.command');
         }
     }

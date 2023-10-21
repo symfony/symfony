@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-20T20:24:14Z
+
+I guess that's accounted for only on the default branch?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-10-20T21:04:59Z
+
+It is the commit that is viewed that is considered.
+You can change this setting in a commit along with generated files, they are displayed or hidden depending on the value you set in `.gitattribute`
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-10-20T21:06:10Z
+
+You're probably right about the stats count. It's based on the default branch.

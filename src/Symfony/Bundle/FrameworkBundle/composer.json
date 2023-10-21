@@ -90,6 +90,7 @@
         "symfony/mime": "<6.4",
         "symfony/property-info": "<6.4",
         "symfony/property-access": "<6.4",
+        "symfony/scheduler": "<6.4",
         "symfony/serializer": "<6.4",
         "symfony/security-csrf": "<6.4",
         "symfony/security-core": "<6.4",

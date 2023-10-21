@@ -62,8 +62,11 @@
         "symfony/browser-kit": "<6.4",
         "symfony/console": "<6.4",
         "symfony/framework-bundle": "<6.4",
+        "symfony/http-client": "<6.4",
         "symfony/ldap": "<6.4",
-        "symfony/twig-bundle": "<6.4"
+        "symfony/serializer": "<6.4",
+        "symfony/twig-bundle": "<6.4",
+        "symfony/validator": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },

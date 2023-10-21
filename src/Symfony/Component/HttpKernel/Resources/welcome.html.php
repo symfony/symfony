@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noodp,notranslate,noimageindex" />
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noodp,notranslate,noimageindex">
     <title>Welcome to Symfony!</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>👋</text></svg>">
     <style>
         <?php $hue = random_int(0, 360); ?>
-        <?php $darkColor = static function (float $alpha = 1) use ($hue) { return "hsla($hue, 20%, 45%, $alpha)"; }; ?>
-        <?php $lightColor = static function (float $alpha = 1) use ($hue) { return "hsla($hue, 20%, 95%, $alpha)"; }; ?>
+        <?php $darkColor = static fn (float $alpha = 1) => "hsla($hue, 20%, 45%, $alpha)"; ?>
+        <?php $lightColor = static fn (float $alpha = 1) => "hsla($hue, 20%, 95%, $alpha)"; ?>
         body { background: <?= $lightColor(); ?>; color: <?= $darkColor(); ?>; display: flex; font: 16px/1.5 sans-serif; justify-content: center; margin: 0; }
         h1, h2 { line-height: 1.2; margin: 0 0 .5em; }
         h1 { font-size: 36px; }

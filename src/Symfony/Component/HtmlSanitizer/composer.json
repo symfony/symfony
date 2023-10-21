@@ -1,0 +1,31 @@
+{
+    "name": "symfony/html-sanitizer",
+    "type": "library",
+    "description": "Provides an object-oriented API to sanitize untrusted HTML input for safe insertion into a document's DOM.",
+    "keywords": ["html", "sanitizer", "purifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Titouan Galopin",
+            "email": "galopintitouan@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-dom": "*",
+        "league/uri": "^6.5|^7.0",
+        "masterminds/html5": "^2.7.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\HtmlSanitizer\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

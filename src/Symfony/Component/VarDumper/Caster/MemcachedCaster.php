@@ -20,9 +20,12 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class MemcachedCaster
 {
-    private static $optionConstants;
-    private static $defaultOptions;
+    private static array $optionConstants;
+    private static array $defaultOptions;
 
+    /**
+     * @return array
+     */
     public static function castMemcached(\Memcached $c, array $a, Stub $stub, bool $isNested)
     {
         $a += [
@@ -37,8 +40,8 @@ class MemcachedCaster
 
     private static function getNonDefaultOptions(\Memcached $c): array
     {
-        self::$defaultOptions = self::$defaultOptions ?? self::discoverDefaultOptions();
-        self::$optionConstants = self::$optionConstants ?? self::getOptionConstants();
+        self::$defaultOptions ??= self::discoverDefaultOptions();
+        self::$optionConstants ??= self::getOptionConstants();
 
         $nonDefaultOptions = [];
         foreach (self::$optionConstants as $constantKey => $value) {
@@ -56,7 +59,7 @@ class MemcachedCaster
         $defaultMemcached->addServer('127.0.0.1', 11211);
 
         $defaultOptions = [];
-        self::$optionConstants = self::$optionConstants ?? self::getOptionConstants();
+        self::$optionConstants ??= self::getOptionConstants();
 
         foreach (self::$optionConstants as $constantKey => $value) {
             $defaultOptions[$constantKey] = $defaultMemcached->getOption($value);

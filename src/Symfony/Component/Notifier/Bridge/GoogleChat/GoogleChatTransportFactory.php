@@ -14,7 +14,6 @@ namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
@@ -23,10 +22,8 @@ final class GoogleChatTransportFactory extends AbstractTransportFactory
 {
     /**
      * @param Dsn $dsn Format: googlechat://<key>:<token>@default/<space>?thread_key=<thread>
-     *
-     * @return GoogleChatTransport
      */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): GoogleChatTransport
     {
         $scheme = $dsn->getScheme();
 

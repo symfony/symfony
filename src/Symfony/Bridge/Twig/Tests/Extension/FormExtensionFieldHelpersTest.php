@@ -22,20 +22,9 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
 {
-    /**
-     * @var FormExtension
-     */
-    private $rawExtension;
-
-    /**
-     * @var FormExtension
-     */
-    private $translatorExtension;
-
-    /**
-     * @var FormView
-     */
-    private $view;
+    private FormExtension $rawExtension;
+    private FormExtension $translatorExtension;
+    private FormView $view;
 
     protected function getTypes()
     {

@@ -30,14 +30,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LinkedInTransport extends AbstractTransport
 {
-    protected const PROTOCOL_VERSION = '2.0.0';
-    protected const PROTOCOL_HEADER = 'X-Restli-Protocol-Version';
     protected const HOST = 'api.linkedin.com';
 
-    private $authToken;
-    private $accountId;
+    private string $authToken;
+    private string $accountId;
 
-    public function __construct(string $authToken, string $accountId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $authToken, string $accountId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->authToken = $authToken;
         $this->accountId = $accountId;
@@ -64,21 +62,21 @@ final class LinkedInTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof LinkedInOptions) {
+        if (($options = $message->getOptions()) && !$options instanceof LinkedInOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, LinkedInOptions::class));
         }
 
-        if (!($opts = $message->getOptions()) && $notification = $message->getNotification()) {
-            $opts = LinkedInOptions::fromNotification($notification);
-            $opts->author(new AuthorShare($this->accountId));
+        if (!$options && $notification = $message->getNotification()) {
+            $options = LinkedInOptions::fromNotification($notification);
+            $options->author(new AuthorShare($this->accountId));
         }
 
         $endpoint = sprintf('https://%s/v2/ugcPosts', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
-            'headers' => [self::PROTOCOL_HEADER => self::PROTOCOL_VERSION],
-            'json' => array_filter($opts ? $opts->toArray() : $this->bodyFromMessageWithNoOption($message)),
+            'headers' => ['X-Restli-Protocol-Version' => '2.0.0'],
+            'json' => array_filter($options?->toArray() ?? $this->bodyFromMessageWithNoOption($message)),
         ]);
 
         try {

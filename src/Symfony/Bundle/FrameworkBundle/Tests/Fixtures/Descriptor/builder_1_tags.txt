@@ -12,3 +12,8 @@
 
  * .definition_2
 
+[33m"tag3" tag[39m
+[33m----------[39m
+
+ * .definition_2
+

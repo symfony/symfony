@@ -16,6 +16,9 @@ use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpSmtpTransport;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 
+/**
+ * @group legacy
+ */
 final class OhMySmtpSmtpTransportTest extends TestCase
 {
     public function testCustomHeader()
@@ -25,7 +28,6 @@ final class OhMySmtpSmtpTransportTest extends TestCase
 
         $transport = new OhMySmtpSmtpTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(OhMySmtpSmtpTransport::class, 'addOhMySmtpHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(1, $email->getHeaders()->toArray());
@@ -41,7 +43,6 @@ final class OhMySmtpSmtpTransportTest extends TestCase
 
         $transport = new OhMySmtpSmtpTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(OhMySmtpSmtpTransport::class, 'addOhMySmtpHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(2, $email->getHeaders()->toArray());

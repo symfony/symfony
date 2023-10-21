@@ -66,7 +66,7 @@ foreach (array_slice($argv, 1) as $argumentOrOption) {
         continue;
     }
 
-    if (0 === strpos($argumentOrOption, '-')) {
+    if (str_starts_with($argumentOrOption, '-')) {
         $config['verbose_output'] = true;
     } else {
         $config['locale_to_analyze'] = $argumentOrOption;
@@ -87,19 +87,15 @@ foreach ($config['original_files'] as $originalFilePath) {
     $translationFilePaths = findTranslationFiles($originalFilePath, $config['locale_to_analyze']);
     $translationStatus = calculateTranslationStatus($originalFilePath, $translationFilePaths);
 
-    $totalMissingTranslations += array_sum(array_map(function ($translation) {
-        return count($translation['missingKeys']);
-    }, array_values($translationStatus)));
-    $totalTranslationMismatches += array_sum(array_map(function ($translation) {
-        return count($translation['mismatches']);
-    }, array_values($translationStatus)));
+    $totalMissingTranslations += array_sum(array_map(fn ($translation) => count($translation['missingKeys']), array_values($translationStatus)));
+    $totalTranslationMismatches += array_sum(array_map(fn ($translation) => count($translation['mismatches']), array_values($translationStatus)));
 
     printTranslationStatus($originalFilePath, $translationStatus, $config['verbose_output'], $config['include_completed_languages']);
 }
 
 exit($totalTranslationMismatches > 0 ? 1 : 0);
 
-function findTranslationFiles($originalFilePath, $localeToAnalyze)
+function findTranslationFiles($originalFilePath, $localeToAnalyze): array
 {
     $translations = [];
 
@@ -122,7 +118,7 @@ function findTranslationFiles($originalFilePath, $localeToAnalyze)
     return $translations;
 }
 
-function calculateTranslationStatus($originalFilePath, $translationFilePaths)
+function calculateTranslationStatus($originalFilePath, $translationFilePaths): array
 {
     $translationStatus = [];
     $allTranslationKeys = extractTranslationKeys($originalFilePath);
@@ -163,7 +159,7 @@ function extractLocaleFromFilePath($filePath)
     return $parts[count($parts) - 2];
 }
 
-function extractTranslationKeys($filePath)
+function extractTranslationKeys($filePath): array
 {
     $translationKeys = [];
     $contents = new \SimpleXMLElement(file_get_contents($filePath));

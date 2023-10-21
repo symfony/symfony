@@ -19,9 +19,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
  */
 class OtherSerializedNameDummy
 {
-    /**
-     * @Groups({"a"})
-     */
+    #[Groups(['a'])]
     private $buz;
 
     public function setBuz($buz)
@@ -34,10 +32,7 @@ class OtherSerializedNameDummy
         return $this->buz;
     }
 
-    /**
-     * @Groups({"b"})
-     * @SerializedName("buz")
-     */
+    #[Groups(['b']), SerializedName('buz')]
     public function getBuzForExport()
     {
         return $this->buz.' Rocks';

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -123,5 +124,13 @@ class MockResponseTest extends TestCase
         $mockResponse->cancel();
 
         $this->assertTrue($mockResponse->getInfo('canceled'));
+    }
+
+    public function testMustBeIssuedByMockHttpClient()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('MockResponse instances must be issued by MockHttpClient before processing.');
+
+        (new MockResponse())->getContent();
     }
 }

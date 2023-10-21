@@ -13,8 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @internal
  */
 abstract class AbstractVault
 {
@@ -42,6 +40,9 @@ abstract class AbstractVault
         }
     }
 
+    /**
+     * @return string
+     */
     protected function getPrettyPath(string $path)
     {
         return str_replace(getcwd().\DIRECTORY_SEPARATOR, '', $path);

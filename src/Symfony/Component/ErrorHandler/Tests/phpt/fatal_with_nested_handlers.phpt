@@ -1,7 +1,5 @@
 --TEST--
 Test catching fatal errors when handlers are nested
---SKIPIF--
-<?php if (\PHP_VERSION_ID < 80100) echo 'skip' ?>
 --FILE--
 <?php
 

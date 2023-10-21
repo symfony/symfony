@@ -35,14 +35,14 @@ use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointExceptio
  */
 class LdapAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {
-    private $authenticator;
-    private $ldapServiceId;
-    private $dnString;
-    private $searchDn;
-    private $searchPassword;
-    private $queryString;
+    private AuthenticatorInterface $authenticator;
+    private string $ldapServiceId;
+    private string $dnString;
+    private string $searchDn;
+    private string $searchPassword;
+    private string $queryString;
 
-    public function __construct(AuthenticatorInterface $authenticator, string $ldapServiceId, string $dnString = '{username}', string $searchDn = '', string $searchPassword = '', string $queryString = '')
+    public function __construct(AuthenticatorInterface $authenticator, string $ldapServiceId, string $dnString = '{user_identifier}', string $searchDn = '', string $searchPassword = '', string $queryString = '')
     {
         $this->authenticator = $authenticator;
         $this->ldapServiceId = $ldapServiceId;
@@ -66,22 +66,16 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
     }
 
     /**
-     * @deprecated since Symfony 5.4, use {@link createToken()} instead
+     * @internal
      */
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
     {
-        trigger_deprecation('symfony/ldap', '5.4', 'Method "%s()" is deprecated, use "%s::createToken()" instead.', __METHOD__, __CLASS__);
-
-        return $this->createToken($passport, $firewallName);
+        throw new \BadMethodCallException(sprintf('The "%s()" method cannot be called.', __METHOD__));
     }
 
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        // @deprecated since Symfony 5.4, in 6.0 change to:
-        // return $this->authenticator->createToken($passport, $firewallName);
-        return method_exists($this->authenticator, 'createToken')
-            ? $this->authenticator->createToken($passport, $firewallName)
-            : $this->authenticator->createAuthenticatedToken($passport, $firewallName);
+        return $this->authenticator->createToken($passport, $firewallName);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

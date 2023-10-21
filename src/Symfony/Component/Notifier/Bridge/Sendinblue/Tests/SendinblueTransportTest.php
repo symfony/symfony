@@ -18,16 +18,15 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
+/**
+ * @group legacy
+ */
 final class SendinblueTransportTest extends TransportTestCase
 {
-    /**
-     * @return SendinblueTransport
-     */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(HttpClientInterface $client = null): SendinblueTransport
     {
         return (new SendinblueTransport('api-key', '0611223344', $client ?? new MockHttpClient()))->setHost('host.test');
     }
@@ -58,9 +57,7 @@ final class SendinblueTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['code' => 400, 'message' => 'bad request']));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 

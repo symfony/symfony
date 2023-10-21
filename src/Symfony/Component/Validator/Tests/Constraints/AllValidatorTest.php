@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AllValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): AllValidator
     {
         return new AllValidator();
     }

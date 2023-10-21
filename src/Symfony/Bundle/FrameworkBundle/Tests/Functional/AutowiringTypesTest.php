@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
@@ -20,17 +21,29 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class AutowiringTypesTest extends AbstractWebTestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testAnnotationReaderAutowiring()
     {
+        $this->expectDeprecation('Since symfony/framework-bundle 6.4: Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
+
         static::bootKernel(['root_config' => 'no_annotations_cache.yml', 'environment' => 'no_annotations_cache']);
 
         $annotationReader = self::getContainer()->get('test.autowiring_types.autowired_services')->getAnnotationReader();
         $this->assertInstanceOf(AnnotationReader::class, $annotationReader);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCachedAnnotationReaderAutowiring()
     {
-        static::bootKernel();
+        $this->expectDeprecation('Since symfony/framework-bundle 6.4: Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
+
+        static::bootKernel(['root_config' => 'with_annotations.yml', 'environment' => 'with_annotations']);
 
         $annotationReader = self::getContainer()->get('test.autowiring_types.autowired_services')->getAnnotationReader();
         $this->assertInstanceOf(PsrCachedReader::class, $annotationReader);

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Check embed limitations
+
 5.3
 ---
 

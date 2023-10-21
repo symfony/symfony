@@ -37,6 +37,11 @@ class Configuration
     private $verboseOutput;
 
     /**
+     * @var string[]
+     */
+    private $ignoreDeprecationPatterns = [];
+
+    /**
      * @var bool
      */
     private $generateBaseline = false;
@@ -54,17 +59,18 @@ class Configuration
     /**
      * @var string|null
      */
-    private $logFile = null;
+    private $logFile;
 
     /**
      * @param int[]       $thresholds       A hash associating groups to thresholds
      * @param string      $regex            Will be matched against messages, to decide whether to display a stack trace
      * @param bool[]      $verboseOutput    Keyed by groups
+     * @param string      $ignoreFile       The path to the ignore deprecation patterns file
      * @param bool        $generateBaseline Whether to generate or update the baseline file
      * @param string      $baselineFile     The path to the baseline file
      * @param string|null $logFile          The path to the log file
      */
-    private function __construct(array $thresholds = [], $regex = '', $verboseOutput = [], $generateBaseline = false, $baselineFile = '', $logFile = null)
+    private function __construct(array $thresholds = [], $regex = '', $verboseOutput = [], $ignoreFile = '', $generateBaseline = false, $baselineFile = '', $logFile = null)
     {
         $groups = ['total', 'indirect', 'direct', 'self'];
 
@@ -110,6 +116,25 @@ class Configuration
             $this->verboseOutput[$group] = $status;
         }
 
+        if ($ignoreFile) {
+            if (!is_file($ignoreFile)) {
+                throw new \InvalidArgumentException(sprintf('The ignoreFile "%s" does not exist.', $ignoreFile));
+            }
+            set_error_handler(static function ($t, $m) use ($ignoreFile, &$line) {
+                throw new \RuntimeException(sprintf('Invalid pattern found in "%s" on line "%d"', $ignoreFile, 1 + $line).substr($m, 12));
+            });
+            try {
+                foreach (file($ignoreFile) as $line => $pattern) {
+                    if ('#' !== (trim($pattern)[0] ?? '#')) {
+                        preg_match($pattern, '');
+                        $this->ignoreDeprecationPatterns[] = $pattern;
+                    }
+                }
+            } finally {
+                restore_error_handler();
+            }
+        }
+
         if ($generateBaseline && !$baselineFile) {
             throw new \InvalidArgumentException('You cannot use the "generateBaseline" configuration option without providing a "baselineFile" configuration option.');
         }
@@ -129,20 +154,15 @@ class Configuration
         $this->logFile = $logFile;
     }
 
-    /**
-     * @return bool
-     */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->enabled;
     }
 
     /**
      * @param DeprecationGroup[] $deprecationGroups
-     *
-     * @return bool
      */
-    public function tolerates(array $deprecationGroups)
+    public function tolerates(array $deprecationGroups): bool
     {
         $grandTotal = 0;
 
@@ -163,6 +183,19 @@ class Configuration
         }
 
         return true;
+    }
+
+    public function isIgnoredDeprecation(Deprecation $deprecation): bool
+    {
+        if (!$this->ignoreDeprecationPatterns) {
+            return false;
+        }
+        $result = @preg_filter($this->ignoreDeprecationPatterns, '$0', $deprecation->getMessage());
+        if (\PREG_NO_ERROR !== preg_last_error()) {
+            throw new \RuntimeException(preg_last_error_msg());
+        }
+
+        return (bool) $result;
     }
 
     /**
@@ -191,10 +224,7 @@ class Configuration
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    public function isBaselineDeprecation(Deprecation $deprecation)
+    public function isBaselineDeprecation(Deprecation $deprecation): bool
     {
         if ($deprecation->isLegacy()) {
             return false;
@@ -224,20 +254,17 @@ class Configuration
         return $result;
     }
 
-    /**
-     * @return bool
-     */
-    public function isGeneratingBaseline()
+    public function isGeneratingBaseline(): bool
     {
         return $this->generateBaseline;
     }
 
-    public function getBaselineFile()
+    public function getBaselineFile(): string
     {
         return $this->baselineFile;
     }
 
-    public function writeBaseline()
+    public function writeBaseline(): void
     {
         $map = [];
         foreach ($this->baselineDeprecations as $location => $messages) {
@@ -254,36 +281,28 @@ class Configuration
 
     /**
      * @param string $message
-     *
-     * @return bool
      */
-    public function shouldDisplayStackTrace($message)
+    public function shouldDisplayStackTrace($message): bool
     {
         return '' !== $this->regex && preg_match($this->regex, $message);
     }
 
-    /**
-     * @return bool
-     */
-    public function isInRegexMode()
+    public function isInRegexMode(): bool
     {
         return '' !== $this->regex;
     }
 
-    /**
-     * @return bool
-     */
-    public function verboseOutput($group)
+    public function verboseOutput($group): bool
     {
         return $this->verboseOutput[$group];
     }
 
-    public function shouldWriteToLogFile()
+    public function shouldWriteToLogFile(): bool
     {
         return null !== $this->logFile;
     }
 
-    public function getLogFile()
+    public function getLogFile(): ?string
     {
         return $this->logFile;
     }
@@ -291,23 +310,22 @@ class Configuration
     /**
      * @param string $serializedConfiguration an encoded string, for instance
      *                                        max[total]=1234&max[indirect]=42
-     *
-     * @return self
      */
-    public static function fromUrlEncodedString($serializedConfiguration)
+    public static function fromUrlEncodedString($serializedConfiguration): self
     {
         parse_str($serializedConfiguration, $normalizedConfiguration);
         foreach (array_keys($normalizedConfiguration) as $key) {
-            if (!\in_array($key, ['max', 'disabled', 'verbose', 'quiet', 'generateBaseline', 'baselineFile', 'logFile'], true)) {
+            if (!\in_array($key, ['max', 'disabled', 'verbose', 'quiet', 'ignoreFile', 'generateBaseline', 'baselineFile', 'logFile'], true)) {
                 throw new \InvalidArgumentException(sprintf('Unknown configuration option "%s".', $key));
             }
         }
 
         $normalizedConfiguration += [
-            'max' => [],
+            'max' => ['total' => 0],
             'disabled' => false,
             'verbose' => true,
             'quiet' => [],
+            'ignoreFile' => '',
             'generateBaseline' => false,
             'baselineFile' => '',
             'logFile' => null,
@@ -329,19 +347,17 @@ class Configuration
         }
 
         return new self(
-            $normalizedConfiguration['max'] ?? [],
+            $normalizedConfiguration['max'],
             '',
             $verboseOutput,
+            $normalizedConfiguration['ignoreFile'],
             filter_var($normalizedConfiguration['generateBaseline'], \FILTER_VALIDATE_BOOLEAN),
             $normalizedConfiguration['baselineFile'],
             $normalizedConfiguration['logFile']
         );
     }
 
-    /**
-     * @return self
-     */
-    public static function inDisabledMode()
+    public static function inDisabledMode(): self
     {
         $configuration = new self();
         $configuration->enabled = false;
@@ -349,18 +365,12 @@ class Configuration
         return $configuration;
     }
 
-    /**
-     * @return self
-     */
-    public static function inStrictMode()
+    public static function inStrictMode(): self
     {
         return new self(['total' => 0]);
     }
 
-    /**
-     * @return self
-     */
-    public static function inWeakMode()
+    public static function inWeakMode(): self
     {
         $verboseOutput = [];
         foreach (['unsilenced', 'direct', 'indirect', 'self', 'other'] as $group) {
@@ -370,18 +380,12 @@ class Configuration
         return new self([], '', $verboseOutput);
     }
 
-    /**
-     * @return self
-     */
-    public static function fromNumber($upperBound)
+    public static function fromNumber($upperBound): self
     {
         return new self(['total' => $upperBound]);
     }
 
-    /**
-     * @return self
-     */
-    public static function fromRegex($regex)
+    public static function fromRegex($regex): self
     {
         return new self([], $regex);
     }

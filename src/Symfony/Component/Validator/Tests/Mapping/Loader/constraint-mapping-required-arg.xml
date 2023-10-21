@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+
+<constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+    <class name="Symfony\Component\Validator\Tests\Fixtures\Entity_81">
+
+        <property name="title">
+            <constraint name="Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument">
+                <option name="requiredArg">X</option>
+            </constraint>
+        </property>
+    </class>
+
+</constraint-mapping>

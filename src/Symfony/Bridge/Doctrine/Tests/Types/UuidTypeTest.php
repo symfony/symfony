@@ -24,15 +24,14 @@ use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;
 
 // DBAL 2 compatibility
-class_exists('Doctrine\DBAL\Platforms\MySqlPlatform');
-class_exists('Doctrine\DBAL\Platforms\PostgreSqlPlatform');
+class_exists(\Doctrine\DBAL\Platforms\MySqlPlatform::class);
+class_exists(\Doctrine\DBAL\Platforms\PostgreSqlPlatform::class);
 
 final class UuidTypeTest extends TestCase
 {
     private const DUMMY_UUID = '9f755235-5a2d-4aba-9605-e9962b312e50';
 
-    /** @var UuidType */
-    private $type;
+    private UuidType $type;
 
     public static function setUpBeforeClass(): void
     {

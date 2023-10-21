@@ -62,9 +62,9 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         ];
 
         $expected = [
-            new Reference('n1'),
-            new Reference('n2'),
-            new Reference('n3'),
+            new Reference('.debug.value_resolver.n1'),
+            new Reference('.debug.value_resolver.n2'),
+            new Reference('.debug.value_resolver.n3'),
         ];
 
         $definition = new Definition(ArgumentResolver::class, [null, []]);
@@ -81,9 +81,9 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         (new ControllerArgumentValueResolverPass())->process($container);
         $this->assertEquals($expected, $definition->getArgument(1)->getValues());
 
-        $this->assertTrue($container->hasDefinition('debug.n1'));
-        $this->assertTrue($container->hasDefinition('debug.n2'));
-        $this->assertTrue($container->hasDefinition('debug.n3'));
+        $this->assertTrue($container->hasDefinition('.debug.value_resolver.n1'));
+        $this->assertTrue($container->hasDefinition('.debug.value_resolver.n2'));
+        $this->assertTrue($container->hasDefinition('.debug.value_resolver.n3'));
 
         $this->assertTrue($container->hasDefinition('n1'));
         $this->assertTrue($container->hasDefinition('n2'));

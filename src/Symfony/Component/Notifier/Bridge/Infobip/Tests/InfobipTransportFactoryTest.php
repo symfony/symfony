@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Infobip\Tests;
 
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class InfobipTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return InfobipTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): InfobipTransportFactory
     {
         return new InfobipTransportFactory();
     }

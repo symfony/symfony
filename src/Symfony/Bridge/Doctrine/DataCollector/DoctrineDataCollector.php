@@ -29,34 +29,42 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DoctrineDataCollector extends DataCollector
 {
-    private $registry;
-    private $connections;
-    private $managers;
-    private $debugDataHolder;
+    private array $connections;
+    private array $managers;
 
     /**
-     * @var DebugStack[]
+     * @var array<string, DebugStack>
      */
-    private $loggers = [];
+    private array $loggers = [];
 
-    public function __construct(ManagerRegistry $registry, DebugDataHolder $debugDataHolder = null)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        private ManagerRegistry $registry,
+        private ?DebugDataHolder $debugDataHolder = null,
+    ) {
         $this->connections = $registry->getConnectionNames();
         $this->managers = $registry->getManagerNames();
-        $this->debugDataHolder = $debugDataHolder;
+
+        if (null === $debugDataHolder) {
+            trigger_deprecation('symfony/doctrine-bridge', '6.4', 'Not passing an instance of "%s" as "$debugDataHolder" to "%s()" is deprecated.', DebugDataHolder::class, __METHOD__);
+        }
     }
 
     /**
      * Adds the stack logger for a connection.
+     *
+     * @return void
+     *
+     * @deprecated since Symfony 6.4, use a DebugDataHolder instead.
      */
     public function addLogger(string $name, DebugStack $logger)
     {
+        trigger_deprecation('symfony/doctrine-bridge', '6.4', '"%s()" is deprecated. Pass an instance of "%s" to the constructor instead.', __METHOD__, DebugDataHolder::class);
+
         $this->loggers[$name] = $logger;
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
@@ -86,6 +94,9 @@ class DoctrineDataCollector extends DataCollector
         return $queries;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->data = [];
@@ -102,26 +113,41 @@ class DoctrineDataCollector extends DataCollector
         }
     }
 
+    /**
+     * @return array
+     */
     public function getManagers()
     {
         return $this->data['managers'];
     }
 
+    /**
+     * @return array
+     */
     public function getConnections()
     {
         return $this->data['connections'];
     }
 
+    /**
+     * @return int
+     */
     public function getQueryCount()
     {
         return array_sum(array_map('count', $this->data['queries']));
     }
 
+    /**
+     * @return array
+     */
     public function getQueries()
     {
         return $this->data['queries'];
     }
 
+    /**
+     * @return int
+     */
     public function getTime()
     {
         $time = 0;
@@ -134,18 +160,12 @@ class DoctrineDataCollector extends DataCollector
         return $time;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'db';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCasters()
+    protected function getCasters(): array
     {
         return parent::getCasters() + [
             ObjectParameter::class => static function (ObjectParameter $o, array $a, Stub $s): array {
@@ -187,9 +207,7 @@ class DoctrineDataCollector extends DataCollector
     {
         $query['explainable'] = true;
         $query['runnable'] = true;
-        if (null === $query['params']) {
-            $query['params'] = [];
-        }
+        $query['params'] ??= [];
         if (!\is_array($query['params'])) {
             $query['params'] = [$query['params']];
         }
@@ -236,7 +254,7 @@ class DoctrineDataCollector extends DataCollector
      * indicating if the original value was kept (allowing to use the sanitized
      * value to explain the query).
      */
-    private function sanitizeParam($var, ?\Throwable $error): array
+    private function sanitizeParam(mixed $var, ?\Throwable $error): array
     {
         if (\is_object($var)) {
             return [$o = new ObjectParameter($var, $error), false, $o->isStringable() && !$error];

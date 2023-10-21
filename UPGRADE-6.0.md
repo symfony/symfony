@@ -149,7 +149,7 @@ Inflector
 Ldap
 ----
 
-* Remove `LdapAuthenticator::createAuthenticatedToken()`, use `LdapAuthenticator::createToken()` instead
+ * Remove `LdapAuthenticator::createAuthenticatedToken()`, use `LdapAuthenticator::createToken()` instead
 
 Lock
 ----

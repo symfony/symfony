@@ -1,0 +1,6 @@
+security:
+    firewalls:
+        no_security:
+            pattern:
+                - "^/register$"
+                - "^/documentation$"

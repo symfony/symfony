@@ -1,0 +1,99 @@
+{% set status_code = request_collector ? request_collector.statuscode|default(0) : 0 %}
+{% set css_class = status_code > 399 ? 'status-error' : status_code > 299 ? 'status-warning' : 'status-success' %}
+
+{% if request_collector and request_collector.redirect %}
+    {% set redirect = request_collector.redirect %}
+    {% set link_to_source_code = redirect.controller.class is defined ? redirect.controller.file|file_link(redirect.controller.line) %}
+    {% set redirect_route_name = '@' ~ redirect.route %}
+
+    <div class="status status-compact status-warning">
+        <span class="icon icon-redirect">{{ source('@WebProfiler/Icon/redirect.svg') }}</span>
+
+        <span class="status-response-status-code">{{ redirect.status_code }}</span> redirect from
+
+        <span class="status-request-method">{{ redirect.method }}</span>
+
+        {% if link_to_source_code %}
+            <a href="{{ link_to_source_code }}" title="{{ redirect.controller.file }}">{{ redirect_route_name }}</a>
+        {% else %}
+            {{ redirect_route_name }}
+        {% endif %}
+
+        (<a href="{{ path('_profiler', { token: redirect.token, panel: request.query.get('panel', 'request') }) }}">{{ redirect.token }}</a>)
+    </div>
+{% endif %}
+
+<div class="status {{ css_class }}">
+    {% if status_code > 399 %}
+        <p class="status-error-details">
+            <span class="icon">{{ source('@WebProfiler/Icon/alert-circle.svg') }}</span>
+            <span class="status-response-status-code">Error {{ status_code }}</span>
+            <span class="status-response-status-text">{{ request_collector.statusText }}</span>
+        </p>
+    {% endif %}
+
+    <h2>
+        <span class="status-request-method">
+            {{ profile.method|upper }}
+        </span>
+
+        {% set profile_title = profile.url|length < 160 ? profile.url : profile.url[:160] ~ '…' %}
+        {% if profile.method|upper in ['GET', 'HEAD'] %}
+            <a href="{{ profile.url }}">{{ profile_title }}</a>
+        {% else %}
+            {{ profile_title }}
+        {% endif %}
+    </h2>
+
+    <dl class="metadata">
+        {% if status_code < 400 %}
+            <dt>Response</dt>
+            <dd>
+                <span class="status-response-status-code">{{ status_code }}</span>
+                <span class="status-response-status-text">{{ request_collector.statusText }}</span>
+            </dd>
+        {% endif %}
+
+        {% set referer = request_collector ? request_collector.requestheaders.get('referer') : null %}
+        {% if referer %}
+            <dt></dt>
+            <dd>
+                <span class="icon icon-referer">{{ source('@WebProfiler/Icon/referrer.svg') }}</span>
+                <a href="{{ referer }}" class="referer">Browse referrer URL</a>
+            </dd>
+        {% endif %}
+
+        <dt>IP</dt>
+        <dd>
+            <a href="{{ path('_profiler_search_results', { token: token, limit: 10, ip: profile.ip }) }}">{{ profile.ip }}</a>
+        </dd>
+
+        <dt>Profiled on</dt>
+        <dd><time data-convert-to-user-timezone data-render-as-datetime datetime="{{ profile.time|date('c') }}">{{ profile.time|date('r') }}</time></dd>
+
+        <dt>Token</dt>
+        <dd>{{ profile.token }}</dd>
+    </dl>
+</div>
+
+{% if request_collector and request_collector.forwardtoken -%}
+    {% set forward_profile = profile.childByToken(request_collector.forwardtoken) %}
+    {% set controller = forward_profile ? forward_profile.collector('request').controller : 'n/a' %}
+    <div class="status status-compact status-compact-forward">
+        <span class="icon icon-forward">{{ source('@WebProfiler/Icon/forward.svg') }}</span>
+
+        Forwarded to
+
+        {% set link = controller.file is defined ? controller.file|file_link(controller.line) : null -%}
+        {%- if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif -%}
+            {% if controller.class is defined %}
+                {{- controller.class|abbr_class|striptags -}}
+                {{- controller.method ? ' :: ' ~ controller.method -}}
+            {% else %}
+                {{- controller -}}
+            {% endif %}
+            {%- if link %}</a>{% endif %}
+        (<a href="{{ path('_profiler', { token: request_collector.forwardtoken }) }}">{{ request_collector.forwardtoken }}</a>)
+
+    </div>
+{%- endif %}

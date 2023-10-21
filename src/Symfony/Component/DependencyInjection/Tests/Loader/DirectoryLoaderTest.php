@@ -22,10 +22,10 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class DirectoryLoaderTest extends TestCase
 {
-    private static $fixturesPath;
+    private static string $fixturesPath;
 
-    private $container;
-    private $loader;
+    private ContainerBuilder $container;
+    private DirectoryLoader $loader;
 
     public static function setUpBeforeClass(): void
     {

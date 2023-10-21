@@ -13,7 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\MessageStreamHeader;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkApiTransport;
 use Symfony\Component\Mailer\Envelope;
@@ -61,7 +61,6 @@ class PostmarkApiTransportTest extends TestCase
 
         $transport = new PostmarkApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('Headers', $payload);
@@ -83,7 +82,7 @@ class PostmarkApiTransportTest extends TestCase
             $this->assertSame('Hello!', $body['Subject']);
             $this->assertSame('Hello There!', $body['TextBody']);
 
-            return new MockResponse(json_encode(['MessageID' => 'foobar']), [
+            return new JsonMockResponse(['MessageID' => 'foobar'], [
                 'http_code' => 200,
             ]);
         });
@@ -103,14 +102,9 @@ class PostmarkApiTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['Message' => 'i\'m a teapot', 'ErrorCode' => 418]), [
-                'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
-            ]);
-        });
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['Message' => 'i\'m a teapot', 'ErrorCode' => 418], [
+            'http_code' => 418,
+        ]));
         $transport = new PostmarkApiTransport('KEY', $client);
         $transport->setPort(8984);
 
@@ -136,7 +130,6 @@ class PostmarkApiTransportTest extends TestCase
 
         $transport = new PostmarkApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayNotHasKey('Headers', $payload);
@@ -158,7 +151,6 @@ class PostmarkApiTransportTest extends TestCase
 
         $transport = new PostmarkApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
 
         $this->expectException(TransportException::class);
 

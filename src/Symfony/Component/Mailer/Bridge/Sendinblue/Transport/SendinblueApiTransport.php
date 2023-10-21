@@ -29,10 +29,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Yann LUCAS
+ *
+ * @deprecated since Symfony 6.4, use BrevoApiTransport instead
  */
 final class SendinblueApiTransport extends AbstractApiTransport
 {
-    private $key;
+    private string $key;
 
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -58,7 +60,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
+        } catch (DecodingExceptionInterface) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Sendinblue server.', $response, 0, $e);
@@ -169,7 +171,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
     private function stringifyAddress(Address $address): array
     {
-        $stringifiedAddress = ['email' => $address->getAddress()];
+        $stringifiedAddress = ['email' => $address->getEncodedAddress()];
 
         if ($address->getName()) {
             $stringifiedAddress['name'] = $address->getName();

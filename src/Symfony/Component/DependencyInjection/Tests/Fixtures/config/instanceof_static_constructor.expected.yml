@@ -1,0 +1,10 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\StaticConstructor\PrototypeStaticConstructor
+        public: true
+        constructor: create

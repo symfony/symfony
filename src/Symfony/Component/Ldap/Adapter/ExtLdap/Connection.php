@@ -36,20 +36,17 @@ class Connection extends AbstractConnection
         ConnectionOptions::X_TLS_REQUIRE_CERT,
     ];
 
-    /** @var bool */
-    private $bound = false;
+    private bool $bound = false;
+    private ?LDAPConnection $connection = null;
 
-    /** @var resource|LDAPConnection */
-    private $connection;
-
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
+    /**
+     * @return void
+     */
     public function __wakeup()
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
@@ -60,20 +57,17 @@ class Connection extends AbstractConnection
         $this->disconnect();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isBound()
+    public function isBound(): bool
     {
         return $this->bound;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
+     *
+     * @return void
      */
-    public function bind(string $dn = null, string $password = null)
+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null)
     {
         if (!$this->connection) {
             $this->connect();
@@ -96,22 +90,26 @@ class Connection extends AbstractConnection
     }
 
     /**
-     * @return resource|LDAPConnection
-     *
      * @internal
      */
-    public function getResource()
+    public function getResource(): ?LDAPConnection
     {
         return $this->connection;
     }
 
-    public function setOption(string $name, $value)
+    /**
+     * @return void
+     */
+    public function setOption(string $name, array|string|int|bool $value)
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
             throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
         }
     }
 
+    /**
+     * @return array|string|int|null
+     */
     public function getOption(string $name)
     {
         if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
@@ -121,6 +119,9 @@ class Connection extends AbstractConnection
         return $ret;
     }
 
+    /**
+     * @return void
+     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -147,7 +148,7 @@ class Connection extends AbstractConnection
         });
     }
 
-    private function connect()
+    private function connect(): void
     {
         if ($this->connection) {
             return;
@@ -176,7 +177,7 @@ class Connection extends AbstractConnection
         }
     }
 
-    private function disconnect()
+    private function disconnect(): void
     {
         if ($this->connection) {
             ldap_unbind($this->connection);

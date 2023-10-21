@@ -1,0 +1,25 @@
+{
+    "Metadata": {
+      "example": "value",
+      "example_2": "value"
+    },
+    "RecordType": "Bounce",
+    "ID": 42,
+    "Type": "HardBounce",
+    "TypeCode": 1,
+    "Name": "Hard bounce",
+    "Tag": "Test",
+    "MessageID": "00000000-0000-0000-0000-000000000000",
+    "ServerID": 1234,
+    "MessageStream": "outbound",
+    "Description": "The server was unable to deliver your message (ex: unknown user, mailbox not found).",
+    "Details": "Test bounce details",
+    "Email": "john@example.com",
+    "From": "sender@example.com",
+    "BouncedAt": "2022-09-02T14:29:19Z",
+    "DumpAvailable": true,
+    "Inactive": true,
+    "CanActivate": true,
+    "Subject": "Test subject",
+    "Content": "Test content"
+}

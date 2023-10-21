@@ -18,14 +18,12 @@ use Symfony\Component\Messenger\Envelope;
  */
 final class AckStamp implements NonSendableStampInterface
 {
-    private $ack;
-
     /**
      * @param \Closure(Envelope, \Throwable|null) $ack
      */
-    public function __construct(\Closure $ack)
-    {
-        $this->ack = $ack;
+    public function __construct(
+        private readonly \Closure $ack,
+    ) {
     }
 
     public function ack(Envelope $envelope, \Throwable $e = null): void

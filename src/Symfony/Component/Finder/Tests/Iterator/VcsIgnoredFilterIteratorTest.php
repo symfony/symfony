@@ -16,10 +16,7 @@ use Symfony\Component\Finder\Iterator\VcsIgnoredFilterIterator;
 
 class VcsIgnoredFilterIteratorTest extends IteratorTestCase
 {
-    /**
-     * @var string
-     */
-    private $tmpDir;
+    private string $tmpDir;
 
     protected function setUp(): void
     {

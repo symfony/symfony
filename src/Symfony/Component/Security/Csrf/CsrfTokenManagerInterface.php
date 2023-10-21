@@ -27,10 +27,8 @@ interface CsrfTokenManagerInterface
      *
      * @param string $tokenId The token ID. You may choose an arbitrary value
      *                        for the ID
-     *
-     * @return CsrfToken
      */
-    public function getToken(string $tokenId);
+    public function getToken(string $tokenId): CsrfToken;
 
     /**
      * Generates a new token value for the given ID.
@@ -41,10 +39,8 @@ interface CsrfTokenManagerInterface
      *
      * @param string $tokenId The token ID. You may choose an arbitrary value
      *                        for the ID
-     *
-     * @return CsrfToken
      */
-    public function refreshToken(string $tokenId);
+    public function refreshToken(string $tokenId): CsrfToken;
 
     /**
      * Invalidates the CSRF token with the given ID, if one exists.
@@ -52,12 +48,10 @@ interface CsrfTokenManagerInterface
      * @return string|null Returns the removed token value if one existed, NULL
      *                     otherwise
      */
-    public function removeToken(string $tokenId);
+    public function removeToken(string $tokenId): ?string;
 
     /**
      * Returns whether the given CSRF token is valid.
-     *
-     * @return bool
      */
-    public function isTokenValid(CsrfToken $token);
+    public function isTokenValid(CsrfToken $token): bool;
 }

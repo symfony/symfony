@@ -24,9 +24,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CompleteCommandTest extends TestCase
 {
-    private $command;
-    private $application;
-    private $tester;
+    private CompleteCommand $command;
+    private Application $application;
+    private CommandTester $tester;
 
     protected function setUp(): void
     {
@@ -47,7 +47,7 @@ class CompleteCommandTest extends TestCase
 
     public function testUnsupportedShellOption()
     {
-        $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash").');
+        $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash", "fish", "zsh").');
         $this->execute(['--shell' => 'unsupported']);
     }
 
@@ -128,7 +128,7 @@ class CompleteCommandTest extends TestCase
     private function execute(array $input)
     {
         // run in verbose mode to assert exceptions
-        $this->tester->execute($input ? ($input + ['--shell' => 'bash']) : $input, ['verbosity' => OutputInterface::VERBOSITY_DEBUG]);
+        $this->tester->execute($input ? ($input + ['--shell' => 'bash', '--api-version' => CompleteCommand::COMPLETION_API_VERSION]) : $input, ['verbosity' => OutputInterface::VERBOSITY_DEBUG]);
     }
 }
 
@@ -138,6 +138,7 @@ class CompleteCommandTest_HelloCommand extends Command
     {
         $this->setName('hello')
              ->setAliases(['ahoy'])
+             ->setDescription('Hello test command')
              ->addArgument('name', InputArgument::REQUIRED)
         ;
     }

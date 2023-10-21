@@ -17,11 +17,18 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+trigger_deprecation('symfony/framework-bundle', '6.4', 'The "%s" class is deprecated, use "%s" instead.', LoggingTranslatorPass::class, \Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass::class);
+
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+ *
+ * @deprecated since Symfony 6.4, use Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass instead.
  */
 class LoggingTranslatorPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasAlias('logger') || !$container->hasAlias('translator')) {

@@ -377,7 +377,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // create symlink to nonexistent dir
         rmdir($basePath.'dir');
-        $this->assertFalse('\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 70400 ? @readlink($basePath.'dir-link') : is_dir($basePath.'dir-link'));
+        $this->assertDirectoryDoesNotExist($basePath.'dir-link');
 
         $this->filesystem->remove($basePath);
 
@@ -1078,11 +1078,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertEquals($file, $this->filesystem->readlink($link1));
 
-        if (!('\\' == \DIRECTORY_SEPARATOR && \PHP_MAJOR_VERSION === 7 && \PHP_MINOR_VERSION === 3)) {
-            // Skip for Windows with PHP 7.3.*
-            $this->assertEquals($link1, $this->filesystem->readlink($link2));
-        }
-
+        $this->assertEquals($link1, $this->filesystem->readlink($link2));
         $this->assertEquals($file, $this->filesystem->readlink($link1, true));
         $this->assertEquals($file, $this->filesystem->readlink($link2, true));
         $this->assertEquals($file, $this->filesystem->readlink($file, true));
@@ -1091,10 +1087,6 @@ class FilesystemTest extends FilesystemTestCase
     public function testReadBrokenLink()
     {
         $this->markAsSkippedIfSymlinkIsMissing();
-
-        if ('\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 70400) {
-            $this->markTestSkipped('Windows does not support reading "broken" symlinks in PHP < 7.4.0');
-        }
 
         $file = Path::join($this->workspace, 'file');
         $link = Path::join($this->workspace, 'link');
@@ -1626,11 +1618,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringEqualsFile($linknameA, 'bar');
         $this->assertStringEqualsFile($linknameB, 'bar');
 
-        // Windows does not support reading "broken" symlinks in PHP < 7.4.0
-        if ('\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 70400) {
-            return;
-        }
-
         $this->filesystem->remove($filename);
         $this->filesystem->dumpFile($linknameB, 'baz');
 
@@ -1836,7 +1823,7 @@ class FilesystemTest extends FilesystemTestCase
             $this->markTestSkipped('This test is specific to Windows.');
         }
 
-        if (($userProfilePath = getenv('USERPROFILE')) === false || !is_dir($userProfilePath)) {
+        if (false === ($userProfilePath = getenv('USERPROFILE')) || !is_dir($userProfilePath)) {
             throw new \RuntimeException('Failed to retrieve user profile path.');
         }
 

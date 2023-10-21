@@ -96,7 +96,7 @@ class DeprecationErrorHandler
     {
         $deprecations = [];
         $previousErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$deprecations, &$previousErrorHandler) {
-            if (\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || false === strpos($msg, '" targeting switch is equivalent to "break'))) {
+            if (\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || !str_contains($msg, '" targeting switch is equivalent to "break'))) {
                 if ($previousErrorHandler) {
                     return $previousErrorHandler($type, $msg, $file, $line, $context);
                 }
@@ -128,7 +128,7 @@ class DeprecationErrorHandler
      */
     public function handleError($type, $msg, $file, $line, $context = [])
     {
-        if ((\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || false === strpos($msg, '" targeting switch is equivalent to "break'))) || !$this->getConfiguration()->isEnabled()) {
+        if ((\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || !str_contains($msg, '" targeting switch is equivalent to "break'))) || !$this->getConfiguration()->isEnabled()) {
             return \call_user_func(self::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
         }
 
@@ -140,6 +140,9 @@ class DeprecationErrorHandler
 
         $deprecation = new Deprecation($msg, $trace, $file, \E_DEPRECATED === $type);
         if ($deprecation->isMuted()) {
+            return null;
+        }
+        if ($this->getConfiguration()->isIgnoredDeprecation($deprecation)) {
             return null;
         }
         if ($this->getConfiguration()->isBaselineDeprecation($deprecation)) {
@@ -337,9 +340,14 @@ class DeprecationErrorHandler
 
                     $countsByCaller = $notice->getCountsByCaller();
                     arsort($countsByCaller);
+                    $limit = 5;
 
                     foreach ($countsByCaller as $method => $count) {
                         if ('count' !== $method) {
+                            if (!$limit--) {
+                                fwrite($handle, "    ...\n");
+                                break;
+                            }
                             fwrite($handle, sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
                         }
                     }
@@ -352,7 +360,7 @@ class DeprecationErrorHandler
         }
     }
 
-    private static function getPhpUnitErrorHandler()
+    private static function getPhpUnitErrorHandler(): callable
     {
         if (!$eh = self::$errorHandler) {
             if (class_exists(Handler::class)) {

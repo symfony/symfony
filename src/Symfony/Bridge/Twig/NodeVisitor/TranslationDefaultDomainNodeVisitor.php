@@ -30,16 +30,13 @@ use Twig\NodeVisitor\AbstractNodeVisitor;
  */
 final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 {
-    private $scope;
+    private Scope $scope;
 
     public function __construct()
     {
         $this->scope = new Scope();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doEnterNode(Node $node, Environment $env): Node
     {
         if ($node instanceof BlockNode || $node instanceof ModuleNode) {
@@ -86,9 +83,6 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doLeaveNode(Node $node, Environment $env): ?Node
     {
         if ($node instanceof TransDefaultDomainNode) {
@@ -102,9 +96,6 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return -10;

@@ -15,15 +15,19 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+trigger_deprecation('symfony/framework-bundle', '6.4', 'The "%s" class is deprecated, use "%s" instead.', AddExpressionLanguageProvidersPass::class, \Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass::class);
+
 /**
  * Registers the expression language providers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass instead.
  */
 class AddExpressionLanguageProvidersPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function process(ContainerBuilder $container)
     {

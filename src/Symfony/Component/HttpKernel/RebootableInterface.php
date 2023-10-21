@@ -25,6 +25,8 @@ interface RebootableInterface
      * while building the container. Use the %kernel.build_dir% parameter instead.
      *
      * @param string|null $warmupDir pass null to reboot in the regular build directory
+     *
+     * @return void
      */
     public function reboot(?string $warmupDir);
 }

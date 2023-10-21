@@ -28,9 +28,9 @@ use Twig\Profiler\Profile;
  */
 class TwigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $profile;
-    private $twig;
-    private $computed;
+    private Profile $profile;
+    private ?Environment $twig;
+    private array $computed;
 
     public function __construct(Profile $profile, Environment $twig = null)
     {
@@ -38,27 +38,18 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $this->twig = $twig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->profile->reset();
-        $this->computed = null;
+        unset($this->computed);
         $this->data = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data['profile'] = serialize($this->profile);
         $this->data['template_paths'] = [];
@@ -71,7 +62,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
             if ($profile->isTemplate()) {
                 try {
                     $template = $this->twig->load($name = $profile->getName());
-                } catch (LoaderError $e) {
+                } catch (LoaderError) {
                     $template = null;
                 }
 
@@ -87,37 +78,37 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $templateFinder($this->profile);
     }
 
-    public function getTime()
+    public function getTime(): float
     {
         return $this->getProfile()->getDuration() * 1000;
     }
 
-    public function getTemplateCount()
+    public function getTemplateCount(): int
     {
         return $this->getComputedData('template_count');
     }
 
-    public function getTemplatePaths()
+    public function getTemplatePaths(): array
     {
         return $this->data['template_paths'];
     }
 
-    public function getTemplates()
+    public function getTemplates(): array
     {
         return $this->getComputedData('templates');
     }
 
-    public function getBlockCount()
+    public function getBlockCount(): int
     {
         return $this->getComputedData('block_count');
     }
 
-    public function getMacroCount()
+    public function getMacroCount(): int
     {
         return $this->getComputedData('macro_count');
     }
 
-    public function getHtmlCallGraph()
+    public function getHtmlCallGraph(): Markup
     {
         $dumper = new HtmlDumper();
         $dump = $dumper->dump($this->getProfile());
@@ -138,25 +129,19 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         return new Markup($dump, 'UTF-8');
     }
 
-    public function getProfile()
+    public function getProfile(): Profile
     {
-        if (null === $this->profile) {
-            $this->profile = unserialize($this->data['profile'], ['allowed_classes' => ['Twig_Profiler_Profile', 'Twig\Profiler\Profile']]);
-        }
-
-        return $this->profile;
+        return $this->profile ??= unserialize($this->data['profile'], ['allowed_classes' => ['Twig_Profiler_Profile', Profile::class]]);
     }
 
-    private function getComputedData(string $index)
+    private function getComputedData(string $index): mixed
     {
-        if (null === $this->computed) {
-            $this->computed = $this->computeData($this->getProfile());
-        }
+        $this->computed ??= $this->computeData($this->getProfile());
 
         return $this->computed[$index];
     }
 
-    private function computeData(Profile $profile)
+    private function computeData(Profile $profile): array
     {
         $data = [
             'template_count' => 0,
@@ -193,9 +178,6 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'twig';

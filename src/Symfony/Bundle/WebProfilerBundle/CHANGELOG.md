@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add console commands to the profiler
+
+6.3
+---
+
+ * Add a "role=img" and an explicit title in the .svg file used by the web debug toolbar
+   to improve accessibility with screen readers for blind users
+ * Add a clickable link to the entry view twig file in the toolbar
+
+6.1
+---
+
+ * Add a download link in mailer profiler for email attachments
+
 5.4
 ---
 

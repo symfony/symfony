@@ -29,11 +29,11 @@ final class MessageMediaTransport extends AbstractTransport
 {
     protected const HOST = 'api.messagemedia.com';
 
-    private $apiKey;
-    private $apiSecret;
-    private $from;
+    private string $apiKey;
+    private string $apiSecret;
+    private ?string $from;
 
-    public function __construct(string $apiKey, string $apiSecret, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, #[\SensitiveParameter] string $apiSecret, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;
@@ -53,7 +53,7 @@ final class MessageMediaTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof MessageMediaOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -62,23 +62,20 @@ final class MessageMediaTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['source_number'] = $message->getFrom() ?: $this->from;
+        $options['destination_number'] = $message->getPhone();
+        $options['content'] = $message->getSubject();
+
         $endpoint = sprintf('https://%s/v1/messages', $this->getEndpoint());
-        $response = $this->client->request(
-            'POST',
-            $endpoint,
-            [
-                'auth_basic' => $this->apiKey.':'.$this->apiSecret,
-                'json' => [
-                    'messages' => [
-                        [
-                            'destination_number' => $message->getPhone(),
-                            'source_number' => $this->from,
-                            'content' => $message->getSubject(),
-                        ],
-                    ],
+        $response = $this->client->request('POST', $endpoint, [
+            'auth_basic' => [$this->apiKey, $this->apiSecret],
+            'json' => [
+                'messages' => [
+                    array_filter($options),
                 ],
-            ]
-        );
+            ],
+        ]);
 
         try {
             $statusCode = $response->getStatusCode();
@@ -98,7 +95,7 @@ final class MessageMediaTransport extends AbstractTransport
             $error = $response->toArray(false);
 
             $errorMessage = $error['details'][0] ?? ($error['message'] ?? 'Unknown reason');
-        } catch (DecodingExceptionInterface|TransportExceptionInterface $e) {
+        } catch (DecodingExceptionInterface|TransportExceptionInterface) {
             $errorMessage = 'Unknown reason';
         }
 

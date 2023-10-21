@@ -71,4 +71,18 @@ class DefinitionErrorExceptionPassTest extends TestCase
         $this->expectExceptionMessage('Things went wrong!');
         $container->get('foo');
     }
+
+    public function testSkipErrorFromTag()
+    {
+        $container = new ContainerBuilder();
+        $def = new Definition();
+        $def->addError('Things went wrong!');
+        $def->addTag('container.error');
+        $container->register('foo_service_id')
+            ->setArguments([$def]);
+
+        $pass = new DefinitionErrorExceptionPass();
+        $pass->process($container);
+        $this->assertSame($def, $container->getDefinition('foo_service_id')->getArgument(0));
+    }
 }

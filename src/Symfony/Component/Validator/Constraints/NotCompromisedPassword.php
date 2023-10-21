@@ -26,7 +26,14 @@ class NotCompromisedPassword extends Constraint
 {
     public const COMPROMISED_PASSWORD_ERROR = 'd9bcdbfe-a9d6-4bfa-a8ff-da5fd93e0f6d';
 
-    protected static $errorNames = [self::COMPROMISED_PASSWORD_ERROR => 'COMPROMISED_PASSWORD_ERROR'];
+    protected const ERROR_NAMES = [
+        self::COMPROMISED_PASSWORD_ERROR => 'COMPROMISED_PASSWORD_ERROR',
+    ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This password has been leaked in a data breach, it must not be used. Please use another password.';
     public $threshold = 1;
@@ -38,7 +45,7 @@ class NotCompromisedPassword extends Constraint
         int $threshold = null,
         bool $skipOnError = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);
 

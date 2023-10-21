@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Uid\AbstractUid;
@@ -25,10 +26,9 @@ use Symfony\Component\Uid\UuidV6;
 
 class UidNormalizerTest extends TestCase
 {
-    /**
-     * @var UidNormalizer
-     */
-    private $normalizer;
+    use ExpectDeprecationTrait;
+
+    private UidNormalizer $normalizer;
 
     protected function setUp(): void
     {
@@ -143,8 +143,13 @@ class UidNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsDenormalization('foo', \stdClass::class));
     }
 
+    /**
+     * @group legacy
+     */
     public function testSupportOurAbstractUid()
     {
+        $this->expectDeprecation('Since symfony/serializer 6.1: Supporting denormalization for the "Symfony\Component\Uid\AbstractUid" type in "Symfony\Component\Serializer\Normalizer\UidNormalizer" is deprecated, use one of "Symfony\Component\Uid\AbstractUid" child class instead.');
+
         $this->assertTrue($this->normalizer->supportsDenormalization('1ea6ecef-eb9a-66fe-b62b-957b45f17e43', AbstractUid::class));
     }
 
@@ -161,13 +166,23 @@ class UidNormalizerTest extends TestCase
         $this->assertEquals($class::fromString($uuidString), $this->normalizer->denormalize($uuidString, $class));
     }
 
+    /**
+     * @group legacy
+     */
     public function testDenormalizeOurAbstractUid()
     {
+        $this->expectDeprecation('Since symfony/serializer 6.1: Denormalizing to an abstract class in "Symfony\Component\Serializer\Normalizer\UidNormalizer" is deprecated.');
+
         $this->assertEquals(Uuid::fromString($uuidString = '1ea6ecef-eb9a-66fe-b62b-957b45f17e43'), $this->normalizer->denormalize($uuidString, AbstractUid::class));
     }
 
+    /**
+     * @group legacy
+     */
     public function testDenormalizeCustomAbstractUid()
     {
+        $this->expectDeprecation('Since symfony/serializer 6.1: Denormalizing to an abstract class in "Symfony\Component\Serializer\Normalizer\UidNormalizer" is deprecated.');
+
         $this->assertEquals(Uuid::fromString($uuidString = '1ea6ecef-eb9a-66fe-b62b-957b45f17e43'), $this->normalizer->denormalize($uuidString, TestAbstractCustomUid::class));
     }
 

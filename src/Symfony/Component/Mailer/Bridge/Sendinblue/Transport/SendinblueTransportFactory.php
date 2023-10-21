@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendinblue\Transport;
 
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -18,11 +19,15 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
  * @author Yann LUCAS
+ *
+ * @deprecated since Symfony 6.4, use BrevoTransportFactory instead
  */
 final class SendinblueTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
+        trigger_deprecation('symfony/sendinblue-mailer', '6.4', 'The "%s" class is deprecated, use "%s" instead.', self::class, BrevoTransportFactory::class);
+
         if (!\in_array($dsn->getScheme(), $this->getSupportedSchemes(), true)) {
             throw new UnsupportedSchemeException($dsn, 'sendinblue', $this->getSupportedSchemes());
         }

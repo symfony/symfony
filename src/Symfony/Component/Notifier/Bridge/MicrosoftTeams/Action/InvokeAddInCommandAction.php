@@ -19,12 +19,12 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action;
  */
 final class InvokeAddInCommandAction implements ActionInterface
 {
-    private $options = [];
+    private array $options = [];
 
     /**
      * @return $this
      */
-    public function name(string $name): self
+    public function name(string $name): static
     {
         $this->options['name'] = $name;
 
@@ -34,7 +34,7 @@ final class InvokeAddInCommandAction implements ActionInterface
     /**
      * @return $this
      */
-    public function addInId(string $addInId): self
+    public function addInId(string $addInId): static
     {
         $this->options['addInId'] = $addInId;
 
@@ -44,7 +44,7 @@ final class InvokeAddInCommandAction implements ActionInterface
     /**
      * @return $this
      */
-    public function desktopCommandId(string $desktopCommandId): self
+    public function desktopCommandId(string $desktopCommandId): static
     {
         $this->options['desktopCommandId'] = $desktopCommandId;
 
@@ -54,7 +54,7 @@ final class InvokeAddInCommandAction implements ActionInterface
     /**
      * @return $this
      */
-    public function initializationContext(array $context): self
+    public function initializationContext(array $context): static
     {
         $this->options['initializationContext'] = $context;
 

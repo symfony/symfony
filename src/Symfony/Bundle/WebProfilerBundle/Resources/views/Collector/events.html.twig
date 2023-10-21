@@ -1,85 +1,92 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
-
 {% block menu %}
 <span class="label">
-    <span class="icon">{{ include('@WebProfiler/Icon/event.svg') }}</span>
+    <span class="icon">{{ source('@WebProfiler/Icon/event.svg') }}</span>
     <strong>Events</strong>
 </span>
 {% endblock %}
 
 {% block panel %}
-    <h2>Event Dispatcher</h2>
+    <h2>Dispatched Events</h2>
 
-    {% if collector.calledlisteners is empty %}
-        <div class="empty">
-            <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
-        </div>
-    {% else %}
-        <div class="sf-tabs">
+    <div class="sf-tabs">
+        {% for dispatcherName, dispatcherData in collector.data %}
             <div class="tab">
-                <h3 class="tab-title">Called Listeners <span class="badge">{{ collector.calledlisteners|length }}</span></h3>
-
+                <h3 class="tab-title">{{ dispatcherName }}</h3>
                 <div class="tab-content">
-                    {{ helper.render_table(collector.calledlisteners) }}
-                </div>
-            </div>
-
-            <div class="tab">
-                <h3 class="tab-title">Not Called Listeners <span class="badge">{{ collector.notcalledlisteners|length }}</span></h3>
-                <div class="tab-content">
-                    {% if collector.notcalledlisteners is empty %}
-                        <div class="empty">
-                            <p>
-                                <strong>There are no uncalled listeners</strong>.
-                            </p>
-                            <p>
-                                All listeners were called for this request or an error occurred
-                                when trying to collect uncalled listeners (in which case check the
-                                logs to get more information).
-                            </p>
+                    {% if dispatcherData['called_listeners'] is empty %}
+                        <div class="empty empty-panel">
+                            <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(collector.notcalledlisteners) }}
+                        <div class="sf-tabs">
+                            <div class="tab">
+                                <h3 class="tab-title">Called Listeners <span class="badge">{{ dispatcherData['called_listeners']|length }}</span></h3>
+
+                                <div class="tab-content">
+                                    {{ _self.render_table(dispatcherData['called_listeners']) }}
+                                </div>
+                            </div>
+
+                            <div class="tab">
+                                <h3 class="tab-title">Not Called Listeners <span class="badge">{{ dispatcherData['not_called_listeners']|length }}</span></h3>
+                                <div class="tab-content">
+                                    {% if dispatcherData['not_called_listeners'] is empty %}
+                                        <div class="empty">
+                                            <p>
+                                                <strong>There are no uncalled listeners</strong>.
+                                            </p>
+                                            <p>
+                                                All listeners were called or an error occurred
+                                                when trying to collect uncalled listeners (in which case check the
+                                                logs to get more information).
+                                            </p>
+                                        </div>
+                                    {% else %}
+                                        {{ _self.render_table(dispatcherData['not_called_listeners']) }}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="tab">
+                                <h3 class="tab-title">Orphaned Events <span class="badge">{{ dispatcherData['orphaned_events']|length }}</span></h3>
+                                <div class="tab-content">
+                                    {% if dispatcherData['orphaned_events'] is empty %}
+                                        <div class="empty">
+                                            <p>
+                                                <strong>There are no orphaned events</strong>.
+                                            </p>
+                                            <p>
+                                                All dispatched events were handled or an error occurred
+                                                when trying to collect orphaned events (in which case check the
+                                                logs to get more information).
+                                            </p>
+                                        </div>
+                                    {% else %}
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Event</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for event in dispatcherData['orphaned_events'] %}
+                                                    <tr>
+                                                        <td class="font-normal">{{ event }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     {% endif %}
                 </div>
             </div>
-
-            <div class="tab">
-                <h3 class="tab-title">Orphaned Events <span class="badge">{{ collector.orphanedEvents|length }}</span></h3>
-                <div class="tab-content">
-                    {% if collector.orphanedEvents is empty %}
-                        <div class="empty">
-                            <p>
-                                <strong>There are no orphaned events</strong>.
-                            </p>
-                            <p>
-                                All dispatched events were handled or an error occurred
-                                when trying to collect orphaned events (in which case check the
-                                logs to get more information).
-                            </p>
-                        </div>
-                    {% else %}
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Event</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for event in collector.orphanedEvents %}
-                                    <tr>
-                                        <td class="font-normal">{{ event }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    {% endif %}
+        {% endfor %}
+    </div>
 {% endblock %}
 
 {% macro render_table(listeners) %}

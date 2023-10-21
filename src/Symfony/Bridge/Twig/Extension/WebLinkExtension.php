@@ -24,25 +24,22 @@ use Twig\TwigFunction;
  */
 final class WebLinkExtension extends AbstractExtension
 {
-    private $requestStack;
+    private RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('link', [$this, 'link']),
-            new TwigFunction('preload', [$this, 'preload']),
-            new TwigFunction('dns_prefetch', [$this, 'dnsPrefetch']),
-            new TwigFunction('preconnect', [$this, 'preconnect']),
-            new TwigFunction('prefetch', [$this, 'prefetch']),
-            new TwigFunction('prerender', [$this, 'prerender']),
+            new TwigFunction('link', $this->link(...)),
+            new TwigFunction('preload', $this->preload(...)),
+            new TwigFunction('dns_prefetch', $this->dnsPrefetch(...)),
+            new TwigFunction('preconnect', $this->preconnect(...)),
+            new TwigFunction('prefetch', $this->prefetch(...)),
+            new TwigFunction('prerender', $this->prerender(...)),
         ];
     }
 

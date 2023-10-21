@@ -19,15 +19,8 @@ use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 
 class FormErrorNormalizerTest extends TestCase
 {
-    /**
-     * @var FormErrorNormalizer
-     */
-    private $normalizer;
-
-    /**
-     * @var FormInterface
-     */
-    private $form;
+    private FormErrorNormalizer $normalizer;
+    private FormInterface $form;
 
     protected function setUp(): void
     {

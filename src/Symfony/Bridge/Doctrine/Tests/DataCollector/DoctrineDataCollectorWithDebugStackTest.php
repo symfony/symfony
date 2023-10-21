@@ -17,6 +17,7 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -31,6 +32,7 @@ class_exists(\Doctrine\DBAL\Platforms\MySqlPlatform::class);
 class DoctrineDataCollectorWithDebugStackTest extends TestCase
 {
     use DoctrineDataCollectorTestTrait;
+    use ExpectDeprecationTrait;
 
     public static function setUpBeforeClass(): void
     {
@@ -122,6 +124,7 @@ class DoctrineDataCollectorWithDebugStackTest extends TestCase
             [true, [], true, true],
             [null, [], null, true],
             [new \DateTime('2011-09-11'), ['date'], '2011-09-11', true],
+            [new \DateTimeImmutable('2011-09-11'), ['date_immutable'], '2011-09-11', true],
             [fopen(__FILE__, 'r'), [], '/* Resource(stream) */', false, false],
             [
                 new \stdClass(),
@@ -184,9 +187,12 @@ EOTXT
             ->method('getConnection')
             ->willReturn($connection);
 
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.4: Not passing an instance of "Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder" as "$debugDataHolder" to "Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector::__construct()" is deprecated.');
         $collector = new DoctrineDataCollector($registry);
         $logger = $this->createMock(DebugStack::class);
         $logger->queries = $queries;
+
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.4: "Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector::addLogger()" is deprecated. Pass an instance of "Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder" to the constructor instead.');
         $collector->addLogger('default', $logger);
 
         return $collector;

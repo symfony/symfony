@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+
 /**
  * Marker interface for message handlers.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @deprecated since Symfony 6.2, use the {@see AsMessageHandler} attribute instead
  */
 interface MessageHandlerInterface
 {

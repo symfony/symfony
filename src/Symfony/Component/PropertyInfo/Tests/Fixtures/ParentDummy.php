@@ -120,9 +120,9 @@ class ParentDummy
     }
 
     /**
-     * @param \DateTime $f
+     * @param \DateTimeImmutable $f
      */
-    public function removeF(\DateTime $f)
+    public function removeF(\DateTimeImmutable $f)
     {
     }
 }

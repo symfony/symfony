@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,7 @@ use Symfony\Component\Routing\Router;
 
 class LocaleListenerTest extends TestCase
 {
-    private $requestStack;
+    private MockObject&RequestStack $requestStack;
 
     protected function setUp(): void
     {
@@ -179,7 +180,7 @@ class LocaleListenerTest extends TestCase
 
         $listener->setDefaultLocale($event);
         $listener->onKernelRequest($event);
-        $this->assertEquals('de', $request->getLocale());
+        $this->assertEquals('fr_FR', $request->getLocale());
     }
 
     public function testRequestAttributeLocaleNotOverridenFromAcceptLanguageHeader()

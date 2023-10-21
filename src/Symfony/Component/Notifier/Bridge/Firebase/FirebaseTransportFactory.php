@@ -14,14 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Firebase;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
  */
 final class FirebaseTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): FirebaseTransport
     {
         $scheme = $dsn->getScheme();
 

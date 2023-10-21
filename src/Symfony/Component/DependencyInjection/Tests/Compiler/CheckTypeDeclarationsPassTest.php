@@ -499,12 +499,12 @@ class CheckTypeDeclarationsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('bar', \DateTime::class)
-            ->setFactory('date_create');
+        $container->register('bar', \DateTimeImmutable::class)
+            ->setFactory('date_create_immutable');
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 
-        $this->assertInstanceOf(\DateTime::class, $container->get('bar'));
+        $this->assertInstanceOf(\DateTimeImmutable::class, $container->get('bar'));
     }
 
     public function testProcessDoesNotLoadCodeByDefault()
@@ -822,9 +822,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithReference()
     {
         $container = new ContainerBuilder();
@@ -838,9 +835,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -853,9 +847,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithFalse()
     {
         $container = new ContainerBuilder();
@@ -889,9 +880,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -906,9 +894,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -922,9 +907,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -940,9 +922,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithTrue()
     {
         $container = new ContainerBuilder();
@@ -958,9 +937,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReferencePassesMixed()
     {
         $container = new ContainerBuilder();
@@ -975,9 +951,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testIntersectionTypePassesWithReference()
     {
         $container = new ContainerBuilder();
@@ -991,9 +964,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testIntersectionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();

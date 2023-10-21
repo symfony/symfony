@@ -35,7 +35,7 @@ foreach ($dirs as $k => $dir) {
         'type' => 'composer',
         'url' => 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)).'/',
     ]];
-    if (false === strpos($json, "\n    \"repositories\": [\n")) {
+    if (!str_contains($json, "\n    \"repositories\": [\n")) {
         $json = rtrim(json_encode(['repositories' => $package->repositories], $flags), "\n}").','.substr($json, 1);
         file_put_contents($dir.'/composer.json', $json);
     }

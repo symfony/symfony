@@ -25,13 +25,13 @@ class FileLocator implements FileLocatorInterface
     /**
      * @param string|string[] $paths A path or an array of paths where to look for resources
      */
-    public function __construct($paths = [])
+    public function __construct(string|array $paths = [])
     {
         $this->paths = (array) $paths;
     }
 
     /**
-     * {@inheritdoc}
+     * @return string|array
      */
     public function locate(string $name, string $currentPath = null, bool $first = true)
     {

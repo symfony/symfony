@@ -27,9 +27,7 @@ class LazyIteratorTest extends TestCase
 
     public function testDelegate()
     {
-        $iterator = new LazyIterator(function () {
-            return new Iterator(['foo', 'bar']);
-        });
+        $iterator = new LazyIterator(fn () => new Iterator(['foo', 'bar']));
 
         $this->assertCount(2, $iterator);
     }

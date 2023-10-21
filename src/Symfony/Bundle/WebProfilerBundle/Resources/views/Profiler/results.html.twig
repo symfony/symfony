@@ -2,56 +2,124 @@
 
 {% macro profile_search_filter(request, result, property) %}
     {%- if request.hasSession -%}
-        <a href="{{ path('_profiler_search_results', request.query.all|merge({token: result.token})|merge({ (property): result[property] })) }}" title="Search"><span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span></a>
+        <a href="{{ path('_profiler_search_results', request.query.all|merge({token: result.token})|merge({ (property): result[property] })) }}" title="Search"><span title="Search" class="sf-icon sf-search">{{ source('@WebProfiler/Icon/search.svg') }}</span></a>
     {%- endif -%}
 {% endmacro %}
 
-{% import _self as helper %}
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #search-results td {
+            font-family: var(--font-family-system);
+            vertical-align: middle;
+        }
+
+        #search-results .sf-search {
+            visibility: hidden;
+            margin-left: 2px;
+        }
+        #search-results tr:hover .sf-search {
+            visibility: visible;
+        }
+        #search-results .sf-search svg {
+            stroke-width: 3;
+        }
+    </style>
+{% endblock %}
 
 {% block summary %}
     <div class="status">
-        <div class="container">
-            <h2>Profile Search</h2>
-        </div>
+        <h2>Profile Search</h2>
     </div>
 {% endblock %}
 
+{% block sidebar_search_css_class %}{% endblock %}
+{% block sidebar_shortcuts_links %}{% endblock %}
+
 {% block panel %}
+    <div class="sf-tabs" data-processed="true">
+        <div class="tab-navigation" role="tablist">
+            <button class="tab-control {{ 'request' == profile_type ? 'active' }}" role="tab" {{ 'request' == profile_type ? 'aria-selected="true"' : 'tabindex="-1"' }} >
+                <a href="{{ path('_profiler_search_results', {token: 'empty', limit: 10}) }}">
+                    HTTP Requests
+                </a>
+            </button>
+            <button class="tab-control {{ 'command' == profile_type ? 'active' }}" role="tab" {{ 'command' == profile_type ? 'aria-selected="true"' : 'tabindex="-1"' }}>
+                <a href="{{ path('_profiler_search_results', {token: 'empty', limit: 10, type: 'command'}) }}">
+                    Console Commands
+                </a>
+            </button>
+        </div>
+    </div>
+
     <h2>{{ tokens ? tokens|length : 'No' }} results found</h2>
 
     {% if tokens %}
         <table id="search-results">
             <thead>
                 <tr>
-                    <th scope="col" class="text-center">Status</th>
-                    <th scope="col">IP</th>
-                    <th scope="col">Method</th>
-                    <th scope="col">URL</th>
+                    <th scope="col" class="text-center">
+                        {% if 'command' == profile_type %}
+                            Exit code
+                        {% else %}
+                            Status
+                        {% endif %}
+                    </th>
+                    <th scope="col">
+                        {% if 'command' == profile_type %}
+                            Application
+                        {% else %}
+                            IP
+                        {% endif %}
+                    </th>
+                    <th scope="col">
+                        {% if 'command' == profile_type %}
+                            Mode
+                        {% else %}
+                            Method
+                        {% endif %}
+                    </th>
+                    <th scope="col">
+                        {% if 'command' == profile_type %}
+                            Command
+                        {% else %}
+                            URL
+                        {% endif %}
+                    </th>
                     <th scope="col">Time</th>
                     <th scope="col">Token</th>
                 </tr>
             </thead>
             <tbody>
                 {% for result in tokens %}
-                    {% set css_class = result.status_code|default(0) > 399 ? 'status-error' : result.status_code|default(0) > 299 ? 'status-warning' : 'status-success' %}
+                    {% if 'command' == profile_type %}
+                        {% set css_class = result.status_code == 113 ? 'status-warning' : result.status_code > 0 ? 'status-error' : 'status-success' %}
+                    {% else %}
+                        {% set css_class = result.status_code|default(0) > 399 ? 'status-error' : result.status_code|default(0) > 299 ? 'status-warning' : 'status-success' %}
+                    {% endif %}
 
                     <tr>
                         <td class="text-center">
                             <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
                         </td>
                         <td>
-                            <span class="nowrap">{{ result.ip }} {{ helper.profile_search_filter(request, result, 'ip') }}</span>
+                            <span class="nowrap">{{ result.ip }} {{ _self.profile_search_filter(request, result, 'ip') }}</span>
                         </td>
                         <td>
-                            <span class="nowrap">{{ result.method }} {{ helper.profile_search_filter(request, result, 'method') }}</span>
+                            <span class="nowrap">{{ result.method }} {{ _self.profile_search_filter(request, result, 'method') }}</span>
                         </td>
                         <td class="break-long-words">
                             {{ result.url }}
-                            {{ helper.profile_search_filter(request, result, 'url') }}
+                            {{ _self.profile_search_filter(request, result, 'url') }}
                         </td>
                         <td class="text-small">
-                            <span class="nowrap">{{ result.time|date('d-M-Y') }}</span>
-                            <span class="nowrap newline">{{ result.time|date('H:i:s') }}</span>
+                            <time data-convert-to-user-timezone data-render-as-date datetime="{{ result.time|date('c') }}">
+                                {{ result.time|date('d-M-Y') }}
+                            </time>
+                            <time class="newline" data-convert-to-user-timezone data-render-as-time datetime="{{ result.time|date('c') }}">
+                                {{ result.time|date('H:i:s') }}
+                            </time>
                         </td>
                         <td class="nowrap"><a href="{{ path('_profiler', { token: result.token }) }}">{{ result.token }}</a></td>
                     </tr>
@@ -59,7 +127,7 @@
             </tbody>
         </table>
     {% else %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>The query returned no result.</p>
         </div>
     {% endif %}

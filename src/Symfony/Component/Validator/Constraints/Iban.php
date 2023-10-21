@@ -30,7 +30,7 @@ class Iban extends Constraint
     public const INVALID_FORMAT_ERROR = 'c8d318f1-2ecc-41ba-b983-df70d225cf5a';
     public const NOT_SUPPORTED_COUNTRY_CODE_ERROR = 'e2c259f3-4b46-48e6-b72e-891658158ec8';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_COUNTRY_CODE_ERROR => 'INVALID_COUNTRY_CODE_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
@@ -38,9 +38,14 @@ class Iban extends Constraint
         self::NOT_SUPPORTED_COUNTRY_CODE_ERROR => 'NOT_SUPPORTED_COUNTRY_CODE_ERROR',
     ];
 
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
+
     public $message = 'This is not a valid International Bank Account Number (IBAN).';
 
-    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
+    public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);
 

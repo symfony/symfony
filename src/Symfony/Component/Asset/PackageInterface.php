@@ -20,15 +20,11 @@ interface PackageInterface
 {
     /**
      * Returns the asset version for an asset.
-     *
-     * @return string
      */
-    public function getVersion(string $path);
+    public function getVersion(string $path): string;
 
     /**
      * Returns an absolute or root-relative public path.
-     *
-     * @return string
      */
-    public function getUrl(string $path);
+    public function getUrl(string $path): string;
 }

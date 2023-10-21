@@ -16,6 +16,7 @@ use AsyncAws\Ses\ValueObject\Content;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\RuntimeException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -101,6 +102,12 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }
 
+        foreach ($email->getHeaders()->all() as $header) {
+            if ($header instanceof MetadataHeader) {
+                $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+            }
+        }
+
         return new SendEmailRequest($request);
     }
 
@@ -108,16 +115,12 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
     {
         $emailRecipients = array_merge($email->getCc(), $email->getBcc());
 
-        return array_filter($envelope->getRecipients(), function (Address $address) use ($emailRecipients) {
-            return !\in_array($address, $emailRecipients, true);
-        });
+        return array_filter($envelope->getRecipients(), fn (Address $address) => !\in_array($address, $emailRecipients, true));
     }
 
     protected function stringifyAddresses(array $addresses): array
     {
-        return array_map(function (Address $a) {
-            return $this->stringifyAddress($a);
-        }, $addresses);
+        return array_map(fn (Address $a) => $this->stringifyAddress($a), $addresses);
     }
 
     protected function stringifyAddress(Address $a): string

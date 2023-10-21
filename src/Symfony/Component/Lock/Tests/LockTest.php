@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\BlockingSharedLockStoreInterface;
 use Symfony\Component\Lock\BlockingStoreInterface;
@@ -22,6 +23,7 @@ use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\SharedLockStoreInterface;
 use Symfony\Component\Lock\Store\ExpiringStoreTrait;
+use Symfony\Component\Lock\Store\InMemoryStore;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -366,6 +368,34 @@ class LockTest extends TestCase
         $lock->release();
     }
 
+    public function testSuccessReleaseLog()
+    {
+        $key = new Key((string) random_int(100, 1000));
+        $store = new InMemoryStore();
+        $logger = new class() extends AbstractLogger {
+            private array $logs = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->logs[] = [
+                    $level,
+                    (string) $message,
+                    $context,
+                ];
+            }
+
+            public function logs(): array
+            {
+                return $this->logs;
+            }
+        };
+        $lock = new Lock($key, $store, 10, true);
+        $lock->setLogger($logger);
+        $lock->release();
+
+        $this->assertSame([['debug', 'Successfully released the "{resource}" lock.', ['resource' => $key]]], $logger->logs());
+    }
+
     /**
      * @dataProvider provideExpiredDates
      */
@@ -439,19 +469,17 @@ class LockTest extends TestCase
         $key = new Key(uniqid(__METHOD__, true));
         $store = new class() implements PersistingStoreInterface {
             use ExpiringStoreTrait;
-            private $keys = [];
-            private $initialTtl = 30;
+            private array $keys = [];
+            private int $initialTtl = 30;
 
-            public function save(Key $key)
+            public function save(Key $key): void
             {
                 $key->reduceLifetime($this->initialTtl);
                 $this->keys[spl_object_hash($key)] = $key;
                 $this->checkNotExpired($key);
-
-                return true;
             }
 
-            public function delete(Key $key)
+            public function delete(Key $key): void
             {
                 unset($this->keys[spl_object_hash($key)]);
             }
@@ -461,7 +489,7 @@ class LockTest extends TestCase
                 return isset($this->keys[spl_object_hash($key)]);
             }
 
-            public function putOffExpiration(Key $key, $ttl)
+            public function putOffExpiration(Key $key, $ttl): void
             {
                 $key->reduceLifetime($ttl);
                 $this->checkNotExpired($key);
@@ -485,19 +513,17 @@ class LockTest extends TestCase
         $key = new Key(uniqid(__METHOD__, true));
         $store = new class() implements PersistingStoreInterface {
             use ExpiringStoreTrait;
-            private $keys = [];
-            private $initialTtl = 30;
+            private array $keys = [];
+            private int $initialTtl = 30;
 
-            public function save(Key $key)
+            public function save(Key $key): void
             {
                 $key->reduceLifetime($this->initialTtl);
                 $this->keys[spl_object_hash($key)] = $key;
                 $this->checkNotExpired($key);
-
-                return true;
             }
 
-            public function delete(Key $key)
+            public function delete(Key $key): void
             {
                 unset($this->keys[spl_object_hash($key)]);
             }
@@ -507,7 +533,7 @@ class LockTest extends TestCase
                 return isset($this->keys[spl_object_hash($key)]);
             }
 
-            public function putOffExpiration(Key $key, $ttl)
+            public function putOffExpiration(Key $key, $ttl): void
             {
                 $key->reduceLifetime($ttl);
                 $this->checkNotExpired($key);

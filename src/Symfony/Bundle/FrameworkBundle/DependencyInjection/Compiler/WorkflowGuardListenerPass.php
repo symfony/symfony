@@ -15,14 +15,18 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
+trigger_deprecation('symfony/framework-bundle', '6.4', 'The "%s" class is deprecated, use "%s" instead.', WorkflowGuardListenerPass::class, \Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass::class);
+
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @deprecated since Symfony 6.4, use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass instead.
  */
 class WorkflowGuardListenerPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function process(ContainerBuilder $container)
     {

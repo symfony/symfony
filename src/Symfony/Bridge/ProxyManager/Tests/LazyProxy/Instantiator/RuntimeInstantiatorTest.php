@@ -22,17 +22,13 @@ use Symfony\Component\DependencyInjection\Definition;
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @group legacy
  */
 class RuntimeInstantiatorTest extends TestCase
 {
-    /**
-     * @var RuntimeInstantiator
-     */
-    protected $instantiator;
+    protected RuntimeInstantiator $instantiator;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->instantiator = new RuntimeInstantiator();
@@ -43,9 +39,7 @@ class RuntimeInstantiatorTest extends TestCase
         $instance = new \stdClass();
         $container = $this->createMock(ContainerInterface::class);
         $definition = new Definition('stdClass');
-        $instantiator = function () use ($instance) {
-            return $instance;
-        };
+        $instantiator = fn () => $instance;
 
         /* @var $proxy LazyLoadingInterface|ValueHolderInterface */
         $proxy = $this->instantiator->instantiateProxy($container, $definition, 'foo', $instantiator);

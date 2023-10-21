@@ -32,13 +32,11 @@ return static function (ContainerConfigurator $container) {
         ->alias(TokenStorageInterface::class, 'security.csrf.token_storage')
 
         ->set('security.csrf.token_manager', CsrfTokenManager::class)
-            ->public()
             ->args([
                 service('security.csrf.token_generator'),
                 service('security.csrf.token_storage'),
                 service('request_stack')->ignoreOnInvalid(),
             ])
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->alias(CsrfTokenManagerInterface::class, 'security.csrf.token_manager')
 

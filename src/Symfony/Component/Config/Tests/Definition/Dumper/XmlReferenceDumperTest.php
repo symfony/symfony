@@ -41,7 +41,7 @@ class XmlReferenceDumperTest extends TestCase
 <!-- scalar-deprecated: Deprecated (Since vendor/package 1.1: The child node "scalar_deprecated" at path "acme_root" is deprecated.) -->
 <!-- scalar-deprecated-with-message: Deprecated (Since vendor/package 1.1: Deprecation custom message for "scalar_deprecated_with_message" at "acme_root") -->
 <!-- enum-with-default: One of "this"; "that" -->
-<!-- enum: One of "this"; "that" -->
+<!-- enum: One of "this"; "that"; Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc -->
 <!-- variable: Example: foo, bar -->
 <config
     boolean="true"

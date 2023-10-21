@@ -20,28 +20,18 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class TranslationDumperPass implements CompilerPassInterface
 {
-    private $writerServiceId;
-    private $dumperTag;
-
-    public function __construct(string $writerServiceId = 'translation.writer', string $dumperTag = 'translation.dumper')
-    {
-        if (1 < \func_num_args()) {
-            trigger_deprecation('symfony/translation', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->writerServiceId = $writerServiceId;
-        $this->dumperTag = $dumperTag;
-    }
-
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->writerServiceId)) {
+        if (!$container->hasDefinition('translation.writer')) {
             return;
         }
 
-        $definition = $container->getDefinition($this->writerServiceId);
+        $definition = $container->getDefinition('translation.writer');
 
-        foreach ($container->findTaggedServiceIds($this->dumperTag, true) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds('translation.dumper', true) as $id => $attributes) {
             $definition->addMethodCall('addDumper', [$attributes[0]['alias'], new Reference($id)]);
         }
     }

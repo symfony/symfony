@@ -24,8 +24,10 @@ interface FormRendererEngineInterface
      * @param FormView $view   The view to assign the theme(s) to
      * @param mixed    $themes The theme(s). The type of these themes
      *                         is open to the implementation.
+     *
+     * @return void
      */
-    public function setTheme(FormView $view, $themes, bool $useDefaultThemes = true);
+    public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true);
 
     /**
      * Returns the resource for a block name.
@@ -43,7 +45,7 @@ interface FormRendererEngineInterface
      *
      * @return mixed the renderer resource or false, if none was found
      */
-    public function getResourceForBlockName(FormView $view, string $blockName);
+    public function getResourceForBlockName(FormView $view, string $blockName): mixed;
 
     /**
      * Returns the resource for a block hierarchy.
@@ -79,7 +81,7 @@ interface FormRendererEngineInterface
      *
      * @return mixed The renderer resource or false, if none was found
      */
-    public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, int $hierarchyLevel);
+    public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): mixed;
 
     /**
      * Returns the hierarchy level at which a resource can be found.
@@ -114,10 +116,8 @@ interface FormRendererEngineInterface
      * @param int      $hierarchyLevel     The level in the hierarchy at which to start
      *                                     looking. Level 0 indicates the root block, i.e.
      *                                     the first element of $blockNameHierarchy.
-     *
-     * @return int|false
      */
-    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel);
+    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): int|false;
 
     /**
      * Renders a block in the given renderer resource.
@@ -132,5 +132,5 @@ interface FormRendererEngineInterface
      *
      * @return string
      */
-    public function renderBlock(FormView $view, $resource, string $blockName, array $variables = []);
+    public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []);
 }

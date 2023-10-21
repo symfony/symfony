@@ -25,8 +25,6 @@ interface EquatableInterface
      *
      * However, you do not need to compare every attribute, but only those that
      * are relevant for assessing whether re-authentication is required.
-     *
-     * @return bool
      */
-    public function isEqualTo(UserInterface $user);
+    public function isEqualTo(UserInterface $user): bool;
 }

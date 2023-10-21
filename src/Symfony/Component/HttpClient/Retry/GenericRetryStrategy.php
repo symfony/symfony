@@ -36,11 +36,11 @@ class GenericRetryStrategy implements RetryStrategyInterface
         510 => self::IDEMPOTENT_METHODS,
     ];
 
-    private $statusCodes;
-    private $delayMs;
-    private $multiplier;
-    private $maxDelayMs;
-    private $jitter;
+    private array $statusCodes;
+    private int $delayMs;
+    private float $multiplier;
+    private int $maxDelayMs;
+    private float $jitter;
 
     /**
      * @param array $statusCodes List of HTTP status codes that trigger a retry
@@ -103,7 +103,7 @@ class GenericRetryStrategy implements RetryStrategyInterface
 
         if ($this->jitter > 0) {
             $randomness = (int) ($delay * $this->jitter);
-            $delay = $delay + random_int(-$randomness, +$randomness);
+            $delay += random_int(-$randomness, +$randomness);
         }
 
         if ($delay > $this->maxDelayMs && 0 !== $this->maxDelayMs) {

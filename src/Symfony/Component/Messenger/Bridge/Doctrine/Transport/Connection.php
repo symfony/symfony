@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\Abstraction\Result as AbstractionResult;
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\Driver\Exception as DriverException;
-use Doctrine\DBAL\Driver\Result as DriverResult;
+use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
@@ -33,7 +34,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @internal since Symfony 5.1
+ * @internal
  *
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -60,11 +61,12 @@ class Connection implements ResetInterface
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default: 3600
      * * auto_setup: Whether the table should be created automatically during send / get. Default: true
      */
-    protected $configuration = [];
-    protected $driverConnection;
-    protected $queueEmptiedAt;
-    private $schemaSynchronizer;
-    private $autoSetup;
+    protected array $configuration;
+    protected DBALConnection $driverConnection;
+    protected ?float $queueEmptiedAt = null;
+
+    private ?SchemaSynchronizer $schemaSynchronizer;
+    private bool $autoSetup;
 
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
@@ -74,7 +76,7 @@ class Connection implements ResetInterface
         $this->autoSetup = $this->configuration['auto_setup'];
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->queueEmptiedAt = null;
     }
@@ -84,10 +86,10 @@ class Connection implements ResetInterface
         return $this->configuration;
     }
 
-    public static function buildConfiguration(string $dsn, array $options = []): array
+    public static function buildConfiguration(#[\SensitiveParameter] string $dsn, array $options = []): array
     {
         if (false === $components = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Doctrine Messenger DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException('The given Doctrine Messenger DSN is invalid.');
         }
 
         $query = [];
@@ -98,7 +100,7 @@ class Connection implements ResetInterface
         $configuration = ['connection' => $components['host']];
         $configuration += $query + $options + static::DEFAULT_OPTIONS;
 
-        $configuration['auto_setup'] = filter_var($configuration['auto_setup'], \FILTER_VALIDATE_BOOLEAN);
+        $configuration['auto_setup'] = filter_var($configuration['auto_setup'], \FILTER_VALIDATE_BOOL);
 
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));
@@ -124,8 +126,8 @@ class Connection implements ResetInterface
      */
     public function send(string $body, array $headers, int $delay = 0): string
     {
-        $now = new \DateTime();
-        $availableAt = (clone $now)->modify(sprintf('+%d seconds', $delay / 1000));
+        $now = new \DateTimeImmutable('UTC');
+        $availableAt = $now->modify(sprintf('+%d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
             ->insert($this->configuration['table_name'])
@@ -147,8 +149,8 @@ class Connection implements ResetInterface
             Types::STRING,
             Types::STRING,
             Types::STRING,
-            Types::DATETIME_MUTABLE,
-            Types::DATETIME_MUTABLE,
+            Types::DATETIME_IMMUTABLE,
+            Types::DATETIME_IMMUTABLE,
         ]);
 
         return $this->driverConnection->lastInsertId();
@@ -199,7 +201,7 @@ class Connection implements ResetInterface
                 $query->getParameters(),
                 $query->getParameterTypes()
             );
-            $doctrineEnvelope = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchAssociative() : $stmt->fetch();
+            $doctrineEnvelope = $stmt instanceof Result ? $stmt->fetchAssociative() : $stmt->fetch();
 
             if (false === $doctrineEnvelope) {
                 $this->driverConnection->commit();
@@ -217,12 +219,12 @@ class Connection implements ResetInterface
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', '?')
                 ->where('id = ?');
-            $now = new \DateTime();
+            $now = new \DateTimeImmutable('UTC');
             $this->executeStatement($queryBuilder->getSQL(), [
                 $now,
                 $doctrineEnvelope['id'],
             ], [
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
             ]);
 
             $this->driverConnection->commit();
@@ -270,7 +272,7 @@ class Connection implements ResetInterface
     {
         $configuration = $this->driverConnection->getConfiguration();
         $assetFilter = $configuration->getSchemaAssetsFilter();
-        $configuration->setSchemaAssetsFilter(static function () { return true; });
+        $configuration->setSchemaAssetsFilter(static fn () => true);
         $this->updateSchema();
         $configuration->setSchemaAssetsFilter($assetFilter);
         $this->autoSetup = false;
@@ -284,7 +286,7 @@ class Connection implements ResetInterface
 
         $stmt = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
 
-        return $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchOne() : $stmt->fetchColumn();
+        return $stmt instanceof Result ? $stmt->fetchOne() : $stmt->fetchColumn();
     }
 
     public function findAll(int $limit = null): array
@@ -296,20 +298,18 @@ class Connection implements ResetInterface
         }
 
         $stmt = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
-        $data = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchAllAssociative() : $stmt->fetchAll();
+        $data = $stmt instanceof Result ? $stmt->fetchAllAssociative() : $stmt->fetchAll();
 
-        return array_map(function ($doctrineEnvelope) {
-            return $this->decodeEnvelopeHeaders($doctrineEnvelope);
-        }, $data);
+        return array_map(fn ($doctrineEnvelope) => $this->decodeEnvelopeHeaders($doctrineEnvelope), $data);
     }
 
-    public function find($id): ?array
+    public function find(mixed $id): ?array
     {
         $queryBuilder = $this->createQueryBuilder()
             ->where('m.id = ? and m.queue_name = ?');
 
         $stmt = $this->executeQuery($queryBuilder->getSQL(), [$id, $this->configuration['queue_name']]);
-        $data = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchAssociative() : $stmt->fetch();
+        $data = $stmt instanceof Result ? $stmt->fetchAssociative() : $stmt->fetch();
 
         return false === $data ? null : $this->decodeEnvelopeHeaders($data);
     }
@@ -317,14 +317,13 @@ class Connection implements ResetInterface
     /**
      * @internal
      */
-    public function configureSchema(Schema $schema, DBALConnection $forConnection): void
+    public function configureSchema(Schema $schema, DBALConnection $forConnection, \Closure $isSameDatabase): void
     {
-        // only update the schema for this connection
-        if ($forConnection !== $this->driverConnection) {
+        if ($schema->hasTable($this->configuration['table_name'])) {
             return;
         }
 
-        if ($schema->hasTable($this->configuration['table_name'])) {
+        if ($forConnection !== $this->driverConnection && !$isSameDatabase($this->executeStatement(...))) {
             return;
         }
 
@@ -341,8 +340,8 @@ class Connection implements ResetInterface
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
-        $now = new \DateTime();
-        $redeliverLimit = (clone $now)->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
+        $now = new \DateTimeImmutable('UTC');
+        $redeliverLimit = $now->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->createQueryBuilder()
             ->where('m.delivered_at is null OR m.delivered_at < ?')
@@ -353,8 +352,8 @@ class Connection implements ResetInterface
                 $now,
                 $this->configuration['queue_name'],
             ], [
-                Types::DATETIME_MUTABLE,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
+                Types::DATETIME_IMMUTABLE,
             ]);
     }
 
@@ -379,7 +378,7 @@ class Connection implements ResetInterface
         ));
     }
 
-    private function executeQuery(string $sql, array $parameters = [], array $types = [])
+    private function executeQuery(string $sql, array $parameters = [], array $types = []): Result|AbstractionResult|ResultStatement
     {
         try {
             $stmt = $this->driverConnection->executeQuery($sql, $parameters, $types);
@@ -398,14 +397,10 @@ class Connection implements ResetInterface
         return $stmt;
     }
 
-    protected function executeStatement(string $sql, array $parameters = [], array $types = [])
+    protected function executeStatement(string $sql, array $parameters = [], array $types = []): int|string
     {
         try {
-            if (method_exists($this->driverConnection, 'executeStatement')) {
-                $stmt = $this->driverConnection->executeStatement($sql, $parameters, $types);
-            } else {
-                $stmt = $this->driverConnection->executeUpdate($sql, $parameters, $types);
-            }
+            $stmt = $this->driverConnection->executeStatement($sql, $parameters, $types);
         } catch (TableNotFoundException $e) {
             if ($this->driverConnection->isTransactionActive()) {
                 throw $e;
@@ -415,11 +410,7 @@ class Connection implements ResetInterface
             if ($this->autoSetup) {
                 $this->setup();
             }
-            if (method_exists($this->driverConnection, 'executeStatement')) {
-                $stmt = $this->driverConnection->executeStatement($sql, $parameters, $types);
-            } else {
-                $stmt = $this->driverConnection->executeUpdate($sql, $parameters, $types);
-            }
+            $stmt = $this->driverConnection->executeStatement($sql, $parameters, $types);
         }
 
         return $stmt;
@@ -448,11 +439,11 @@ class Connection implements ResetInterface
         $table->addColumn('queue_name', Types::STRING)
             ->setLength(190) // MySQL 5.6 only supports 191 characters on an indexed column in utf8mb4 mode
             ->setNotnull(true);
-        $table->addColumn('created_at', Types::DATETIME_MUTABLE)
+        $table->addColumn('created_at', Types::DATETIME_IMMUTABLE)
             ->setNotnull(true);
-        $table->addColumn('available_at', Types::DATETIME_MUTABLE)
+        $table->addColumn('available_at', Types::DATETIME_IMMUTABLE)
             ->setNotnull(true);
-        $table->addColumn('delivered_at', Types::DATETIME_MUTABLE)
+        $table->addColumn('delivered_at', Types::DATETIME_IMMUTABLE)
             ->setNotnull(false);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['queue_name']);
@@ -479,11 +470,10 @@ class Connection implements ResetInterface
         $comparator = $this->createComparator($schemaManager);
         $schemaDiff = $this->compareSchemas($comparator, method_exists($schemaManager, 'introspectSchema') ? $schemaManager->introspectSchema() : $schemaManager->createSchema(), $this->getSchema());
         $platform = $this->driverConnection->getDatabasePlatform();
-        $exec = method_exists($this->driverConnection, 'executeStatement') ? 'executeStatement' : 'exec';
 
         if (!method_exists(SchemaDiff::class, 'getCreatedSchemas')) {
             foreach ($schemaDiff->toSaveSql($platform) as $sql) {
-                $this->driverConnection->$exec($sql);
+                $this->driverConnection->executeStatement($sql);
             }
 
             return;
@@ -491,27 +481,27 @@ class Connection implements ResetInterface
 
         if ($platform->supportsSchemas()) {
             foreach ($schemaDiff->getCreatedSchemas() as $schema) {
-                $this->driverConnection->$exec($platform->getCreateSchemaSQL($schema));
+                $this->driverConnection->executeStatement($platform->getCreateSchemaSQL($schema));
             }
         }
 
         if ($platform->supportsSequences()) {
             foreach ($schemaDiff->getAlteredSequences() as $sequence) {
-                $this->driverConnection->$exec($platform->getAlterSequenceSQL($sequence));
+                $this->driverConnection->executeStatement($platform->getAlterSequenceSQL($sequence));
             }
 
             foreach ($schemaDiff->getCreatedSequences() as $sequence) {
-                $this->driverConnection->$exec($platform->getCreateSequenceSQL($sequence));
+                $this->driverConnection->executeStatement($platform->getCreateSequenceSQL($sequence));
             }
         }
 
         foreach ($platform->getCreateTablesSQL($schemaDiff->getCreatedTables()) as $sql) {
-            $this->driverConnection->$exec($sql);
+            $this->driverConnection->executeStatement($sql);
         }
 
         foreach ($schemaDiff->getAlteredTables() as $tableDiff) {
             foreach ($platform->getAlterTableSQL($tableDiff) as $sql) {
-                $this->driverConnection->$exec($sql);
+                $this->driverConnection->executeStatement($sql);
             }
         }
     }
@@ -536,8 +526,4 @@ class Connection implements ResetInterface
             ? $comparator->compareSchemas($from, $to)
             : $comparator->compare($from, $to);
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\Connection::class, false)) {
-    class_alias(Connection::class, \Symfony\Component\Messenger\Transport\Doctrine\Connection::class);
 }

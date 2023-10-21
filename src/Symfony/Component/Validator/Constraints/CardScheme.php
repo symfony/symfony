@@ -41,20 +41,20 @@ class CardScheme extends Constraint
     public const NOT_NUMERIC_ERROR = 'a2ad9231-e827-485f-8a1e-ef4d9a6d5c2e';
     public const INVALID_FORMAT_ERROR = 'a8faedbf-1c2f-4695-8d22-55783be8efed';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NOT_NUMERIC_ERROR => 'NOT_NUMERIC_ERROR',
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
     ];
 
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
+
     public $message = 'Unsupported card type or invalid card number.';
     public $schemes;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param array|string $schemes The schemes to validate against or a set of options
-     */
-    public function __construct($schemes, string $message = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct(array|string|null $schemes, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($schemes) && \is_string(key($schemes))) {
             $options = array_merge($schemes, $options);
@@ -67,12 +67,12 @@ class CardScheme extends Constraint
         $this->message = $message ?? $this->message;
     }
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'schemes';
     }
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['schemes'];
     }

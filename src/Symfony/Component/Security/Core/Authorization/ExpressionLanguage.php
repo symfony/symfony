@@ -29,9 +29,6 @@ if (!class_exists(BaseExpressionLanguage::class)) {
      */
     class ExpressionLanguage extends BaseExpressionLanguage
     {
-        /**
-         * {@inheritdoc}
-         */
         public function __construct(CacheItemPoolInterface $cache = null, array $providers = [])
         {
             // prepend the default provider to let users override it easily

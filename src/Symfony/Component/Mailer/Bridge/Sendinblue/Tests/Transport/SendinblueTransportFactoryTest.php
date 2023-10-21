@@ -20,6 +20,9 @@ use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
+/**
+ * @group legacy
+ */
 class SendinblueTransportFactoryTest extends TransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface

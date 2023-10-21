@@ -38,6 +38,9 @@ final class PostgreSqlConnection extends Connection
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
+    /**
+     * @return void
+     */
     public function __wakeup()
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
@@ -48,7 +51,7 @@ final class PostgreSqlConnection extends Connection
         $this->unlisten();
     }
 
-    public function reset()
+    public function reset(): void
     {
         parent::reset();
         $this->unlisten();
@@ -76,9 +79,9 @@ final class PostgreSqlConnection extends Connection
         $notification = $wrappedConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
         if (
             // no notifications, or for another table or queue
-            (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name']) &&
+            (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name'])
             // delayed messages
-            (microtime(true) * 1000 - $this->queueEmptiedAt < $this->configuration['check_delayed_interval'])
+            && (microtime(true) * 1000 - $this->queueEmptiedAt < $this->configuration['check_delayed_interval'])
         ) {
             usleep(1000);
 
@@ -143,7 +146,7 @@ SQL
         return sprintf('%1$s.notify_%2$s', $tableConfig[0], $tableConfig[1]);
     }
 
-    private function unlisten()
+    private function unlisten(): void
     {
         $this->executeStatement(sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
     }

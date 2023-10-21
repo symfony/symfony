@@ -30,22 +30,6 @@ class AutowiringTypesTest extends AbstractWebTestCase
         $this->assertInstanceOf(TraceableAccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The debug.security.access.decision_manager service should be injected in non-debug mode');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyAccessDecisionManagerAutowiring()
-    {
-        static::bootKernel(['debug' => false, 'root_config' => 'legacy_config.yml']);
-
-        $autowiredServices = static::getContainer()->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(AccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The security.access.decision_manager service should be injected in debug mode');
-
-        static::bootKernel(['debug' => true, 'root_config' => 'legacy_config.yml']);
-
-        $autowiredServices = static::getContainer()->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(TraceableAccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The debug.security.access.decision_manager service should be injected in non-debug mode');
-    }
-
     protected static function createKernel(array $options = []): KernelInterface
     {
         return parent::createKernel(['test_case' => 'AutowiringTypes'] + $options);

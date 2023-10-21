@@ -20,8 +20,8 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 
 class ApplicationTesterTest extends TestCase
 {
-    protected $application;
-    protected $tester;
+    protected Application $application;
+    protected ApplicationTester $tester;
 
     protected function setUp(): void
     {
@@ -36,12 +36,6 @@ class ApplicationTesterTest extends TestCase
 
         $this->tester = new ApplicationTester($this->application);
         $this->tester->run(['command' => 'foo', 'foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->application = null;
-        $this->tester = null;
     }
 
     public function testRun()

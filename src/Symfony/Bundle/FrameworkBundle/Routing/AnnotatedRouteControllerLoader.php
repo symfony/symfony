@@ -11,42 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
-use Symfony\Component\Routing\Route;
+trigger_deprecation('symfony/framework-bundle', '6.4', 'The "%s" class is deprecated, use "%s" instead.', AnnotatedRouteControllerLoader::class, AttributeRouteControllerLoader::class);
 
-/**
- * AnnotatedRouteControllerLoader is an implementation of AnnotationClassLoader
- * that sets the '_controller' default based on the class and method names.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
-class AnnotatedRouteControllerLoader extends AnnotationClassLoader
-{
+class_exists(AttributeRouteControllerLoader::class);
+
+if (false) {
     /**
-     * Configures the _controller default parameter of a given Route instance.
+     * @deprecated since Symfony 6.4, to be removed in 7.0, use {@link AttributeRouteControllerLoader} instead
      */
-    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot)
+    class AnnotatedRouteControllerLoader
     {
-        if ('__invoke' === $method->getName()) {
-            $route->setDefault('_controller', $class->getName());
-        } else {
-            $route->setDefault('_controller', $class->getName().'::'.$method->getName());
-        }
-    }
-
-    /**
-     * Makes the default route name more sane by removing common keywords.
-     *
-     * @return string
-     */
-    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
-    {
-        $name = preg_replace('/(bundle|controller)_/', '_', parent::getDefaultRouteName($class, $method));
-
-        if (str_ends_with($method->name, 'Action') || str_ends_with($method->name, '_action')) {
-            $name = preg_replace('/action(_\d+)?$/', '\\1', $name);
-        }
-
-        return str_replace('__', '_', $name);
     }
 }

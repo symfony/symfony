@@ -1,7 +1,6 @@
 <?php
 
 $container->loadFromExtension('security', [
-    'enable_authenticator_manager' => true,
     'password_hashers' => [
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => [
@@ -77,7 +76,7 @@ $container->loadFromExtension('security', [
             'logout' => true,
             'remember_me' => ['secret' => 'TheSecret'],
             'user_checker' => null,
-            'entry_point' => 'form_login'
+            'entry_point' => 'form_login',
         ],
         'host' => [
             'provider' => 'default',
@@ -97,6 +96,7 @@ $container->loadFromExtension('security', [
         ['path' => '/blog/524', 'role' => 'ROLE_USER', 'requires_channel' => 'https', 'methods' => ['get', 'POST'], 'port' => 8000],
         ['path' => '/blog/.*', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY'],
         ['path' => '/blog/524', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY', 'allow_if' => "token.getUserIdentifier() matches '/^admin/'"],
+        ['role' => 'ROLE_ADMIN', 'attributes' => ['_controller' => 'AdminController::index'], 'route' => 'admin'],
     ],
 
     'role_hierarchy' => [

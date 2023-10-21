@@ -30,7 +30,7 @@ final class SesTransportFactory extends AbstractTransportFactory
         $region = $dsn->getOption('region');
 
         if ('ses+smtp' === $scheme || 'ses+smtps' === $scheme) {
-            $transport = new SesSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $region, $this->dispatcher, $this->logger);
+            $transport = new SesSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $region, $this->dispatcher, $this->logger, $dsn->getHost());
 
             if (null !== $pingThreshold = $dsn->getOption('ping_threshold')) {
                 $transport->setPingThreshold((int) $pingThreshold);
@@ -45,7 +45,7 @@ final class SesTransportFactory extends AbstractTransportFactory
                 // no break
             case 'ses':
             case 'ses+https':
-                $class = $class ?? SesHttpAsyncAwsTransport::class;
+                $class ??= SesHttpAsyncAwsTransport::class;
                 $options = [
                     'region' => $dsn->getOption('region') ?: 'eu-west-1',
                     'accessKeyId' => $dsn->getUser(),

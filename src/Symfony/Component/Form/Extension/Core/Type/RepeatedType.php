@@ -14,13 +14,12 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RepeatedType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -46,7 +45,7 @@ class RepeatedType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -58,11 +57,7 @@ class RepeatedType extends AbstractType
             'first_name' => 'first',
             'second_name' => 'second',
             'error_bubbling' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'The values do not match.';
-            },
+            'invalid_message' => 'The values do not match.',
         ]);
 
         $resolver->setAllowedTypes('options', 'array');
@@ -70,10 +65,7 @@ class RepeatedType extends AbstractType
         $resolver->setAllowedTypes('second_options', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'repeated';
     }

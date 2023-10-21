@@ -29,6 +29,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 class StreamOutput extends Output
 {
+    /** @var resource */
     private $stream;
 
     /**
@@ -47,9 +48,7 @@ class StreamOutput extends Output
 
         $this->stream = $stream;
 
-        if (null === $decorated) {
-            $decorated = $this->hasColorSupport();
-        }
+        $decorated ??= $this->hasColorSupport();
 
         parent::__construct($verbosity, $decorated, $formatter);
     }
@@ -65,7 +64,7 @@ class StreamOutput extends Output
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     protected function doWrite(string $message, bool $newline)
     {
@@ -91,7 +90,7 @@ class StreamOutput extends Output
      *
      * @return bool true if the stream supports colorization, false otherwise
      */
-    protected function hasColorSupport()
+    protected function hasColorSupport(): bool
     {
         // Follow https://no-color.org/
         if (isset($_SERVER['NO_COLOR']) || false !== getenv('NO_COLOR')) {

@@ -17,14 +17,15 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @requires extension redis
- *
  * @group integration
  */
 class RedisCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
+    /**
+     * @requires extension redis
+     */
     public function testNotConnected()
     {
         $redis = new \Redis();
@@ -38,10 +39,18 @@ EODUMP;
         $this->assertDumpMatchesFormat($xCast, $redis);
     }
 
-    public function testConnected()
+    /**
+     * @testWith ["Redis"]
+     *           ["Relay\\Relay"]
+     */
+    public function testConnected(string $class)
     {
+        if (!class_exists($class)) {
+            self::markTestSkipped(sprintf('"%s" class required', $class));
+        }
+
         $redisHost = explode(':', getenv('REDIS_HOST')) + [1 => 6379];
-        $redis = new \Redis();
+        $redis = new $class();
         try {
             $redis->connect(...$redisHost);
         } catch (\Exception $e) {
@@ -49,7 +58,7 @@ EODUMP;
         }
 
         $xCast = <<<EODUMP
-Redis {%A
+%a {%A
   isConnected: true
   host: "{$redisHost[0]}"
   port: {$redisHost[1]}
@@ -58,9 +67,9 @@ Redis {%A
   dbNum: 0
   timeout: 0.0
   lastError: null
-  persistentId: null
+  persistentId: %a
   options: {
-    TCP_KEEPALIVE: 0
+    TCP_KEEPALIVE: %a
     READ_TIMEOUT: 0.0
     COMPRESSION: NONE
     SERIALIZER: NONE

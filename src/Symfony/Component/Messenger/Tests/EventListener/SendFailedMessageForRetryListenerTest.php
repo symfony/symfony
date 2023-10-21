@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
@@ -21,7 +22,6 @@ use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SendFailedMessageForRetryListenerTest extends TestCase
 {

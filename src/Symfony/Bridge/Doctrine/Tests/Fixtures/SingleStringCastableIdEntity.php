@@ -16,26 +16,19 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
 #[Entity]
 class SingleStringCastableIdEntity
 {
-    /**
-     * @Id
-     * @Column(type="string")
-     * @GeneratedValue(strategy="NONE")
-     */
     #[Id, Column(type: 'string'), GeneratedValue(strategy: 'NONE')]
-    protected $id;
+    protected StringCastableObjectIdentity $id;
 
-    /** @Column(type="string", nullable=true) */
-    #[Column(type: 'string', nullable: true)]
-    public $name;
+    public function __construct(
+        int $id,
 
-    public function __construct($id, $name)
-    {
+        #[Column(nullable: true)]
+        public ?string $name,
+    ) {
         $this->id = new StringCastableObjectIdentity($id);
-        $this->name = $name;
     }
 
     public function __toString(): string
@@ -46,11 +39,9 @@ class SingleStringCastableIdEntity
 
 class StringCastableObjectIdentity
 {
-    protected $id;
-
-    public function __construct($id)
-    {
-        $this->id = $id;
+    public function __construct(
+        protected readonly int $id,
+    ) {
     }
 
     public function __toString(): string

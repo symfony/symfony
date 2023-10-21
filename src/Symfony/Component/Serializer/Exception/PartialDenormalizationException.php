@@ -16,20 +16,26 @@ namespace Symfony\Component\Serializer\Exception;
  */
 class PartialDenormalizationException extends UnexpectedValueException
 {
-    private $data;
-    private $errors;
-
-    public function __construct($data, array $errors)
-    {
-        $this->data = $data;
-        $this->errors = $errors;
+    /**
+     * @param NotNormalizableValueException[] $errors
+     */
+    public function __construct(
+        private mixed $data,
+        private array $errors,
+    ) {
     }
 
+    /**
+     * @return mixed
+     */
     public function getData()
     {
         return $this->data;
     }
 
+    /**
+     * @return NotNormalizableValueException[]
+     */
     public function getErrors(): array
     {
         return $this->errors;

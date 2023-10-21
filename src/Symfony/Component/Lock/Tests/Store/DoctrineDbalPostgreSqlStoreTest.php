@@ -44,9 +44,6 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         return self::getDbalConnection('pdo-pgsql://postgres:password@'.getenv('POSTGRES_HOST'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         $conn = $this->createPostgreSqlConnection();

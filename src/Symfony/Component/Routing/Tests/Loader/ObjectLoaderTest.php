@@ -96,9 +96,9 @@ class ObjectLoaderTest extends TestCase
 
 class TestObjectLoader extends ObjectLoader
 {
-    public $loaderMap = [];
+    public array $loaderMap = [];
 
-    public function supports($resource, string $type = null): bool
+    public function supports(mixed $resource, string $type = null): bool
     {
         return 'service';
     }
@@ -111,8 +111,8 @@ class TestObjectLoader extends ObjectLoader
 
 class TestObjectLoaderRouteService
 {
-    private $collection;
-    private $env;
+    private RouteCollection $collection;
+    private ?string $env;
 
     public function __construct($collection, string $env = null)
     {

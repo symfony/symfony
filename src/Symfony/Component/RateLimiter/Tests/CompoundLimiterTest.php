@@ -23,7 +23,7 @@ use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
  */
 class CompoundLimiterTest extends TestCase
 {
-    private $storage;
+    private InMemoryStorage $storage;
 
     protected function setUp(): void
     {

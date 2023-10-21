@@ -32,19 +32,19 @@ interface ClassMetadataInterface
     /**
      * Adds an {@link AttributeMetadataInterface}.
      */
-    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata);
+    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata): void;
 
     /**
      * Gets the list of {@link AttributeMetadataInterface}.
      *
-     * @return AttributeMetadataInterface[]
+     * @return array<string, AttributeMetadataInterface>
      */
     public function getAttributesMetadata(): array;
 
     /**
      * Merges a {@link ClassMetadataInterface} in the current one.
      */
-    public function merge(self $classMetadata);
+    public function merge(self $classMetadata): void;
 
     /**
      * Returns a {@link \ReflectionClass} instance for this class.
@@ -53,5 +53,5 @@ interface ClassMetadataInterface
 
     public function getClassDiscriminatorMapping(): ?ClassDiscriminatorMapping;
 
-    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null);
+    public function setClassDiscriminatorMapping(?ClassDiscriminatorMapping $mapping): void;
 }

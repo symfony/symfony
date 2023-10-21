@@ -15,7 +15,7 @@ use Symfony\Component\Config\FileLocatorInterface;
 
 class FileLocatorStub implements FileLocatorInterface
 {
-    public function locate(string $name, string $currentPath = null, bool $first = true)
+    public function locate(string $name, string $currentPath = null, bool $first = true): string|array
     {
         if (str_starts_with($name, 'http')) {
             return $name;

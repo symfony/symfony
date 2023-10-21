@@ -22,10 +22,8 @@ interface ConnectionInterface
 {
     /**
      * Checks whether the connection was already bound or not.
-     *
-     * @return bool
      */
-    public function isBound();
+    public function isBound(): bool;
 
     /**
      * Binds the connection against a user's DN and password.
@@ -33,6 +31,8 @@ interface ConnectionInterface
      * @throws AlreadyExistsException      When the connection can't be created because of an LDAP_ALREADY_EXISTS error
      * @throws ConnectionTimeoutException  When the connection can't be created because of an LDAP_TIMEOUT error
      * @throws InvalidCredentialsException When the connection can't be created because of an LDAP_INVALID_CREDENTIALS error
+     *
+     * @return void
      */
-    public function bind(string $dn = null, string $password = null);
+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null);
 }

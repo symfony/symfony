@@ -11,20 +11,17 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
 #[Entity]
 class GuidIdEntity
 {
-    /** @Id @Column(type="guid") */
-    #[Id, Column(type: 'guid')]
-    protected $id;
-
-    public function __construct($id)
-    {
-        $this->id = $id;
+    public function __construct(
+        #[Id, Column(type: Types::GUID)]
+        protected string $id,
+    ) {
     }
 }

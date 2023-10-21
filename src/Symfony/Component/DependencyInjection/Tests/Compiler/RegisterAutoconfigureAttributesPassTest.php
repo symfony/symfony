@@ -20,10 +20,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureAttributed;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StaticConstructorAutoconfigure;
 
-/**
- * @requires PHP 8
- */
 class RegisterAutoconfigureAttributesPassTest extends TestCase
 {
     public function testProcess()
@@ -47,6 +45,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
             ->addTag('another_tag', ['attr' => 234])
             ->addMethodCall('setBar', [2, 3])
             ->setBindings(['$bar' => $argument])
+            ->setFactory([null, 'create'])
         ;
         $this->assertEquals([AutoconfigureAttributed::class => $expected], $container->getAutoconfiguredInstanceof());
     }
@@ -87,5 +86,22 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         (new RegisterAutoconfigureAttributesPass())->process($container);
 
         $this->addToAssertionCount(1);
+    }
+
+    public function testStaticConstructor()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', StaticConstructorAutoconfigure::class)
+            ->setAutoconfigured(true);
+
+        $argument = new BoundArgument('foo', false, BoundArgument::INSTANCEOF_BINDING, realpath(__DIR__.'/../Fixtures/StaticConstructorAutoconfigure.php'));
+
+        (new RegisterAutoconfigureAttributesPass())->process($container);
+
+        $expected = (new ChildDefinition(''))
+            ->setFactory([null, 'create'])
+            ->setBindings(['$foo' => $argument])
+        ;
+        $this->assertEquals([StaticConstructorAutoconfigure::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 }

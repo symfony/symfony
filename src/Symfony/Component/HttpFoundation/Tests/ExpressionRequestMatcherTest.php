@@ -16,6 +16,9 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\ExpressionRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @group legacy
+ */
 class ExpressionRequestMatcherTest extends TestCase
 {
     public function testWhenNoExpressionIsSet()

@@ -16,16 +16,13 @@ use Symfony\Component\Mime\RawMessage;
 
 final class EmailHasHeader extends Constraint
 {
-    private $headerName;
+    private string $headerName;
 
     public function __construct(string $headerName)
     {
         $this->headerName = $headerName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('has header "%s"', $this->headerName);
@@ -33,12 +30,10 @@ final class EmailHasHeader extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function matches($message): bool
     {
-        if (RawMessage::class === \get_class($message)) {
+        if (RawMessage::class === $message::class) {
             throw new \LogicException('Unable to test a message header on a RawMessage instance.');
         }
 
@@ -47,8 +42,6 @@ final class EmailHasHeader extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($message): string
     {

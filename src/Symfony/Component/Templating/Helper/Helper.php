@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating\Helper;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', Helper::class);
+
 /**
  * Helper is the base class for all helper classes.
  *
@@ -18,6 +20,8 @@ namespace Symfony\Component\Templating\Helper;
  * class that exposes a read-only interface for templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 abstract class Helper implements HelperInterface
 {
@@ -25,6 +29,8 @@ abstract class Helper implements HelperInterface
 
     /**
      * Sets the default charset.
+     *
+     * @return void
      */
     public function setCharset(string $charset)
     {
@@ -33,10 +39,8 @@ abstract class Helper implements HelperInterface
 
     /**
      * Gets the default charset.
-     *
-     * @return string
      */
-    public function getCharset()
+    public function getCharset(): string
     {
         return $this->charset;
     }

@@ -17,16 +17,11 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTrans
 
 class ValueToDuplicatesTransformerTest extends TestCase
 {
-    private $transformer;
+    private ValueToDuplicatesTransformer $transformer;
 
     protected function setUp(): void
     {
         $this->transformer = new ValueToDuplicatesTransformer(['a', 'b', 'c']);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->transformer = null;
     }
 
     public function testTransform()

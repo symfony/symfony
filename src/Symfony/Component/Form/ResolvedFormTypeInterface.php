@@ -22,50 +22,42 @@ interface ResolvedFormTypeInterface
 {
     /**
      * Returns the prefix of the template block name for this type.
-     *
-     * @return string
      */
-    public function getBlockPrefix();
+    public function getBlockPrefix(): string;
 
     /**
      * Returns the parent type.
-     *
-     * @return self|null
      */
-    public function getParent();
+    public function getParent(): ?self;
 
     /**
      * Returns the wrapped form type.
-     *
-     * @return FormTypeInterface
      */
-    public function getInnerType();
+    public function getInnerType(): FormTypeInterface;
 
     /**
      * Returns the extensions of the wrapped form type.
      *
      * @return FormTypeExtensionInterface[]
      */
-    public function getTypeExtensions();
+    public function getTypeExtensions(): array;
 
     /**
      * Creates a new form builder for this type.
      *
      * @param string $name The name for the builder
-     *
-     * @return FormBuilderInterface
      */
-    public function createBuilder(FormFactoryInterface $factory, string $name, array $options = []);
+    public function createBuilder(FormFactoryInterface $factory, string $name, array $options = []): FormBuilderInterface;
 
     /**
      * Creates a new form view for a form of this type.
-     *
-     * @return FormView
      */
-    public function createView(FormInterface $form, FormView $parent = null);
+    public function createView(FormInterface $form, FormView $parent = null): FormView;
 
     /**
      * Configures a form builder for the type hierarchy.
+     *
+     * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options);
 
@@ -73,6 +65,8 @@ interface ResolvedFormTypeInterface
      * Configures a form view for the type hierarchy.
      *
      * It is called before the children of the view are built.
+     *
+     * @return void
      */
     public function buildView(FormView $view, FormInterface $form, array $options);
 
@@ -80,13 +74,13 @@ interface ResolvedFormTypeInterface
      * Finishes a form view for the type hierarchy.
      *
      * It is called after the children of the view have been built.
+     *
+     * @return void
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
 
     /**
      * Returns the configured options resolver used for this type.
-     *
-     * @return OptionsResolver
      */
-    public function getOptionsResolver();
+    public function getOptionsResolver(): OptionsResolver;
 }

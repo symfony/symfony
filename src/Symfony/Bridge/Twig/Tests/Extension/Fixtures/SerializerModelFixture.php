@@ -9,9 +9,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class SerializerModelFixture
 {
-    /**
-     * @Groups({"read"})
-     */
+    #[Groups(['read'])]
     public $name = 'howdy';
 
     public $title = 'fixture';

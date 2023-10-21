@@ -30,8 +30,7 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
         'testClearPrefix' => 'Couchbase cannot clear by prefix',
     ];
 
-    /** @var Collection */
-    protected static $client;
+    protected static Collection $client;
 
     public static function setupBeforeClass(): void
     {
@@ -44,9 +43,6 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         if (!CouchbaseCollectionAdapter::isSupported()) {

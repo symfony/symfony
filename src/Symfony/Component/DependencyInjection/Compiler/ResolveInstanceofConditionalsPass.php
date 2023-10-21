@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function process(ContainerBuilder $container)
     {
@@ -73,7 +73,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         $parent = $definition instanceof ChildDefinition ? $definition->getParent() : null;
 
         foreach ($conditionals as $interface => $instanceofDefs) {
-            if ($interface !== $class && !($reflectionClass ?? $reflectionClass = $container->getReflectionClass($class, false) ?: false)) {
+            if ($interface !== $class && !($reflectionClass ??= $container->getReflectionClass($class, false) ?: false)) {
                 continue;
             }
 
@@ -110,7 +110,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             $definition->setBindings([]);
             $definition = serialize($definition);
 
-            if (Definition::class === \get_class($abstract)) {
+            if (Definition::class === $abstract::class) {
                 // cast Definition to ChildDefinition
                 $definition = substr_replace($definition, '53', 2, 2);
                 $definition = substr_replace($definition, 'Child', 44, 0);
@@ -158,7 +158,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
     private function mergeConditionals(array $autoconfiguredInstanceof, array $instanceofConditionals, ContainerBuilder $container): array
     {
         // make each value an array of ChildDefinition
-        $conditionals = array_map(function ($childDef) { return [$childDef]; }, $autoconfiguredInstanceof);
+        $conditionals = array_map(fn ($childDef) => [$childDef], $autoconfiguredInstanceof);
 
         foreach ($instanceofConditionals as $interface => $instanceofDef) {
             // make sure the interface/class exists (but don't validate automaticInstanceofConditionals)

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\MaxUlid;
 use Symfony\Component\Uid\NilUlid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
 use Symfony\Component\Uid\Ulid;
@@ -55,6 +56,12 @@ class UlidTest extends TestCase
         $this->assertSame('7fffffffffffffffffffffffffffffff', bin2hex($ulid->toBinary()));
 
         $this->assertTrue($ulid->equals(Ulid::fromString(hex2bin('7fffffffffffffffffffffffffffffff'))));
+    }
+
+    public function toHex()
+    {
+        $ulid = Ulid::fromString('1BVXue8CnY8ogucrHX3TeF');
+        $this->assertSame('0x0177058f4dacd0b2a990a49af02bc008', $ulid->toHex());
     }
 
     public function testFromUuid()
@@ -265,5 +272,22 @@ class UlidTest extends TestCase
     public function testNewNilUlid()
     {
         $this->assertSame('00000000000000000000000000', (string) new NilUlid());
+    }
+
+    /**
+     * @testWith    ["ffffffff-ffff-ffff-ffff-ffffffffffff"]
+     *              ["7zzzzzzzzzzzzzzzzzzzzzzzzz"]
+     */
+    public function testMaxUlid(string $ulid)
+    {
+        $ulid = Ulid::fromString($ulid);
+
+        $this->assertInstanceOf(MaxUlid::class, $ulid);
+        $this->assertSame('7ZZZZZZZZZZZZZZZZZZZZZZZZZ', (string) $ulid);
+    }
+
+    public function testNewMaxUlid()
+    {
+        $this->assertSame('7ZZZZZZZZZZZZZZZZZZZZZZZZZ', (string) new MaxUlid());
     }
 }

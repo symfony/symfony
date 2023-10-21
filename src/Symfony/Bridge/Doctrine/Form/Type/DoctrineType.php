@@ -39,12 +39,12 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
     /**
      * @var IdReader[]
      */
-    private $idReaders = [];
+    private array $idReaders = [];
 
     /**
      * @var EntityLoaderInterface[]
      */
-    private $entityLoaders = [];
+    private array $entityLoaders = [];
 
     /**
      * Creates the label for a choice.
@@ -66,14 +66,12 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      * a single-column integer ID. In that case, the value of the field is
      * the ID of the object. That ID is also used as field name.
      *
-     * @param int|string $key   The choice key
-     * @param string     $value The choice value. Corresponds to the object's
-     *                          ID here.
+     * @param string $value The choice value. Corresponds to the object's ID here.
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public static function createChoiceName(object $choice, $key, string $value): string
+    public static function createChoiceName(object $choice, int|string $key, string $value): string
     {
         return str_replace('-', '_', $value);
     }
@@ -99,6 +97,9 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $this->registry = $registry;
     }
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['multiple'] && interface_exists(Collection::class)) {
@@ -109,6 +110,9 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $choiceLoader = function (Options $options) {
@@ -158,7 +162,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $choiceValue = function (Options $options) {
             // If the entity has a single-column ID, use that ID as value
             if ($options['id_reader'] instanceof IdReader && $options['id_reader']->isSingleId()) {
-                return ChoiceList::value($this, [$options['id_reader'], 'getIdValue'], $options['id_reader']);
+                return ChoiceList::value($this, $options['id_reader']->getIdValue(...), $options['id_reader']);
             }
 
             // Otherwise, an incrementing integer is used as value automatically
@@ -195,15 +199,13 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
 
         // Set the "id_reader" option via the normalizer. This option is not
         // supposed to be set by the user.
-        $idReaderNormalizer = function (Options $options) {
-            // The ID reader is a utility that is needed to read the object IDs
-            // when generating the field values. The callback generating the
-            // field values has no access to the object manager or the class
-            // of the field, so we store that information in the reader.
-            // The reader is cached so that two choice lists for the same class
-            // (and hence with the same reader) can successfully be cached.
-            return $this->getCachedIdReader($options['em'], $options['class']);
-        };
+        // The ID reader is a utility that is needed to read the object IDs
+        // when generating the field values. The callback generating the
+        // field values has no access to the object manager or the class
+        // of the field, so we store that information in the reader.
+        // The reader is cached so that two choice lists for the same class
+        // (and hence with the same reader) can successfully be cached.
+        $idReaderNormalizer = fn (Options $options) => $this->getCachedIdReader($options['em'], $options['class']);
 
         $resolver->setDefaults([
             'em' => null,
@@ -228,19 +230,17 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
 
     /**
      * Return the default loader object.
-     *
-     * @return EntityLoaderInterface
      */
-    abstract public function getLoader(ObjectManager $manager, object $queryBuilder, string $class);
+    abstract public function getLoader(ObjectManager $manager, object $queryBuilder, string $class): EntityLoaderInterface;
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): string
     {
         return ChoiceType::class;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->idReaders = [];
@@ -265,6 +265,6 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
     {
         $hash = CachingFactoryDecorator::generateHash($vary);
 
-        return $this->entityLoaders[$hash] ?? ($this->entityLoaders[$hash] = $this->getLoader($manager, $queryBuilder, $class));
+        return $this->entityLoaders[$hash] ??= $this->getLoader($manager, $queryBuilder, $class);
     }
 }

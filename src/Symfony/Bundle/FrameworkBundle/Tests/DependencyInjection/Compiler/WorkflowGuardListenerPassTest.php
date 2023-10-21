@@ -21,10 +21,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * @group legacy
+ */
 class WorkflowGuardListenerPassTest extends TestCase
 {
-    private $container;
-    private $compilerPass;
+    private ContainerBuilder $container;
+    private WorkflowGuardListenerPass $compilerPass;
 
     protected function setUp(): void
     {

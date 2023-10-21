@@ -12,27 +12,37 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherAnnotationStaticReturnType;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
-use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class AutowireRequiredMethodsPassTest extends TestCase
 {
-    public function testSetterInjection()
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
+    public function testSetterInjectionAnnotation()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionAnnotation::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionAnnotation::setChildMethodWithoutDocBlock()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionParentAnnotation::setDependencies()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+
         $container = new ContainerBuilder();
-        $container->register(Foo::class);
+        $container->register(FooAnnotation::class);
         $container->register(A::class);
         $container->register(CollisionA::class);
         $container->register(CollisionB::class);
 
         // manually configure *one* call, to override autowiring
         $container
-            ->register('setter_injection', SetterInjection::class)
+            ->register('setter_injection', SetterInjectionAnnotation::class)
             ->setAutowired(true)
             ->addMethodCall('setWithCallsConfigured', ['manual_arg1', 'manual_arg2']);
 
@@ -42,7 +52,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
         $this->assertEquals(
-            ['setWithCallsConfigured', 'setFoo', 'setDependencies', 'setChildMethodWithoutDocBlock'],
+            ['setWithCallsConfigured', 'setFoo', 'setChildMethodWithoutDocBlock', 'setDependencies'],
             array_column($methodCalls, 0)
         );
 
@@ -55,15 +65,8 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertEquals([], $methodCalls[1][1]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testSetterInjectionWithAttribute()
     {
-        if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
-        }
-
         $container = new ContainerBuilder();
         $container->register(Foo::class);
 
@@ -78,7 +81,41 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertSame([['setFoo', []]], $methodCalls);
     }
 
-    public function testExplicitMethodInjection()
+    /**
+     * @group legacy
+     */
+    // @deprecated since Symfony 6.3, to be removed in 7.0
+    public function testExplicitMethodInjectionAnnotation()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionAnnotation::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionAnnotation::setChildMethodWithoutDocBlock()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionParentAnnotation::setDependencies()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionParentAnnotation::setWithCallsConfigured()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+
+        $container = new ContainerBuilder();
+        $container->register(FooAnnotation::class);
+        $container->register(A::class);
+        $container->register(CollisionA::class);
+        $container->register(CollisionB::class);
+
+        $container
+            ->register('setter_injection', SetterInjectionAnnotation::class)
+            ->setAutowired(true)
+            ->addMethodCall('notASetter', []);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
+
+        $this->assertEquals(
+            ['notASetter', 'setFoo', 'setChildMethodWithoutDocBlock', 'setDependencies', 'setWithCallsConfigured'],
+            array_column($methodCalls, 0)
+        );
+        $this->assertEquals([], $methodCalls[0][1]);
+    }
+
+    public function testExplicitMethodInjectionAttribute()
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -103,13 +140,19 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertEquals([], $methodCalls[0][1]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testWitherInjection()
     {
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo1()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo2()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+
         $container = new ContainerBuilder();
-        $container->register(Foo::class);
+        $container->register(FooAnnotation::class);
 
         $container
-            ->register('wither', Wither::class)
+            ->register('wither', WitherAnnotation::class)
             ->setAutowired(true);
 
         (new ResolveClassPass())->process($container);
@@ -126,8 +169,32 @@ class AutowireRequiredMethodsPassTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
+     * @group legacy
      */
+    public function testWitherAnnotationWithStaticReturnTypeInjection()
+    {
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Fixtures\WitherAnnotationStaticReturnType::withFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Fixtures\WitherAnnotationStaticReturnType::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
+
+        $container = new ContainerBuilder();
+        $container->register(FooAnnotation::class);
+
+        $container
+            ->register('wither', WitherAnnotationStaticReturnType::class)
+            ->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $methodCalls = $container->getDefinition('wither')->getMethodCalls();
+
+        $expected = [
+            ['withFoo', [], true],
+            ['setFoo', []],
+        ];
+        $this->assertSame($expected, $methodCalls);
+    }
+
     public function testWitherWithStaticReturnTypeInjection()
     {
         $container = new ContainerBuilder();
@@ -149,15 +216,8 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertSame($expected, $methodCalls);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWitherInjectionWithAttribute()
     {
-        if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
-        }
-
         $container = new ContainerBuilder();
         $container->register(Foo::class);
 

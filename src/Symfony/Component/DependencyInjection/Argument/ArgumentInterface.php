@@ -18,10 +18,10 @@ namespace Symfony\Component\DependencyInjection\Argument;
  */
 interface ArgumentInterface
 {
-    /**
-     * @return array
-     */
-    public function getValues();
+    public function getValues(): array;
 
+    /**
+     * @return void
+     */
     public function setValues(array $values);
 }

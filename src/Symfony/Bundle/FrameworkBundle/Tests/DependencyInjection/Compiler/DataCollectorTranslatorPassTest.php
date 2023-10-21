@@ -15,28 +15,33 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
+use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @group legacy
+ */
 class DataCollectorTranslatorPassTest extends TestCase
 {
-    private $container;
-    private $dataCollectorTranslatorPass;
+    private ContainerBuilder $container;
+    private DataCollectorTranslatorPass $dataCollectorTranslatorPass;
 
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->dataCollectorTranslatorPass = new DataCollectorTranslatorPass();
 
-        $this->container->setParameter('translator_implementing_bag', 'Symfony\Component\Translation\Translator');
+        $this->container->setParameter('translator_implementing_bag', Translator::class);
         $this->container->setParameter('translator_not_implementing_bag', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag');
 
-        $this->container->register('translator.data_collector', 'Symfony\Component\Translation\DataCollectorTranslator')
-            ->setPublic(false)
+        $this->container->register('translator.data_collector', DataCollectorTranslator::class)
             ->setDecoratedService('translator')
             ->setArguments([new Reference('translator.data_collector.inner')])
         ;
 
-        $this->container->register('data_collector.translation', 'Symfony\Component\Translation\DataCollector\TranslationDataCollector')
+        $this->container->register('data_collector.translation', TranslationDataCollector::class)
             ->setArguments([new Reference('translator.data_collector')])
         ;
     }
@@ -68,7 +73,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     public static function getImplementingTranslatorBagInterfaceTranslatorClassNames()
     {
         return [
-            ['Symfony\Component\Translation\Translator'],
+            [Translator::class],
             ['%translator_implementing_bag%'],
         ];
     }

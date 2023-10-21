@@ -14,6 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Controller;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,15 +33,15 @@ use Twig\Environment;
  */
 class ProfilerController
 {
-    private $templateManager;
-    private $generator;
-    private $profiler;
-    private $twig;
-    private $templates;
-    private $cspHandler;
-    private $baseDir;
+    private TemplateManager $templateManager;
+    private UrlGeneratorInterface $generator;
+    private ?Profiler $profiler;
+    private Environment $twig;
+    private array $templates;
+    private ?ContentSecurityPolicyHandler $cspHandler;
+    private ?string $baseDir;
 
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, ?Profiler $profiler, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
@@ -71,23 +72,24 @@ class ProfilerController
     {
         $this->denyAccessIfProfilerDisabled();
 
-        if (null !== $this->cspHandler) {
-            $this->cspHandler->disableCsp();
-        }
+        $this->cspHandler?->disableCsp();
 
         $panel = $request->query->get('panel');
         $page = $request->query->get('page', 'home');
+        $profileType = $request->query->get('type', 'request');
 
-        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null))) {
+        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null, null, fn ($profile) => $profileType === $profile['virtual_type']))) {
             $token = $latest['token'];
         }
 
         if (!$profile = $this->profiler->loadProfile($token)) {
-            return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/info.html.twig', ['about' => 'no_token', 'token' => $token, 'request' => $request]);
+            return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/info.html.twig', ['about' => 'no_token', 'token' => $token, 'request' => $request, 'profile_type' => $profileType]);
         }
 
+        $profileType = $profile->getVirtualType() ?? 'request';
+
         if (null === $panel) {
-            $panel = 'request';
+            $panel = $profileType;
 
             foreach ($profile->getCollectors() as $collector) {
                 if ($collector instanceof ExceptionDataCollector && $collector->hasException()) {
@@ -115,7 +117,8 @@ class ProfilerController
             'request' => $request,
             'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
-            'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
+            'profiler_markup_version' => 3, // 1 = original profiler, 2 = Symfony 2.8+ profiler, 3 = Symfony 6.2+ profiler
+            'profile_type' => $profileType,
         ]);
     }
 
@@ -130,7 +133,9 @@ class ProfilerController
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
-        if ($request->hasSession() && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+        if (!$request->attributes->getBoolean('_stateless') && $request->hasSession()
+            && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag
+        ) {
             // keep current flashes for one more request if using AutoExpireFlashBag
             $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }
@@ -148,7 +153,7 @@ class ProfilerController
         $url = null;
         try {
             $url = $this->generator->generate('_profiler', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // the profiler is not enabled
         }
 
@@ -159,7 +164,7 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getNames($profile),
             'profiler_url' => $url,
             'token' => $token,
-            'profiler_markup_version' => 2, // 1 = original toolbar, 2 = Symfony 2.8+ toolbar
+            'profiler_markup_version' => 3, // 1 = original toolbar, 2 = Symfony 2.8+ profiler, 3 = Symfony 6.2+ profiler
         ]);
     }
 
@@ -172,43 +177,26 @@ class ProfilerController
     {
         $this->denyAccessIfProfilerDisabled();
 
-        if (null !== $this->cspHandler) {
-            $this->cspHandler->disableCsp();
-        }
+        $this->cspHandler?->disableCsp();
 
-        if (!$request->hasSession()) {
-            $ip =
-            $method =
-            $statusCode =
-            $url =
-            $start =
-            $end =
-            $limit =
-            $token = null;
-        } else {
+        $session = null;
+        if ($request->attributes->getBoolean('_stateless') && $request->hasSession()) {
             $session = $request->getSession();
-
-            $ip = $request->query->get('ip', $session->get('_profiler_search_ip'));
-            $method = $request->query->get('method', $session->get('_profiler_search_method'));
-            $statusCode = $request->query->get('status_code', $session->get('_profiler_search_status_code'));
-            $url = $request->query->get('url', $session->get('_profiler_search_url'));
-            $start = $request->query->get('start', $session->get('_profiler_search_start'));
-            $end = $request->query->get('end', $session->get('_profiler_search_end'));
-            $limit = $request->query->get('limit', $session->get('_profiler_search_limit'));
-            $token = $request->query->get('token', $session->get('_profiler_search_token'));
         }
 
         return new Response(
             $this->twig->render('@WebProfiler/Profiler/search.html.twig', [
-                'token' => $token,
-                'ip' => $ip,
-                'method' => $method,
-                'status_code' => $statusCode,
-                'url' => $url,
-                'start' => $start,
-                'end' => $end,
-                'limit' => $limit,
+                'token' => $request->query->get('token', $session?->get('_profiler_search_token')),
+                'ip' => $request->query->get('ip', $session?->get('_profiler_search_ip')),
+                'method' => $request->query->get('method', $session?->get('_profiler_search_method')),
+                'status_code' => $request->query->get('status_code', $session?->get('_profiler_search_status_code')),
+                'url' => $request->query->get('url', $session?->get('_profiler_search_url')),
+                'start' => $request->query->get('start', $session?->get('_profiler_search_start')),
+                'end' => $request->query->get('end', $session?->get('_profiler_search_end')),
+                'limit' => $request->query->get('limit', $session?->get('_profiler_search_limit')),
                 'request' => $request,
+                'render_hidden_by_default' => false,
+                'profile_type' => $request->query->get('type', $session?->get('_profiler_search_type', 'request')),
             ]),
             200,
             ['Content-Type' => 'text/html']
@@ -224,9 +212,7 @@ class ProfilerController
     {
         $this->denyAccessIfProfilerDisabled();
 
-        if (null !== $this->cspHandler) {
-            $this->cspHandler->disableCsp();
-        }
+        $this->cspHandler?->disableCsp();
 
         $profile = $this->profiler->loadProfile($token);
 
@@ -237,12 +223,13 @@ class ProfilerController
         $start = $request->query->get('start', null);
         $end = $request->query->get('end', null);
         $limit = $request->query->get('limit');
+        $profileType = $request->query->get('type', 'request');
 
         return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/results.html.twig', [
             'request' => $request,
             'token' => $token,
             'profile' => $profile,
-            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode),
+            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode, fn ($profile) => $profileType === $profile['virtual_type']),
             'ip' => $ip,
             'method' => $method,
             'status_code' => $statusCode,
@@ -251,6 +238,7 @@ class ProfilerController
             'end' => $end,
             'limit' => $limit,
             'panel' => null,
+            'profile_type' => $profileType,
         ]);
     }
 
@@ -271,8 +259,9 @@ class ProfilerController
         $end = $request->query->get('end', null);
         $limit = $request->query->get('limit');
         $token = $request->query->get('token');
+        $profileType = $request->query->get('type', 'request');
 
-        if ($request->hasSession()) {
+        if (!$request->attributes->getBoolean('_stateless') && $request->hasSession()) {
             $session = $request->getSession();
 
             $session->set('_profiler_search_ip', $ip);
@@ -283,13 +272,14 @@ class ProfilerController
             $session->set('_profiler_search_end', $end);
             $session->set('_profiler_search_limit', $limit);
             $session->set('_profiler_search_token', $token);
+            $session->set('_profiler_search_type', $profileType);
         }
 
         if (!empty($token)) {
             return new RedirectResponse($this->generator->generate('_profiler', ['token' => $token]), 302, ['Content-Type' => 'text/html']);
         }
 
-        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode);
+        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode, fn ($profile) => $profileType === $profile['virtual_type']);
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', [
             'token' => $tokens ? $tokens[0]['token'] : 'empty',
@@ -300,6 +290,7 @@ class ProfilerController
             'start' => $start,
             'end' => $end,
             'limit' => $limit,
+            'type' => $profileType,
         ]), 302, ['Content-Type' => 'text/html']);
     }
 
@@ -312,15 +303,57 @@ class ProfilerController
     {
         $this->denyAccessIfProfilerDisabled();
 
-        if (null !== $this->cspHandler) {
-            $this->cspHandler->disableCsp();
-        }
+        $this->cspHandler?->disableCsp();
 
         ob_start();
         phpinfo();
         $phpinfo = ob_get_clean();
 
         return new Response($phpinfo, 200, ['Content-Type' => 'text/html']);
+    }
+
+    /**
+     * Displays the Xdebug info.
+     *
+     * @throws NotFoundHttpException
+     */
+    public function xdebugAction(): Response
+    {
+        $this->denyAccessIfProfilerDisabled();
+
+        if (!\function_exists('xdebug_info')) {
+            throw new NotFoundHttpException('Xdebug must be installed in version 3.');
+        }
+
+        $this->cspHandler?->disableCsp();
+
+        ob_start();
+        xdebug_info();
+        $xdebugInfo = ob_get_clean();
+
+        return new Response($xdebugInfo, 200, ['Content-Type' => 'text/html']);
+    }
+
+    /**
+     * Returns the custom web fonts used in the profiler.
+     *
+     * @throws NotFoundHttpException
+     */
+    public function fontAction(string $fontName): Response
+    {
+        $this->denyAccessIfProfilerDisabled();
+        if ('JetBrainsMono' !== $fontName) {
+            throw new NotFoundHttpException(sprintf('Font file "%s.woff2" not found.', $fontName));
+        }
+
+        $fontFile = \dirname(__DIR__).'/Resources/fonts/'.$fontName.'.woff2';
+        if (!is_file($fontFile) || !is_readable($fontFile)) {
+            throw new NotFoundHttpException(sprintf('Cannot read font file "%s".', $fontFile));
+        }
+
+        $this->profiler?->disable();
+
+        return new BinaryFileResponse($fontFile, 200, ['Content-Type' => 'font/woff2']);
     }
 
     /**
@@ -334,9 +367,7 @@ class ProfilerController
             throw new NotFoundHttpException('The base dir should be set.');
         }
 
-        if ($this->profiler) {
-            $this->profiler->disable();
-        }
+        $this->profiler?->disable();
 
         $file = $request->query->get('file');
         $line = $request->query->get('line');
@@ -348,25 +379,18 @@ class ProfilerController
         }
 
         return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/open.html.twig', [
-            'filename' => $filename,
+            'file_info' => new \SplFileInfo($filename),
             'file' => $file,
             'line' => $line,
         ]);
     }
 
-    /**
-     * Gets the Template Manager.
-     */
     protected function getTemplateManager(): TemplateManager
     {
-        if (null === $this->templateManager) {
-            $this->templateManager = new TemplateManager($this->profiler, $this->twig, $this->templates);
-        }
-
-        return $this->templateManager;
+        return $this->templateManager ??= new TemplateManager($this->profiler, $this->twig, $this->templates);
     }
 
-    private function denyAccessIfProfilerDisabled()
+    private function denyAccessIfProfilerDisabled(): void
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');

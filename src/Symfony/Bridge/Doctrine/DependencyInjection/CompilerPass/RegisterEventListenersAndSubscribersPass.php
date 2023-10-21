@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -29,34 +30,35 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
-    private $connections;
-    private $eventManagers;
-    private $managerTemplate;
-    private $tagPrefix;
+    private array $connections;
 
     /**
-     * @param string $connections     Parameter ID for connections
+     * @var array<string, Definition>
+     */
+    private array $eventManagers = [];
+
+    /**
      * @param string $managerTemplate sprintf() template for generating the event
      *                                manager's service ID for a connection name
      * @param string $tagPrefix       Tag prefix for listeners and subscribers
      */
-    public function __construct(string $connections, string $managerTemplate, string $tagPrefix)
-    {
-        $this->connections = $connections;
-        $this->managerTemplate = $managerTemplate;
-        $this->tagPrefix = $tagPrefix;
+    public function __construct(
+        private readonly string $connectionsParameter,
+        private readonly string $managerTemplate,
+        private readonly string $tagPrefix,
+    ) {
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasParameter($this->connections)) {
+        if (!$container->hasParameter($this->connectionsParameter)) {
             return;
         }
 
-        $this->connections = $container->getParameter($this->connections);
+        $this->connections = $container->getParameter($this->connectionsParameter);
         $listenerRefs = $this->addTaggedServices($container);
 
         // replace service container argument of event managers with smaller service locator
@@ -72,7 +74,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         $listenerTag = $this->tagPrefix.'.event_listener';
         $subscriberTag = $this->tagPrefix.'.event_subscriber';
         $listenerRefs = [];
-        $taggedServices = $this->findAndSortTags([$subscriberTag, $listenerTag], $container);
+        $taggedServices = $this->findAndSortTags($subscriberTag, $listenerTag, $container);
 
         $managerDefs = [];
         foreach ($taggedServices as $taggedSubscriber) {
@@ -103,6 +105,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                     $refs = $managerDef->getArguments()[1] ?? [];
                     $listenerRefs[$con][$id] = new Reference($id);
                     if ($subscriberTag === $tagName) {
+                        trigger_deprecation('symfony/doctrine-bridge', '6.3', 'Registering "%s" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.', $id);
                         $refs[] = $id;
                     } else {
                         $refs[] = [[$tag['event']], $id];
@@ -121,7 +124,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         return $listenerRefs;
     }
 
-    private function getEventManagerDef(ContainerBuilder $container, string $name)
+    private function getEventManagerDef(ContainerBuilder $container, string $name): Definition
     {
         if (!isset($this->eventManagers[$name])) {
             $this->eventManagers[$name] = $container->getDefinition(sprintf($this->managerTemplate, $name));
@@ -140,12 +143,17 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      * @see https://bugs.php.net/53710
      * @see https://bugs.php.net/60926
      */
-    private function findAndSortTags(array $tagNames, ContainerBuilder $container): array
+    private function findAndSortTags(string $subscriberTag, string $listenerTag, ContainerBuilder $container): array
     {
         $sortedTags = [];
+        $taggedIds = [
+            $subscriberTag => $container->findTaggedServiceIds($subscriberTag, true),
+            $listenerTag => $container->findTaggedServiceIds($listenerTag, true),
+        ];
+        $taggedIds[$subscriberTag] = array_diff_key($taggedIds[$subscriberTag], $taggedIds[$listenerTag]);
 
-        foreach ($tagNames as $tagName) {
-            foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tags) {
+        foreach ($taggedIds as $tagName => $serviceIds) {
+            foreach ($serviceIds as $serviceId => $tags) {
                 foreach ($tags as $attributes) {
                     $priority = $attributes['priority'] ?? 0;
                     $sortedTags[$priority][] = [$tagName, $serviceId, $attributes];
@@ -153,11 +161,8 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             }
         }
 
-        if ($sortedTags) {
-            krsort($sortedTags);
-            $sortedTags = array_merge(...$sortedTags);
-        }
+        krsort($sortedTags);
 
-        return $sortedTags;
+        return array_merge(...$sortedTags);
     }
 }

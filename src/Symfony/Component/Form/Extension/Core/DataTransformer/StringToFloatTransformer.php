@@ -14,21 +14,19 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @implements DataTransformerInterface<numeric-string, float>
+ */
 class StringToFloatTransformer implements DataTransformerInterface
 {
-    private $scale;
+    private ?int $scale;
 
     public function __construct(int $scale = null)
     {
         $this->scale = $scale;
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return float|null
-     */
-    public function transform($value)
+    public function transform(mixed $value): ?float
     {
         if (null === $value) {
             return null;
@@ -41,12 +39,7 @@ class StringToFloatTransformer implements DataTransformerInterface
         return (float) $value;
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return string|null
-     */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): ?string
     {
         if (null === $value) {
             return null;

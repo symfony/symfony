@@ -35,17 +35,17 @@ class Connection
     ];
 
     /**
-     * Available options:
+     * Available options:.
      *
      * * tube_name: name of the tube
      * * timeout: message reservation timeout (in seconds)
      * * ttr: the message time to run before it is put back in the ready queue (in seconds)
      */
-    private $configuration;
-    private $client;
-    private $tube;
-    private $timeout;
-    private $ttr;
+    private array $configuration;
+    private PheanstalkInterface $client;
+    private string $tube;
+    private int $timeout;
+    private int $ttr;
 
     public function __construct(array $configuration, PheanstalkInterface $client)
     {
@@ -56,10 +56,10 @@ class Connection
         $this->ttr = $this->configuration['ttr'];
     }
 
-    public static function fromDsn(string $dsn, array $options = []): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = []): self
     {
         if (false === $components = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Beanstalkd DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException('The given Beanstalkd DSN is invalid.');
         }
 
         $connectionCredentials = [

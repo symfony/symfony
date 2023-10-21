@@ -21,11 +21,11 @@ class ReturnTyped
         return 'It doesn\'t respect the return type on purpose';
     }
 
-    public function addFoo(\DateTime $dateTime)
+    public function addFoo(\DateTimeImmutable $dateTime)
     {
     }
 
-    public function removeFoo(\DateTime $dateTime)
+    public function removeFoo(\DateTimeImmutable $dateTime)
     {
     }
 

@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -38,35 +38,24 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        ];
-    }
-
     /**
      * Gets the public 'bar' shared service.
      *
      * @return \BarClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        $this->services['bar'] = $instance = new \BarClass();
+        $container->services['bar'] = $instance = new \BarClass();
 
-        $instance->setBaz($this->parameters['array_1'], $this->parameters['array_2'], '%array_1%', $this->parameters['array_1']);
+        $instance->setBaz($container->parameters['array_1'], $container->parameters['array_2'], '%array_1%', $container->parameters['array_1']);
 
         return $instance;
     }
 
-    /**
-     * @return array|bool|float|int|string|\UnitEnum|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new ParameterNotFoundException($name);
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -87,7 +76,7 @@ class ProjectServiceContainer extends Container
 
     public function getParameterBag(): ParameterBagInterface
     {
-        if (null === $this->parameterBag) {
+        if (!isset($this->parameterBag)) {
             $parameters = $this->parameters;
             foreach ($this->loadedDynamicParameters as $name => $loaded) {
                 $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -103,7 +92,7 @@ class ProjectServiceContainer extends Container
 
     private function getDynamicParameter(string $name)
     {
-        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
+        throw new ParameterNotFoundException($name);
     }
 
     protected function getDefaultParameters(): array

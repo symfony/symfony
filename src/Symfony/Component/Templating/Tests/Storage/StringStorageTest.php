@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\StringStorage;
 
+/**
+ * @group legacy
+ */
 class StringStorageTest extends TestCase
 {
     public function testGetContent()

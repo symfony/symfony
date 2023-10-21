@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="bar1" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" autowire="true">
+            <bind key="$foo" type="collection">
+                <bind>item.1</bind>
+                <bind>item.2</bind>
+            </bind>
+        </service>
+        <service id="bar2" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" autowire="true">
+            <bind key="$foo" type="collection">
+                <bind>item.1</bind>
+                <bind>item.2</bind>
+            </bind>
+        </service>
+        <service id="bar3" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" autowire="true">
+            <bind key="$foo" type="collection">
+                <bind>item.1</bind>
+                <bind>item.2</bind>
+                <bind>item.3</bind>
+                <bind>item.4</bind>
+            </bind>
+        </service>
+        <service id="bar4" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" autowire="true">
+            <bind key="$foo" type="collection">
+                <bind>item.1</bind>
+                <bind>item.2</bind>
+                <bind key="1">item.3</bind>
+                <bind>item.4</bind>
+            </bind>
+        </service>
+        <service id="bar5" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" autowire="true">
+            <bind key="$foo" type="collection">
+                <bind>item.1</bind>
+                <bind>item.2</bind>
+                <bind type="collection">
+                    <bind>item.3.1</bind>
+                    <bind>item.3.2</bind>
+                </bind>
+            </bind>
+        </service>
+        <service id="bar6" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" autowire="true">
+            <bind key="$foo" type="collection">
+                <bind>item.1</bind>
+                <bind type="collection">
+                    <bind>item.2.1</bind>
+                    <bind>item.2.2</bind>
+                </bind>
+                <bind>item.3</bind>
+            </bind>
+        </service>
+        <service id="bar7" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" autowire="true">
+            <bind key="$foo" type="iterator">
+                <bind>item.1</bind>
+                <bind>item.2</bind>
+            </bind>
+        </service>
+        <service id="bar8" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" autowire="true">
+            <bind key="$foo" type="iterator">
+                <bind>item.1</bind>
+                <bind>item.2</bind>
+                <bind type="collection">
+                    <bind>item.3.1</bind>
+                    <bind>item.3.2</bind>
+                </bind>
+            </bind>
+        </service>
+    </services>
+</container>

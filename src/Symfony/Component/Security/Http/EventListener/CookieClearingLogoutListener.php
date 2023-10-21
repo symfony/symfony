@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
  */
 class CookieClearingLogoutListener implements EventSubscriberInterface
 {
-    private $cookies;
+    private array $cookies;
 
     /**
      * @param array $cookies An array of cookies (keys are names, values contain path and domain) to unset

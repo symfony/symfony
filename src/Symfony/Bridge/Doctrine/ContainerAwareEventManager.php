@@ -28,29 +28,23 @@ class ContainerAwareEventManager extends EventManager
      *
      * <event> => <listeners>
      */
-    private $listeners = [];
-    private $subscribers;
-    private $initialized = [];
-    private $initializedSubscribers = false;
-    private $initializedHashMapping = [];
-    private $methods = [];
-    private $container;
+    private array $listeners = [];
+    private array $initialized = [];
+    private bool $initializedSubscribers = false;
+    private array $initializedHashMapping = [];
+    private array $methods = [];
+    private ContainerInterface $container;
 
     /**
-     * @param list<string|EventSubscriber|array{string[], string|object}> $subscriberIds List of subscribers, subscriber ids, or [events, listener] tuples
+     * @param list<array{string[], string|object}> $listeners List of [events, listener] tuples
      */
-    public function __construct(ContainerInterface $container, array $subscriberIds = [])
+    public function __construct(ContainerInterface $container, array $listeners = [])
     {
         $this->container = $container;
-        $this->subscribers = $subscriberIds;
+        $this->listeners = $listeners;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return void
-     */
-    public function dispatchEvent($eventName, EventArgs $eventArgs = null)
+    public function dispatchEvent($eventName, EventArgs $eventArgs = null): void
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -59,7 +53,7 @@ class ContainerAwareEventManager extends EventManager
             return;
         }
 
-        $eventArgs = $eventArgs ?? EventArgs::getEmptyInstance();
+        $eventArgs ??= EventArgs::getEmptyInstance();
 
         if (!isset($this->initialized[$eventName])) {
             $this->initializeListeners($eventName);
@@ -70,14 +64,11 @@ class ContainerAwareEventManager extends EventManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return object[][]
-     */
-    public function getListeners($event = null)
+    public function getListeners($event = null): array
     {
         if (null === $event) {
+            trigger_deprecation('symfony/doctrine-bridge', '6.2', 'Calling "%s()" without an event name is deprecated. Call "getAllListeners()" instead.', __METHOD__);
+
             return $this->getAllListeners();
         }
         if (!$this->initializedSubscribers) {
@@ -105,12 +96,7 @@ class ContainerAwareEventManager extends EventManager
         return $this->listeners;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return bool
-     */
-    public function hasListeners($event)
+    public function hasListeners($event): bool
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -119,12 +105,7 @@ class ContainerAwareEventManager extends EventManager
         return isset($this->listeners[$event]) && $this->listeners[$event];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return void
-     */
-    public function addEventListener($events, $listener)
+    public function addEventListener($events, $listener): void
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -146,12 +127,7 @@ class ContainerAwareEventManager extends EventManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return void
-     */
-    public function removeEventListener($events, $listener)
+    public function removeEventListener($events, $listener): void
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -194,7 +170,7 @@ class ContainerAwareEventManager extends EventManager
         parent::removeEventSubscriber($subscriber);
     }
 
-    private function initializeListeners(string $eventName)
+    private function initializeListeners(string $eventName): void
     {
         $this->initialized[$eventName] = true;
 
@@ -218,26 +194,26 @@ class ContainerAwareEventManager extends EventManager
         $this->listeners[$eventName] = $listeners;
     }
 
-    private function initializeSubscribers()
+    private function initializeSubscribers(): void
     {
         $this->initializedSubscribers = true;
-        foreach ($this->subscribers as $subscriber) {
-            if (\is_array($subscriber)) {
-                $this->addEventListener(...$subscriber);
+        $listeners = $this->listeners;
+        $this->listeners = [];
+        foreach ($listeners as $listener) {
+            if (\is_array($listener)) {
+                $this->addEventListener(...$listener);
                 continue;
             }
-            if (\is_string($subscriber)) {
-                $subscriber = $this->container->get($subscriber);
+            if (\is_string($listener)) {
+                $listener = $this->container->get($listener);
             }
-            parent::addEventSubscriber($subscriber);
+            // throw new \InvalidArgumentException(sprintf('Using Doctrine subscriber "%s" is not allowed, declare it as a listener instead.', \is_object($listener) ? $listener::class : $listener));
+            trigger_deprecation('symfony/doctrine-bridge', '6.3', 'Registering "%s" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.', \is_object($listener) ? get_debug_type($listener) : $listener);
+            parent::addEventSubscriber($listener);
         }
-        $this->subscribers = [];
     }
 
-    /**
-     * @param string|object $listener
-     */
-    private function getHash($listener): string
+    private function getHash(string|object $listener): string
     {
         if (\is_string($listener)) {
             return '_service_'.$listener;

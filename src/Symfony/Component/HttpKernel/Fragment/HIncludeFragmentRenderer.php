@@ -13,8 +13,8 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
-use Symfony\Component\HttpKernel\UriSigner;
 use Twig\Environment;
 
 /**
@@ -24,10 +24,10 @@ use Twig\Environment;
  */
 class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {
-    private $globalDefaultTemplate;
-    private $signer;
-    private $twig;
-    private $charset;
+    private ?string $globalDefaultTemplate;
+    private ?UriSigner $signer;
+    private ?Environment $twig;
+    private string $charset;
 
     /**
      * @param string|null $globalDefaultTemplate The global default content (it can be a template name or the content)
@@ -42,24 +42,20 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 
     /**
      * Checks if a templating engine has been set.
-     *
-     * @return bool
      */
-    public function hasTemplating()
+    public function hasTemplating(): bool
     {
         return null !== $this->twig;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Additional available options:
      *
      *  * default:    The default content (it can be a template name or the content)
      *  * id:         An optional hx:include tag id attribute
      *  * attributes: An optional array of hx:include tag attributes
      */
-    public function render($uri, Request $request, array $options = [])
+    public function render(string|ControllerReference $uri, Request $request, array $options = []): Response
     {
         if ($uri instanceof ControllerReference) {
             $uri = (new FragmentUriGenerator($this->fragmentPath, $this->signer))->generate($uri, $request);
@@ -94,10 +90,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         return new Response(sprintf('<hx:include src="%s"%s>%s</hx:include>', $uri, $renderedAttributes, $content));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'hinclude';
     }

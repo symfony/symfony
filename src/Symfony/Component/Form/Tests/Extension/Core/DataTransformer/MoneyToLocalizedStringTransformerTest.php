@@ -18,8 +18,8 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class MoneyToLocalizedStringTransformerTest extends TestCase
 {
-    private $previousLocale;
-    private $defaultLocale;
+    private string|false $previousLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {

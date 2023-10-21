@@ -23,9 +23,14 @@ class IdenticalTo extends AbstractComparison
 {
     public const NOT_IDENTICAL_ERROR = '2a8cc50f-58a2-4536-875e-060a2ce69ed5';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NOT_IDENTICAL_ERROR => 'NOT_IDENTICAL_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This value should be identical to {{ compared_value_type }} {{ compared_value }}.';
 }

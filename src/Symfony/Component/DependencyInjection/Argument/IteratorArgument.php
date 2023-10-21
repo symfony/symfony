@@ -18,5 +18,23 @@ namespace Symfony\Component\DependencyInjection\Argument;
  */
 class IteratorArgument implements ArgumentInterface
 {
-    use ReferenceSetArgumentTrait;
+    private array $values;
+
+    public function __construct(array $values)
+    {
+        $this->setValues($values);
+    }
+
+    public function getValues(): array
+    {
+        return $this->values;
+    }
+
+    /**
+     * @return void
+     */
+    public function setValues(array $values)
+    {
+        $this->values = $values;
+    }
 }

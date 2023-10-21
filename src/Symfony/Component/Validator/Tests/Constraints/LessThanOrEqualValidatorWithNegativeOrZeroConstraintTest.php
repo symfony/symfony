@@ -26,9 +26,6 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
         return new NegativeOrZero();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -40,9 +37,6 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [

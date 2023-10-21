@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ExpressionLanguage;
 
+use Symfony\Component\ExpressionLanguage\Node\Node;
+
 /**
  * Represents an already parsed expression.
  *
@@ -18,7 +20,7 @@ namespace Symfony\Component\ExpressionLanguage;
  */
 class SerializedParsedExpression extends ParsedExpression
 {
-    private $nodes;
+    private string $nodes;
 
     /**
      * @param string $expression An expression
@@ -30,6 +32,9 @@ class SerializedParsedExpression extends ParsedExpression
         $this->nodes = $nodes;
     }
 
+    /**
+     * @return Node
+     */
     public function getNodes()
     {
         return unserialize($this->nodes);

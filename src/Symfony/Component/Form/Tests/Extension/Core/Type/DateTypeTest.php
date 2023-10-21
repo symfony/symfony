@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -19,10 +20,12 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateTypeTest extends BaseTypeTestCase
 {
+    use ExpectDeprecationTrait;
+
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
 
-    private $defaultTimezone;
-    private $defaultLocale;
+    private string $defaultTimezone;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -50,6 +53,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'input' => 'fake_input',
+            'widget' => 'choice',
         ]);
     }
 
@@ -379,6 +383,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => $format,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -416,6 +421,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [6, 7],
             'format' => 'yy',
+            'widget' => 'choice',
         ]);
     }
 
@@ -435,6 +441,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => 105,
+            'widget' => 'choice',
         ]);
     }
 
@@ -443,6 +450,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => [],
+            'widget' => 'choice',
         ]);
     }
 
@@ -451,6 +459,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'years' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 
@@ -459,6 +468,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'months' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 
@@ -467,6 +477,7 @@ class DateTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'days' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 
@@ -523,6 +534,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'years' => [2010, 2011],
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -539,6 +551,7 @@ class DateTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [6, 7],
             'format' => \IntlDateFormatter::SHORT,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -559,6 +572,7 @@ class DateTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [1, 4],
             'format' => 'dd.MMM.yy',
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -579,6 +593,7 @@ class DateTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [1, 4],
             'format' => 'dd.MMMM.yy',
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -598,6 +613,7 @@ class DateTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [1, 4],
             'format' => 'dd.MMMM.yy',
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -612,6 +628,7 @@ class DateTypeTest extends BaseTypeTestCase
         \Locale::setDefault('en');
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'days' => [6, 7],
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -640,7 +657,7 @@ class DateTypeTest extends BaseTypeTestCase
 
     public function testIsSynchronizedReturnsTrueIfChoiceAndCompletelyFilled()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, new \DateTime(), [
+        $form = $this->factory->create(static::TESTED_TYPE, new \DateTime('now', new \DateTimeZone('UTC')), [
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'choice',
@@ -679,7 +696,7 @@ class DateTypeTest extends BaseTypeTestCase
 
         \Locale::setDefault('de_AT');
 
-        $view = $this->factory->create(static::TESTED_TYPE)
+        $view = $this->factory->create(static::TESTED_TYPE, null, ['widget' => 'choice'])
             ->createView();
 
         $this->assertSame('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
@@ -694,6 +711,7 @@ class DateTypeTest extends BaseTypeTestCase
 
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::LONG,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -704,6 +722,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => 'MMyyyydd',
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -714,6 +733,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => 'MM*yyyy*dd',
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -740,6 +760,7 @@ class DateTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             // EEEE, d 'de' MMMM 'de' y
             'format' => \IntlDateFormatter::FULL,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -760,7 +781,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime()));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime(), ['widget' => 'choice']));
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()
@@ -777,6 +798,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => false,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -789,6 +811,7 @@ class DateTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => true,
+            'widget' => 'choice',
         ])
             ->createView();
 
@@ -800,6 +823,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassPlaceholderAsString()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'placeholder' => 'Empty',
         ])
             ->createView();
@@ -812,6 +836,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassPlaceholderAsArray()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'placeholder' => [
                 'year' => 'Empty year',
                 'month' => 'Empty month',
@@ -828,6 +853,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'required' => false,
             'placeholder' => [
                 'year' => 'Empty year',
@@ -844,6 +870,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'required' => true,
             'placeholder' => [
                 'year' => 'Empty year',
@@ -956,6 +983,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testYears()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'years' => [1900, 2000, 2040],
         ])
             ->createView();
@@ -970,7 +998,7 @@ class DateTypeTest extends BaseTypeTestCase
 
     public function testPassDefaultChoiceTranslationDomain()
     {
-        $form = $this->factory->create(static::TESTED_TYPE);
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['widget' => 'choice']);
 
         $view = $form->createView();
         $this->assertFalse($view['year']->vars['choice_translation_domain']);
@@ -981,6 +1009,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassChoiceTranslationDomainAsString()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'choice_translation_domain' => 'messages',
         ]);
 
@@ -993,6 +1022,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testPassChoiceTranslationDomainAsArray()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'choice_translation_domain' => [
                 'year' => 'foo',
                 'day' => 'test',
@@ -1025,6 +1055,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testSubmitNullUsesDefaultEmptyData($emptyData = [], $expectedData = null)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
             'empty_data' => $emptyData,
         ]);
         $form->submit(null);
@@ -1057,9 +1088,7 @@ class DateTypeTest extends BaseTypeTestCase
     public static function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i:s', '2018-11-11 00:00:00');
-        $lazyEmptyData = static function (FormInterface $form) {
-            return $form->getConfig()->getCompound() ? ['year' => '2018', 'month' => '11', 'day' => '11'] : '2018-11-11';
-        };
+        $lazyEmptyData = static fn (FormInterface $form) => $form->getConfig()->getCompound() ? ['year' => '2018', 'month' => '11', 'day' => '11'] : '2018-11-11';
 
         return [
             'Simple field' => ['single_text', '2018-11-11', $expectedData],
@@ -1084,5 +1113,39 @@ class DateTypeTest extends BaseTypeTestCase
         $form->submit('2018-01-14');
 
         $this->assertSame('14/01/2018', $form->getData());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDateTimeInputTimezoneNotMatchingModelTimezone()
+    {
+        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
+        // $this->expectException(LogicException::class);
+        // $this->expectExceptionMessage('Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+
+        $this->factory->create(static::TESTED_TYPE, new \DateTime('now', new \DateTimeZone('UTC')), [
+            'model_timezone' => 'Europe/Berlin',
+        ]);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDateTimeImmutableInputTimezoneNotMatchingModelTimezone()
+    {
+        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
+        // $this->expectException(LogicException::class);
+        // $this->expectExceptionMessage('Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+
+        $this->factory->create(static::TESTED_TYPE, new \DateTimeImmutable('now', new \DateTimeZone('UTC')), [
+            'input' => 'datetime_immutable',
+            'model_timezone' => 'Europe/Berlin',
+        ]);
+    }
+
+    protected function getTestOptions(): array
+    {
+        return ['widget' => 'choice'];
     }
 }

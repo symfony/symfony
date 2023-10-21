@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\LogicException;
@@ -20,6 +21,8 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class TimeTypeTest extends BaseTypeTestCase
 {
+    use ExpectDeprecationTrait;
+
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimeType';
 
     public function testSubmitDateTime()
@@ -28,6 +31,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'datetime',
+            'widget' => 'choice',
         ]);
 
         $input = [
@@ -49,6 +53,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'datetime_immutable',
+            'widget' => 'choice',
         ]);
 
         $input = [
@@ -71,6 +76,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'string',
+            'widget' => 'choice',
         ]);
 
         $input = [
@@ -106,6 +112,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'timestamp',
+            'widget' => 'choice',
         ]);
 
         $input = [
@@ -127,6 +134,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'array',
+            'widget' => 'choice',
         ]);
 
         $input = [
@@ -288,6 +296,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'input' => 'datetime',
             'with_seconds' => true,
             'reference_date' => new \DateTimeImmutable('2019-01-01', new \DateTimeZone('UTC')),
+            'widget' => 'choice',
         ]);
         $form->setData(new \DateTime('2022-01-01 15:09:10', new \DateTimeZone('UTC')));
 
@@ -307,6 +316,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'input' => 'datetime',
             'with_seconds' => true,
             'reference_date' => new \DateTimeImmutable('2019-07-12', new \DateTimeZone('UTC')),
+            'widget' => 'choice',
         ]);
         $form->setData(new \DateTime('2022-04-29 15:09:10', new \DateTimeZone('UTC')));
 
@@ -358,6 +368,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'input' => 'datetime',
             'with_seconds' => true,
             'reference_date' => new \DateTimeImmutable('2019-01-01', new \DateTimeZone('UTC')),
+            'widget' => 'choice',
         ]);
         $form->submit([
             'hour' => '16',
@@ -376,6 +387,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'input' => 'datetime',
             'with_seconds' => true,
             'reference_date' => new \DateTimeImmutable('2019-07-12', new \DateTimeZone('UTC')),
+            'widget' => 'choice',
         ]);
         $form->submit([
             'hour' => '16',
@@ -456,6 +468,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'view_timezone' => 'UTC',
             'input' => 'datetime',
             'with_minutes' => false,
+            'widget' => 'choice',
         ]);
 
         $form->setData(new \DateTime('03:04:05 UTC'));
@@ -470,6 +483,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'view_timezone' => 'UTC',
             'input' => 'datetime',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $form->setData(new \DateTime('03:04:05 UTC'));
@@ -485,6 +499,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'input' => 'string',
             'with_seconds' => true,
             'reference_date' => new \DateTimeImmutable('2013-01-01 00:00:00', new \DateTimeZone('America/New_York')),
+            'widget' => 'choice',
         ]);
 
         $dateTime = new \DateTime('2013-01-01 12:04:05');
@@ -512,6 +527,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'input' => 'datetime',
             'with_seconds' => true,
             'reference_date' => new \DateTimeImmutable('now', new \DateTimeZone('America/New_York')),
+            'widget' => 'choice',
         ]);
 
         $dateTime = new \DateTime('12:04:05');
@@ -540,6 +556,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'input' => 'datetime',
             'with_seconds' => true,
             'reference_date' => new \DateTimeImmutable('2019-07-12', new \DateTimeZone('UTC')),
+            'widget' => 'choice',
         ]);
 
         $form->setData(new \DateTime('2019-07-24 14:09:10', new \DateTimeZone('UTC')));
@@ -557,6 +574,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'view_timezone' => 'Europe/Berlin',
             'input' => 'datetime',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $form->setData(new \DateTime('2019-07-24 14:09:10', new \DateTimeZone('UTC')));
@@ -568,6 +586,7 @@ class TimeTypeTest extends BaseTypeTestCase
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'hours' => [6, 7],
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -582,6 +601,7 @@ class TimeTypeTest extends BaseTypeTestCase
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'minutes' => [6, 7],
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -597,6 +617,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'seconds' => [6, 7],
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -733,7 +754,7 @@ class TimeTypeTest extends BaseTypeTestCase
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime()));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime(), ['widget' => 'choice']));
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()
@@ -789,6 +810,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => false,
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -802,6 +824,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => true,
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -815,6 +838,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'placeholder' => 'Empty',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -832,6 +856,7 @@ class TimeTypeTest extends BaseTypeTestCase
                 'second' => 'Empty second',
             ],
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -849,6 +874,7 @@ class TimeTypeTest extends BaseTypeTestCase
                 'second' => 'Empty second',
             ],
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -866,6 +892,7 @@ class TimeTypeTest extends BaseTypeTestCase
                 'second' => 'Empty second',
             ],
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -934,6 +961,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $this->factory->create(static::TESTED_TYPE, null, [
             'with_minutes' => false,
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
     }
 
@@ -942,6 +970,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'hours' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 
@@ -950,6 +979,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'minutes' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 
@@ -958,6 +988,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'seconds' => 'bad value',
+            'widget' => 'choice',
         ]);
     }
 
@@ -968,6 +999,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'model_timezone' => 'UTC',
             'view_timezone' => 'Europe/Berlin',
             'reference_date' => new \DateTimeImmutable('now', new \DateTimeZone('Europe/Berlin')),
+            'widget' => 'choice',
         ]);
     }
 
@@ -976,6 +1008,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'view_timezone' => 'Europe/Berlin',
             'reference_date' => new \DateTimeImmutable('now', new \DateTimeZone('Europe/Berlin')),
+            'widget' => 'choice',
         ]);
 
         $this->assertSame('Europe/Berlin', $form->getConfig()->getOption('model_timezone'));
@@ -985,6 +1018,7 @@ class TimeTypeTest extends BaseTypeTestCase
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'Europe/Berlin',
+            'widget' => 'choice',
         ]);
 
         $this->assertSame('Europe/Berlin', $form->getConfig()->getOption('view_timezone'));
@@ -992,7 +1026,7 @@ class TimeTypeTest extends BaseTypeTestCase
 
     public function testPassDefaultChoiceTranslationDomain()
     {
-        $form = $this->factory->create(static::TESTED_TYPE);
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['widget' => 'choice']);
 
         $view = $form->createView();
         $this->assertFalse($view['hour']->vars['choice_translation_domain']);
@@ -1004,6 +1038,7 @@ class TimeTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_domain' => 'messages',
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -1020,6 +1055,7 @@ class TimeTypeTest extends BaseTypeTestCase
                 'second' => 'test',
             ],
             'with_seconds' => true,
+            'widget' => 'choice',
         ]);
 
         $view = $form->createView();
@@ -1039,6 +1075,7 @@ class TimeTypeTest extends BaseTypeTestCase
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
+            'widget' => 'choice',
         ]);
         $form->submit(null);
 
@@ -1055,6 +1092,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'view_timezone' => 'Europe/Berlin',
             'reference_date' => new \DateTimeImmutable('01-01-2021 12:34:56', new \DateTimeZone('UTC')),
             'input' => 'array',
+            'widget' => 'choice',
         ]);
 
         $input = [
@@ -1082,6 +1120,7 @@ class TimeTypeTest extends BaseTypeTestCase
             'view_timezone' => 'Europe/Berlin',
             'reference_date' => new \DateTimeImmutable('01-05-2021 12:34:56', new \DateTimeZone('UTC')),
             'input' => 'array',
+            'widget' => 'choice',
         ]);
 
         $this->assertSame($input, $form->getData());
@@ -1113,9 +1152,7 @@ class TimeTypeTest extends BaseTypeTestCase
     public static function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '1970-01-01 21:23');
-        $lazyEmptyData = static function (FormInterface $form) {
-            return $form->getConfig()->getCompound() ? ['hour' => '21', 'minute' => '23'] : '21:23';
-        };
+        $lazyEmptyData = static fn (FormInterface $form) => $form->getConfig()->getCompound() ? ['hour' => '21', 'minute' => '23'] : '21:23';
 
         return [
             'Simple field' => ['single_text', '21:23', $expectedData],
@@ -1125,5 +1162,39 @@ class TimeTypeTest extends BaseTypeTestCase
             'Compound text field lazy' => ['text', $lazyEmptyData, $expectedData],
             'Compound choice field lazy' => ['choice', $lazyEmptyData, $expectedData],
         ];
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDateTimeInputTimezoneNotMatchingModelTimezone()
+    {
+        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
+        // $this->expectException(LogicException::class);
+        // $this->expectExceptionMessage('Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+
+        $this->factory->create(static::TESTED_TYPE, new \DateTime('now', new \DateTimeZone('UTC')), [
+            'model_timezone' => 'Europe/Berlin',
+        ]);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDateTimeImmutableInputTimezoneNotMatchingModelTimezone()
+    {
+        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
+        // $this->expectException(LogicException::class);
+        // $this->expectExceptionMessage('Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+
+        $this->factory->create(static::TESTED_TYPE, new \DateTimeImmutable('now', new \DateTimeZone('UTC')), [
+            'input' => 'datetime_immutable',
+            'model_timezone' => 'Europe/Berlin',
+        ]);
+    }
+
+    protected function getTestOptions(): array
+    {
+        return ['widget' => 'choice'];
     }
 }

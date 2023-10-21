@@ -9,8 +9,6 @@
     <xsd:complexType name="config">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="access-decision-manager" type="access_decision_manager" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="encoders" type="encoders" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="encoder" type="encoder" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="password_hashers" type="password_hashers" minOccurs="0" maxOccurs="1" />
             <xsd:element name="password_hasher" type="password_hasher" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="providers" type="providers" minOccurs="0" maxOccurs="1" />
@@ -26,12 +24,6 @@
         <xsd:attribute name="always-authenticate-before-granting" type="xsd:boolean" />
         <xsd:attribute name="erase-credentials" type="xsd:boolean" />
         <xsd:attribute name="enable-authenticator-manager" type="xsd:boolean" />
-    </xsd:complexType>
-
-    <xsd:complexType name="encoders">
-        <xsd:sequence>
-            <xsd:element name="encoder" type="encoder" minOccurs="1" maxOccurs="unbounded" />
-        </xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="password_hashers">
@@ -76,23 +68,6 @@
             <xsd:enumeration value="priority" />
         </xsd:restriction>
     </xsd:simpleType>
-
-    <xsd:complexType name="encoder">
-        <xsd:sequence>
-            <xsd:element name="migrate-from" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:attribute name="class" type="xsd:string" use="required" />
-        <xsd:attribute name="algorithm" type="xsd:string" />
-        <xsd:attribute name="hash-algorithm" type="xsd:string" />
-        <xsd:attribute name="key-length" type="xsd:string" />
-        <xsd:attribute name="ignore-case" type="xsd:boolean" />
-        <xsd:attribute name="encode-as-base64" type="xsd:boolean" />
-        <xsd:attribute name="iterations" type="xsd:string" />
-        <xsd:attribute name="cost" type="xsd:integer" />
-        <xsd:attribute name="memory-cost" type="xsd:string" />
-        <xsd:attribute name="time-cost" type="xsd:string" />
-        <xsd:attribute name="id" type="xsd:string" />
-    </xsd:complexType>
 
     <xsd:complexType name="password_hasher">
         <xsd:sequence>
@@ -165,6 +140,7 @@
             <xsd:element name="form-login" type="form_login" minOccurs="0" maxOccurs="1" />
             <xsd:element name="form-login-ldap" type="form_login_ldap" minOccurs="0" maxOccurs="1" />
             <xsd:element name="guard" type="guard" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="access-token" type="access_token" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-basic" type="http_basic" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-basic-ldap" type="http_basic_ldap" minOccurs="0" maxOccurs="1" />
             <xsd:element name="json-login" type="json_login" minOccurs="0" maxOccurs="1" />
@@ -196,15 +172,17 @@
     </xsd:complexType>
 
     <xsd:complexType name="logout">
-        <xsd:sequence>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="delete-cookie" type="delete_cookie" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
+            <xsd:element name="clear-site-data" type="clear_site_data" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
         <xsd:attribute name="csrf-parameter" type="xsd:string" />
         <xsd:attribute name="csrf-token-generator" type="xsd:string" />
+        <xsd:attribute name="csrf-token-manager" type="xsd:string" />
         <xsd:attribute name="csrf-token-id" type="xsd:string" />
+        <xsd:attribute name="enable-csrf" type="xsd:boolean" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="target" type="xsd:string" />
-        <xsd:attribute name="success-handler" type="xsd:string" />
         <xsd:attribute name="invalidate-session" type="xsd:boolean" />
     </xsd:complexType>
 
@@ -329,6 +307,51 @@
         <xsd:attribute name="provider" type="xsd:string" />
     </xsd:complexType>
 
+    <xsd:complexType name="access_token">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="token-extractor" type="xsd:string" />
+            <xsd:element name="token-handler" type="oidc_token_handler" />
+        </xsd:choice>
+        <xsd:attribute name="token-handler" type="xsd:string" />
+        <xsd:attribute name="realm" type="xsd:string" />
+        <xsd:attribute name="success-handler" type="xsd:string" />
+        <xsd:attribute name="failure-handler" type="xsd:string" />
+        <xsd:attribute name="provider" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="oidc_token_handler">
+        <xsd:sequence>
+            <xsd:choice minOccurs="0" maxOccurs="1">
+                <xsd:element name="oidc-user-info" type="oidc_user_info"></xsd:element>
+                <xsd:element name="oidc" type="oidc"></xsd:element>
+            </xsd:choice>
+        </xsd:sequence>
+        <xsd:attribute name="oidc-user-info" type="xsd:anyURI"></xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="oidc_user_info">
+        <xsd:attribute name="base-uri" type="xsd:anyURI" use="required" />
+        <xsd:attribute name="claim" type="xsd:string" />
+        <xsd:attribute name="client" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="oidc">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="issuers" type="oidc_issuers" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="issuer" type="password_hasher" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="claim" type="xsd:string" />
+        <xsd:attribute name="audience" type="xsd:string" use="required" />
+        <xsd:attribute name="algorithm" type="xsd:string" use="required" />
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="oidc_issuers">
+        <xsd:sequence>
+            <xsd:element name="issuer" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
     <xsd:complexType name="login_throttling">
         <xsd:attribute name="limiter" type="xsd:string" />
         <xsd:attribute name="max-attempts" type="xsd:integer" />
@@ -403,6 +426,7 @@
             <xsd:element name="method" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="role" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="allow-if" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="attribute" type="rule_attribute" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
         <xsd:attribute name="requires-channel" type="xsd:string" />
         <xsd:attribute name="path" type="xsd:string" />
@@ -411,6 +435,7 @@
         <xsd:attribute name="role" type="xsd:string" />
         <xsd:attribute name="methods" type="xsd:string" />
         <xsd:attribute name="allow-if" type="xsd:string" />
+        <xsd:attribute name="route" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="role">
@@ -421,5 +446,23 @@
             </xsd:extension>
         </xsd:simpleContent>
     </xsd:complexType>
+
+    <xsd:complexType name="rule_attribute">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="key" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:simpleType name="clear_site_data">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="*" />
+            <xsd:enumeration value="cache" />
+            <xsd:enumeration value="cookies" />
+            <xsd:enumeration value="storage" />
+            <xsd:enumeration value="executionContexts" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
 </xsd:schema>

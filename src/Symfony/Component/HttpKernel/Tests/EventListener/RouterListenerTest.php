@@ -37,7 +37,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends TestCase
 {
-    private $requestStack;
+    private RequestStack $requestStack;
 
     protected function setUp(): void
     {
@@ -84,12 +84,6 @@ class RouterListenerTest extends TestCase
         $request->attributes->set('_controller', null); // Prevents going in to routing process
 
         return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
-    }
-
-    public function testInvalidMatcher()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        new RouterListener(new \stdClass(), $this->requestStack);
     }
 
     public function testRequestMatcher()
@@ -175,9 +169,7 @@ class RouterListenerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new ValidateRequestListener());
         $dispatcher->addSubscriber(new RouterListener($requestMatcher, $requestStack, new RequestContext()));
-        $dispatcher->addSubscriber(new ErrorListener(function () {
-            return new Response('Exception handled', 400);
-        }));
+        $dispatcher->addSubscriber(new ErrorListener(fn () => new Response('Exception handled', 400)));
 
         $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
 

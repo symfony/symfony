@@ -27,11 +27,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class ZulipTransport extends AbstractTransport
 {
-    private $email;
-    private $token;
-    private $channel;
+    private string $email;
+    private string $token;
+    private string $channel;
 
-    public function __construct(string $email, string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $email, #[\SensitiveParameter] string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->email = $email;
         $this->token = $token;
@@ -59,11 +59,7 @@ final class ZulipTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if (null !== $message->getOptions() && !($message->getOptions() instanceof ZulipOptions)) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, ZulipOptions::class));
-        }
-
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
+        $options = $message->getOptions()?->toArray() ?? [];
         $options['content'] = $message->getSubject();
 
         if (null === $message->getRecipientId() && empty($options['topic'])) {
@@ -81,7 +77,7 @@ final class ZulipTransport extends AbstractTransport
         $endpoint = sprintf('https://%s/api/v1/messages', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
-            'auth_basic' => $this->email.':'.$this->token,
+            'auth_basic' => [$this->email, $this->token],
             'body' => $options,
         ]);
 

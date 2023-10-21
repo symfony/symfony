@@ -15,26 +15,18 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/** @Entity */
 #[Entity]
 class DoubleNameEntity
 {
-    /** @Id @Column(type="integer") */
-    #[Id, Column(type: 'integer')]
-    protected $id;
+    public function __construct(
+        #[Id, Column]
+        protected int $id,
 
-    /** @Column(type="string") */
-    #[Column(type: 'string')]
-    public $name;
+        #[Column]
+        public string $name,
 
-    /** @Column(type="string", nullable=true) */
-    #[Column(type: 'string', nullable: true)]
-    public $name2;
-
-    public function __construct($id, $name, $name2)
-    {
-        $this->id = $id;
-        $this->name = $name;
-        $this->name2 = $name2;
+        #[Column(nullable: true)]
+        public ?string $name2,
+    ) {
     }
 }

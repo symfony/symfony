@@ -32,7 +32,6 @@ class WebDebugToolbarListenerTest extends TestCase
     {
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $m = new \ReflectionMethod($listener, 'injectToolbar');
-        $m->setAccessible(true);
 
         $response = new Response($content);
 

@@ -22,6 +22,8 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStr
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
@@ -48,7 +50,7 @@ class DateTimeType extends AbstractType
     ];
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -79,7 +81,8 @@ class DateTimeType extends AbstractType
             if (self::HTML5_FORMAT === $pattern) {
                 $builder->addViewTransformer(new DateTimeToHtml5LocalDateTimeTransformer(
                     $options['model_timezone'],
-                    $options['view_timezone']
+                    $options['view_timezone'],
+                    $options['with_seconds']
                 ));
             } else {
                 $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
@@ -110,12 +113,10 @@ class DateTimeType extends AbstractType
             ]));
 
             if ($emptyData instanceof \Closure) {
-                $lazyEmptyData = static function ($option) use ($emptyData) {
-                    return static function (FormInterface $form) use ($emptyData, $option) {
-                        $emptyData = $emptyData($form->getParent());
+                $lazyEmptyData = static fn ($option) => static function (FormInterface $form) use ($emptyData, $option) {
+                    $emptyData = $emptyData($form->getParent());
 
-                        return $emptyData[$option] ?? '';
-                    };
+                    return $emptyData[$option] ?? '';
                 };
 
                 $dateOptions['empty_data'] = $lazyEmptyData('date');
@@ -149,16 +150,11 @@ class DateTimeType extends AbstractType
                 $timeOptions['label'] = false;
             }
 
-            if (null !== $options['date_widget']) {
-                $dateOptions['widget'] = $options['date_widget'];
-            }
+            $dateOptions['widget'] = $options['date_widget'] ?? $options['widget'] ?? 'choice';
+            $timeOptions['widget'] = $options['time_widget'] ?? $options['widget'] ?? 'choice';
 
             if (null !== $options['date_label']) {
                 $dateOptions['label'] = $options['date_label'];
-            }
-
-            if (null !== $options['time_widget']) {
-                $timeOptions['widget'] = $options['time_widget'];
             }
 
             if (null !== $options['time_label']) {
@@ -200,10 +196,25 @@ class DateTimeType extends AbstractType
                 new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
             ));
         }
+
+        if (\in_array($options['input'], ['datetime', 'datetime_immutable'], true) && null !== $options['model_timezone']) {
+            $builder->addEventListener(FormEvents::POST_SET_DATA, static function (FormEvent $event) use ($options): void {
+                $date = $event->getData();
+
+                if (!$date instanceof \DateTimeInterface) {
+                    return;
+                }
+
+                if ($date->getTimezone()->getName() !== $options['model_timezone']) {
+                    trigger_deprecation('symfony/form', '6.4', sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is deprecated.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
+                    // throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
+                }
+            });
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -220,30 +231,22 @@ class DateTimeType extends AbstractType
             // adding the HTML attribute step if not already defined.
             // Otherwise the browser will not display and so not send the seconds
             // therefore the value will always be considered as invalid.
-            if ($options['with_seconds'] && !isset($view->vars['attr']['step'])) {
-                $view->vars['attr']['step'] = 1;
+            if (!isset($view->vars['attr']['step'])) {
+                if ($options['with_seconds']) {
+                    $view->vars['attr']['step'] = 1;
+                } elseif (!$options['with_minutes']) {
+                    $view->vars['attr']['step'] = 3600;
+                }
             }
         }
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $compound = function (Options $options) {
-            return 'single_text' !== $options['widget'];
-        };
-
-        // Defaults to the value of "widget"
-        $dateWidget = function (Options $options) {
-            return 'single_text' === $options['widget'] ? null : $options['widget'];
-        };
-
-        // Defaults to the value of "widget"
-        $timeWidget = function (Options $options) {
-            return 'single_text' === $options['widget'] ? null : $options['widget'];
-        };
+        $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 
         $resolver->setDefaults([
             'input' => 'datetime',
@@ -252,8 +255,8 @@ class DateTimeType extends AbstractType
             'format' => self::HTML5_FORMAT,
             'date_format' => null,
             'widget' => null,
-            'date_widget' => $dateWidget,
-            'time_widget' => $timeWidget,
+            'date_widget' => null,
+            'time_widget' => null,
             'with_minutes' => true,
             'with_seconds' => false,
             'html5' => true,
@@ -269,15 +272,9 @@ class DateTimeType extends AbstractType
             'compound' => $compound,
             'date_label' => null,
             'time_label' => null,
-            'empty_data' => function (Options $options) {
-                return $options['compound'] ? [] : '';
-            },
+            'empty_data' => static fn (Options $options) => $options['compound'] ? [] : '',
             'input_format' => 'Y-m-d H:i:s',
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter a valid date and time.';
-            },
+            'invalid_message' => 'Please enter a valid date and time.',
         ]);
 
         // Don't add some defaults in order to preserve the defaults
@@ -322,28 +319,29 @@ class DateTimeType extends AbstractType
 
         $resolver->setAllowedTypes('input_format', 'string');
 
-        $resolver->setNormalizer('date_format', function (Options $options, $dateFormat) {
+        $resolver->setNormalizer('date_format', static function (Options $options, $dateFormat) {
             if (null !== $dateFormat && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
                 throw new LogicException(sprintf('Cannot use the "date_format" option of the "%s" with an HTML5 date.', self::class));
             }
 
             return $dateFormat;
         });
-        $resolver->setNormalizer('date_widget', function (Options $options, $dateWidget) {
-            if (null !== $dateWidget && 'single_text' === $options['widget']) {
-                throw new LogicException(sprintf('Cannot use the "date_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
+        $resolver->setNormalizer('widget', static function (Options $options, $widget) {
+            if ('single_text' === $widget) {
+                if (null !== $options['date_widget']) {
+                    throw new LogicException(sprintf('Cannot use the "date_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
+                }
+                if (null !== $options['time_widget']) {
+                    throw new LogicException(sprintf('Cannot use the "time_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
+                }
+            } elseif (null === $widget && null === $options['date_widget'] && null === $options['time_widget']) {
+                trigger_deprecation('symfony/form', '6.3', 'Not configuring the "widget" option of form type "datetime" is deprecated. It will default to "single_text" in Symfony 7.0.');
+                // return 'single_text';
             }
 
-            return $dateWidget;
+            return $widget;
         });
-        $resolver->setNormalizer('time_widget', function (Options $options, $timeWidget) {
-            if (null !== $timeWidget && 'single_text' === $options['widget']) {
-                throw new LogicException(sprintf('Cannot use the "time_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
-            }
-
-            return $timeWidget;
-        });
-        $resolver->setNormalizer('html5', function (Options $options, $html5) {
+        $resolver->setNormalizer('html5', static function (Options $options, $html5) {
             if ($html5 && self::HTML5_FORMAT !== $options['format']) {
                 throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is enabled.', self::class));
             }
@@ -352,10 +350,7 @@ class DateTimeType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'datetime';
     }

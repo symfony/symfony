@@ -14,26 +14,26 @@ namespace Symfony\Component\Templating\Loader;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
+trigger_deprecation('symfony/templating', '6.4', '"%s" is deprecated since version 6.4 and will be removed in 7.0. Use Twig instead.', LoaderInterface::class);
+
 /**
  * LoaderInterface is the interface all loaders must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.4, use Twig instead
  */
 interface LoaderInterface
 {
     /**
      * Loads a template.
-     *
-     * @return Storage|false
      */
-    public function load(TemplateReferenceInterface $template);
+    public function load(TemplateReferenceInterface $template): Storage|false;
 
     /**
      * Returns true if the template is still fresh.
      *
      * @param int $time The last modification time of the cached template (timestamp)
-     *
-     * @return bool
      */
-    public function isFresh(TemplateReferenceInterface $template, int $time);
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool;
 }

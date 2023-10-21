@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 final class TestPasswordAuthenticatedUser implements PasswordAuthenticatedUserInterface
 {
-    private $password;
+    private ?string $password;
 
     public function __construct(?string $password = null)
     {

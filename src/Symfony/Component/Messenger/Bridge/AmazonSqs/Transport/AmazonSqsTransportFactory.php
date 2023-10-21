@@ -18,25 +18,27 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
+ * @implements TransportFactoryInterface<AmazonSqsTransport>
  */
 class AmazonSqsTransportFactory implements TransportFactoryInterface
 {
-    private $logger;
+    private ?LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger = null)
     {
         $this->logger = $logger;
     }
 
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         unset($options['transport_name']);
 
         return new AmazonSqsTransport(Connection::fromDsn($dsn, $options, null, $this->logger), $serializer);
     }
 
-    public function supports(string $dsn, array $options): bool
+    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
-        return 0 === strpos($dsn, 'sqs://') || preg_match('#^https://sqs\.[\w\-]+\.amazonaws\.com/.+#', $dsn);
+        return str_starts_with($dsn, 'sqs://') || preg_match('#^https://sqs\.[\w\-]+\.amazonaws\.com/.+#', $dsn);
     }
 }

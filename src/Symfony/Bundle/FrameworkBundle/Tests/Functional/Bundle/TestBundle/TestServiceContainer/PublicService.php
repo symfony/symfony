@@ -13,9 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Test
 
 class PublicService
 {
-    private $nonPublicService;
-
-    private $privateService;
+    private NonPublicService $nonPublicService;
+    private PrivateService $privateService;
 
     public function __construct(NonPublicService $nonPublicService, PrivateService $privateService)
     {

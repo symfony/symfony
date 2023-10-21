@@ -17,15 +17,14 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  * This class is used for testing purposes, and is not really suited for production.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @final since Symfony 6.4
  */
 class InMemoryTokenProvider implements TokenProviderInterface
 {
-    private $tokens = [];
+    private array $tokens = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadTokenBySeries(string $series)
+    public function loadTokenBySeries(string $series): PersistentTokenInterface
     {
         if (!isset($this->tokens[$series])) {
             throw new TokenNotFoundException('No token found.');
@@ -35,9 +34,11 @@ class InMemoryTokenProvider implements TokenProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param \DateTimeInterface $lastUsed Accepting only DateTime is deprecated since Symfony 6.4
+     *
+     * @return void
      */
-    public function updateToken(string $series, string $tokenValue, \DateTime $lastUsed)
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
     {
         if (!isset($this->tokens[$series])) {
             throw new TokenNotFoundException('No token found.');
@@ -45,7 +46,7 @@ class InMemoryTokenProvider implements TokenProviderInterface
 
         $token = new PersistentToken(
             $this->tokens[$series]->getClass(),
-            method_exists($this->tokens[$series], 'getUserIdentifier') ? $this->tokens[$series]->getUserIdentifier() : $this->tokens[$series]->getUsername(),
+            $this->tokens[$series]->getUserIdentifier(),
             $series,
             $tokenValue,
             $lastUsed
@@ -54,7 +55,7 @@ class InMemoryTokenProvider implements TokenProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function deleteTokenBySeries(string $series)
     {
@@ -62,7 +63,7 @@ class InMemoryTokenProvider implements TokenProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function createNewToken(PersistentTokenInterface $token)
     {

@@ -21,9 +21,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class JsonValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Json) {
             throw new UnexpectedTypeException($constraint, Json::class);
@@ -33,15 +33,13 @@ class JsonValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
         $value = (string) $value;
 
-        json_decode($value);
-
-        if (\JSON_ERROR_NONE !== json_last_error()) {
+        if (!json_validate($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Json::INVALID_JSON_ERROR)

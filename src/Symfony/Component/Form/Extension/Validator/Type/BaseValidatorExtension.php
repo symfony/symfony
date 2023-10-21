@@ -25,12 +25,12 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 abstract class BaseValidatorExtension extends AbstractTypeExtension
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function configureOptions(OptionsResolver $resolver)
     {
         // Make sure that validation groups end up as null, closure or array
-        $validationGroupsNormalizer = function (Options $options, $groups) {
+        $validationGroupsNormalizer = static function (Options $options, $groups) {
             if (false === $groups) {
                 return [];
             }

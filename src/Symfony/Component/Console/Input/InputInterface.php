@@ -18,15 +18,16 @@ use Symfony\Component\Console\Exception\RuntimeException;
  * InputInterface is the interface implemented by all input classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @method string __toString() Returns a stringified representation of the args passed to the command.
+ *                             InputArguments MUST be escaped as well as the InputOption values passed to the command.
  */
 interface InputInterface
 {
     /**
      * Returns the first argument from the raw parameters (not parsed).
-     *
-     * @return string|null
      */
-    public function getFirstArgument();
+    public function getFirstArgument(): ?string;
 
     /**
      * Returns true if the raw parameters (not parsed) contain a value.
@@ -38,10 +39,8 @@ interface InputInterface
      *
      * @param string|array $values     The values to look for in the raw parameters (can be an array)
      * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
-     *
-     * @return bool
      */
-    public function hasParameterOption($values, bool $onlyParams = false);
+    public function hasParameterOption(string|array $values, bool $onlyParams = false): bool;
 
     /**
      * Returns the value of a raw option (not parsed).
@@ -57,10 +56,12 @@ interface InputInterface
      *
      * @return mixed
      */
-    public function getParameterOption($values, $default = false, bool $onlyParams = false);
+    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.
+     *
+     * @return void
      *
      * @throws RuntimeException
      */
@@ -68,6 +69,8 @@ interface InputInterface
 
     /**
      * Validates the input.
+     *
+     * @return void
      *
      * @throws RuntimeException When not enough arguments are given
      */
@@ -78,7 +81,7 @@ interface InputInterface
      *
      * @return array<string|bool|int|float|array|null>
      */
-    public function getArguments();
+    public function getArguments(): array;
 
     /**
      * Returns the argument value for a given argument name.
@@ -92,25 +95,23 @@ interface InputInterface
     /**
      * Sets an argument value by name.
      *
-     * @param mixed $value The argument value
+     * @return void
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function setArgument(string $name, $value);
+    public function setArgument(string $name, mixed $value);
 
     /**
      * Returns true if an InputArgument object exists by name or position.
-     *
-     * @return bool
      */
-    public function hasArgument(string $name);
+    public function hasArgument(string $name): bool;
 
     /**
      * Returns all the given options merged with the default values.
      *
      * @return array<string|bool|int|float|array|null>
      */
-    public function getOptions();
+    public function getOptions(): array;
 
     /**
      * Returns the option value for a given option name.
@@ -124,28 +125,26 @@ interface InputInterface
     /**
      * Sets an option value by name.
      *
-     * @param mixed $value The option value
+     * @return void
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function setOption(string $name, $value);
+    public function setOption(string $name, mixed $value);
 
     /**
      * Returns true if an InputOption object exists by name.
-     *
-     * @return bool
      */
-    public function hasOption(string $name);
+    public function hasOption(string $name): bool;
 
     /**
      * Is this input means interactive?
-     *
-     * @return bool
      */
-    public function isInteractive();
+    public function isInteractive(): bool;
 
     /**
      * Sets the input interactivity.
+     *
+     * @return void
      */
     public function setInteractive(bool $interactive);
 }

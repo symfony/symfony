@@ -38,7 +38,7 @@ class GlobFileLoaderTest extends TestCase
 
 class GlobFileLoaderWithoutImport extends GlobFileLoader
 {
-    public function import($resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, $exclude = null)
+    public function import(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, $exclude = null): mixed
     {
         return new RouteCollection();
     }

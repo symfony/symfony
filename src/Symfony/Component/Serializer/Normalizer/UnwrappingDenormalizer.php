@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
@@ -25,17 +26,19 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
 
     public const UNWRAP_PATH = 'unwrap_path';
 
-    private $propertyAccessor;
+    private readonly PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize($data, $class, string $format = null, array $context = [])
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => false];
+    }
+
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         $propertyPath = $context[self::UNWRAP_PATH];
         $context['unwrapped'] = true;
@@ -48,22 +51,25 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
             $data = $this->propertyAccessor->getValue($data, $propertyPath);
         }
 
-        return $this->serializer->denormalize($data, $class, $format, $context);
+        if (!$this->serializer instanceof DenormalizerInterface) {
+            throw new LogicException('Cannot unwrap path because the injected serializer is not a denormalizer.');
+        }
+
+        return $this->serializer->denormalize($data, $type, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return \array_key_exists(self::UNWRAP_PATH, $context) && !isset($context['unwrapped']);
     }
 
     /**
-     * {@inheritdoc}
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
      */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return $this->serializer instanceof CacheableSupportsMethodInterface && $this->serializer->hasCacheableSupportsMethod();
     }
 }

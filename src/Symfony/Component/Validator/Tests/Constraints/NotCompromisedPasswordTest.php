@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -28,13 +28,10 @@ class NotCompromisedPasswordTest extends TestCase
         $this->assertFalse($constraint->skipOnError);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(NotCompromisedPasswordDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();

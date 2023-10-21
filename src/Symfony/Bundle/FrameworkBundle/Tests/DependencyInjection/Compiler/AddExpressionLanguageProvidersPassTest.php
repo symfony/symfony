@@ -17,6 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * @group legacy
+ */
 class AddExpressionLanguageProvidersPassTest extends TestCase
 {
     public function testProcessForRouter()
@@ -24,11 +27,11 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
 
-        $definition = new Definition('\stdClass');
+        $definition = new Definition(\stdClass::class);
         $definition->addTag('routing.expression_language_provider');
         $container->setDefinition('some_routing_provider', $definition->setPublic(true));
 
-        $container->register('router.default', '\stdClass')->setPublic(true);
+        $container->register('router.default', \stdClass::class)->setPublic(true);
         $container->compile();
 
         $router = $container->getDefinition('router.default');
@@ -43,11 +46,11 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
 
-        $definition = new Definition('\stdClass');
+        $definition = new Definition(\stdClass::class);
         $definition->addTag('routing.expression_language_provider');
         $container->setDefinition('some_routing_provider', $definition->setPublic(true));
 
-        $container->register('my_router', '\stdClass')->setPublic(true);
+        $container->register('my_router', \stdClass::class)->setPublic(true);
         $container->setAlias('router.default', 'my_router');
         $container->compile();
 

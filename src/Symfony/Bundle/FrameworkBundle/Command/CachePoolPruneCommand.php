@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,12 +23,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Rob Frawley 2nd <rmf@src.run>
  */
+#[AsCommand(name: 'cache:pool:prune', description: 'Prune cache pools')]
 final class CachePoolPruneCommand extends Command
 {
-    protected static $defaultName = 'cache:pool:prune';
-    protected static $defaultDescription = 'Prune cache pools';
-
-    private $pools;
+    private iterable $pools;
 
     /**
      * @param iterable<mixed, PruneableInterface> $pools
@@ -39,13 +38,9 @@ final class CachePoolPruneCommand extends Command
         $this->pools = $pools;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command deletes all expired items from all pruneable pools.
 
@@ -55,9 +50,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

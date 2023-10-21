@@ -16,7 +16,7 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class FlushBatchHandlersStamp implements NonSendableStampInterface
 {
-    private $force;
+    private bool $force;
 
     public function __construct(bool $force)
     {

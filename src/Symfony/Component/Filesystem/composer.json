@@ -16,10 +16,9 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.1",
         "symfony/polyfill-ctype": "~1.8",
-        "symfony/polyfill-mbstring": "~1.8",
-        "symfony/polyfill-php80": "^1.16"
+        "symfony/polyfill-mbstring": "~1.8"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Filesystem\\": "" },

@@ -21,9 +21,7 @@ namespace Symfony\Component\Intl\Data\Bundle\Writer;
 interface BundleWriterInterface
 {
     /**
-     * Writes data to a resource bundle.
-     *
-     * @param mixed $data The data to write
+     * @return void
      */
-    public function write(string $path, string $locale, $data);
+    public function write(string $path, string $locale, mixed $data);
 }

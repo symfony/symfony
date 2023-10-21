@@ -36,7 +36,7 @@ final class LifecycleStateShare extends AbstractLinkedInShare
         self::PUBLISHED_EDITED,
     ];
 
-    private $lifecycleState;
+    private string $lifecycleState;
 
     public function __construct(string $lifecycleState = self::PUBLISHED)
     {

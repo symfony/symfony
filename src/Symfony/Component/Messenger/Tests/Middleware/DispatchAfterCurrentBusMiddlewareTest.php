@@ -256,15 +256,11 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $commandHandlingMiddleware->expects($this->once())
             ->method('handle')
             ->with($this->expectHandledMessage($message))
-            ->willReturnCallback(function ($envelope, StackInterface $stack) {
-                return $stack->next()->handle($envelope, $stack);
-            });
+            ->willReturnCallback(fn ($envelope, StackInterface $stack) => $stack->next()->handle($envelope, $stack));
         $eventHandlingMiddleware->expects($this->once())
             ->method('handle')
             ->with($this->expectHandledMessage($event))
-            ->willReturnCallback(function ($envelope, StackInterface $stack) {
-                return $stack->next()->handle($envelope, $stack);
-            });
+            ->willReturnCallback(fn ($envelope, StackInterface $stack) => $stack->next()->handle($envelope, $stack));
         $messageBus->dispatch($message);
     }
 
@@ -292,22 +288,18 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
 
     private function expectHandledMessage($message): Callback
     {
-        return $this->callback(function (Envelope $envelope) use ($message) {
-            return $envelope->getMessage() === $message;
-        });
+        return $this->callback(fn (Envelope $envelope) => $envelope->getMessage() === $message);
     }
 
     private function willHandleMessage(): ReturnCallback
     {
-        return $this->returnCallback(function ($envelope, StackInterface $stack) {
-            return $stack->next()->handle($envelope, $stack);
-        });
+        return $this->returnCallback(fn ($envelope, StackInterface $stack) => $stack->next()->handle($envelope, $stack));
     }
 }
 
 class DummyEvent
 {
-    private $message;
+    private string $message;
 
     public function __construct(string $message)
     {
@@ -322,8 +314,8 @@ class DummyEvent
 
 class DispatchingMiddleware implements MiddlewareInterface
 {
-    private $bus;
-    private $messages;
+    private MessageBusInterface $bus;
+    private array $messages;
 
     public function __construct(MessageBusInterface $bus, array $messages)
     {

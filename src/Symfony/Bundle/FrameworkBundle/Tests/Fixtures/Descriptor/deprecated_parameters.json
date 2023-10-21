@@ -1,0 +1,7 @@
+{
+    "integer": 12,
+    "string": "Hello world!",
+    "_deprecations": {
+        "string": "Since symfony\/framework-bundle 6.4: The parameter \"string\" is deprecated."
+    }
+}

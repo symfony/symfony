@@ -25,12 +25,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
  */
 class MongoDbSessionHandlerTest extends TestCase
 {
-    /**
-     * @var MockObject&Client
-     */
-    private $mongo;
-    private $storage;
-    public $options;
+    public array $options;
+    private MockObject&Client $mongo;
+    private MongoDbSessionHandler $storage;
 
     protected function setUp(): void
     {
@@ -200,7 +197,6 @@ class MongoDbSessionHandlerTest extends TestCase
     public function testGetConnection()
     {
         $method = new \ReflectionMethod($this->storage, 'getMongo');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(Client::class, $method->invoke($this->storage));
     }

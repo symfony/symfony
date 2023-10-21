@@ -38,19 +38,19 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     /**
      * @var array<string, array{DocBlock|null, int|null, string|null}>
      */
-    private $docBlocks = [];
+    private array $docBlocks = [];
 
     /**
      * @var Context[]
      */
-    private $contexts = [];
+    private array $contexts = [];
 
-    private $docBlockFactory;
-    private $contextFactory;
-    private $phpDocTypeHelper;
-    private $mutatorPrefixes;
-    private $accessorPrefixes;
-    private $arrayMutatorPrefixes;
+    private DocBlockFactoryInterface $docBlockFactory;
+    private ContextFactory $contextFactory;
+    private PhpDocTypeHelper $phpDocTypeHelper;
+    private array $mutatorPrefixes;
+    private array $accessorPrefixes;
+    private array $arrayMutatorPrefixes;
 
     /**
      * @param string[]|null $mutatorPrefixes
@@ -71,9 +71,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $this->arrayMutatorPrefixes = $arrayMutatorPrefixes ?? ReflectionExtractor::$defaultArrayMutatorPrefixes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
@@ -101,9 +98,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
@@ -117,9 +111,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return '' === $contents ? null : $contents;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         /** @var $docBlock DocBlock */
@@ -128,19 +119,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return null;
         }
 
-        switch ($source) {
-            case self::PROPERTY:
-                $tag = 'var';
-                break;
-
-            case self::ACCESSOR:
-                $tag = 'return';
-                break;
-
-            case self::MUTATOR:
-                $tag = 'param';
-                break;
-        }
+        $tag = match ($source) {
+            self::PROPERTY => 'var',
+            self::ACCESSOR => 'return',
+            self::MUTATOR => 'param',
+        };
 
         $parentClass = null;
         $types = [];
@@ -155,7 +138,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                             break;
 
                         case 'parent':
-                            if (false !== $resolvedClass = $parentClass ?? $parentClass = get_parent_class($class)) {
+                            if (false !== $resolvedClass = $parentClass ??= get_parent_class($class)) {
                                 break;
                             }
                             // no break
@@ -181,9 +164,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $types[0])];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypesFromConstructor(string $class, string $property): ?array
     {
         $docBlock = $this->getDocBlockFromConstructor($class, $property);
@@ -211,7 +191,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
         $reflectionConstructor = $reflectionClass->getConstructor();
@@ -223,16 +203,14 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             $docBlock = $this->docBlockFactory->create($reflectionConstructor, $this->contextFactory->createFromReflector($reflectionConstructor));
 
             return $this->filterDocBlockParams($docBlock, $property);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             return null;
         }
     }
 
     private function filterDocBlockParams(DocBlock $docBlock, string $allowedParam): DocBlock
     {
-        $tags = array_values(array_filter($docBlock->getTagsByName('param'), function ($tag) use ($allowedParam) {
-            return $tag instanceof DocBlock\Tags\Param && $allowedParam === $tag->getVariableName();
-        }));
+        $tags = array_values(array_filter($docBlock->getTagsByName('param'), fn ($tag) => $tag instanceof DocBlock\Tags\Param && $allowedParam === $tag->getVariableName()));
 
         return new DocBlock($docBlock->getSummary(), $docBlock->getDescription(), $tags, $docBlock->getContext(),
             $docBlock->getLocation(), $docBlock->isTemplateStart(), $docBlock->isTemplateEnd());
@@ -249,9 +227,19 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return $this->docBlocks[$propertyHash];
         }
 
+        try {
+            $reflectionProperty = new \ReflectionProperty($class, $property);
+        } catch (\ReflectionException) {
+            $reflectionProperty = null;
+        }
+
         $ucFirstProperty = ucfirst($property);
 
         switch (true) {
+            case $reflectionProperty?->isPromoted() && $docBlock = $this->getDocBlockFromConstructor($class, $property):
+                $data = [$docBlock, self::MUTATOR, null];
+                break;
+
             case $docBlock = $this->getDocBlockFromProperty($class, $property):
                 $data = [$docBlock, self::PROPERTY, null];
                 break;
@@ -276,7 +264,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         // Use a ReflectionProperty instead of $class to get the parent class if applicable
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -290,7 +278,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         try {
             return $this->docBlockFactory->create($reflectionProperty, $this->createFromReflector($reflector));
-        } catch (\InvalidArgumentException|\RuntimeException $e) {
+        } catch (\InvalidArgumentException|\RuntimeException) {
             return null;
         }
     }
@@ -313,12 +301,12 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                 }
 
                 if (
-                    (self::ACCESSOR === $type && 0 === $reflectionMethod->getNumberOfRequiredParameters()) ||
-                    (self::MUTATOR === $type && $reflectionMethod->getNumberOfParameters() >= 1)
+                    (self::ACCESSOR === $type && 0 === $reflectionMethod->getNumberOfRequiredParameters())
+                    || (self::MUTATOR === $type && $reflectionMethod->getNumberOfParameters() >= 1)
                 ) {
                     break;
                 }
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 // Try the next prefix if the method doesn't exist
             }
         }
@@ -337,7 +325,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         try {
             return [$this->docBlockFactory->create($reflectionMethod, $this->createFromReflector($reflector)), $prefix];
-        } catch (\InvalidArgumentException|\RuntimeException $e) {
+        } catch (\InvalidArgumentException|\RuntimeException) {
             return null;
         }
     }

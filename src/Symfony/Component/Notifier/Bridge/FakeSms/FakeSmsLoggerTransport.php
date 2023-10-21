@@ -27,7 +27,7 @@ final class FakeSmsLoggerTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

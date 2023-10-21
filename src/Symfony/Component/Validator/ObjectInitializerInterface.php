@@ -22,5 +22,8 @@ namespace Symfony\Component\Validator;
  */
 interface ObjectInitializerInterface
 {
+    /**
+     * @return void
+     */
     public function initialize(object $object);
 }

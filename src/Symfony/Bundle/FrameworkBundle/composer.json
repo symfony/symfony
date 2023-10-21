@@ -101,7 +101,7 @@
         "symfony/twig-bridge": "<5.4",
         "symfony/twig-bundle": "<5.4",
         "symfony/validator": "<6.4",
-        "symfony/web-profiler-bundle": "<5.4",
+        "symfony/web-profiler-bundle": "<6.4",
         "symfony/workflow": "<6.4"
     },
     "autoload": {

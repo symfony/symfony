@@ -26,7 +26,7 @@ namespace Symfony\Component\HttpFoundation;
  */
 class StreamedResponse extends Response
 {
-    protected \Closure $callback;
+    protected ?\Closure $callback = null;
     protected bool $streamed = false;
 
     private bool $headersSent = false;

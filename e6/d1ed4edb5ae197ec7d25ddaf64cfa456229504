@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-21T10:44:17Z
+
+Works for me, but can you think of any other way that wouldn't involve a conflict?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2023-10-21T10:45:54Z
+
+The only other way I can think of would be to disallow FWB 6.4 by adding the conflict in WPB 5.4.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-21T12:21:17Z
+
+If the problem happen only with 2 datacollectors, would it be possible to add a specific conflict ?
+
+FMB 6.4 has a conflict with worflow < 6.4, but allow console 5.4.. so i guess there won't be a problem with the new worflow profiler
+
+What if we add a conflict on console < 6.4 on FMB ?

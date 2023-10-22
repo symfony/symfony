@@ -11,8 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use use Symfony\Bundle\FrameworkBundle\Test\MailerAssertionsTrait;
+
 final class NotificationTest extends AbstractWebTestCase
 {
+    use NotificationAssertionsTrait;
+
     /**
      * @requires function \Symfony\Bundle\MercureBundle\MercureBundle::build
      */

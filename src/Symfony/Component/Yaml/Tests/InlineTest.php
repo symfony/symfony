@@ -76,14 +76,21 @@ class InlineTest extends TestCase
     public function testParsePhpEnumThrowsExceptionWhenUndefined()
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('The enum "SomeEnum::Foo" is not defined');
-        Inline::parse('!php/enum SomeEnum::Foo', Yaml::PARSE_CONSTANT);
+        $this->expectExceptionMessage('The enum "SomeEnum" is not defined');
+        Inline::parse('!php/enum SomeEnum', Yaml::PARSE_CONSTANT);
+    }
+
+    public function testParsePhpEnumThrowsExceptionWhenNameUndefined()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The string "Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::Foo" is not the name of a valid enum');
+        Inline::parse('!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::Foo', Yaml::PARSE_CONSTANT);
     }
 
     public function testParsePhpEnumThrowsExceptionWhenNotAnEnum()
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('The string "PHP_INT_MAX" is not the name of a valid enum');
+        $this->expectExceptionMessage('The enum "PHP_INT_MAX" is not defined');
         Inline::parse('!php/enum PHP_INT_MAX', Yaml::PARSE_CONSTANT);
     }
 
@@ -716,6 +723,11 @@ class InlineTest extends TestCase
     public function testDumpUnitEnum()
     {
         $this->assertSame("!php/const Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
+    }
+
+    public function testParseUnitEnumCases()
+    {
+        $this->assertSame(FooUnitEnum::cases(), Inline::parse("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum", Yaml::PARSE_CONSTANT));
     }
 
     public function testParseUnitEnum()

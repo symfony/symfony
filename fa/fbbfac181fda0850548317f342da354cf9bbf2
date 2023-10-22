@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2023-10-22T12:12:10Z
+
+An alternative would be to add the native return type and document the BC break. We've done that for multiple other method implementations as well: #50890 Given `EntityFactory` is a DI factory class, the likelihood of anyone being hit by this BC break seems rather slim.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-22T14:04:51Z
+
+I like @wouterj's proposal!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-22T14:21:08Z
+
+Yes, let's do what @wouterj proposes. If someone complains about the BC break, we could still make the return type conditional using a trait, but I doubt that someone extends this class.
+
+While we're at it, should we make `EntityFactory` final in 7.0? There's really no point in extending it: It only exposes the public methods from `UserProviderFactoryInterface`. If someone wants to extend the functionality of that class, a decorator would be the better way to do that.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-22T14:31:32Z
+
+I have added the return types and also marked the class as final.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-22T14:59:16Z
+
+Is this the same problem there ?
+
+> PHP Fatal error:  Declaration of Symfony\WebpackEncoreBundle\CacheWarmer\EntrypointCacheWarmer::doWarmUp($cacheDir, Symfony\Component\Cache\Adapter\ArrayAdapter $arrayAdapter): bool must be compatible with Symfony\Bundle\FrameworkBundle\CacheWarmer\AbstractPhpFileCacheWarmer::doWarmUp(string $cacheDir, Symfony\Component\Cache\Adapter\ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool in /home/runner/work/ux/ux/src/Turbo/vendor/symfony/webpack-encore-bundle/src/CacheWarmer/EntrypointCacheWarmer.php on line 27
+
+https://github.com/symfony/ux/issues/1223
+
+If so, could you explain what are the steps to fix ? (i must admit i'm not yet fluent in "multi-php multi-version multi-bundle" troubles 😅
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-10-22T15:04:21Z
+
+@smnandre that's a different issue: the first parameter `$cacheDir` must get the `string` type in the WebpackEncoreBundle. Adding types to parameters can be done safely (it's not a BC break), as a child can have a less specific parameter type than its parent).
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-22T15:05:41Z
+
+Thank you @wouterj !

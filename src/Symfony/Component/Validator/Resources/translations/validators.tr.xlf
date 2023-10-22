@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Netmask'in değeri {{ min }} ve {{ max }} arasında olmaldır.</target>
             </trans-unit>
+             <trans-unit id="104">
+              <source>Dosya adı çok uzun. {{ filename_max_length }} karakter veya daha az olmalıdır.|Dosya adı çok uzun. {{ filename_max_length }} karakter veya daha az olmalıdır.</source>
+              <target>Dosya adı çok uzun. {{ filename_max_length }} karakter veya daha az olmalıdır.|Dosya adı çok uzun. {{ filename_max_length }} karakter veya daha az olmalıdır.</target>
+             </trans-unit>
+             <trans-unit id="105">
+              <source>Şifre gücü çok düşük. Daha güçlü bir şifre kullanın, lütfen.</source>
+              <target>Şifre gücü çok düşük. Daha güçlü bir şifre kullanın, lütfen.</target>
+             </trans-unit>
+             <trans-unit id="106">
+             <source>Bu değer, mevcut kısıtlama seviyesi tarafından izin verilmeyen karakterler içerir.</source>
+             <target>Bu değer, mevcut kısıtlama seviyesi tarafından izin verilmeyen karakterler içerir.</target>
+            </trans-unit>
+            <trans-unit id="107">
+             <source>Görünmez karakterler kullanmak izin verilmez.</source>
+             <target>Görünmez karakterler kullanmak izin verilmez.</target>
+           </trans-unit>
+           <trans-unit id="108">
+            <source>Farklı yazı türlerinden rakamlar karıştırmak izin verilmez.</source>
+            <target>Farklı yazı türlerinden rakamlar karıştırmak izin verilmez.</target>
+            </trans-unit>
+            <trans-unit id="109">
+             <source>Gizli üst üste karakterler kullanmak izin verilmez.</source>
+             <target>Gizli üst üste karakterler kullanmak izin verilmez.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

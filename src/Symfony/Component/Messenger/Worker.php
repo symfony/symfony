@@ -187,7 +187,7 @@ class Worker
                     $receiver->reject($envelope);
                 }
 
-                if ($e instanceof HandlerFailedException || $e instanceof DelayedMessageHandlingException) {
+                if ($e instanceof HandlerFailedException || ($e instanceof DelayedMessageHandlingException && null !== $e->getEnvelope())) {
                     $envelope = $e->getEnvelope();
                 }
 

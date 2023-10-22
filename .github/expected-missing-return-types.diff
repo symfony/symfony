@@ -151,30 +151,6 @@ diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/Regist
 +    public function process(ContainerBuilder $container): void
      {
          if (!$this->enabled($container)) {
-diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php
---- a/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php
-+++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php
-@@ -34,5 +34,5 @@ class EntityFactory implements UserProviderFactoryInterface
-      * @return void
-      */
--    public function create(ContainerBuilder $container, string $id, array $config)
-+    public function create(ContainerBuilder $container, string $id, array $config): void
-     {
-         $container
-@@ -47,5 +47,5 @@ class EntityFactory implements UserProviderFactoryInterface
-      * @return string
-      */
--    public function getKey()
-+    public function getKey(): string
-     {
-         return $this->key;
-@@ -55,5 +55,5 @@ class EntityFactory implements UserProviderFactoryInterface
-      * @return void
-      */
--    public function addConfiguration(NodeDefinition $node)
-+    public function addConfiguration(NodeDefinition $node): void
-     {
-         $node
 diff --git a/src/Symfony/Bridge/Doctrine/Form/DoctrineOrmTypeGuesser.php b/src/Symfony/Bridge/Doctrine/Form/DoctrineOrmTypeGuesser.php
 --- a/src/Symfony/Bridge/Doctrine/Form/DoctrineOrmTypeGuesser.php
 +++ b/src/Symfony/Bridge/Doctrine/Form/DoctrineOrmTypeGuesser.php

@@ -393,6 +393,24 @@ class JsDelivrEsmResolverTest extends TestCase
             ],
         ];
 
+        yield 'make imports point to file and relative' => [
+            [
+                'twig' => self::createRemoteEntry('twig', version: '1.16.0'),
+            ],
+            [
+                [
+                    'url' => '/twig@1.16.0/+esm',
+                    'body' => 'import e from"/npm/locutus@2.0.16/php/strings/sprintf/+esm";console.log()',
+                ],
+            ],
+            [
+                'twig' => [
+                    'content' => 'import e from"locutus/php/strings/sprintf";console.log()',
+                    'dependencies' => ['locutus/php/strings/sprintf'],
+                ],
+            ],
+        ];
+
         yield 'js sourcemap is removed' => [
             [
                 '@chart.js/auto' => self::createRemoteEntry('chart.js/auto', version: '1.2.3'),
@@ -444,7 +462,12 @@ class JsDelivrEsmResolverTest extends TestCase
             $expectedNames[] = $packageData[0];
             $expectedVersions[] = $packageData[1];
         }
-        $this->assertSame($expectedNames, $matches[1]);
+        $actualNames = [];
+        foreach ($matches[1] as $i => $name) {
+            $actualNames[] = $name.$matches[3][$i];
+        }
+
+        $this->assertSame($expectedNames, $actualNames);
         $this->assertSame($expectedVersions, $matches[2]);
     }
 
@@ -480,6 +503,14 @@ class JsDelivrEsmResolverTest extends TestCase
             [
                 ['datatables.net', '2.1.1'],
                 ['datatables.net', '2.1.1'], // for the export syntax
+            ],
+        ];
+
+        yield 'import statements with paths' => [
+            'import e from"/npm/locutus@2.0.16/php/strings/sprintf/+esm";import t from"/npm/locutus@2.0.16/php/strings/vsprintf/+esm"',
+            [
+                ['locutus/php/strings/sprintf', '2.0.16'],
+                ['locutus/php/strings/vsprintf', '2.0.16'],
             ],
         ];
     }

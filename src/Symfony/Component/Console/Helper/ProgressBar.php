@@ -311,6 +311,8 @@ final class ProgressBar
      */
     public function start(int $max = null, int $startAt = 0): void
     {
+        $this->isMaxKnown = !is_null($max);
+
         $this->startTime = time();
         $this->step = $startAt;
         $this->startingStep = $startAt;

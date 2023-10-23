@@ -119,6 +119,13 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         }
 
         if (0 != intl_get_error_code()) {
+            var_dump($value);
+            var_dump($this->dateFormat);
+            var_dump($this->timeFormat);
+            var_dump($this->calendar);
+            var_dump($this->pattern);
+            var_dump(\Locale::getDefault());
+
             throw new TransformationFailedException(intl_get_error_message(), intl_get_error_code());
         } elseif ($timestamp > 253402214400) {
             // This timestamp represents UTC midnight of 9999-12-31 to prevent 5+ digit years

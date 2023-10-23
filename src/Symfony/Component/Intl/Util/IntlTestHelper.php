@@ -32,9 +32,16 @@ class IntlTestHelper
      *
      * @return void
      */
-    public static function requireIntl(TestCase $testCase, string $minimumIcuVersion = null)
+    public static function requireIntl(TestCase $testCase, string $minimumIcuVersion = null, bool $debug = false)
     {
+        if ($debug) {
+            var_dump(__METHOD__);
+            var_dump($minimumIcuVersion);
+        }
         $minimumIcuVersion ??= Intl::getIcuStubVersion();
+        if ($debug) {
+            var_dump($minimumIcuVersion);
+        }
 
         // We only run tests if the version is *one specific version*.
         // This condition is satisfied if
@@ -66,14 +73,18 @@ class IntlTestHelper
      *
      * @return void
      */
-    public static function requireFullIntl(TestCase $testCase, string $minimumIcuVersion = null)
+    public static function requireFullIntl(TestCase $testCase, string $minimumIcuVersion = null, bool $debug = false)
     {
+        if ($debug) {
+            var_dump(__METHOD__);
+            var_dump($minimumIcuVersion);
+        }
         // We only run tests if the intl extension is loaded...
         if (!Intl::isExtensionLoaded()) {
             $testCase->markTestSkipped('Extension intl is required.');
         }
 
-        self::requireIntl($testCase, $minimumIcuVersion);
+        self::requireIntl($testCase, $minimumIcuVersion, $debug);
 
         // Consequently, tests will
         //

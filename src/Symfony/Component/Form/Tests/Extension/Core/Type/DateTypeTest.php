@@ -15,6 +15,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
@@ -92,7 +93,7 @@ class DateTypeTest extends BaseTypeTestCase
     public function testSubmitFromSingleTextDateTime()
     {
         // we test against "de_DE", so we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, false, true);
 
         \Locale::setDefault('de_DE');
 
@@ -106,6 +107,18 @@ class DateTypeTest extends BaseTypeTestCase
         ]);
 
         $form->submit('2.6.2010');
+        var_dump(__METHOD__);
+        var_dump(Intl::getIcuVersion());
+
+        if (!$form->isValid()) {
+            /** @var FormError $error */
+            foreach ($form->getErrors(true) as $error) {
+                var_dump($error->getMessage());
+                var_dump($error->getCause()->getMessage());
+                var_dump($error->getCause()->getInvalidMessage());
+                var_dump($error->getCause()->getInvalidMessageParameters());
+            }
+        }
 
         $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());

@@ -131,6 +131,6 @@ class RoleHierarchy implements RoleHierarchyInterface
         /** @var int $count */
         $placeholderPattern = preg_replace(pattern: '/(?<=_)\\\\\*(?=_|$)/', replacement: '[^\*]*', subject: preg_quote($role), count: $count);
 
-        return ($count > 0) ? sprintf('/%s/', $placeholderPattern) : false;
+        return ($count > 0) ? sprintf('/^%s$/', $placeholderPattern) : false;
     }
 }

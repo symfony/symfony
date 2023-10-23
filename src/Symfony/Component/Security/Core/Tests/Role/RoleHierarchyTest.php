@@ -37,6 +37,7 @@ class RoleHierarchyTest extends TestCase
             'ROLE_BAZ_*' => ['ROLE_USER'],
             'ROLE_FOO_*' => ['ROLE_BAZ_FOO'],
             'ROLE_BAR_*' => ['ROLE_BAZ_BAR'],
+            'ROLE_QUX_*_BAR' => ['ROLE_FOOBAR'],
         ]);
 
         $this->assertEquals(['ROLE_BAZ_A', 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_BAZ_A']));
@@ -47,6 +48,10 @@ class RoleHierarchyTest extends TestCase
 
         // Multiple roles matching multiple placeholders
         $this->assertEquals(['ROLE_FOO_A', 'ROLE_BAR_A', 'ROLE_BAZ_FOO', 'ROLE_BAZ_BAR', 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_FOO_A', 'ROLE_BAR_A']));
+
+        // Test placeholders don't match more than the pattern
+        $this->assertEquals(['FOO_ROLE_FOO_A'], $role->getReachableRoleNames(['FOO_ROLE_FOO_A'])); // Doesn't start with ROLE_FOO_
+        $this->assertEquals(['ROLE_QUX_A_BARA'], $role->getReachableRoleNames(['ROLE_QUX_A_BARA'])); // Doesn't end with _BAR
     }
 
     public function testGetReachableRoleNamesWithRecursivePlaceholders()

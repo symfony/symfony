@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Värdet på nätmasken bör vara mellan {{ min }} och {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Filnamnet är för långt. Det måste vara {{ filename_max_length }} tecken eller färre.|Filnamnet är för långt. Det måste vara {{ filename_max_length }} tecken eller färre.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Detta lösenord är för svagt. Använd ett starkare lösenord.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Detta värde innehåller tecken som inte är tillåtna.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Användning av osynliga tecken är inte tillåtet.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Blandning av siffror från olika skript är inte tillåtet.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Användning av dolda överlagringstecken är inte tillåtet.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

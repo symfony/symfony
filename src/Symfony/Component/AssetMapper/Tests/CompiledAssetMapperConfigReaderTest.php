@@ -14,6 +14,7 @@ namespace Symfony\Component\AssetMapper\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 class CompiledAssetMapperConfigReaderTest extends TestCase
 {
@@ -54,8 +55,9 @@ class CompiledAssetMapperConfigReaderTest extends TestCase
     public function testSaveConfig()
     {
         $reader = new CompiledAssetMapperConfigReader($this->writableRoot);
-        $this->assertEquals($this->writableRoot.\DIRECTORY_SEPARATOR.'foo.json', realpath($reader->saveConfig('foo.json', ['foo' => 'bar'])));
-        $this->assertEquals(['foo' => 'bar'], json_decode(file_get_contents($this->writableRoot.'/foo.json'), true));
+
+        $this->assertSame(Path::normalize($this->writableRoot.\DIRECTORY_SEPARATOR.'foo.json'), Path::normalize(realpath($reader->saveConfig('foo.json', ['foo' => 'bar']))));
+        $this->assertSame(['foo' => 'bar'], json_decode(file_get_contents($this->writableRoot.'/foo.json'), true));
     }
 
     public function testRemoveConfig()

@@ -31,6 +31,38 @@ class FileTest extends TestCase
         $this->assertTrue($file->__isset('maxSize'));
     }
 
+    /**
+     * @dataProvider provideValidSizesForIntegerOverflow
+     */
+    public function testMaxSizeWithIntegerOverflow($maxSize, $bytes, $binaryFormat)
+    {
+        if (4 !== \PHP_INT_SIZE) {
+            $this->markTestSkipped('This test can only run on 32-bits systems.');
+        }
+
+        $file = new File(['maxSize' => $maxSize]);
+
+        $this->assertSame($bytes, $file->maxSize);
+        $this->assertSame($binaryFormat, $file->binaryFormat);
+        $this->assertTrue($file->__isset('maxSize'));
+    }
+
+    /**
+     * @dataProvider provideValidSizesFor64bitsIntegers
+     */
+    public function testMaxSizeWith64bitsIntegers($maxSize, $bytes, $binaryFormat)
+    {
+        if (8 !== \PHP_INT_SIZE) {
+            $this->markTestSkipped('This test can only run on 64-bits systems.');
+        }
+
+        $file = new File(['maxSize' => $maxSize]);
+
+        $this->assertSame($bytes, $file->maxSize);
+        $this->assertSame($binaryFormat, $file->binaryFormat);
+        $this->assertTrue($file->__isset('maxSize'));
+    }
+
     public function testMagicIsset()
     {
         $file = new File(['maxSize' => 1]);
@@ -45,6 +77,38 @@ class FileTest extends TestCase
      */
     public function testMaxSizeCanBeSetAfterInitialization($maxSize, $bytes, $binaryFormat)
     {
+        $file = new File();
+        $file->maxSize = $maxSize;
+
+        $this->assertSame($bytes, $file->maxSize);
+        $this->assertSame($binaryFormat, $file->binaryFormat);
+    }
+
+    /**
+     * @dataProvider provideValidSizesForIntegerOverflow
+     */
+    public function testMaxSizeCanBeSetAfterInitializationWithIntegerOverflow($maxSize, $bytes, $binaryFormat)
+    {
+        if (4 !== \PHP_INT_SIZE) {
+            $this->markTestSkipped('This test can only run on 32-bits systems.');
+        }
+
+        $file = new File();
+        $file->maxSize = $maxSize;
+
+        $this->assertSame($bytes, $file->maxSize);
+        $this->assertSame($binaryFormat, $file->binaryFormat);
+    }
+
+    /**
+     * @dataProvider provideValidSizesFor64bitsIntegers
+     */
+    public function testMaxSizeCanBeSetAfterInitializationWith64bitsIntegers($maxSize, $bytes, $binaryFormat)
+    {
+        if (8 !== \PHP_INT_SIZE) {
+            $this->markTestSkipped('This test can only run on 64-bits systems.');
+        }
+
         $file = new File();
         $file->maxSize = $maxSize;
 
@@ -101,9 +165,21 @@ class FileTest extends TestCase
             ['3M', 3000000, false],
             ['1gi', 1073741824, true],
             ['1GI', 1073741824, true],
-            ['4g', 4000000000, false],
-            ['4G', 4000000000, false],
+            ['2g', 2000000000, false],
+            ['2G', 2000000000, false],
         ];
+    }
+
+    public static function provideValidSizesForIntegerOverflow(): \Generator
+    {
+        yield ['4g', '4000000000', false];
+        yield ['4G', '4000000000', false];
+    }
+
+    public static function provideValidSizesFor64bitsIntegers(): \Generator
+    {
+        yield ['4g', 4000000000, false];
+        yield ['4G', 4000000000, false];
     }
 
     public static function provideInvalidSizes()

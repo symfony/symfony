@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-24T15:17:53Z
+
+#52229 is not sufficient as we also would have had to remove the data collector service if the installed version of the WebProfilerBundle is not 6.4 or higher (otherwise the template would be missing).
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-24T17:40:18Z
+
+**Update**: as i previously said, i just tried to find an other solution.. i made you lose enough time, so sorry for that and :)
+
+(and if there is a small bug, i'll find a repro and present a fix, basing it on your work)
+
+--
+
+<details>
+
+<summary>
+Original message
+</summary>
+Sorry if i made you lose time, i was suprised we needed that conflict when other profiler did not.
+
+So there is a problem, maybe not caused by this, but there is one.
+
+Try
+
+```
+APP_DEBUG=false php bin/console
+```
+
+```
+  The service "data_collector.dump" has a dependency on a non-existent service ".virtual_request_stack".
+```
+
+</details>

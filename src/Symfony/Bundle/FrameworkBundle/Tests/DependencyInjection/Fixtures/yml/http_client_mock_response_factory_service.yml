@@ -6,4 +6,4 @@ framework:
         log: true
     http_client:
         default_options: ~
-        mock_response_factory: true
+        mock_response_factory: my_response_factory

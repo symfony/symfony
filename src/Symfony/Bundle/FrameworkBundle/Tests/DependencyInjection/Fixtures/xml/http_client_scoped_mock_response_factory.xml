@@ -8,8 +8,10 @@
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:http-client mock-response-factory="true">
+        <framework:http-client mock-response-factory="my_response_factory">
             <framework:default-options />
+            <framework:scoped-client name="notMocked" base-uri="https://symfony.com" />
+            <framework:scoped-client name="mocked" base-uri="https://symfony.com" mock_response_factory="true" />
         </framework:http-client>
     </framework:config>
 </container>

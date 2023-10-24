@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\DataCollector\RouterDataCollector;
+use Symfony\Component\Console\DataCollector\CommandDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\AjaxDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\EventDataCollector;
@@ -74,5 +75,8 @@ return static function (ContainerConfigurator $container) {
         ->set('data_collector.router', RouterDataCollector::class)
             ->tag('kernel.event_listener', ['event' => KernelEvents::CONTROLLER, 'method' => 'onKernelController'])
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/router.html.twig', 'id' => 'router', 'priority' => 285])
+
+        ->set('.data_collector.command', CommandDataCollector::class)
+            ->tag('data_collector', ['template' => '@WebProfiler/Collector/command.html.twig', 'id' => 'command', 'priority' => 335])
     ;
 };

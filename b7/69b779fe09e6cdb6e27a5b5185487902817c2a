@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-24T06:27:44Z
+
+In addition, what about using `array_is_list()` to decide what to do with keys?
+
+---------------------------------------------------------------------------
+
+by priyadi at 2023-10-24T09:02:22Z
+
+> In addition, what about using `array_is_list()` to decide what to do with keys?
+
+good idea. done.

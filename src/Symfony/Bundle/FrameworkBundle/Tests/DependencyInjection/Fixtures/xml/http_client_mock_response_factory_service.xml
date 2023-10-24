@@ -8,7 +8,7 @@
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:http-client mock-response-factory="true">
+        <framework:http-client mock-response-factory="my_response_factory">
             <framework:default-options />
         </framework:http-client>
     </framework:config>

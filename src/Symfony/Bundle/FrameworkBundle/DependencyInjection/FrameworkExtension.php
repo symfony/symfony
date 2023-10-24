@@ -2468,18 +2468,27 @@ class FrameworkExtension extends Extension
             $retryOptions = $scopeConfig['retry_failed'] ?? ['enabled' => false];
             unset($scopeConfig['retry_failed']);
 
+            $httpClientTransport = new Reference('http_client.transport');
+
+            if ($responseFactoryId = $scopeConfig['mock_response_factory'] ?? null) {
+                $container->register('http_client.mock_client.'.$name, MockHttpClient::class)
+                    ->setDecoratedService($httpClientTransport, null, -10)  // lower priority than TraceableHttpClient (5)
+                    ->setArguments(
+                        true === $responseFactoryId ? [] : [new Reference($responseFactoryId)]);
+            }
+
             if (null === $scope) {
                 $baseUri = $scopeConfig['base_uri'];
                 unset($scopeConfig['base_uri']);
 
                 $container->register($name, ScopingHttpClient::class)
                     ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                    ->setArguments([new Reference('http_client.transport'), $baseUri, $scopeConfig])
+                    ->setArguments([$httpClientTransport, $baseUri, $scopeConfig])
                     ->addTag('http_client.client')
                 ;
             } else {
                 $container->register($name, ScopingHttpClient::class)
-                    ->setArguments([new Reference('http_client.transport'), [$scope => $scopeConfig], $scope])
+                    ->setArguments([$httpClientTransport, [$scope => $scopeConfig], $scope])
                     ->addTag('http_client.client')
                 ;
             }
@@ -2521,7 +2530,7 @@ class FrameworkExtension extends Extension
         if ($responseFactoryId = $config['mock_response_factory'] ?? null) {
             $container->register('http_client.mock_client', MockHttpClient::class)
                 ->setDecoratedService('http_client.transport', null, -10)  // lower priority than TraceableHttpClient (5)
-                ->setArguments([new Reference($responseFactoryId)]);
+                ->setArguments(true === $responseFactoryId ? [] : [new Reference($responseFactoryId)]);
         }
     }
 

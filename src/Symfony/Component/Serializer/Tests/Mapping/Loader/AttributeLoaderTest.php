@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyThirdChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadMethodContextDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyParent;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyPromotedProperties;
@@ -217,6 +218,16 @@ class AttributeLoaderTest extends TestCase
         self::assertSame(['a', 'b'], $attributesMetadata['foo']->getGroups());
         self::assertSame(['a', 'c', 'd'], $attributesMetadata['bar']->getGroups());
         self::assertSame(['a'], $attributesMetadata['baz']->getGroups());
+    }
+
+    public function testLoadWithInvalidAttribute()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Could not instantiate attribute "Symfony\Component\Serializer\Annotation\Groups" on "Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy::myMethod()".');
+
+        $classMetadata = new ClassMetadata(BadAttributeDummy::class);
+
+        $this->loader->loadClassMetadata($classMetadata);
     }
 
     protected function getLoaderForContextMapping(): AttributeLoader

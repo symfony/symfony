@@ -180,6 +180,6 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
     private function getEndpoint(): ?string
     {
-        return ($this->host ?: 'api.sendinblue.com').($this->port ? ':'.$this->port : '');
+        return ($this->host ?: 'api.brevo.com').($this->port ? ':'.$this->port : '');
     }
 }

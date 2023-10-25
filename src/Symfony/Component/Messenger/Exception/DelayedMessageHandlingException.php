@@ -22,9 +22,9 @@ use Symfony\Component\Messenger\Envelope;
 class DelayedMessageHandlingException extends RuntimeException
 {
     private array $exceptions;
-    private Envelope $envelope;
+    private ?Envelope $envelope;
 
-    public function __construct(array $exceptions, Envelope $envelope)
+    public function __construct(array $exceptions, Envelope $envelope = null)
     {
         $this->envelope = $envelope;
 
@@ -49,7 +49,7 @@ class DelayedMessageHandlingException extends RuntimeException
         return $this->exceptions;
     }
 
-    public function getEnvelope(): Envelope
+    public function getEnvelope(): ?Envelope
     {
         return $this->envelope;
     }

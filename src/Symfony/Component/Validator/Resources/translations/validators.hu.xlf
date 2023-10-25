@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Ennek a netmask értéknek {{ min }} és {{ max }} között kell lennie.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>A fájlnév túl hosszú. {{ filename_max_length }} karakter vagy kevesebb legyen.|A fájlnév túl hosszú. {{ filename_max_length }} karakter vagy kevesebb legyen.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>A jelszó túl egyszerű. Kérjük, használjon egy bonyolultabb jelszót.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Ez az érték olyan karaktereket tartalmaz, amik nem megengedettek.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Láthatatlan karaktert használata nem megengedett.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Különböző szám írásmódok használata nem megengedett.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Rejtett módosító karakterek használata nem megengedett.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

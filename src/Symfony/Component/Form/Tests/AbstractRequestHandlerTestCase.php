@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -225,6 +226,24 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertTrue($form->isSubmitted());
         $this->assertSame('DATA', $form->get('field1')->getData());
         $this->assertSame($file, $form->get('field2')->getData());
+    }
+
+    public function testIntegerChildren()
+    {
+        $form = $this->createForm('root', 'POST', true);
+        $form->add('0', TextType::class);
+        $form->add('1', TextType::class);
+
+        $this->setRequestData('POST', [
+            'root' => [
+                '1' => 'bar',
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertNull($form->get('0')->getData());
+        $this->assertSame('bar', $form->get('1')->getData());
     }
 
     /**

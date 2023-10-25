@@ -32,7 +32,6 @@ use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
-use Symfony\Contracts\Service\Attribute\SubscribedService;
 
 class RegisterControllerArgumentLocatorsPassTest extends TestCase
 {

@@ -157,7 +157,7 @@ class SendinblueApiTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
+            $this->assertSame('https://api.brevo.com:8984/v3/smtp/email', $url);
             $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
             $body = json_decode($options['body'], true);

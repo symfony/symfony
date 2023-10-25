@@ -578,6 +578,25 @@ class WorkerTest extends TestCase
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
     }
+
+    public function testGcCollectCyclesIsCalledOnMessageHandle()
+    {
+        $apiMessage = new DummyMessage('API');
+
+        $receiver = new DummyReceiver([[new Envelope($apiMessage)]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
+        $worker->run();
+
+        $gcStatus = gc_status();
+
+        $this->assertGreaterThan(0, $gcStatus['runs']);
+    }
 }
 
 class DummyReceiver implements ReceiverInterface

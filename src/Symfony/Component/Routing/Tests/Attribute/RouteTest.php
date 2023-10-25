@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing\Tests\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\FooController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\FooController as FooAttributesController;
 

@@ -315,7 +315,7 @@ class DoctrineReceiverTest extends TestCase
     private function createSerializer(): Serializer
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+            new SerializerComponent\Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer())
         );
 
         return $serializer;

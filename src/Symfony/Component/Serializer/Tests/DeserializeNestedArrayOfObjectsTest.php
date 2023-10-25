@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -42,10 +43,11 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
     ]
 }
 EOF;
-        $serializer = new Serializer([
+        $denormalizer = new ChainDenormalizer([
             new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
             new ArrayDenormalizer(),
-        ], ['json' => new JsonEncoder()]);
+        ]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, $denormalizer);
 
         /** @var Zoo|ZooImmutable $zoo */
         $zoo = $serializer->deserialize($json, $class, 'json');
@@ -74,10 +76,11 @@ EOF;
     }
 }
 EOF;
-        $serializer = new Serializer([
+        $denormalizer = new ChainDenormalizer([
             new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
             new ArrayDenormalizer(),
-        ], ['json' => new JsonEncoder()]);
+        ]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, $denormalizer);
 
         /** @var ZooWithKeyTypes $zoo */
         $zoo = $serializer->deserialize($json, ZooWithKeyTypes::class, 'json');

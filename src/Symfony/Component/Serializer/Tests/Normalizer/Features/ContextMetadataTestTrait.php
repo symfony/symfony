@@ -17,6 +17,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -35,7 +37,7 @@ trait ContextMetadataTestTrait
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new PhpDocExtractor());
-        new Serializer([new DateTimeNormalizer(), $normalizer]);
+        new Serializer([], [], new ChainNormalizer([new DateTimeNormalizer(), $normalizer]));
 
         $dummy = new $contextMetadataDummyClass();
         $dummy->date = new \DateTimeImmutable('2011-07-28T08:44:00.123+00:00');
@@ -58,7 +60,7 @@ trait ContextMetadataTestTrait
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new PhpDocExtractor());
-        new Serializer([new DateTimeNormalizer(), $normalizer]);
+        new Serializer([], [], new ChainNormalizer([new DateTimeNormalizer(), $normalizer]), new ChainDenormalizer([new DateTimeNormalizer(), $normalizer]));
 
         /** @var ContextMetadataDummy|ContextChildMetadataDummy $dummy */
         $dummy = $normalizer->denormalize(['date' => '2011-07-28T08:44:00+00:00'], $contextMetadataDummyClass);
@@ -90,7 +92,7 @@ trait ContextMetadataTestTrait
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, new PhpDocExtractor());
-        new Serializer([new DateTimeNormalizer(), $normalizer]);
+        new Serializer([], [], null, new ChainDenormalizer([new DateTimeNormalizer(), $normalizer]));
 
         /** @var ContextMetadataNamingDummy $dummy */
         $dummy = $normalizer->denormalize(['created_at' => '28/07/2011'], ContextMetadataNamingDummy::class);

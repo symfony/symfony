@@ -32,7 +32,7 @@ class AmqpReceiverTest extends TestCase
     public function testItReturnsTheDecodedMessageToTheHandler()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+            new SerializerComponent\Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer())
         );
 
         $amqpEnvelope = $this->createAMQPEnvelope();

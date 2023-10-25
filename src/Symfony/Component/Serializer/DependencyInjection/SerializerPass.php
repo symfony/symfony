@@ -15,10 +15,13 @@ use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Adds all services with the tags "serializer.encoder" and "serializer.normalizer" as
@@ -67,8 +70,37 @@ class SerializerPass implements CompilerPassInterface
             }
         }
 
+        $denormalizers = [];
+        $trueNormalizers = [];
+        /** @var Reference|Definition $definition */
+        foreach ($normalizers as $definition) {
+            $reference = null;
+            if ($definition instanceof Reference) {
+                $reference = $definition;
+                $definition = $container->getDefinition($definition);
+            }
+
+            $class = $definition->getClass();
+            if (null === $class) {
+                continue;
+            }
+            $interfaces = class_implements($class);
+            if (isset($interfaces[NormalizerInterface::class])) {
+                $trueNormalizers[] = $reference ?? $definition;
+            }
+            if (isset($interfaces[DenormalizerInterface::class])) {
+                $denormalizers[] = $reference ?? $definition;
+            }
+        }
+
         $serializerDefinition = $container->getDefinition('serializer');
-        $serializerDefinition->replaceArgument(0, $normalizers);
         $serializerDefinition->replaceArgument(1, $encoders);
+
+        if ($container->hasDefinition('serializer.normalizer') && $container->hasDefinition('serializer.denormalizer')) {
+            $container->getDefinition('serializer.normalizer')->replaceArgument(0, $trueNormalizers);
+            $container->getDefinition('serializer.denormalizer')->replaceArgument(0, $denormalizers);
+        } else {
+            $serializerDefinition->replaceArgument(0, $normalizers);
+        }
     }
 }

@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -35,8 +36,8 @@ class XmlEncoderTest extends TestCase
     protected function setUp(): void
     {
         $this->encoder = new XmlEncoder();
-        $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
-        $this->encoder->setSerializer($serializer);
+        $normalizer = new ChainNormalizer([new CustomNormalizer()]);
+        $serializer = new Serializer([], ['xml' => $this->encoder], $normalizer);
     }
 
     public function testEncodeScalar()
@@ -461,8 +462,8 @@ XML;
     public function testEncodeTraversableWhenNormalizable()
     {
         $this->encoder = new XmlEncoder();
-        $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
-        $this->encoder->setSerializer($serializer);
+        $normalizer = new CustomNormalizer();
+        $serializer = new Serializer([], ['xml' => $this->encoder], $normalizer);
 
         $expected = <<<'XML'
 <?xml version="1.0"?>
@@ -726,8 +727,8 @@ XML;
             XmlEncoder::ROOT_NODE_NAME => 'people',
             XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE],
         ]);
-        $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
-        $this->encoder->setSerializer($serializer);
+        $normalizer = new CustomNormalizer();
+        $serializer = new Serializer([], ['xml' => $this->encoder], $normalizer);
 
         $expected = ['person' => [
           ['firstname' => 'Benjamin', 'lastname' => 'Alexandre', '#comment' => ' This comment should be decoded. '],
@@ -740,8 +741,8 @@ XML;
     public function testDecodeAlwaysAsCollection()
     {
         $this->encoder = new XmlEncoder([XmlEncoder::ROOT_NODE_NAME => 'response']);
-        $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
-        $this->encoder->setSerializer($serializer);
+        $normalizer = new CustomNormalizer();
+        $serializer = new Serializer([], ['xml' => $this->encoder], $normalizer);
 
         $source = <<<'XML'
 <?xml version="1.0"?>
@@ -1002,14 +1003,13 @@ XML;
 
     private function createXmlEncoderWithEnvelopeNormalizer(): XmlEncoder
     {
-        $normalizers = [
+        $normalizer = new ChainNormalizer([
             $envelopeNormalizer = new EnvelopeNormalizer(),
             new EnvelopedMessageNormalizer(),
-        ];
+        ]);
 
         $encoder = new XmlEncoder();
-        $serializer = new Serializer($normalizers, ['xml' => $encoder]);
-        $encoder->setSerializer($serializer);
+        $serializer = new Serializer([], ['xml' => $encoder], $normalizer);
         $envelopeNormalizer->setSerializer($serializer);
 
         return $encoder;
@@ -1018,8 +1018,9 @@ XML;
     private function createXmlEncoderWithDateTimeNormalizer(): XmlEncoder
     {
         $encoder = new XmlEncoder();
-        $serializer = new Serializer([$this->createMockDateTimeNormalizer()], ['xml' => new XmlEncoder()]);
-        $encoder->setSerializer($serializer);
+        $normalizer = new ChainNormalizer([$this->createMockDateTimeNormalizer()]);
+        $serializer = new Serializer([], ['xml' => $encoder], $normalizer);
+        $encoder->setNormalizer($normalizer);
 
         return $encoder;
     }

@@ -50,7 +50,7 @@ class SerializerExtensionTest extends TestCase
     private function getTwig(string $template): Environment
     {
         $meta = new ClassMetadataFactory(new AttributeLoader());
-        $runtime = new SerializerRuntime(new Serializer([new ObjectNormalizer($meta)], [new JsonEncoder(), new YamlEncoder()]));
+        $runtime = new SerializerRuntime(new Serializer([], [new JsonEncoder(), new YamlEncoder()], new ObjectNormalizer($meta), new ObjectNormalizer($meta)));
 
         $mockRuntimeLoader = $this->createMock(RuntimeLoaderInterface::class);
         $mockRuntimeLoader

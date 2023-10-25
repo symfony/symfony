@@ -27,6 +27,8 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -204,7 +206,10 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testWithoutValidatorAndCouldNotDenormalize()
+    /**
+     * @group legacy
+     */
+    public function testWithoutValidatorAndCouldNotDenormalizeWithLegacySerializer()
     {
         $content = '{"price": 50, "title": ["not a string"]}';
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
@@ -228,10 +233,34 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
+    public function testWithoutValidatorAndCouldNotDenormalize()
+    {
+        $content = '{"price": 50, "title": ["not a string"]}';
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
+
+        $resolver = new RequestPayloadValueResolver($serializer);
+
+        $argument = new ArgumentMetadata('invalid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: $content);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $e->getPrevious());
+        }
+    }
+
     public function testValidationNotPassed()
     {
         $content = '{"price": 50, "title": ["not a string"]}';
-        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->never())
@@ -262,7 +291,7 @@ class RequestPayloadValueResolverTest extends TestCase
     public function testValidationNotPerformedWhenPartialDenormalizationReturnsViolation()
     {
         $content = '{"password": "abc"}';
-        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->never())
@@ -316,7 +345,7 @@ class RequestPayloadValueResolverTest extends TestCase
     {
         $content = '{"price": 50}';
         $payload = new RequestPayload(50);
-        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->once())
@@ -372,7 +401,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $payload = new RequestPayload(50);
         $query = ['price' => '50'];
 
-        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->once())
@@ -400,7 +429,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $input = ['price' => '50'];
         $payload = new RequestPayload(50);
 
-        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->once())
@@ -434,7 +463,7 @@ class RequestPayloadValueResolverTest extends TestCase
             new RequestPayload(23),
         ];
 
-        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new ArrayDenormalizer(), new ObjectNormalizer()]));
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->once())
@@ -513,7 +542,7 @@ class RequestPayloadValueResolverTest extends TestCase
     public function testAcceptFormatPassed(mixed $acceptFormat, string $contentType, string $content)
     {
         $encoders = ['json' => new JsonEncoder(), 'xml' => new XmlEncoder()];
-        $serializer = new Serializer([new ObjectNormalizer()], $encoders);
+        $serializer = new Serializer([], $encoders, new ObjectNormalizer(), new ObjectNormalizer());
         $validator = (new ValidatorBuilder())->getValidator();
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
@@ -576,7 +605,7 @@ class RequestPayloadValueResolverTest extends TestCase
      */
     public function testAcceptFormatNotPassed(mixed $acceptFormat, string $contentType, string $content, string $expectedExceptionMessage)
     {
-        $serializer = new Serializer([new ObjectNormalizer()]);
+        $serializer = new Serializer([], [], new ObjectNormalizer(), new ObjectNormalizer());
         $validator = (new ValidatorBuilder())->getValidator();
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
@@ -647,7 +676,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $payload = new RequestPayload(50);
         $payload->title = 'A long title, so the validation passes';
 
-        $serializer = new Serializer([new ObjectNormalizer()]);
+        $serializer = new Serializer([], [], new ObjectNormalizer(), new ObjectNormalizer());
         $validator = (new ValidatorBuilder())->enableAttributeMapping()->getValidator();
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
@@ -673,7 +702,7 @@ class RequestPayloadValueResolverTest extends TestCase
     {
         $input = ['price' => '50', 'title' => 'Too short'];
 
-        $serializer = new Serializer([new ObjectNormalizer()]);
+        $serializer = new Serializer([], [], new ObjectNormalizer(), new ObjectNormalizer());
         $validator = (new ValidatorBuilder())->enableAttributeMapping()->getValidator();
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
@@ -732,7 +761,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
     public function testQueryValidationErrorCustomStatusCode()
     {
-        $serializer = new Serializer([new ObjectNormalizer()], []);
+        $serializer = new Serializer([], [], new ObjectNormalizer(), new ObjectNormalizer());
 
         $validator = $this->createMock(ValidatorInterface::class);
 
@@ -765,7 +794,7 @@ class RequestPayloadValueResolverTest extends TestCase
     public function testRequestPayloadValidationErrorCustomStatusCode()
     {
         $content = '{"price": 50, "title": ["not a string"]}';
-        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->never())
@@ -798,7 +827,7 @@ class RequestPayloadValueResolverTest extends TestCase
      */
     public function testBoolArgumentInQueryString(mixed $expectedValue, ?string $parameterValue)
     {
-        $serializer = new Serializer([new ObjectNormalizer()]);
+        $serializer = new Serializer([], [], new ObjectNormalizer(), new ObjectNormalizer());
         $validator = $this->createMock(ValidatorInterface::class);
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
@@ -821,7 +850,7 @@ class RequestPayloadValueResolverTest extends TestCase
      */
     public function testBoolArgumentInBody(mixed $expectedValue, ?string $parameterValue)
     {
-        $serializer = new Serializer([new ObjectNormalizer()]);
+        $serializer = new Serializer([], [], new ObjectNormalizer(), new ObjectNormalizer());
         $validator = $this->createMock(ValidatorInterface::class);
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
@@ -857,7 +886,7 @@ class RequestPayloadValueResolverTest extends TestCase
      */
     public function testBoolArgumentInJsonBody()
     {
-        $serializer = new Serializer([new ObjectNormalizer()]);
+        $serializer = new Serializer([], [], new ObjectNormalizer(), new ObjectNormalizer());
         $validator = $this->createMock(ValidatorInterface::class);
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 

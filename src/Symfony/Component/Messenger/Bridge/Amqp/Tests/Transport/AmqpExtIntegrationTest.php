@@ -262,7 +262,7 @@ TXT
     private function createSerializer(): SerializerInterface
     {
         return new Serializer(
-            new SerializerComponent\Serializer([new ObjectNormalizer(), new ArrayDenormalizer()], ['json' => new JsonEncoder()])
+            new SerializerComponent\Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new SerializerComponent\Normalizer\ChainDenormalizer([new ObjectNormalizer(), new ArrayDenormalizer()]))
         );
     }
 

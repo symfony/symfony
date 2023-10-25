@@ -15,6 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -88,7 +89,7 @@ class JsonSerializableNormalizerTest extends TestCase
     protected function getNormalizerForCircularReference(array $defaultContext): JsonSerializableNormalizer
     {
         $normalizer = new JsonSerializableNormalizer(null, null, $defaultContext);
-        new Serializer([$normalizer]);
+        new Serializer([], [], new ChainNormalizer([$normalizer]));
 
         return $normalizer;
     }

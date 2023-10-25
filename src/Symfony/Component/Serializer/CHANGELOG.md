@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `ChainNormalizer` and `ChainDenormalizer`
+ * Add two more constructor arguments for `Serializer` to accept a `NormalizerInterface` and `DenormalizerInterface`
+
 7.1
 ---
 

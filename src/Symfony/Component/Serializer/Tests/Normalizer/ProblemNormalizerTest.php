@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Messenger\Exception\ValidationFailedException as MessageValidationFailedException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -82,7 +83,8 @@ class ProblemNormalizerTest extends TestCase
 
     public function testNormalizeValidationFailedException()
     {
-        $this->normalizer->setSerializer(new Serializer([new ConstraintViolationListNormalizer()]));
+        $serializer = new Serializer([], [], new ConstraintViolationListNormalizer());
+        $this->normalizer->setSerializer($serializer);
 
         $expected = [
             'type' => 'https://symfony.com/errors/validation',
@@ -106,7 +108,8 @@ class ProblemNormalizerTest extends TestCase
 
     public function testNormalizeMessageValidationFailedException()
     {
-        $this->normalizer->setSerializer(new Serializer([new ConstraintViolationListNormalizer()]));
+        $serializer = new Serializer([], [], new ConstraintViolationListNormalizer());
+        $this->normalizer->setSerializer($serializer);
 
         $expected = [
             'type' => 'https://symfony.com/errors/validation',

@@ -59,7 +59,7 @@
         "symfony/scheduler": "^6.4.4|^7.0.4",
         "symfony/security-bundle": "^6.4|^7.0",
         "symfony/semaphore": "^6.4|^7.0",
-        "symfony/serializer": "^6.4|^7.0",
+        "symfony/serializer": "^7.2",
         "symfony/stopwatch": "^6.4|^7.0",
         "symfony/string": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",

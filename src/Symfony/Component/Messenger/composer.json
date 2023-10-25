@@ -30,7 +30,7 @@
         "symfony/property-access": "^6.4|^7.0",
         "symfony/rate-limiter": "^6.4|^7.0",
         "symfony/routing": "^6.4|^7.0",
-        "symfony/serializer": "^6.4|^7.0",
+        "symfony/serializer": "^7.2",
         "symfony/service-contracts": "^2.5|^3",
         "symfony/stopwatch": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0"
@@ -41,7 +41,7 @@
         "symfony/event-dispatcher-contracts": "<2.5",
         "symfony/framework-bundle": "<6.4",
         "symfony/http-kernel": "<6.4",
-        "symfony/serializer": "<6.4"
+        "symfony/serializer": "<7.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\": "" },

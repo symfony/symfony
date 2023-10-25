@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer;
 
 /**
+ * @deprecated since Symfony 7.2, use {@see NormalizerAwareInterface} instead
+ *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface SerializerAwareInterface

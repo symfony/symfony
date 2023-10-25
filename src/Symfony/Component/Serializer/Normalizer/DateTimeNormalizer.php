@@ -88,11 +88,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
-        $timezone = $this->getTimezone($context);
-
         if (\is_int($data) || \is_float($data)) {
-            switch ($dateTimeFormat) {
+            switch ($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY] ?? null) {
                 case 'U': $data = sprintf('%d', $data); break;
                 case 'U.u': $data = sprintf('%.6F', $data); break;
             }
@@ -103,6 +100,9 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         }
 
         try {
+            $timezone = $this->getTimezone($context);
+            $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
+
             if (null !== $dateTimeFormat) {
                 $object = \DateTime::class === $type ? \DateTime::createFromFormat($dateTimeFormat, $data, $timezone) : \DateTimeImmutable::createFromFormat($dateTimeFormat, $data, $timezone);
 

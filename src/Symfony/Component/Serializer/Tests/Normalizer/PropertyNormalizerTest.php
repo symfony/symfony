@@ -24,6 +24,8 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -249,7 +251,7 @@ class PropertyNormalizerTest extends TestCase
     protected function getNormalizerForCircularReference(array $defaultContext): PropertyNormalizer
     {
         $normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer);
 
         return $normalizer;
     }
@@ -261,7 +263,7 @@ class PropertyNormalizerTest extends TestCase
 
     public function testSiblingReference()
     {
-        $serializer = new Serializer([$this->normalizer]);
+        $serializer = new Serializer([], [], new ChainNormalizer([$this->normalizer]));
         $this->normalizer->setSerializer($serializer);
 
         $siblingHolder = new PropertySiblingHolder();
@@ -278,7 +280,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $denormalizer = new PropertyNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
-        $serializer = new Serializer([$denormalizer]);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([$denormalizer]));
         $denormalizer->setSerializer($serializer);
 
         return $denormalizer;
@@ -346,7 +348,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $normalizer = new PropertyNormalizer();
         // instantiate a serializer with the normalizer to handle normalizing recursive structures
-        new Serializer([$normalizer]);
+        new Serializer([], [], null, $normalizer);
 
         return $normalizer;
     }
@@ -355,7 +357,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $normalizer = new PropertyNormalizer();
         // instantiate a serializer with the normalizer to handle normalizing recursive structures
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer);
 
         return $normalizer;
     }
@@ -369,7 +371,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new PropertyNormalizer($classMetadataFactory);
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer);
         $normalizer->setSerializer($serializer);
 
         return $normalizer;
@@ -379,7 +381,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new PropertyNormalizer($classMetadataFactory, null, new PhpDocExtractor());
-        new Serializer([$normalizer]);
+        new Serializer([], [], null, $normalizer);
 
         return $normalizer;
     }
@@ -388,7 +390,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new PropertyNormalizer(null, null, $extractor);
-        $serializer = new Serializer([new ArrayDenormalizer(), $normalizer]);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([new ArrayDenormalizer(), $normalizer]));
         $normalizer->setSerializer($serializer);
 
         return $normalizer;

@@ -25,6 +25,8 @@ use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
@@ -260,12 +262,21 @@ EOF;
 
         $extractor = new PhpDocExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
-        $serializer = new Serializer([
-            new ArrayDenormalizer(),
-            new MimeMessageNormalizer($propertyNormalizer),
-            new ObjectNormalizer(null, null, null, $extractor),
-            $propertyNormalizer,
-        ], [new JsonEncoder()]);
+        $serializer = new Serializer(
+            [],
+            [new JsonEncoder()],
+            new ChainNormalizer([
+                new MimeMessageNormalizer($propertyNormalizer),
+                new ObjectNormalizer(null, null, null, $extractor),
+                $propertyNormalizer,
+            ]),
+            new ChainDenormalizer([
+                new ArrayDenormalizer(),
+                new MimeMessageNormalizer($propertyNormalizer),
+                new ObjectNormalizer(null, null, null, $extractor),
+                $propertyNormalizer,
+            ])
+        );
 
         $serialized = $serializer->serialize($e, 'json');
         $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));

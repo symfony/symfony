@@ -25,6 +25,8 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -246,7 +248,7 @@ class GetSetMethodNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, null, null, $defaultContext);
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer);
 
         return $normalizer;
     }
@@ -260,7 +262,7 @@ class GetSetMethodNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $denormalizer = new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
-        new Serializer([$denormalizer]);
+        new Serializer([], [], null, new ChainDenormalizer([$denormalizer]));
 
         return $denormalizer;
     }
@@ -327,7 +329,7 @@ class GetSetMethodNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory);
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer);
         $normalizer->setSerializer($serializer);
 
         return $normalizer;
@@ -337,7 +339,7 @@ class GetSetMethodNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, new PhpDocExtractor());
-        new Serializer([$normalizer]);
+        new Serializer([], [], null, $normalizer);
 
         return $normalizer;
     }
@@ -346,8 +348,7 @@ class GetSetMethodNormalizerTest extends TestCase
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new GetSetMethodNormalizer(null, null, $extractor);
-        $serializer = new Serializer([new ArrayDenormalizer(), $normalizer]);
-        $normalizer->setSerializer($serializer);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([new ArrayDenormalizer(), $normalizer]));
 
         return $normalizer;
     }
@@ -361,7 +362,7 @@ class GetSetMethodNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, new PhpDocExtractor());
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer);
 
         return $normalizer;
     }
@@ -370,7 +371,7 @@ class GetSetMethodNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, new PhpDocExtractor());
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer, $normalizer);
 
         return $normalizer;
     }
@@ -392,7 +393,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testSiblingReference()
     {
-        $serializer = new Serializer([$this->normalizer]);
+        $serializer = new Serializer([], [], new ChainNormalizer([$this->normalizer]));
         $this->normalizer->setSerializer($serializer);
 
         $expected = [

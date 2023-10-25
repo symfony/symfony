@@ -22,6 +22,8 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
@@ -53,8 +55,9 @@ class Serializer implements SerializerInterface
         }
 
         $encoders = [new XmlEncoder(), new JsonEncoder()];
-        $normalizers = [new DateTimeNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()];
-        $serializer = new SymfonySerializer($normalizers, $encoders);
+        $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer()];
+        $denormalizers = [new DateTimeNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()];
+        $serializer = new SymfonySerializer([], $encoders, new ChainNormalizer($normalizers), new ChainDenormalizer($denormalizers));
 
         return new self($serializer);
     }

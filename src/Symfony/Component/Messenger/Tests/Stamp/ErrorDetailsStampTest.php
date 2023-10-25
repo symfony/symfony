@@ -20,6 +20,8 @@ use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExcept
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
@@ -57,11 +59,12 @@ class ErrorDetailsStampTest extends TestCase
         $exception = new \Exception('exception message');
         $stamp = ErrorDetailsStamp::create($exception);
         $serializer = new Serializer(
-            new SymfonySerializer([
-                new ArrayDenormalizer(),
-                new FlattenExceptionNormalizer(),
-                new ObjectNormalizer(),
-            ], [new JsonEncoder()])
+            new SymfonySerializer(
+                [],
+                [new JsonEncoder()],
+                new ChainNormalizer([new FlattenExceptionNormalizer(), new ObjectNormalizer()]),
+                new ChainDenormalizer([new ArrayDenormalizer(), new FlattenExceptionNormalizer(), new ObjectNormalizer()])
+            )
         );
 
         $deserializedEnvelope = $serializer->decode($serializer->encode(new Envelope(new \stdClass(), [$stamp])));

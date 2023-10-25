@@ -33,6 +33,8 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -58,12 +60,16 @@ return static function (ContainerConfigurator $container) {
     ;
 
     $container->services()
+        ->set('serializer.normalizer', ChainNormalizer::class)
+            ->args([[]])
+        ->set('serializer.denormalizer', ChainDenormalizer::class)
+            ->args([[]])
         ->set('serializer', Serializer::class)
-            ->args([[], []])
+            ->args([[], [], service('serializer.normalizer'), service('serializer.denormalizer')])
 
         ->alias(SerializerInterface::class, 'serializer')
-        ->alias(NormalizerInterface::class, 'serializer')
-        ->alias(DenormalizerInterface::class, 'serializer')
+        ->alias(NormalizerInterface::class, 'serializer.normalizer')
+        ->alias(DenormalizerInterface::class, 'serializer.denormalizer')
         ->alias(EncoderInterface::class, 'serializer')
         ->alias(DecoderInterface::class, 'serializer')
 

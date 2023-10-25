@@ -30,7 +30,7 @@ class SerializerErrorRendererTest extends TestCase
     {
         $exception = new \RuntimeException('Foo');
         $errorRenderer = new SerializerErrorRenderer(
-            new Serializer([new ProblemNormalizer()], [new JsonEncoder()]),
+            new Serializer([], [new JsonEncoder()], new ProblemNormalizer()),
             fn () => 'json'
         );
 

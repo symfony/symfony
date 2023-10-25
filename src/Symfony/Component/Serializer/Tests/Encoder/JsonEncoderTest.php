@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -24,8 +25,9 @@ class JsonEncoderTest extends TestCase
 
     protected function setUp(): void
     {
+        $normalizer = new ChainNormalizer([new CustomNormalizer()]);
         $this->encoder = new JsonEncoder();
-        $this->serializer = new Serializer([new CustomNormalizer()], ['json' => new JsonEncoder()]);
+        $this->serializer = new Serializer([], ['json' => new JsonEncoder()], $normalizer);
     }
 
     public function testEncodeScalar()

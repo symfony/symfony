@@ -4,6 +4,8 @@ CHANGELOG
 7.1
 ---
 
+ * Add `ChainNormalizer` and `ChainDenormalizer`
+ * Add two more constructor arguments for `Serializer` to accept a `NormalizerInterface` and `DenormalizerInterface`
  * Add `DateTimeNormalizer::CAST_KEY` context option
  * Add `Default` and "class name" default groups
 

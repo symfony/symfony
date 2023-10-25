@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer;
 
 /**
+ * @deprecated
+ *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface SerializerAwareInterface

@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use Symfony\Component\Messenger\Transport\Receiver\QueueBlockingReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
+class AmqpReceiver implements QueueReceiverInterface, QueueBlockingReceiverInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
     private Connection $connection;
@@ -39,6 +40,46 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
     public function get(): iterable
     {
         yield from $this->getFromQueues($this->connection->getQueueNames());
+    }
+
+    public function pull(callable $callback): void
+    {
+        $this->pullFromQueues($this->connection->getQueueNames(), $callback);
+    }
+
+    public function pullFromQueues(array $queueNames, callable $callback): void
+    {
+        if (0 === \count($queueNames)) {
+            return;
+        }
+
+        // Pop last queue to send callback
+        $firstQueue = array_pop($queueNames);
+
+        foreach ($queueNames as $queueName) {
+            $this->pullEnvelope($queueName, null);
+        }
+
+        $this->pullEnvelope($firstQueue, $callback);
+    }
+
+    private function pullEnvelope(string $queueName, ?callable $callback): void
+    {
+        if (null !== $callback) {
+            $callback = function (\AMQPEnvelope $amqpEnvelope, \AMQPQueue $queue) use ($callback) {
+                $queueName = $queue->getName();
+                $body = $amqpEnvelope->getBody();
+                $envelope = $this->decodeAmqpEnvelope($amqpEnvelope, $body, $queueName);
+
+                return $callback($envelope->with(new AmqpReceivedStamp($amqpEnvelope, $queueName)));
+            };
+        }
+
+        try {
+            $this->connection->pull($queueName, $callback);
+        } catch (\AMQPException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
     }
 
     public function getFromQueues(array $queueNames): iterable
@@ -61,9 +102,15 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
         }
 
         $body = $amqpEnvelope->getBody();
+        $envelope = $this->decodeAmqpEnvelope($amqpEnvelope, $body, $queueName);
 
+        yield $envelope->with(new AmqpReceivedStamp($amqpEnvelope, $queueName));
+    }
+
+    private function decodeAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, false|string $body, string $queueName): Envelope
+    {
         try {
-            $envelope = $this->serializer->decode([
+            return $this->serializer->decode([
                 'body' => false === $body ? '' : $body, // workaround https://github.com/pdezwart/php-amqp/issues/351
                 'headers' => $amqpEnvelope->getHeaders(),
             ]);
@@ -73,8 +120,6 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 
             throw $exception;
         }
-
-        yield $envelope->with(new AmqpReceivedStamp($amqpEnvelope, $queueName));
     }
 
     public function ack(Envelope $envelope): void

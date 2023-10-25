@@ -41,6 +41,8 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Receiver\BlockingReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\QueueBlockingReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
@@ -578,6 +580,145 @@ class WorkerTest extends TestCase
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
     }
+
+    public function testBlockingMode()
+    {
+        $apiMessage = new DummyMessage('API');
+        $ipaMessage = new DummyMessage('IPA');
+
+        $receiver = new BlockingDummyReceiver([
+            [new Envelope($apiMessage), new Envelope($ipaMessage)],
+        ]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $envelopes = [];
+
+        $bus->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(function ($envelope) use (&$envelopes) {
+                return $envelopes[] = $envelope;
+            });
+
+        $dispatcher = new class() implements EventDispatcherInterface {
+            private StopWorkerOnMessageLimitListener $listener;
+
+            public function __construct()
+            {
+                $this->listener = new StopWorkerOnMessageLimitListener(2);
+            }
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerRunningEvent) {
+                    $this->listener->onWorkerRunning($event);
+                }
+
+                return $event;
+            }
+        };
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
+        $worker->run(['blocking-mode' => true]);
+
+        $this->assertSame($apiMessage, $envelopes[0]->getMessage());
+        $this->assertSame($ipaMessage, $envelopes[1]->getMessage());
+        $this->assertCount(1, $envelopes[0]->all(ReceivedStamp::class));
+        $this->assertCount(1, $envelopes[0]->all(ConsumedByWorkerStamp::class));
+        $this->assertSame('transport', $envelopes[0]->last(ReceivedStamp::class)->getTransportName());
+
+        $this->assertSame(2, $receiver->getAcknowledgeCount());
+    }
+
+    public function testReceiverDoesNotSupportBlockingMode()
+    {
+        $receiver = $this->createMock(QueueReceiverInterface::class);
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+
+        $worker = new Worker(['transport' => $receiver], $bus);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf('Receiver for "transport" does not implement "%s".', BlockingReceiverInterface::class));
+        $worker->run(['blocking-mode' => true]);
+    }
+
+    public function testMoreThanOneReceiverInBlockingMode()
+    {
+        $receiver1 = $this->createMock(QueueReceiverInterface::class);
+        $receiver2 = $this->createMock(QueueReceiverInterface::class);
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+
+        $worker = new Worker(['transport1' => $receiver1, 'transport2' => $receiver2], $bus);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('In blocking mode only one receiver is supported');
+        $worker->run(['blocking-mode' => true]);
+    }
+
+    public function testWorkerLimitQueuesInBlockingMode()
+    {
+        $apiMessage = new DummyMessage('API');
+        $ipaMessage = new DummyMessage('IPA');
+
+        $receiver = new QueueBlockingDummyReceiver([
+            [new Envelope($apiMessage), new Envelope($ipaMessage)],
+        ]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $envelopes = [];
+
+        $bus->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(function ($envelope) use (&$envelopes) {
+                return $envelopes[] = $envelope;
+            });
+
+        $dispatcher = new class() implements EventDispatcherInterface {
+            private StopWorkerOnMessageLimitListener $listener;
+
+            public function __construct()
+            {
+                $this->listener = new StopWorkerOnMessageLimitListener(2);
+            }
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerRunningEvent) {
+                    $this->listener->onWorkerRunning($event);
+                }
+
+                return $event;
+            }
+        };
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
+        $worker->run([
+            'blocking-mode' => true,
+            'queues' => ['foo'],
+        ]);
+
+        $this->assertSame($apiMessage, $envelopes[0]->getMessage());
+        $this->assertSame($ipaMessage, $envelopes[1]->getMessage());
+        $this->assertCount(1, $envelopes[0]->all(ReceivedStamp::class));
+        $this->assertCount(1, $envelopes[0]->all(ConsumedByWorkerStamp::class));
+        $this->assertSame('transport', $envelopes[0]->last(ReceivedStamp::class)->getTransportName());
+
+        $this->assertSame(2, $receiver->getAcknowledgeCount());
+    }
+
+    public function testWorkerLimitQueuesUnsupportedInBlockingMode()
+    {
+        $receiver = $this->createMock(BlockingReceiverInterface::class);
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+
+        $worker = new Worker(['transport' => $receiver], $bus);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf('Receiver for "transport" does not implement "%s".', QueueBlockingReceiverInterface::class));
+        $worker->run([
+            'queues' => ['foo'],
+            'blocking-mode' => true,
+        ]);
+    }
 }
 
 class DummyReceiver implements ReceiverInterface
@@ -628,6 +769,30 @@ class DummyReceiver implements ReceiverInterface
     public function getAcknowledgedEnvelopes(): array
     {
         return $this->acknowledgedEnvelopes;
+    }
+}
+
+class BlockingDummyReceiver extends DummyReceiver implements BlockingReceiverInterface
+{
+    public function pull(callable $callback): void
+    {
+        $envelopes = $this->get();
+
+        foreach ($envelopes as $envelope) {
+            $shouldContinue = $callback($envelope);
+
+            if (false === $shouldContinue) {
+                return;
+            }
+        }
+    }
+}
+
+class QueueBlockingDummyReceiver extends BlockingDummyReceiver implements QueueBlockingReceiverInterface
+{
+    public function pullFromQueues(array $queueNames, callable $callback): void
+    {
+        $this->pull($callback);
     }
 }
 

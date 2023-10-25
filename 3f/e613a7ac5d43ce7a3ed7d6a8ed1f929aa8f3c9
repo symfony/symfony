@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-10-19T15:47:37Z
+
+There will probably be false positives one day but it currently works for every maintained branch.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-20T18:17:12Z
+
+Maybe a dumb question, but couldn't we use composer-unused for this task?
+
+cc @icanhazstring
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-20T18:19:44Z
+
+@OskarStark not for the part about missing the necessary requirement (which is the most important part of this PR)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-20T19:03:27Z
+
+Ah yes, you are right the other way around would be [ComposerRequireChecker ](https://github.com/maglnet/ComposerRequireChecker)

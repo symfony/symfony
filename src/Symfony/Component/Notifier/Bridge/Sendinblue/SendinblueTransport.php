@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class SendinblueTransport extends AbstractTransport
 {
-    protected const HOST = 'api.sendinblue.com';
+    protected const HOST = 'api.brevo.com';
 
     private string $apiKey;
     private string $sender;

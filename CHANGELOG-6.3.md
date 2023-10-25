@@ -7,6 +7,36 @@ in 6.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.3.0...v6.3.1
 
+* 6.3.6 (2023-10-21)
+
+ * bug #52201 [HttpKernel] Resolve EBADP error on flock with LOCK_SH with NFS (driskell)
+ * bug #52194 [Validator] Handle `null` case (OskarStark)
+ * bug #52158 [Messenger] Fix graceful exit with ids (HypeMC)
+ * bug #52105 [Cache] Remove temporary cache item file on `rename()` failure (cedric-anne)
+ * bug #52021 [Form] Fix merging params & files when "multiple" is enabled (priyadi)
+ * bug #51819 [HttpFoundation] Do not swallow trailing `=` in cookie value (OskarStark)
+ * bug #52095 [Notifier][Sendinblue] Handle error responses without a message key (stof)
+ * bug #51907 [Serializer] Fix collecting only first missing constructor argument (HypeMC)
+ * bug #52080 [Messenger] Fix graceful exit (HypeMC)
+ * bug #52075 [Messenger] Fix DoctrineOpenTransactionLoggerMiddleware (ro0NL)
+ * bug #52005 [Translation] Prevent creating empty keys when key ends with a period (javleds)
+ * bug #52035 [DoctrineBridge] Fix DBAL 4 compatibility (derrabus)
+ * bug #52040 [Cache] Fix ArrayAdapter::freeze() return type (fancyweb)
+ * bug #52036 [Cache][VarExporter] Fix proxy generation to deal with edgy behaviors of internal classes (nicolas-grekas)
+ * bug #51947 [Cache][Doctrine][DoctrineBridge][Lock][Messenger] Compatibility with ORM 3 and DBAL 4 (derrabus)
+ * bug #51972 [HttpKernel] Handle nullable callback of `StreamedResponse` (elementaire)
+ * bug #52017 [Mailer] Capitalize sender header for Mailgun (Romanavr)
+ * bug #52009 [FrameworkBundle] Configure `logger` as error logger if the Monolog Bundle is not registered (MatTheCat)
+ * bug #51969 [FrameworkBundle] Fix calling `Kernel::warmUp()` when running `cache:warmup` (nicolas-grekas)
+ * bug #51985 [WebProfilerBundle] Fix markup to make link to profiler appear on errored WDT (MatTheCat)
+ * bug #44766 [RateLimiter] TokenBucket policy fix for adding tokens with a predefined frequency (relo-san)
+ * bug #51825 Fix order array sum normalizedData and nestedData (jerowork)
+ * bug #51876 [HttpClient] Fix type error with http_version 1.1 (Filnor)
+ * bug #51858 [Security] Fix resetting traceable listeners (chalasr)
+ * bug #51843 [FrameworkBundle] Fix call to invalid method in NotificationAssertionsTrait (ker0x)
+ * bug #51791 [Messenger] Check if PCNTL is installed (HypeMC)
+ * bug #47342 Change incorrect message, when the sender in the global envelope or the from header of asEmailMessage() is not defined. (fredericlesueurs)
+
 * 6.3.5 (2023-09-30)
 
  * bug #51773 [Mailer] [Mailgun] Fix outlook sender (Romanavr)

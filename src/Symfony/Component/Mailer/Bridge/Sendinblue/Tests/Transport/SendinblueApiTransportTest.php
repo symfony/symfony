@@ -41,7 +41,7 @@ class SendinblueApiTransportTest extends TestCase
     {
         yield [
             new SendinblueApiTransport('ACCESS_KEY'),
-            'sendinblue+api://api.sendinblue.com',
+            'sendinblue+api://api.brevo.com',
         ];
 
         yield [
@@ -92,7 +92,7 @@ class SendinblueApiTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
+            $this->assertSame('https://api.brevo.com:8984/v3/smtp/email', $url);
             $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
             return new JsonMockResponse(['message' => 'i\'m a teapot'], [
@@ -119,7 +119,7 @@ class SendinblueApiTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
+            $this->assertSame('https://api.brevo.com:8984/v3/smtp/email', $url);
             $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
             return new JsonMockResponse(['messageId' => 'foobar'], [

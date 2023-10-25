@@ -46,20 +46,21 @@ class FormUtil
      */
     public static function mergeParamsAndFiles(array $params, array $files): array
     {
-        $result = [];
+        if (array_is_list($files)) {
+            foreach ($files as $value) {
+                $params[] = $value;
+            }
+
+            return $params;
+        }
 
         foreach ($params as $key => $value) {
             if (\is_array($value) && \is_array($files[$key] ?? null)) {
-                $value = self::mergeParamsAndFiles($value, $files[$key]);
+                $params[$key] = self::mergeParamsAndFiles($value, $files[$key]);
                 unset($files[$key]);
-            }
-            if (\is_int($key)) {
-                $result[] = $value;
-            } else {
-                $result[$key] = $value;
             }
         }
 
-        return array_merge($result, $files);
+        return array_replace($params, $files);
     }
 }

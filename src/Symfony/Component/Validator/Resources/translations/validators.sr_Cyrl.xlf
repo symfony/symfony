@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Вредност мрежне маске треба бити између {{ min }} и {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Назив датотеке је сувише дугачак. Треба да има {{ filename_max_length }} карактер или мање.|Назив датотеке је сувише дугачак. Треба да има {{ filename_max_length }} карактера или мање.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Лозинка није довољно јака. Молимо користите јачу лозинку.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Ова вредност садржи карактере који нису дозвољени од стране важећег нивоа рестрикције.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Коришћење невидљивих карактера није дозвољено.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Мешање бројева из различитих скрипти није дозвољено.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Коришћење скривених преклопних карактера није дозвољено.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

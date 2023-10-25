@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ste93cry at 2023-10-23T19:05:57Z
+
+Shouldn't a deprecation be triggered so that accepting a `null` value is not allowed anymore in the next major? This would make the behavior consistent with similar exceptions, e.g. `HandlerFailedException`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-23T20:15:33Z
+
+We cannot add new deprecations in already released minor versions.

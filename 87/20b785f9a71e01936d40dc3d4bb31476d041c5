@@ -1,0 +1,131 @@
+---------------------------------------------------------------------------
+
+by goetas at 2023-10-24T06:42:43Z
+
+We have almost the same middleware on all our projects, it brings the same memory improvement. My guess is that the number of roots the php garbage collector waits is too high for most of the situations
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-10-24T07:10:49Z
+
+Can you share the impact on CPU?
+Usually RAM is much cheaper than CPU
+
+---------------------------------------------------------------------------
+
+by jwage at 2023-10-24T13:57:44Z
+
+> Can you share the impact on CPU?
+>
+> Usually RAM is much cheaper than CPU
+
+We haven't seen any noticeable difference in the CPU load graphs but our worker servers aren't under heavy load. It takes around 1ms each time we call gc_collect_cycles().
+
+![image](https://github.com/symfony/symfony/assets/97422/c3b3bc72-169a-4bdf-9d0e-ebb3a5044181)
+
+---------------------------------------------------------------------------
+
+by jwage at 2023-10-24T14:05:49Z
+
+> We have almost the same middleware on all our projects, it brings the same memory improvement. My guess is that the number of roots the php garbage collector waits is too high for most of the situations
+
+Yes, that was my conclusion as well. And it is my understanding that PHP will adjust that threshold higher or lower each time gc runs depending on how much was cleaned up. If not much was cleaned up, then it will wait longer. For some reason in my case, the threshold gets extended higher and higher and it takes longer and longer for gc to run on its own.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-10-24T15:02:38Z
+
+> And it is my understanding that PHP will adjust that threshold higher or lower each time gc runs depending on how much was cleaned up
+
+PHP run GC when the number of object is > 10K (it's configurable, but only during compile time)
+
+---------------------------------------------------------------------------
+
+by jwage at 2023-10-24T15:03:56Z
+
+> > And it is my understanding that PHP will adjust that threshold higher or lower each time gc runs depending on how much was cleaned up
+>
+> PHP run GC when the number of object is > 10K (it's configurable, but only during compile time)
+
+:+1: and the threshold was getting extended to 20k, then 30k, etc. each time the automatic gc would run.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-24T19:59:20Z
+
+We discussed that on Slack and I investigated the way the GC works in PHP.
+
+Manual runs of the GC (triggered by the `gc_collect_cycles()` function don't adjust the threshold at all.
+Automatic runs are adjusting the threshold based on the number of collected cycles: if less than 100, the threshold gets increased by 10000 (it starts at 10001) otherwise it gets decreased by 10000 if higher than the initial one.
+
+But this means that if an automatic GC run cannot collect objects (because you have lots of alive objects at that time), it will increase the threshold and that threshold won't ever decrease again if those objects are cleaned by the manual run.
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2023-10-24T22:14:37Z
+
+> I added a call to gc_collect_cycles() in my application after each message is handled,
+
+I have applied this PR (along with an echo statement to tell me when that line is run) to my dev stack, and started my 5 workers (We have over 1000 workers in production),
+
+Without running any messages, just sitting there with a worker started, the gc_collect_cycles is running over and over and over again - continuously every few seconds (evidenced by logging out to the terminal)
+
+This is not "after each message is handled" like you stated, its near continuous... and obviously if there are more than worker on the same server, that "continuous" is x the n number of workers also.
+
+If you needed it  "after each message is handled" surely then it should be listened with `WorkerMessageHandledEvent`?
+
+Or am I missing something?
+
+---------------------------------------------------------------------------
+
+by jwage at 2023-10-24T22:22:14Z
+
+@PhilETaylor initially, it was inside the `foreach ($envelopes as $envelope) {` loop, but in the conversation here https://github.com/symfony/symfony/pull/52253#discussion_r1369096871, we discussed moving it outside of the foreach and that was done in this commit 06b071344384a82d2a1a9f5f1d9bcfa8dbe35e6a. We are missing some additional logic around the `gc_collect_cycles()` call now to only run it when the receivers return envelopes. I will work on another commit to address this.
+
+Edit: Try this commit 0084c455fa642d57e584a6de3d0095ecfee7a1a0
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2023-10-24T22:28:20Z
+
+@jwage Thanks - the 0084c455fa642d57e584a6de3d0095ecfee7a1a0 fixes the "continuous" calling. I'm deploying this to "production" now, if you dont hear from me, it didn't break haha.
+
+---------------------------------------------------------------------------
+
+by jwage at 2023-10-24T22:29:43Z
+
+> @jwage Thanks - the [0084c45](https://github.com/symfony/symfony/commit/0084c455fa642d57e584a6de3d0095ecfee7a1a0) fixes the "continuous" calling. I'm deploying this to "production" now, if you dont hear from me, it didn't break haha.
+
+@PhilETaylor 😮 you live on the bleeding edge :) :)
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2023-10-24T22:31:28Z
+
+@jwage nothing like running a SaaS with 1000s of paying users on decent code :) Symfony makes me powerful
+Current status:
+![ScreenShot-2023-10-24-23 30 23](https://github.com/symfony/symfony/assets/400092/7a83604f-9b89-4f02-aa90-9a37e51d9fbc)
+
+edit: Nothing broke :-) but no huge decrease in memory for me either... dip is the deployment
+
+![ScreenShot-2023-10-24-23 32 56](https://github.com/symfony/symfony/assets/400092/94509126-e8f5-4395-a504-58788ac40286)
+
+---------------------------------------------------------------------------
+
+by jwage at 2023-10-24T22:36:56Z
+
+@PhilETaylor it is my understanding that if your code doesn't have any cyclic references, then the `gc_collect_cycles()` won't have to do anything because the objects will be destroyed immediately when the refcount === 0. So if your code doesn't have any cyclic references, then you won't see any benefit. Did you see any difference in your cpu/load graphs?
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2023-10-24T22:40:15Z
+
+The CPU and Load graphs have their normal spike during deployment but other than that the loads before and after are pretty consistent with each other with no major decrease and no major increase
+
+---------------------------------------------------------------------------
+
+by jwage at 2023-10-24T22:41:10Z
+
+> The CPU and Load graphs have their normal spike during deployment but other than that the loads before and after are pretty consistent with each other with no major decrease and no major increase
+
+Thanks. I am not expecting a drop, but there was some concern that it could increase cpu usage since we're calling gc more often than we were before. Thanks for testing!

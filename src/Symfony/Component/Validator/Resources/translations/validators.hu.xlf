@@ -412,7 +412,7 @@
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target>Ez az érték olyan karaktereket tratalmaz, amik nem megengedettek.</target>
+                <target>Ez az érték olyan karaktereket tartalmaz, amik nem megengedettek.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>

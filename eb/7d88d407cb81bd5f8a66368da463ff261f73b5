@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-09-20T21:36:56Z
+
+> can this be tested somehow?
+
+Test added.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-10-01T11:39:25Z
+
+Should be rebased (see #51653)
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-10-02T12:40:57Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-10-02T13:13:52Z
+
+Psalm errors fixed.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-10-02T18:29:18Z
+
+What about reverting the changes made to the now deprecated `getNestedExceptions()` to update the newly introduced API only?
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-10-02T18:40:55Z
+
+> What about reverting the changes made to the now deprecated getNestedExceptions() to update the newly introduced API only?
+
+You mean throw an `array_values()` into `getNestedExceptions()` before returning?
+
+---
+
+Another thing, it would be nice if `DelayedMessageHandlingException` (which implements this new interface) could provide handlers names as array keys as well but.. I don't think this is possible?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-10-02T19:44:41Z
+
+> You mean throw an array_values() into getNestedExceptions() before returning?
+
+It's probably not a big deal here but yes, we usually avoid changing deprecated code paths.
+
+> Another thing, it would be nice if DelayedMessageHandlingException (which implements this new interface) could provide handlers names as array keys as well but.. I don't think this is possible?
+
+I think it would be possible to use `exception->getTrace()[0]['class']` as keys in `DispatchAfterCurrentBusMiddleware`.
+I may be missing some edge cases though e.g. if the exception wasn't thrown by the handler or if the handler callable has no class (if that's even possible?)
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-10-23T16:33:15Z
+
+> It's probably not a big deal here but yes, we usually avoid changing deprecated code paths.
+
+@chalasr, I've made this change.
+
+> I think it would be possible to use exception->getTrace()[0]['class'] as keys in DispatchAfterCurrentBusMiddleware.
+I may be missing some edge cases though e.g. if the exception wasn't thrown by the handler or if the handler callable has no class (if that's even possible?)
+
+I'm going to leave this off of this PR because of the possible edge cases you describe. This can be revisited later if desired.

@@ -103,8 +103,8 @@ class FileTest extends TestCase
             ['1GI', 1073741824, true],
             ['2g', 2000000000, false],
             ['2G', 2000000000, false],
-            ['4g', 4 === \PHP_INT_SIZE ? '4000000000' : 4000000000, false],
-            ['4G', 4 === \PHP_INT_SIZE ? '4000000000' : 4000000000, false],
+            ['4g', 4 === \PHP_INT_SIZE ? 4000000000.0 : 4000000000, false],
+            ['4G', 4 === \PHP_INT_SIZE ? 4000000000.0 : 4000000000, false],
         ];
     }
 

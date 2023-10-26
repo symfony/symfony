@@ -332,16 +332,17 @@ class Connection implements ResetInterface
         $redeliverLimit = $now->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->createQueryBuilder()
-            ->where('m.delivered_at is null OR m.delivered_at < ?')
+            ->where('m.queue_name = ?')
+            ->andWhere('m.delivered_at is null OR m.delivered_at < ?')
             ->andWhere('m.available_at <= ?')
-            ->andWhere('m.queue_name = ?')
             ->setParameters([
+                $this->configuration['queue_name'],
                 $redeliverLimit,
                 $now,
-                $this->configuration['queue_name'],
             ], [
-                Types::DATETIME_IMMUTABLE,
-                Types::DATETIME_IMMUTABLE,
+                Types::STRING,
+                Types::DATETIME_MUTABLE,
+                Types::DATETIME_MUTABLE,
             ]);
     }
 

@@ -101,3 +101,43 @@ jobs:
           done
 
           exit $ok
+      - name: Verify symfony/deprecation-contracts requirements
+        run: |
+          set +e
+
+          ok=0
+          json='${{ steps.find-packages.outputs.packages }}'
+          for package in $(echo "${json}" | jq -r '.[] | @base64'); do
+              _jq() {
+                echo ${package} | base64 --decode | jq -r ${1}
+              }
+
+              NAME=$(_jq '.name')
+              if [[ $NAME = 'symfony/deprecation-contracts' || $NAME = 'symfony/contracts' ]]; then
+                continue
+              fi
+
+              echo "::group::$NAME"
+              DIR=$(_jq '.directory')
+              localExit=0
+              grep -rq 'trigger_deprecation(' --include=*.php --exclude-dir=Tests/ --exclude-dir=Bridge/ $DIR
+              triggersDeprecation=$?
+              if [[ $triggersDeprecation -eq 0 && $(_jq '.requires_deprecation_contracts') == false ]]; then
+                errorMessage="::error::$NAME does not require symfony/deprecation-contracts but triggers at least one deprecation"
+                localExit=1
+              elif [[ $triggersDeprecation -eq 1 && $(_jq '.requires_deprecation_contracts') == true ]]; then
+                errorMessage="::error::$NAME requires symfony/deprecation-contracts but does not trigger any deprecation"
+                localExit=1
+              elif [[ $triggersDeprecation -ne 0 && $triggersDeprecation -ne 1 ]]; then
+                echo "::error::grep failed"
+                exit 2
+              fi
+
+              ok=$(( $localExit || $ok ))
+              echo ::endgroup::
+              if [ $localExit -ne 0 ]; then
+                echo $errorMessage
+              fi
+          done
+
+          exit $ok

@@ -23,9 +23,10 @@ class DelayedMessageHandlingException extends RuntimeException implements Wrappe
 {
     use WrappedExceptionsTrait;
 
-    private Envelope $envelope;
+    private array $exceptions;
+    private ?Envelope $envelope;
 
-    public function __construct(array $exceptions, Envelope $envelope)
+    public function __construct(array $exceptions, Envelope $envelope = null)
     {
         $this->envelope = $envelope;
 
@@ -45,7 +46,7 @@ class DelayedMessageHandlingException extends RuntimeException implements Wrappe
         parent::__construct($message, 0, $exceptions[array_key_first($exceptions)]);
     }
 
-    public function getEnvelope(): Envelope
+    public function getEnvelope(): ?Envelope
     {
         return $this->envelope;
     }

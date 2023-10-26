@@ -20,7 +20,7 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
     private Envelope $envelope;
 
     /**
-     * @param \Throwable[] $exceptions
+     * @param \Throwable[] $exceptions The name of the handler should be given as key
      */
     public function __construct(Envelope $envelope, array $exceptions)
     {

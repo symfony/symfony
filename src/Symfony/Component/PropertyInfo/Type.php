@@ -11,27 +11,38 @@
 
 namespace Symfony\Component\PropertyInfo;
 
+use Symfony\Component\TypeInfo\BackwardCompatibilityHelper;
+use Symfony\Component\TypeInfo\Type as TypeInfoType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+
+trigger_deprecation('symfony/property-info', '7.1', 'The "%s" class is deprecated. Use "%s" of "symfony/type-info" component instead.', Type::class, TypeInfoType::class);
+
 /**
  * Type value object (immutable).
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
+ * @deprecated since Symfony 7.1, use "Symfony\Component\TypeInfo\Type" of "symfony/type-info" component instead
+ *
  * @final
  */
 class Type
 {
-    public const BUILTIN_TYPE_INT = 'int';
-    public const BUILTIN_TYPE_FLOAT = 'float';
-    public const BUILTIN_TYPE_STRING = 'string';
-    public const BUILTIN_TYPE_BOOL = 'bool';
-    public const BUILTIN_TYPE_RESOURCE = 'resource';
-    public const BUILTIN_TYPE_OBJECT = 'object';
-    public const BUILTIN_TYPE_ARRAY = 'array';
-    public const BUILTIN_TYPE_NULL = 'null';
-    public const BUILTIN_TYPE_FALSE = 'false';
-    public const BUILTIN_TYPE_TRUE = 'true';
-    public const BUILTIN_TYPE_CALLABLE = 'callable';
-    public const BUILTIN_TYPE_ITERABLE = 'iterable';
+    public const BUILTIN_TYPE_INT = TypeIdentifier::INT->value;
+    public const BUILTIN_TYPE_FLOAT = TypeIdentifier::FLOAT->value;
+    public const BUILTIN_TYPE_STRING = TypeIdentifier::STRING->value;
+    public const BUILTIN_TYPE_BOOL = TypeIdentifier::BOOL->value;
+    public const BUILTIN_TYPE_RESOURCE = TypeIdentifier::RESOURCE->value;
+    public const BUILTIN_TYPE_OBJECT = TypeIdentifier::OBJECT->value;
+    public const BUILTIN_TYPE_ARRAY = TypeIdentifier::ARRAY->value;
+    public const BUILTIN_TYPE_NULL = TypeIdentifier::NULL->value;
+    public const BUILTIN_TYPE_FALSE = TypeIdentifier::FALSE->value;
+    public const BUILTIN_TYPE_TRUE = TypeIdentifier::TRUE->value;
+    public const BUILTIN_TYPE_CALLABLE = TypeIdentifier::CALLABLE->value;
+    public const BUILTIN_TYPE_ITERABLE = TypeIdentifier::ITERABLE->value;
 
     /**
      * List of PHP builtin types.
@@ -63,12 +74,10 @@ class Type
         self::BUILTIN_TYPE_ITERABLE,
     ];
 
-    private string $builtinType;
-    private bool $nullable;
-    private ?string $class;
-    private bool $collection;
-    private array $collectionKeyType;
-    private array $collectionValueType;
+    /**
+     * @internal
+     */
+    public TypeInfoType $internalType;
 
     /**
      * @param Type[]|Type|null $collectionKeyType
@@ -78,35 +87,14 @@ class Type
      */
     public function __construct(string $builtinType, bool $nullable = false, ?string $class = null, bool $collection = false, array|self|null $collectionKeyType = null, array|self|null $collectionValueType = null)
     {
-        if (!\in_array($builtinType, self::$builtinTypes, true)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));
-        }
-
-        $this->builtinType = $builtinType;
-        $this->nullable = $nullable;
-        $this->class = $class;
-        $this->collection = $collection;
-        $this->collectionKeyType = $this->validateCollectionArgument($collectionKeyType, 5, '$collectionKeyType') ?? [];
-        $this->collectionValueType = $this->validateCollectionArgument($collectionValueType, 6, '$collectionValueType') ?? [];
-    }
-
-    private function validateCollectionArgument(array|self|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
-    {
-        if (null === $collectionArgument) {
-            return null;
-        }
-
-        if (\is_array($collectionArgument)) {
-            foreach ($collectionArgument as $type) {
-                if (!$type instanceof self) {
-                    throw new \TypeError(sprintf('"%s()": Argument #%d (%s) must be of type "%s[]", "%s" or "null", array value "%s" given.', __METHOD__, $argumentIndex, $argumentName, self::class, self::class, get_debug_type($collectionArgument)));
-                }
-            }
-
-            return $collectionArgument;
-        }
-
-        return [$collectionArgument];
+        $this->internalType = BackwardCompatibilityHelper::createTypeFromLegacyValues(
+            $builtinType,
+            $nullable,
+            $class,
+            $collection,
+            $this->validateCollectionArgument($collectionKeyType, 5, '$collectionKeyType') ?? [],
+            $this->validateCollectionArgument($collectionValueType, 6, '$collectionValueType') ?? [],
+        );
     }
 
     /**
@@ -116,12 +104,14 @@ class Type
      */
     public function getBuiltinType(): string
     {
-        return $this->builtinType;
+        $internalType = BackwardCompatibilityHelper::unwrapNullableType($this->internalType);
+
+        return $internalType->getBaseType()->getTypeIdentifier()->value;
     }
 
     public function isNullable(): bool
     {
-        return $this->nullable;
+        return $this->internalType->isNullable();
     }
 
     /**
@@ -131,12 +121,19 @@ class Type
      */
     public function getClassName(): ?string
     {
-        return $this->class;
+        $internalType = BackwardCompatibilityHelper::unwrapNullableType($this->internalType);
+        $internalType = $internalType->getBaseType();
+
+        if (!$internalType instanceof ObjectType) {
+            return null;
+        }
+
+        return $internalType->getClassName();
     }
 
     public function isCollection(): bool
     {
-        return $this->collection;
+        return $this->internalType->isCollection;
     }
 
     /**
@@ -148,7 +145,17 @@ class Type
      */
     public function getCollectionKeyTypes(): array
     {
-        return $this->collectionKeyType;
+        $internalType = BackwardCompatibilityHelper::unwrapNullableType($this->internalType);
+
+        if ($internalType instanceof CollectionType) {
+            return BackwardCompatibilityHelper::convertTypeToLegacyTypes($internalType->getCollectionKeyType()) ?? [];
+        }
+
+        if ($internalType instanceof GenericType) {
+            return BackwardCompatibilityHelper::convertTypeToLegacyTypes($internalType->getVariableTypes()[0]) ?? [];
+        }
+
+        return [];
     }
 
     /**
@@ -160,6 +167,35 @@ class Type
      */
     public function getCollectionValueTypes(): array
     {
-        return $this->collectionValueType;
+        $internalType = BackwardCompatibilityHelper::unwrapNullableType($this->internalType);
+
+        if ($internalType instanceof CollectionType) {
+            return BackwardCompatibilityHelper::convertTypeToLegacyTypes($internalType->getCollectionValueType()) ?? [];
+        }
+
+        if ($internalType instanceof GenericType) {
+            return BackwardCompatibilityHelper::convertTypeToLegacyTypes($internalType->getVariableTypes()[1]) ?? [];
+        }
+
+        return [];
+    }
+
+    private function validateCollectionArgument(array|self|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
+    {
+        if (null === $collectionArgument) {
+            return null;
+        }
+
+        if (!\is_array($collectionArgument)) {
+            $collectionArgument = [$collectionArgument];
+        }
+
+        foreach ($collectionArgument as $type) {
+            if (!$type instanceof self) {
+                throw new \TypeError(sprintf('"%s()": Argument #%d (%s) must be of type "%s[]", "%s" or "null", array value "%s" given.', __METHOD__, $argumentIndex, $argumentName, self::class, self::class, get_debug_type($collectionArgument)));
+            }
+        }
+
+        return $collectionArgument;
     }
 }

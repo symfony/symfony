@@ -33,7 +33,18 @@ final class CollectionType extends Type
     public function __construct(
         private readonly BuiltinType|ObjectType|GenericType $type,
         private readonly bool $isList = false,
+        private readonly bool $validateListKeys = true,
     ) {
+        if (\func_num_args() > 2) {
+            trigger_deprecation('symfony/property-info', '7.1', 'The "$validateListKeys" parameter of "%s()" is deprecated.', __METHOD__);
+        }
+
+        // BC layer to allow invalid list keys
+        // Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
+        if (!$validateListKeys) {
+            return;
+        }
+
         if ($this->isList()) {
             $keyType = $this->getCollectionKeyType();
 
@@ -104,5 +115,31 @@ final class CollectionType extends Type
     public function __call(string $method, array $arguments): mixed
     {
         return $this->type->{$method}(...$arguments);
+    }
+
+    /**
+     * BC layer for Symfony\Component\PropertyInfo\Type.
+     *
+     * Can be removed as soon as Symfony\Component\PropertyInfo\Type is removed (8.0).
+     *
+     * @internal
+     */
+    public function setCollection(bool $collection): void
+    {
+        parent::setCollection($collection);
+        $this->type->setCollection($collection);
+    }
+
+    /**
+     * BC layer for Symfony\Component\PropertyInfo\Type.
+     *
+     * Can be removed as soon as Symfony\Component\PropertyInfo\Type is removed (8.0).
+     *
+     * @internal
+     */
+    public function setNullable(bool $nullable): void
+    {
+        parent::setNullable($nullable);
+        $this->type->setNullable($nullable);
     }
 }

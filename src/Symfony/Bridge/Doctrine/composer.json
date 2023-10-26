@@ -19,6 +19,7 @@
         "php": ">=8.2",
         "doctrine/event-manager": "^2",
         "doctrine/persistence": "^3.1",
+        "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/service-contracts": "^2.5|^3"
@@ -38,6 +39,7 @@
         "symfony/security-core": "^6.4|^7.0",
         "symfony/stopwatch": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",
+        "symfony/type-info": "^7.1",
         "symfony/uid": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
         "symfony/var-dumper": "^6.4|^7.0",

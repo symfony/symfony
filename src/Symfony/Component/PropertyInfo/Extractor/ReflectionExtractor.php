@@ -19,9 +19,16 @@ use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\String\Inflector\EnglishInflector;
 use Symfony\Component\String\Inflector\InflectorInterface;
+use Symfony\Component\TypeInfo\BackwardCompatibilityHelper;
+use Symfony\Component\TypeInfo\Exception\UnsupportedException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
 /**
  * Extracts data using the reflection API.
@@ -61,9 +68,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     public const ALLOW_MAGIC_CALL = 1 << 2;
 
     private const MAP_TYPES = [
-        'integer' => Type::BUILTIN_TYPE_INT,
-        'boolean' => Type::BUILTIN_TYPE_BOOL,
-        'double' => Type::BUILTIN_TYPE_FLOAT,
+        'integer' => TypeIdentifier::INT->value,
+        'boolean' => TypeIdentifier::BOOL->value,
+        'double' => TypeIdentifier::FLOAT->value,
     ];
 
     private array $mutatorPrefixes;
@@ -76,6 +83,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private InflectorInterface $inflector;
     private array $arrayMutatorPrefixesFirst;
     private array $arrayMutatorPrefixesLast;
+    private TypeResolverInterface $typeResolver;
 
     /**
      * @param string[]|null $mutatorPrefixes
@@ -92,6 +100,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);
         $this->magicMethodsFlags = $magicMethodsFlags;
         $this->inflector = $inflector ?? new EnglishInflector();
+        $this->typeResolver = TypeResolver::create();
 
         $this->arrayMutatorPrefixesFirst = array_merge($this->arrayMutatorPrefixes, array_diff($this->mutatorPrefixes, $this->arrayMutatorPrefixes));
         $this->arrayMutatorPrefixesLast = array_reverse($this->arrayMutatorPrefixesFirst);
@@ -132,13 +141,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return $properties ? array_values($properties) : null;
     }
 
-    public function getTypes(string $class, string $property, array $context = []): ?array
+    public function getType(string $class, string $property, array $context = []): ?Type
     {
+        // BC layer to allow unconsistent legacy type extraction
+        // Can be removed as soon as ReflectionExtractor::getTypes() is removed (8.0).
+        $backwardCompatible = \func_get_args()[3] ?? false;
+
         if ($fromMutator = $this->extractFromMutator($class, $property)) {
             return $fromMutator;
         }
 
-        if ($fromAccessor = $this->extractFromAccessor($class, $property)) {
+        if ($fromAccessor = $this->extractFromAccessor($class, $property, $backwardCompatible)) {
             return $fromAccessor;
         }
 
@@ -156,7 +169,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    public function getTypesFromConstructor(string $class, string $property): ?array
+    /**
+     * @deprecated since Symfony 7.1, use "getType" instead
+     */
+    public function getTypes(string $class, string $property, array $context = []): ?array
+    {
+        trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
+
+        return BackwardCompatibilityHelper::convertTypeToLegacyTypes($this->getType($class, $property, $context, true), keepNullType: false);
+    }
+
+    public function getTypeFromConstructor(string $class, string $property): ?Type
     {
         try {
             $reflection = new \ReflectionClass($class);
@@ -169,14 +192,23 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         if (!$reflectionParameter = $this->getReflectionParameterFromConstructor($property, $reflectionConstructor)) {
             return null;
         }
-        if (!$reflectionType = $reflectionParameter->getType()) {
+        try {
+            return $this->typeResolver->resolve($reflectionParameter);
+        } catch (UnsupportedException) {
             return null;
         }
-        if (!$types = $this->extractFromReflectionType($reflectionType, $reflectionConstructor->getDeclaringClass())) {
-            return null;
-        }
+    }
 
-        return $types;
+    /**
+     * @deprecated since Symfony 7.1, use "getTypeFromConstructor" instead
+     *
+     * @return LegacyType[]|null
+     */
+    public function getTypesFromConstructor(string $class, string $property): ?array
+    {
+        trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getTypeFromConstructor()" instead.', __METHOD__, self::class);
+
+        return BackwardCompatibilityHelper::convertTypeToLegacyTypes($this->getTypeFromConstructor($class, $property));
     }
 
     private function getReflectionParameterFromConstructor(string $property, \ReflectionMethod $reflectionConstructor): ?\ReflectionParameter
@@ -404,26 +436,21 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return $noneProperty;
     }
 
-    /**
-     * @return Type[]|null
-     */
-    private function extractFromMutator(string $class, string $property): ?array
+    private function extractFromMutator(string $class, string $property): ?Type
     {
         [$reflectionMethod, $prefix] = $this->getMutatorMethod($class, $property);
         if (null === $reflectionMethod) {
             return null;
         }
 
-        $reflectionParameters = $reflectionMethod->getParameters();
-        $reflectionParameter = $reflectionParameters[0];
-
-        if (!$reflectionType = $reflectionParameter->getType()) {
+        try {
+            $type = $this->typeResolver->resolve($reflectionMethod->getParameters()[0]);
+        } catch (UnsupportedException) {
             return null;
         }
-        $type = $this->extractFromReflectionType($reflectionType, $reflectionMethod->getDeclaringClass());
 
-        if (1 === \count($type) && \in_array($prefix, $this->arrayMutatorPrefixes, true)) {
-            $type = [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $type[0])];
+        if (!$type instanceof CollectionType && \in_array($prefix, $this->arrayMutatorPrefixes, true)) {
+            $type = Type::list($type);
         }
 
         return $type;
@@ -431,22 +458,24 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     /**
      * Tries to extract type information from accessors.
-     *
-     * @return Type[]|null
      */
-    private function extractFromAccessor(string $class, string $property): ?array
+    private function extractFromAccessor(string $class, string $property, bool $backwardCompatible = false): ?Type
     {
         [$reflectionMethod, $prefix] = $this->getAccessorMethod($class, $property);
         if (null === $reflectionMethod) {
             return null;
         }
 
-        if ($reflectionType = $reflectionMethod->getReturnType()) {
-            return $this->extractFromReflectionType($reflectionType, $reflectionMethod->getDeclaringClass());
+        try {
+            return $this->typeResolver->resolve($reflectionMethod);
+        } catch (UnsupportedException) {
+            if ($backwardCompatible && 'void' === (string) $reflectionMethod->getReturnType()) {
+                return Type::void();
+            }
         }
 
         if (\in_array($prefix, ['is', 'can', 'has'])) {
-            return [new Type(Type::BUILTIN_TYPE_BOOL)];
+            return Type::bool();
         }
 
         return null;
@@ -454,10 +483,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     /**
      * Tries to extract type information from constructor.
-     *
-     * @return Type[]|null
      */
-    private function extractFromConstructor(string $class, string $property): ?array
+    private function extractFromConstructor(string $class, string $property): ?Type
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
@@ -475,9 +502,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             if ($property !== $parameter->name) {
                 continue;
             }
-            $reflectionType = $parameter->getType();
 
-            return $reflectionType ? $this->extractFromReflectionType($reflectionType, $constructor->getDeclaringClass()) : null;
+            try {
+                return $this->typeResolver->resolve($parameter);
+            } catch (UnsupportedException) {
+                return null;
+            }
         }
 
         if ($parentClass = $reflectionClass->getParentClass()) {
@@ -487,16 +517,15 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    private function extractFromPropertyDeclaration(string $class, string $property): ?array
+    private function extractFromPropertyDeclaration(string $class, string $property): ?Type
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
-
             $reflectionProperty = $reflectionClass->getProperty($property);
-            $reflectionPropertyType = $reflectionProperty->getType();
 
-            if (null !== $reflectionPropertyType && $types = $this->extractFromReflectionType($reflectionPropertyType, $reflectionProperty->getDeclaringClass())) {
-                return $types;
+            try {
+                return $this->typeResolver->resolve($reflectionProperty);
+            } catch (UnsupportedException) {
             }
         } catch (\ReflectionException) {
             return null;
@@ -508,52 +537,14 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return null;
         }
 
-        $type = \gettype($defaultValue);
-        $type = static::MAP_TYPES[$type] ?? $type;
+        $typeIdentifier = TypeIdentifier::from(static::MAP_TYPES[\gettype($defaultValue)] ?? \gettype($defaultValue));
+        $type = 'array' === $typeIdentifier->value ? Type::array() : Type::builtin($typeIdentifier);
 
-        return [new Type($type, $this->isNullableProperty($class, $property), null, Type::BUILTIN_TYPE_ARRAY === $type)];
-    }
-
-    private function extractFromReflectionType(\ReflectionType $reflectionType, \ReflectionClass $declaringClass): array
-    {
-        $types = [];
-        $nullable = $reflectionType->allowsNull();
-
-        foreach (($reflectionType instanceof \ReflectionUnionType || $reflectionType instanceof \ReflectionIntersectionType) ? $reflectionType->getTypes() : [$reflectionType] as $type) {
-            if (!$type instanceof \ReflectionNamedType) {
-                // Nested composite types are not supported yet.
-                return [];
-            }
-
-            $phpTypeOrClass = $type->getName();
-            if ('null' === $phpTypeOrClass || 'mixed' === $phpTypeOrClass || 'never' === $phpTypeOrClass) {
-                continue;
-            }
-
-            if (Type::BUILTIN_TYPE_ARRAY === $phpTypeOrClass) {
-                $types[] = new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true);
-            } elseif ('void' === $phpTypeOrClass) {
-                $types[] = new Type(Type::BUILTIN_TYPE_NULL, $nullable);
-            } elseif ($type->isBuiltin()) {
-                $types[] = new Type($phpTypeOrClass, $nullable);
-            } else {
-                $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $declaringClass));
-            }
+        if ($this->isNullableProperty($class, $property)) {
+            $type = Type::nullable($type);
         }
 
-        return $types;
-    }
-
-    private function resolveTypeName(string $name, \ReflectionClass $declaringClass): string
-    {
-        if ('self' === $lcName = strtolower($name)) {
-            return $declaringClass->name;
-        }
-        if ('parent' === $lcName && $parent = $declaringClass->getParentClass()) {
-            return $parent->name;
-        }
-
-        return $name;
+        return $type;
     }
 
     private function isNullableProperty(string $class, string $property): bool

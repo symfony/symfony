@@ -71,6 +71,10 @@ final class StringTypeResolver implements TypeResolverInterface
 
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
+        // BC layer to allow unconsistent legacy type extraction
+        // Can be removed as soon as PhpStanExtractor::getTypes() is removed (8.0).
+        $backwardCompatible = \func_get_args()[2] ?? false;
+
         if (!\is_string($subject)) {
             throw new UnsupportedException(sprintf('Expected subject to be a "string", "%s" given.', get_debug_type($subject)), $subject);
         }
@@ -79,20 +83,20 @@ final class StringTypeResolver implements TypeResolverInterface
             $tokens = new TokenIterator($this->lexer->tokenize($subject));
             $node = $this->parser->parse($tokens);
 
-            return $this->getTypeFromNode($node, $typeContext);
+            return $this->getTypeFromNode($node, $typeContext, $backwardCompatible);
         } catch (\DomainException $e) {
             throw new UnsupportedException(sprintf('Cannot resolve "%s".', $subject), $subject, previous: $e);
         }
     }
 
-    private function getTypeFromNode(TypeNode $node, ?TypeContext $typeContext): Type
+    private function getTypeFromNode(TypeNode $node, ?TypeContext $typeContext, bool $backwardCompatible): Type
     {
         if ($node instanceof CallableTypeNode) {
             return Type::callable();
         }
 
         if ($node instanceof ArrayTypeNode) {
-            return Type::array($this->getTypeFromNode($node->type, $typeContext));
+            return Type::list($this->getTypeFromNode($node->type, $typeContext, $backwardCompatible));
         }
 
         if ($node instanceof ArrayShapeNode) {
@@ -172,20 +176,27 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof NullableTypeNode) {
-            return Type::nullable($this->getTypeFromNode($node->type, $typeContext));
+            return Type::nullable($this->getTypeFromNode($node->type, $typeContext, $backwardCompatible));
         }
 
         if ($node instanceof GenericTypeNode) {
-            $type = $this->getTypeFromNode($node->type, $typeContext);
+            $type = $this->getTypeFromNode($node->type, $typeContext, $backwardCompatible);
 
             // handle integer ranges as simple integers
             if ($type->isA(TypeIdentifier::INT)) {
                 return $type;
             }
 
-            $variableTypes = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->genericTypes);
+            // BC layer to convert class-string generics as simple strings
+            // Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
+            if ($backwardCompatible && 'class-string' === $node->type->name) {
+                return $type;
+            }
+
+            $variableTypes = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext, $backwardCompatible), $node->genericTypes);
 
             if ($type instanceof CollectionType) {
+                $asList = $type->isList();
                 $keyType = $type->getCollectionKeyType();
 
                 $type = $type->getType();
@@ -194,9 +205,15 @@ final class StringTypeResolver implements TypeResolverInterface
                 }
 
                 if (1 === \count($variableTypes)) {
-                    return Type::collection($type, $variableTypes[0], $keyType);
+                    // BC layer to keep "mixed" array key
+                    // Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
+                    if ($backwardCompatible) {
+                        return new CollectionType(Type::generic($type, 'list' !== $node->type->name ? Type::mixed() : $keyType, $variableTypes[0]), $asList, validateListKeys: false);
+                    }
+
+                    return new CollectionType(Type::generic($type, $keyType, $variableTypes[0]), $asList);
                 } elseif (2 === \count($variableTypes)) {
-                    return Type::collection($type, $variableTypes[1], $variableTypes[0]);
+                    return Type::collection($type, $variableTypes[1], $variableTypes[0], $asList);
                 }
             }
 
@@ -212,11 +229,11 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof UnionTypeNode) {
-            return Type::union(...array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->types));
+            return Type::union(...array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext, $backwardCompatible), $node->types));
         }
 
         if ($node instanceof IntersectionTypeNode) {
-            return Type::intersection(...array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->types));
+            return Type::intersection(...array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext, $backwardCompatible), $node->types));
         }
 
         throw new \DomainException(sprintf('Unhandled "%s" node.', $node::class));

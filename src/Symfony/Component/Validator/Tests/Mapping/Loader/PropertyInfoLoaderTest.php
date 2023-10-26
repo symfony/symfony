@@ -12,8 +12,11 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Iban;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -35,8 +38,8 @@ class PropertyInfoLoaderTest extends TestCase
 {
     public function testLoadClassMetadata()
     {
-        $propertyInfoStub = $this->createMock(PropertyInfoExtractorInterface::class);
-        $propertyInfoStub
+        $propertyListExtractor = $this->createMock(PropertyListExtractorInterface::class);
+        $propertyListExtractor
             ->method('getProperties')
             ->willReturn([
                 'nullableString',
@@ -54,24 +57,62 @@ class PropertyInfoLoaderTest extends TestCase
                 'noAutoMapping',
             ])
         ;
-        $propertyInfoStub
-            ->method('getTypes')
-            ->will($this->onConsecutiveCalls(
-                [new Type(Type::BUILTIN_TYPE_STRING, true)],
-                [new Type(Type::BUILTIN_TYPE_STRING)],
-                [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_BOOL)],
-                [new Type(Type::BUILTIN_TYPE_OBJECT, true, Entity::class)],
-                [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Entity::class))],
-                [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)],
-                [new Type(Type::BUILTIN_TYPE_FLOAT, true)], // The existing constraint is float
-                [new Type(Type::BUILTIN_TYPE_STRING, true)],
-                [new Type(Type::BUILTIN_TYPE_STRING, true)],
-                [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_FLOAT))],
-                [new Type(Type::BUILTIN_TYPE_STRING)],
-                [new Type(Type::BUILTIN_TYPE_STRING)]
-            ))
-        ;
-        $propertyInfoStub
+
+        $propertyTypeExtractor = new class() implements PropertyTypeExtractorInterface {
+            private int $i = 0;
+            private int $j = 0;
+            private array $types;
+            private array $legacyTypes;
+
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                $this->types ??= [
+                    Type::nullable(Type::string()),
+                    Type::string(),
+                    Type::union(Type::string(), Type::int(), Type::bool(), Type::null()),
+                    Type::nullable(Type::object(Entity::class)),
+                    Type::nullable(Type::array(Type::object(Entity::class))),
+                    Type::nullable(Type::array()),
+                    Type::nullable(Type::float()), // The existing constraint is float
+                    Type::nullable(Type::string()),
+                    Type::nullable(Type::string()),
+                    Type::nullable(Type::array(Type::float())),
+                    Type::string(),
+                    Type::string(),
+                ];
+
+                $type = $this->types[$this->i];
+                ++$this->i;
+
+                return $type;
+            }
+
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                $this->legacyTypes ??= [
+                    [new LegacyType('string', true)],
+                    [new LegacyType('string')],
+                    [new LegacyType('string', true), new LegacyType('int'), new LegacyType('bool')],
+                    [new LegacyType('object', true, Entity::class)],
+                    [new LegacyType('array', true, null, true, null, new LegacyType('object', false, Entity::class))],
+                    [new LegacyType('array', true, null, true)],
+                    [new LegacyType('float', true)], // The existing constraint is float
+                    [new LegacyType('string', true)],
+                    [new LegacyType('string', true)],
+                    [new LegacyType('array', true, null, true, null, new LegacyType('float'))],
+                    [new LegacyType('string')],
+                    [new LegacyType('string')],
+                ];
+
+                $legacyType = $this->legacyTypes[$this->j];
+                ++$this->j;
+
+                return $legacyType;
+            }
+        };
+
+        $propertyAccessExtractor = $this->createMock(PropertyAccessExtractorInterface::class);
+        $propertyAccessExtractor
             ->method('isWritable')
             ->will($this->onConsecutiveCalls(
                 true,
@@ -89,7 +130,7 @@ class PropertyInfoLoaderTest extends TestCase
             ))
         ;
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
+        $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor, '{.*}');
 
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
@@ -170,7 +211,6 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertInstanceOf(TypeConstraint::class, $alreadyPartiallyMappedCollectionConstraints[0]->constraints[0]);
         $this->assertSame('string', $alreadyPartiallyMappedCollectionConstraints[0]->constraints[0]->type);
         $this->assertInstanceOf(Iban::class, $alreadyPartiallyMappedCollectionConstraints[0]->constraints[1]);
-        $this->assertInstanceOf(NotNull::class, $alreadyPartiallyMappedCollectionConstraints[0]->constraints[2]);
 
         $readOnlyMetadata = $classMetadata->getPropertyMetadata('readOnly');
         $this->assertEmpty($readOnlyMetadata);
@@ -188,17 +228,27 @@ class PropertyInfoLoaderTest extends TestCase
      */
     public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null)
     {
-        $propertyInfoStub = $this->createMock(PropertyInfoExtractorInterface::class);
-        $propertyInfoStub
+        $propertyListExtractor = $this->createMock(PropertyListExtractorInterface::class);
+        $propertyListExtractor
             ->method('getProperties')
             ->willReturn(['string'])
         ;
-        $propertyInfoStub
-            ->method('getTypes')
-            ->willReturn([new Type(Type::BUILTIN_TYPE_STRING)])
-        ;
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, $classValidatorRegexp);
+        $propertyTypeExtractor = new class() implements PropertyTypeExtractorInterface {
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                return Type::string();
+            }
+
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return [new LegacyType('string')];
+            }
+        };
+
+        $propertyAccessExtractor = $this->createMock(PropertyAccessExtractorInterface::class);
+
+        $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor, $classValidatorRegexp);
 
         $classMetadata = new ClassMetadata(PropertyInfoLoaderEntity::class);
         $this->assertSame($expected, $propertyInfoLoader->loadClassMetadata($classMetadata));
@@ -214,21 +264,31 @@ class PropertyInfoLoaderTest extends TestCase
         ];
     }
 
-    public function testClassNoAutoMapping()
+    public function testClassNoAutoMapping(?PropertyTypeExtractorInterface $propertyListExtractor = null)
     {
-        $propertyInfoStub = $this->createMock(PropertyInfoExtractorInterface::class);
-        $propertyInfoStub
-            ->method('getProperties')
-            ->willReturn(['string', 'autoMappingExplicitlyEnabled'])
-        ;
-        $propertyInfoStub
-            ->method('getTypes')
-            ->willReturnOnConsecutiveCalls(
-                [new Type(Type::BUILTIN_TYPE_STRING)],
-                [new Type(Type::BUILTIN_TYPE_BOOL)]
-            );
+        if (null === $propertyListExtractor) {
+            $propertyListExtractor = $this->createMock(PropertyListExtractorInterface::class);
+            $propertyListExtractor
+                ->method('getProperties')
+                ->willReturn(['string', 'autoMappingExplicitlyEnabled'])
+            ;
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
+            $propertyTypeExtractor = new class() implements PropertyTypeExtractorInterface {
+                public function getType(string $class, string $property, array $context = []): ?Type
+                {
+                    return Type::string();
+                }
+
+                public function getTypes(string $class, string $property, array $context = []): ?array
+                {
+                    return [new LegacyType('string')];
+                }
+            };
+        }
+
+        $propertyAccessExtractor = $this->createMock(PropertyAccessExtractorInterface::class);
+
+        $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor, '{.*}');
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
             ->addLoader($propertyInfoLoader)

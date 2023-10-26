@@ -6,6 +6,8 @@ CHANGELOG
 
  * Introduce `PropertyDocBlockExtractorInterface` to extract a property's doc block
  * Restrict access to `PhpStanExtractor` based on visibility
+ * Deprecate the `Type` class, use `Symfony\Component\TypeInfo\Type` class of `symfony/type-info` component instead
+ * Deprecate the `PropertyTypeExtractorInterface::getTypes()` method, use `PropertyTypeExtractorInterface::getType()` instead
 
 6.4
 ---

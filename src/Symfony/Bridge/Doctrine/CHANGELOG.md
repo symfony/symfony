@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Deprecate the `DoctrineExtractor::getTypes()` method, use `DoctrineExtractor::getType()` instead
+
 7.0
 ---
 
@@ -17,7 +22,7 @@ CHANGELOG
 6.4
 ---
 
- * [BC BREAK] Add argument `$buildDir` to `ProxyCacheWarmer::warmUp()` 
+ * [BC BREAK] Add argument `$buildDir` to `ProxyCacheWarmer::warmUp()`
  * [BC BREAK] Add return type-hints to `EntityFactory`
  * Deprecate `DbalLogger`, use a middleware instead
  * Deprecate not constructing `DoctrineDataCollector` with an instance of `DebugDataHolder`

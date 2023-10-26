@@ -145,6 +145,7 @@
             <xsd:element name="http-basic-ldap" type="http_basic_ldap" minOccurs="0" maxOccurs="1" />
             <xsd:element name="json-login" type="json_login" minOccurs="0" maxOccurs="1" />
             <xsd:element name="json-login-ldap" type="json_login_ldap" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="login-link" type="login_link" minOccurs="0" maxOccurs="1" />
             <xsd:element name="login-throttling" type="login_throttling" minOccurs="0" maxOccurs="1" />
             <xsd:element name="remember-me" type="remember_me" minOccurs="0" maxOccurs="1" />
             <xsd:element name="remote-user" type="remote_user" minOccurs="0" maxOccurs="1" />

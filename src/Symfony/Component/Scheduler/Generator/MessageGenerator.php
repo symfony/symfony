@@ -72,8 +72,11 @@ final class MessageGenerator implements MessageGeneratorInterface
             }
 
             if ($yield) {
-                yield (new MessageContext($this->name, $id, $trigger, $time, $nextTime)) => $message;
-                $checkpoint->save($time, $index);
+                try {
+                    yield (new MessageContext($this->name, $id, $trigger, $time, $nextTime)) => $message;
+                } finally {
+                    $checkpoint->save($time, $index);
+                }
             }
         }
 

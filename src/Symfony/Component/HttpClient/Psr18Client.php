@@ -31,6 +31,7 @@ use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface as HttpClientResponseInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 if (!interface_exists(ClientInterface::class)) {
@@ -105,7 +106,9 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
 
             $response = $this->client->request($request->getMethod(), (string) $request->getUri(), $options);
 
-            $psrResponse = $this->responseFactory->createResponse($response->getStatusCode());
+            $psrResponse = $this->responseFactory->createResponse(
+                $response->getStatusCode(), $this->getReasonPhrase($response)
+            );
 
             foreach ($response->getHeaders(false) as $name => $values) {
                 foreach ($values as $value) {
@@ -194,6 +197,19 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         if ($this->client instanceof ResetInterface) {
             $this->client->reset();
         }
+    }
+
+    protected function getReasonPhrase(HttpClientResponseInterface $response): ?string
+    {
+        foreach (array_reverse($response->getInfo('response_headers')) as $h) {
+            if (str_starts_with($h, 'HTTP/')) {
+
+                if (preg_match('#^HTTP/\d+(?:\.\d+)? \d\d\d (.+)$#', $h, $m)) {
+                    return $m[1];
+                }
+            }
+        }
+        return null;
     }
 }
 

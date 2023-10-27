@@ -50,13 +50,7 @@ class FormUtil
      */
     public static function mergeParamsAndFiles(array $params, array $files): array
     {
-        if (array_is_list($files)) {
-            foreach ($files as $value) {
-                $params[] = $value;
-            }
-
-            return $params;
-        }
+        $isFilesList = array_is_list($files);
 
         foreach ($params as $key => $value) {
             if (\is_array($value) && \is_array($files[$key] ?? null)) {
@@ -65,6 +59,14 @@ class FormUtil
             }
         }
 
-        return array_replace($params, $files);
+        if (!$isFilesList) {
+            return array_replace($params, $files);
+        }
+
+        foreach ($files as $value) {
+            $params[] = $value;
+        }
+
+        return $params;
     }
 }

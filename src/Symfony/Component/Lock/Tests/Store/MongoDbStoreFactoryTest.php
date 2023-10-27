@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use MongoDB\Collection;
+use MongoDB\Client;
+use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Store\MongoDbStore;
 use Symfony\Component\Lock\Store\StoreFactory;
@@ -18,13 +21,20 @@ use Symfony\Component\Lock\Store\StoreFactory;
 /**
  * @author Alexandre Daubois <alex.daubois@gmail.com>
  *
- * @requires extension mongo
+ * @requires extension mongodb
  */
 class MongoDbStoreFactoryTest extends TestCase
 {
+    public static function setupBeforeClass(): void
+    {
+        if (!class_exists(Client::class)) {
+            throw new SkippedTestSuiteError('The mongodb/mongodb package is required.');
+        }
+    }
+
     public function testCreateMongoDbCollectionStore()
     {
-        $store = StoreFactory::createStore($this->createMock(\MongoDB\Collection::class));
+        $store = StoreFactory::createStore($this->createMock(Collection::class));
 
         $this->assertInstanceOf(MongoDbStore::class, $store);
     }

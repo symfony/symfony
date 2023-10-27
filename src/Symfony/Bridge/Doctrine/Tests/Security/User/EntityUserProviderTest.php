@@ -89,8 +89,6 @@ class EntityUserProviderTest extends TestCase
 
     public function testLoadUserByIdentifierWithNonUserLoaderRepositoryAndWithoutProperty()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('You must either make the "Symfony\Bridge\Doctrine\Tests\Fixtures\User" entity Doctrine Repository ("Doctrine\ORM\EntityRepository") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.');
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
 
@@ -100,6 +98,10 @@ class EntityUserProviderTest extends TestCase
         $em->flush();
 
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('You must either make the "Symfony\Bridge\Doctrine\Tests\Fixtures\User" entity Doctrine Repository ("Doctrine\ORM\EntityRepository") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.');
+
         $provider->loadUserByIdentifier('user1');
     }
 
@@ -171,13 +173,14 @@ class EntityUserProviderTest extends TestCase
 
     public function testLoadUserByIdentifierShouldDeclineInvalidInterface()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $repository = $this->createMock(ObjectRepository::class);
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),
             'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
         );
+
+        $this->expectException(\InvalidArgumentException::class);
 
         $provider->loadUserByIdentifier('name');
     }

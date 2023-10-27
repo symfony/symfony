@@ -56,14 +56,15 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 
     public function testTransactionIsRolledBackOnException()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Thrown from next middleware.');
         $this->connection->expects($this->once())
             ->method('beginTransaction')
         ;
         $this->connection->expects($this->once())
             ->method('rollBack')
         ;
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Thrown from next middleware.');
 
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getThrowingStackMock());
     }

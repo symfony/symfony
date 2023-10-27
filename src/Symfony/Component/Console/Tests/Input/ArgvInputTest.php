@@ -242,8 +242,7 @@ class ArgvInputTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $input = new ArgvInput($argv);
-        $input->bind($definition);
+        (new ArgvInput($argv))->bind($definition);
     }
 
     /**
@@ -254,11 +253,10 @@ class ArgvInputTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $input = new ArgvInput($argv);
-        $input->bind($definition);
+        (new ArgvInput($argv))->bind($definition);
     }
 
-    public static function provideInvalidInput()
+    public static function provideInvalidInput(): array
     {
         return [
             [
@@ -329,7 +327,7 @@ class ArgvInputTest extends TestCase
         ];
     }
 
-    public static function provideInvalidNegatableInput()
+    public static function provideInvalidNegatableInput(): array
     {
         return [
             [

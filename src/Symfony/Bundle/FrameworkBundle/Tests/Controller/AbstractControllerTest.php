@@ -92,12 +92,13 @@ class AbstractControllerTest extends TestCase
 
     public function testMissingParameterBag()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
         $container = new Container();
 
         $controller = $this->createController();
         $controller->setContainer($container);
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
 
         $controller->getParameter('foo');
     }
@@ -146,11 +147,11 @@ class AbstractControllerTest extends TestCase
 
     public function testGetUserWithEmptyContainer()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
-
         $controller = $this->createController();
         $controller->setContainer(new Container());
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
 
         $controller->getUser();
     }
@@ -327,9 +328,9 @@ class AbstractControllerTest extends TestCase
 
     public function testFileWhichDoesNotExist()
     {
-        $this->expectException(FileNotFoundException::class);
-
         $controller = $this->createController();
+
+        $this->expectException(FileNotFoundException::class);
 
         $controller->file('some-file.txt', 'test.php');
     }
@@ -350,8 +351,6 @@ class AbstractControllerTest extends TestCase
 
     public function testdenyAccessUnlessGranted()
     {
-        $this->expectException(AccessDeniedException::class);
-
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
 
@@ -360,6 +359,8 @@ class AbstractControllerTest extends TestCase
 
         $controller = $this->createController();
         $controller->setContainer($container);
+
+        $this->expectException(AccessDeniedException::class);
 
         $controller->denyAccessUnlessGranted('foo');
     }

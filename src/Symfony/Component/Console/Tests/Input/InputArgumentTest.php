@@ -86,25 +86,31 @@ class InputArgumentTest extends TestCase
 
     public function testSetDefaultWithRequiredArgument()
     {
+        $argument = new InputArgument('foo', InputArgument::REQUIRED);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
-        $argument = new InputArgument('foo', InputArgument::REQUIRED);
+
         $argument->setDefault('default');
     }
 
     public function testSetDefaultWithRequiredArrayArgument()
     {
+        $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
-        $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
+
         $argument->setDefault([]);
     }
 
     public function testSetDefaultWithArrayArgument()
     {
+        $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A default value for an array argument must be an array.');
-        $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
+
         $argument->setDefault('default');
     }
 
@@ -130,10 +136,11 @@ class InputArgumentTest extends TestCase
 
     public function testCompleteClosureReturnIncorrectType()
     {
+        $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
+
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Closure for argument "foo" must return an array. Got "string".');
 
-        $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
         $argument->complete(new CompletionInput(), new CompletionSuggestions());
     }
 }

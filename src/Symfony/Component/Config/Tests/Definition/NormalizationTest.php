@@ -170,13 +170,14 @@ class NormalizationTest extends TestCase
 
     public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The attribute "id" must be set for path "root.thing".');
         $denormalized = [
             'thing' => [
                 ['foo', 'bar'], ['baz', 'qux'],
             ],
         ];
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The attribute "id" must be set for path "root.thing".');
 
         $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, []);
     }

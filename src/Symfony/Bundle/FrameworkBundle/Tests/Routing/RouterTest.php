@@ -299,25 +299,29 @@ class RouterTest extends TestCase
 
     public function testEnvPlaceholders()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%env(FOO)%'));
 
         $router = new Router($this->getPsr11ServiceContainer($routes), 'foo', [], null, $this->getParameterBag());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
+
         $router->getRouteCollection();
     }
 
     public function testEnvPlaceholdersWithSfContainer()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%env(FOO)%'));
 
         $router = new Router($this->getServiceContainer($routes), 'foo');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
+
         $router->getRouteCollection();
     }
 
@@ -381,8 +385,6 @@ class RouterTest extends TestCase
 
     public function testExceptionOnNonExistentParameterWithSfContainer()
     {
-        $this->expectException(ParameterNotFoundException::class);
-        $this->expectExceptionMessage('You have requested a non-existent parameter "nope".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%nope%'));
@@ -390,13 +392,15 @@ class RouterTest extends TestCase
         $sc = $this->getServiceContainer($routes);
 
         $router = new Router($sc, 'foo');
+
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage('You have requested a non-existent parameter "nope".');
+
         $router->getRouteCollection()->get('foo');
     }
 
     public function testExceptionOnNonStringParameter()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));
@@ -405,6 +409,10 @@ class RouterTest extends TestCase
         $parameters = $this->getParameterBag(['object' => new \stdClass()]);
 
         $router = new Router($sc, 'foo', [], null, $parameters);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
+
         $router->getRouteCollection()->get('foo');
     }
 

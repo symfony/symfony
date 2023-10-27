@@ -331,7 +331,7 @@ class Response
     /**
      * Sends HTTP headers.
      *
-     * @param null|positive-int $statusCode The status code to use, override the statusCode property if set and not null
+     * @param positive-int|null $statusCode The status code to use, override the statusCode property if set and not null
      *
      * @return $this
      */

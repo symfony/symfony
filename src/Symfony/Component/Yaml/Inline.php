@@ -55,7 +55,7 @@ class Inline
      *
      * @throws ParseException
      */
-    public static function parse(string $value = null, int $flags = 0, array &$references = []): mixed
+    public static function parse(string $value, int $flags = 0, array &$references = []): mixed
     {
         self::initialize($flags);
 

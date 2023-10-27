@@ -29,7 +29,7 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getTestsForParse
      */
-    public function testParse($yaml, $value, $flags = 0)
+    public function testParse(string $yaml, $value, $flags = 0)
     {
         $this->assertSame($value, Inline::parse($yaml, $flags), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
     }

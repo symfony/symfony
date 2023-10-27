@@ -139,7 +139,7 @@ EOF;
 
         $extractor = new PhpExtractor();
         $extractor->setPrefix('prefix');
-        $extractor->extract(__DIR__ . '/../Fixtures/extractor-7.3/translation.html.php', $catalogue);
+        $extractor->extract(__DIR__.'/../Fixtures/extractor-7.3/translation.html.php', $catalogue);
 
         $expectedCatalogue = [
             'messages' => [
@@ -153,7 +153,7 @@ EOF;
 
     public static function resourcesProvider()
     {
-        $directory = __DIR__ . '/../Fixtures/extractor/';
+        $directory = __DIR__.'/../Fixtures/extractor/';
         $phpFiles = [];
         $splFiles = [];
         foreach (new \DirectoryIterator($directory) as $fileInfo) {

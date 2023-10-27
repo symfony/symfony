@@ -26,7 +26,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     public const URL_PATTERN_DIST = self::URL_PATTERN_DIST_CSS.'/+esm';
     public const URL_PATTERN_ENTRYPOINT = 'https://data.jsdelivr.com/v1/packages/npm/%s@%s/entrypoints';
 
-    public const IMPORT_REGEX = '{from"/npm/((?:@[^/]+/)?[^@]+)@([^/]+)((?:/[^/]+)*?)/\+esm"}';
+    public const IMPORT_REGEX = '{from"/npm/((?:@[^/]+/)?[^@]+?)(?:@([^/]+))?((?:/[^/]+)*?)/\+esm"}';
 
     private HttpClientInterface $httpClient;
 
@@ -222,7 +222,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         preg_match_all(self::IMPORT_REGEX, $content, $matches);
         $dependencies = [];
         foreach ($matches[1] as $index => $packageName) {
-            $version = $matches[2][$index];
+            $version = $matches[2][$index] ?: null;
             $packageName .= $matches[3][$index]; // add the path if any
 
             $dependencies[] = new PackageRequireOptions($packageName, $version);

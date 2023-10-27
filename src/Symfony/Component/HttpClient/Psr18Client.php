@@ -201,15 +201,15 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
 
     protected function getReasonPhrase(HttpClientResponseInterface $response): ?string
     {
-        foreach (array_reverse($response->getInfo('response_headers')) as $h) {
-            if (str_starts_with($h, 'HTTP/')) {
+        $reason = null;
 
-                if (preg_match('#^HTTP/\d+(?:\.\d+)? \d\d\d (.+)$#', $h, $m)) {
-                    return $m[1];
-                }
+        foreach ($response->getInfo('response_headers') as $h) {
+            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? (?:\d\d\d) (.+)#', $h, $m)) {
+                $reason = $m[1];
             }
         }
-        return null;
+
+        return $reason;
     }
 }
 

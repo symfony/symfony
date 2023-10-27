@@ -513,6 +513,22 @@ class JsDelivrEsmResolverTest extends TestCase
                 ['locutus/php/strings/vsprintf', '2.0.16'],
             ],
         ];
+
+        yield 'import statements without a version' => [
+            'import{ReplaceAroundStep as c,canSplit as d,StepMap as p,liftTarget as f}from"/npm/prosemirror-transform/+esm";import{PluginKey as h,EditorState as m,TextSelection as v,Plugin as g,AllSelection as y,Selection as b,NodeSelection as w,SelectionRange as k}from"/npm/prosemirror-state@1.4.3/+esm";',
+            [
+                ['prosemirror-transform', ''],
+                ['prosemirror-state', '1.4.3'],
+            ],
+        ];
+
+        yield 'import statements without a version and with paths' => [
+            'import{ReplaceAroundStep as c,canSplit as d,StepMap as p,liftTarget as f}from"/npm/prosemirror-transform/php/strings/vsprintf/+esm";import{PluginKey as h,EditorState as m,TextSelection as v,Plugin as g,AllSelection as y,Selection as b,NodeSelection as w,SelectionRange as k}from"/npm/prosemirror-state@1.4.3/php/strings/sprintf/+esm";',
+            [
+                ['prosemirror-transform/php/strings/vsprintf', ''],
+                ['prosemirror-state/php/strings/sprintf', '1.4.3'],
+            ],
+        ];
     }
 
     private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, string $packageSpecifier = null): ImportMapEntry

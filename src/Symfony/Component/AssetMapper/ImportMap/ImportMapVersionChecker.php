@@ -87,13 +87,12 @@ class ImportMapVersionChecker
                 }
 
                 $dependencyPackageName = $entries->get($dependencyName)->getPackageName();
-                $dependencyVersionConstraint = $packageDependencies[$dependencyPackageName] ?? null;
 
-                if (null === $dependencyVersionConstraint) {
-                    $problems[] = new PackageVersionProblem($packageName, $dependencyPackageName, $dependencyVersionConstraint, $entries->get($dependencyName)->version);
-
+                if (!isset($packageDependencies[$dependencyPackageName])) {
                     continue;
                 }
+
+                $dependencyVersionConstraint = $packageDependencies[$dependencyPackageName];
 
                 if (!$this->isVersionSatisfied($dependencyVersionConstraint, $entries->get($dependencyName)->version)) {
                     $problems[] = new PackageVersionProblem($packageName, $dependencyPackageName, $dependencyVersionConstraint, $entries->get($dependencyName)->version);

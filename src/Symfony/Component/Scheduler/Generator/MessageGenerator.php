@@ -80,11 +80,13 @@ final class MessageGenerator implements MessageGeneratorInterface
 
             if ($yield) {
                 $context = new MessageContext($this->name, $id, $trigger, $time, $nextTime);
-                foreach ($recurringMessage->getMessages($context) as $message) {
-                    yield $context => $message;
+                try {
+                    foreach ($recurringMessage->getMessages($context) as $message) {
+                        yield $context => $message;
+                    }
+                } finally {
+                    $checkpoint->save($time, $index);
                 }
-
-                $checkpoint->save($time, $index);
             }
         }
 

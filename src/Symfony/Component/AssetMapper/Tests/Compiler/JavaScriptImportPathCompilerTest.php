@@ -417,6 +417,48 @@ class JavaScriptImportPathCompilerTest extends TestCase
         ];
     }
 
+    public function testCompileHandlesCircularRelativeAssets()
+    {
+        $appAsset = new MappedAsset('app.js', 'anythingapp', '/assets/app.js');
+        $otherAsset = new MappedAsset('other.js', 'anythingother', '/assets/other.js');
+
+        $importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
+        $assetMapper = $this->createMock(AssetMapperInterface::class);
+        $assetMapper->expects($this->once())
+            ->method('getAsset')
+            ->with('other.js')
+            ->willThrowException(new CircularAssetsException($otherAsset));
+
+        $compiler = new JavaScriptImportPathCompiler($importMapConfigReader);
+        $input = 'import "./other.js";';
+        $compiler->compile($input, $appAsset, $assetMapper);
+        $this->assertCount(1, $appAsset->getJavaScriptImports());
+        $this->assertSame($otherAsset, $appAsset->getJavaScriptImports()[0]->asset);
+    }
+
+    public function testCompileHandlesCircularBareImportAssets()
+    {
+        $bootstrapAsset = new MappedAsset('bootstrap', 'anythingbootstrap', '/assets/bootstrap.js');
+        $popperAsset = new MappedAsset('@popperjs/core', 'anythingpopper', '/assets/popper.js');
+
+        $importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
+        $importMapConfigReader->expects($this->once())
+            ->method('findRootImportMapEntry')
+            ->with('@popperjs/core')
+            ->willReturn(ImportMapEntry::createRemote('@popperjs/core', ImportMapType::JS, '/path/to/vendor/@popperjs/core.js', '1.2.3', 'could_be_anything', false));
+        $assetMapper = $this->createMock(AssetMapperInterface::class);
+        $assetMapper->expects($this->once())
+            ->method('getAssetFromSourcePath')
+            ->with('/path/to/vendor/@popperjs/core.js')
+            ->willThrowException(new CircularAssetsException($popperAsset));
+
+        $compiler = new JavaScriptImportPathCompiler($importMapConfigReader);
+        $input = 'import "@popperjs/core";';
+        $compiler->compile($input, $bootstrapAsset, $assetMapper);
+        $this->assertCount(1, $bootstrapAsset->getJavaScriptImports());
+        $this->assertSame($popperAsset, $bootstrapAsset->getJavaScriptImports()[0]->asset);
+    }
+
     /**
      * @dataProvider provideMissingImportModeTests
      */
@@ -487,7 +529,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                 }
 
                 if ('htmx.js' === $logicalPath) {
-                    throw new CircularAssetsException();
+                    throw new CircularAssetsException(new MappedAsset('htmx.js'));
                 }
             });
 

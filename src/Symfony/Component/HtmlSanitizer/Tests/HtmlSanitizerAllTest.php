@@ -427,8 +427,8 @@ class HtmlSanitizerAllTest extends TestCase
                 '<hr />',
             ],
             [
-                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title">',
-                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title" />',
+                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title" height="150" width="300">',
+                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title" height="150" width="300" />',
             ],
             [
                 '<img src="http://trusted.com/img/example.jpg" alt="Image alternative text" title="Image title" />',

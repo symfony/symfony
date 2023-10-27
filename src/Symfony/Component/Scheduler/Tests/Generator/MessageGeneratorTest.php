@@ -13,7 +13,6 @@ namespace Symfony\Component\Scheduler\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Scheduler\Generator\Checkpoint;
 use Symfony\Component\Scheduler\Generator\MessageContext;
@@ -30,11 +29,7 @@ class MessageGeneratorTest extends TestCase
      */
     public function testGetMessagesFromSchedule(string $startTime, array $runs, array $schedule)
     {
-        // for referencing
-        $now = self::makeDateTime($startTime);
-
-        $clock = $this->createMock(ClockInterface::class);
-        $clock->method('now')->willReturnReference($now);
+        $clock = new MockClock(self::makeDateTime($startTime));
 
         foreach ($schedule as $i => $s) {
             if (\is_array($s)) {
@@ -50,7 +45,7 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
 
         foreach ($runs as $time => $expected) {
-            $now = self::makeDateTime($time);
+            $clock->modify($time);
             $this->assertSame($expected, iterator_to_array($scheduler->getMessages(), false));
         }
     }
@@ -60,11 +55,7 @@ class MessageGeneratorTest extends TestCase
      */
     public function testGetMessagesFromScheduleProvider(string $startTime, array $runs, array $schedule)
     {
-        // for referencing
-        $now = self::makeDateTime($startTime);
-
-        $clock = $this->createMock(ClockInterface::class);
-        $clock->method('now')->willReturnReference($now);
+        $clock = new MockClock(self::makeDateTime($startTime));
 
         foreach ($schedule as $i => $s) {
             if (\is_array($s)) {
@@ -92,18 +83,14 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
 
         foreach ($runs as $time => $expected) {
-            $now = self::makeDateTime($time);
+            $clock->modify($time);
             $this->assertSame($expected, iterator_to_array($scheduler->getMessages(), false));
         }
     }
 
     public function testYieldedContext()
     {
-        // for referencing
-        $now = self::makeDateTime('22:12:00');
-
-        $clock = $this->createMock(ClockInterface::class);
-        $clock->method('now')->willReturnReference($now);
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
 
         $message = $this->createMessage((object) ['id' => 'message'], '22:13:00', '22:14:00', '22:16:00');
         $schedule = (new Schedule())->add($message);
@@ -114,8 +101,7 @@ class MessageGeneratorTest extends TestCase
         // Warmup. The first run is alw ays returns nothing.
         $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
 
-        $now = self::makeDateTime('22:14:10');
-
+        $clock->sleep(2 * 60 + 10);
         $iterator = $scheduler->getMessages();
 
         $this->assertInstanceOf(MessageContext::class, $context = $iterator->key());

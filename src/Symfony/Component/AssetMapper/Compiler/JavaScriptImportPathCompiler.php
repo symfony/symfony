@@ -61,15 +61,19 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
                 $dependentAsset = $this->findAssetForRelativeImport($importedModule, $asset, $assetMapper);
             }
 
+            if (!$dependentAsset) {
+                return $fullImportString;
+            }
+
             // List as a JavaScript import.
             // This will cause the asset to be included in the importmap (for relative imports)
             // and will be used to generate the preloads in the importmap.
             $isLazy = str_contains($fullImportString, 'import(');
-            $addToImportMap = $isRelativeImport && $dependentAsset;
+            $addToImportMap = $isRelativeImport;
             $asset->addJavaScriptImport(new JavaScriptImport(
                 $addToImportMap ? $dependentAsset->publicPathWithoutDigest : $importedModule,
-                $isLazy,
                 $dependentAsset,
+                $isLazy,
                 $addToImportMap,
             ));
 

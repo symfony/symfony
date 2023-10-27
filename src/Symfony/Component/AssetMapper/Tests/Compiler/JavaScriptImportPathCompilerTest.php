@@ -72,7 +72,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame($input, $compiler->compile($input, $asset, $assetMapper));
         $actualImports = [];
         foreach ($asset->getJavaScriptImports() as $import) {
-            $actualImports[$import->importName] = ['lazy' => $import->isLazy, 'asset' => $import->asset?->logicalPath, 'add' => $import->addImplicitlyToImportMap];
+            $actualImports[$import->importName] = ['lazy' => $import->isLazy, 'asset' => $import->asset->logicalPath, 'add' => $import->addImplicitlyToImportMap];
         }
 
         $this->assertEquals($expectedJavaScriptImports, $actualImports);
@@ -172,9 +172,10 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'expectedJavaScriptImports' => ['/assets/styles.css' => ['lazy' => false, 'asset' => 'styles.css', 'add' => true]],
         ];
 
-        yield 'importing_non_existent_file_without_strict_mode_is_ignored_still_listed_as_an_import' => [
+        yield 'importing_non_existent_file_without_strict_mode_is_ignored_and_no_import_added' => [
+            'sourceLogicalName' => 'app.js',
             'input' => "import './non-existent.js';",
-            'expectedJavaScriptImports' => ['./non-existent.js' => ['lazy' => false, 'asset' => null, 'add' => false]],
+            'expectedJavaScriptImports' => [],
         ];
 
         yield 'single_line_comment_at_start_ignored' => [
@@ -262,7 +263,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
 
         yield 'bare_import_not_in_importmap' => [
             'input' => 'import "some_module";',
-            'expectedJavaScriptImports' => ['some_module' => ['lazy' => false, 'asset' => null, 'add' => false]],
+            'expectedJavaScriptImports' => [],
         ];
 
         yield 'bare_import_in_importmap_with_local_asset' => [
@@ -275,9 +276,14 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'expectedJavaScriptImports' => ['module_in_importmap_remote' => ['lazy' => false, 'asset' => 'module_in_importmap_remote.js', 'add' => false]],
         ];
 
+<<<<<<< HEAD
         yield 'absolute_import_added_as_dependency_only' => [
+=======
+        yield 'absolute_import_ignored_and_no_dependency_added' => [
+            'sourceLogicalName' => 'app.js',
+>>>>>>> a79f543f8f ([AssetMapper] Fix file deleting errors & remove nullable MappedAsset on JS import)
             'input' => 'import "https://example.com/module.js";',
-            'expectedJavaScriptImports' => ['https://example.com/module.js' => ['lazy' => false, 'asset' => null, 'add' => false]],
+            'expectedJavaScriptImports' => [],
         ];
 
         yield 'bare_import_with_minimal_spaces' => [

@@ -26,7 +26,6 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
 
     private array $assetsCache = [];
     private array $assetsBeingCreated = [];
-    private array $fileContentsCache = [];
 
     public function __construct(
         private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
@@ -46,14 +45,15 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
             $isVendor = $this->isVendor($sourcePath);
             $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath), isVendor: $isVendor);
 
-            [$digest, $isPredigested] = $this->getDigest($asset);
+            $content = $this->compileContent($asset);
+            [$digest, $isPredigested] = $this->getDigest($asset, $content);
 
             $asset = new MappedAsset(
                 $asset->logicalPath,
                 $asset->sourcePath,
                 $asset->publicPathWithoutDigest,
-                $this->getPublicPath($asset),
-                $this->compileContent($asset),
+                $this->getPublicPath($asset, $content),
+                $content,
                 $digest,
                 $isPredigested,
                 $isVendor,
@@ -75,7 +75,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
      *
      * @return array{0: string, 1: bool}
      */
-    private function getDigest(MappedAsset $asset): array
+    private function getDigest(MappedAsset $asset, ?string $content): array
     {
         // check for a pre-digested file
         if (preg_match(self::PREDIGESTED_REGEX, $asset->logicalPath, $matches)) {
@@ -83,7 +83,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         }
 
         // Use the compiled content if any
-        if (null !== $content = $this->compileContent($asset)) {
+        if (null !== $content) {
             return [hash('xxh128', $content), false];
         }
 
@@ -95,27 +95,23 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
 
     private function compileContent(MappedAsset $asset): ?string
     {
-        if (\array_key_exists($asset->logicalPath, $this->fileContentsCache)) {
-            return $this->fileContentsCache[$asset->logicalPath];
-        }
-
         if (!is_file($asset->sourcePath)) {
             throw new RuntimeException(sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
         }
 
         if (!$this->compiler->supports($asset)) {
-            return $this->fileContentsCache[$asset->logicalPath] = null;
+            return null;
         }
 
         $content = file_get_contents($asset->sourcePath);
-        $content = $this->compiler->compile($content, $asset);
+        $compiled = $this->compiler->compile($content, $asset);
 
-        return $this->fileContentsCache[$asset->logicalPath] = $content;
+        return $compiled !== $content ? $compiled : null;
     }
 
-    private function getPublicPath(MappedAsset $asset): ?string
+    private function getPublicPath(MappedAsset $asset, ?string $content): ?string
     {
-        [$digest, $isPredigested] = $this->getDigest($asset);
+        [$digest, $isPredigested] = $this->getDigest($asset, $content);
 
         if ($isPredigested) {
             return $this->assetsPathResolver->resolvePublicPath($asset->logicalPath);

@@ -36,6 +36,7 @@ CHANGELOG
 6.4
 ---
 
+ * Add support for `--sort` option for `--force` option with `translation:extract` command
  * Add `HttpClientAssertionsTrait`
  * Add `AbstractController::renderBlock()` and `renderBlockView()`
  * Add native return type to `Translator` and to `Application::reset()`

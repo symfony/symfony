@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
 {
@@ -23,11 +24,12 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $client->request('GET', '/assets/file1-b3445cb7a86a0795a7af7f2004498aef.css');
         $response = $client->getResponse();
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
         $this->assertSame(<<<EOF
         /* file1.css */
         body {}
 
-        EOF, $response->getContent());
+        EOF, $response->getFile()->getContent());
         $this->assertSame('"b3445cb7a86a0795a7af7f2004498aef"', $response->headers->get('ETag'));
         $this->assertSame('immutable, max-age=604800, public', $response->headers->get('Cache-Control'));
         $this->assertTrue($response->headers->has('X-Assets-Dev'));
@@ -59,11 +61,12 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $client->request('GET', '/assets/already-abcdefVWXYZ0123456789.digested.css');
         $response = $client->getResponse();
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
         $this->assertSame(<<<EOF
         /* already-abcdefVWXYZ0123456789.digested.css */
         body {}
 
-        EOF, $response->getContent());
+        EOF, $response->getFile()->getContent());
     }
 
     protected static function getKernelClass(): string

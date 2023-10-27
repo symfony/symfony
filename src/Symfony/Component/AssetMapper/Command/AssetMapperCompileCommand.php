@@ -104,11 +104,9 @@ EOT
 
     private function createManifestAndWriteFiles(SymfonyStyle $io): array
     {
-        $allAssets = $this->assetMapper->allAssets();
-
         $io->comment(sprintf('Compiling and writing asset files to <info>%s</info>', $this->shortenPath($this->assetsFilesystem->getDestinationPath())));
         $manifest = [];
-        foreach ($allAssets as $asset) {
+        foreach ($this->assetMapper->allAssets() as $asset) {
             if (null !== $asset->content) {
                 // The original content has been modified by the AssetMapperCompiler
                 $this->assetsFilesystem->write($asset->publicPath, $asset->content);

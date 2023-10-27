@@ -14,6 +14,8 @@ namespace Symfony\Component\Scheduler\Tests\Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Scheduler\Generator\Checkpoint;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\RecurringMessage;
@@ -192,6 +194,32 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame($message->getTrigger(), $context->trigger);
         $this->assertEquals(self::makeDateTime('22:14:00'), $context->triggeredAt);
         $this->assertEquals(self::makeDateTime('22:16:00'), $context->nextTriggerAt);
+    }
+
+    public function testCheckpointSavedInBrokenLoop()
+    {
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
+
+        $message = $this->createMessage((object) ['id' => 'message'], '22:13:00', '22:14:00', '22:16:00');
+        $schedule = (new Schedule())->add($message);
+
+        $cache = new ArrayAdapter();
+        $schedule->stateful($cache);
+        $checkpoint = new Checkpoint('dummy', cache: $cache);
+
+        $scheduler = new MessageGenerator($schedule, 'dummy', clock: $clock, checkpoint: $checkpoint);
+
+        // Warmup. The first run is always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(60 + 10); // 22:13:10
+
+        foreach ($scheduler->getMessages() as $message) {
+            // Message is handled but loop is broken just after
+            break;
+        }
+
+        $this->assertEquals(self::makeDateTime('22:13:00'), $checkpoint->time());
     }
 
     public static function messagesProvider(): \Generator

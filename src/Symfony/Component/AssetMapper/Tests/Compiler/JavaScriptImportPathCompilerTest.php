@@ -276,12 +276,8 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'expectedJavaScriptImports' => ['module_in_importmap_remote' => ['lazy' => false, 'asset' => 'module_in_importmap_remote.js', 'add' => false]],
         ];
 
-<<<<<<< HEAD
-        yield 'absolute_import_added_as_dependency_only' => [
-=======
         yield 'absolute_import_ignored_and_no_dependency_added' => [
             'sourceLogicalName' => 'app.js',
->>>>>>> a79f543f8f ([AssetMapper] Fix file deleting errors & remove nullable MappedAsset on JS import)
             'input' => 'import "https://example.com/module.js";',
             'expectedJavaScriptImports' => [],
         ];

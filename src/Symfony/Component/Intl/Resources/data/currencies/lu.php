@@ -174,9 +174,13 @@ return [
             'SHP',
             'Pauni wa Santu Elena',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone',
+        ],
         'SLL' => [
             'SLL',
-            'Leone',
+            'Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

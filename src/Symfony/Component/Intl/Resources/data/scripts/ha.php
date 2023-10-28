@@ -27,6 +27,7 @@ return [
         'Hebr' => 'Ibrananci',
         'Hira' => 'Tsarin Rubutun Hiragana',
         'Hrkt' => 'kalaman Jafananci',
+        'Jamo' => 'Jamo',
         'Jpan' => 'Jafanis',
         'Kana' => 'Tsarin Rubutun Katakana',
         'Khmr' => 'Yaren Khmer',

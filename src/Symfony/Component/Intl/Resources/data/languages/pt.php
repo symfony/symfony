@@ -48,6 +48,7 @@ return [
         'bez' => 'bena',
         'bfd' => 'bafut',
         'bg' => 'búlgaro',
+        'bgc' => 'hariani',
         'bgn' => 'balúchi ocidental',
         'bho' => 'bhojpuri',
         'bi' => 'bislamá',

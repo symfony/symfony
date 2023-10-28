@@ -174,9 +174,13 @@ return [
             'SHP',
             'Phawundindi laseSt Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'Leyoni',
+        ],
         'SLL' => [
             'SLL',
-            'Leyoni',
+            'Leyoni (1964—2022)',
         ],
         'SOS' => [
             'SOS',

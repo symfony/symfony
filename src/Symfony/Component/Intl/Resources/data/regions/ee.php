@@ -105,7 +105,6 @@ return [
         'IL' => 'Israel nutome',
         'IM' => 'Aisle of Man nutome',
         'IN' => 'India nutome',
-        'IO' => 'Britaintɔwo ƒe india ƒudome nutome',
         'IQ' => 'iraqdukɔ',
         'IR' => 'Iran nutome',
         'IS' => 'Aiseland nutome',

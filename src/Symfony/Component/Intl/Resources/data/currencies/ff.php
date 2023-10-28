@@ -170,9 +170,13 @@ return [
             'SHP',
             'Liibar Sent Helen',
         ],
+        'SLE' => [
+            'SLE',
+            'Lewoon Seraa Liyon',
+        ],
         'SLL' => [
             'SLL',
-            'Lewoon Seraa Liyon',
+            'Lewoon Seraa Liyon (1964—2022)',
         ],
         'SOS' => [
             'SOS',

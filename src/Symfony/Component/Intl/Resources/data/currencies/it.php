@@ -224,7 +224,7 @@ return [
         ],
         'CNY' => [
             'CN¥',
-            'renminbi cinese',
+            'yuan cinese',
         ],
         'COP' => [
             'COP',
@@ -810,9 +810,13 @@ return [
             'SKK',
             'corona slovacca',
         ],
+        'SLE' => [
+            'SLE',
+            'leone della Sierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'leone della Sierra Leone',
+            'leone della Sierra Leone (1964–2022)',
         ],
         'SOS' => [
             'SOS',
@@ -852,7 +856,7 @@ return [
         ],
         'SZL' => [
             'SZL',
-            'lilangeni dello Swaziland',
+            'lilangeni',
         ],
         'THB' => [
             '฿',

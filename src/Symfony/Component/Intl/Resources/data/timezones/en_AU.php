@@ -21,7 +21,6 @@ return [
         'Australia/Adelaide' => 'Australian Central Time (Adelaide)',
         'Australia/Brisbane' => 'Australian Eastern Time (Brisbane)',
         'Australia/Broken_Hill' => 'Australian Central Time (Broken Hill)',
-        'Australia/Currie' => 'Australian Eastern Time (Currie)',
         'Australia/Darwin' => 'Australian Central Time (Darwin)',
         'Australia/Hobart' => 'Australian Eastern Time (Hobart)',
         'Australia/Lindeman' => 'Australian Eastern Time (Lindeman)',

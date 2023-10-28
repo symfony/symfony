@@ -498,9 +498,13 @@ return [
             'SHP',
             'IPonti yaseSt. Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'I-Loeone yaseSierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'I-Loeone yaseSierra Leone',
+            'I-Loeone yaseSierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

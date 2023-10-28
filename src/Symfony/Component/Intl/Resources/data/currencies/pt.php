@@ -894,9 +894,13 @@ return [
             'SKK',
             'Coroa eslovaca',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone de Serra Leoa',
+        ],
         'SLL' => [
             'SLL',
-            'Leone de Serra Leoa',
+            'Leone de Serra Leoa (1964—2022)',
         ],
         'SOS' => [
             'SOS',

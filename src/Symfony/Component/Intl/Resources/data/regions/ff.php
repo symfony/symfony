@@ -92,7 +92,6 @@ return [
         'IE' => 'Irlannda',
         'IL' => 'Israa’iila',
         'IN' => 'Enndo',
-        'IO' => 'Keeriindi britaani to maayo enndo',
         'IQ' => 'Iraak',
         'IR' => 'Iraan',
         'IS' => 'Islannda',

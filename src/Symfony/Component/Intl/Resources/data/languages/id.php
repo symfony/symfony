@@ -57,6 +57,7 @@ return [
         'bez' => 'Bena',
         'bfd' => 'Bafut',
         'bg' => 'Bulgaria',
+        'bgc' => 'Haryanvi',
         'bgn' => 'Balochi Barat',
         'bho' => 'Bhojpuri',
         'bi' => 'Bislama',

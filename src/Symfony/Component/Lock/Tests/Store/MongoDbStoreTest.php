@@ -32,7 +32,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
 
     public static function setupBeforeClass(): void
     {
-        if (!class_exists(\MongoDB\Client::class)) {
+        if (!class_exists(Client::class)) {
             throw new SkippedTestSuiteError('The mongodb/mongodb package is required.');
         }
 

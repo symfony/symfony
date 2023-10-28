@@ -108,7 +108,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
 
             $responseParameters = [$response->getStatusCode()];
             if ($phrase = $this->getReasonPhrase($response)) {
-                $responseParameters []= $phrase;
+                $responseParameters[] = $phrase;
             }
 
             $psrResponse = $this->responseFactory->createResponse(...$responseParameters);

@@ -104,7 +104,6 @@ class Psr18ClientTest extends TestCase
 
     public function testResponseReasonPhrase()
     {
-        #'HTTP/1.1 103 Early Hints'
         $responseHeaders = [
             'HTTP/1.1 103 Very Early Hints',
         ];

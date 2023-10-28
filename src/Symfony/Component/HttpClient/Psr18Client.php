@@ -106,9 +106,12 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
 
             $response = $this->client->request($request->getMethod(), (string) $request->getUri(), $options);
 
-            $psrResponse = $this->responseFactory->createResponse(
-                $response->getStatusCode(), $this->getReasonPhrase($response)
-            );
+            $responseParameters = [$response->getStatusCode()];
+            if ($phrase = $this->getReasonPhrase($response)) {
+                $responseParameters []= $phrase;
+            }
+
+            $psrResponse = $this->responseFactory->createResponse(...$responseParameters);
 
             foreach ($response->getHeaders(false) as $name => $values) {
                 foreach ($values as $value) {

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -23,6 +24,7 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
+use Symfony\Component\Form\Tests\Extension\Type\ItemFileType;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**
@@ -300,6 +302,48 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
 
         $this->assertTrue($form->isSubmitted());
         $this->assertSame('DATA', $form->getData());
+    }
+
+    public function testMergeZeroIndexedCollection()
+    {
+        $form = $this->createForm('root', 'POST', true);
+        $form->add('items', CollectionType::class, [
+            'entry_type' => ItemFileType::class,
+            'allow_add' => true,
+        ]);
+
+        $file = $this->getUploadedFile();
+
+        $this->setRequestData('POST', [
+            'root' => [
+                'items' => [
+                    0 => [
+                        'item' => 'test',
+                    ],
+                ],
+            ],
+        ], [
+            'root' => [
+                'items' => [
+                    0 => [
+                        'file' => $file,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $itemsForm = $form->get('items');
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertTrue($form->isValid());
+
+        $this->assertTrue($itemsForm->has('0'));
+        $this->assertFalse($itemsForm->has('1'));
+
+        $this->assertEquals('test', $itemsForm->get('0')->get('item')->getData());
+        $this->assertNotNull($itemsForm->get('0')->get('file'));
     }
 
     /**

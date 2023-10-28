@@ -826,9 +826,13 @@ return [
             'SKK',
             'corona eslovaca',
         ],
+        'SLE' => [
+            'SLE',
+            'leona',
+        ],
         'SLL' => [
             'SLL',
-            'leona',
+            'leona (1964—2022)',
         ],
         'SOS' => [
             'SOS',

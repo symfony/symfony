@@ -614,9 +614,13 @@ return [
             'SKK',
             'Slovakijas krona',
         ],
+        'SLE' => [
+            'SLE',
+            'Sjerraleones leone',
+        ],
         'SLL' => [
             'SLL',
-            'Sjerraleones leone',
+            'Sjerraleones leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

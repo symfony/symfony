@@ -3,6 +3,7 @@
 return [
     'Names' => [
         'Adlm' => 'Adlam',
+        'Aghb' => 'Kaukázusi albaniai',
         'Arab' => 'Arab',
         'Aran' => 'Nasztalik',
         'Armi' => 'Birodalmi arámi',
@@ -23,6 +24,7 @@ return [
         'Cham' => 'Csám',
         'Cher' => 'Cseroki',
         'Copt' => 'Kopt',
+        'Cpmn' => 'Ciprusi-minószi',
         'Cprt' => 'Ciprusi',
         'Cyrl' => 'Cirill',
         'Cyrs' => 'Óegyházi szláv cirill',
@@ -47,6 +49,7 @@ return [
         'Hant' => 'Hagyományos',
         'Hebr' => 'Héber',
         'Hira' => 'Hiragana',
+        'Hluw' => 'Anatóliai hieroglifák',
         'Hmng' => 'Pahawh hmong',
         'Hrkt' => 'Katakana vagy hiragana',
         'Hung' => 'Ómagyar',
@@ -82,6 +85,7 @@ return [
         'Moon' => 'Moon',
         'Mtei' => 'Meitei mayek',
         'Mymr' => 'Burmai',
+        'Nbat' => 'Nabateus',
         'Nkoo' => 'N’ko',
         'Ogam' => 'Ogham',
         'Olck' => 'Ol chiki',

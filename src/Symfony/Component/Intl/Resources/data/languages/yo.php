@@ -35,6 +35,7 @@ return [
         'bem' => 'Èdè Béḿbà',
         'bez' => 'Èdè Bẹ́nà',
         'bg' => 'Èdè Bugaria',
+        'bgc' => 'Èdè Haryanvi',
         'bho' => 'Èdè Bojuri',
         'bi' => 'Èdè Bisilama',
         'bin' => 'Èdè Bini',

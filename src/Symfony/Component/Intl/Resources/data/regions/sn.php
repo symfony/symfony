@@ -92,7 +92,6 @@ return [
         'IE' => 'Ireland',
         'IL' => 'Izuraeri',
         'IN' => 'India',
-        'IO' => 'British Indian Ocean Territory',
         'IQ' => 'Iraq',
         'IR' => 'Iran',
         'IS' => 'Iceland',

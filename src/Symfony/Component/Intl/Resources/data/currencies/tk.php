@@ -506,9 +506,13 @@ return [
             'SHP',
             'Keramatly Ýelena adasynyň funty',
         ],
+        'SLE' => [
+            'SLE',
+            'Sýerra-Leone leony',
+        ],
         'SLL' => [
             'SLL',
-            'Sýerra-Leone leony',
+            'Sýerra-Leone leony (1964—2022)',
         ],
         'SOS' => [
             'SOS',

@@ -640,7 +640,7 @@ return [
         ],
         'MVR' => [
             'MVR',
-            'rufiyaa maldivien',
+            'rufiyaa maldivienne',
         ],
         'MWK' => [
             'MWK',
@@ -830,9 +830,13 @@ return [
             'SKK',
             'couronne slovaque',
         ],
+        'SLE' => [
+            'SLE',
+            'leone sierra-léonais',
+        ],
         'SLL' => [
             'SLL',
-            'leone sierra-léonais',
+            'leone sierra-léonais (1964—2022)',
         ],
         'SOS' => [
             'SOS',

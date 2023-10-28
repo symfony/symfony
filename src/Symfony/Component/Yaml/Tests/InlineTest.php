@@ -318,6 +318,7 @@ class InlineTest extends TestCase
     {
         return [
             ['', ''],
+            [null, ''],
             ['null', null],
             ['false', false],
             ['true', true],

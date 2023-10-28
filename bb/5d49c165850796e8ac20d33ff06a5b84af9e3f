@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-28T08:55:15Z
+
+For 5.4?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-10-28T09:01:12Z
+
+> For 5.4?
+
+Even if the class is internal, people may have used it directly. I don't want to break things in a bugfix version. This is not a bug fix. This is only a better error handling for PHP 8.3+
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-28T09:12:11Z
+
+Fine for me, but then we should additionally merge #52332 into 5.4, right?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-28T13:25:53Z
+
+> Fine for me, but then we should additionally merge #52332 into 5.4, right?
+
+Let's merge #52332 first, merge it up and then undo it in this PR.

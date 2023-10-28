@@ -199,7 +199,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         }
     }
 
-    protected function getReasonPhrase(HttpClientResponseInterface $response): ?string
+    private function getReasonPhrase(HttpClientResponseInterface $response): ?string
     {
         $reason = null;
 

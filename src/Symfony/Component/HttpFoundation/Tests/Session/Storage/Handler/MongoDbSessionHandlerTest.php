@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use MongoDB\Client;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
 
@@ -32,13 +33,16 @@ class MongoDbSessionHandlerTest extends TestCase
     private $storage;
     public $options;
 
+    public static function setUpBeforeClass(): void
+    {
+        if (!class_exists(Client::class)) {
+            throw new SkippedTestSuiteError('The mongodb/mongodb package is required.');
+        }
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        if (!class_exists(Client::class)) {
-            $this->markTestSkipped('The mongodb/mongodb package is required.');
-        }
 
         $this->mongo = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()

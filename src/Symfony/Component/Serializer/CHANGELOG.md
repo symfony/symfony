@@ -4,6 +4,7 @@ CHANGELOG
 6.4
 ---
 
+ * Add `TranslatableNormalizer`
  * Allow `Context` attribute to target classes
  * Deprecate Doctrine annotations support in favor of native attributes
  * Allow the `Groups` attribute/annotation on classes

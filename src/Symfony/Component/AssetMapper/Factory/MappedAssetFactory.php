@@ -37,13 +37,14 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
     {
         if (isset($this->assetsBeingCreated[$logicalPath])) {
-            throw new CircularAssetsException(sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
+            throw new CircularAssetsException($this->assetsCache[$logicalPath], sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
         }
         $this->assetsBeingCreated[$logicalPath] = $logicalPath;
 
         if (!isset($this->assetsCache[$logicalPath])) {
             $isVendor = $this->isVendor($sourcePath);
             $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath), isVendor: $isVendor);
+            $this->assetsCache[$logicalPath] = $asset;
 
             $content = $this->compileContent($asset);
             [$digest, $isPredigested] = $this->getDigest($asset, $content);

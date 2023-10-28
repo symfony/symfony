@@ -148,11 +148,15 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             return null;
         }
 
-        if ($asset = $assetMapper->getAsset($importMapEntry->path)) {
-            return $asset;
-        }
+        try {
+            if ($asset = $assetMapper->getAsset($importMapEntry->path)) {
+                return $asset;
+            }
 
-        return $assetMapper->getAssetFromSourcePath($importMapEntry->path);
+            return $assetMapper->getAssetFromSourcePath($importMapEntry->path);
+        } catch (CircularAssetsException $exception) {
+            return $exception->getIncompleteMappedAsset();
+        }
     }
 
     private function findAssetForRelativeImport(string $importedModule, MappedAsset $asset, AssetMapperInterface $assetMapper): ?MappedAsset
@@ -168,8 +172,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             return null;
         }
 
-        $dependentAsset = $assetMapper->getAssetFromSourcePath($resolvedSourcePath);
-
+        $dependentAsset = $assetMapper->getAsset($resolvedSourcePath);
         if ($dependentAsset) {
             return $dependentAsset;
         }

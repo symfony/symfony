@@ -18,7 +18,7 @@ use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
-use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\MappedAsset;
@@ -85,7 +85,7 @@ class MappedAssetFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(CircularAssetsException::class);
         $this->expectExceptionMessage('Circular reference detected while creating asset for "circular1.css": "circular1.css -> circular2.css -> circular1.css".');
         $factory->createMappedAsset('circular1.css', __DIR__.'/../Fixtures/circular_dir/circular1.css');
     }

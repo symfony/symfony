@@ -116,7 +116,12 @@ final class HttplugWaitLoop
 
     public function createPsr7Response(ResponseInterface $response, bool $buffer = false): Psr7ResponseInterface
     {
-        $psrResponse = $this->responseFactory->createResponse($response->getStatusCode());
+        $responseParameters = [$response->getStatusCode()];
+        if ($phrase = $this->getReasonPhrase($response)) {
+            $responseParameters[] = $phrase;
+        }
+
+        $psrResponse = $this->responseFactory->createResponse(...$responseParameters);
 
         foreach ($response->getHeaders(false) as $name => $values) {
             foreach ($values as $value) {
@@ -141,5 +146,18 @@ final class HttplugWaitLoop
         }
 
         return $psrResponse->withBody($body);
+    }
+
+    private function getReasonPhrase(ResponseInterface $response): ?string
+    {
+        $reason = null;
+
+        foreach ($response->getInfo('response_headers') as $h) {
+            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? (?:\d\d\d) (.+)#', $h, $m)) {
+                $reason = $m[1];
+            }
+        }
+
+        return $reason;
     }
 }

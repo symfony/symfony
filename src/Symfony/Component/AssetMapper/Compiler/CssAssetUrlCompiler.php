@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Resolves url() paths in CSS files.
@@ -23,8 +24,6 @@ use Symfony\Component\AssetMapper\MappedAsset;
  */
 final class CssAssetUrlCompiler implements AssetCompilerInterface
 {
-    use AssetCompilerPathResolverTrait;
-
     // https://regex101.com/r/BOJ3vG/1
     public const ASSET_URL_PATTERN = '/url\(\s*["\']?(?!(?:\/|\#|%23|data|http|\/\/))([^"\'\s?#)]+)([#?][^"\')]+)?\s*["\']?\)/';
 
@@ -38,23 +37,29 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
     {
         return preg_replace_callback(self::ASSET_URL_PATTERN, function ($matches) use ($asset, $assetMapper) {
             try {
-                $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[1]);
+                $resolvedSourcePath = Path::join(\dirname($asset->sourcePath), $matches[1]);
             } catch (RuntimeException $e) {
                 $this->handleMissingImport(sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
 
                 return $matches[0];
             }
-            $dependentAsset = $assetMapper->getAsset($resolvedPath);
+            $dependentAsset = $assetMapper->getAssetFromSourcePath($resolvedSourcePath);
 
             if (null === $dependentAsset) {
-                $this->handleMissingImport(sprintf('Unable to find asset "%s" referenced in "%s".', $matches[1], $asset->sourcePath));
+                $message = sprintf('Unable to find asset "%s" referenced in "%s". The file "%s" ', $matches[1], $asset->sourcePath, $resolvedSourcePath);
+                if (is_file($resolvedSourcePath)) {
+                    $message .= 'exists, but it is not in a mapped asset path. Add it to the "paths" config.';
+                } else {
+                    $message .= 'does not exist.';
+                }
+                $this->handleMissingImport($message);
 
                 // return original, unchanged path
                 return $matches[0];
             }
 
             $asset->addDependency($dependentAsset);
-            $relativePath = $this->createRelativePath($asset->publicPathWithoutDigest, $dependentAsset->publicPath);
+            $relativePath = Path::makeRelative($dependentAsset->publicPath, \dirname($asset->publicPathWithoutDigest));
 
             return 'url("'.$relativePath.'")';
         }, $content);

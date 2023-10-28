@@ -168,19 +168,16 @@ class MappedAssetFactoryTest extends TestCase
         // mock the AssetMapper to behave like normal: by calling back to the factory
         $this->assetMapper = $this->createMock(AssetMapperInterface::class);
         $this->assetMapper->expects($this->any())
-            ->method('getAsset')
-            ->willReturnCallback(function (string $logicalPath) use ($factory) {
-                $sourcePath = __DIR__.'/../Fixtures/dir1/'.$logicalPath;
-                if (!is_file($sourcePath)) {
-                    $sourcePath = __DIR__.'/../Fixtures/dir2/'.$logicalPath;
-                }
-
-                if (!is_file($sourcePath)) {
-                    $sourcePath = __DIR__.'/../Fixtures/circular_dir/'.$logicalPath;
-                }
-
-                if (!is_file($sourcePath)) {
-                    throw new \RuntimeException(sprintf('Could not find asset "%s".', $logicalPath));
+            ->method('getAssetFromSourcePath')
+            ->willReturnCallback(function (string $sourcePath) use ($factory) {
+                if (str_contains($sourcePath, 'dir1')) {
+                    $logicalPath = substr($sourcePath, strpos($sourcePath, 'dir1') + 5);
+                } elseif (str_contains($sourcePath, 'dir2')) {
+                    $logicalPath = substr($sourcePath, strpos($sourcePath, 'dir2') + 5);
+                } elseif (str_contains($sourcePath, 'circular_dir')) {
+                    $logicalPath = substr($sourcePath, strpos($sourcePath, 'circular_dir') + 13);
+                } else {
+                    throw new \RuntimeException(sprintf('Could not find asset "%s".', $sourcePath));
                 }
 
                 return $factory->createMappedAsset($logicalPath, $sourcePath);

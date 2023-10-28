@@ -580,7 +580,7 @@ return [
         ],
         'LSL' => [
             'LSL',
-            'Ioti Lesotho',
+            'Loti Lesotho',
         ],
         'LTL' => [
             'LTL',
@@ -636,7 +636,7 @@ return [
         ],
         'MGA' => [
             'MGA',
-            'Ariary Malagasy',
+            'Ariary Madagascar',
         ],
         'MGF' => [
             'MGF',
@@ -878,13 +878,17 @@ return [
             'SKK',
             'Cuaron Xlôvác',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone Sierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'Leone Sierra Leone',
+            'Leone Sierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',
-            'Schilling Somali',
+            'Shilling Somali',
         ],
         'SRD' => [
             'SRD',

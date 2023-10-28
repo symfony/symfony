@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[[ $1 == force ]] && docker pull jakzal/php-intl
+[[ $1 == force ]] && docker pull jakzal/php-intl:8.2-73.2
 [[ ! -d /tmp/symfony/icu ]] && mkdir -p /tmp/symfony/icu
 
 docker run \
@@ -9,5 +9,5 @@ docker run \
     -v /tmp/symfony/icu:/tmp \
     -v $(pwd):/symfony \
     -w /symfony \
-    jakzal/php-intl:8.1-70.1 \
+    jakzal/php-intl:8.2-73.2 \
     php src/Symfony/Component/Intl/Resources/bin/update-data.php

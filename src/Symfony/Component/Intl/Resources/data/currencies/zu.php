@@ -514,9 +514,13 @@ return [
             'SHP',
             'i-Saint Helena Pound',
         ],
+        'SLE' => [
+            'SLE',
+            'i-Sierra Leonean Leone',
+        ],
         'SLL' => [
             'SLL',
-            'i-Sierra Leonean Leone',
+            'i-Sierra Leonean Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

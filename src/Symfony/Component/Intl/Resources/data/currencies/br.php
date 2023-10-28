@@ -46,18 +46,6 @@ return [
             'AON',
             'kwanza nevez Angola (1990–2000)',
         ],
-        'AOR' => [
-            'AOR',
-            'AOR',
-        ],
-        'ARA' => [
-            'ARA',
-            'ARA',
-        ],
-        'ARL' => [
-            'ARL',
-            'ARL',
-        ],
         'ARM' => [
             'ARM',
             'peso Arcʼhantina (1881–1970)',
@@ -118,10 +106,6 @@ return [
             'BEF',
             'lur Belgia',
         ],
-        'BGL' => [
-            'BGL',
-            'BGL',
-        ],
         'BGM' => [
             'BGM',
             'lev sokialour Bulgaria',
@@ -162,37 +146,9 @@ return [
             'BOP',
             'peso Bolivia',
         ],
-        'BOV' => [
-            'BOV',
-            'BOV',
-        ],
-        'BRB' => [
-            'BRB',
-            'BRB',
-        ],
-        'BRC' => [
-            'BRC',
-            'BRC',
-        ],
-        'BRE' => [
-            'BRE',
-            'BRE',
-        ],
         'BRL' => [
             'BRL',
             'real Brazil',
-        ],
-        'BRN' => [
-            'BRN',
-            'BRN',
-        ],
-        'BRR' => [
-            'BRR',
-            'BRR',
-        ],
-        'BRZ' => [
-            'BRZ',
-            'BRZ',
         ],
         'BSD' => [
             'BSD',
@@ -274,10 +230,6 @@ return [
             'COP',
             'peso Kolombia',
         ],
-        'COU' => [
-            'COU',
-            'COU',
-        ],
         'CRC' => [
             'CRC',
             'colón Costa Rica',
@@ -285,10 +237,6 @@ return [
         'CSD' => [
             'CSD',
             'dinar Serbia (2002–2006)',
-        ],
-        'CSK' => [
-            'CSK',
-            'CSK',
         ],
         'CUC' => [
             'CUC',
@@ -334,14 +282,6 @@ return [
             'DZD',
             'dinar Aljeria',
         ],
-        'ECS' => [
-            'ECS',
-            'ECS',
-        ],
-        'ECV' => [
-            'ECV',
-            'ECV',
-        ],
         'EEK' => [
             'EEK',
             'kurunenn Estonia',
@@ -353,10 +293,6 @@ return [
         'ERN' => [
             'ERN',
             'nakfa Eritrea',
-        ],
-        'ESA' => [
-            'ESA',
-            'ESA',
         ],
         'ESB' => [
             'ESB',
@@ -394,17 +330,9 @@ return [
             '£ RU',
             'lur Breizh-Veur',
         ],
-        'GEK' => [
-            'GEK',
-            'GEK',
-        ],
         'GEL' => [
             'GEL',
             'lari Jorjia',
-        ],
-        'GHC' => [
-            'GHC',
-            'GHC',
         ],
         'GHS' => [
             'GHS',
@@ -437,10 +365,6 @@ return [
         'GTQ' => [
             'GTQ',
             'quetzal Guatemala',
-        ],
-        'GWE' => [
-            'GWE',
-            'GWE',
         ],
         'GWP' => [
             'GWP',
@@ -610,10 +534,6 @@ return [
             'LUF',
             'lur Luksembourg',
         ],
-        'LUL' => [
-            'LUL',
-            'LUL',
-        ],
         'LVL' => [
             'LVL',
             'lats Latvia',
@@ -637,10 +557,6 @@ return [
         'MCF' => [
             'MCF',
             'lur Monaco',
-        ],
-        'MDC' => [
-            'MDC',
-            'MDC',
         ],
         'MDL' => [
             'MDL',
@@ -718,10 +634,6 @@ return [
             'MXP',
             'peso arcʼhant Mecʼhiko (1861–1992)',
         ],
-        'MXV' => [
-            'MXV',
-            'MXV',
-        ],
         'MYR' => [
             'MYR',
             'ringgit Malaysia',
@@ -777,10 +689,6 @@ return [
         'PAB' => [
             'PAB',
             'balboa Panamá',
-        ],
-        'PEI' => [
-            'PEI',
-            'PEI',
         ],
         'PEN' => [
             'PEN',
@@ -894,9 +802,13 @@ return [
             'SKK',
             'kurunenn Slovakia',
         ],
+        'SLE' => [
+            'SLE',
+            'leone Sierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'leone Sierra Leone',
+            'leone Sierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',
@@ -994,10 +906,6 @@ return [
             'UAH',
             'hryvnia Ukraina',
         ],
-        'UAK' => [
-            'UAK',
-            'UAK',
-        ],
         'UGS' => [
             'UGS',
             'shilling Ouganda (1966–1987)',
@@ -1009,18 +917,6 @@ return [
         'USD' => [
             '$ SU',
             'dollar SU',
-        ],
-        'USN' => [
-            'USN',
-            'USN',
-        ],
-        'USS' => [
-            'USS',
-            'USS',
-        ],
-        'UYI' => [
-            'UYI',
-            'UYI',
         ],
         'UYP' => [
             'UYP',
@@ -1090,10 +986,6 @@ return [
             'CFPF',
             'lur CFP',
         ],
-        'XRE' => [
-            'XRE',
-            'XRE',
-        ],
         'YDD' => [
             'YDD',
             'dinar Yemen',
@@ -1101,10 +993,6 @@ return [
         'YER' => [
             'YER',
             'rial Yemen',
-        ],
-        'YUD' => [
-            'YUD',
-            'YUD',
         ],
         'YUM' => [
             'YUM',
@@ -1118,10 +1006,6 @@ return [
             'YUR',
             'dinar adreizhet Yougoslavia (1992–1993)',
         ],
-        'ZAL' => [
-            'ZAL',
-            'ZAL',
-        ],
         'ZAR' => [
             'ZAR',
             'rand Suafrika',
@@ -1133,14 +1017,6 @@ return [
         'ZMW' => [
             'ZMW',
             'kwacha Zambia',
-        ],
-        'ZRN' => [
-            'ZRN',
-            'ZRN',
-        ],
-        'ZRZ' => [
-            'ZRZ',
-            'ZRZ',
         ],
         'ZWD' => [
             'ZWD',

@@ -58,6 +58,7 @@ return [
         'bfd' => 'Tiếng Bafut',
         'bfq' => 'Tiếng Badaga',
         'bg' => 'Tiếng Bulgaria',
+        'bgc' => 'Tiếng Haryana',
         'bgn' => 'Tiếng Tây Balochi',
         'bho' => 'Tiếng Bhojpuri',
         'bi' => 'Tiếng Bislama',

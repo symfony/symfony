@@ -894,9 +894,13 @@ return [
             'SKK',
             'cruna slovaca',
         ],
+        'SLE' => [
+            'SLE',
+            'leone da la Sierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'leone da la Sierra Leone',
+            'leone da la Sierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

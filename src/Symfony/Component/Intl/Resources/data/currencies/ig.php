@@ -498,9 +498,13 @@ return [
             'SHP',
             'Ego Pound obodo St Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'Ego Leone obodo Sierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'Ego Leone obodo Sierra Leone',
+            'Ego Leone obodo Sierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

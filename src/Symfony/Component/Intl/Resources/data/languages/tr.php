@@ -61,6 +61,7 @@ return [
         'bfd' => 'Bafut',
         'bfq' => 'Badaga',
         'bg' => 'Bulgarca',
+        'bgc' => 'Haryanvi dili',
         'bgn' => 'Batı Balochi',
         'bho' => 'Arayanice',
         'bi' => 'Bislama',

@@ -4,7 +4,7 @@ return [
     'Names' => [
         'SLE' => [
             'Le',
-            'SLE',
+            'Lewoon Seraa Liyon',
         ],
     ],
 ];

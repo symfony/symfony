@@ -107,7 +107,6 @@ return [
         'IL' => 'Israel',
         'IM' => 'Insla da Man',
         'IN' => 'India',
-        'IO' => 'Territori Britannic en l’Ocean Indic',
         'IQ' => 'Irac',
         'IR' => 'Iran',
         'IS' => 'Islanda',

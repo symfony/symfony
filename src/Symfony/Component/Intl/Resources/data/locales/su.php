@@ -8,6 +8,7 @@ return [
         'en' => 'Inggris',
         'en_DE' => 'Inggris (Jérman)',
         'en_GB' => 'Inggris (Britania Raya)',
+        'en_ID' => 'Inggris (Indonesia)',
         'en_IN' => 'Inggris (India)',
         'en_US' => 'Inggris (Amérika Sarikat)',
         'es' => 'Spanyol',

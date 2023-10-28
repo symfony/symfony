@@ -54,10 +54,6 @@ return [
             'ARA',
             'Austral Airgintíneach',
         ],
-        'ARL' => [
-            'ARL',
-            'ARL',
-        ],
         'ARM' => [
             'ARM',
             'Peso na hAirgintíne (1881–1970)',
@@ -97,10 +93,6 @@ return [
         'BAM' => [
             'BAM',
             'Marg Inmhalartaithe na Boisnia-Heirseagaivéine',
-        ],
-        'BAN' => [
-            'BAN',
-            'BAN',
         ],
         'BBD' => [
             'BBD',
@@ -153,10 +145,6 @@ return [
         'BOB' => [
             'BOB',
             'Boliviano',
-        ],
-        'BOL' => [
-            'BOL',
-            'BOL',
         ],
         'BOP' => [
             'BOP',
@@ -262,10 +250,6 @@ return [
             'COP',
             'Peso na Colóime',
         ],
-        'COU' => [
-            'COU',
-            'COU',
-        ],
         'CRC' => [
             'CRC',
             'Colón Chósta Ríce',
@@ -341,14 +325,6 @@ return [
         'ERN' => [
             'ERN',
             'Nakfa na hEiritré',
-        ],
-        'ESA' => [
-            'ESA',
-            'ESA',
-        ],
-        'ESB' => [
-            'ESB',
-            'ESB',
         ],
         'ESP' => [
             'ESP',
@@ -530,14 +506,6 @@ return [
             'KPW',
             'Won na Cóiré Thuaidh',
         ],
-        'KRH' => [
-            'KRH',
-            'KRH',
-        ],
-        'KRO' => [
-            'KRO',
-            'KRO',
-        ],
         'KRW' => [
             '₩',
             'Won na Cóiré Theas',
@@ -625,10 +593,6 @@ return [
         'MKD' => [
             'MKD',
             'Denar na Macadóine',
-        ],
-        'MKN' => [
-            'MKN',
-            'MKN',
         ],
         'MLF' => [
             'MLF',
@@ -858,9 +822,13 @@ return [
             'SKK',
             'Koruna na Slóvaice',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone Shiarra Leon',
+        ],
         'SLL' => [
             'SLL',
-            'Leone Shiarra Leon',
+            'Leone Shiarra Leon (1964—2022)',
         ],
         'SOS' => [
             'SOS',
@@ -1050,10 +1018,6 @@ return [
             'CFPF',
             'Franc CFP',
         ],
-        'XRE' => [
-            'XRE',
-            'XRE',
-        ],
         'YDD' => [
             'YDD',
             'Dínear Éimin',
@@ -1073,10 +1037,6 @@ return [
         'YUN' => [
             'YUN',
             'Dinar Inmhalartaithe Iúgslavach (1990–1992)',
-        ],
-        'YUR' => [
-            'YUR',
-            'YUR',
         ],
         'ZAL' => [
             'ZAL',

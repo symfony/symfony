@@ -181,7 +181,7 @@ return [
         'PH' => 'Filipini',
         'PK' => 'Pakistan',
         'PL' => 'Poljska',
-        'PM' => 'Saint-Pierre-et-Miquelon',
+        'PM' => 'Sveti Petar i Mikelon',
         'PN' => 'Otoci Pitcairn',
         'PR' => 'Portoriko',
         'PS' => 'Palestinsko područje',

@@ -220,28 +220,6 @@ class ImportMapVersionCheckerTest extends TestCase
             ],
         ];
 
-        yield 'single that imports something that is not required by the package' => [
-            [
-                self::createRemoteEntry('foo', version: '1.0.0'),
-                self::createRemoteEntry('bar', version: '1.5.0'),
-            ],
-            [
-                'foo' => ['bar'],
-                'bar' => [],
-            ],
-            [
-                [
-                    'url' => '/foo/1.0.0',
-                    'response' => [
-                        'dependencies' => [],
-                    ],
-                ],
-            ],
-            [
-                new PackageVersionProblem('foo', 'bar', null, '1.5.0'),
-            ],
-        ];
-
         yield 'single with npm-style constraint' => [
             [
                 self::createRemoteEntry('foo', version: '1.0.0'),

@@ -16,7 +16,7 @@ final class PackageVersionProblem
     public function __construct(
         public readonly string $packageName,
         public readonly string $dependencyPackageName,
-        public readonly ?string $requiredVersionConstraint,
+        public readonly string $requiredVersionConstraint,
         public readonly ?string $installedVersion
     ) {
     }

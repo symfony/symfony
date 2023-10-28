@@ -726,9 +726,13 @@ return [
             'SKK',
             'coroană slovacă',
         ],
+        'SLE' => [
+            'SLE',
+            'leone din Sierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'leone din Sierra Leone',
+            'leone din Sierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

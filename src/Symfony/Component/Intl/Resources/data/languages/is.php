@@ -46,6 +46,7 @@ return [
         'bem' => 'bemba',
         'bez' => 'bena',
         'bg' => 'búlgarska',
+        'bgc' => 'haryanví',
         'bgn' => 'vesturbalotsí',
         'bho' => 'bojpúrí',
         'bi' => 'bíslama',

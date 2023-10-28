@@ -26,7 +26,9 @@ final class MappedAsset
     public readonly string $publicExtension;
 
     /**
-     * The final content of this asset, if different from the source.
+     * The final content of this asset if different from the sourcePath.
+     *
+     * If null, the content should be read from the sourcePath.
      */
     public readonly ?string $content;
 

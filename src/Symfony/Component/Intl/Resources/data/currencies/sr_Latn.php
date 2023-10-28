@@ -834,9 +834,13 @@ return [
             'SKK',
             'Slovačka kruna',
         ],
+        'SLE' => [
+            'SLE',
+            'sijeraleonski leone',
+        ],
         'SLL' => [
             'SLL',
-            'sijeraleonski leone',
+            'sijeraleonski leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

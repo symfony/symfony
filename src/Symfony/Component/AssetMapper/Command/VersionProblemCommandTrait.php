@@ -29,12 +29,6 @@ trait VersionProblemCommandTrait
                 continue;
             }
 
-            if (null === $problem->requiredVersionConstraint) {
-                $output->writeln(sprintf('[warning] <info>%s</info> appears to import <info>%s</info> but this is not listed as a dependency of <info>%s</info>. This is odd and could be a misconfiguration of that package.', $problem->packageName, $problem->dependencyPackageName, $problem->packageName));
-
-                continue;
-            }
-
             $output->writeln(sprintf('[warning] <info>%s</info> requires <info>%s</info>@<comment>%s</comment> but version <comment>%s</comment> is installed.', $problem->packageName, $problem->dependencyPackageName, $problem->requiredVersionConstraint, $problem->installedVersion));
         }
     }

@@ -48,14 +48,22 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertSame('/final-assets/already-abcdefVWXYZ0123456789.digested.css', $asset->publicPathWithoutDigest);
     }
 
-    public function testCreateMappedAssetWithContentBasic()
+    public function testCreateMappedAssetWithContentThatChanged()
     {
-        $assetMapper = $this->createFactory();
-        $expected = <<<EOF
-        /* file1.css */
-        body {}
+        $file1Compiler = new class() implements AssetCompilerInterface {
+            public function supports(MappedAsset $asset): bool
+            {
+                return true;
+            }
 
-        EOF;
+            public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
+            {
+                return 'totally changed';
+            }
+        };
+
+        $assetMapper = $this->createFactory($file1Compiler);
+        $expected = 'totally changed';
 
         $asset = $assetMapper->createMappedAsset('file1.css', __DIR__.'/../Fixtures/dir1/file1.css');
         $this->assertSame($expected, $asset->content);
@@ -63,6 +71,14 @@ class MappedAssetFactoryTest extends TestCase
         // verify internal caching doesn't cause issues
         $asset = $assetMapper->createMappedAsset('file1.css', __DIR__.'/../Fixtures/dir1/file1.css');
         $this->assertSame($expected, $asset->content);
+    }
+
+    public function testCreateMappedAssetWithContentThatDoesNotChange()
+    {
+        $assetMapper = $this->createFactory();
+        $asset = $assetMapper->createMappedAsset('file1.css', __DIR__.'/../Fixtures/dir1/file1.css');
+        // null content because the final content matches the file source
+        $this->assertNull($asset->content);
     }
 
     public function testCreateMappedAssetWithContentErrorsOnCircularReferences()

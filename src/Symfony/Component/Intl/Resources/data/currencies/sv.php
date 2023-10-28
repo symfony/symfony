@@ -216,15 +216,15 @@ return [
         ],
         'BYB' => [
             'BYB',
-            'vitrysk ny rubel (1994–1999)',
+            'belarusisk ny rubel (1994–1999)',
         ],
         'BYN' => [
             'BYN',
-            'vitrysk rubel',
+            'belarusisk rubel',
         ],
         'BYR' => [
             'BYR',
-            'vitrysk rubel (2000–2016)',
+            'belarusisk rubel (2000–2016)',
         ],
         'BZD' => [
             'BZ$',
@@ -898,9 +898,13 @@ return [
             'SKK',
             'slovakisk koruna',
         ],
+        'SLE' => [
+            'SLE',
+            'sierraleonsk leone',
+        ],
         'SLL' => [
             'SLL',
-            'sierraleonsk leone',
+            'sierraleonsk leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

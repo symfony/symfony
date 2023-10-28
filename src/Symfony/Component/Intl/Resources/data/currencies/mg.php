@@ -174,9 +174,13 @@ return [
             'SHP',
             'livre de Sainte-Hélène',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone',
+        ],
         'SLL' => [
             'SLL',
-            'Leone',
+            'Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

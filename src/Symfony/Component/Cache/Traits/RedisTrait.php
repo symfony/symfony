@@ -333,6 +333,10 @@ trait RedisTrait
                     case 'slaves': $redis->setOption(\RedisCluster::OPT_SLAVE_FAILOVER, \RedisCluster::FAILOVER_DISTRIBUTE_SLAVES); break;
                 }
 
+                if (isset($params['prefix']) && is_string($params['prefix'])) {
+                    $redis->setOption(\Redis::OPT_PREFIX, $params['prefix']);
+                }
+
                 return $redis;
             };
 

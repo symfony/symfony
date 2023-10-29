@@ -173,7 +173,6 @@ class JavaScriptImportPathCompilerTest extends TestCase
         ];
 
         yield 'importing_non_existent_file_without_strict_mode_is_ignored_and_no_import_added' => [
-            'sourceLogicalName' => 'app.js',
             'input' => "import './non-existent.js';",
             'expectedJavaScriptImports' => [],
         ];
@@ -277,7 +276,6 @@ class JavaScriptImportPathCompilerTest extends TestCase
         ];
 
         yield 'absolute_import_ignored_and_no_dependency_added' => [
-            'sourceLogicalName' => 'app.js',
             'input' => 'import "https://example.com/module.js";',
             'expectedJavaScriptImports' => [],
         ];
@@ -415,14 +413,14 @@ class JavaScriptImportPathCompilerTest extends TestCase
 
     public function testCompileHandlesCircularRelativeAssets()
     {
-        $appAsset = new MappedAsset('app.js', 'anythingapp', '/assets/app.js');
-        $otherAsset = new MappedAsset('other.js', 'anythingother', '/assets/other.js');
+        $appAsset = new MappedAsset('app.js', '/project/assets/app.js', '/assets/app.js');
+        $otherAsset = new MappedAsset('other.js', '/project/assets/other.js', '/assets/other.js');
 
         $importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
         $assetMapper = $this->createMock(AssetMapperInterface::class);
         $assetMapper->expects($this->once())
-            ->method('getAsset')
-            ->with('other.js')
+            ->method('getAssetFromSourcePath')
+            ->with('/project/assets/other.js')
             ->willThrowException(new CircularAssetsException($otherAsset));
 
         $compiler = new JavaScriptImportPathCompiler($importMapConfigReader);

@@ -7,6 +7,35 @@ in 6.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.4.0...v6.4.1
 
+* 6.4.0-BETA2 (2023-10-29)
+
+ * bug #52329 [HttpClient] Psr18Client: parse HTTP Reason Phrase for Response (Hanmac)
+ * bug #52323 [AssetMapper] Allowing circular references in JavaScriptImportPathCompiler (weaverryan)
+ * bug #52331 [AssetMapper] Fix file deleting errors & remove nullable MappedAsset on JS import (weaverryan)
+ * bug #52332 [Yaml] Fix deprecated passing null to trim() (javaDeveloperKid)
+ * bug #52349 [AssetMapper] Fix in-file imports to resolve via filesystem (weaverryan)
+ * bug #52343 [Intl] Update the ICU data to 74.1 (jderusse)
+ * bug #52347 [Form] Fix merging form data and files (ter) (Jan Pintr)
+ * bug #52330 [AssetMapper] Fixing memory bug where we stored way more file content than needed (weaverryan)
+ * bug #52325 [AssetMapper] jsdelivr "no version" import syntax (weaverryan)
+ * bug #52307 [Scheduler] Save checkpoint in a finally block (FrancoisPog)
+ * feature #52193 [PhpUnitBridge] Allow setting the locale using SYMFONY_PHPUNIT_LOCALE env var (VincentLanglet)
+ * bug #52290 [DebugBundle] ignore a not-existing virtual request stack (xabbuh)
+ * bug #52308 [SecurityBundle] Fix missing login-link element in xsd schema (fancyweb)
+ * bug #51331 [Messenger] add handler description as array key to `HandlerFailedException::getWrappedExceptions()` (kbond)
+ * bug #51992 [Serializer] Fix using `DateIntervalNormalizer` with union types (Jeroeny)
+ * bug #52276 DB table locks on messenger_messages with many failures (bn-jdcook)
+ * bug #52232 [Messenger] declare constructor argument as optional for backwards compatibility (xabbuh)
+ * bug #52254 [AssetMapper] Adding import-parsing case where import contains a path (weaverryan)
+ * bug #52283 [Serializer] Handle default context when denormalizing timestamps in DateTimeNormalizer (mtarld)
+ * bug #52272 [VarDump] Fix order of dumped properties - parent goes first (lyrixx)
+ * bug #52274 [FrameworkBundle] re-introduce conflict rule with WebProfilerBundle < 6.4 (xabbuh)
+ * bug #52268 [Mailer][Notifier] Update Sendinblue / Brevo API host (Stephanie)
+ * bug #52255 [Form] Skip merging params & files if there are no files in the first place (dmaicher, priyadi)
+ * bug #52234  add return type hints to EntityFactory (xabbuh)
+ * bug #52229 [FrameworkBundle] Fix CommandDataCollector is always registered (smnandre)
+ * bug #52218 [FrameworkBundle] Add conflict with `WebProfilerBundle` < 6.4 (HeahDude)
+
 * 6.4.0-BETA1 (2023-10-21)
 
  * feature #51847 [AssetMapper] Allowing for files to be written to some non-local location (weaverryan)

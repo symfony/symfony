@@ -7,6 +7,34 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.30 (2023-10-29)
+
+ * bug #52332 [Yaml] Fix deprecated passing null to trim() (javaDeveloperKid)
+ * bug #52343 [Intl] Update the ICU data to 74.1 (jderusse)
+ * bug #52347 [Form] Fix merging form data and files (ter) (Jan Pintr)
+ * bug #52308 [SecurityBundle] Fix missing login-link element in xsd schema (fancyweb)
+ * bug #51992 [Serializer] Fix using `DateIntervalNormalizer` with union types (Jeroeny)
+ * bug #52276 DB table locks on messenger_messages with many failures (bn-jdcook)
+ * bug #52283 [Serializer] Handle default context when denormalizing timestamps in DateTimeNormalizer (mtarld)
+ * bug #52268 [Mailer][Notifier] Update Sendinblue / Brevo API host (Stephanie)
+ * bug #52255 [Form] Skip merging params & files if there are no files in the first place (dmaicher, priyadi)
+ * bug #52201 [HttpKernel] Resolve EBADP error on flock with LOCK_SH with NFS (driskell)
+ * bug #52105 [Cache] Remove temporary cache item file on `rename()` failure (cedric-anne)
+ * bug #52021 [Form] Fix merging params & files when "multiple" is enabled (priyadi)
+ * bug #51819 [HttpFoundation] Do not swallow trailing `=` in cookie value (OskarStark)
+ * bug #52095 [Notifier][Sendinblue] Handle error responses without a message key (stof)
+ * bug #51907 [Serializer] Fix collecting only first missing constructor argument (HypeMC)
+ * bug #52075 [Messenger] Fix DoctrineOpenTransactionLoggerMiddleware (ro0NL)
+ * bug #52005 [Translation] Prevent creating empty keys when key ends with a period (javleds)
+ * bug #52035 [DoctrineBridge] Fix DBAL 4 compatibility (derrabus)
+ * bug #51947 [Cache][Doctrine][DoctrineBridge][Lock][Messenger] Compatibility with ORM 3 and DBAL 4 (derrabus)
+ * bug #52009 [FrameworkBundle] Configure `logger` as error logger if the Monolog Bundle is not registered (MatTheCat)
+ * bug #51969 [FrameworkBundle] Fix calling `Kernel::warmUp()` when running `cache:warmup` (nicolas-grekas)
+ * bug #51985 [WebProfilerBundle] Fix markup to make link to profiler appear on errored WDT (MatTheCat)
+ * bug #44766 [RateLimiter] TokenBucket policy fix for adding tokens with a predefined frequency (relo-san)
+ * bug #51858 [Security] Fix resetting traceable listeners (chalasr)
+ * bug #47342 Change incorrect message, when the sender in the global envelope or the from header of asEmailMessage() is not defined. (fredericlesueurs)
+
 * 5.4.29 (2023-09-30)
 
  * bug #51701 [Serializer] Fix parsing XML root node attributes (mtarld)

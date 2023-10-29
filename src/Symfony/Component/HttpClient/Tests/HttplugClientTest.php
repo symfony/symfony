@@ -285,4 +285,19 @@ class HttplugClientTest extends TestCase
         $resultResponse = $client->sendRequest($request);
         $this->assertCount(1, $resultResponse->getHeaders());
     }
+
+    public function testResponseReasonPhrase()
+    {
+        $responseHeaders = [
+            'HTTP/1.1 103 Very Early Hints',
+        ];
+        $response = new MockResponse('body', ['response_headers' => $responseHeaders]);
+
+        $client = new HttplugClient(new MockHttpClient($response));
+        $request = $client->createRequest('POST', 'http://localhost:8057/post')
+            ->withBody($client->createStream('foo=0123456789'));
+
+        $resultResponse = $client->sendRequest($request);
+        $this->assertSame('Very Early Hints', $resultResponse->getReasonPhrase());
+    }
 }

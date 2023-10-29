@@ -105,7 +105,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
     public function sendRequest(RequestInterface $request): Psr7ResponseInterface
     {
         try {
-            return $this->waitLoop->createPsr7Response($this->sendPsr7Request($request));
+            return HttplugWaitLoop::createPsr7Response($this->responseFactory, $this->streamFactory, $this->client, $this->sendPsr7Request($request), true);
         } catch (TransportExceptionInterface $e) {
             throw new NetworkException($e->getMessage(), $request, $e);
         }

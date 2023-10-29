@@ -27,10 +27,12 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
+use Symfony\Component\HttpClient\Internal\HttplugWaitLoop;
 use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface as HttpClientResponseInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 if (!interface_exists(ClientInterface::class)) {
@@ -105,26 +107,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
 
             $response = $this->client->request($request->getMethod(), (string) $request->getUri(), $options);
 
-            $psrResponse = $this->responseFactory->createResponse($response->getStatusCode());
-
-            foreach ($response->getHeaders(false) as $name => $values) {
-                foreach ($values as $value) {
-                    try {
-                        $psrResponse = $psrResponse->withAddedHeader($name, $value);
-                    } catch (\InvalidArgumentException $e) {
-                        // ignore invalid header
-                    }
-                }
-            }
-
-            $body = $response instanceof StreamableInterface ? $response->toStream(false) : StreamWrapper::createResource($response, $this->client);
-            $body = $this->streamFactory->createStreamFromResource($body);
-
-            if ($body->isSeekable()) {
-                $body->seek(0);
-            }
-
-            return $psrResponse->withBody($body);
+            return HttplugWaitLoop::createPsr7Response($this->responseFactory, $this->streamFactory, $this->client, $response, false);
         } catch (TransportExceptionInterface $e) {
             if ($e instanceof \InvalidArgumentException) {
                 throw new Psr18RequestException($e, $request);

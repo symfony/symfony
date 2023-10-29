@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-21T17:51:41Z
+
+Can you add a test to prevent future regressions?
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2023-10-21T20:03:53Z
+
+> Can you add a test to prevent future regressions?
+
+I think it's difficult in this PR to add test because mock stream functions will cause a refactoring of the command.
+I might try doing this in an other PR. What do you think ?
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2023-10-22T07:47:44Z
+
+I don't know how to fix psalm error because in monolog 2.x, LogRecord is an interface and psalm runs with this version.
+Anyone have an idea?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-25T17:09:38Z
+
+Don't care about Psalm in this case. This is an expected error due to supporting several versions of Monolog. Our psalm setup only reports *new* issues for each PR, so this won't both future PRs.

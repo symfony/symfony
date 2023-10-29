@@ -91,7 +91,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Returns the parent node.
      */
-    public function end(): NodeParentInterface|NodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition|null
+    public function end(): NodeParentInterface|NodeBuilder|self|ArrayNodeDefinition|VariableNodeDefinition|null
     {
         return $this->parent;
     }

@@ -68,7 +68,7 @@ class StreamedResponse extends Response
     /**
      * This method only sends the headers once.
      *
-     * @param null|positive-int $statusCode The status code to use, override the statusCode property if set and not null
+     * @param positive-int|null $statusCode The status code to use, override the statusCode property if set and not null
      *
      * @return $this
      */

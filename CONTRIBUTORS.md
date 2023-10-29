@@ -6,68 +6,57 @@ Symfony is the result of the work of many people who made the code better.
 The Symfony Connect username in parenthesis allows to get more information
  - Fabien Potencier (fabpot)
  - Nicolas Grekas (nicolas-grekas)
- - Alexander M. Turek (derrabus)
  - Christian Flothmann (xabbuh)
- - Robin Chalas (chalas_r)
+ - Alexander M. Turek (derrabus)
  - Bernhard Schussek (bschussek)
+ - Robin Chalas (chalas_r)
  - Tobias Schultze (tobion)
- - Thomas Calvet (fancyweb)
  - Grégoire Pineau (lyrixx)
- - Jérémy DERUSSÉ (jderusse)
- - Wouter de Jong (wouterj)
- - Maxime Steinhausser (ogizanagi)
+ - Thomas Calvet (fancyweb)
  - Christophe Coevoet (stof)
- - Kévin Dunglas (dunglas)
  - Jordi Boggiano (seldaek)
- - Oskar Stark (oskarstark)
- - Roland Franssen (ro0)
+ - Maxime Steinhausser (ogizanagi)
+ - Wouter de Jong (wouterj)
+ - Kévin Dunglas (dunglas)
  - Victor Berchet (victor)
- - Javier Eguiluz (javier.eguiluz)
  - Ryan Weaver (weaverryan)
- - Yonel Ceruto (yonelceruto)
- - Tobias Nyholm (tobias)
- - Alexandre Daubois (alexandre-daubois)
+ - Jérémy DERUSSÉ (jderusse)
+ - Roland Franssen
+ - Javier Eguiluz (javier.eguiluz)
  - Johannes S (johannes)
- - Jakub Zalas (jakubzalas)
  - Kris Wallsmith (kriswallsmith)
+ - Jakub Zalas (jakubzalas)
+ - Yonel Ceruto (yonelceruto)
  - Jules Pietri (heah)
+ - Oskar Stark (oskarstark)
+ - Tobias Nyholm (tobias)
  - Hugo Hamon (hhamon)
- - Jérôme Tamarelle (gromnan)
- - Hamza Amrouche (simperfit)
+ - Alexandre Daubois (alexandre-daubois)
  - Samuel ROZE (sroze)
- - Kevin Bond (kbond)
  - Pascal Borreli (pborreli)
  - Romain Neutron
  - Joseph Bielawski (stloyd)
  - Drak (drak)
  - Abdellatif Ait boudad (aitboudad)
- - HypeMC (hypemc)
- - Jan Schädlich (jschaedl)
  - Lukas Kahwe Smith (lsmith)
- - Antoine Lamirault (alamirault)
+ - Hamza Amrouche (simperfit)
  - Martin Hasoň (hason)
+ - Kevin Bond (kbond)
+ - Jérôme Tamarelle (gromnan)
  - Jeremy Mikola (jmikola)
+ - Antoine Lamirault (alamirault)
  - Jean-François Simon (jfsimon)
  - Benjamin Eberlei (beberlei)
+ - HypeMC (hypemc)
  - Igor Wiedler
- - Valentin Udaltsov (vudaltsov)
- - Vasilij Duško (staff)
+ - Jan Schädlich (jschaedl)
+ - Mathieu Lechat (mat_the_cat)
+ - Jonathan Wage (jwage)
  - Matthias Pigulla (mpdude)
  - Gabriel Ostrolucký (gadelat)
- - Laurent VOULLEMIER (lvo)
- - Antoine Makdessi (amakdessi)
- - Mathieu Lechat (mat_the_cat)
- - Pierre du Plessis (pierredup)
- - Grégoire Paris (greg0ire)
- - Jonathan Wage (jwage)
- - Alexander Schranz (alexander-schranz)
- - David Maicher (dmaicher)
- - Titouan Galopin (tgalopin)
- - Gary PEGEOT (gary-p)
- - Mathieu Santostefano (welcomattic)
- - Vincent Langlet (deviling)
- - Gábor Egyed (1ed)
+ - Valentin Udaltsov (vudaltsov)
  - Alexandre Salomé (alexandresalome)
+ - Grégoire Paris (greg0ire)
  - William DURAND
  - ornicar
  - Dany Maillard (maidmaid)
@@ -76,824 +65,614 @@ The Symfony Connect username in parenthesis allows to get more information
  - stealth35 ‏ (stealth35)
  - Alexander Mols (asm89)
  - Francis Besset (francisbesset)
- - Allison Guilhem (a_guilhem)
- - Vasilij Dusko | CREATION
+ - Titouan Galopin (tgalopin)
+ - Pierre du Plessis (pierredup)
+ - David Maicher (dmaicher)
+ - Gábor Egyed (1ed)
  - Bulat Shakirzyanov (avalanche123)
  - Iltar van der Berg
  - Miha Vrhovnik (mvrhov)
- - Mathieu Piot (mpiot)
  - Saša Stamenković (umpirsky)
- - Alex Pott
- - Guilhem N (guilhemn)
- - Vladimir Reznichenko (kalessil)
+ - Mathieu Piot (mpiot)
+ - Alexander Schranz (alexander-schranz)
+ - Vasilij Duško (staff)
  - Sarah Khalil (saro0h)
- - Tomas Norkūnas (norkunas)
- - Ruud Kamphuis (ruudk)
+ - Laurent VOULLEMIER (lvo)
  - Konstantin Kudryashov (everzet)
+ - Vincent Langlet (deviling)
+ - Guilhem N (guilhemn)
  - Bilal Amarni (bamarni)
  - Eriksen Costa
- - Frank A. Fiebig (fafiebig)
- - Mathias Arlaud (mtarld)
+ - Mathieu Santostefano (welcomattic)
  - Florin Patan (florinpatan)
- - Konstantin Myakshin (koc)
+ - Vladimir Reznichenko (kalessil)
  - Peter Rehm (rpet)
  - Henrik Bjørnskov (henrikbjorn)
- - David Buchmann (dbu)
- - Massimiliano Arione (garak)
  - Andrej Hudec (pulzarraider)
- - Julien Falque (julienfalque)
- - Fran Moreno (franmomu)
  - Jáchym Toušek (enumag)
- - Douglas Greenshields (shieldo)
+ - David Buchmann (dbu)
  - Christian Raue
- - Graham Campbell (graham)
- - Michel Weimerskirch (mweimerskirch)
  - Eric Clemmons (ericclemmons)
- - Issei Murasawa (issei_m)
- - Malte Schlüter (maltemaltesich)
  - Denis (yethee)
- - Vasilij Dusko
- - Maxime Helias (maxhelias)
+ - Michel Weimerskirch (mweimerskirch)
+ - Issei Murasawa (issei_m)
+ - Douglas Greenshields (shieldo)
+ - Gary PEGEOT (gary-p)
+ - Alex Pott
+ - Fran Moreno (franmomu)
  - Arnout Boks (aboks)
  - Charles Sarrazin (csarrazi)
- - Przemysław Bogusz (przemyslaw-bogusz)
+ - Ruud Kamphuis (ruudk)
  - Henrik Westphal (snc)
  - Dariusz Górecki (canni)
+ - Allison Guilhem (a_guilhem)
  - Ener-Getick
+ - Dariusz Ruminski
+ - Graham Campbell (graham)
  - Tugdual Saunier (tucksaun)
- - Yanick Witschi (toflar)
- - Rokas Mikalkėnas (rokasm)
- - Sebastiaan Stok (sstok)
- - Jérôme Vasseur (jvasseur)
- - Ion Bazan (ionbazan)
  - Lee McDermott
  - Brandon Turner
  - Luis Cordova (cordoval)
+ - Antoine Makdessi (amakdessi)
+ - Mathias Arlaud (mtarld)
+ - Konstantin Myakshin (koc)
  - Daniel Holmes (dholmes)
+ - Julien Falque (julienfalque)
+ - Tomas Norkūnas (norkunas)
  - Toni Uebernickel (havvg)
  - Bart van den Burg (burgov)
+ - Vasilij Dusko | CREATION
  - Jordan Alliot (jalliot)
- - Smaine Milianni (ismail1432)
- - John Wards (johnwards)
- - Dariusz Ruminski
- - Lars Strojny (lstrojny)
- - Joel Wurtz (brouznouf)
  - Hubert Lenoir (hubert_lenoir)
+ - John Wards (johnwards)
+ - Massimiliano Arione (garak)
+ - Phil E. Taylor (philetaylor)
  - Antoine Hérault (herzult)
  - Konstantin.Myakshin
- - Arman Hosseini (arman)
- - gnito-org
- - Saif Eddin Gmati (azjezz)
- - Simon Berger
+ - Yanick Witschi (toflar)
  - Arnaud Le Blanc (arnaud-lb)
+ - Joel Wurtz (brouznouf)
+ - Sebastiaan Stok (sstok)
  - Maxime STEINHAUSSER
- - Peter Kokot (maastermedia)
- - jeremyFreeAgent (jeremyfreeagent)
- - Jeroen Spee (jeroens)
- - Ahmed TAILOULOUTE (ahmedtai)
+ - gnito-org
  - Tim Nagel (merk)
- - Andreas Braun
- - Teoh Han Hui (teohhanhui)
- - YaFou
  - Chris Wilkinson (thewilkybarkid)
+ - Jérôme Vasseur (jvasseur)
+ - Peter Kokot (peterkokot)
  - Brice BERNARD (brikou)
- - Roman Martinuk (a2a4)
- - Jacob Dreesen (jdreesen)
- - Gregor Harlan (gharlan)
- - Christopher Hertel (chertel)
- - Baptiste Clavié (talus)
- - Adrien Brault (adrienbrault)
  - Michal Piotrowski
  - marc.weistroff
+ - Rokas Mikalkėnas (rokasm)
+ - Lars Strojny (lstrojny)
  - lenar
- - Jesse Rushlow (geeshoe)
- - Théo FIDRY
- - Michael Babker (mbabker)
+ - Jacob Dreesen (jdreesen)
  - Włodzimierz Gajda (gajdaw)
- - Hugo Alliaume (kocal)
- - Christian Scheb
- - Guillaume (guill)
- - Olivier Dolbeau (odolbeau)
+ - Simon André (simonandre)
+ - Adrien Brault (adrienbrault)
+ - Jeroen Spee (jeroens)
+ - Théo FIDRY
  - Florian Voutzinos (florianv)
- - zairig imad (zairigimad)
+ - Teoh Han Hui (teohhanhui)
+ - Przemysław Bogusz (przemyslaw-bogusz)
  - Colin Frei
  - Javier Spagnoletti (phansys)
  - excelwebzone
- - Phil Taylor (prazgod)
- - Jérôme Parmentier (lctrs)
- - HeahDude
- - Richard van Laak (rvanlaak)
- - Nicolas Philippe (nikophil)
  - Paráda József (paradajozsef)
- - Alessandro Lai (jean85)
+ - Baptiste Clavié (talus)
  - Alexander Schwenn (xelaris)
- - Jonathan Scheiber (jmsche)
  - Fabien Pennequin (fabienpennequin)
  - Gordon Franke (gimler)
- - François-Xavier de Guillebon (de-gui_f)
- - Andreas Schempp (aschempp)
- - Gabriel Caruso
+ - Malte Schlüter (maltemaltesich)
+ - jeremyFreeAgent (jeremyfreeagent)
  - Joshua Thijssen
- - Anthony GRASSIOT (antograssiot)
- - Jan Rosier (rosier)
- - Andreas Möller (localheinz)
+ - Vasilij Dusko
  - Daniel Wehner (dawehner)
- - Gocha Ossinkine (ossinkine)
- - Chi-teck
- - Hugo Monteiro (monteiro)
- - Baptiste Leduc (korbeil)
- - Antonio Pauletich (x-coder264)
- - Marco Pivetta (ocramius)
+ - Maxime Helias (maxhelias)
  - Robert Schönthal (digitalkaoz)
- - Michael Voříšek
- - Alexis Lefebvre
- - Võ Xuân Tiến (tienvx)
- - fd6130 (fdtvui)
- - Tigran Azatyan (tigranazatyan)
+ - Smaine Milianni (ismail1432)
+ - François-Xavier de Guillebon (de-gui_f)
+ - noniagriconomie
  - Eric GELOEN (gelo)
- - Matthieu Napoli (mnapoli)
- - Ben Davies (bendavies)
- - Tomáš Votruba (tomas_votruba)
+ - Gabriel Caruso
  - Stefano Sala (stefano.sala)
- - Alessandro Chitolina (alekitto)
- - Valentine Boineau (valentineboineau)
- - Jeroen Noten (jeroennoten)
+ - Ion Bazan (ionbazan)
  - OGAWA Katsuhiro (fivestar)
- - Dāvis Zālītis (k0d3r1s)
  - Jhonny Lidfors (jhonne)
- - Martin Hujer (martinhujer)
- - Wouter J
- - Guilliam Xavier
- - David Prévot
- - Sergey (upyx)
- - Timo Bakx (timobakx)
+ - Frank A. Fiebig (fafiebig)
+ - Baldini
  - Juti Noppornpitak (shiroyuki)
- - Joe Bennett (kralos)
- - Nate Wiebe (natewiebe13)
- - Farhad Safarov (safarov)
+ - Gregor Harlan (gharlan)
+ - Michael Babker (mbabker)
  - Anthony MARTIN
- - Colin O&#039;Dell (colinodell)
  - Sebastian Hörl (blogsh)
- - Markus Fasselt (digilist)
- - Daniel Burger
+ - Tigran Azatyan (tigranazatyan)
+ - Christopher Hertel (chertel)
+ - Jonathan Scheiber (jmsche)
  - Daniel Gomes (danielcsgomes)
- - Michael Käfer (michael_kaefer)
  - Hidenori Goto (hidenorigoto)
- - Albert Casademont (acasademont)
  - Arnaud Kleinpeter (nanocom)
  - Guilherme Blanco (guilhermeblanco)
- - soyuka
+ - Saif Eddin Gmati (azjezz)
+ - Alexis Lefebvre
  - SpacePossum
- - Sébastien Alfaiate (seb33300)
- - Pablo Godel (pgodel)
- - Denis Brumann (dbrumann)
- - Romaric Drigon (romaricdrigon)
- - Andréia Bohner (andreia)
- - Bastien Jaillot (bastnic)
- - Jannik Zschiesche
- - Rafael Dohms (rdohms)
- - George Mponos (gmponos)
- - Thomas Landauer (thomas-landauer)
- - Fritz Michael Gschwantner (fritzmg)
- - Aleksandar Jakovljevic (ajakov)
- - jwdeitch
- - Jurica Vlahoviček (vjurica)
- - Vincent Touzet (vincenttouzet)
- - Fabien Bourigault (fbourigault)
- - Jérémy Derussé
+ - Richard van Laak (rvanlaak)
+ - Andreas Schempp (aschempp)
  - Maximilian Beckers (maxbeckers)
+ - Andreas Braun
+ - Hugo Alliaume (kocal)
+ - Nicolas Philippe (nikophil)
+ - Pablo Godel (pgodel)
+ - Alessandro Chitolina (alekitto)
+ - Rafael Dohms (rdohms)
+ - jwdeitch
+ - Jérôme Parmentier (lctrs)
+ - Ahmed TAILOULOUTE (ahmedtai)
+ - Simon Berger
+ - Jérémy Derussé
+ - Matthieu Napoli (mnapoli)
+ - Tomas Votruba (tomas_votruba)
  - Florent Mata (fmata)
- - mcfedr (mcfedr)
- - Maciej Malarz (malarzm)
- - Soner Sayakci
- - Artem Lopata
+ - Arman Hosseini (arman)
  - Sokolov Evgeniy (ewgraf)
- - Stadly
- - Justin Hileman (bobthecow)
+ - Andréia Bohner (andreia)
  - Tom Van Looy (tvlooy)
  - Niels Keurentjes (curry684)
  - Vyacheslav Pavlov
+ - Albert Casademont (acasademont)
+ - George Mponos (gmponos)
  - Richard Shank (iampersistent)
+ - David Prévot (taffit)
  - Romain Monteil (ker0x)
- - Andre Rømcke (andrerom)
- - Dmitrii Poddubnyi (karser)
+ - Sergey (upyx)
+ - Marco Pivetta (ocramius)
+ - Antonio Pauletich (x-coder264)
+ - Vincent Touzet (vincenttouzet)
+ - Olivier Dolbeau (odolbeau)
  - Rouven Weßling (realityking)
- - BoShurik
- - Zmey
+ - Ben Davies (bendavies)
+ - YaFou
  - Clemens Tolboom
  - Oleg Voronkovich
- - Alan Poulain (alanpoulain)
  - Helmer Aaviksoo
- - Michał (bambucha15)
- - Remon van de Kamp
- - Ben Hakim
- - Martin Auswöger
- - Sylvain Fabre (sylfabre)
- - Filippo Tessarotto (slamdunk)
+ - Alessandro Lai (jean85)
  - 77web
- - Bohan Yang (brentybh)
- - W0rma
+ - Gocha Ossinkine (ossinkine)
+ - Jesse Rushlow (geeshoe)
  - Matthieu Ouellette-Vachon (maoueh)
- - Lynn van der Berg (kjarli)
  - Michał Pipa (michal.pipa)
  - Dawid Nowak
+ - Jannik Zschiesche
+ - Roman Martinuk (a2a4)
  - Amal Raghav (kertz)
  - Jonathan Ingram
  - Artur Kotyrba
+ - Wouter J
  - Tyson Andre
+ - Roland Franssen :)
  - GDIBass
  - Samuel NELA (snela)
- - dFayet
- - Karoly Gossler (connorhu)
  - Vincent AUBERT (vincent)
- - Sebastien Morel (plopix)
- - Yoann RENARD (yrenard)
- - Oleg Andreyev (oleg.andreyev)
- - Thomas Lallement (raziel057)
- - Timothée Barray (tyx)
+ - Fabien Bourigault (fbourigault)
+ - Michael Voříšek
+ - zairig imad (zairigimad)
+ - Colin O&#039;Dell (colinodell)
+ - Sébastien Alfaiate (seb33300)
  - James Halsall (jaitsu)
+ - Christian Scheb
+ - Guillaume (guill)
  - Mikael Pajunen
- - Marcin Sikoń (marphi)
  - Warnar Boekkooi (boekkooi)
- - Marco Petersen (ocrampete16)
- - Benjamin Leveque (benji07)
+ - Justin Hileman (bobthecow)
+ - Anthony GRASSIOT (antograssiot)
  - Dmitrii Chekaliuk (lazyhammer)
  - Clément JOBEILI (dator)
- - Vilius Grigaliūnas
+ - Andreas Möller (localheinz)
+ - Vladimir Tsykun (vtsykun)
  - Marek Štípek (maryo)
- - Patrick Landolt (scube)
- - François Pluchino (francoispluchino)
  - Daniel Espendiller
  - Arnaud PETITPAS (apetitpa)
+ - Michael Käfer (michael_kaefer)
  - Dorian Villet (gnutix)
- - Wojciech Kania
- - Alexey Kopytko (sanmai)
+ - Dāvis Zālītis (k0d3r1s)
+ - Martin Hujer (martinhujer)
  - Sergey Linnik (linniksa)
- - Warxcell (warxcell)
  - Richard Miller
- - Leo Feyer (leofeyer)
  - Mario A. Alvarez Garcia (nomack84)
  - Thomas Rabaix (rande)
  - D (denderello)
+ - Fritz Michael Gschwantner (fritzmg)
  - DQNEO
- - Andrii Bodnar
- - Artem (artemgenvald)
- - ivan
- - Sergey Belyshkin (sbelyshkin)
- - Urinbayev Shakhobiddin (shokhaa)
- - Ahmed Raafat
- - Philippe Segatori
- - Thibaut Cheymol (tcheymol)
- - Julien Pauli
- - Islam Israfilov (islam93)
- - Daniel Gorgan
- - Hendrik Luup (hluup)
- - Bob van de Vijver (bobvandevijver)
- - Martin Herndl (herndlm)
+ - Chi-teck
+ - Andre Rømcke (andrerom)
+ - Baptiste Leduc (korbeil)
+ - soyuka
+ - Farhad Safarov (safarov)
  - Ruben Gonzalez (rubenrua)
  - Benjamin Dulau (dbenjamin)
- - Pavel Kirpitsov (pavel-kirpichyov)
+ - Markus Fasselt (digilist)
+ - Denis Brumann (dbrumann)
+ - mcfedr (mcfedr)
+ - Remon van de Kamp
  - Mathieu Lemoine (lemoinem)
  - Christian Schmidt
  - Andreas Hucks (meandmymonkey)
+ - Jan Rosier (rosier)
  - Noel Guilbert (noel)
- - Hamza Makraz (makraz)
- - Vladimir Tsykun (vtsykun)
- - Loick Piera (pyrech)
- - Vitalii Ekert (comrade42)
- - Clara van Miert
- - Alexander Menshchikov
+ - Martin Auswöger
+ - Stadly
  - Stepan Anchugov (kix)
  - bronze1man
  - sun (sun)
  - Larry Garfield (crell)
- - Fabien Villepinte
- - SiD (plbsid)
- - Thomas Bisignani (toma)
- - Edi Modrić (emodric)
+ - Leo Feyer
+ - Thomas Landauer (thomas-landauer)
  - Philipp Wahala (hifi)
+ - Victor Bocharsky (bocharsky_bw)
  - Nikolay Labinskiy (e-moe)
+ - Aleksandar Jakovljevic (ajakov)
  - Martin Schuhfuß (usefulthink)
  - apetitpa
- - Vladyslav Loboda
+ - Guilliam Xavier
  - Pierre Minnieur (pminnieur)
- - Kyle
  - Dominique Bongiraud
- - Hidde Wieringa (hiddewie)
- - Dane Powell
- - Loïc Frémont (loic425)
- - Christopher Davis (chrisguitarguy)
- - Lukáš Holeczy (holicz)
+ - Hugo Monteiro (monteiro)
+ - Timo Bakx (timobakx)
+ - Dmitrii Poddubnyi (karser)
+ - Julien Pauli
  - Michael Lee (zerustech)
  - Florian Lonqueu-Brochard (florianlb)
+ - Nate Wiebe (natewiebe13)
+ - Joe Bennett (kralos)
  - Leszek Prabucki (l3l0)
  - Giorgio Premi
- - Emanuele Panzeri (thepanz)
- - Matthew Smeets
+ - Thomas Lallement (raziel057)
  - François Zaninotto (fzaninotto)
  - Dustin Whittle (dustinwhittle)
+ - Timothée Barray (tyx)
+ - Valtteri R (valtzu)
  - jeff
+ - Bob van de Vijver (bobvandevijver)
  - John Kary (johnkary)
- - smoench
+ - Võ Xuân Tiến (tienvx)
+ - fd6130 (fdtvui)
+ - Alan Poulain (alanpoulain)
+ - Maciej Malarz (malarzm)
+ - Marcin Sikoń (marphi)
  - Michele Orselli (orso)
  - Sven Paulus (subsven)
- - Daniel STANCU
+ - Daniel Burger
  - Maxime Veber (nek-)
- - Oleksiy (alexndlm)
- - Sullivan SENECHAL (soullivaneuh)
+ - Bastien Jaillot (bastnic)
+ - Valentine Boineau (valentineboineau)
  - Rui Marinho (ruimarinho)
- - Marc Weistroff (futurecat)
- - Dimitri Gritsajuk (ottaviano)
+ - Patrick Landolt (scube)
+ - Filippo Tessarotto (slamdunk)
+ - Jeroen Noten (jeroennoten)
  - Possum
  - Jérémie Augustin (jaugustin)
+ - Edi Modrić (emodric)
  - Pascal Montoya
  - Julien Brochet
- - Phil E. Taylor (philetaylor)
- - Michaël Perrin (michael.perrin)
+ - François Pluchino (francoispluchino)
  - Tristan Darricau (tristandsensio)
- - Fabien S (bafs)
- - Victor Bocharsky (bocharsky_bw)
  - Jan Sorgalla (jsor)
  - henrikbjorn
- - Alex Bowers
- - Simon Podlipsky (simpod)
  - Marcel Beerta (mazen)
- - flack (flack)
- - Craig Duncan (duncan3dc)
  - Mantis Development
- - Pablo Lozano (arkadis)
- - quentin neyrat (qneyrat)
+ - Hidde Wieringa (hiddewie)
  - Florent Morselli (spomky_)
- - Antonio Jose Cerezo (ajcerezo)
- - Marcin Szepczynski (czepol)
- - Lescot Edouard (idetox)
+ - dFayet
  - Rob Frawley 2nd (robfrawley)
- - Mohammad Emran Hasan (phpfour)
- - Dmitriy Mamontov (mamontovdmitriy)
- - Kévin THERAGE (kevin_therage)
  - Nikita Konstantinov (unkind)
  - Dariusz
  - Francois Zaninotto
- - Laurent Masforné (heisenberg)
- - Claude Khedhiri (ck-developer)
  - Daniel Tschinder
  - Christian Schmidt
  - Alexander Kotynia (olden)
- - Toni Rudolf (toooni)
  - Elnur Abdurrakhimov (elnur)
- - Iker Ibarguren (ikerib)
  - Manuel Reinhard (sprain)
- - Johann Pardanaud
- - Indra Gunawan (indragunawan)
- - Tim Goudriaan (codedmonkey)
- - Harm van Tilborg (hvt)
- - Baptiste Lafontaine (magnetik)
- - Dries Vints
+ - BoShurik
  - Adam Prager (padam87)
- - Judicaël RUFFIEUX (axanagor)
  - Benoît Burnichon (bburnichon)
  - maxime.steinhausser
- - simon chrzanowski (simonch)
- - Andrew M-Y (andr)
- - Krasimir Bosilkov (kbosilkov)
- - Marcin Michalski (marcinmichalski)
+ - Oleg Andreyev (oleg.andreyev)
  - Roman Ring (inori)
  - Xavier Montaña Carreras (xmontana)
- - Samaël Villette (samadu61)
- - Tarmo Leppänen (tarlepp)
- - AnneKir
- - Tobias Weichart
- - Miro Michalicka
  - Peter Kruithof (pkruithof)
- - M. Vondano
+ - Romaric Drigon (romaricdrigon)
+ - Sylvain Fabre (sylfabre)
+ - Soner Sayakci
  - Xavier Perez
  - Arjen Brouwer (arjenjb)
- - Tavo Nieves J (tavoniievez)
- - Arjen van der Meijden
+ - Artem Lopata
  - Patrick McDougle (patrick-mcdougle)
- - Jerzy (jlekowski)
+ - Marc Weistroff (futurecat)
  - Danny Berger (dpb587)
- - Marek Zajac
  - Alif Rachmawadi
  - Anton Chernikov (anton_ch1989)
  - Pierre-Yves Lebecq (pylebecq)
- - Alireza Mirsepassi (alirezamirsepassi)
+ - Benjamin Leveque (benji07)
  - Jordan Samouh (jordansamouh)
- - Koen Reiniers (koenre)
- - Nathan Dench (ndenc2)
- - Gijs van Lammeren
- - Matthew Grasmick
- - David Badura (davidbadura)
+ - Wojciech Kania
+ - Sullivan SENECHAL (soullivaneuh)
+ - Loick Piera (pyrech)
  - Uwe Jäger (uwej711)
+ - Lynn van der Berg (kjarli)
+ - Michaël Perrin (michael.perrin)
  - Eugene Leonovich (rybakit)
- - Damien Alexandre (damienalexandre)
  - Joseph Rouff (rouffj)
  - Félix Labrecque (woodspire)
  - GordonsLondon
- - Roman Anasal
- - Piotr Kugla (piku235)
- - Quynh Xuan Nguyen (seriquynh)
  - Ray
  - Philipp Cordes (corphi)
- - Yannick Ihmels (ihmels)
- - Andrii Dembitskyi
  - Chekote
- - Evert Harmeling (evertharmeling)
- - bhavin (bhavin4u)
- - Pavel Popov (metaer)
  - Thomas Adam
- - R. Achmad Dadang Nur Hidayanto (dadangnh)
- - Stefan Kruppa
- - Petr Duda (petrduda)
- - Marcos Rezende (rezende79)
  - jdhoek
- - Ivan Kurnosov
- - Dieter
+ - Jurica Vlahoviček (vjurica)
  - Bob den Otter (bopp)
- - Johan Vlaar (johjohan)
  - Thomas Schulz (king2500)
- - Anderson Müller
- - Marko Kaznovac (kaznovac)
- - Benjamin Morel
- - Bernd Stellwag
  - Philippe SEGATORI (tigitz)
  - Frank de Jonge
- - Chris Tanaskoski
- - julien57
+ - Dane Powell
  - Renan (renanbr)
- - Ippei Sumida (ippey_s)
- - Ben Ramsey (ramsey)
+ - Sebastien Morel (plopix)
+ - Christopher Davis (chrisguitarguy)
+ - Karoly Gossler (connorhu)
+ - Loïc Frémont (loic425)
  - Matthieu Auger (matthieuauger)
+ - Sergey Belyshkin (sbelyshkin)
+ - Kévin THERAGE (kevin_therage)
+ - Yoann RENARD (yrenard)
  - Josip Kruslin (jkruslin)
+ - Daniel Gorgan
  - renanbr
- - Maxim Dovydenok (shiftby)
  - Sébastien Lavoie (lavoiesl)
  - Alex Rock (pierstoval)
  - Wodor Wodorski
  - Beau Simensen (simensen)
  - Magnus Nordlander (magnusnordlander)
+ - Tim Goudriaan (codedmonkey)
  - Robert Kiss (kepten)
  - Zan Baldwin (zanbaldwin)
  - Antonio J. García Lagar (ajgarlag)
  - Alexandre Quercia (alquerci)
  - Marcos Sánchez
- - Jérôme Tanghe (deuchnord)
+ - Emanuele Panzeri (thepanz)
+ - Zmey
+ - Quentin Devos
  - Kim Hemsø Rasmussen (kimhemsoe)
  - Maximilian Reichel (phramz)
+ - Samaël Villette (samadu61)
  - jaugustin
- - Dmytro Borysovskyi (dmytr0)
- - Mathias STRASSER (roukmoute)
  - Pascal Luna (skalpa)
  - Wouter Van Hecke
+ - Baptiste Lafontaine (magnetik)
+ - Iker Ibarguren (ikerib)
+ - Tomasz Kowalczyk (thunderer)
+ - Indra Gunawan (indragunawan)
  - Michael Holm (hollo)
+ - Arjen van der Meijden
  - Yassine Guedidi (yguedidi)
- - Giso Stallenberg (gisostallenberg)
  - Blanchon Vincent (blanchonvincent)
- - Quentin Devos
- - William Arslett (warslett)
- - Jérémy REYNAUD (babeuloula)
+ - Michał (bambucha15)
  - Christian Schmidt
- - Gonzalo Vilaseca (gonzalovilaseca)
- - Vadim Borodavko (javer)
- - Haralan Dobrev (hkdobrev)
- - Soufian EZ ZANTAR (soezz)
- - Arnaud POINTET (oipnet)
- - Jan van Thoor (janvt)
- - Martin Kirilov (wucdbm)
- - Axel Guckelsberger (guite)
+ - Ben Hakim
+ - Marco Petersen (ocrampete16)
+ - Bohan Yang (brentybh)
+ - Vilius Grigaliūnas
+ - David Badura (davidbadura)
  - Chris Smith (cs278)
+ - Thomas Bisignani (toma)
  - Florian Klein (docteurklein)
- - James Gilliland (neclimdul)
- - Bilge
- - Cătălin Dan (dancatalin)
- - Rhodri Pugh (rodnaph)
- - Manuel Kiessling (manuelkiessling)
- - Patrick Reimers (preimers)
- - Anatoly Pashin (b1rdex)
- - Pol Dellaiera (drupol)
+ - W0rma
+ - Damien Alexandre (damienalexandre)
+ - Manuel Kießling (manuelkiessling)
+ - Alexey Kopytko (sanmai)
+ - Warxcell (warxcell)
  - Atsuhiro KUBO (iteman)
  - rudy onfroy (ronfroy)
  - Serkan Yildiz (srknyldz)
- - Jeroen Thora (bolle)
  - Andrew Moore (finewolf)
  - Bertrand Zuchuat (garfield-fr)
  - Marc Morera (mmoreram)
- - Zbigniew Malcherczyk (ferror)
+ - Quynh Xuan Nguyen (seriquynh)
  - Gabor Toth (tgabi333)
  - realmfoo
- - Dmitriy Derepko
+ - Simon Podlipsky (simpod)
  - Thomas Tourlourat (armetiz)
- - Gasan Guseynov (gassan)
  - Andrey Esaulov (andremaha)
  - Grégoire Passault (gregwar)
  - Jerzy Zawadzki (jzawadzki)
  - Ismael Ambrosi (iambrosi)
- - Saif Eddin G
- - Emmanuel BORGES (eborges78)
- - siganushka (siganushka)
+ - Craig Duncan (duncan3dc)
+ - Emmanuel BORGES
  - Aurelijus Valeiša (aurelijus)
  - Jan Decavele (jandc)
  - Gustavo Piltcher
- - Joachim Løvgaard (loevgaard)
- - Shakhobiddin
- - Grenier Kévin (mcsky_biig)
  - Lee Rowlands
- - Peter Bowyer (pbowyer)
  - Stepan Tanasiychuk (stfalcon)
+ - Ivan Kurnosov
  - Tiago Ribeiro (fixe)
  - Raul Fraile (raulfraile)
  - Adrian Rudnik (kreischweide)
  - Pavel Batanov (scaytrase)
  - Francesc Rosàs (frosas)
  - Bongiraud Dominique
+ - Kyle
  - janschoenherr
  - Emanuele Gaspari (inmarelibero)
+ - Marko Kaznovac (kaznovac)
  - Dariusz Rumiński
- - Terje Bråten
- - Gennadi Janzen
- - James Hemery
- - Ben Roberts (benr77)
- - Benjamin (yzalis)
- - Egor Taranov
- - Philippe Segatori
- - Adrian Nguyen (vuphuong87)
- - benjaminmal
+ - Andrii Bodnar
+ - Artem (artemgenvald)
  - Thierry T (lepiaf)
  - Lorenz Schori
- - Andrey Sevastianov
- - Oleksandr Barabolia (oleksandrbarabolia)
- - Khoo Yong Jun
- - Christin Gruber (christingruber)
+ - Lukáš Holeczy (holicz)
  - Jeremy Livingston (jeremylivingston)
- - Tobias Bönner
- - Julien Turby
- - scyzoryck
- - Greg Anderson
- - Tri Pham (phamuyentri)
- - marie
- - Erkhembayar Gantulga (erheme318)
- - Fractal Zombie
- - Gunnstein Lye (glye)
- - Thomas Talbot (ioni)
- - Noémi Salaün (noemi-salaun)
- - Michel Hunziker
- - Krystian Marcisz (simivar)
- - Matthias Krauser (mkrauser)
+ - ivan
+ - Urinbayev Shakhobiddin (shokhaa)
+ - Ahmed Raafat
+ - Philippe Segatori
+ - Thibaut Cheymol (tcheymol)
  - Erin Millard
- - Lorenzo Millucci (lmillucci)
- - Jérôme Tamarelle (jtamarelle-prismamedia)
- - Emil Masiakowski
- - Sergey Melesh (sergex)
- - Alexandre Parent
- - Angelov Dejan (angelov)
- - DT Inier (gam6itko)
  - Matthew Lewinski (lewinski)
+ - Islam Israfilov (islam93)
  - Ricard Clau (ricardclau)
- - Dmitrii Tarasov (dtarasov)
- - Philipp Kolesnikov
- - Carlos Pereira De Amorim (epitre)
- - Rodrigo Aguilera
  - Roumen Damianoff
- - Vladimir Varlamov (iamvar)
  - Thomas Royer (cydonia7)
- - Gildas Quéméner (gquemener)
  - Nicolas LEFEVRE (nicoweb)
  - Asmir Mustafic (goetas)
- - Martins Sipenko
- - Guilherme Augusto Henschel
- - Mardari Dorel (dorumd)
- - Pierrick VIGNAND (pierrick)
  - Mateusz Sip (mateusz_sip)
- - Andy Palmer (andyexeter)
- - Marko H. Tamminen (gzumba)
  - Francesco Levorato
- - DerManoMann
- - David Molineus
- - Desjardins Jérôme (jewome62)
  - Vitaliy Zakharov (zakharovvi)
  - Tobias Sjösten (tobiassjosten)
  - Gyula Sallai (salla)
- - Stefan Gehrig (sgehrig)
- - Benjamin Cremer (bcremer)
- - rtek
+ - Hendrik Luup (hluup)
  - Inal DJAFAR (inalgnu)
- - Christian Gärtner (dagardner)
- - Artem Stepin (astepin)
- - Adrien Jourdier (eclairia)
- - Ivan Grigoriev (greedyivan)
- - Tomasz Kowalczyk (thunderer)
- - Erik Saunier (snickers)
- - Kevin SCHNEKENBURGER
- - Fabien Salles (blacked)
+ - C (dagardner)
+ - Martin Herndl (herndlm)
+ - Dmytro Borysovskyi (dmytr0)
+ - Johann Pardanaud
+ - Pavel Kirpitsov (pavel-kirpichyov)
  - Artur Eshenbrener
- - Ahmed Ashraf (ahmedash95)
- - Gert Wijnalda (cinamo)
- - Luca Saba (lucasaba)
+ - Harm van Tilborg (hvt)
  - Thomas Perez (scullwm)
- - Thomas P
- - Kristijan Kanalaš (kristijan_kanalas_infostud)
+ - smoench
  - Felix Labrecque
  - mondrake (mondrake)
  - Yaroslav Kiliba
- - “Filip
  - FORT Pierre-Louis (plfort)
- - Simon Watiau (simonwatiau)
- - Ruben Jacobs (rubenj)
- - Arkadius Stefanski (arkadius)
- - Jérémy M (th3mouk)
- - Tristan Pouliquen
  - Terje Bråten
- - Pierre Rineau
- - Renan Gonçalves (renan_saddam)
- - Raulnet
- - Tomasz Kusy
+ - Gonzalo Vilaseca (gonzalovilaseca)
+ - Tarmo Leppänen (tarlepp)
  - Jakub Kucharovic (jkucharovic)
+ - Daniel STANCU
  - Kristen Gilden
  - Robbert Klarenbeek (robbertkl)
+ - Hamza Makraz (makraz)
  - Eric Masoero (eric-masoero)
- - Michael Lutz
- - Michel Roca (mroca)
- - Reedy
+ - Vitalii Ekert (comrade42)
+ - Clara van Miert
+ - Haralan Dobrev (hkdobrev)
  - hossein zolfi (ocean)
+ - Alexander Menshchikov
  - Clément Gautier (clementgautier)
- - Jelle Raaijmakers (gmta)
- - Roberto Nygaard
- - Valtteri R (valtzu)
- - Joshua Nye
  - Jordane VASPARD (elementaire)
- - Dalibor Karlović
- - Randy Geraads
+ - James Gilliland (neclimdul)
  - Sanpi (sanpi)
  - Eduardo Gulias (egulias)
- - Andreas Leathley (iquito)
- - Nathanael Noblet (gnat)
  - giulio de donato (liuggio)
- - Mohamed Gamal
- - Eric COURTIAL
- - Xesxen
  - ShinDarth
- - Arun Philip
  - Stéphane PY (steph_py)
+ - Cătălin Dan (dancatalin)
  - Philipp Kräutli (pkraeutli)
- - Carl Casbolt (carlcasbolt)
- - battye
+ - Rhodri Pugh (rodnaph)
  - BrokenSourceCode
  - Grzegorz (Greg) Zdanowski (kiler129)
+ - Dimitri Gritsajuk (ottaviano)
  - Kirill chEbba Chebunin
- - kylekatarnls (kylekatarnls)
- - Steve Grunwell
- - 
+ - Pol Dellaiera (drupol)
  - Alex (aik099)
+ - Fabien Villepinte
+ - SiD (plbsid)
  - Greg Thornton (xdissent)
- - BENOIT POLASZEK (bpolaszek)
- - Shaharia Azam
- - Gerben Oolbekkink
- - Alexandre Parent
- - Thibault Richard (t-richard)
- - Oleksii Zhurbytskyi
- - Guillaume Verstraete
- - vladimir.panivko
- - Jason Tan (jt2k)
+ - Alex Bowers
+ - Fabien S (bafs)
  - Costin Bereveanu (schniper)
- - kick-the-bucket
+ - Andrii Dembitskyi
+ - Gasan Guseynov (gassan)
  - Marek Kalnik (marekkalnik)
- - Jeremiasz Major
  - Vyacheslav Salakhutdinov (megazoll)
- - Trevor North
  - Maksym Slesarenko (maksym_slesarenko)
  - Hassan Amouhzi
- - Antonin CLAUZIER (0x346e3730)
- - Andrei C. (moldman)
  - Tamas Szijarto
- - stlrnz
- - Adrien Wilmet (adrienfr)
- - Mathieu Rochette (mathroc)
- - Alex Bacart
- - hugovms
  - Michele Locati
+ - Yannick Ihmels (ihmels)
  - Pavel Volokitin (pvolok)
- - DemigodCode
  - Arthur de Moulins (4rthem)
  - Matthias Althaus (althaus)
- - Maximilian Bösing
- - Leevi Graham (leevigraham)
+ - Saif Eddin G
  - Endre Fejes
- - Carlos Buenosvinos (carlosbuenosvinos)
- - Jake (jakesoft)
+ - Evert Harmeling (evertharmeling)
  - Tobias Naumann (tna)
- - Greg ORIOL
- - Bahman Mehrdad (bahman)
  - Daniel Beyer
- - Manuel Alejandro Paz Cetina
- - Youssef Benhssaien (moghreb)
- - Mario Ramundo (rammar)
- - Ivan
+ - flack (flack)
  - Shein Alexey
- - Nico Haase
- - Jacek Jędrzejewski (jacek.jedrzejewski)
- - Stefan Kruppa
- - Shahriar56
- - Dhananjay Goratela
- - Kien Nguyen
  - Joe Lencioni
- - arai
- - Mouad ZIANI (mouadziani)
  - Daniel Tschinder
- - Roland Franssen :)
  - Diego Agulló (aeoris)
- - Tomasz Ignatiuk
  - vladimir.reznichenko
  - Kai
  - Alain Hippolyte (aloneh)
+ - Grenier Kévin (mcsky_biig)
  - Karoly Negyesi (chx)
  - Xavier HAUSHERR
- - Loïc Beurlet
- - Ana Raro
- - Ana Raro
- - Tom Klingenberg
- - Florian Wolfsjaeger (flowolf)
- - Ivan Sarastov (isarastov)
- - Jordi Sala Morales (jsala)
  - Albert Jessurum (ajessu)
- - Samuele Lilli (doncallisto)
  - Romain Pierre
  - Laszlo Korte
- - Gabrielle Langer
  - Alessandro Desantis
  - hubert lecorche (hlecorche)
- - bogdan
- - mmokhi
- - Daniel Tiringer
- - Andrew Codispoti
- - Lctrs
- - Joppe De Cuyper (joppedc)
+ - Vladyslav Loboda
  - Marc Morales Valldepérez (kuert)
  - Vadim Kharitonov (vadim)
  - Oscar Cubo Medina (ocubom)
  - Karel Souffriau
  - Christophe L. (christophelau)
- - Daniël Brekelmans (dbrekelmans)
- - Simon Heimberg (simon_heimberg)
- - Morten Wulff (wulff)
- - Sander Toonen (xatoo)
  - Anthon Pang (robocoder)
  - Julien Galenski (ruian)
- - Rimas Kudelis
  - Ben Scott (bpscott)
- - Andrii Dembitskyi
- - a.dmitryuk
- - Pavol Tuka
- - Paulo Ribeiro (paulo)
- - Marc Laporte
- - Michał Jusięga
- - Sebastian Paczkowski (sebpacz)
- - Dragos Protung (dragosprotung)
- - Thiago Cordeiro (thiagocordeiro)
- - wicliff wolda (wickedone)
- - Julien Maulny
+ - Anderson Müller
+ - Pablo Lozano (arkadis)
  - Brian King
- - Wouter van der Loop (toppy-hennie)
- - Paul Oms
+ - quentin neyrat (qneyrat)
+ - Chris Tanaskoski (devristo)
  - Steffen Roßkamp
  - Alexandru Furculita (afurculita)
  - Michel Salib (michelsalib)
- - Quentin Dequippe (qdequippe)
+ - Ben Roberts (benr77)
  - Valentin Jonovs
  - geoffrey
- - Bastien DURAND (deamon)
- - Benoit Galati (benoitgalati)
- - Jon Gotlin (jongotlin)
+ - Benjamin (yzalis)
  - Jeanmonod David (jeanmonod)
- - Daniel González (daniel.gonzalez)
+ - SUMIDA, Ippei (ippey_s)
  - Webnet team (webnet)
+ - Tobias Bönner
+ - Ben Ramsey (ramsey)
  - Berny Cantos (xphere81)
- - Baldini
- - Mátyás Somfai (smatyas)
- - Simon Leblanc (leblanc_simon)
+ - Antonio Jose Cerezo (ajcerezo)
+ - Maelan LE BORGNE
+ - Thomas Talbot (ioni)
+ - Marcin Szepczynski (czepol)
+ - Lescot Edouard (idetox)
+ - Mohammad Emran Hasan (phpfour)
+ - Dmitriy Mamontov (mamontovdmitriy)
  - Jan Schumann
  - Matheo Daninos (mathdns)
  - Niklas Fiekas
  - Mark Challoner (markchalloner)
  - Markus Bachmann (baachi)
  - Matthieu Lempereur (mryamous)
- - Roger Guasch (rogerguasch)
- - Luis Tacón (lutacon)
- - Alex Hofbauer (alexhofbauer)
- - Andrii Popov (andrii-popov)
+ - Gunnstein Lye (glye)
+ - Erkhembayar Gantulga (erheme318)
+ - Sergey Melesh (sergex)
+ - Greg Anderson
  - lancergr
- - Maxime PINEAU
+ - Tri Pham (phamuyentri)
+ - Angelov Dejan (angelov)
  - Ivan Nikolaev (destillat)
- - Xavier Leune (xleune)
- - Matthieu Calie (matth--)
- - Simon André (simonandre)
+ - Gildas Quéméner (gquemener)
+ - Maxim Dovydenok (dovydenok-maxim)
+ - Laurent Masforné (heisenberg)
+ - Claude Khedhiri (ck-developer)
  - Benjamin Georgeault (wedgesama)
- - Joost van Driel (j92)
- - ampaze
+ - Desjardins Jérôme (jewome62)
  - Arturs Vonda
+ - Matthew Smeets
  - Michael Hirschler (mvhirsch)
- - Xavier Briand (xavierbriand)
- - Daniel Badura
+ - Toni Rudolf (toooni)
+ - Stefan Gehrig (sgehrig)
  - vagrant
+ - Benjamin Cremer (bcremer)
  - Maarten de Boer (mdeboer)
  - Asier Illarramendi (doup)
  - AKeeman (akeeman)
@@ -901,852 +680,637 @@ The Symfony Connect username in parenthesis allows to get more information
  - Restless-ET
  - Robert Meijers
  - Vlad Gregurco (vgregurco)
+ - Artem Stepin (astepin)
  - Boris Vujicic (boris.vujicic)
+ - Dries Vints
+ - Judicaël RUFFIEUX (axanagor)
  - Chris Sedlmayr (catchamonkey)
+ - Cédric Anne
+ - DerManoMann
+ - Jérôme Tanghe (deuchnord)
+ - Mathias STRASSER (roukmoute)
  - Gwendolen Lynch
+ - simon chrzanowski (simonch)
  - Kamil Kokot (pamil)
  - Seb Koelen
- - Guillaume Aveline
  - Christoph Mewes (xrstf)
+ - Andrew M-Y (andr)
+ - Krasimir Bosilkov (kbosilkov)
+ - Marcin Michalski (marcinmichalski)
  - Vitaliy Tverdokhlib (vitaliytv)
  - Ariel Ferrandini (aferrandini)
- - Niklas Keller
  - BASAK Semih (itsemih)
  - Dirk Pahl (dirkaholic)
  - Cédric Lombardot (cedriclombardot)
+ - Jérémy REYNAUD (babeuloula)
+ - Arkadius Stefanski (arkadius)
  - Jonas Flodén (flojon)
- - Adrien Lucas (adrienlucas)
+ - AnneKir
+ - Tobias Weichart
+ - Arnaud POINTET (oipnet)
+ - Tristan Pouliquen
+ - Miro Michalicka
+ - M. Vondano
  - Dominik Zogg
- - Kai Dederichs
+ - Vadim Borodavko (javer)
+ - Tavo Nieves J (tavoniievez)
  - Luc Vieillescazes (iamluc)
- - Thomas Nunninger
+ - Erik Saunier (snickers)
  - François Dume (franek)
+ - Jerzy Lekowski (jlekowski)
+ - Raulnet
+ - Oleksiy (alexndlm)
+ - William Arslett (warslett)
+ - Giso Stallenberg (gisostallenberg)
  - Rob Bast
  - Roberto Espinoza (respinoza)
+ - Pierre Rineau
+ - Soufian EZ ZANTAR (soezz)
+ - Marek Zajac
  - Adam Harvey
  - ilyes kooli (skafandri)
  - Anton Bakai
+ - battye
  - Nicolas Dousson
+ - Axel Guckelsberger (guite)
  - Sam Fleming (sam_fleming)
  - Alex Bakhturin
+ - Patrick Reimers (preimers)
  - Brayden Williams (redstar504)
  - insekticid
+ - Jérémy M (th3mouk)
  - Trent Steel (trsteel88)
- - Vitaliy Ryaboy (vitaliy)
  - boombatower
- - Douglas Hammond (wizhippo)
+ - Alireza Mirsepassi (alirezamirsepassi)
  - Jérôme Macias (jeromemacias)
  - Andrey Astakhov (aast)
  - ReenExe
  - Fabian Lange (codingfabian)
  - Yoshio HANAWA
- - Toon Verwerft (veewee)
- - Jiri Barous
- - Gert de Pagter
+ - Jan van Thoor (janvt)
+ - Joshua Nye
+ - Martin Kirilov (wucdbm)
+ - Koen Reiniers (koenre)
+ - Nathan Dench (ndenc2)
+ - Gijs van Lammeren
  - Sebastian Bergmann
+ - Matthew Grasmick
  - Miroslav Šustek (sustmi)
  - Pablo Díez (pablodip)
- - Damien Fa
  - Kevin McBride
  - Sergio Santoro
- - AndrolGenhald
  - Philipp Rieber (bicpi)
- - Dennis Væversted (srnzitcom)
+ - Dmitriy Derepko
  - Manuel de Ruiter (manuel)
+ - Nathanael Noblet (gnat)
  - nikos.sotiropoulos
+ - BENOIT POLASZEK (bpolaszek)
  - Eduardo Oliveira (entering)
+ - Oleksii Zhurbytskyi
+ - Bilge
+ - Anatoly Pashin (b1rdex)
  - Jonathan Johnson (jrjohnson)
  - Eugene Wissner
- - aegypius
  - Ricardo Oliveira (ricardolotr)
  - Roy Van Ginneken (rvanginneken)
  - ondrowan
  - Barry vd. Heuvel (barryvdh)
- - Jon Dufresne
  - Chad Sikorra (chadsikorra)
- - Mathias Brodala (mbrodala)
- - naitsirch (naitsirch)
  - Evan S Kaufman (evanskaufman)
- - Jonathan Sui Lioung Lee Slew (jlslew)
  - mcben
  - Jérôme Vieilledent (lolautruche)
+ - Roman Anasal
  - Filip Procházka (fprochazka)
- - Alex Kalineskou
- - stoccc
+ - Jeroen Thora (bolle)
  - Markus Lanthaler (lanthaler)
  - Gigino Chianese (sajito)
- - Xav` (xavismeh)
  - Remi Collet
+ - Piotr Kugla (piku235)
  - Vicent Soria Durá (vicentgodella)
  - Michael Moravec
+ - Leevi Graham (leevigraham)
  - Anthony Ferrara
- - Glodzienski
- - Christian Gripp (core23)
- - Marcel Hernandez
+ - tim
+ - Mathieu Rochette (mathroc)
  - Ioan Negulescu
+ - Greg ORIOL
  - Jakub Škvára (jskvara)
  - Andrew Udvare (audvare)
- - Volodymyr Panivko
+ - siganushka (siganushka)
  - alexpods
- - Dennis Langen (nijusan)
  - Adam Szaraniec
  - Dariusz Ruminski
+ - Joppe De Cuyper (joppedc)
  - Romain Gautier (mykiwi)
- - Cyril Pascal (paxal)
  - Matthieu Bontemps
  - Erik Trapman
  - De Cock Xavier (xdecock)
+ - Zbigniew Malcherczyk (ferror)
  - Nicolas Dewez (nicolas_dewez)
- - Quentin Dreyer
  - Denis Kulichkin (onexhovia)
  - Scott Arciszewski
  - Xavier HAUSHERR
- - Achilles Kaloeridis (achilles)
  - Norbert Orzechowicz (norzechowicz)
  - Robert-Jan de Dreu
  - Fabrice Bernhard (fabriceb)
  - Matthijs van den Bos (matthijs)
+ - Bhavinkumar Nakrani (bhavin4u)
  - Jaik Dean (jaikdean)
  - Krzysztof Piasecki (krzysztek)
+ - Pavel Popov (metaer)
  - Lenard Palko
  - Nils Adermann (naderman)
+ - Tom Klingenberg
  - Gábor Fási
+ - R. Achmad Dadang Nur Hidayanto (dadangnh)
  - Nate (frickenate)
- - Sander De la Marche (sanderdlm)
+ - Stefan Kruppa
+ - Jacek Jędrzejewski (jacek.jedrzejewski)
+ - Shakhobiddin
+ - Stefan Kruppa
+ - Joachim Løvgaard (loevgaard)
  - sasezaki
- - Kristof Van Cauwenbergh (kristofvc)
  - Dawid Pakuła (zulusx)
- - Marco Lipparini (liarco)
  - Florian Rey (nervo)
+ - Peter Bowyer (pbowyer)
  - Rodrigo Borrego Bernabé (rodrigobb)
  - John Bafford (jbafford)
  - Emanuele Iannone
- - Ondrej Machulda (ondram)
+ - Petr Duda (petrduda)
+ - Marcos Rezende (rezende79)
  - Denis Gorbachev (starfall)
  - Martin Morávek (keeo)
  - Kevin Saliou (kbsali)
- - Matthieu Mota (matthieumota)
  - Steven Surowiec (steves)
  - Shawn Iwinski
+ - Dieter
+ - Samuele Lilli (doncallisto)
  - Gawain Lynch (gawain)
+ - mmokhi
  - Ryan
  - Alexander Deruwe (aderuwe)
  - Dave Hulbert (dave1010)
- - Konstantin Grachev (grachevko)
  - Ivan Rey (ivanrey)
+ - Johan Vlaar (johjohan)
  - M. (mbontemps)
  - Marcin Chyłek (songoq)
  - Ned Schwartz
  - Ziumin
- - Matthias Schmidt
  - Lenar Lõhmus
  - Ilija Tovilo (ilijatovilo)
+ - Sander Toonen (xatoo)
  - Zach Badgett (zachbadgett)
+ - a.dmitryuk
  - Loïc Faugeron
  - Aurélien Fredouelle
  - Pavel Campr (pcampr)
+ - Andrii Dembitskyi
  - Markus Staab
  - Forfarle (forfarle)
  - Johnny Robeson (johnny)
- - Kai Eichinger (kai_eichinger)
- - Kuba Werłos (kuba)
- - Philipp Keck
  - Disquedur
- - Markus S. (staabm)
+ - Benjamin Morel
  - Guilherme Ferreira
  - Geoffrey Tran (geoff)
- - Elan Ruusamäe (glen)
- - Brad Jones
- - Nicolas de Marqué (nicola)
+ - Tac Tacelosky (tacman1123)
  - Jannik Zschiesche
+ - Bernd Stellwag
  - Jan Ole Behrens (deegital)
+ - wicliff wolda (wickedone)
  - Mantas Var (mvar)
- - Yann LUCAS (drixs6o9)
+ - Yuriy Vilks (igrizzli)
+ - Terje Bråten
  - Sebastian Krebs
- - Htun Htun Htet (ryanhhh91)
- - Sorin Pop (sorinpop)
  - Piotr Stankowski
- - Stewart Malik
  - Pierre-Emmanuel Tanguy (petanguy)
- - Stefan Graupner (efrane)
- - Gemorroj (gemorroj)
- - Adrien Chinour
- - Mihail Krasilnikov (krasilnikovm)
- - iamvar
- - Pierre Tondereau
- - Joel Lusavuvu (enigma97)
- - Alex Vo (votanlean)
- - André Matthies
- - Piergiuseppe Longo
- - Kevin Auivinet
- - Valentin Nazarov
- - Aurélien MARTIN
- - Malte Schlüter
- - Jules Matsounga (hyoa)
- - Yewhen Khoptynskyi (khoptynskyi)
- - Jérôme Nadaud (jnadaud)
+ - Julien Maulny
+ - Gennadi Janzen
+ - Quentin Dequippe (qdequippe)
+ - Benoit Galati (benoitgalati)
+ - Paul Oms
+ - James Hemery
  - wuchen90
- - Alexandre Tranchant (alexandre_t)
- - Anthony Moutte
- - shreyadenny
- - Daniel Iwaniec
- - Thomas Ferney (thomasf)
- - Hallison Boaventura (hallisonboaventura)
- - Mas Iting
- - Albion Bame (abame)
- - Ivan Nemets
+ - Wouter van der Loop (toppy-hennie)
+ - julien57
+ - Mátyás Somfai (smatyas)
+ - Bastien DURAND (deamon)
  - Dmitry Simushev
- - Grégoire Hébert (gregoirehebert)
  - alcaeus
  - Ahmed Ghanem (ahmedghanem00)
+ - Simon Leblanc (leblanc_simon)
  - Fred Cox
- - Iliya Miroslavov Iliev (i.miroslavov)
- - Safonov Nikita (ns3777k)
  - Simon DELICATA
  - Thibault Buathier (gwemox)
  - Julien Boudry
  - vitaliytv
  - Franck RANAIVO-HARISOA (franckranaivo)
+ - Egor Taranov
  - Andreas Hennings
  - Arnaud Frézet
- - Nicolas Martin (cocorambo)
- - luffy1727
- - LHommet Nicolas (nicolaslh)
+ - Philippe Segatori
+ - Jon Gotlin (jongotlin)
+ - Adrian Nguyen (vuphuong87)
+ - benjaminmal
+ - Andrey Sevastianov
+ - Oleksandr Barabolia (oleksandrbarabolia)
+ - Khoo Yong Jun
+ - Christin Gruber (christingruber)
  - Sebastian Blum
- - Amirreza Shafaat (amirrezashafaat)
- - Laurent Clouet
- - Adoni Pavlakis (adoni)
- - Maarten Nusteling (nusje2000)
- - Ahmed EBEN HASSINE (famas23)
- - Eduard Bulava (nonanerz)
+ - Daniel González (daniel.gonzalez)
+ - Julien Turby
  - Ricky Su (ricky)
- - Igor Timoshenko (igor.timoshenko)
- - “teerasak”
+ - scyzoryck
  - Kyle Evans (kevans91)
- - Benoit Mallo
  - Max Rath (drak3)
- - Giuseppe Campanelli
- - Valentin
- - pizzaminded
+ - marie
  - Stéphane Escandell (sescandell)
- - ivan
- - linh
- - Oleg Krasavin (okwinza)
- - Mario Blažek (marioblazek)
- - Jure (zamzung)
+ - Fractal Zombie
  - James Johnston
- - Michael Nelson
- - Eric Krona
- - Sinan Eldem
+ - Noémi Salaün (noemi-salaun)
+ - Sinan Eldem (sineld)
  - Gennady Telegin
- - Kajetan Kołtuniak (kajtii)
- - Sander Goossens (sandergo90)
- - Damien  Fayet (rainst0rm)
+ - ampaze
  - Alexandre Dupuy (satchette)
- - MatTheCat
+ - Michel Hunziker
  - Malte Blättermann
- - Erfan Bahramali
+ - Arnaud De Abreu (arnaud-deabreu)
  - Simeon Kolev (simeon_kolev9)
- - Abdiel Carrazana (abdielcs)
- - Arman
- - Gabi Udrescu
- - Adamo Crespi (aerendir)
+ - Joost van Driel (j92)
  - Jonas Elfering
- - Luis Pabon (luispabon)
- - boulei_n
- - Anna Filina (afilina)
  - Mihai Stancu
  - Nahuel Cuesta (ncuesta)
- - Patrick Luca Fazzi (ap3ir0n)
  - Chris Boden (cboden)
  - EStyles (insidestyles)
  - Christophe Villeger (seragan)
- - Bruno Rodrigues de Araujo (brunosinister)
+ - Krystian Marcisz (simivar)
+ - Matthias Krauser (mkrauser)
  - Julien Fredon
- - Jacek Wilczyński (jacekwilczynski)
+ - Xavier Leune (xleune)
  - Hany el-Kerdany
  - Wang Jingyu
  - Åsmund Garfors
  - Maxime Douailin
  - Jean Pasdeloup
- - Laurent Moreau
+ - Lorenzo Millucci (lmillucci)
  - Javier López (loalf)
- - tamar peled
  - Reinier Kip
+ - Jérôme Tamarelle (jtamarelle-prismamedia)
+ - Emil Masiakowski
  - Geoffrey Brier (geoffrey-brier)
  - Sofien Naas
- - Christophe Meneses (c77men)
- - Andrei O
+ - Alexandre Parent
+ - Daniel Badura
+ - Roger Guasch (rogerguasch)
+ - DT Inier (gam6itko)
  - Dustin Dobervich (dustin10)
- - Alejandro Diaz Torres
- - Karl Shea
+ - Luis Tacón (lutacon)
+ - Dmitrii Tarasov (dtarasov)
+ - Alex Hofbauer (alexhofbauer)
  - dantleech
- - Valentin
+ - Philipp Kolesnikov
  - Jack Worman (jworman)
  - Sebastian Marek (proofek)
- - Łukasz Chruściel (lchrusciel)
- - Jan Vernieuwe (vernija)
+ - Carlos Pereira De Amorim (epitre)
  - zenmate
- - Cédric Anne
- - j.schmitt
- - Georgi Georgiev
+ - Andrii Popov (andrii-popov)
  - David Fuhr
- - Evgeny Anisiforov
- - TristanPouliquen
- - mwos
+ - Malte Müns
+ - Rodrigo Aguilera
+ - Vladimir Varlamov (iamvar)
  - Aurimas Niekis (gcds)
- - Volker Killesreiter (ol0lll)
  - Benjamin Zaslavsky (tiriel)
- - Vedran Mihočinec (v-m-i)
  - Vincent Chalamon
- - creiner
- - RevZer0 (rav)
- - remieuronews
- - Marek Binkowski
+ - Matthieu Calie (matth--)
  - Benjamin Schoch (bschoch)
+ - Martins Sipenko
+ - Guilherme Augusto Henschel
  - Rostyslav Kinash
- - Andrey Lebedev (alebedev)
- - Cristoforo Cervino (cristoforocervino)
  - Dennis Fridrich (dfridrich)
- - Yoann MOROCUTTI
+ - Mardari Dorel (dorumd)
  - Daisuke Ohata
  - Vincent Simonin
- - Alexander Onatskiy
- - Philipp Fritsche
- - tarlepp
+ - Pierrick VIGNAND (pierrick)
  - Alex Bogomazov (alebo)
- - Claus Due (namelesscoder)
  - aaa2000 (aaa2000)
- - Alexandru Patranescu
+ - Andy Palmer (andyexeter)
  - Andrew Neil Forster (krciga22)
- - Arkadiusz Rzadkowolski (flies)
- - Oksana Kozlova (oksanakozlova)
- - Quentin Moreau (sheitak)
  - Stefan Warman (warmans)
- - Bert Ramakers
  - Tristan Maindron (tmaindron)
  - Behnoush Norouzali (behnoush)
- - Marc Duboc (icemad)
+ - Marko H. Tamminen (gzumba)
  - Wesley Lancel
+ - Xavier Briand (xavierbriand)
  - Ke WANG (yktd26)
- - Timothée BARRAY
- - Nilmar Sanchez Muguercia
  - Ivo Bathke (ivoba)
  - Lukas Mencl
+ - David Molineus
  - Strate
  - Anton A. Sumin
- - Atthaphon Urairat
- - Jon Green (jontjs)
- - Mickaël Isaert (misaert)
  - alexandre.lassauge
  - Israel J. Carberry
- - Julius Kiekbusch
  - Miquel Rodríguez Telep (mrtorrent)
  - Tamás Nagy (t-bond)
  - Sergey Kolodyazhnyy (skolodyazhnyy)
  - umpirski
  - Quentin de Longraye (quentinus95)
  - Chris Heng (gigablah)
- - Oleksii Svitiashchuk
  - Mickaël Buliard (mbuliard)
- - Tristan Bessoussa (sf_tristanb)
  - Richard Bradley
- - Nathanaël Martel (nathanaelmartel)
- - Nicolas Jourdan (nicolasjc)
  - Ulumuddin Cahyadi Yunus (joenoez)
- - Benjamin Dos Santos
- - GagnarTest (gagnartest)
- - Tomas Javaisis
+ - rtek
+ - Adrien Jourdier (eclairia)
  - Florian Pfitzer (marmelatze)
+ - Ivan Grigoriev (greedyivan)
  - Johann Saunier (prophet777)
- - Lucas Bäuerle
- - Dario Savella
- - Jack Thomas
+ - Kevin SCHNEKENBURGER
+ - Fabien Salles (blacked)
  - Andreas Erhard (andaris)
- - Evgeny Efimov (edefimov)
- - John VanDeWeghe
- - Oleg Mifle
  - Michael Devery (mickadoo)
- - Loïc Ovigne (oviglo)
  - Gregor Nathanael Meyer (spackmat)
  - Antoine Corcy
- - Markkus Millend
- - Clément
- - Jorrit Schippers (jorrit)
+ - Ahmed Ashraf (ahmedash95)
+ - Gert Wijnalda (cinamo)
  - Aurimas Niekis (aurimasniekis)
- - maxime.perrimond
- - rvoisin
- - cthulhu
+ - Luca Saba (lucasaba)
  - Sascha Grossenbacher (berdir)
- - Dmitry Derepko
- - Rémi Leclerc
- - Jan Vernarsky
- - Jonas Hünig
- - Amine Yakoubi
+ - Guillaume Aveline
  - Robin Lehrmann
  - Szijarto Tamas
- - Arend Hummeling
- - Makdessi Alex
- - Juan Miguel Besada Vidal (soutlink)
- - dlorek
- - Stuart Fyfe
+ - Thomas P
+ - Priyadi Iman Nurcahyo (priyadi)
  - Jaroslav Kuba
  - Benjamin Zikarsky (bzikarsky)
- - Jason Schilling (chapterjason)
- - Nathan PAGE (nathix)
+ - Kristijan Kanalaš (kristijan_kanalas_infostud)
  - Rodrigo Méndez (rodmen)
  - sl_toto (sl_toto)
  - Marek Pietrzak (mheki)
- - Dmitrii Lozhkin
- - Marion Hurteau (marionleherisson)
+ - “Filip
  - Mickaël Andrieu (mickaelandrieu)
- - Oscar Esteve (oesteve)
- - Sobhan Sharifi (50bhan)
- - Peter Potrowl
- - Stephen
- - Tomasz (timitao)
- - Nguyen Tuan Minh (tuanminhgp)
- - dbrekelmans
- - Piet Steinhart
- - mousezheng
- - Rémy LESCALLIER
+ - Simon Watiau (simonwatiau)
+ - Ruben Jacobs (rubenj)
  - Simon Schick (simonsimcity)
- - Victor Macko (victor_m)
  - Tristan Roussel
- - Jorge Vahldick (jvahldick)
- - Vladimir Mantulo (mantulo)
- - aim8604
- - Aleksandr Dankovtsev
- - Maciej Zgadzaj
- - David Legatt (dlegatt)
+ - Niklas Keller
  - Alexandre parent
  - Cameron Porter
  - Hossein Bukhamsin
  - Oliver Hoff
  - Christian Sciberras (uuf6429)
- - Arthur Woimbée
- - Théo DELCEY
- - Andrii Serdiuk (andreyserdjuk)
- - dangkhoagms (dangkhoagms)
- - Floran Brutel (notFloran) (floran)
- - Vlad Gapanovich (gapik)
+ - Thomas Nunninger
  - origaminal
  - Matteo Beccati (matteobeccati)
- - Konstantin Bogomolov
- - Mark Spink
- - Cesar Scur (cesarscur)
+ - Renan Gonçalves (renan_saddam)
+ - Vitaliy Ryaboy (vitaliy)
  - Kevin (oxfouzer)
  - Paweł Wacławczyk (pwc)
- - Sagrario Meneses
  - Oleg Zinchenko (cystbear)
  - Baptiste Meyer (meyerbaptiste)
- - Stefano A. (stefano93)
  - Tales Santos (tsantos84)
+ - Tomasz Kusy
  - Johannes Klauss (cloppy)
- - PierreRebeilleau
  - Evan Villemez
- - Florian Hermann (fhermann)
  - fzerorubigd
  - Thomas Ploch
  - Benjamin Grandfond (benjamin)
  - Tiago Brito (blackmx)
  - Gintautas Miselis (naktibalda)
- - Christian Rishøj
- - Roromix
- - Patrick Berenschot
- - SuRiKmAn
- - rtek
- - Maxime AILLOUD (mailloud)
  - Richard van den Brand (ricbra)
- - mohammadreza honarkhah
+ - Kai Dederichs
+ - Toon Verwerft (veewee)
  - develop
  - flip111
- - Artem Oliinyk (artemoliynyk)
  - Marvin Feldmann (breyndotechse)
- - fruty
+ - Douglas Hammond (wizhippo)
  - VJ
  - RJ Garcia
- - Adam Wójs (awojs)
- - Justin Reherman (jreherman)
+ - Adrien Lucas (adrienlucas)
  - Delf Tonder (leberknecht)
- - Paweł Niedzielski (steveb)
- - Peter Jaap Blaakmeer
- - Agustin Gomes
  - Ondrej Exner
  - Mark Sonnabaum
- - Adiel Cristo (arcristo)
- - Fabian Kropfhamer (fabiank)
- - Junaid Farooq (junaidfarooq)
  - Chris Jones (magikid)
  - Massimiliano Braglia (massimilianobraglia)
- - Swen van Zanten (swenvanzanten)
- - Frankie Wittevrongel
  - Richard Quadling
  - James Hudson (mrthehud)
- - Adam Prickett
  - Raphaëll Roussel
- - Luke Towers
- - Anton Kroshilin
- - Norman Soetbeer
- - William Thomson (gauss)
- - Javier Espinosa (javespi)
+ - Michael Lutz
  - jochenvdv
- - František Maša
+ - Michel Roca (mroca)
+ - Reedy
  - Arturas Smorgun (asarturas)
- - Andrea Sprega (asprega)
  - Aleksandr Volochnev (exelenz)
- - Viktor Bajraktar (njutn95)
  - Robin van der Vleuten (robinvdvleuten)
  - Grinbergs Reinis (shima5)
- - Ruud Arentsen
- - Harald Tollefsen
- - Arend-Jan Tetteroo
- - Mbechezi Nawo
  - Klaus Silveira (klaussilveira)
- - Andre Eckardt (korve)
  - Michael Piecko (michael.piecko)
- - Osayawe Ogbemudia Terry (terdia)
  - Toni Peric (tperic)
  - yclian
  - radar3301
  - Aleksey Prilipko
+ - Jelle Raaijmakers (gmta)
  - Andrew Berry
+ - Nadim AL ABDOU (nadim)
  - Sylvain BEISSIER (sylvain-beissier)
  - Wybren Koelmans (wybren_koelmans)
- - Dmytro Dzubenko
+ - Roberto Nygaard
  - victor-prdh
- - Benjamin RICHARD
- - pdommelen
- - Cedrick Oka
  - Davide Borsatto (davide.borsatto)
- - Guillaume Sainthillier (guillaume-sainthillier)
- - Jens Hatlak
- - Tayfun Aydin
- - Arne Groskurth
- - Ilya Chekalsky
  - zenas1210
- - Ostrzyciel
+ - Gert de Pagter
  - Julien DIDIER (juliendidier)
- - Ilia Sergunin (maranqz)
- - Johan de Ruijter
- - marbul
- - Filippos Karailanidis
- - David Brooks
- - Volodymyr Kupriienko (greeflas)
+ - Dalibor Karlović
+ - Randy Geraads
+ - Andreas Leathley (iquito)
  - Sebastian Grodzicki (sgrodzicki)
- - Florian Caron (shalalalala)
- - Serhiy Lunak (slunak)
- - Wojciech Błoszyk (wbloszyk)
+ - Mohamed Gamal
+ - Eric COURTIAL
+ - Xesxen
  - Jeroen van den Enden (endroid)
- - abunch
- - tamcy
- - Mikko Pesari
- - Aurélien Fontaine
+ - Arun Philip
+ - Asis Pattisahusiwa
  - Pascal Helfenstein
- - Malcolm Fell (emarref)
- - phuc vo (phucwan)
+ - Jesper Skytte (greew)
  - Petar Obradović
  - Baldur Rensch (brensch)
- - Bogdan Scordaliu
- - Daniel Rotter (danrot)
- - Foxprodev
- - developer-av
+ - Carl Casbolt (carlcasbolt)
+ - Jiri Barous
  - Vladyslav Petrovych
  - Loïc Chardonnet
- - Hugo Sales
- - Dale.Nash
  - Alex Xandra Albert Sim
  - Sergey Yastrebov
  - Carson Full (carsonfull)
+ - kylekatarnls (kylekatarnls)
+ - Steve Grunwell
  - Yuen-Chi Lian
- - Maxim Semkin
- - BrokenSourceCode
- - Fabian Haase
- - Nikita Popov (nikic)
+ - Belhassen Bouchoucha (crownbackend)
+ - Mathias Brodala (mbrodala)
  - Robert Fischer (sandoba)
  - Tarjei Huse (tarjei)
  - Besnik Br
  - Issam Raouf (iraouf)
- - Michael Olšavský
- - Benny Born
- - Emirald Mateli
  - Jose Gonzalez
+ - Jonathan (jlslew)
  - Claudio Zizza
- - Ivo Valchev
- - Zlatoslav Desyatnikov
- - Wickex
- - tuqqu
+ - aegypius
  - Ilia (aliance)
- - Neagu Cristian-Doru (cristian-neagu)
+ - Christian Stoller (naitsirch)
  - Dave Marshall (davedevelopment)
  - Jakub Kulhan (jakubkulhan)
+ - Shaharia Azam
  - avorobiev
+ - Gerben Oolbekkink
  - Gladhon
- - Kai
- - Bartłomiej Zając
  - Maximilian.Beckers
+ - Alex Kalineskou
+ - stoccc
  - Grégoire Penverne (gpenverne)
  - Venu
+ - Damien Fa
  - Jonatan Männchen
  - Dennis Hotson
  - Andrew Tchircoff (andrewtch)
  - Lars Vierbergen (vierbergenlars)
+ - Xav` (xavismeh)
  - Barney Hanlon
- - Bart Wach
- - Jos Elstgeest
  - Thorry84
- - Kirill Lazarev
- - Serhii Smirnov
- - Martins Eglitis
+ - Romanavr
  - michaelwilliams
- - Wouter Diesveld
- - Romain
- - Matěj Humpál
- - Guillaume Loulier (guikingone)
- - Pedro Casado (pdr33n)
- - Pierre Grimaud (pgrimaud)
- - Alexander Janssen (tnajanssen)
+ - Alexandre Parent
  - 1emming
  - Nykopol (nykopol)
- - Julien BERNARD
- - Michael Zangerle
+ - Thibault Richard (t-richard)
  - Jordan Deitch
- - Raphael Hardt
  - Casper Valdemar Poulsen
- - SnakePin
- - Matthew Covey
- - Anthony Massard (decap94)
- - Chris Maiden (matason)
- - Andrea Ruggiero (pupax)
+ - Guillaume Verstraete
+ - vladimir.panivko
  - Oliver Hader
  - Josiah (josiah)
- - Alexandre Beaujour
- - George Yiannoulopoulos
+ - Dennis Væversted (srnzitcom)
+ - AndrolGenhald
+ - Asier Etxebeste
  - Joschi Kuphal
  - John Bohn (jbohn)
- - Peter Schultz
- - Benhssaein Youssef
- - bill moll
- - PaoRuby
- - Bizley
+ - Jason Tan (jt2k)
  - Edvin Hultberg
- - Dominik Piekarski (dompie)
- - Rares Sebastian Moldovan (raresmldvn)
  - Felds Liscia (felds)
- - dsech
- - Gilbertsoft
- - tadas
- - Bastien Picharles
- - mamazu
- - Victor Garcia
- - Juan Mrad
- - Denis Yuzhanin
- - knezmilos13
- - alireza
- - Marcin Kruk
- - Marek Víger (freezy)
+ - Sergey Panteleev
  - Andrew Hilobok (hilobok)
- - Wahyu Kristianto (kristories)
  - Noah Heck (myesain)
- - Stephan Wentz (temp)
  - Christian Soronellas (theunic)
+ - Volodymyr Panivko
+ - kick-the-bucket
  - fedor.f
  - Yosmany Garcia (yosmanyga)
- - Markus Staab
- - bahram
- - Marie Minasyan (marie.minassyan)
+ - Jeremiasz Major
+ - Trevor North
  - Degory Valentine
  - izzyp
  - Jeroen Fiege (fieg)
  - Martin (meckhardt)
- - Radosław Kowalewski
- - JustDylan23
+ - Marcel Hernandez
  - buffcode
- - Juraj Surman
- - Victor
- - Andreas Allacher
- - Alexis
- - Camille Dejoye (cdejoye)
+ - Glodzienski
  - Krzysztof Łabuś (crozin)
- - cybernet (cybernet2u)
- - Stefan Kleff (stefanxl)
- - Thijs-jan Veldhuizen (tjveldhuizen)
  - Xavier Lacot (xavier)
+ - Jon Dufresne
  - possum
  - Denis Zunke (donalberto)
  - Adrien Roches (neirda24)
  - _sir_kane (waly)
+ - Antonin CLAUZIER (0x346e3730)
  - Olivier Maisonneuve
- - Bruno BOUTAREL
- - John Stevenson
- - everyx
- - Stanislav Gamayunov (happyproff)
- - Alexander McCullagh (mccullagh)
- - Paul L McNeely (mcneely)
+ - Andrei C. (moldman)
  - Mike Meier (mykon)
  - Pedro Miguel Maymone de Resende (pedroresende)
- - Sergey Fokin (tyraelqp)
+ - stlrnz
  - Masterklavi
+ - Adrien Wilmet (adrienfr)
  - Franco Traversaro (belinde)
  - Francis Turmel (fturmel)
  - Kagan Balga (kagan-balga)
  - Nikita Nefedov (nikita2206)
- - Bernat Llibre
+ - Alex Bacart
  - cgonzalez
+ - hugovms
  - Ben
- - Joni Halme
- - aetxebeste
- - roromix
- - Vitali Tsyrkin
- - Juga Paazmaya
- - afaricamp
- - riadh26
- - Konstantinos Alexiou
- - Dilek Erkut
- - WaiSkats
- - Morimoto Ryosuke
- - Christoph König (chriskoenig)
- - Dmytro Pigin (dotty)
  - Vincent Composieux (eko)
- - Jm Aribau (jmaribau)
+ - Cyril Pascal (paxal)
+ - Pedro Casado (pdr33n)
  - Jayson Xu (superjavason)
+ - DemigodCode
  - fago
- - popnikos
- - Tito Costa
  - Jan Prieser
- - Thiago Melo
- - Giorgio Premi
+ - Maximilian Bösing
  - Matt Johnson (gdibass)
- - Gerhard Seidel (gseidel)
  - Zhuravlev Alexander (scif)
  - Stefano Degenkamp (steef)
  - James Michael DuPont
+ - Carlos Buenosvinos (carlosbuenosvinos)
+ - Christian Gripp (core23)
+ - Jake (jakesoft)
  - kor3k kor3k (kor3k)
  - Rustam Bakeev (nommyde)
- - Eric Schildkamp
- - agaktr
  - Vincent CHALAMON
- - Mostafa
- - kernig
- - Gennadi Janzen
- - SenTisso
- - Joe Springe
  - Ivan Kurnosov
- - Flinsch
- - botbotbot
- - Timon van der Vorm
- - G.R.Dalenoort
- - Vladimir Khramtsov (chrome)
- - Denys Voronin (hurricane)
- - Jordan de Laune (jdelaune)
- - Juan Gonzalez Montes (juanwilde)
- - Mathieu Dewet (mdewet)
+ - Bahman Mehrdad (bahman)
  - Christopher Hall (mythmakr)
- - none (nelexa)
  - Patrick Dawkins (pjcdawkins)
  - Paul Kamer (pkamer)
  - Rafał Wrzeszcz (rafalwrzeszcz)
  - Reyo Stallenberg (reyostallenberg)
- - Rémi Faivre (rfv)
  - Nguyen Xuan Quynh
  - Reen Lokum
+ - Dennis Langen (nijusan)
+ - Quentin Dreyer (qkdreyer)
  - Martin Parsiegla (spea)
- - Bernhard Rusch
- - Ruben Jansen
- - Marc Biorklund
- - shreypuranik
- - Thibaut Salanon
- - Urban Suppiger
+ - Manuel Alejandro Paz Cetina
  - Denis Charrier (brucewouaigne)
- - Marcello Mönkemeyer (marcello-moenkemeyer)
+ - Youssef Benhssaien (moghreb)
+ - Mario Ramundo (rammar)
+ - Ivan
+ - Nico Haase
  - Philipp Scheit (pscheit)
  - Pierre Vanliefland (pvanliefland)
  - Roy Klutman (royklutman)
  - Sofiane HADDAG (sofhad)
  - Quentin Schuler (sukei)
- - VojtaB
+ - Antoine M
  - frost-nzcr4
- - Yuri Karaban
- - Johan
- - Edwin
- - Andriy
- - Taylor Otwell
- - Sami Mussbach
- - qzylalala
- - Mikolaj Czajkowski
- - Shiro
- - Reda DAOUDI
- - Jesper Skytte
- - Christiaan Wiesenekker
+ - Shahriar56
+ - Dhananjay Goratela
+ - Kien Nguyen
  - Bozhidar Hristov
- - Foxprodev
- - Eric Hertwig
- - Sergey Panteleev
- - Dmitry Hordinky
- - Oliver Klee
- - Niels Robin-Aubertin
- - Mikko Ala-Fossi
- - Jan Christoph Beyer
- - Daniel Tiringer
- - Koray Zorluoglu
- - Roy-Orbison
- - kshida
- - Yasmany Cubela Medina (bitgandtter)
- - Aryel Tupinamba (dfkimera)
- - Hans Höchtl (hhoechtl)
- - Jawira Portugal (jawira)
+ - arai
+ - Achilles Kaloeridis (achilles)
  - Laurent Bassin (lbassin)
- - Roman Igoshin (masterro)
- - Jeroen van den Nieuwenhuisen (nieuwenhuisen)
- - Pierre Rebeilleau (pierrereb)
- - Raphael de Almeida (raphaeldealmeida)
+ - Mouad ZIANI (mouadziani)
+ - Tomasz Ignatiuk
  - andrey1s
  - Abhoryo
  - Fabian Vogler (fabian)
  - Korvin Szanto
- - Simon Ackermann
  - Stéphan Kochen
- - Steven Dubois
  - Arjan Keeman
- - Bálint Szekeres
  - Alaattin Kahramanlar (alaattin)
  - Sergey Zolotov (enleur)
  - Nicole Cordes (ichhabrecht)
- - Mark Beech (jaybizzle)
  - Maksim Kotlyar (makasim)
- - Thibaut Arnoud (thibautarnoud)
  - Neil Ferreira
  - Julie Hourcade (juliehde)
  - Dmitry Parnas (parnas)
- - Christian Weiske
- - Maria Grazia Patteri
- - Sébastien COURJEAN
- - Marko Vušak
- - Ismo Vuorinen
+ - Loïc Beurlet
+ - Ana Raro
+ - Ana Raro
  - Tony Malzhacker
- - Valentin
- - Ali Tavafi
- - Viet Pham
- - Pchol
- - divinity76
- - Yiorgos Kalligeros
- - Arek Bochinski
- - Rafael Tovar
- - Amin Hosseini (aminh)
  - Andreas Lutro (anlutro)
  - DUPUCH (bdupuch)
  - Cyril Quintin (cyqui)
- - Cyrille Bourgois (cyrilleb)
  - Gerard van Helden (drm)
  - Florent Destremau (florentdestremau)
+ - Florian Wolfsjaeger (flowolf)
+ - Ivan Sarastov (isarastov)
  - Johnny Peck (johnnypeck)
- - Geoffrey Monte (numerogeek)
- - Martijn Boers (plebian)
- - Plamen Mishev (pmishev)
- - Sergii Dolgushev (serhey)
- - Rein Baarsma (solidwebcode)
- - Stephen Lewis (tehanomalousone)
- - Wim Molenberghs (wimm)
+ - Jordi Sala Morales (jsala)
+ - Sander De la Marche (sanderdlm)
  - Loic Chardonnet
  - Ivan Menshykov
  - David Romaní
@@ -1754,306 +1318,157 @@ The Symfony Connect username in parenthesis allows to get more information
  - Alexander Li (aweelex)
  - Gustavo Falco (gfalco)
  - Matt Robinson (inanimatt)
- - Marcel Berteler
- - sdkawata
+ - Kristof Van Cauwenbergh (kristofvc)
+ - Marco Lipparini (liarco)
  - Aleksey Podskrebyshev
  - Calin Mihai Pristavu
- - Rainrider
- - Oliver Eglseder
- - zcodes
+ - Gabrielle Langer
  - Jörn Lang
  - David Marín Carreño (davefx)
  - Fabien LUCAS (flucas2)
  - Alex (garrett)
+ - Konstantin Grachev (grachevko)
  - Hidde Boomsma (hboomsma)
- - Johan Wilfer (johanwilfer)
- - Toby Griffiths (tog)
- - Ashura
- - Alessandra Lai
- - Ernest Hymel
- - Andrea Civita
- - Nicolás Alonso
+ - Ondrej Machulda (ondram)
+ - Jason Woods
  - mwsaz
- - LoginovIlya
- - carlos-ea
- - Olexandr Kalaidzhy
- - Jérémy Benoist
- - Ferran Vidal
- - youssef saoubou
- - elattariyassine
- - Carlos Tasada
- - zors1
- - Peter Simoncic
- - lerminou
- - Ahmad El-Bardan
- - pdragun
- - Noel Light-Hilary
- - Emre YILMAZ
- - Marcos Labad
- - Antoine M
- - Frank Jogeleit
- - Ondřej Frei
- - Jenne van der Meer
- - Storkeus
- - Anton Zagorskii
- - ging-dev
- - zakaria-amm
+ - bogdan
+ - Daniel Tiringer
  - Geert De Deckere
- - Agata
- - dakur
  - grizlik
- - florian-michael-mast
- - Henry Snoek
- - Vlad Dumitrache
  - Derek ROTH
  - Jeremy Benoist
  - Ben Johnson
  - Jan Kramer
  - mweimerskirch
- - robmro27
- - Vallel Blanco
- - Bastien Clément
- - Benjamin Franzke
- - Pavinthan
- - Sylvain METAYER
+ - Andrew Codispoti
  - Benjamin Laugueux
- - Ivo Valchev
- - baron (bastien)
+ - Lctrs
  - Benoît Bourgeois (bierdok)
- - Damien Harper (damien.harper)
- - Dominik Pesch (dombn)
  - Dmytro Boiko (eagle)
  - Shin Ohno (ganchiku)
- - Jaap van Otterdijk (jaapio)
- - Kubicki Kamil (kubik)
- - Vladislav Nikolayev (luxemate)
- - Martin Mandl (m2mtech)
+ - Matthieu Mota (matthieumota)
  - Maxime Pinot (maximepinot)
- - Misha Klomp (mishaklomp)
  - Jean-Baptiste GOMOND (mjbgo)
- - Mikhail Prosalov (mprosalov)
- - Ulrik Nielsen (mrbase)
- - Artem (nexim)
- - Nicolas ASSING (nicolasassing)
- - Pierre Gasté (pierre_g)
- - Pierre-Olivier Vares (povares)
- - Ronny López (ronnylt)
- - Julius (sakalys)
  - abdul malik ikhsan (samsonasik)
- - Dmitry (staratel)
- - Tito Miguel Costa (titomiguelcosta)
- - Wim Godden (wimg)
+ - Henry Snoek (snoek09)
  - Morgan Auchede
  - Christian Morgan
  - Alexander Miehe
+ - Daniël Brekelmans (dbrekelmans)
  - Simon (kosssi)
  - Sascha Dens (saschadens)
- - Maxime Aknin (3m1x4m)
- - Geordie
- - Exploit.cz
+ - Simon Heimberg (simon_heimberg)
+ - Morten Wulff (wulff)
  - Don Pinkster
  - Maksim Muruev
  - Emil Einarsson
- - Jason Stephens
  - 243083df
- - Tinjo Schöni
  - Thibault Duplessis
- - Quentin Favrie
- - Matthias Derer
- - vladyslavstartsev
- - Kévin
+ - Rimas Kudelis
  - Marc Abramowitz
- - michal
+ - Matthias Schmidt
  - Martijn Evers
- - Sjoerd Adema
  - Tony Tran
- - Evgeniy Koval
- - Claas Augner
  - Balazs Csaba
  - Bill Hance (billhance)
  - Douglas Reith (douglas_reith)
  - Harry Walter (haswalt)
- - Jeffrey Moelands (jeffreymoelands)
  - Jacques MOATI (jmoati)
  - Johnson Page (jwpage)
+ - Kuba Werłos (kuba)
  - Ruben Gonzalez (rubenruateltek)
- - Ruslan Zavacky (ruslanzavacky)
- - Stefano Cappellini (stefano_cappellini)
  - Michael Roterman (wtfzdotnet)
+ - Philipp Keck
+ - Pavol Tuka
  - Arno Geurts
  - Adán Lobato (adanlobato)
  - Ian Jenkins (jenkoian)
  - Marcos Gómez Vilches (markitosgv)
  - Matthew Davis (mdavis1982)
- - George Bateman
- - misterx
- - arend
- - Vincent Godé
- - helmi
- - Michael Steininger
- - Nardberjean
- - jersoe
- - Eric Grimois
- - Beno!t POLASZEK
- - Armando
- - Jens Schulze
- - Olatunbosun Egberinde
- - Knallcharge
- - Michel Bardelmeijer
- - Ikko Ashimine
- - Erwin Dirks
- - Markus Ramšak
+ - Paulo Ribeiro (paulo)
+ - Markus S. (staabm)
+ - Marc Laporte
+ - Michał Jusięga
  - den
- - George Dietrich
- - jannick-holm
- - Menno Holtkamp
- - Ser5
- - Clemens Krack
- - Bruno Baguette
- - Alexis Lefebvre
- - sarah-eit
- - Michal Forbak
- - Alexey Berezuev
- - Pierrick Charron
- - gechetspr
- - brian978
- - Talha Zekeriya Durmuş
- - bch36
- - Steve Hyde
- - Ettore Del Negro
- - dima-gr
  - Gábor Tóth
- - Rodolfo Ruiz
- - tsilefy
- - Enrico
- - Jérémie Broutier
- - Success Go
- - Chris McGehee
- - Bastien THOMAS
- - Benjamin Rosenberger
- - Vladyslav Startsev
- - Markus Klein
- - Bruno Nogueira Nascimento Wowk
- - Tomanhez
- - satalaondrej
- - Matthias Dötsch
- - jonmldr
  - ouardisoft
- - RTUnreal
- - Richard Hodgson
- - Sven Fabricius
- - Bogdan
- - Marco Pfeiffer
  - Daniel Cestari
  - Matt Janssen
- - Kévin Gonella
- - Matteo Galli
- - Ash014
- - Loenix
- - Simon Frost
- - Cantepie
- - detinkin
- - Harry Wiseman
- - Steve Marvell
- - Shyim
- - sabruss
- - Andrejs Leonovs
- - Signor Pedro
- - Matthias Larisch
- - Maxime  P
- - Sean Templeton
- - Yendric
  - Stéphane Delprat
- - Matthias Meyer
- - Temuri Takalandze (abgeo)
- - Bernard van der Esch (adeptofvoltron)
- - Benedict Massolle (bemas)
- - Gerard Berengue Llobera (bere)
- - Ronny (big-r)
- - Anton (bonio)
- - Alexandre Fiocre (demos77)
- - Erwan Nader (ernadoo)
- - Faizan Akram Dar (faizanakram)
- - Greg Szczotka (greg606)
- - Ian Littman (iansltx)
- - Nathan DIdier (icz)
- - Ilia Lazarev (ilzrv)
- - Arkadiusz Kondas (itcraftsmanpl)
- - Joao Paulo V Martins (jpjoao)
+ - Elan Ruusamäe (glen)
  - Brunet Laurent (lbrunet)
- - Jérémy (libertjeremy)
  - Florent Viel (luxifer)
  - Maks 3w (maks3w)
- - Mamikon Arakelyan (mamikon)
  - Michiel Boeckaert (milio)
- - Mike Milano (mmilano)
- - Guillaume Lajarige (molkobain)
- - Diego Aguiar (mollokhan)
  - Mikhail Yurasov (mym)
- - PLAZANET Pierre (pedrotroller)
- - Igor Tarasov (polosatus)
  - Robert Gruendler (pulse00)
- - Ramazan APAYDIN (rapaydin)
- - Babichev Maxim (rez1dent3)
- - Christopher Georg (sky-chris)
- - Francisco Alvarez (sormes)
+ - Sebastian Paczkowski (sebpacz)
  - Simon Terrien (sterrien)
- - Stephan Vierkant (svierkant)
  - Benoît Merlet (trompette)
- - Aaron Piotrowski (trowski)
- - Roman Tymoshyk (tymoshyk)
- - Vincent MOULENE (vints24)
+ - Brad Jones
  - datibbaw
+ - Dragos Protung (dragosprotung)
  - Koen Kuipers (koku)
- - Ryan Linnit
- - Antoine Leblanc
- - Andre Johnson
- - MaPePeR
- - Marco Pfeiffer
+ - Nicolas de Marqué (nicola)
+ - Thiago Cordeiro (thiagocordeiro)
  - Matthieu Bontemps
- - Vivien
  - Rootie
- - david-binda
- - Alexandru Năstase
- - ddegentesh
- - Anne-Julia Seitz
- - Alexander Bauer (abauer)
  - Sébastien Santoro (dereckson)
- - Gabriel Solomon (gabrielsolomon)
  - Daniel Alejandro Castro Arellano (lexcast)
- - Aleksandar Dimitrov (netbull)
- - Gary Houbre (thegarious)
  - Vincent Chalamon
  - Thomas Jarrand
  - Baptiste Leduc (bleduc)
- - Antoine Bluchet (soyuka)
+ - soyuka
  - Patrick Kaufmann
- - Mickael Perraud (mikaelkael)
+ - Mickael Perraud
  - Anton Dyshkant
  - Ramunas Pabreza
  - Zoran Makrevski (zmakrevski)
+ - Yann LUCAS (drixs6o9)
  - Kirill Nesmeyanov (serafim)
  - Reece Fowell (reecefowell)
  - Muhammad Aakash
  - Charly Goblet (_mocodo)
+ - Htun Htun Htet (ryanhhh91)
  - Guillaume Gammelin
  - Valérian Galliat
+ - Sorin Pop (sorinpop)
  - d-ph
  - MrMicky
+ - Stewart Malik
  - Renan Taranto (renan-taranto)
+ - Stefan Graupner (efrane)
+ - Gemorroj (gemorroj)
+ - Adrien Chinour
  - Mateusz Żyła (plotkabytes)
  - Rikijs Murgs
  - WoutervanderLoop.nl
+ - Mihail Krasilnikov (krasilnikovm)
  - Uladzimir Tsykun
+ - iamvar
  - Amaury Leroux de Lens (amo__)
  - Christian Jul Jensen
  - Alexandre GESLIN
  - The Whole Life to Learn
+ - Pierre Tondereau
+ - Joel Lusavuvu (enigma97)
+ - Alex Vo (votanlean)
  - Mikkel Paulson
  - ergiegonzaga
+ - André Matthies
  - kurozumi (kurozumi)
+ - Nicolas Lemoine
+ - Piergiuseppe Longo
+ - Kevin Auivinet
  - Liverbool (liverbool)
+ - Valentin Nazarov
  - Dalibor Karlović
+ - Aurélien MARTIN
+ - Malte Schlüter
+ - Jules Matsounga (hyoa)
+ - Yewhen Khoptynskyi (khoptynskyi)
+ - Jérôme Nadaud (jnadaud)
  - Sam Malone
  - Ha Phan (haphan)
  - Chris Jones (leek)
@@ -2062,13 +1477,23 @@ The Symfony Connect username in parenthesis allows to get more information
  - xaav
  - Jean-Christophe Cuvelier [Artack]
  - Mahmoud Mostafa (mahmoud)
+ - Alexandre Tranchant (alexandre_t)
+ - Anthony Moutte
  - Ahmed Abdou
+ - shreyadenny
+ - Daniel Iwaniec
+ - Thomas Ferney (thomasf)
  - Pieter
  - Louis-Proffit
  - Michael Tibben
+ - Hallison Boaventura (hallisonboaventura)
+ - Mas Iting
  - Billie Thompson
+ - Albion Bame (abame)
  - Ganesh Chandrasekaran (gxc4795)
  - Sander Marechal
+ - Ivan Nemets
+ - Grégoire Hébert (gregoirehebert)
  - Franz Wilding (killerpoke)
  - Ferenczi Krisztian (fchris82)
  - Artyum Petrov
@@ -2079,77 +1504,120 @@ The Symfony Connect username in parenthesis allows to get more information
  - Bert ter Heide (bertterheide)
  - Kevin Nadin (kevinjhappy)
  - jean pasqualini (darkilliant)
+ - Iliya Miroslavov Iliev (i.miroslavov)
+ - Safonov Nikita (ns3777k)
  - Ross Motley (rossmotley)
  - ttomor
  - Mei Gwilym (meigwilym)
  - Michael H. Arieli
  - Jitendra Adhikari (adhocore)
+ - Nicolas Martin (cocorambo)
  - Tom Panier (neemzy)
  - Fred Cox
+ - luffy1727
  - Luciano Mammino (loige)
+ - LHommet Nicolas (nicolaslh)
  - fabios
  - Sander Coolen (scoolen)
+ - Amirreza Shafaat (amirrezashafaat)
+ - Laurent Clouet
+ - Adoni Pavlakis (adoni)
  - Nicolas Le Goff (nlegoff)
+ - Maarten Nusteling (nusje2000)
  - Anne-Sophie Bachelard
  - Gordienko Vladislav
+ - Ahmed EBEN HASSINE (famas23)
  - Marvin Butkereit
  - Ben Oman
  - Chris de Kok
+ - Eduard Bulava (nonanerz)
  - Andreas Kleemann (andesk)
  - Hubert Moreau (hmoreau)
  - Brajk19
+ - Igor Timoshenko (igor.timoshenko)
  - Manuele Menozzi
+ - “teerasak”
  - Anton Babenko (antonbabenko)
  - Irmantas Šiupšinskas (irmantas)
+ - Benoit Mallo
  - Charles-Henri Bruyand
  - Danilo Silva
+ - Giuseppe Campanelli
+ - Valentin
+ - pizzaminded
  - Konstantin S. M. Möllers (ksmmoellers)
  - Ken Stanley
+ - ivan
  - Zachary Tong (polyfractal)
+ - linh
+ - Oleg Krasavin (okwinza)
+ - Mario Blažek (marioblazek)
+ - Jure (zamzung)
+ - Michael Nelson
  - Ashura
  - Hryhorii Hrebiniuk
  - Nsbx
+ - Eric Krona
  - Alex Plekhanov
  - johnstevenson
  - hamza
  - dantleech
+ - Kajetan Kołtuniak (kajtii)
+ - Sander Goossens (sandergo90)
  - Rudy Onfroy
  - Tero Alén (tero)
  - DerManoMann
+ - Damien  Fayet (rainst0rm)
+ - MatTheCat
  - Guillaume Royer
+ - Erfan Bahramali
  - Artem (digi)
  - boite
  - Silvio Ginter
  - Peter Culka
  - MGDSoft
+ - Abdiel Carrazana (abdielcs)
  - joris
  - Vadim Tyukov (vatson)
+ - Arman
+ - Gabi Udrescu
+ - Adamo Crespi (aerendir)
  - David Wolter (davewww)
  - Sortex
  - chispita
  - Wojciech Sznapka
+ - Luis Pabon (luispabon)
+ - boulei_n
+ - Anna Filina (afilina)
  - Gavin (gavin-markup)
  - Ksaveras Šakys (xawiers)
  - Shaun Simmons
  - Ariel J. Birnbaum
+ - Patrick Luca Fazzi (ap3ir0n)
  - Danijel Obradović
  - Pablo Borowicz
  - Ondřej Frei
+ - Bruno Rodrigues de Araujo (brunosinister)
  - Máximo Cuadros (mcuadros)
+ - Jacek Wilczyński (jacekwilczynski)
  - Camille Baronnet
  - EXT - THERAGE Kevin
  - tamirvs
  - gauss
  - julien.galenski
  - Florian Guimier
+ - Maxime PINEAU
  - Igor Kokhlov (verdet)
  - Christian Neff (secondtruth)
  - Chris Tiearney
  - Oliver Hoff
+ - Minna N
  - Ole Rößner (basster)
  - andersmateusz
+ - Laurent Moreau
  - Faton (notaf)
  - Tom Houdmont
+ - tamar peled
  - mark burdett
  - Per Sandström (per)
  - Goran Juric
@@ -2161,7 +1629,9 @@ The Symfony Connect username in parenthesis allows to get more information
  - Guido Donnari
  - Mert Simsek (mrtsmsk0)
  - Lin Clark
+ - Christophe Meneses (c77men)
  - Jeremy David (jeremy.david)
+ - Andrei O
  - Michał Marcin Brzuchalski (brzuchal)
  - Jordi Rejas
  - Troy McCabe
@@ -2170,21 +1640,34 @@ The Symfony Connect username in parenthesis allows to get more information
  - gr1ev0us
  - Léo VINCENT
  - mlazovla
+ - Alejandro Diaz Torres
+ - Karl Shea
+ - Valentin
  - Markus Baumer
  - Max Beutel
  - adnen chouibi
  - Nathan Sepulveda
+ - Łukasz Chruściel (lchrusciel)
+ - Jan Vernieuwe (vernija)
  - Antanas Arvasevicius
  - Pierre Dudoret
  - Michal Trojanowski
  - Thomas
+ - j.schmitt
+ - Georgi Georgiev
  - Norbert Schultheisz
  - Maximilian Berghoff (electricmaxxx)
  - SOEDJEDE Felix (fsoedjede)
+ - Evgeny Anisiforov
  - otsch
+ - TristanPouliquen
  - Piotr Antosik (antek88)
  - Nacho Martin (nacmartin)
+ - mwos
+ - Volker Killesreiter (ol0lll)
+ - Vedran Mihočinec (v-m-i)
  - Sergey Novikov (s12v)
+ - creiner
  - ProgMiner
  - Marcos Quesada (marcos_quesada)
  - Matthew (mattvick)
@@ -2192,34 +1675,54 @@ The Symfony Connect username in parenthesis allows to get more information
  - Viktor Novikov (nowiko)
  - Paul Mitchum (paul-m)
  - Angel Koilov (po_taka)
+ - RevZer0 (rav)
  - Yura Uvarov (zim32)
  - Dan Finnie
+ - remieuronews
+ - Marek Binkowski
  - Ken Marfilla (marfillaster)
  - Max Grigorian (maxakawizard)
  - allison guilhem
  - benatespina (benatespina)
  - Denis Kop
+ - Fabrice Locher
  - Kamil Szalewski (szal1k)
+ - Andrey Lebedev (alebedev)
+ - Cristoforo Cervino (cristoforocervino)
  - Jean-Guilhem Rouel (jean-gui)
+ - Yoann MOROCUTTI
  - Ivan Yivoff
  - EdgarPE
  - jfcixmedia
  - Dominic Tubach
  - Martijn Evers
+ - Alexander Onatskiy
+ - Philipp Fritsche
  - Léon Gersen
+ - tarlepp
  - Dustin Wilson
  - Benjamin Paap (benjaminpaap)
+ - Claus Due (namelesscoder)
  - Christian
+ - Alexandru Patranescu
  - ju1ius
  - Denis Golubovskiy (bukashk0zzz)
+ - Arkadiusz Rzadkowolski (flies)
  - Serge (nfx)
+ - Oksana Kozlova (oksanakozlova)
+ - Quentin Moreau (sheitak)
  - Mikkel Paulson
  - Michał Strzelecki
+ - Bert Ramakers
  - Hugo Fonseca (fonsecas72)
+ - Marc Duboc (icemad)
  - Martynas Narbutas
+ - Timothée BARRAY
+ - Nilmar Sanchez Muguercia
  - Pierre LEJEUNE (darkanakin41)
  - Bailey Parker
  - curlycarla2004
+ - Javier Ledezma
  - Kevin Auvinet
  - Antanas Arvasevicius
  - Kris Kelly
@@ -2236,11 +1739,15 @@ The Symfony Connect username in parenthesis allows to get more information
  - Serhii Polishchuk (spolischook)
  - Tadas Gliaubicas (tadcka)
  - Thanos Polymeneas (thanos)
+ - Atthaphon Urairat
  - Benoit Garret
  - HellFirePvP
  - Maximilian Zumbansen
  - Maximilian Ruta (deltachaos)
+ - Jon Green (jontjs)
+ - Mickaël Isaert (misaert)
  - Jakub Sacha
+ - Julius Kiekbusch
  - Kamil Musial
  - Olaf Klischat
  - orlovv
@@ -2255,22 +1762,32 @@ The Symfony Connect username in parenthesis allows to get more information
  - Marcin Chwedziak
  - hjkl
  - Dan Wilga
+ - Jan Böhmer
  - Florian Heller
+ - Oleksii Svitiashchuk
  - Andrew Tch
  - Alexander Cheprasov
+ - Tristan Bessoussa (sf_tristanb)
  - Rodrigo Díez Villamuera (rodrigodiez)
  - Brad Treloar
  - Stephen Clouse
  - e-ivanov
+ - Nathanaël Martel (nathanaelmartel)
+ - Nicolas Jourdan (nicolasjc)
+ - Benjamin Dos Santos
  - Abderrahman DAIF (death_maker)
  - Yann Rabiller (einenlum)
+ - GagnarTest (gagnartest)
  - Jochen Bayer (jocl)
+ - Tomas Javaisis
  - Constantine Shtompel
  - VAN DER PUTTE Guillaume (guillaume_vdp)
  - Patrick Carlo-Hickman
  - Bruno MATEU
  - Jeremy Bush
+ - Lucas Bäuerle
  - Thomason, James
+ - Dario Savella
  - Gordienko Vladislav
  - Ener-Getick
  - Moza Bogdan (bogdan_moza)
@@ -2281,98 +1798,153 @@ The Symfony Connect username in parenthesis allows to get more information
  - Matt Brunt
  - Carlos Ortega Huetos
  - Péter Buri (burci)
+ - Evgeny Efimov (edefimov)
+ - jack.thomas (jackthomasatl)
+ - John VanDeWeghe
  - kaiwa
  - Charles Sanquer (csanquer)
  - Albert Ganiev (helios-ag)
  - Neil Katin
+ - Oleg Mifle
  - David Otton
  - Will Donohoe
  - peter
  - Jeroen de Boer
  - Jérémy Jourdin (jjk801)
  - BRAMILLE Sébastien (oktapodia)
+ - Loïc Ovigne (oviglo)
  - Artem Kolesnikov (tyomo4ka)
+ - Markkus Millend
+ - Clément
  - Gustavo Adrian
+ - Jorrit Schippers (jorrit)
  - Matthias Neid
  - Yannick
  - Kuzia
  - Bram Leeda
  - Vladimir Luchaninov (luchaninov)
  - spdionis
+ - maxime.perrimond
  - rchoquet
  - v.shevelev
+ - rvoisin
  - gitlost
  - Taras Girnyk
+ - cthulhu
+ - Andoni Larzabal (andonilarz)
+ - Dmitry Derepko
+ - Rémi Leclerc
+ - Jan Vernarsky
  - Sergio
+ - Jonas Hünig
  - Mehrdad
+ - Amine Yakoubi
  - Eduardo García Sanz (coma)
+ - Arend Hummeling
+ - Makdessi Alex
  - fduch (fduch)
  - Jan Walther (janwalther)
+ - Juan Miguel Besada Vidal (soutlink)
  - Takashi Kanemoto (ttskch)
+ - dlorek
+ - Stuart Fyfe
+ - Jason Schilling (chapterjason)
  - David de Boer (ddeboer)
  - Eno Mullaraj (emullaraj)
  - Stephan Vock (glaubinix)
  - Guillem Fondin (guillemfondin)
+ - Nathan PAGE (nathix)
  - Ryan Rogers
  - Arnaud
  - Klaus Purer
+ - Dmitrii Lozhkin
  - Gilles Doge (gido)
+ - Marion Hurteau (marionleherisson)
+ - Oscar Esteve (oesteve)
+ - Sobhan Sharifi (50bhan)
+ - Peter Potrowl
  - abulford
  - Philipp Kretzschmar
  - Jairo Pastor
  - Ilya Vertakov
  - Brooks Boyd
  - Axel Venet
+ - Stephen
  - Roger Webb
  - Dmitriy Simushev
  - Pawel Smolinski
  - John Espiritu (johnillo)
+ - Tomasz (timitao)
+ - Nguyen Tuan Minh (tuanminhgp)
  - Oxan van Leeuwen
  - pkowalczyk
+ - dbrekelmans
+ - Mykola Zyk
  - Soner Sayakci
  - Max Voloshin (maxvoloshin)
  - Nicolas Fabre (nfabre)
  - Raul Rodriguez (raul782)
+ - Piet Steinhart
+ - mousezheng
  - mshavliuk
- - Jesper Skytte
+ - Rémy LESCALLIER
  - MightyBranch
  - Kacper Gunia (cakper)
  - Derek Lambert (dlambert)
  - Mark Pedron (markpedron)
  - Peter Thompson (petert82)
+ - Victor Macko (victor_m)
  - Ismail Turan
  - error56
  - Felicitus
  - alexpozzi
+ - Jorge Vahldick (jvahldick)
  - Krzysztof Przybyszewski (kprzybyszewski)
+ - Vladimir Mantulo (mantulo)
  - Boullé William (williamboulle)
  - Frederic Godfrin
  - Paul Matthews
+ - aim8604
  - Jakub Kisielewski
  - Vacheslav Silyutin
+ - Aleksandr Dankovtsev
+ - Maciej Zgadzaj
  - Juan Traverso
+ - David Legatt (dlegatt)
  - Alain Flaus (halundra)
  - Ворожцов Максим (myks92)
+ - Arthur Woimbée
  - tsufeki
+ - Théo DELCEY
  - Philipp Strube
  - Wim Hendrikx
+ - Andrii Serdiuk (andreyserdjuk)
  - Clement Herreman (clemherreman)
+ - dangkhoagms (dangkhoagms)
  - Dan Ionut Dumitriu (danionut90)
  - Evgeny (disparity)
+ - Floran Brutel (notFloran) (floran)
  - Vladislav Rastrusny (fractalizer)
+ - Vlad Gapanovich (gapik)
  - Alexander Kurilo (kamazee)
  - nyro (nyro)
+ - Konstantin Bogomolov
  - Marco
  - Marc Torres
+ - Mark Spink
  - gndk
  - Alberto Aldegheri
  - Dalibor Karlović
+ - Cesar Scur (cesarscur)
  - Cyril Vermandé (cyve)
  - Raul Garcia Canet (juagarc4)
+ - Sagrario Meneses
  - Dmitri Petmanson
  - heccjj
  - Alexandre Melard
  - Rafał Toboła
+ - Stefano A. (stefano93)
+ - PierreRebeilleau
  - AlbinoDrought
  - Jay Klehr
  - Sergey Yuferev
@@ -2384,41 +1956,61 @@ The Symfony Connect username in parenthesis allows to get more information
  - Evan Shaw
  - Sander Hagen
  - cilefen (cilefen)
+ - Florian Hermann (fhermann)
  - Mo Di (modi)
  - Victor Truhanovich (victor_truhanovich)
  - Pablo Schläpfer
+ - Christian Rishøj
  - Nikos Charalampidis
  - Caligone
+ - Roromix
+ - Patrick Berenschot
+ - SuRiKmAn
  - Xavier RENAUDIN
+ - rtek
  - Christian Wahler (christian)
  - Jelte Steijaert (jelte)
+ - Maxime AILLOUD (mailloud)
  - David Négrier (moufmouf)
  - Quique Porta (quiqueporta)
  - Tobias Feijten (tobias93)
+ - mohammadreza honarkhah
+ - Jessica F Martinez
+ - Artem Oliinyk (artemoliynyk)
  - Andrea Quintino (dirk39)
  - Andreas Heigl (heiglandreas)
  - Tomasz Szymczyk (karion)
- - Nadim AL ABDOU (nadim)
  - Peter Dietrich (xosofox)
  - Alex Vasilchenko
  - sez-open
+ - fruty
  - ConneXNL
  - Aharon Perkel
  - matze
+ - Adam Wójs (awojs)
+ - Justin Reherman (jreherman)
  - Rubén Calvo (rubencm)
+ - Paweł Niedzielski (steveb)
  - Abdul.Mohsen B. A. A
  - Cédric Girard
+ - Peter Jaap Blaakmeer
  - Robert Worgul
+ - Swen van Zanten
+ - Agustin Gomes
  - pthompson
  - Malaney J. Hill
  - Patryk Kozłowski
  - Alexandre Pavy
  - Tim Ward
+ - Adiel Cristo (arcristo)
  - Christian Flach (cmfcmf)
+ - Fabian Kropfhamer (fabiank)
+ - Junaid Farooq (junaidfarooq)
  - Lars Ambrosius Wallenborn (larsborn)
  - Oriol Mangas Abellan (oriolman)
  - Raphaël Geffroy (raphael-geffroy)
  - Sebastian Göttschkes (sgoettschkes)
+ - Frankie Wittevrongel
  - Tatsuya Tsuruoka
  - Ross Tuck
  - omniError
@@ -2428,18 +2020,25 @@ The Symfony Connect username in parenthesis allows to get more information
  - Kevin van Sonsbeek (kevin_van_sonsbeek)
  - Mihai Nica (redecs)
  - Andrei Igna
+ - Adam Prickett
  - azine
+ - Luke Towers
  - Wojciech Zimoń
  - Vladimir Melnik
+ - Anton Kroshilin
  - Pierre Tachoire
  - Dawid Sajdak
+ - Norman Soetbeer
  - Ludek Stepan
  - Mark van den Berg
  - Aaron Stephens (astephens)
  - Craig Menning (cmenning)
  - Balázs Benyó (duplabe)
  - Erika Heidi Reinaldo (erikaheidi)
+ - William Thomson (gauss)
+ - Javier Espinosa (javespi)
  - Marc J. Schmidt (marcjs)
+ - František Maša
  - Sebastian Schwarz
  - Flohw
  - karolsojko
@@ -2449,34 +2048,45 @@ The Symfony Connect username in parenthesis allows to get more information
  - Zacharias Luiten
  - Sebastian Utz
  - Adrien Gallou (agallou)
+ - Andrea Sprega (asprega)
  - Maks Rafalko (bornfree)
  - Conrad Kleinespel (conradk)
  - Clément LEFEBVRE (nemoneph)
+ - Viktor Bajraktar (njutn95)
  - Walter Dal Mut (wdalmut)
  - abluchet
+ - Ruud Arentsen
+ - Harald Tollefsen
  - PabloKowalczyk
  - Matthieu
+ - Arend-Jan Tetteroo
  - Albin Kerouaton
  - Sébastien HOUZÉ
+ - Mbechezi Nawo
  - wivaku
  - Jingyu Wang
  - steveYeah
+ - Asrorbek (asrorbek)
  - Samy D (dinduks)
  - Keri Henare (kerihenare)
+ - Andre Eckardt (korve)
  - Cédric Lahouste (rapotor)
  - Samuel Vogel (samuelvogel)
+ - Osayawe Ogbemudia Terry (terdia)
  - Berat Doğan
  - Christian Kolb
  - Guillaume LECERF
  - Juanmi Rodriguez Cerón
  - twifty
  - Andy Raines
+ - François Poguet
  - Anthony Ferrara
  - Geoffrey Pécro (gpekz)
  - Jérémy DECOOL (jdecool)
  - Klaas Cuvelier (kcuvelier)
  - Flavien Knuchel (knuch)
  - Mathieu TUDISCO (mathieutu)
+ - Dmytro Dzubenko
  - Peter Ward
  - markusu49
  - Steve Frécinaux
@@ -2484,83 +2094,138 @@ The Symfony Connect username in parenthesis allows to get more information
  - Jules Lamur
  - Renato Mendes Figueiredo
  - xdavidwu
+ - Benjamin RICHARD
  - Raphaël Droz
- - Asis Pattisahusiwa
+ - pdommelen
  - Eric Stern
  - ShiraNai7
+ - Cedrick Oka
  - Antal Áron (antalaron)
  - Alexander Grimalovsky (flying)
+ - Guillaume Sainthillier (guillaume-sainthillier)
  - Ivan Pepelko (pepelko)
  - Vašek Purchart (vasek-purchart)
  - Janusz Jabłoński (yanoosh)
+ - Jens Hatlak
  - Fleuv
+ - Tayfun Aydin
  - Łukasz Makuch
+ - Arne Groskurth
+ - Ilya Chekalsky
+ - Ostrzyciel
  - George Giannoulopoulos
  - Alexander Pasichnik (alex_brizzz)
  - Luis Ramirez (luisdeimos)
+ - Ilia Sergunin (maranqz)
  - Daniel Richter (richtermeister)
  - Sandro Hopf (senaria)
  - ChrisC
+ - André Laugks
  - jack.shpartko
  - Willem Verspyck
  - Kim Laï Trinh
+ - Johan de Ruijter
  - Jason Desrosiers
  - m.chwedziak
+ - marbul
+ - Filippos Karailanidis
  - Andreas Frömer
  - Bikal Basnet
  - Philip Frank
+ - David Brooks
  - Lance McNearney
  - Illia Antypenko (aivus)
  - Jelizaveta Lemeševa (broken_core)
  - Dominik Ritter (dritter)
  - Frank Neff (fneff)
+ - Volodymyr Kupriienko (greeflas)
  - Ilya Biryukov (ibiryukov)
  - Roma (memphys)
+ - Florian Caron (shalalalala)
+ - Serhiy Lunak (slunak)
+ - Wojciech Błoszyk (wbloszyk)
  - Giorgio Premi
  - Matthias Bilger
+ - abunch
+ - tamcy
+ - Lukas Naumann
+ - Mikko Pesari
  - Krzysztof Pyrkosz
+ - Aurélien Fontaine
  - ncou
  - Ian Carroll
  - caponica
+ - jdcook
  - Daniel Kay (danielkay-cp)
  - Matt Daum (daum)
+ - Malcolm Fell (emarref)
  - Alberto Pirovano (geezmo)
  - inwebo veritas (inwebo)
  - Pascal Woerde (pascalwoerde)
  - Pete Mitchell (peterjmit)
+ - phuc vo (phucwan)
  - Tom Corrigan (tomcorrigan)
  - Luis Galeas
+ - Bogdan Scordaliu
  - Martin Pärtel
+ - Daniel Rotter (danrot)
  - Frédéric Bouchery (fbouchery)
  - Patrick Daley (padrig)
  - Phillip Look (plook)
+ - Foxprodev
+ - developer-av
  - Max Summe
  - Ema Panz
+ - Hugo Sales
+ - Dale.Nash
  - DidierLmn
+ - Pedro Silva
  - Chihiro Adachi (chihiro-adachi)
  - Thomas Trautner (thomastr)
+ - Jeroen de Graaf
+ - Ulrik McArdle
+ - BiaDd
  - mfettig
+ - Oleksii Bulba
+ - Ramon Cuñat
  - Raphaëll Roussel
+ - Vitalii
  - Tadcka
+ - Bárbara Luz
  - Abudarham Yuval
  - Beth Binkovitz
+ - adhamiamirhossein
+ - Maxim Semkin
  - Gonzalo Míguez
+ - Evan C
+ - BrokenSourceCode
+ - Fabian Haase
+ - parinz1234
  - Romain Geissler
  - Adrien Moiruad
+ - Natsuki Ikeguchi
+ - Viktoriia Zolotova
  - Tomaz Ahlin
  - Nasim
+ - Randel Palu
+ - Anamarija Papić (anamarijapapic)
  - AnotherSymfonyUser (arderyp)
  - Marcus Stöhr (dafish)
  - Daniel González Zaballos (dem3trio)
  - Emmanuel Vella (emmanuel.vella)
+ - Giuseppe Petraroli (gpetraroli)
  - Guillaume BRETOU (guiguiboy)
  - Ibon Conesa (ibonkonesa)
  - Yoann Chocteau (kezaweb)
+ - Nikita Popov (nikic)
  - nuryagdy mustapayev (nueron)
  - Carsten Nielsen (phreaknerd)
- - lepeule (vlepeule)
+ - Valérian Lepeule (vlepeule)
+ - Michael Olšavský
  - Jay Severson
+ - Benny Born
  - Stefan Moonen
+ - Emirald Mateli
  - René Kerner
  - Nathaniel Catchpole
  - upchuk
@@ -2571,11 +2236,17 @@ The Symfony Connect username in parenthesis allows to get more information
  - Andriy Prokopenko (sleepyboy)
  - Dariusz Ruminski
  - Starfox64
+ - Ivo Valchev
  - Thomas Hanke
  - Daniel Tschinder
  - Arnaud CHASSEUX
+ - Zlatoslav Desyatnikov
+ - Wickex
+ - tuqqu
  - Wojciech Gorczyca
+ - Neagu Cristian-Doru (cristian-neagu)
  - Mathieu Morlon (glutamatt)
+ - Owen Gray (otis)
  - Rafał Muszyński (rafmus90)
  - Sébastien Decrême (sebdec)
  - Timothy Anido (xanido)
@@ -2583,42 +2254,64 @@ The Symfony Connect username in parenthesis allows to get more information
  - Mara Blaga
  - Rick Prent
  - skalpa
- - Pierre Foresi
+ - Kai
+ - Jonathan H. Wage
+ - Bartłomiej Zając
  - Pieter Jordaan
  - Tournoud (damientournoud)
  - Michael Dowling (mtdowling)
  - Karlos Presumido (oneko)
+ - Pierre Foresi (pforesi)
  - Tony Vermeiren (tony)
+ - Bart Wach
+ - Jos Elstgeest
+ - Kirill Lazarev
  - Thomas Counsell
  - BilgeXA
  - mmokhi
  - javaDeveloperKid
+ - Serhii Smirnov
  - Robert Queck
  - Peter Bouwdewijn
+ - Martins Eglitis
  - Daniil Gentili
  - Eduard Morcinek
+ - Wouter Diesveld
+ - Romain
+ - Matěj Humpál
  - Amine Matmati
  - Kristen Gilden
  - caalholm
  - Nouhail AL FIDI (alfidi)
  - Fabian Steiner (fabstei)
  - Felipy Amorim (felipyamorim)
+ - Guillaume Loulier (guikingone)
  - Michael Lively (mlivelyjr)
+ - Pierre Grimaud (pgrimaud)
  - Abderrahim (phydev)
  - Attila Bukor (r1pp3rj4ck)
  - Thomas Boileau (tboileau)
+ - Alexander Janssen (tnajanssen)
  - Thomas Chmielowiec (chmielot)
  - Jānis Lukss
+ - Julien BERNARD
+ - Michael Zangerle
  - rkerner
  - Alex Silcock
+ - Raphael Hardt
  - Qingshan Luo
  - Ergie Gonzaga
  - Matthew J Mucklo
  - AnrDaemon
+ - SnakePin
+ - Matthew Covey
  - Tristan Kretzer
  - Charly Terrier (charlypoppins)
+ - Dcp (decap94)
  - Emre Akinci (emre)
+ - Chris Maiden (matason)
  - psampaz (psampaz)
+ - Andrea Ruggiero (pupax)
  - Stan Jansen (stanjan)
  - Maxwell Vandervelde
  - kaywalker
@@ -2630,9 +2323,11 @@ The Symfony Connect username in parenthesis allows to get more information
  - Simon Neidhold
  - Valentin VALCIU
  - Jeremiah VALERIE
+ - Alexandre Beaujour
  - Franck Ranaivo-Harisoa
  - Cas van Dongen
  - Patrik Patie Gmitter
+ - George Yiannoulopoulos
  - Yannick Snobbert
  - Kevin Dew
  - James Cowgill
@@ -2642,10 +2337,15 @@ The Symfony Connect username in parenthesis allows to get more information
  - Nicolas Schwartz (nicoschwartz)
  - Tim Jabs (rubinum)
  - Stéphane Seng (stephaneseng)
+ - Peter Schultz
  - Robert Korulczyk
  - Jonathan Gough
+ - Benhssaein Youssef
  - Benoit Leveque
+ - bill moll
  - Benjamin Bender
+ - PaoRuby
+ - Bizley
  - Jared Farrish
  - Yohann Tilotti
  - karl.rixon
@@ -2653,78 +2353,116 @@ The Symfony Connect username in parenthesis allows to get more information
  - Konrad Mohrfeldt
  - Lance Chen
  - Ciaran McNulty (ciaranmcnulty)
+ - Dominik Piekarski (dompie)
  - Andrew (drew)
  - j4nr6n (j4nr6n)
+ - Rares Sebastian Moldovan (raresmldvn)
  - Stelian Mocanita (stelian)
  - Gautier Deuette
+ - dsech
+ - Gilbertsoft
+ - tadas
+ - Bastien Picharles
  - Kirk Madera
+ - mamazu
  - Keith Maika
  - izenin
  - Mephistofeles
  - Oleh Korneliuk
  - Hoffmann András
  - LubenZA
+ - Victor Garcia
+ - Juan Mrad
+ - Denis Yuzhanin
  - Flavian Sierk
  - Rik van der Heijden
+ - knezmilos13
+ - alireza
  - Michael Bessolov
  - Zdeněk Drahoš
  - Dan Harper
  - moldcraft
+ - Marcin Kruk
  - Antoine Bellion (abellion)
  - Ramon Kleiss (akathos)
  - Alexey Buyanow (alexbuyanow)
  - Antonio Peric-Mazar (antonioperic)
  - César Suárez (csuarez)
  - Bjorn Twachtmann (dotbjorn)
+ - Marek Víger (freezy)
  - Goran (gog)
+ - Wahyu Kristianto (kristories)
  - Tobias Genberg (lorceroth)
  - Michael Simonson (mikes)
  - Nicolas Badey (nico-b)
  - Olivier Scherler (oscherler)
  - Shane Preece (shane)
+ - Stephan Wentz (temp)
  - Johannes Goslar
  - Mike Gladysch
  - Geoff
  - georaldc
  - wusuopu
+ - Markus Staab
  - Wouter de Wild
  - Peter Potrowl
  - povilas
  - Gavin Staniforth
+ - bahram
  - Alessandro Tagliapietra (alex88)
  - Nikita Starshinov (biji)
  - Alex Teterin (errogaht)
  - Gunnar Lium (gunnarlium)
  - Malte Wunsch (maltewunsch)
+ - Marie Minasyan (marie.minassyan)
  - Simo Heinonen (simoheinonen)
+ - Szymon Kamiński (szk)
  - Tiago Garcia (tiagojsag)
  - Artiom
  - Jakub Simon
+ - robin.de.croock
  - Brandon Antonio Lorenzo
  - Bouke Haarsma
  - Boris Medvedev
  - mlievertz
+ - Radosław Kowalewski
  - Enrico Schultz
  - tpetry
+ - JustDylan23
+ - Juraj Surman
  - Martin Eckhardt
  - natechicago
+ - Victor
+ - Andreas Allacher
+ - Alexis
  - Leonid Terentyev
  - Sergei Gorjunov
  - Jonathan Poston
  - Adrian Olek (adrianolek)
+ - Camille Dejoye (cdejoye)
+ - cybernet (cybernet2u)
  - Jody Mickey (jwmickey)
  - Przemysław Piechota (kibao)
  - Martin Schophaus (m_schophaus_adcada)
  - Martynas Sudintas (martiis)
  - Anton Sukhachev (mrsuh)
+ - Stefan Kleff (stefanxl)
+ - Thijs-jan Veldhuizen (tjveldhuizen)
  - Vitaliy Zhuk (zhukv)
  - Marcel Siegert
  - ryunosuke
+ - Bruno BOUTAREL
  - Roy de Vos Burchart
+ - John Stevenson
+ - everyx
  - Francisco Facioni (fran6co)
+ - Stanislav Gamaiunov (happyproff)
  - Iwan van Staveren (istaveren)
+ - Alexander McCullagh (mccullagh)
+ - Paul L McNeely (mcneely)
  - Povilas S. (povilas)
  - Laurent Negre (raulnet)
+ - Sergey Fokin (tyraelqp)
  - Victoria Quirante Ruiz (victoria)
  - Evrard Boulou
  - pborreli
@@ -2736,19 +2474,33 @@ The Symfony Connect username in parenthesis allows to get more information
  - Wing
  - Thomas Bibb
  - Stefan Koopmanschap
+ - Joni Halme
  - Matt Farmer
  - catch
+ - aetxebeste
+ - roromix
+ - Vitali Tsyrkin
+ - Juga Paazmaya
  - Alexandre Segura
- - Asier Etxebeste
+ - afaricamp
  - Josef Cech
+ - riadh26
  - AntoineDly
+ - Konstantinos Alexiou
  - Andrii Boiko
+ - Dilek Erkut
  - Harold Iedema
+ - WaiSkats
+ - Morimoto Ryosuke
  - Ikhsan Agustian
  - Benoit Lévêque (benoit_leveque)
+ - Bernat Llibre Martín (bernatllibre)
  - Simon Bouland (bouland)
+ - Christoph König (chriskoenig)
+ - Dmytro Pigin (dotty)
  - Jakub Janata (janatjak)
  - Jibé Barth (jibbarth)
+ - Jm Aribau (jmaribau)
  - Matthew Foster (mfoster)
  - Paul Seiffert (seiffert)
  - Vasily Khayrulin (sirian)
@@ -2756,23 +2508,28 @@ The Symfony Connect username in parenthesis allows to get more information
  - Stefan Hüsges (tronsha)
  - Jake Bishop (yakobeyak)
  - Dan Blows
+ - popnikos
  - Matt Wells
  - Nicolas Appriou
  - Javier Alfonso Bellota de Frutos
  - stloyd
+ - Tito Costa
  - Andreas
  - Chris Tickner
  - Andrew Coulton
  - Ulugbek Miniyarov
  - Jeremy Benoist
- - sdrewergutland
  - Michal Gebauer
  - René Landgrebe
  - Phil Davis
+ - Thiago Melo
  - Gleb Sidora
  - David Stone
+ - Giorgio Premi
+ - Gerhard Seidel (gseidel)
  - Jovan Perovic (jperovic)
  - Pablo Maria Martelletti (pmartelletti)
+ - Sebastian Drewer-Gutland (sdg)
  - Sander van der Vlugt (stranding)
  - Maxim Tugaev (tugmaks)
  - Florian Bogey
@@ -2783,27 +2540,38 @@ The Symfony Connect username in parenthesis allows to get more information
  - Kris Buist
  - Houziaux mike
  - Phobetor
+ - Eric Schildkamp
  - Yoann MOROCUTTI
  - d.huethorst
  - Markus
  - Zayan Goripov
+ - agaktr
  - Janusz Mocek
+ - Mostafa
+ - kernig
  - Thomas Chmielowiec
  - shdev
  - Andrey Ryaguzov
+ - Gennadi Janzen
+ - SenTisso
  - Stefan
  - Peter Bex
  - Manatsawin Hanmongkolchai
  - Gunther Konig
+ - Joe Springe
  - Mickael GOETZ
  - Tobias Speicher
  - Jesper Noordsij
  - DerStoffel
+ - Flinsch
  - Maciej Schmidt
+ - botbotbot
  - tatankat
+ - Timon van der Vorm
  - nuncanada
  - Thierry Marianne
  - František Bereň
+ - G.R.Dalenoort
  - Jeremiah VALERIE
  - Mike Francis
  - Nil Borodulia
@@ -2811,28 +2579,43 @@ The Symfony Connect username in parenthesis allows to get more information
  - Almog Baku (almogbaku)
  - Arrakis (arrakis)
  - Benjamin Schultz (bschultz)
+ - Vladimir Khramtsov (chrome)
  - Gerd Christian Kunze (derdu)
+ - Stephanie Trumtel (einahp)
+ - Denys Voronin (hurricane)
  - Ionel Scutelnicu (ionelscutelnicu)
+ - Jordan de Laune (jdelaune)
+ - Juan Gonzalez Montes (juanwilde)
  - Kamil Madejski (kmadejski)
+ - Mathieu Dewet (mdewet)
+ - none (nelexa)
  - Nicolas Tallefourtané (nicolab)
  - Botond Dani (picur)
+ - Rémi Faivre (rfv)
  - Radek Wionczek (rwionczek)
  - Nick Stemerdink
+ - Bernhard Rusch
  - David Stone
  - Vincent Bouzeran
  - Grayson Koonce
+ - Ruben Jansen
  - Wissame MEKHILEF
+ - Marc Biorklund
+ - shreypuranik
  - NanoSector
+ - Thibaut Salanon
  - Romain Dorgueil
  - Christopher Parotat
+ - Andrey Helldar
  - Dennis Haarbrink
  - Daniel Kozák
+ - Urban Suppiger
  - 蝦米
  - Julius Beckmann (h4cc)
- - Andrey Helldar (helldar)
  - Julien JANVIER (jjanvier)
  - Karim Cassam Chenaï (ka)
  - Lorenzo Adinolfi (loru88)
+ - Marcello Mönkemeyer (marcello-moenkemeyer)
  - Ahmed Shamim Hassan (me_shaon)
  - Michal Kurzeja (mkurzeja)
  - Nicolas Bastien (nicolas_bastien)
@@ -2840,13 +2623,20 @@ The Symfony Connect username in parenthesis allows to get more information
  - Andrew Zhilin (zhil)
  - Sjors Ottjes
  - azjezz
+ - VojtaB
  - Andy Stanberry
  - Felix Marezki
  - Normunds
+ - Yuri Karaban
  - Walter Doekes
+ - Johan
  - Thomas Rothe
+ - Edwin
  - Troy Crawford
+ - Jeroen van den Nieuwenhuisen
  - nietonfir
+ - Andriy
+ - Taylor Otwell
  - alefranz
  - David Barratt
  - Andrea Giannantonio
@@ -2855,34 +2645,58 @@ The Symfony Connect username in parenthesis allows to get more information
  - Pavel Prischepa
  - Philip Dahlstrøm
  - Pierre Schmitz
+ - Sami Mussbach
+ - qzylalala
  - alsar
  - downace
  - Aarón Nieves Fernández
+ - Mikolaj Czajkowski
  - Ph3nol
  - Kirill Saksin
+ - Shiro
+ - Reda DAOUDI
  - Koalabaerchen
  - michalmarcinkowski
  - Warwick
  - Chris
  - Farid Jalilov
+ - Christiaan Wiesenekker
  - Florent Olivaud
+ - Foxprodev
+ - Eric Hertwig
  - JakeFr
+ - Dmitry Hordinky
+ - Oliver Klee
+ - Niels Robin-Aubertin
  - Simon Sargeant
  - efeen
+ - Mikko Ala-Fossi
+ - Jan Christoph Beyer
  - Nicolas Pion
  - Muhammed Akbulut
+ - Daniel Tiringer
  - Xesau
+ - Koray Zorluoglu
+ - Roy-Orbison
  - Aaron Somi
+ - kshida
+ - Yasmany Cubela Medina (bitgandtter)
  - Michał Dąbrowski (defrag)
+ - Aryel Tupinamba (dfkimera)
+ - Hans Höchtl (hhoechtl)
  - Simone Fumagalli (hpatoio)
  - Brian Graham (incognito)
  - Kevin Vergauwen (innocenzo)
  - Alessio Baglio (ioalessio)
+ - Jawira Portugal (jawira)
  - Johannes Müller (johmue)
  - Jordi Llonch (jordillonch)
  - julien_tempo1 (julien_tempo1)
+ - Roman Igoshin (masterro)
  - Nicholas Ruunu (nicholasruunu)
+ - Pierre Rebeilleau (pierrereb)
  - Milos Colakovic (project2481)
+ - Raphael de Almeida (raphaeldealmeida)
  - Rénald Casagraude (rcasagraude)
  - Robin Duval (robin-duval)
  - Mohammad Ali Sarbanha (sarbanha)
@@ -2891,52 +2705,65 @@ The Symfony Connect username in parenthesis allows to get more information
  - alex
  - evgkord
  - Roman Orlov
+ - Simon Ackermann
  - Andreas Allacher
  - VolCh
  - Alexey Popkov
  - Gijs Kunze
  - Artyom Protaskin
+ - Steven Dubois
  - Nathanael d. Noblet
- - PEHAUT-PIETRI Valmont
  - Yurun
  - helmer
  - ged15
  - Simon Asika
  - Daan van Renterghem
+ - Bálint Szekeres
  - Boudry Julien
  - amcastror
  - Bram Van der Sype (brammm)
  - Guile (guile)
- - Yuriy Vilks (igrizzli)
+ - Mark Beech (jaybizzle)
  - Julien Moulin (lizjulien)
  - Raito Akehanareru (raito)
  - Mauro Foti (skler)
  - skmedix (skmedix)
+ - Thibaut Arnoud (thibautarnoud)
+ - Valmont Pehaut-Pietri (valmonzo)
  - Yannick Warnier (ywarnier)
  - Jörn Lang
  - Kevin Decherf
  - Paul LE CORRE
- - Jason Woods
+ - Christian Weiske
+ - Maria Grazia Patteri
  - klemens
  - dened
+ - muchafm
  - jpauli
  - Dmitry Korotovsky
  - Michael van Tricht
  - ReScO
  - Tim Strehle
+ - Sébastien COURJEAN
  - cay89
  - Sam Ward
  - Hans N. Hjort
+ - Marko Vušak
  - Walther Lalk
  - Adam
  - Ivo
+ - Ismo Vuorinen
  - Markus Staab
+ - Valentin
  - Sören Bernstein
  - michael.kubovic
  - devel
  - taiiiraaa
+ - Ali Tavafi
  - gedrox
+ - Viet Pham
  - Alan Bondarchuk
+ - Pchol
  - Cyril HERRERA
  - dropfen
  - Andrey Chernykh
@@ -2946,16 +2773,22 @@ The Symfony Connect username in parenthesis allows to get more information
  - Kevin EMO
  - Chansig
  - Tischoi
+ - divinity76
  - Andreas Hasenack
  - J Bruni
  - Alexey Prilipko
  - vlakoff
  - thib92
+ - Yiorgos Kalligeros
  - Rudolf Ratusiński
  - Bertalan Attila
+ - Arek Bochinski
+ - Rafael Tovar
+ - Amin Hosseini (aminh)
  - AmsTaFF (amstaff)
  - Simon Müller (boscho)
  - Yannick Bensacq (cibou)
+ - Cyrille Bourgois (cyrilleb)
  - Damien Vauchel (damien_vauchel)
  - Dmitrii Fedorenko (dmifedorenko)
  - Frédéric G. Marand (fgm)
@@ -2968,16 +2801,25 @@ The Symfony Connect username in parenthesis allows to get more information
  - Maxime Corteel (mcorteel)
  - Dan Patrick (mdpatrick)
  - Mathieu MARCHOIS (mmar)
+ - Geoffrey Monte (numerogeek)
+ - Martijn Boers (plebian)
+ - Plamen Mishev (pmishev)
  - Pedro Magalhães (pmmaga)
  - Rares Vlaseanu (raresvla)
  - Trevor N. Suarez (rican7)
+ - Sergii Dolgushev (serhey)
  - Clément Bertillon (skigun)
+ - Rein Baarsma (solidwebcode)
  - tante kinast (tante)
- - Adam RANDI (tiecoders)
+ - Stephen Lewis (tehanomalousone)
+ - Ahmed HANNACHI (tiecoders)
  - Vincent LEFORT (vlefort)
  - Walid BOUGHDIRI (walidboughdiri)
+ - Wim Molenberghs (wimm)
  - Darryl Hein (xmmedia)
  - Vladimir Sadicov (xtech)
+ - Marcel Berteler
+ - sdkawata
  - Peter van Dommelen
  - Tim van Densen
  - Andrzej
@@ -2997,10 +2839,13 @@ The Symfony Connect username in parenthesis allows to get more information
  - Tom Maguire
  - Mateusz Lerczak
  - Richard Quadling
+ - Rainrider
  - David Zuelke
  - Adrian
+ - Oliver Eglseder
  - neFAST
  - Peter Gribanov
+ - zcodes
  - Pierre Rineau
  - Florian Morello
  - Maxim Lovchikov
@@ -3011,60 +2856,94 @@ The Symfony Connect username in parenthesis allows to get more information
  - Jan Eichhorn (exeu)
  - Georg Ringer (georgringer)
  - Grégory Pelletier (ip512)
+ - Johan Wilfer (johanwilfer)
  - John Nickell (jrnickell)
  - Martin Mayer (martin)
  - Grzegorz Łukaszewicz (newicz)
  - Omar Yepez (oyepez003)
  - Jonny Schmid (schmidjon)
+ - Toby Griffiths (tog)
+ - Ashura
  - Götz Gottwald
- - Adrien Peyre
+ - Alessandra Lai
  - Christoph Krapp
+ - Ernest Hymel
+ - Andrea Civita
+ - Nicolás Alonso
+ - LoginovIlya
  - andreyserdjuk
  - Nick Chiu
  - Robert Campbell
  - Matt Lehner
+ - carlos-ea
+ - Olexandr Kalaidzhy
  - Helmut Januschka
+ - Jérémy Benoist
  - Hein Zaw Htet™
  - Kieran
  - Ruben Kruiswijk
  - Cosmin-Romeo TANASE
+ - Ferran Vidal
  - Michael J
+ - youssef saoubou
  - Joseph Maarek
  - Alexander Menk
  - Alex Pods
  - timaschew
  - Jelle Kapitein
  - Jochen Mandl
+ - elattariyassine
  - Marin Nicolae
  - Gerrit Addiks
  - Albert Prat
  - Alessandro Loffredo
  - Ian Phillips
+ - Carlos Tasada
  - Remi Collet
  - Haritz
  - Matthieu Prat
  - Brieuc Thomas
+ - zors1
+ - Peter Simoncic
+ - lerminou
+ - Ahmad El-Bardan
  - mantulo
+ - pdragun
  - Paul Le Corre
+ - Noel Light-Hilary
  - Filipe Guerra
  - Jean Ragouin
  - Gerben Wijnja
+ - Emre YILMAZ
  - Rowan Manning
  - qsz
+ - Marcos Labad
  - Per Modin
  - David Windell
+ - Frank Jogeleit
+ - Ondřej Frei
  - Gabriel Birke
  - Derek Bonner
  - martijn
+ - Jenne van der Meer
  - annesosensio
  - NothingWeAre
+ - Storkeus
  - goabonga
  - Alan Chen
+ - Anton Zagorskii
+ - ging-dev
  - Maerlyn
  - Even André Fiskvik
+ - Agata
+ - dakur
+ - florian-michael-mast
  - tourze
+ - Vlad Dumitrache
  - Erik van Wingerden
  - Valouleloup
+ - robmro27
+ - Vallel Blanco
  - Alexis MARQUIS
  - Matheus Gontijo
  - Gerrit Drost
@@ -3078,23 +2957,32 @@ The Symfony Connect username in parenthesis allows to get more information
  - hainey
  - Juan M Martínez
  - Gilles Gauthier
+ - Benjamin Franzke
+ - Pavinthan
+ - Sylvain METAYER
  - ddebree
  - Gyula Szucs
  - Tomas Liubinas
+ - Ivo Valchev
  - Jan Hort
  - Klaas Naaijkens
  - Rafał
  - Adria Lopez (adlpz)
+ - Adrien Peyre (adpeyre)
  - Aaron Scherer (aequasi)
  - Alexandre Jardin (alexandre.jardin)
  - Bart Brouwer (bartbrouwer)
+ - baron (bastien)
+ - Bastien Clément (bastienclement)
  - Rosio (ben-rosio)
  - Simon Paarlberg (blamh)
  - Masao Maeda (brtriver)
+ - Damien Harper (damien.harper)
  - Darius Leskauskas (darles)
  - david perez (davidpv)
  - David Joos (djoos)
  - Denis Klementjev (dklementjev)
+ - Dominik Pesch (dombn)
  - Dominik Hajduk (dominikalp)
  - Tomáš Polívka (draczris)
  - Dennis Smink (dsmink)
@@ -3106,6 +2994,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Hadrien Cren (hcren)
  - Gusakov Nikita (hell0w0rd)
  - Oz (import)
+ - Jaap van Otterdijk (jaapio)
  - Javier Núñez Berrocoso (javiernuber)
  - Jelle Bekker (jbekker)
  - Giovanni Albero (johntree)
@@ -3113,52 +3002,82 @@ The Symfony Connect username in parenthesis allows to get more information
  - Joeri Verdeyen (jverdeyen)
  - Kevin Verschaeve (keversc)
  - Kevin Herrera (kherge)
+ - Kubicki Kamil (kubik)
  - Luis Ramón López López (lrlopez)
+ - Vladislav Nikolayev (luxemate)
+ - Martin Mandl (m2mtech)
  - Mehdi Mabrouk (mehdidev)
  - Bart Reunes (metalarend)
  - Muriel (metalmumu)
  - Michael Pohlers (mick_the_big)
+ - Misha Klomp (mishaklomp)
  - mlpo (mlpo)
+ - Mikhail Prosalov (mprosalov)
+ - Ulrik Nielsen (mrbase)
  - Marek Šimeček (mssimi)
  - Dmitriy Tkachenko (neka)
  - Cayetano Soriano Gallego (neoshadybeat)
+ - Artem (nexim)
+ - Nicolas ASSING (nicolasassing)
  - Olivier Laviale (olvlvl)
+ - Pierre Gasté (pierre_g)
  - Pablo Monterde Perez (plebs)
+ - Pierre-Olivier Vares (povares)
  - Jimmy Leger (redpanda)
+ - Ronny López (ronnylt)
+ - Julius (sakalys)
  - Sébastien JEAN (sebastien76)
  - Mokhtar Tlili (sf-djuba)
+ - Dmitry (staratel)
  - Marcin Szepczynski (szepczynski)
+ - Tito Miguel Costa (titomiguelcosta)
  - Simone Di  Maulo (toretto460)
  - Cyrille Jouineau (tuxosaurus)
  - Lajos Veres (vlajos)
  - Vladimir Chernyshev (volch)
+ - Wim Godden (wimg)
  - Yorkie Chadwick (yorkie76)
+ - Zakaria AMMOURA (zakariaamm)
+ - Maxime Aknin (3m1x4m)
+ - Geordie
  - Pavel Barton
+ - Exploit.cz
  - GuillaumeVerdon
  - Marien Fressinaud
  - ureimers
  - akimsko
  - Youpie
+ - Jason Stephens
  - srsbiz
+ - Tinjo Schöni
  - Taylan Kasap
  - Michael Orlitzky
  - Nicolas A. Bérard-Nault
+ - Quentin Favrie
+ - Matthias Derer
  - Francois Martin
+ - vladyslavstartsev
  - Saem Ghani
+ - Kévin
  - Stefan Oderbolz
  - Tamás Szigeti
  - Gabriel Moreira
  - Alexey Popkov
  - ChS
+ - michal
  - Jannik Zschiesche
  - Alexis MARQUIS
  - Joseph Deray
  - Damian Sromek
  - Ben
  - Evgeniy Tetenchuk
+ - Sjoerd Adema
  - Shrey Puranik
+ - Kai Eichinger
+ - Evgeniy Koval
  - Lars Moelleken
  - dasmfm
+ - Claas Augner
  - Baptiste CONTRERAS
  - Mathias Geat
  - Angel Fernando Quiroz Campos (angelfqc)
@@ -3169,10 +3088,13 @@ The Symfony Connect username in parenthesis allows to get more information
  - HADJEDJ Vincent (hadjedjvincent)
  - Daniele Cesarini (ijanki)
  - Ismail Asci (ismailasci)
+ - Jeffrey Moelands (jeffreymoelands)
  - Ondřej Mirtes (mirtes)
  - Paulius Jarmalavičius (pjarmalavicius)
  - Ramon Ornelas (ramonornela)
  - Ricardo de Vries (ricardodevries)
+ - Ruslan Zavacky (ruslanzavacky)
+ - Stefano Cappellini (stefano_cappellini)
  - Thomas Dutrion (theocrite)
  - Till Klampaeckel (till)
  - Tobias Weinert (tweini)
@@ -3180,39 +3102,57 @@ The Symfony Connect username in parenthesis allows to get more information
  - goohib
  - Tom Counsell
  - Sepehr Lajevardi
+ - George Bateman
  - Xavier HAUSHERR
  - Edwin Hageman
  - Mantas Urnieža
  - temperatur
  - Paul Andrieux
  - Sezil
+ - misterx
  - Cas
+ - arend
+ - Vincent Godé
+ - helmi
+ - Michael Steininger
+ - Nardberjean
  - ghazy ben ahmed
  - Karolis
  - Myke79
+ - jersoe
  - Brian Debuire
+ - Eric Grimois
  - Piers Warmers
  - Sylvain Lorinet
  - klyk50
  - jc
  - BenjaminBeck
  - Aurelijus Rožėnas
+ - Beno!t POLASZEK
+ - Armando
  - Jordan Hoff
  - znerol
  - Christian Eikermann
  - Sergei Shitikov
  - Steffen Keuper
+ - Kai Eichinger
  - Antonio Angelino
- - Pavel Golovin
+ - Jens Schulze
  - Tema Yud
  - Matt Fields
+ - Olatunbosun Egberinde
  - Andras Debreczeni
+ - Knallcharge
  - Vladimir Sazhin
+ - Michel Bardelmeijer
  - Tomas Kmieliauskas
+ - Ikko Ashimine
+ - Erwin Dirks
+ - Markus Ramšak
  - Billie Thompson
+ - Philipp
  - lol768
  - jamogon
- - Antoine LA
  - Vyacheslav Slinko
  - Benjamin Laugueux
  - Lane Shukhov
@@ -3220,7 +3160,11 @@ The Symfony Connect username in parenthesis allows to get more information
  - William Pinaud (DocFX)
  - Johannes
  - Jörg Rühl
+ - George Dietrich
+ - jannick-holm
  - wesleyh
+ - Menno Holtkamp
+ - Ser5
  - Michael Hudson-Doyle
  - Daniel Bannert
  - Karim Miladi
@@ -3228,6 +3172,8 @@ The Symfony Connect username in parenthesis allows to get more information
  - patrick-mcdougle
  - Tyler Stroud
  - Dariusz Czech
+ - Clemens Krack
+ - Bruno Baguette
  - Jack Wright
  - MrNicodemuz
  - Anonymous User
@@ -3237,39 +3183,57 @@ The Symfony Connect username in parenthesis allows to get more information
  - Blackfelix
  - Pavel Witassek
  - Alexandru Bucur
+ - Alexis Lefebvre
  - cmfcmf
+ - sarah-eit
+ - Michal Forbak
  - Drew Butler
+ - Alexey Berezuev
  - pawel-lewtak
+ - Pierrick Charron
  - Steve Müller
  - omerida
  - Andras Ratz
  - andreabreu98
+ - gechetspr
+ - brian978
  - Michael Schneider
  - n-aleha
+ - Talha Zekeriya Durmuş
  - Anatol Belski
  - Alexis BOYER
  - Shyim
+ - bch36
  - Kaipi Yann
  - wiseguy1394
  - adam-mospan
+ - Steve Hyde
  - nerdgod
  - Sam Williams
+ - Ettore Del Negro
  - Guillaume Aveline
  - Adrian Philipp
  - James Michael DuPont
  - Markus Tacker
+ - Tomáš Votruba
  - Kasperki
+ - dima-gr
  - Daniel Strøm
  - Tammy D
+ - Rodolfo Ruiz
+ - tsilefy
+ - Enrico
  - Adrien Foulon
  - Ryan Rud
  - Ondrej Slinták
+ - Jérémie Broutier
  - vlechemin
  - Brian Corrigan
  - Ladislav Tánczos
  - Brian Freytag
  - Skorney
  - Lucas Matte
+ - Success Go
  - fmarchalemisys
  - MGatner
  - mieszko4
@@ -3282,25 +3246,41 @@ The Symfony Connect username in parenthesis allows to get more information
  - bokonet
  - Arrilot
  - andrey-tech
+ - Chris McGehee
+ - Bastien THOMAS
  - Shaun Simmons
  - Pierre-Louis LAUNAY
  - A. Pauly
  - djama
+ - Benjamin Rosenberger
+ - Vladyslav Startsev
  - Michael Gwynne
  - Eduardo Conceição
  - changmin.keum
  - Jon Cave
  - Sébastien HOUZE
  - Abdulkadir N. A.
+ - Markus Klein
  - Adam Klvač
+ - Bruno Nogueira Nascimento Wowk
+ - Tomanhez
+ - satalaondrej
+ - Matthias Dötsch
+ - jonmldr
  - Yevgen Kovalienia
  - Lebnik
  - Shude
+ - RTUnreal
+ - Richard Hodgson
+ - Sven Fabricius
+ - Antonio Mansilla
  - Ondřej Führer
+ - Bogdan
  - Sema
  - Ayke Halder
  - Thorsten Hallwas
  - Brian Freytag
+ - Marco Pfeiffer
  - Alex Nostadt
  - Michael Squires
  - Egor Gorbachev
@@ -3313,28 +3293,36 @@ The Symfony Connect username in parenthesis allows to get more information
  - enomotodev
  - Vincent
  - Benjamin Long
+ - Kévin Gonella
  - Ben Miller
  - Peter Gribanov
+ - Matteo Galli
  - Bart Ruysseveldt
+ - Ash014
+ - Loenix
  - kwiateusz
  - Ilya Bulakh
  - David Soria Parra
+ - Simon Frost
  - Sergiy Sokolenko
+ - Cantepie
+ - detinkin
  - Ahmed Abdulrahman
  - dinitrol
  - Penny Leach
  - Kevin Mian Kraiker
  - Yurii K
  - Richard Trebichavský
+ - Rich Sage
  - g123456789l
  - Mark Ogilvie
  - Jonathan Vollebregt
- - Vladimir Vasilev
  - oscartv
  - DanSync
  - Peter Zwosta
  - Michal Čihař
  - parhs
+ - Harry Wiseman
  - Diego Campoy
  - Oncle Tom
  - Sam Anthony
@@ -3342,15 +3330,23 @@ The Symfony Connect username in parenthesis allows to get more information
  - Oussama Elgoumri
  - Gert de Pagter
  - David Lima
+ - Steve Marvell
  - Dawid Nowak
  - Lesnykh Ilia
+ - Shyim
+ - sabruss
  - darnel
  - Nicolas
  - Sergio Santoro
  - tirnanog06
+ - Andrejs Leonovs
  - Alfonso Fernández García
  - phc
  - Дмитрий Пацура
+ - Signor Pedro
+ - Matthias Larisch
+ - Maxime  P
+ - Sean Templeton
  - db306
  - Michaël VEROUX
  - Julia
@@ -3359,20 +3355,29 @@ The Symfony Connect username in parenthesis allows to get more information
  - sualko
  - Fabien
  - Martin Komischke
+ - Yendric
  - ADmad
  - Nicolas Roudaire
+ - Matthias Meyer
  - Abdouni Karim (abdounikarim)
+ - Temuri Takalandze (abgeo)
+ - Bernard van der Esch (adeptofvoltron)
  - Adrian Günter (adrianguenter)
  - Andreas Forsblom (aforsblo)
  - Alex Olmos (alexolmos)
  - Cedric BERTOLINI (alsciende)
- - Antonio Mansilla (amansilla)
  - Robin Kanters (anddarerobin)
+ - Antoine (antoinela_adveris)
  - Juan Ases García (ases)
  - Siragusa (asiragusa)
  - Daniel Basten (axhm3a)
  - Albert Bakker (babbert)
+ - Benedict Massolle (bemas)
+ - Gerard Berengue Llobera (bere)
+ - Ronny (big-r)
  - Bernd Matzner (bmatzner)
+ - Vladimir Vasilev (bobahvas)
+ - Anton (bonio)
  - Sébastien Despont (bouillou)
  - Bram Tweedegolf (bram_tweedegolf)
  - Brandon Kelly (brandonkelly)
@@ -3380,10 +3385,12 @@ The Symfony Connect username in parenthesis allows to get more information
  - Bermon Clément (chou666)
  - Kousuke Ebihara (co3k)
  - Loïc Vernet (coil)
+ - Mior Muhammad Zaki (crynobone)
  - Christoph Vincent Schaefer (cvschaefer)
  - Kamil Piwowarski (cyklista)
  - Damon Jones (damon__jones)
  - David Courtey (david-crty)
+ - Alexandre Fiocre (demos77)
  - Łukasz Giza (destroyer)
  - Daniel Londero (dlondero)
  - Dušan Kasan (dudo1904)
@@ -3391,21 +3398,31 @@ The Symfony Connect username in parenthesis allows to get more information
  - Adel ELHAIBA (eadel)
  - Damián Nohales (eagleoneraptor)
  - Elliot Anderson (elliot)
+ - Erwan Nader (ernadoo)
  - Fabien D. (fabd)
+ - Faizan Akram Dar (faizanakram)
  - Carsten Eilers (fnc)
  - Sorin Gitlan (forapathy)
+ - Fraller Balázs (fracsi)
+ - Lesueurs Frédéric (fredlesueurs)
  - Yohan Giarelli (frequence-web)
  - Gerry Vandermaesen (gerryvdm)
  - Arash Tabrizian (ghost098)
+ - Greg Szczotka (greg606)
+ - Ian Littman (iansltx)
+ - Nathan DIdier (icz)
  - Vladislav Krupenkin (ideea)
  - Peter Orosz (ill_logical)
+ - Ilia Lazarev (ilzrv)
  - Imangazaliev Muhammad (imangazaliev)
+ - Arkadiusz Kondas (itcraftsmanpl)
  - j0k (j0k)
  - joris de wit (jdewit)
  - Jérémy CROMBEZ (jeremy)
  - Jose Manuel Gonzalez (jgonzalez)
  - Joachim Krempel (jkrempel)
  - Jorge Maiden (jorgemaiden)
+ - Joao Paulo V Martins (jpjoao)
  - Justin Rainbow (jrainbow)
  - Juan Luis (juanlugb)
  - JuntaTom (juntatom)
@@ -3419,11 +3436,16 @@ The Symfony Connect username in parenthesis allows to get more information
  - samuel laulhau (lalop)
  - Laurent Bachelier (laurentb)
  - Luís Cobucci (lcobucci)
+ - Jérémy (libertjeremy)
  - Mehdi Achour (machour)
+ - Mamikon Arakelyan (mamikon)
  - Matt Ketmo (mattketmo)
  - Moritz Borgmann (mborgmann)
  - Matt Drollette (mdrollette)
  - Adam Monsen (meonkeys)
+ - Mike Milano (mmilano)
+ - Guillaume Lajarige (molkobain)
+ - Diego Aguiar (mollokhan)
  - Steffen Persch (n3o77)
  - Ala Eddine Khefifi (nayzo)
  - emilienbouard (neime)
@@ -3433,14 +3455,18 @@ The Symfony Connect username in parenthesis allows to get more information
  - ollie harridge (ollietb)
  - Pawel Szczepanek (pauluz)
  - Philippe Degeeter (pdegeeter)
+ - PLAZANET Pierre (pedrotroller)
  - Christian López Espínola (penyaskito)
  - Petr Jaroš (petajaros)
+ - Pavel Golovin (pgolovin)
  - Philipp Hoffmann (philipphoffmann)
  - Alex Carol (picard89)
  - Daniel Perez Pinazo (pitiflautico)
+ - Igor Tarasov (polosatus)
  - Maksym Pustynnikov (pustynnikov)
  - Ralf Kühnel (ralfkuehnel)
- - Rich Sage (richsage)
+ - Ramazan APAYDIN (rapaydin)
+ - Babichev Maxim (rez1dent3)
  - scourgen hung (scourgen)
  - Sebastian Busch (sebu)
  - Sergey Stavichenko (sergey_stavichenko)
@@ -3450,15 +3476,21 @@ The Symfony Connect username in parenthesis allows to get more information
  - Şəhriyar İmanov (shehriyari)
  - Thomas Baumgartner (shoplifter)
  - Schuyler Jager (sjager)
+ - Christopher Georg (sky-chris)
  - Volker (skydiablo)
+ - Francisco Alvarez (sormes)
  - Julien Sanchez (sumbobyboys)
+ - Stephan Vierkant (svierkant)
  - Ron Gähler (t-ronx)
  - Guillermo Gisinger (t3chn0r)
  - Tom Newby (tomnewbyau)
  - Andrew Clark (tqt_andrew_clark)
+ - Aaron Piotrowski (trowski)
  - David Lumaye (tux1124)
+ - Roman Tymoshyk (tymoshyk)
  - Moritz Kraft (userfriendly)
  - Víctor Mateo (victormateo)
+ - Vincent MOULENE (vints24)
  - David Grüner (vworldat)
  - Eugene Babushkin (warl)
  - Wouter Sioen (wouter_sioen)
@@ -3466,18 +3498,26 @@ The Symfony Connect username in parenthesis allows to get more information
  - Jesper Søndergaard Pedersen (zerrvox)
  - Florent Cailhol
  - szymek
+ - Ryan Linnit
  - Konrad
  - Kovacs Nicolas
  - craigmarvelley
  - Stano Turza
+ - Antoine Leblanc
  - drublic
+ - Andre Johnson
+ - MaPePeR
  - Andreas Streichardt
  - Alexandre Segura
+ - Marco Pfeiffer
+ - Vivien
  - Pascal Hofmann
+ - david-binda
  - smokeybear87
  - Gustavo Adrian
  - damaya
  - Kevin Weber
+ - Alexandru Năstase
  - Dionysis Arvanitis
  - Sergey Fedotov
  - Konstantin Scheumann
@@ -3485,13 +3525,16 @@ The Symfony Connect username in parenthesis allows to get more information
  - fh-github@fholzhauer.de
  - rogamoore
  - AbdElKader Bouadjadja
+ - ddegentesh
  - DSeemiller
  - Jan Emrich
+ - Anne-Julia Seitz
  - Mark Topper
  - Romain
  - Xavier REN
  - Kevin Meijer
  - max
+ - Alexander Bauer (abauer)
  - Ahmad Mayahi (ahmadmayahi)
  - Mohamed Karnichi (amiral)
  - Andrew Carter (andrewcarteruk)
@@ -3500,17 +3543,20 @@ The Symfony Connect username in parenthesis allows to get more information
  - Bogdan Rancichi (devck)
  - Daniel Kolvik (dkvk)
  - Marc Lemay (flug)
+ - Gabriel Solomon (gabrielsolomon)
  - Courcier Marvin (helyakin)
  - Henne Van Och (hennevo)
  - Jeroen De Dauw (jeroendedauw)
  - Maxime COLIN (maximecolin)
  - Muharrem Demirci (mdemirci)
  - Evgeny Z (meze)
+ - Aleksandar Dimitrov (netbull)
  - Pierre-Henry Soria 🌴 (pierrehenry)
  - Pierre Geyer (ptheg)
  - Thomas BERTRAND (sevrahk)
  - Vladislav (simpson)
  - Matej Žilák (teo_sk)
+ - Gary Houbre (thegarious)
  - Vladislav Vlastovskiy (vlastv)
  - RENAUDIN Xavier (xorrox)
  - Yannick Vanhaeren (yvh)

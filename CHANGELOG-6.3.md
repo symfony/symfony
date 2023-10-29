@@ -7,6 +7,21 @@ in 6.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.3.0...v6.3.1
 
+* 6.3.7 (2023-10-29)
+
+ * bug #52329 [HttpClient] Psr18Client: parse HTTP Reason Phrase for Response (Hanmac)
+ * bug #52332 [Yaml] Fix deprecated passing null to trim() (javaDeveloperKid)
+ * bug #52343 [Intl] Update the ICU data to 74.1 (jderusse)
+ * bug #52347 [Form] Fix merging form data and files (ter) (Jan Pintr)
+ * bug #52307 [Scheduler] Save checkpoint in a finally block (FrancoisPog)
+ * bug #52308 [SecurityBundle] Fix missing login-link element in xsd schema (fancyweb)
+ * bug #51992 [Serializer] Fix using `DateIntervalNormalizer` with union types (Jeroeny)
+ * bug #52276 DB table locks on messenger_messages with many failures (bn-jdcook)
+ * bug #52232 [Messenger] declare constructor argument as optional for backwards compatibility (xabbuh)
+ * bug #52283 [Serializer] Handle default context when denormalizing timestamps in DateTimeNormalizer (mtarld)
+ * bug #52268 [Mailer][Notifier] Update Sendinblue / Brevo API host (Stephanie)
+ * bug #52255 [Form] Skip merging params & files if there are no files in the first place (dmaicher, priyadi)
+
 * 6.3.6 (2023-10-21)
 
  * bug #52201 [HttpKernel] Resolve EBADP error on flock with LOCK_SH with NFS (driskell)

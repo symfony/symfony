@@ -100,11 +100,7 @@ class MessageGeneratorTest extends TestCase
         ];
         $schedule = [[$first, '22:13:00', '22:14:00']];
 
-        // for referencing
-        $now = self::makeDateTime($startTime);
-
-        $clock = $this->createMock(ClockInterface::class);
-        $clock->method('now')->willReturnReference($now);
+        $clock = new MockClock(self::makeDateTime($startTime));
 
         foreach ($schedule as $i => $s) {
             if (\is_array($s)) {
@@ -142,7 +138,7 @@ class MessageGeneratorTest extends TestCase
         $toAdd = (object) ['id' => 'added-after-start'];
 
         foreach ($runs as $time => $expected) {
-            $now = self::makeDateTime($time);
+            $clock->modify($time);
             $this->assertSame($expected, iterator_to_array($scheduler->getMessages(), false));
         }
 
@@ -150,7 +146,7 @@ class MessageGeneratorTest extends TestCase
 
         $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
 
-        $now = self::makeDateTime('22:13:10');
+        $clock->sleep(9);
         $this->assertSame([$toAdd], iterator_to_array($scheduler->getMessages(), false));
     }
 

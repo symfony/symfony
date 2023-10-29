@@ -341,8 +341,8 @@ class Connection implements ResetInterface
                 $now,
             ], [
                 Types::STRING,
-                Types::DATETIME_MUTABLE,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
+                Types::DATETIME_IMMUTABLE,
             ]);
     }
 

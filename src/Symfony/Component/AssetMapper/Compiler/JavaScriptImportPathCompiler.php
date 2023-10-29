@@ -172,7 +172,12 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             return null;
         }
 
-        $dependentAsset = $assetMapper->getAsset($resolvedSourcePath);
+        try {
+            $dependentAsset = $assetMapper->getAssetFromSourcePath($resolvedSourcePath);
+        } catch (CircularAssetsException $exception) {
+            $dependentAsset = $exception->getIncompleteMappedAsset();
+        }
+
         if ($dependentAsset) {
             return $dependentAsset;
         }

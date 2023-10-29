@@ -49,10 +49,10 @@ diff --git a/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php 
 --- a/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
 +++ b/src/Symfony/Component/Config/Definition/Builder/NodeDefinition.php
 @@ -94,5 +94,5 @@ abstract class NodeDefinition implements NodeParentInterface
-      * @return NodeParentInterface|NodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
+      * @return NodeParentInterface|NodeBuilder|self|ArrayNodeDefinition|VariableNodeDefinition
       */
 -    public function end(): NodeParentInterface
-+    public function end(): NodeParentInterface|NodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
++    public function end(): NodeParentInterface|NodeBuilder|\Symfony\Component\Config\Definition\Builder\NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
      {
          return $this->parent;
 diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Component/Console/Command/Command.php

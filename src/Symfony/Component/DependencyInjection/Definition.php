@@ -781,7 +781,7 @@ class Definition
      *
      * @return $this
      */
-    public function addError(string|\Closure|Definition $error): static
+    public function addError(string|\Closure|self $error): static
     {
         if ($error instanceof self) {
             $this->errors = array_merge($this->errors, $error->errors);

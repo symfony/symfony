@@ -178,7 +178,7 @@ class ImportMapGenerator
             }
 
             // check if this import requires an automatic importmap entry
-            if ($javaScriptImport->addImplicitlyToImportMap && $javaScriptImport->asset) {
+            if ($javaScriptImport->addImplicitlyToImportMap) {
                 $nextEntry = ImportMapEntry::createLocal(
                     $importName,
                     ImportMapType::tryFrom($javaScriptImport->asset->publicExtension) ?: ImportMapType::JS,
@@ -226,10 +226,8 @@ class ImportMapGenerator
 
             $dependencies[] = $javaScriptImport->importName;
 
-            // the import is for a MappedAsset? Follow its imports!
-            if ($javaScriptImport->asset) {
-                $dependencies = array_merge($dependencies, $this->findEagerImports($javaScriptImport->asset));
-            }
+            // Follow its imports!
+            $dependencies = array_merge($dependencies, $this->findEagerImports($javaScriptImport->asset));
         }
 
         return $dependencies;

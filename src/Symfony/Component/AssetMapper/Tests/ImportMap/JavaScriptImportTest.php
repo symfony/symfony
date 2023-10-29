@@ -20,7 +20,7 @@ class JavaScriptImportTest extends TestCase
     public function testBasicConstruction()
     {
         $asset = new MappedAsset('the-asset');
-        $import = new JavaScriptImport('the-import', true, $asset, true);
+        $import = new JavaScriptImport('the-import', $asset, true, true);
 
         $this->assertSame('the-import', $import->importName);
         $this->assertTrue($import->isLazy);

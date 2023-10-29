@@ -307,6 +307,8 @@ class Response
     /**
      * Sends HTTP headers.
      *
+     * @param positive-int|null $statusCode The status code to use, override the statusCode property if set and not null
+     *
      * @return $this
      */
     public function sendHeaders(int $statusCode = null): static

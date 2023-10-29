@@ -18,6 +18,7 @@ use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
 use Symfony\Component\AssetMapper\MappedAsset;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Resolves import paths in JS files.
@@ -26,8 +27,6 @@ use Symfony\Component\AssetMapper\MappedAsset;
  */
 final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 {
-    use AssetCompilerPathResolverTrait;
-
     // https://regex101.com/r/fquriB/1
     private const IMPORT_PATTERN = '/(?:import\s*(?:(?:\*\s*as\s+\w+|[\w\s{},*]+)\s*from\s*)?|\bimport\()\s*[\'"`](\.\/[^\'"`]+|(\.\.\/)*[^\'"`]+)[\'"`]\s*[;\)]?/m';
 
@@ -62,15 +61,19 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
                 $dependentAsset = $this->findAssetForRelativeImport($importedModule, $asset, $assetMapper);
             }
 
+            if (!$dependentAsset) {
+                return $fullImportString;
+            }
+
             // List as a JavaScript import.
             // This will cause the asset to be included in the importmap (for relative imports)
             // and will be used to generate the preloads in the importmap.
             $isLazy = str_contains($fullImportString, 'import(');
-            $addToImportMap = $isRelativeImport && $dependentAsset;
+            $addToImportMap = $isRelativeImport;
             $asset->addJavaScriptImport(new JavaScriptImport(
                 $addToImportMap ? $dependentAsset->publicPathWithoutDigest : $importedModule,
-                $isLazy,
                 $dependentAsset,
+                $isLazy,
                 $addToImportMap,
             ));
 
@@ -80,7 +83,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             }
 
             // support possibility where the final public files have moved relative to each other
-            $relativeImportPath = $this->createRelativePath($asset->publicPathWithoutDigest, $dependentAsset->publicPathWithoutDigest);
+            $relativeImportPath = Path::makeRelative($dependentAsset->publicPathWithoutDigest, \dirname($asset->publicPathWithoutDigest));
             $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);
 
             return str_replace($importedModule, $relativeImportPath, $fullImportString);
@@ -145,17 +148,21 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             return null;
         }
 
-        if ($asset = $assetMapper->getAsset($importMapEntry->path)) {
-            return $asset;
-        }
+        try {
+            if ($asset = $assetMapper->getAsset($importMapEntry->path)) {
+                return $asset;
+            }
 
-        return $assetMapper->getAssetFromSourcePath($importMapEntry->path);
+            return $assetMapper->getAssetFromSourcePath($importMapEntry->path);
+        } catch (CircularAssetsException $exception) {
+            return $exception->getIncompleteMappedAsset();
+        }
     }
 
     private function findAssetForRelativeImport(string $importedModule, MappedAsset $asset, AssetMapperInterface $assetMapper): ?MappedAsset
     {
         try {
-            $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $importedModule);
+            $resolvedSourcePath = Path::join(\dirname($asset->sourcePath), $importedModule);
         } catch (RuntimeException $e) {
             // avoid warning about vendor imports - these are often comments
             if (!$asset->isVendor) {
@@ -165,26 +172,36 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             return null;
         }
 
-        $dependentAsset = $assetMapper->getAsset($resolvedPath);
+        try {
+            $dependentAsset = $assetMapper->getAssetFromSourcePath($resolvedSourcePath);
+        } catch (CircularAssetsException $exception) {
+            $dependentAsset = $exception->getIncompleteMappedAsset();
+        }
 
         if ($dependentAsset) {
             return $dependentAsset;
         }
 
+        // avoid warning about vendor imports - these are often comments
+        if ($asset->isVendor) {
+            return null;
+        }
+
         $message = sprintf('Unable to find asset "%s" imported from "%s".', $importedModule, $asset->sourcePath);
 
-        try {
-            if (null !== $assetMapper->getAsset(sprintf('%s.js', $resolvedPath))) {
-                $message .= sprintf(' Try adding ".js" to the end of the import - i.e. "%s.js".', $importedModule);
+        if (is_file($resolvedSourcePath)) {
+            $message .= sprintf('The file "%s" exists, but it is not in a mapped asset path. Add it to the "paths" config.', $resolvedSourcePath);
+        } else {
+            try {
+                if (null !== $assetMapper->getAssetFromSourcePath(sprintf('%s.js', $resolvedSourcePath))) {
+                    $message .= sprintf(' Try adding ".js" to the end of the import - i.e. "%s.js".', $importedModule);
+                }
+            } catch (CircularAssetsException) {
+                // avoid circular error if there is self-referencing import comments
             }
-        } catch (CircularAssetsException) {
-            // avoid circular error if there is self-referencing import comments
         }
 
-        // avoid warning about vendor imports - these are often comments
-        if (!$asset->isVendor) {
-            $this->handleMissingImport($message);
-        }
+        $this->handleMissingImport($message);
 
         return null;
     }

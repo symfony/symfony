@@ -80,7 +80,7 @@ and supported by [Symfony contributors][19].
 [12]: https://symfony.com/events/
 [13]: https://symfony.com/support
 [14]: https://github.com/symfony
-[15]: https://twitter.com/symfony
+[15]: https://x.com/symfony
 [16]: https://www.facebook.com/SymfonyFramework/
 [17]: https://symfony.com/doc/current/contributing/code/index.html
 [18]: https://symfony.com/doc/current/contributing/documentation/index.html

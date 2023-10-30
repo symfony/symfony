@@ -23,6 +23,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 class ImportMapGeneratorTest extends TestCase
 {
@@ -252,8 +253,14 @@ class ImportMapGeneratorTest extends TestCase
         $this->mockImportMap($importMapEntries);
         $this->mockAssetMapper($mappedAssets);
         $this->configReader->expects($this->any())
-            ->method('getRootDirectory')
-            ->willReturn('/fake/root');
+            ->method('convertPathToFilesystemPath')
+            ->willReturnCallback(function (string $path) {
+                if (!str_starts_with($path, '.')) {
+                    return $path;
+                }
+
+                return Path::join('/fake/root', $path);
+            });
 
         $this->assertEquals($expectedData, $manager->getRawImportMapData());
     }

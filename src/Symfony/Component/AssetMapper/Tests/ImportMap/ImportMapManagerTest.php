@@ -75,8 +75,22 @@ class ImportMapManagerTest extends TestCase
         ;
 
         $this->configReader->expects($this->any())
-            ->method('getRootDirectory')
-            ->willReturn(self::$writableRoot);
+            ->method('convertPathToFilesystemPath')
+            ->willReturnCallback(function ($path) {
+                if (str_ends_with($path, 'some_file.js')) {
+                    return '/path/to/assets/some_file.js';
+                }
+
+                throw new \Exception(sprintf('Unexpected path "%s"', $path));
+            });
+        $this->configReader->expects($this->any())
+            ->method('convertFilesystemPathToPath')
+            ->willReturnCallback(function ($path) {
+                return match ($path) {
+                    '/path/to/assets/some_file.js' => './assets/some_file.js',
+                    default => throw new \Exception(sprintf('Unexpected path "%s"', $path)),
+                };
+            });
         $this->configReader->expects($this->once())
             ->method('getEntries')
             ->willReturn(new ImportMapEntries())
@@ -187,15 +201,15 @@ class ImportMapManagerTest extends TestCase
         ];
 
         yield 'single_package_with_a_path' => [
-            'packages' => [new PackageRequireOptions('some/module', path: self::$writableRoot.'/assets/some_file.js')],
-            'expectedProviderPackageArgumentCount' => 0,
-            'resolvedPackages' => [],
-            'expectedImportMap' => [
-                'some/module' => [
-                    // converted to relative path
-                    'path' => './assets/some_file.js',
-                ],
+        'packages' => [new PackageRequireOptions('some/module', path: self::$writableRoot.'/assets/some_file.js')],
+        'expectedProviderPackageArgumentCount' => 0,
+        'resolvedPackages' => [],
+        'expectedImportMap' => [
+            'some/module' => [
+                // converted to relative path
+                'path' => './assets/some_file.js',
             ],
+        ],
         ];
     }
 
@@ -289,10 +303,6 @@ class ImportMapManagerTest extends TestCase
 
         $this->remotePackageDownloader->expects($this->once())
             ->method('downloadPackages');
-
-        $this->configReader->expects($this->any())
-            ->method('getRootDirectory')
-            ->willReturn(self::$writableRoot);
         $this->configReader->expects($this->once())
             ->method('writeEntries')
             ->with($this->callback(function (ImportMapEntries $entries) {

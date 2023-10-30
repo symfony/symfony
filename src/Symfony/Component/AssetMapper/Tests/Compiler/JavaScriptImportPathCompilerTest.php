@@ -38,9 +38,18 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->willReturnCallback(function ($importName) {
                 return match ($importName) {
                     'module_in_importmap_local_asset' => ImportMapEntry::createLocal('module_in_importmap_local_asset', ImportMapType::JS, 'module_in_importmap_local_asset.js', false),
-                    'module_in_importmap_remote' => ImportMapEntry::createRemote('module_in_importmap_remote', ImportMapType::JS, '/path/to/vendor/module_in_importmap_remote.js', '1.2.3', 'could_be_anything', false),
-                    '@popperjs/core' => ImportMapEntry::createRemote('@popperjs/core', ImportMapType::JS, '/path/to/vendor/@popperjs/core.js', '1.2.3', 'could_be_anything', false),
+                    'module_in_importmap_remote' => ImportMapEntry::createRemote('module_in_importmap_remote', ImportMapType::JS, './vendor/module_in_importmap_remote.js', '1.2.3', 'could_be_anything', false),
+                    '@popperjs/core' => ImportMapEntry::createRemote('@popperjs/core', ImportMapType::JS, '/project/assets/vendor/@popperjs/core.js', '1.2.3', 'could_be_anything', false),
                     default => null,
+                };
+            });
+        $importMapConfigReader->expects($this->any())
+            ->method('convertPathToFilesystemPath')
+            ->willReturnCallback(function ($path) {
+                return match ($path) {
+                    './vendor/module_in_importmap_remote.js' => '/project/assets/vendor/module_in_importmap_remote.js',
+                    '/project/assets/vendor/@popperjs/core.js' => '/project/assets/vendor/@popperjs/core.js',
+                    default => throw new \RuntimeException(sprintf('Unexpected path "%s"', $path)),
                 };
             });
 
@@ -61,8 +70,8 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     '/project/assets/other.js' => new MappedAsset('other.js', publicPathWithoutDigest: '/assets/other.js'),
                     '/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
                     '/project/assets/styles.css' => new MappedAsset('styles.css', publicPathWithoutDigest: '/assets/styles.css'),
-                    '/path/to/vendor/module_in_importmap_remote.js' => new MappedAsset('module_in_importmap_remote.js', publicPathWithoutDigest: '/assets/module_in_importmap_remote.js'),
-                    '/path/to/vendor/@popperjs/core.js' => new MappedAsset('assets/vendor/@popperjs/core.js', publicPathWithoutDigest: '/assets/@popperjs/core.js'),
+                    '/project/assets/vendor/module_in_importmap_remote.js' => new MappedAsset('module_in_importmap_remote.js', publicPathWithoutDigest: '/assets/module_in_importmap_remote.js'),
+                    '/project/assets/vendor/@popperjs/core.js' => new MappedAsset('assets/vendor/@popperjs/core.js', publicPathWithoutDigest: '/assets/@popperjs/core.js'),
                     default => null,
                 };
             });
@@ -439,7 +448,12 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $importMapConfigReader->expects($this->once())
             ->method('findRootImportMapEntry')
             ->with('@popperjs/core')
-            ->willReturn(ImportMapEntry::createRemote('@popperjs/core', ImportMapType::JS, '/path/to/vendor/@popperjs/core.js', '1.2.3', 'could_be_anything', false));
+            ->willReturn(ImportMapEntry::createRemote('@popperjs/core', ImportMapType::JS, './vendor/@popperjs/core.js', '1.2.3', 'could_be_anything', false));
+        $importMapConfigReader->expects($this->any())
+            ->method('convertPathToFilesystemPath')
+            ->with('./vendor/@popperjs/core.js')
+            ->willReturn('/path/to/vendor/@popperjs/core.js');
+
         $assetMapper = $this->createMock(AssetMapperInterface::class);
         $assetMapper->expects($this->once())
             ->method('getAssetFromSourcePath')

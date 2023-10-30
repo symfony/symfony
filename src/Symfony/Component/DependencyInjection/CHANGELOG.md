@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
  * Add `defined` env var processor that returns `true` for defined and neither null nor empty env vars
  * Add `#[AutowireLocator]` and `#[AutowireIterator]` attributes
+ * Add `urlencode` env var processor that url encodes a string value
 
 6.3
 ---

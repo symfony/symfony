@@ -948,6 +948,17 @@ CSV;
         $this->assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('defined', 'NO_SOMETHING', $callback));
     }
 
+    public function testGetEnvUrlencode()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('urlencode', 'URLENCODETEST', function () {
+            return 'foo: Data123!@-_ + bar: Not the same content as Data123!@-_ +';
+        });
+
+        $this->assertSame('foo%3A%20Data123%21%40-_%20%2B%20bar%3A%20Not%20the%20same%20content%20as%20Data123%21%40-_%20%2B', $result);
+    }
+
     public static function provideGetEnvDefined(): iterable
     {
         yield 'Defined' => [true, fn () => 'foo'];

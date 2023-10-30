@@ -57,6 +57,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'enum' => \BackedEnum::class,
             'shuffle' => 'array',
             'defined' => 'bool',
+            'urlencode' => 'string',
         ];
     }
 
@@ -342,6 +343,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         if ('trim' === $prefix) {
             return trim($env);
+        }
+
+        if ('urlencode' === $prefix) {
+            return rawurlencode($env);
         }
 
         throw new RuntimeException(sprintf('Unsupported env var prefix "%s" for env name "%s".', $prefix, $name));

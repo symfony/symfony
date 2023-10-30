@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-10-25T14:39:11Z
+
+This is going to conflict with PR on #51920.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-25T15:59:02Z
+
+There are some related failure to check ;)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-10-29T16:17:52Z
+
+Fixed lots of typos. I believe the high deps tests are fixed when this is up merged into 7.0, all other failure seem unrelated.

@@ -37,7 +37,7 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
         $this->dateTimeWithoutSeconds = null;
     }
 
-    public static function allProvider()
+    public static function allProvider(): array
     {
         return [
             ['UTC', 'UTC', '2010-02-03 04:05:06 UTC', '2010-02-03T04:05:06Z'],

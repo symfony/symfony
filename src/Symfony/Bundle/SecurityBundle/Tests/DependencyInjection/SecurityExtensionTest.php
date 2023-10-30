@@ -526,7 +526,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('very', $handler->getArgument(1));
     }
 
-    public static function sessionConfigurationProvider()
+    public static function sessionConfigurationProvider(): array
     {
         return [
             [
@@ -659,7 +659,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($entryPointId, (string) $container->getDefinition('security.exception_listener.main')->getArgument(4));
     }
 
-    public static function provideEntryPointFirewalls()
+    public static function provideEntryPointFirewalls(): iterable
     {
         // only one entry point available
         yield [['http_basic' => true], 'security.authenticator.http_basic.main'];
@@ -679,7 +679,7 @@ class SecurityExtensionTest extends TestCase
     /**
      * @dataProvider provideEntryPointRequiredData
      */
-    public function testEntryPointRequired(array $firewall, $messageRegex)
+    public function testEntryPointRequired(array $firewall, string $messageRegex)
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches($messageRegex);
@@ -699,7 +699,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public static function provideEntryPointRequiredData()
+    public static function provideEntryPointRequiredData(): iterable
     {
         // more than one entry point available and not explicitly set
         yield [
@@ -749,7 +749,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($expectedAuthenticators, array_map('strval', $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
     }
 
-    public static function provideConfigureCustomAuthenticatorData()
+    public static function provideConfigureCustomAuthenticatorData(): iterable
     {
         yield [
             ['custom_authenticator' => TestAuthenticator::class],
@@ -829,7 +829,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($expectedUserCheckerClass, $container->findDefinition($userCheckerId)->getClass());
     }
 
-    public static function provideUserCheckerConfig()
+    public static function provideUserCheckerConfig(): iterable
     {
         yield [[], InMemoryUserChecker::class];
         yield [['user_checker' => TestUserChecker::class], TestUserChecker::class];

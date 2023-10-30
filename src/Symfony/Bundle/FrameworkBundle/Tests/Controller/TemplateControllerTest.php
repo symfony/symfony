@@ -32,13 +32,23 @@ class TemplateControllerTest extends TestCase
         $this->assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
-    public function testNoTwig()
+    public function testNoTwigTemplateActionMethod()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('You cannot use the TemplateController if the Twig Bundle is not available.');
         $controller = new TemplateController();
 
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('You cannot use the TemplateController if the Twig Bundle is not available.');
+
         $controller->templateAction('mytemplate')->getContent();
+    }
+
+    public function testNoTwigInvokeMethod()
+    {
+        $controller = new TemplateController();
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('You cannot use the TemplateController if the Twig Bundle is not available.');
+
         $controller('mytemplate')->getContent();
     }
 

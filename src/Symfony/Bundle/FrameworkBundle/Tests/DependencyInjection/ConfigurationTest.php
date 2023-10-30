@@ -113,7 +113,7 @@ class ConfigurationTest extends TestCase
         $this->assertArrayHasKey($packageName, $config['assets']['packages']);
     }
 
-    public static function provideValidAssetsPackageNameConfigurationTests()
+    public static function provideValidAssetsPackageNameConfigurationTests(): array
     {
         return [
             ['foobar'],
@@ -139,7 +139,7 @@ class ConfigurationTest extends TestCase
             ]);
     }
 
-    public static function provideInvalidAssetConfigurationTests()
+    public static function provideInvalidAssetConfigurationTests(): iterable
     {
         // helper to turn config into embedded package config
         $createPackageConfig = function (array $packageConfig) {
@@ -192,7 +192,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($processedConfig, $config['lock']);
     }
 
-    public static function provideValidLockConfigurationTests()
+    public static function provideValidLockConfigurationTests(): iterable
     {
         yield [null, ['enabled' => true, 'resources' => ['default' => [class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock']]]];
 

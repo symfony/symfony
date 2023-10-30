@@ -100,7 +100,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
-    public static function isSelectedChoiceProvider()
+    public static function isSelectedChoiceProvider(): array
     {
         return [
             [true, '0', '0'],
@@ -150,7 +150,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
-    public static function isRootFormProvider()
+    public static function isRootFormProvider(): array
     {
         return [
             [true, new FormView()],
@@ -381,14 +381,14 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->renderer->setTheme($view, $themes, $useDefaultThemes);
     }
 
-    public static function themeBlockInheritanceProvider()
+    public static function themeBlockInheritanceProvider(): array
     {
         return [
             [['theme.html.twig']],
         ];
     }
 
-    public static function themeInheritanceProvider()
+    public static function themeInheritanceProvider(): array
     {
         return [
             [['parent_label.html.twig'], ['child_label.html.twig']],

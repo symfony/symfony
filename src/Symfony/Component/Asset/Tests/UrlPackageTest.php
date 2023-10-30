@@ -25,13 +25,13 @@ class UrlPackageTest extends TestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testGetUrl($baseUrls, $format, $path, $expected)
+    public function testGetUrl($baseUrls, string $format, string $path, string $expected)
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format));
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public static function getConfigs()
+    public static function getConfigs(): array
     {
         return [
             ['http://example.net', '', 'http://example.com/foo', 'http://example.com/foo'],
@@ -65,14 +65,14 @@ class UrlPackageTest extends TestCase
     /**
      * @dataProvider getContextConfigs
      */
-    public function testGetUrlWithContext($secure, $baseUrls, $format, $path, $expected)
+    public function testGetUrlWithContext(bool $secure, $baseUrls, string $format, string $path, string $expected)
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format), $this->getContext($secure));
 
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public static function getContextConfigs()
+    public static function getContextConfigs(): array
     {
         return [
             [false, 'http://example.com', '', 'foo', 'http://example.com/foo?v1'],
@@ -114,7 +114,7 @@ class UrlPackageTest extends TestCase
         new UrlPackage($baseUrls, new EmptyVersionStrategy());
     }
 
-    public static function getWrongBaseUrlConfig()
+    public static function getWrongBaseUrlConfig(): array
     {
         return [
             ['not-a-url'],
@@ -122,7 +122,7 @@ class UrlPackageTest extends TestCase
         ];
     }
 
-    private function getContext($secure)
+    private function getContext($secure): ContextInterface
     {
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->any())->method('isSecure')->willReturn($secure);

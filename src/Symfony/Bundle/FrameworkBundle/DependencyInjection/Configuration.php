@@ -15,6 +15,8 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LogLevel;
 use Seld\JsonLint\JsonParser;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+use Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\AssetMapper\AssetMapper;
@@ -192,6 +194,7 @@ class Configuration implements ConfigurationInterface
         $this->addHtmlSanitizerSection($rootNode, $enableIfStandalone);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode, $enableIfStandalone);
+        $this->addPsrHttpMessageBridgeSection($rootNode, $willBeAvailable);
 
         return $treeBuilder;
     }
@@ -2580,6 +2583,26 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addPsrHttpMessageBridgeSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
+    {
+        $enableMode = 'canBeEnabled';
+        if (!class_exists(FullStack::class)
+            && $willBeAvailable('symfony/psr-http-message-bridge', HttpFoundationFactoryInterface::class)
+            && 0 === (new \ReflectionClass(PsrHttpFactory::class))->getConstructor()->getNumberOfRequiredParameters()
+        ) {
+            $enableMode = 'canBeDisabled';
+        }
+
+        $rootNode
+            ->children()
+                ->arrayNode('psr_http_message_bridge')
+                    ->info('PSR HTTP message bridge configuration')
+                    ->{$enableMode}()
                 ->end()
             ->end()
         ;

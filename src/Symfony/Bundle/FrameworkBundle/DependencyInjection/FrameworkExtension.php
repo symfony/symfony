@@ -25,6 +25,8 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+use Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
@@ -574,6 +576,17 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
+        }
+
+        if ($this->readConfigEnabled('psr_http_message_bridge', $container, $config['psr_http_message_bridge'])) {
+            if (!interface_exists(HttpFoundationFactoryInterface::class)) {
+                throw new LogicException('PSR HTTP Message support cannot be enabled as the bridge is not installed. Try running "composer require symfony/psr-http-message-bridge".');
+            }
+            if ((new \ReflectionClass(PsrHttpFactory::class))->getConstructor()->getNumberOfRequiredParameters() > 0) {
+                throw new LogicException('PSR HTTP Message support cannot be enabled for version 2 or earlier. Please update symfony/psr-http-message-bridge to 6.4 or wire all services manually.');
+            }
+
+            $loader->load('psr_http_message_bridge.php');
         }
 
         $this->addAnnotatedClassesToCompile([

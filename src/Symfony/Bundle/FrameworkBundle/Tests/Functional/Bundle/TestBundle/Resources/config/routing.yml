@@ -65,6 +65,10 @@ http_client_call:
     path:     /http_client_call
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\HttpClientController::index }
 
+psr_http_message_bridge:
+    path:     /psr_http
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\PsrHttpMessageController
+
 uid:
     resource: "../../Controller/UidController.php"
     type: "attribute"

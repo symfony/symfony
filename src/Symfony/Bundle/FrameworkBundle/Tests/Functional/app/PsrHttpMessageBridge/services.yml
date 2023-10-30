@@ -1,0 +1,7 @@
+services:
+    nyholm_psr7_factory:
+        class: Nyholm\Psr7\Factory\Psr17Factory
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\PsrHttpMessageController:
+        public: true
+        arguments: ['@nyholm_psr7_factory']

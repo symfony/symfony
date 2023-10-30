@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
@@ -46,7 +47,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
 
-    public function getTestValidSessionName()
+    public function getTestValidSessionName(): array
     {
         return [
             [null],
@@ -529,7 +530,7 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
-    protected static function getBundleDefaultConfig()
+    protected static function getBundleDefaultConfig(): array
     {
         return [
             'http_method_override' => false,
@@ -786,6 +787,9 @@ class ConfigurationTest extends TestCase
             ],
             'remote-event' => [
                 'enabled' => false,
+            ],
+            'psr_http_message_bridge' => [
+                'enabled' => !class_exists(FullStack::class) && 0 === (new \ReflectionClass(PsrHttpFactory::class))->getConstructor()->getNumberOfRequiredParameters(),
             ],
         ];
     }

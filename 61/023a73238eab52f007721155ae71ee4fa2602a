@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-04T08:34:51Z
+
+Wouldn't we violate PSR-11 if we upcast `ServiceNotFoundException`?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-10-04T08:56:36Z
+
+> Wouldn't we violate PSR-11 if we upcast `ServiceNotFoundException`?
+
+Sorry, I'm not sure to understand ; can you develop ?
+
+Currently PSR\Container\ContainerInterface have the following phpdoc:
+```
+interface ContainerInterface
+{
+    /**
+     * Finds an entry of the container by its identifier and returns it.
+     *
+     * @param string $id Identifier of the entry to look for.
+     *
+     * @throws NotFoundExceptionInterface  No entry was found for **this** identifier.
+     * @throws ContainerExceptionInterface Error while retrieving the entry.
+     *
+     * @return mixed Entry.
+     */
+    public function get(string $id);
+}
+```
+So, to be PSR, Symfony should only throw NotFoundExceptionInterface and ContainerExceptionInterface.
+
+Currently, since Symfony allows to throws `\Exception` in the Container::get method,  in my understanding the Symfony Container doesn't fully respect the PSR interface.
+
+The introduced `ServiceLoadingException` implements `ContainerExceptionInterface` so it will now respect the PSR interface.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-10-09T12:36:08Z
+
+Is this PR ok @derrabus @stof ? I'm not sure but failures seem unrelated

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\FooController;
 
 class RouteTest extends TestCase

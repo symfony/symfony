@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Serializer\Annotation;
 
-/**
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
-final class Ignore
-{
+class_exists(\Symfony\Component\Serializer\Attribute\Ignore::class);
+
+if (false) {
+    #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
+    final class Ignore
+    {
+    }
 }

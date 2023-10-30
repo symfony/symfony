@@ -11,23 +11,11 @@
 
 namespace Symfony\Component\Serializer\Annotation;
 
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+class_exists(\Symfony\Component\Serializer\Attribute\SerializedName::class);
 
-/**
- * @author Fabien Bourigault <bourigaultfabien@gmail.com>
- */
-#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
-final class SerializedName
-{
-    public function __construct(private readonly string $serializedName)
+if (false) {
+    #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
+    final class SerializedName
     {
-        if ('' === $serializedName) {
-            throw new InvalidArgumentException(sprintf('Parameter given to "%s" must be a non-empty string.', self::class));
-        }
-    }
-
-    public function getSerializedName(): string
-    {
-        return $this->serializedName;
     }
 }

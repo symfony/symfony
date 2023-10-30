@@ -45,7 +45,7 @@ Community
 
 * [Join the Symfony Community][11] and meet other members at the [Symfony events][12].
 * [Get Symfony support][13] on GitHub Discussions, Slack, etc.
-* Follow us on [GitHub][14], [Twitter][15] and [Facebook][16].
+* Follow us on [GitHub][14], [𝕏 (Twitter)][15] and [Facebook][16].
 * Read our [Code of Conduct][24] and meet the [CARE Team][25].
 
 Contributing

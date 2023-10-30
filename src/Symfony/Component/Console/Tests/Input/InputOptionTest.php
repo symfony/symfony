@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
@@ -20,6 +21,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class InputOptionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructor()
     {
         $option = new InputOption('foo');
@@ -69,9 +72,9 @@ class InputOptionTest extends TestCase
         $this->assertFalse($option->isValueOptional(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
 
         $option = new InputOption('foo', 'f', null);
-        $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
-        $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
-        $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        $this->assertFalse($option->acceptValue(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
+        $this->assertFalse($option->isValueRequired(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
+        $this->assertFalse($option->isValueOptional(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
         $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
@@ -95,6 +98,46 @@ class InputOptionTest extends TestCase
         $this->expectExceptionMessage('Option mode "-1" is not valid.');
 
         new InputOption('foo', 'f', '-1');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCombiningNoneAndRequiredModeIsInvalid()
+    {
+        $this->expectDeprecation('Since symfony/console 6.4: InputOption mode should be either none, required or optional.');
+
+        new InputOption('foo', 'f', InputOption::VALUE_NONE | InputOption::VALUE_REQUIRED);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCombiningNoneAndOptionalModeIsInvalid()
+    {
+        $this->expectDeprecation('Since symfony/console 6.4: InputOption mode should be either none, required or optional.');
+
+        new InputOption('foo', 'f', InputOption::VALUE_NONE | InputOption::VALUE_OPTIONAL);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCombiningRequiredAndOptionalModeIsInvalid()
+    {
+        $this->expectDeprecation('Since symfony/console 6.4: InputOption mode should be either none, required or optional.');
+
+        new InputOption('foo', 'f', InputOption::VALUE_REQUIRED | InputOption::VALUE_OPTIONAL);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCombiningNoneRequiredAndOptionalModeIsInvalid()
+    {
+        $this->expectDeprecation('Since symfony/console 6.4: InputOption mode should be either none, required or optional.');
+
+        new InputOption('foo', 'f', InputOption::VALUE_NONE | InputOption::VALUE_REQUIRED | InputOption::VALUE_OPTIONAL);
     }
 
     public function testEmptyNameIsInvalid()

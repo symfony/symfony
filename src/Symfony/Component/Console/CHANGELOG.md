@@ -9,6 +9,8 @@ CHANGELOG
  * The application can also catch errors with `Application::setCatchErrors(true)`
  * Add `RunCommandMessage` and `RunCommandMessageHandler`
  * Dispatch `ConsoleTerminateEvent` after an exit on signal handling and add `ConsoleTerminateEvent::getInterruptingSignal()`
+ * Deprecate passing both `InputArgument::REQUIRED` and `InputArgument::OPTIONAL` modes to `InputArgument` constructor
+ * Deprecate passing more than one out of `InputOption::VALUE_NONE`, `InputOption::VALUE_REQUIRED` and `InputOption::VALUE_OPTIONAL` modes to `InputOption` constructor
 
 6.3
 ---

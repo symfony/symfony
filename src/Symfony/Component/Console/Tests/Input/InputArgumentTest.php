@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
@@ -20,6 +21,8 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class InputArgumentTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructor()
     {
         $argument = new InputArgument('foo');
@@ -32,7 +35,7 @@ class InputArgumentTest extends TestCase
         $this->assertFalse($argument->isRequired(), '__construct() gives a "InputArgument::OPTIONAL" mode by default');
 
         $argument = new InputArgument('foo', null);
-        $this->assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
+        $this->assertFalse($argument->isRequired(), '__construct() gives a "InputArgument::OPTIONAL" mode by default');
 
         $argument = new InputArgument('foo', InputArgument::OPTIONAL);
         $this->assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
@@ -47,6 +50,16 @@ class InputArgumentTest extends TestCase
         $this->expectExceptionMessage('Argument mode "-1" is not valid.');
 
         new InputArgument('foo', '-1');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testAmbigiousRequirementSpecifierMode()
+    {
+        $this->expectDeprecation('Since symfony/console 6.4: InputArgument mode should specify either required or optional.');
+
+        new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::REQUIRED);
     }
 
     public function testIsArray()

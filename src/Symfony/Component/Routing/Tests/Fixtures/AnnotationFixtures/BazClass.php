@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures;
 
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * @Route("/1", name="route1", schemes={"https"}, methods={"GET"})

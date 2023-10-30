@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures\Annotations;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

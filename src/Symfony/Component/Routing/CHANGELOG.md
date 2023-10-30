@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate `AnnotationDirectoryLoader`, use `AttributeDirectoryLoader` instead
  * Deprecate `AnnotationFileLoader`, use `AttributeFileLoader` instead
  * Add `AddExpressionLanguageProvidersPass` (moved from `FrameworkBundle`)
+ * Add aliases for all classes in the `Annotation` namespace to `Attribute`
 
 6.2
 ---

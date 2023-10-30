@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures\Annotations;
 
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 
 /**
  * @DiscriminatorMap(typeProperty="type", mapping={

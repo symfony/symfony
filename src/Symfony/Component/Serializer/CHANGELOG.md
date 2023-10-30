@@ -12,6 +12,7 @@ CHANGELOG
  * Make `ProblemNormalizer` give details about Messenger's `ValidationFailedException`
  * Add `XmlEncoder::CDATA_WRAPPING` context option
  * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Add aliases for all classes in the `Annotation` namespace to `Attribute`
 
 6.3
 ---

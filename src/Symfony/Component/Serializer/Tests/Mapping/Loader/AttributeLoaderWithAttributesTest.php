@@ -30,7 +30,7 @@ class AttributeLoaderWithAttributesTest extends AttributeLoaderTestCase
     public function testLoadWithInvalidAttribute()
     {
         $this->expectException(MappingException::class);
-        $this->expectExceptionMessage('Could not instantiate attribute "Symfony\Component\Serializer\Annotation\Groups" on "Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy::myMethod()".');
+        $this->expectExceptionMessage('Could not instantiate attribute "Symfony\Component\Serializer\Attribute\Groups" on "Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy::myMethod()".');
 
         $classMetadata = new ClassMetadata($this->getNamespace().'\BadAttributeDummy');
 

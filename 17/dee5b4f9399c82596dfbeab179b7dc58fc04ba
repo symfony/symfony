@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-10-30T17:47:22Z
+
+@stof I pushed a new version. I now use `beforeNormalization` and I was able to revert the change about `defaultNull()`

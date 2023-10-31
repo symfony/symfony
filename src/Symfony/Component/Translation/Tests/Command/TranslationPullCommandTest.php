@@ -14,9 +14,11 @@ namespace Symfony\Component\Translation\Tests\Command;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Dumper\YamlFileDumper;
+use Symfony\Component\Translation\Event\TranslationPullEvent;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
@@ -720,16 +722,55 @@ XLIFF
         ];
     }
 
-    private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en'): CommandTester
+    /**
+     * @dataProvider provideEventDispatchingCommands
+     */
+    public function testEventIsDispatched(array $command)
     {
-        $command = $this->createCommand($provider, $locales, $domains, $defaultLocale);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::once())
+            ->method('dispatch')->with(self::callback(static fn (TranslationPullEvent $event): bool => true));
+
+        $providerReadTranslatorBag = new TranslatorBag();
+
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('read')
+            ->willReturn($providerReadTranslatorBag);
+
+        $tester = $this->createCommandTester(provider: $provider, dispatcher: $dispatcher);
+
+        $tester->execute($command);
+    }
+
+    public static function provideEventDispatchingCommands(): \Generator
+    {
+        yield 'without force' => [
+            'command' => [
+                '--locales' => ['en'],
+                '--domains' => ['messages'],
+            ],
+        ];
+
+        yield 'with force' => [
+            'command' => [
+                '--locales' => ['en'],
+                '--domains' => ['messages'],
+                '--force' => '',
+            ],
+        ];
+    }
+
+    private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en', EventDispatcherInterface $dispatcher = null): CommandTester
+    {
+        $command = $this->createCommand(provider: $provider, locales: $locales, domains: $domains, defaultLocale: $defaultLocale, dispatcher: $dispatcher);
         $application = new Application();
         $application->add($command);
 
         return new CommandTester($application->find('translation:pull'));
     }
 
-    private function createCommand(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en', array $providerNames = ['loco']): TranslationPullCommand
+    private function createCommand(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en', array $providerNames = ['loco'], EventDispatcherInterface $dispatcher = null): TranslationPullCommand
     {
         $writer = new TranslationWriter();
         $writer->addDumper('xlf', new XliffFileDumper());
@@ -740,12 +781,13 @@ XLIFF
         $reader->addLoader('yml', new YamlFileLoader());
 
         return new TranslationPullCommand(
-            $this->getProviderCollection($provider, $providerNames, $locales, $domains),
-            $writer,
-            $reader,
-            $defaultLocale,
-            [$this->translationAppDir.'/translations'],
-            $locales
+            providerCollection: $this->getProviderCollection($provider, $providerNames, $locales, $domains),
+            writer: $writer,
+            reader: $reader,
+            defaultLocale: $defaultLocale,
+            transPaths: [$this->translationAppDir.'/translations'],
+            enabledLocales: $locales,
+            eventDispatcher: $dispatcher
         );
     }
 }

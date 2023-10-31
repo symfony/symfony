@@ -21,10 +21,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Translation\Event\TranslationPushEvent;
 use Symfony\Component\Translation\Provider\FilteringProvider;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\TranslatorBag;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -38,13 +40,15 @@ final class TranslationPushCommand extends Command
     private TranslationReaderInterface $reader;
     private array $transPaths;
     private array $enabledLocales;
+    private ?EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(TranslationProviderCollection $providers, TranslationReaderInterface $reader, array $transPaths = [], array $enabledLocales = [])
+    public function __construct(TranslationProviderCollection $providers, TranslationReaderInterface $reader, array $transPaths = [], array $enabledLocales = [], ?EventDispatcherInterface $eventDispatcher = null)
     {
         $this->providers = $providers;
         $this->reader = $reader;
         $this->transPaths = $transPaths;
         $this->enabledLocales = $enabledLocales;
+        $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
     }
@@ -137,6 +141,8 @@ EOF
         }
 
         if (!$deleteMissing && $force) {
+            $this->eventDispatcher?->dispatch(new TranslationPushEvent($localTranslations));
+
             $provider->write($localTranslations);
 
             $io->success(sprintf('All local translations has been sent to "%s" (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
@@ -161,6 +167,8 @@ EOF
         if ($force) {
             $translationsToWrite->addBag($localTranslations->intersect($providerTranslations));
         }
+
+        $this->eventDispatcher?->dispatch(new TranslationPushEvent($translationsToWrite));
 
         $provider->write($translationsToWrite);
 

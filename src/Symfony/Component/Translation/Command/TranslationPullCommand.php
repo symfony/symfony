@@ -21,10 +21,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
+use Symfony\Component\Translation\Event\TranslationPullEvent;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -40,8 +42,9 @@ final class TranslationPullCommand extends Command
     private string $defaultLocale;
     private array $transPaths;
     private array $enabledLocales;
+    private ?EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(TranslationProviderCollection $providerCollection, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, array $transPaths = [], array $enabledLocales = [])
+    public function __construct(TranslationProviderCollection $providerCollection, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, array $transPaths = [], array $enabledLocales = [], ?EventDispatcherInterface $eventDispatcher = null)
     {
         $this->providerCollection = $providerCollection;
         $this->writer = $writer;
@@ -49,6 +52,7 @@ final class TranslationPullCommand extends Command
         $this->defaultLocale = $defaultLocale;
         $this->transPaths = $transPaths;
         $this->enabledLocales = $enabledLocales;
+        $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
     }
@@ -155,6 +159,8 @@ EOF
         $providerTranslations = $provider->read($domains, $locales);
 
         if ($force) {
+            $this->eventDispatcher?->dispatch(new TranslationPullEvent($providerTranslations));
+
             foreach ($providerTranslations->getCatalogues() as $catalogue) {
                 $operation = new TargetOperation(new MessageCatalogue($catalogue->getLocale()), $catalogue);
                 if ($intlIcu) {
@@ -172,6 +178,8 @@ EOF
 
         // Append pulled translations to local ones.
         $localTranslations->addBag($providerTranslations->diff($localTranslations));
+
+        $this->eventDispatcher?->dispatch(new TranslationPullEvent($localTranslations));
 
         foreach ($localTranslations->getCatalogues() as $catalogue) {
             $this->writer->write($catalogue, $format, $writeOptions);

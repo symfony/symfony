@@ -14,7 +14,9 @@ namespace Symfony\Component\Translation\Tests\Command;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\Command\TranslationPushCommand;
+use Symfony\Component\Translation\Event\TranslationPushEvent;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Provider\FilteringProvider;
@@ -400,16 +402,64 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         ];
     }
 
-    private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages']): CommandTester
+    /**
+     * @dataProvider provideEventDispatchingCommands
+     */
+    public function testEventIsDispatched(array $command)
     {
-        $command = $this->createCommand($provider, $locales, $domains);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::once())
+            ->method('dispatch')->with(self::callback(static fn (TranslationPushEvent $event): bool => true));
+
+        $providerReadTranslatorBag = new TranslatorBag();
+
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('read')
+            ->willReturn($providerReadTranslatorBag);
+
+        $tester = $this->createCommandTester(provider: $provider, dispatcher: $dispatcher);
+
+        $tester->execute($command);
+    }
+
+    public static function provideEventDispatchingCommands(): \Generator
+    {
+        yield 'without force' => [
+            'command' => [
+                '--locales' => ['en'],
+                '--domains' => ['messages'],
+            ],
+        ];
+
+        yield 'with force' => [
+            'command' => [
+                '--locales' => ['en'],
+                '--domains' => ['messages'],
+                '--force' => '',
+            ],
+        ];
+
+        yield 'with force and delete missing' => [
+            'command' => [
+                '--locales' => ['en'],
+                '--domains' => ['messages'],
+                '--force' => '',
+                '--delete-missing' => '',
+            ],
+        ];
+    }
+
+    private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], EventDispatcherInterface $dispatcher = null): CommandTester
+    {
+        $command = $this->createCommand(provider: $provider, locales: $locales, domains: $domains, dispatcher: $dispatcher);
         $application = new Application();
         $application->add($command);
 
         return new CommandTester($application->find('translation:push'));
     }
 
-    private function createCommand(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], array $providerNames = ['loco']): TranslationPushCommand
+    private function createCommand(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], array $providerNames = ['loco'], EventDispatcherInterface $dispatcher = null): TranslationPushCommand
     {
         $reader = new TranslationReader();
         $reader->addLoader('xlf', new XliffFileLoader());
@@ -418,7 +468,8 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
             $this->getProviderCollection($provider, $providerNames, $locales, $domains),
             $reader,
             [$this->translationAppDir.'/translations'],
-            $locales
+            $locales,
+            $dispatcher
         );
     }
 }

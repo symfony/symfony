@@ -269,7 +269,7 @@ TXT
         $this->assertStringContainsString('[WARNING] The deprecation file does not exist', $tester->getDisplay());
     }
 
-    public static function provideIgnoreBackslashWhenFindingService()
+    public static function provideIgnoreBackslashWhenFindingService(): array
     {
         return [
             [BackslashClass::class],
@@ -297,7 +297,7 @@ TXT
         }
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         $serviceId = 'console.command.container_debug';
         $hiddenServiceId = '.console.command.container_debug.lazy';

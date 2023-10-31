@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
-use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
  * DebugExtension.

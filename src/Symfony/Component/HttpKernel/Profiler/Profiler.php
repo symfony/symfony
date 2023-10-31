@@ -124,8 +124,6 @@ class Profiler implements ResetInterface
      */
     public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?string $start, ?string $end, string $statusCode = null, \Closure $filter = null): array
     {
-        $filter = 7 < \func_num_args() ? func_get_arg(7) : null;
-
         return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end), $statusCode, $filter);
     }
 

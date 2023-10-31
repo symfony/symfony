@@ -254,10 +254,8 @@ abstract class AbstractBrowser
      *
      * @param array $serverParameters An array of server parameters
      */
-    public function click(Link $link/* , array $serverParameters = [] */): Crawler
+    public function click(Link $link, array $serverParameters = []): Crawler
     {
-        $serverParameters = 1 < \func_num_args() ? func_get_arg(1) : [];
-
         if ($link instanceof Form) {
             return $this->submit($link, [], $serverParameters);
         }
@@ -271,10 +269,8 @@ abstract class AbstractBrowser
      * @param string $linkText         The text of the link or the alt attribute of the clickable image
      * @param array  $serverParameters An array of server parameters
      */
-    public function clickLink(string $linkText/* , array $serverParameters = [] */): Crawler
+    public function clickLink(string $linkText, array $serverParameters = []): Crawler
     {
-        $serverParameters = 1 < \func_num_args() ? func_get_arg(1) : [];
-
         $crawler = $this->crawler ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
 
         return $this->click($crawler->selectLink($linkText)->link(), $serverParameters);

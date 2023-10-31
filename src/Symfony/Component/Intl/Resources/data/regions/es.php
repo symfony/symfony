@@ -45,7 +45,7 @@ return [
         'CF' => 'República Centroafricana',
         'CG' => 'Congo',
         'CH' => 'Suiza',
-        'CI' => 'Côte d’Ivoire',
+        'CI' => 'Costa de Marfil',
         'CK' => 'Islas Cook',
         'CL' => 'Chile',
         'CM' => 'Camerún',

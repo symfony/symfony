@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-30T13:53:51Z
+
+> 1) Symfony\Component\Console\Tests\Helper\TableTest::testThrowsWhenTheCellInAnArray
+> Failed asserting that exception of type "Symfony\Component\Console\Exception\InvalidArgumentException" is thrown.
+
+Related isn't it?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-31T07:29:22Z
+
+Test failures unrelated
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-31T08:45:42Z
+
+Test failures unrelated

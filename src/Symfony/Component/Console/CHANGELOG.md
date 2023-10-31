@@ -9,6 +9,7 @@ CHANGELOG
  * The application can also catch errors with `Application::setCatchErrors(true)`
  * Add `RunCommandMessage` and `RunCommandMessageHandler`
  * Dispatch `ConsoleTerminateEvent` after an exit on signal handling and add `ConsoleTerminateEvent::getInterruptingSignal()`
+ * Command now allows multiple usage examples to be set at once via `Command::addUsages()`
 
 6.3
 ---

@@ -43,7 +43,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     {
         return ['foo', 'bar'];
     }
-    
+
     public static function staticCallbackWithArgs($foo, $bar)
     {
         return [$foo, $bar];
@@ -128,7 +128,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         yield 'named arguments, closure' => [new Choice(callback: fn () => ['foo', 'bar'])];
         yield 'named arguments, static method' => [new Choice(callback: [__CLASS__, 'staticCallback'])];
     }
-    
+
     public function testValidChoiceCallbackContextMethod()
     {
         // search $this for "staticCallback"
@@ -159,21 +159,21 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     public function testValidChoiceCallbackFunctionWithCallbackArgs(Choice $constraint)
     {
         $this->validator->validate('foo', $constraint);
-        
+
         $this->assertNoViolation();
     }
 
     public static function provideConstraintsWithCallbackFunctionAndCallbackArgs(): iterable
     {
         yield 'doctrine style, namespaced function with args' => [new Choice([
-            'callback' => __NAMESPACE__.'\choice_callback_with_args', 'callbackArgs' => ['foo', 'bar']
+            'callback' => __NAMESPACE__.'\choice_callback_with_args', 'callbackArgs' => ['foo', 'bar'],
         ])];
         yield 'doctrine style, closure with args' => [new Choice([
-            'callback' => fn ($foo) => [$foo, 'bar'], 'callbackArgs' => ['foo']
+            'callback' => fn ($foo) => [$foo, 'bar'], 'callbackArgs' => ['foo'],
         ])];
-        
+
         yield 'doctrine style, static method with args' => [new Choice([
-            'callback' => [__CLASS__, 'staticCallbackWithArgs'], 'callbackArgs' => ['foo', 'bar']
+            'callback' => [__CLASS__, 'staticCallbackWithArgs'], 'callbackArgs' => ['foo', 'bar'],
         ])];
         yield 'named arguments, namespaced function with args' => [new Choice(
             callback: __NAMESPACE__.'\choice_callback_with_args', callbackArgs: ['foo', 'bar']
@@ -181,11 +181,10 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         yield 'named arguments, closure with args' => [new Choice(
             callback: fn ($foo, $bar) => [$foo, $bar], callbackArgs: ['foo', 'bar']
         )];
-        yield 'named arguments, static method with args' => [new Choice(callback:
-            [__CLASS__, 'staticCallbackWithArgs'], callbackArgs: ['foo', 'bar']
+        yield 'named arguments, static method with args' => [new Choice(callback: [__CLASS__, 'staticCallbackWithArgs'], callbackArgs: ['foo', 'bar']
         )];
     }
-    
+
     public function testValidChoiceCallbackContextMethodWithCallbackArgs()
     {
         // search $this for "staticCallback"
@@ -209,7 +208,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
-    
+
     /**
      * @dataProvider provideConstraintsWithMultipleTrue
      */

@@ -152,11 +152,10 @@ class ImportMapManager
                 throw new \LogicException(sprintf('The path "%s" of the package "%s" cannot be found: either pass the logical name of the asset or a relative path starting with "./".', $requireOptions->path, $requireOptions->importName));
             }
 
-            $rootImportMapDir = $this->importMapConfigReader->getRootDirectory();
             // convert to a relative path (or fallback to the logical path)
             $path = $asset->logicalPath;
-            if ($rootImportMapDir && str_starts_with(realpath($asset->sourcePath), realpath($rootImportMapDir))) {
-                $path = './'.substr(realpath($asset->sourcePath), \strlen(realpath($rootImportMapDir)) + 1);
+            if (null !== $relativePath = $this->importMapConfigReader->convertFilesystemPathToPath($asset->sourcePath)) {
+                $path = $relativePath;
             }
 
             $newEntry = ImportMapEntry::createLocal(
@@ -213,10 +212,6 @@ class ImportMapManager
             return $asset;
         }
 
-        if (str_starts_with($path, '.')) {
-            $path = $this->importMapConfigReader->getRootDirectory().'/'.$path;
-        }
-
-        return $this->assetMapper->getAssetFromSourcePath($path);
+        return $this->assetMapper->getAssetFromSourcePath($this->importMapConfigReader->convertPathToFilesystemPath($path));
     }
 }

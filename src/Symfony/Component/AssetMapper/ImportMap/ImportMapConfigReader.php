@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\VarExporter\VarExporter;
 
 /**
@@ -144,7 +145,40 @@ class ImportMapConfigReader
         return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
     }
 
-    public function getRootDirectory(): string
+    /**
+     * Converts the "path" string from an importmap entry to the filesystem path.
+     *
+     * The path may already be a filesystem path. But if it starts with ".",
+     * then the path is relative and the root directory is prepended.
+     */
+    public function convertPathToFilesystemPath(string $path): string
+    {
+        if (!str_starts_with($path, '.')) {
+            return $path;
+        }
+
+        return Path::join($this->getRootDirectory(), $path);
+    }
+
+    /**
+     * Converts a filesystem path to a relative path that can be used in the importmap.
+     *
+     * If no relative path could be created - e.g. because the path is not in
+     * the same directory/subdirectory as the root importmap.php file - null is returned.
+     */
+    public function convertFilesystemPathToPath(string $filesystemPath): ?string
+    {
+        $rootImportMapDir = realpath($this->getRootDirectory());
+        $filesystemPath = realpath($filesystemPath);
+        if (!str_starts_with($filesystemPath, $rootImportMapDir)) {
+            return null;
+        }
+
+        // remove the root directory, prepend "./" & normalize slashes
+        return './'.str_replace('\\', '/', substr($filesystemPath, \strlen($rootImportMapDir) + 1));
+    }
+
+    private function getRootDirectory(): string
     {
         return \dirname($this->importMapConfigPath);
     }

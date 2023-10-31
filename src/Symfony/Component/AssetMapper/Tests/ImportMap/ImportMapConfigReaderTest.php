@@ -109,10 +109,50 @@ EOF;
         $this->assertSame($originalImportMapData, $newImportMapData);
     }
 
-    public function testGetRootDirectory()
+    /**
+     * @dataProvider getPathToFilesystemPathTests
+     */
+    public function testConvertPathToFilesystemPath(string $path, string $expectedPath)
+    {
+        $configReader = new ImportMapConfigReader(realpath(__DIR__.'/../Fixtures/importmap.php'), $this->createMock(RemotePackageStorage::class));
+        // normalize path separators for comparison
+        $expectedPath = str_replace('\\', '/', $expectedPath);
+        $this->assertSame($expectedPath, $configReader->convertPathToFilesystemPath($path));
+    }
+
+    public static function getPathToFilesystemPathTests()
+    {
+        yield 'no change' => [
+            'path' => 'dir1/file2.js',
+            'expectedPath' => 'dir1/file2.js',
+        ];
+
+        yield 'prefixed with relative period' => [
+            'path' => './dir1/file2.js',
+            'expectedPath' => realpath(__DIR__.'/../Fixtures').'/dir1/file2.js',
+        ];
+    }
+
+    /**
+     * @dataProvider getFilesystemPathToPathTests
+     */
+    public function testConvertFilesystemPathToPath(string $path, ?string $expectedPath)
     {
         $configReader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
-        $this->assertSame(__DIR__.'/../Fixtures', $configReader->getRootDirectory());
+        $this->assertSame($expectedPath, $configReader->convertFilesystemPathToPath($path));
+    }
+
+    public static function getFilesystemPathToPathTests()
+    {
+        yield 'not in root directory' => [
+            'path' => __FILE__,
+            'expectedPath' => null,
+        ];
+
+        yield 'converted to relative path' => [
+            'path' => __DIR__.'/../Fixtures/dir1/file2.js',
+            'expectedPath' => './dir1/file2.js',
+        ];
     }
 
     public function testFindRootImportMapEntry()

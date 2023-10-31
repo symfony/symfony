@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-31T09:53:11Z
+
+Shall we have FrameworkBundle 6.4 conflict with WebProfilerBundle 5.4 instead? Otherwise, Composer might decide to pin WebProfilerBundle 5.4 to an old patch release.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-31T10:00:03Z
+
+> Shall we have FrameworkBundle 6.4 conflict with WebProfilerBundle 5.4 instead? Otherwise, Composer might decide to pin WebProfilerBundle 5.4 to an old patch release.
+
+We have in BETA2, but we didn't have one in BETA1. Maybe we should simply conflict with BETA1?

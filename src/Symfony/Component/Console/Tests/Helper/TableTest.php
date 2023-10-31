@@ -1998,4 +1998,63 @@ TABLE;
 
         $this->assertSame($expected, $this->getOutputContent($output));
     }
+
+    public function testGithubIssue52101HorizontalTrue()
+    {
+        $tableStyle = (new TableStyle())
+            ->setHorizontalBorderChars('─')
+            ->setVerticalBorderChars('│')
+            ->setCrossingChars('┼', '┌', '┬', '┐', '┤', '┘', '┴', '└', '├')
+        ;
+
+        $table = (new Table($output = $this->getOutputStream()))
+            ->setStyle($tableStyle)
+            ->setHeaderTitle('Title')
+            ->setHeaders(['Hello', 'World'])
+            ->setRows([[1, 2], [3, 4]])
+            ->setHorizontal(true)
+        ;
+        $table->render();
+
+        $this->assertSame(<<<TABLE
+┌──── Title ┬───┐
+│ Hello │ 1 │ 3 │
+│ World │ 2 │ 4 │
+└───────┴───┴───┘
+
+TABLE
+            ,
+            $this->getOutputContent($output)
+        );
+    }
+
+    public function testGithubIssue52101HorizontalFalse()
+    {
+        $tableStyle = (new TableStyle())
+            ->setHorizontalBorderChars('─')
+            ->setVerticalBorderChars('│')
+            ->setCrossingChars('┼', '┌', '┬', '┐', '┤', '┘', '┴', '└', '├')
+        ;
+
+        $table = (new Table($output = $this->getOutputStream()))
+            ->setStyle($tableStyle)
+            ->setHeaderTitle('Title')
+            ->setHeaders(['Hello', 'World'])
+            ->setRows([[1, 2], [3, 4]])
+            ->setHorizontal(false)
+        ;
+        $table->render();
+
+        $this->assertSame(<<<TABLE
+┌──── Title ────┐
+│ Hello │ World │
+├───────┼───────┤
+│ 1     │ 2     │
+│ 3     │ 4     │
+└───────┴───────┘
+
+TABLE,
+            $this->getOutputContent($output)
+        );
+    }
 }

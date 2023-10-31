@@ -192,7 +192,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertSame($mappingType, 'attribute');
     }
 
-    public static function providerBasicDrivers()
+    public static function providerBasicDrivers(): array
     {
         return [
             ['doctrine.orm.cache.apc.class',       ['type' => 'apc']],
@@ -271,7 +271,7 @@ class DoctrineExtensionTest extends TestCase
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
     }
 
-    public static function providerBundles()
+    public static function providerBundles(): iterable
     {
         yield ['AnnotationsBundle', 'attribute', '/Entity'];
         yield ['AnnotationsOneLineBundle', 'attribute', '/Entity'];

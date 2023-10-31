@@ -148,7 +148,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
     }
 
-    public static function provideRedirects()
+    public static function provideRedirects(): array
     {
         return [
             [301],

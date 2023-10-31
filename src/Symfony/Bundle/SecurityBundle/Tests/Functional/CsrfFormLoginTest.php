@@ -122,7 +122,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $this->assertStringContainsString('You\'re browsing to path "/protected-resource".', $text);
     }
 
-    public static function provideClientOptions()
+    public static function provideClientOptions(): iterable
     {
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml']];
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml']];

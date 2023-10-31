@@ -340,7 +340,7 @@ class ProfilerControllerTest extends WebTestCase
         $twig = $this->createMock(Environment::class);
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
-        $controller->phpinfoAction(Request::create('/_profiler/phpinfo'));
+        $controller->phpinfoAction();
     }
 
     public function testPhpinfoAction()
@@ -353,7 +353,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString('PHP License', $client->getResponse()->getContent());
     }
 
-    public static function provideCspVariants()
+    public static function provideCspVariants(): array
     {
         return [
             [true],

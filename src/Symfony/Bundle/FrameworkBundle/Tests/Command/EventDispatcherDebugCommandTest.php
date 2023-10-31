@@ -32,7 +32,7 @@ class EventDispatcherDebugCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'event' => [[''], [MessageEvent::class, 'console.command']];
         yield 'event for other dispatcher' => [['--dispatcher', 'other_event_dispatcher', ''], ['other_event', 'App\OtherEvent']];

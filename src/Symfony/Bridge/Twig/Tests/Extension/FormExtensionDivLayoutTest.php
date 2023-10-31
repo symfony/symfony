@@ -68,7 +68,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
-    public static function isSelectedChoiceProvider()
+    public static function isSelectedChoiceProvider(): array
     {
         return [
             [true, '0', '0'],
@@ -118,7 +118,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
-    public static function isRootFormProvider()
+    public static function isRootFormProvider(): array
     {
         return [
             [true, new FormView()],
@@ -295,14 +295,68 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"]/b[.="Bolded label"]');
     }
 
-    public static function themeBlockInheritanceProvider()
+    protected function renderForm(FormView $view, array $vars = [])
+    {
+        return $this->renderer->renderBlock($view, 'form', $vars);
+    }
+
+    protected function renderLabel(FormView $view, $label = null, array $vars = [])
+    {
+        if (null !== $label) {
+            $vars += ['label' => $label];
+        }
+
+        return $this->renderer->searchAndRenderBlock($view, 'label', $vars);
+    }
+
+    protected function renderHelp(FormView $view)
+    {
+        return $this->renderer->searchAndRenderBlock($view, 'help');
+    }
+
+    protected function renderErrors(FormView $view)
+    {
+        return $this->renderer->searchAndRenderBlock($view, 'errors');
+    }
+
+    protected function renderWidget(FormView $view, array $vars = [])
+    {
+        return $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
+    }
+
+    protected function renderRow(FormView $view, array $vars = [])
+    {
+        return $this->renderer->searchAndRenderBlock($view, 'row', $vars);
+    }
+
+    protected function renderRest(FormView $view, array $vars = [])
+    {
+        return $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
+    }
+
+    protected function renderStart(FormView $view, array $vars = [])
+    {
+        return $this->renderer->renderBlock($view, 'form_start', $vars);
+    }
+
+    protected function renderEnd(FormView $view, array $vars = [])
+    {
+        return $this->renderer->renderBlock($view, 'form_end', $vars);
+    }
+
+    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
+    {
+        $this->renderer->setTheme($view, $themes, $useDefaultThemes);
+    }
+
+    public static function themeBlockInheritanceProvider(): array
     {
         return [
             [['theme.html.twig']],
         ];
     }
 
-    public static function themeInheritanceProvider()
+    public static function themeInheritanceProvider(): array
     {
         return [
             [['parent_label.html.twig'], ['child_label.html.twig']],

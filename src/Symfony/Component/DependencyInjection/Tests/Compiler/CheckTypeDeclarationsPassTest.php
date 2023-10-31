@@ -265,17 +265,15 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
     public function testProcessFailsWhenPassingBadTypeToOptional()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgument::__construct()" accepts "stdClass", "string" passed.');
-
         $container = new ContainerBuilder();
 
         $container->register('bar', BarOptionalArgument::class)
             ->addArgument('string instead of stdClass');
 
-        (new CheckTypeDeclarationsPass(true))->process($container);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgument::__construct()" accepts "stdClass", "string" passed.');
 
-        $this->assertNull($container->get('bar')->foo);
+        (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
     public function testProcessSuccessScalarType()
@@ -604,17 +602,15 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
     public function testProcessThrowsOnIterableTypeWhenScalarPassed()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable()" accepts "iterable", "int" passed.');
-
         $container = new ContainerBuilder();
 
         $container->register('bar_call', BarMethodCall::class)
             ->addMethodCall('setIterable', [2]);
 
-        (new CheckTypeDeclarationsPass(true))->process($container);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable()" accepts "iterable", "int" passed.');
 
-        $this->assertInstanceOf(\stdClass::class, $container->get('bar')->foo);
+        (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
     public function testProcessResolveExpressions()

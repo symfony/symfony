@@ -209,11 +209,7 @@ class ImportMapGenerator
             return $asset;
         }
 
-        if (str_starts_with($path, '.')) {
-            $path = $this->importMapConfigReader->getRootDirectory().'/'.$path;
-        }
-
-        return $this->assetMapper->getAssetFromSourcePath($path);
+        return $this->assetMapper->getAssetFromSourcePath($this->importMapConfigReader->convertPathToFilesystemPath($path));
     }
 
     private function findEagerImports(MappedAsset $asset): array

@@ -110,7 +110,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('my_custom_alias', $tester->getDisplay());
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'option --format' => [
             ['--format', ''],

@@ -174,7 +174,23 @@ class DoctrineExtensionTest extends TestCase
         ], $expectedEm2));
     }
 
-    public static function providerBasicDrivers()
+    public function testMappingTypeDetection()
+    {
+        $container = $this->createContainer();
+
+        $reflection = new \ReflectionClass($this->extension);
+        $method = $reflection->getMethod('detectMappingType');
+
+        // The ordinary fixtures contain annotation
+        $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures', $container);
+        $this->assertSame($mappingType, 'attribute');
+
+        // In the attribute folder, attributes are used
+        $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures/Attribute', $container);
+        $this->assertSame($mappingType, 'attribute');
+    }
+
+    public static function providerBasicDrivers(): array
     {
         return [
             ['doctrine.orm.cache.apc.class',       ['type' => 'apc']],
@@ -253,7 +269,7 @@ class DoctrineExtensionTest extends TestCase
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
     }
 
-    public static function providerBundles()
+    public static function providerBundles(): iterable
     {
         yield ['AnnotationsBundle', 'attribute', '/Entity'];
         yield ['AnnotationsOneLineBundle', 'attribute', '/Entity'];

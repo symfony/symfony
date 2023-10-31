@@ -44,7 +44,7 @@ class CachePoolClearCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'pool_name' => [
             ['f'],

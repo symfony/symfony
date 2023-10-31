@@ -30,7 +30,13 @@ class ChoiceToValueTransformerTest extends TestCase
         $this->transformerWithNull = new ChoiceToValueTransformer($listWithNull);
     }
 
-    public static function transformProvider()
+    protected function tearDown(): void
+    {
+        $this->transformer = null;
+        $this->transformerWithNull = null;
+    }
+
+    public static function transformProvider(): array
     {
         return [
             // more extensive test set can be found in FormUtilTest

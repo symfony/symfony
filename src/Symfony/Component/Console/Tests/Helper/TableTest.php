@@ -1017,14 +1017,15 @@ TABLE;
 
     public function testThrowsWhenTheCellInAnArray()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
-        $table = new Table($output = $this->getOutputStream());
+        $table = new Table($this->getOutputStream());
         $table
             ->setHeaders(['ISBN', 'Title', 'Author', 'Price'])
             ->setRows([
                 ['99921-58-10-7', [], 'Dante Alighieri', '9.95'],
             ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
 
         $table->render();
     }
@@ -1996,5 +1997,64 @@ EOTXT
 TABLE;
 
         $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testGithubIssue52101HorizontalTrue()
+    {
+        $tableStyle = (new TableStyle())
+            ->setHorizontalBorderChars('─')
+            ->setVerticalBorderChars('│')
+            ->setCrossingChars('┼', '┌', '┬', '┐', '┤', '┘', '┴', '└', '├')
+        ;
+
+        $table = (new Table($output = $this->getOutputStream()))
+            ->setStyle($tableStyle)
+            ->setHeaderTitle('Title')
+            ->setHeaders(['Hello', 'World'])
+            ->setRows([[1, 2], [3, 4]])
+            ->setHorizontal(true)
+        ;
+        $table->render();
+
+        $this->assertSame(<<<TABLE
+┌──── Title ┬───┐
+│ Hello │ 1 │ 3 │
+│ World │ 2 │ 4 │
+└───────┴───┴───┘
+
+TABLE
+            ,
+            $this->getOutputContent($output)
+        );
+    }
+
+    public function testGithubIssue52101HorizontalFalse()
+    {
+        $tableStyle = (new TableStyle())
+            ->setHorizontalBorderChars('─')
+            ->setVerticalBorderChars('│')
+            ->setCrossingChars('┼', '┌', '┬', '┐', '┤', '┘', '┴', '└', '├')
+        ;
+
+        $table = (new Table($output = $this->getOutputStream()))
+            ->setStyle($tableStyle)
+            ->setHeaderTitle('Title')
+            ->setHeaders(['Hello', 'World'])
+            ->setRows([[1, 2], [3, 4]])
+            ->setHorizontal(false)
+        ;
+        $table->render();
+
+        $this->assertSame(<<<TABLE
+┌──── Title ────┐
+│ Hello │ World │
+├───────┼───────┤
+│ 1     │ 2     │
+│ 3     │ 4     │
+└───────┴───────┘
+
+TABLE,
+            $this->getOutputContent($output)
+        );
     }
 }

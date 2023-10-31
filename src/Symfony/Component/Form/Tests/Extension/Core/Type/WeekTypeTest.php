@@ -313,7 +313,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
-    public static function provideEmptyData()
+    public static function provideEmptyData(): array
     {
         return [
             'Compound text field' => ['text', ['year' => '2019', 'week' => '1'], ['year' => 2019, 'week' => 1]],

@@ -153,7 +153,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
                 return $asset;
             }
 
-            return $assetMapper->getAssetFromSourcePath($importMapEntry->path);
+            return $assetMapper->getAssetFromSourcePath($this->importMapConfigReader->convertPathToFilesystemPath($importMapEntry->path));
         } catch (CircularAssetsException $exception) {
             return $exception->getIncompleteMappedAsset();
         }

@@ -28,9 +28,9 @@ class DateIntervalNormalizerTest extends TestCase
         $this->normalizer = new DateIntervalNormalizer();
     }
 
-    public static function dataProviderISO()
+    public static function dataProviderISO(): array
     {
-        $data = [
+        return [
             ['P%YY%MM%DDT%HH%IM%SS', 'P00Y00M00DT00H00M00S', 'PT0S'],
             ['P%yY%mM%dDT%hH%iM%sS', 'P0Y0M0DT0H0M0S', 'PT0S'],
             ['P%yY%mM%dDT%hH%iM%sS', 'P10Y2M3DT16H5M6S', 'P10Y2M3DT16H5M6S'],
@@ -43,8 +43,6 @@ class DateIntervalNormalizerTest extends TestCase
             ['%rP%yY%mM%dD', '-P10Y2M3D', '-P10Y2M3DT0H'],
             ['%rP%yY%mM%dD', 'P10Y2M3D', 'P10Y2M3DT0H'],
         ];
-
-        return $data;
     }
 
     public function testSupportsNormalization()

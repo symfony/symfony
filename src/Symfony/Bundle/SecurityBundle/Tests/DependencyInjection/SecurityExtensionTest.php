@@ -538,7 +538,27 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('very', $handler->getArgument(2));
     }
 
-    public function sessionConfigurationProvider()
+    public function testSecretRememberMeHandler()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_remember_me', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => ['secret' => 'very', 'token_provider' => 'token_provider_id'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $handler = $container->getDefinition('security.authenticator.remember_me_handler.default');
+        $this->assertSame('very', $handler->getArgument(1));
+    }
+
+    public static function sessionConfigurationProvider(): array
     {
         return [
             [
@@ -642,10 +662,27 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue(true, 'extension throws an InvalidConfigurationException if there is one more more empty access control items');
     }
 
+    public static function provideEntryPointFirewalls(): iterable
+    {
+        // only one entry point available
+        yield [['http_basic' => true], 'security.authenticator.http_basic.main'];
+        // explicitly configured by authenticator key
+        yield [['form_login' => true, 'http_basic' => true, 'entry_point' => 'form_login'], 'security.authenticator.form_login.main'];
+        // explicitly configured another service
+        yield [['form_login' => true, 'entry_point' => EntryPointStub::class], EntryPointStub::class];
+        // no entry point required
+        yield [['json_login' => true], null];
+
+        // only one guard authenticator entry point available
+        yield [[
+            'guard' => ['authenticators' => [AppCustomAuthenticator::class]],
+        ], 'security.authenticator.guard.main.0'];
+    }
+
     /**
      * @dataProvider provideEntryPointRequiredData
      */
-    public function testEntryPointRequired(array $firewall, $messageRegex)
+    public function testEntryPointRequired(array $firewall, string $messageRegex)
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches($messageRegex);
@@ -664,7 +701,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public static function provideEntryPointRequiredData()
+    public static function provideEntryPointRequiredData(): iterable
     {
         // more than one entry point available and not explicitly set
         yield [
@@ -695,7 +732,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($expectedAuthenticators, array_map('strval', $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
     }
 
-    public static function provideConfigureCustomAuthenticatorData()
+    public static function provideConfigureCustomAuthenticatorData(): iterable
     {
         yield [
             ['custom_authenticator' => TestAuthenticator::class],
@@ -772,7 +809,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($expectedUserCheckerClass, $container->findDefinition($userCheckerId)->getClass());
     }
 
-    public static function provideUserCheckerConfig()
+    public static function provideUserCheckerConfig(): iterable
     {
         yield [[], InMemoryUserChecker::class];
         yield [['user_checker' => TestUserChecker::class], TestUserChecker::class];

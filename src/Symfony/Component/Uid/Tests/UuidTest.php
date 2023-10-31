@@ -240,7 +240,7 @@ class UuidTest extends TestCase
         $this->assertFalse((new UuidV4(self::A_UUID_V4))->equals($other));
     }
 
-    public static function provideInvalidEqualType()
+    public static function provideInvalidEqualType(): iterable
     {
         yield [null];
         yield [self::A_UUID_V1];
@@ -317,7 +317,7 @@ class UuidTest extends TestCase
         Uuid::fromBinary($ulid);
     }
 
-    public static function provideInvalidBinaryFormat()
+    public static function provideInvalidBinaryFormat(): array
     {
         return [
             ['01EW2RYKDCT2SAK454KBR2QG08'],
@@ -344,7 +344,7 @@ class UuidTest extends TestCase
         Uuid::fromBase58($ulid);
     }
 
-    public static function provideInvalidBase58Format()
+    public static function provideInvalidBase58Format(): array
     {
         return [
             ["\x41\x4C\x08\x92\x57\x1B\x11\xEB\xBF\x70\x93\xF9\xB0\x82\x2C\x57"],
@@ -371,7 +371,7 @@ class UuidTest extends TestCase
         Uuid::fromBase32($ulid);
     }
 
-    public static function provideInvalidBase32Format()
+    public static function provideInvalidBase32Format(): array
     {
         return [
             ["\x5B\xA8\x32\x72\x45\x6D\x5A\xC0\xAB\xE3\xAA\x8B\xF7\x01\x96\x73"],
@@ -398,7 +398,7 @@ class UuidTest extends TestCase
         Uuid::fromRfc4122($ulid);
     }
 
-    public static function provideInvalidRfc4122Format()
+    public static function provideInvalidRfc4122Format(): array
     {
         return [
             ["\x1E\xB5\x71\xB4\x14\xC0\x68\x93\xBF\x70\x2D\x4C\x83\xCF\x75\x5A"],

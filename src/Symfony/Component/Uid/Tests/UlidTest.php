@@ -156,7 +156,7 @@ class UlidTest extends TestCase
         Ulid::fromBinary($ulid);
     }
 
-    public static function provideInvalidBinaryFormat()
+    public static function provideInvalidBinaryFormat(): array
     {
         return [
             ['01EW2RYKDCT2SAK454KBR2QG08'],
@@ -183,7 +183,7 @@ class UlidTest extends TestCase
         Ulid::fromBase58($ulid);
     }
 
-    public static function provideInvalidBase58Format()
+    public static function provideInvalidBase58Format(): array
     {
         return [
             ["\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"],
@@ -210,7 +210,7 @@ class UlidTest extends TestCase
         Ulid::fromBase32($ulid);
     }
 
-    public static function provideInvalidBase32Format()
+    public static function provideInvalidBase32Format(): array
     {
         return [
             ["\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"],
@@ -237,7 +237,7 @@ class UlidTest extends TestCase
         Ulid::fromRfc4122($ulid);
     }
 
-    public static function provideInvalidRfc4122Format()
+    public static function provideInvalidRfc4122Format(): array
     {
         return [
             ["\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"],

@@ -20,8 +20,8 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
 {
     use DateTimeEqualsTrait;
 
-    protected \DateTime $dateTime;
-    protected \DateTime $dateTimeWithoutSeconds;
+    protected ?\DateTime $dateTime;
+    protected ?\DateTime $dateTimeWithoutSeconds;
 
     protected function setUp(): void
     {

@@ -100,7 +100,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'option --format' => [
             ['--format', ''],

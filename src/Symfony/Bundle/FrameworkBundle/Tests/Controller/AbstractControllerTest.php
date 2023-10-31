@@ -409,7 +409,7 @@ class AbstractControllerTest extends TestCase
         }
     }
 
-    public static function provideDenyAccessUnlessGrantedSetsAttributesAsArray()
+    public static function provideDenyAccessUnlessGrantedSetsAttributesAsArray(): array
     {
         $obj = new \stdClass();
         $obj->foo = 'bar';

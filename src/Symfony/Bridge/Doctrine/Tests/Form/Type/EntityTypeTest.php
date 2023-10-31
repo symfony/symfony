@@ -158,7 +158,7 @@ class EntityTypeTest extends BaseTypeTestCase
         }
     }
 
-    public static function choiceTranslationDomainProvider()
+    public static function choiceTranslationDomainProvider(): array
     {
         return [
             [false],
@@ -240,8 +240,6 @@ class EntityTypeTest extends BaseTypeTestCase
                 return new \stdClass();
             },
         ]);
-
-        $field->submit('2');
     }
 
     public function testConfigureQueryBuilderWithClosureReturningNullUseDefault()

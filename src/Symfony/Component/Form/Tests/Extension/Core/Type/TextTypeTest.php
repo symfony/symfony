@@ -32,7 +32,7 @@ class TextTypeTest extends BaseTypeTestCase
         $this->assertSame('', $form->getViewData());
     }
 
-    public static function provideZeros()
+    public static function provideZeros(): array
     {
         return [
             [0, '0'],

@@ -47,11 +47,12 @@ class AbstractBrowserTest extends TestCase
 
     public function testGetRequestNull()
     {
+        $client = $this->getBrowser();
+
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getRequest()".');
 
-        $client = $this->getBrowser();
-        $this->assertNull($client->getRequest());
+        $client->getRequest();
     }
 
     public function testXmlHttpRequest()
@@ -95,20 +96,22 @@ class AbstractBrowserTest extends TestCase
 
     public function testGetResponseNull()
     {
+        $client = $this->getBrowser();
+
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getResponse()".');
 
-        $client = $this->getBrowser();
-        $this->assertNull($client->getResponse());
+        $client->getResponse();
     }
 
     public function testGetInternalResponseNull()
     {
+        $client = $this->getBrowser();
+
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalResponse()".');
 
-        $client = $this->getBrowser();
-        $this->assertNull($client->getInternalResponse());
+        $client->getInternalResponse();
     }
 
     public function testGetContent()
@@ -131,11 +134,12 @@ class AbstractBrowserTest extends TestCase
 
     public function testGetCrawlerNull()
     {
+        $client = $this->getBrowser();
+
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getCrawler()".');
 
-        $client = $this->getBrowser();
-        $this->assertNull($client->getCrawler());
+        $client->getCrawler();
     }
 
     public function testRequestHttpHeaders()
@@ -384,7 +388,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('bar', $server['PHP_AUTH_PW']);
     }
 
-    public function testSubmitPassthrewHeaders()
+    public function testSubmitPassthroughHeaders()
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
@@ -623,7 +627,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame($expectedEndingUrl, $client->getRequest()->getUri());
     }
 
-    public static function getTestsForMetaRefresh()
+    public static function getTestsForMetaRefresh(): array
     {
         return [
             ['<html><head><meta http-equiv="Refresh" content="4" /><meta http-equiv="refresh" content="0; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
@@ -844,10 +848,11 @@ class AbstractBrowserTest extends TestCase
 
     public function testInternalRequestNull()
     {
+        $client = $this->getBrowser();
+
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalRequest()".');
 
-        $client = $this->getBrowser();
-        $this->assertNull($client->getInternalRequest());
+        $client->getInternalRequest();
     }
 }

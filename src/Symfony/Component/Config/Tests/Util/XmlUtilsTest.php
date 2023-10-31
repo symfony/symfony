@@ -91,12 +91,13 @@ class XmlUtilsTest extends TestCase
 
     public function testParseWithInvalidValidatorCallable()
     {
-        $this->expectException(InvalidXmlException::class);
-        $this->expectExceptionMessage('The XML is not valid');
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
         $mock = $this->createMock(Validator::class);
         $mock->expects($this->once())->method('validate')->willReturn(false);
+
+        $this->expectException(InvalidXmlException::class);
+        $this->expectExceptionMessage('The XML is not valid');
 
         XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), [$mock, 'validate']);
     }

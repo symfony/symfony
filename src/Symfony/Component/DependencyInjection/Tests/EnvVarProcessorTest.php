@@ -196,9 +196,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvIntInvalid($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Non-numeric env var');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('int', 'foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -246,9 +247,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvFloatInvalid($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Non-numeric env var');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('float', 'foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -295,9 +297,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvConstInvalid($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('undefined constant');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('const', 'foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -373,9 +376,10 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvInvalidJson()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Syntax error');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('json', 'foo', function ($name) {
             $this->assertSame('foo', $name);
@@ -389,9 +393,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvJsonOther($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid JSON env var');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('json', 'foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -413,9 +418,10 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvUnknown()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unsupported env var prefix');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('unknown', 'foo', function ($name) {
             $this->assertSame('foo', $name);
@@ -426,9 +432,10 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvKeyInvalidKey()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid env "key:foo": a key specifier should be provided.');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('key', 'foo', function ($name) {
             $this->fail('Should not get here');
@@ -440,9 +447,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvKeyNoArrayResult($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Resolved value of "foo" did not result in an array value.');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -466,9 +474,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvKeyArrayKeyNotFound($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(EnvNotFoundException::class);
         $this->expectExceptionMessage('Key "index" not found in');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -621,9 +630,10 @@ class EnvVarProcessorTest extends TestCase
 
     public function testRequireMissingFile()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(EnvNotFoundException::class);
         $this->expectExceptionMessage('missing-file');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('require', '/missing-file', fn ($name) => $name);
     }
@@ -684,14 +694,14 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvResolveNotScalar($value)
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Parameter "bar" found when resolving env var "foo" must be scalar');
-
         $container = new ContainerBuilder();
         $container->setParameter('bar', $value);
         $container->compile();
 
         $processor = new EnvVarProcessor($container);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter "bar" found when resolving env var "foo" must be scalar');
 
         $processor->getEnv('resolve', 'foo', fn () => '%bar%');
     }
@@ -877,9 +887,10 @@ CSV;
 
     public function testGetEnvInvalidPrefixWithDefault()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unsupported env var prefix');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('unknown', 'default::FAKE', function ($name) {
             $this->assertSame('default::FAKE', $name);

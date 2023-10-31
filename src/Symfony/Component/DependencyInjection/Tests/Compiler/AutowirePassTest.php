@@ -609,12 +609,13 @@ class AutowirePassTest extends TestCase
 
     public function testUnionScalarArgsCannotBeAutowired()
     {
-        $this->expectException(AutowiringFailedException::class);
-        $this->expectExceptionMessage('Cannot autowire service "union_scalars": argument "$timeout" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionScalars::__construct()" is type-hinted "float|int", you should configure its value explicitly.');
         $container = new ContainerBuilder();
 
         $container->register('union_scalars', UnionScalars::class)
             ->setAutowired(true);
+
+        $this->expectException(AutowiringFailedException::class);
+        $this->expectExceptionMessage('Cannot autowire service "union_scalars": argument "$timeout" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionScalars::__construct()" is type-hinted "float|int", you should configure its value explicitly.');
 
         (new AutowirePass())->process($container);
     }

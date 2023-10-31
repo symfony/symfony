@@ -229,8 +229,8 @@ class ApplicationTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Command class "Foo5Command" is not correctly initialized. You probably forgot to call the parent constructor.');
-        $application = new Application();
-        $application->add(new \Foo5Command());
+
+        (new Application())->add(new \Foo5Command());
     }
 
     public function testHasGet()
@@ -294,8 +294,8 @@ class ApplicationTest extends TestCase
     {
         $this->expectException(CommandNotFoundException::class);
         $this->expectExceptionMessage('The command "foofoo" does not exist.');
-        $application = new Application();
-        $application->get('foofoo');
+
+        (new Application())->get('foofoo');
     }
 
     public function testGetNamespaces()
@@ -351,20 +351,21 @@ class ApplicationTest extends TestCase
     {
         $this->expectException(NamespaceNotFoundException::class);
         $this->expectExceptionMessage('There are no commands defined in the "bar" namespace.');
-        $application = new Application();
-        $application->findNamespace('bar');
+
+        (new Application)->findNamespace('bar');
     }
 
     public function testFindUniqueNameButNamespaceName()
     {
-        $this->expectException(CommandNotFoundException::class);
-        $this->expectExceptionMessage('Command "foo1" is not defined');
         $application = new Application();
         $application->add(new \FooCommand());
         $application->add(new \Foo1Command());
         $application->add(new \Foo2Command());
 
-        $application->find($commandName = 'foo1');
+        $this->expectException(CommandNotFoundException::class);
+        $this->expectExceptionMessage('Command "foo1" is not defined');
+
+        $application->find('foo1');
     }
 
     public function testFind()
@@ -403,13 +404,14 @@ class ApplicationTest extends TestCase
 
     public function testFindCaseInsensitiveSuggestions()
     {
-        $this->expectException(CommandNotFoundException::class);
-        $this->expectExceptionMessage('Command "FoO:BaR" is ambiguous');
         $application = new Application();
         $application->add(new \FooSameCaseLowercaseCommand());
         $application->add(new \FooSameCaseUppercaseCommand());
 
-        $this->assertInstanceOf(\FooSameCaseLowercaseCommand::class, $application->find('FoO:BaR'), '->find() will find two suggestions with case insensitivity');
+        $this->expectException(CommandNotFoundException::class);
+        $this->expectExceptionMessage('Command "FoO:BaR" is ambiguous');
+
+        $application->find('FoO:BaR');
     }
 
     public function testFindWithCommandLoader()
@@ -506,10 +508,12 @@ class ApplicationTest extends TestCase
      */
     public function testFindAlternativeExceptionMessageSingle($name)
     {
-        $this->expectException(CommandNotFoundException::class);
-        $this->expectExceptionMessage('Did you mean this');
         $application = new Application();
         $application->add(new \Foo3Command());
+
+        $this->expectException(CommandNotFoundException::class);
+        $this->expectExceptionMessage('Did you mean this');
+
         $application->find($name);
     }
 
@@ -744,11 +748,13 @@ class ApplicationTest extends TestCase
 
     public function testFindWithDoubleColonInNameThrowsException()
     {
-        $this->expectException(CommandNotFoundException::class);
-        $this->expectExceptionMessage('Command "foo::bar" is not defined.');
         $application = new Application();
         $application->add(new \FooCommand());
         $application->add(new \Foo4Command());
+
+        $this->expectException(CommandNotFoundException::class);
+        $this->expectExceptionMessage('Command "foo::bar" is not defined.');
+
         $application->find('foo::bar');
     }
 
@@ -1248,8 +1254,6 @@ class ApplicationTest extends TestCase
 
     public function testAddingOptionWithDuplicateShortcut()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('An option with shortcut "e" already exists.');
         $dispatcher = new EventDispatcher();
         $application = new Application();
         $application->setAutoExit(false);
@@ -1268,6 +1272,9 @@ class ApplicationTest extends TestCase
         $input = new ArrayInput(['command' => 'foo']);
         $output = new NullOutput();
 
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('An option with shortcut "e" already exists.');
+
         $application->run($input, $output);
     }
 
@@ -1276,7 +1283,6 @@ class ApplicationTest extends TestCase
      */
     public function testAddingAlreadySetDefinitionElementData($def)
     {
-        $this->expectException(\LogicException::class);
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
@@ -1288,10 +1294,13 @@ class ApplicationTest extends TestCase
 
         $input = new ArrayInput(['command' => 'foo']);
         $output = new NullOutput();
+
+        $this->expectException(\LogicException::class);
+
         $application->run($input, $output);
     }
 
-    public static function getAddingAlreadySetDefinitionElementData()
+    public static function getAddingAlreadySetDefinitionElementData(): array
     {
         return [
             [new InputArgument('command', InputArgument::REQUIRED)],
@@ -1428,8 +1437,6 @@ class ApplicationTest extends TestCase
 
     public function testRunWithExceptionAndDispatcher()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('error');
         $application = new Application();
         $application->setDispatcher($this->getDispatcher());
         $application->setAutoExit(false);
@@ -1440,6 +1447,10 @@ class ApplicationTest extends TestCase
         });
 
         $tester = new ApplicationTester($application);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('error');
+
         $tester->run(['command' => 'foo']);
     }
 
@@ -1504,9 +1515,6 @@ class ApplicationTest extends TestCase
 
     public function testRunWithFindError()
     {
-        $this->expectException(\Error::class);
-        $this->expectExceptionMessage('Find exception');
-
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
@@ -1518,6 +1526,10 @@ class ApplicationTest extends TestCase
 
         // The exception should not be ignored
         $tester = new ApplicationTester($application);
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Find exception');
+
         $tester->run(['command' => 'foo']);
     }
 
@@ -1590,8 +1602,6 @@ class ApplicationTest extends TestCase
 
     public function testRunWithErrorAndDispatcher()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('error');
         $application = new Application();
         $application->setDispatcher($this->getDispatcher());
         $application->setAutoExit(false);
@@ -1604,6 +1614,10 @@ class ApplicationTest extends TestCase
         });
 
         $tester = new ApplicationTester($application);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('error');
+
         $tester->run(['command' => 'dym']);
         $this->assertStringContainsString('before.dym.error.after.', $tester->getDisplay(), 'The PHP error did not dispatch events');
     }
@@ -1802,9 +1816,11 @@ class ApplicationTest extends TestCase
 
     public function testGetDisabledLazyCommand()
     {
-        $this->expectException(CommandNotFoundException::class);
         $application = new Application();
         $application->setCommandLoader(new FactoryCommandLoader(['disabled' => fn () => new DisabledCommand()]));
+
+        $this->expectException(CommandNotFoundException::class);
+
         $application->get('disabled');
     }
 
@@ -1895,8 +1911,6 @@ class ApplicationTest extends TestCase
 
     public function testThrowingErrorListener()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('foo');
         $dispatcher = $this->getDispatcher();
         $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
             throw new \RuntimeException('foo');
@@ -1916,20 +1930,25 @@ class ApplicationTest extends TestCase
         });
 
         $tester = new ApplicationTester($application);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('foo');
+
         $tester->run(['command' => 'foo']);
     }
 
     public function testCommandNameMismatchWithCommandLoaderKeyThrows()
     {
-        $this->expectException(CommandNotFoundException::class);
-        $this->expectExceptionMessage('The "test" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".');
-
         $app = new Application();
         $loader = new FactoryCommandLoader([
             'test' => static fn () => new Command('test-command'),
         ]);
 
         $app->setCommandLoader($loader);
+
+        $this->expectException(CommandNotFoundException::class);
+        $this->expectExceptionMessage('The "test" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".');
+
         $app->get('test');
     }
 

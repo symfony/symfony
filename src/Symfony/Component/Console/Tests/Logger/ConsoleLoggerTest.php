@@ -137,8 +137,7 @@ class ConsoleLoggerTest extends TestCase
     public function testThrowsOnInvalidLevel()
     {
         $this->expectException(InvalidArgumentException::class);
-        $logger = $this->getLogger();
-        $logger->log('invalid level', 'Foo');
+        $this->getLogger()->log('invalid level', 'Foo');
     }
 
     public function testContextReplacement()

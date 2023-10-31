@@ -118,9 +118,11 @@ class DefinitionTest extends TestCase
 
     public function testExceptionOnEmptyMethodCall()
     {
+        $def = new Definition('stdClass');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Method name cannot be empty.');
-        $def = new Definition('stdClass');
+
         $def->addMethodCall('');
     }
 
@@ -189,12 +191,14 @@ class DefinitionTest extends TestCase
      */
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
     {
-        $this->expectException(InvalidArgumentException::class);
         $def = new Definition('stdClass');
+
+        $this->expectException(InvalidArgumentException::class);
+
         $def->setDeprecated('vendor/package', '1.1', $message);
     }
 
-    public static function invalidDeprecationMessageProvider()
+    public static function invalidDeprecationMessageProvider(): array
     {
         return [
             "With \rs" => ["invalid \r message %service_id%"],
@@ -274,28 +278,32 @@ class DefinitionTest extends TestCase
 
     public function testGetArgumentShouldCheckBounds()
     {
-        $this->expectException(\OutOfBoundsException::class);
         $def = new Definition('stdClass');
-
         $def->addArgument('foo');
+
+        $this->expectException(\OutOfBoundsException::class);
+
         $def->getArgument(1);
     }
 
     public function testReplaceArgumentShouldCheckBounds()
     {
+        $def = new Definition('stdClass');
+        $def->addArgument('foo');
+
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('The index "1" is not in the range [0, 0] of the arguments of class "stdClass".');
-        $def = new Definition('stdClass');
 
-        $def->addArgument('foo');
         $def->replaceArgument(1, 'bar');
     }
 
     public function testReplaceArgumentWithoutExistingArgumentsShouldCheckBounds()
     {
+        $def = new Definition('stdClass');
+
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Cannot replace arguments for class "stdClass" if none have been configured yet.');
-        $def = new Definition('stdClass');
+
         $def->replaceArgument(0, 'bar');
     }
 

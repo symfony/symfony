@@ -18,8 +18,8 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransform
 
 class ChoiceToValueTransformerTest extends TestCase
 {
-    protected ?ChoiceToValueTransformer $transformer;
-    protected ?ChoiceToValueTransformer $transformerWithNull;
+    protected ChoiceToValueTransformer $transformer;
+    protected ChoiceToValueTransformer $transformerWithNull;
 
     protected function setUp(): void
     {
@@ -32,8 +32,8 @@ class ChoiceToValueTransformerTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->transformer = null;
-        $this->transformerWithNull = null;
+        unset($this->transformer);
+        unset($this->transformerWithNull);
     }
 
     public static function transformProvider(): array

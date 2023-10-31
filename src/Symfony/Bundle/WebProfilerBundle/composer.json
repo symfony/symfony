@@ -18,7 +18,7 @@
     "require": {
         "php": ">=7.2.5",
         "symfony/config": "^4.4|^5.0|^6.0",
-        "symfony/framework-bundle": "^5.3|^6.0",
+        "symfony/framework-bundle": "^5.3|^6.0,<6.4",
         "symfony/http-kernel": "^5.3|^6.0",
         "symfony/polyfill-php80": "^1.16",
         "symfony/routing": "^4.4|^5.0|^6.0",

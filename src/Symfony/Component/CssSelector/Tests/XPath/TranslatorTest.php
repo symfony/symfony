@@ -38,56 +38,68 @@ class TranslatorTest extends TestCase
 
     public function testCssToXPathPseudoElement()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->cssToXPath('e::first-line');
     }
 
     public function testGetExtensionNotExistsExtension()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->getExtension('fake');
     }
 
     public function testAddCombinationNotExistsExtension()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $parser = new Parser();
         $xpath = $parser->parse('*')[0];
         $combinedXpath = $parser->parse('*')[0];
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->addCombination('fake', $xpath, $combinedXpath);
     }
 
     public function testAddFunctionNotExistsFunction()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
         $function = new FunctionNode(new ElementNode(), 'fake');
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->addFunction($xpath, $function);
     }
 
     public function testAddPseudoClassNotExistsClass()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->addPseudoClass($xpath, 'fake');
     }
 
     public function testAddAttributeMatchingClassNotExistsClass()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->addAttributeMatching($xpath, '', '', '');
     }
 

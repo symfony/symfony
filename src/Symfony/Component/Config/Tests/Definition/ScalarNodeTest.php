@@ -88,8 +88,10 @@ class ScalarNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException(InvalidTypeException::class);
         $node = new ScalarNode('test');
+
+        $this->expectException(InvalidTypeException::class);
+
         $node->normalize($value);
     }
 
@@ -154,9 +156,11 @@ class ScalarNodeTest extends TestCase
      */
     public function testNotAllowedEmptyValuesThrowException($value)
     {
-        $this->expectException(InvalidConfigurationException::class);
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);
+
+        $this->expectException(InvalidConfigurationException::class);
+
         $node->finalize($value);
     }
 

@@ -48,7 +48,6 @@ class LoaderTest extends TestCase
 
     public function testResolveWhenResolverCannotFindLoader()
     {
-        $this->expectException(LoaderLoadException::class);
         $resolver = $this->createMock(LoaderResolverInterface::class);
         $resolver->expects($this->once())
             ->method('resolve')
@@ -57,6 +56,8 @@ class LoaderTest extends TestCase
 
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
+
+        $this->expectException(LoaderLoadException::class);
 
         $loader->resolve('FOOBAR');
     }

@@ -21,18 +21,20 @@ class CheckDefinitionValidityPassTest extends TestCase
 {
     public function testProcessDetectsSyntheticNonPublicDefinitions()
     {
-        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(true)->setPublic(false);
+
+        $this->expectException(RuntimeException::class);
 
         $this->process($container);
     }
 
     public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
     {
-        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(false)->setAbstract(false);
+
+        $this->expectException(RuntimeException::class);
 
         $this->process($container);
     }
@@ -92,10 +94,12 @@ class CheckDefinitionValidityPassTest extends TestCase
      */
     public function testInvalidTags(string $name, array $attributes, string $message)
     {
-        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage($message);
         $container = new ContainerBuilder();
         $container->register('a', 'class')->addTag($name, $attributes);
+
+        $this->expectException(RuntimeException::class);
+
         $this->process($container);
     }
 
@@ -121,20 +125,22 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testDynamicPublicServiceName()
     {
-        $this->expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->register("foo.$env", 'class')->setPublic(true);
+
+        $this->expectException(EnvParameterException::class);
 
         $this->process($container);
     }
 
     public function testDynamicPublicAliasName()
     {
-        $this->expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->setAlias("foo.$env", 'class')->setPublic(true);
+
+        $this->expectException(EnvParameterException::class);
 
         $this->process($container);
     }

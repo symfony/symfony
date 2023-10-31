@@ -30,8 +30,9 @@ class HttpKernelExtensionTest extends TestCase
 {
     public function testFragmentWithError()
     {
-        $this->expectException(\Twig\Error\RuntimeError::class);
         $renderer = $this->getFragmentHandler($this->throwException(new \Exception('foo')));
+
+        $this->expectException(\Twig\Error\RuntimeError::class);
 
         $this->renderTemplate($renderer);
     }

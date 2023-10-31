@@ -162,17 +162,21 @@ class InputOptionTest extends TestCase
 
     public function testDefaultValueWithValueNoneMode()
     {
+        $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot set a default value when using InputOption::VALUE_NONE mode.');
-        $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
+
         $option->setDefault('default');
     }
 
     public function testDefaultValueWithIsArrayMode()
     {
+        $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A default value for an array option must be an array.');
-        $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
+
         $option->setDefault('default');
     }
 
@@ -229,10 +233,11 @@ class InputOptionTest extends TestCase
 
     public function testCompleteClosureReturnIncorrectType()
     {
+        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
+
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Closure for option "foo" must return an array. Got "string".');
 
-        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
         $option->complete(new CompletionInput(), new CompletionSuggestions());
     }
 }

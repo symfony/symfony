@@ -81,9 +81,11 @@ class RouterDebugCommandTest extends AbstractWebTestCase
 
     public function testSearchWithThrow()
     {
+        $tester = $this->createCommandTester();
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The route "gerard" does not exist.');
-        $tester = $this->createCommandTester();
+
         $tester->execute(['name' => 'gerard'], ['interactive' => true]);
     }
 

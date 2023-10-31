@@ -29,12 +29,13 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
 
     public function testGetThrowsOnUndefinedService()
     {
-        $this->expectException(NotFoundExceptionInterface::class);
-        $this->expectExceptionMessage('Service "dummy" not found: the container inside "Symfony\Component\DependencyInjection\Tests\ServiceLocatorTest" is a smaller service locator that only knows about the "foo" and "bar" services.');
         $locator = $this->getServiceLocator([
             'foo' => fn () => 'bar',
             'bar' => fn () => 'baz',
         ]);
+
+        $this->expectException(NotFoundExceptionInterface::class);
+        $this->expectExceptionMessage('Service "dummy" not found: the container inside "Symfony\Component\DependencyInjection\Tests\ServiceLocatorTest" is a smaller service locator that only knows about the "foo" and "bar" services.');
 
         $locator->get('dummy');
     }
@@ -48,26 +49,29 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
 
     public function testThrowsInServiceSubscriber()
     {
-        $this->expectException(NotFoundExceptionInterface::class);
-        $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "caller" is a smaller service locator that only knows about the "bar" service. Unless you need extra laziness, try using dependency injection instead. Otherwise, you need to declare it using "SomeServiceSubscriber::getSubscribedServices()".');
         $container = new Container();
         $container->set('foo', new \stdClass());
         $subscriber = new SomeServiceSubscriber();
         $subscriber->container = $this->getServiceLocator(['bar' => function () {}]);
         $subscriber->container = $subscriber->container->withContext('caller', $container);
 
+        $this->expectException(NotFoundExceptionInterface::class);
+        $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "caller" is a smaller service locator that only knows about the "bar" service. Unless you need extra laziness, try using dependency injection instead. Otherwise, you need to declare it using "SomeServiceSubscriber::getSubscribedServices()".');
+
         $subscriber->getFoo();
     }
 
     public function testGetThrowsServiceNotFoundException()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "foo" is a smaller service locator that is empty... Try using dependency injection instead.');
         $container = new Container();
         $container->set('foo', new \stdClass());
 
         $locator = new ServiceLocator([]);
         $locator = $locator->withContext('foo', $container);
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "foo" is a smaller service locator that is empty... Try using dependency injection instead.');
+
         $locator->get('foo');
     }
 

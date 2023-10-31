@@ -110,7 +110,7 @@ class UrlPackageTest extends TestCase
     /**
      * @dataProvider getWrongBaseUrlConfig
      */
-    public function testWrongBaseUrl($baseUrls)
+    public function testWrongBaseUrl(string $baseUrls)
     {
         $this->expectException(InvalidArgumentException::class);
         new UrlPackage($baseUrls, new EmptyVersionStrategy());

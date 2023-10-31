@@ -141,11 +141,10 @@ class CommandTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Command name "%s" is invalid.', $name));
 
-        $command = new \TestCommand();
-        $command->setName($name);
+        (new \TestCommand())->setName($name);
     }
 
-    public static function provideInvalidCommandNames()
+    public static function provideInvalidCommandNames(): array
     {
         return [
             [''],
@@ -233,8 +232,7 @@ class CommandTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot retrieve helper "formatter" because there is no HelperSet defined.');
-        $command = new \TestCommand();
-        $command->getHelper('formatter');
+        (new \TestCommand())->getHelper('formatter');
     }
 
     public function testMergeApplicationDefinition()
@@ -302,16 +300,17 @@ class CommandTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You must override the execute() method in the concrete command class.');
-        $command = new Command('foo');
-        $command->run(new StringInput(''), new NullOutput());
+        (new Command('foo'))->run(new StringInput(''), new NullOutput());
     }
 
     public function testRunWithInvalidOption()
     {
-        $this->expectException(InvalidOptionException::class);
-        $this->expectExceptionMessage('The "--bar" option does not exist.');
         $command = new \TestCommand();
         $tester = new CommandTester($command);
+
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage('The "--bar" option does not exist.');
+
         $tester->execute(['--bar' => true]);
     }
 

@@ -154,8 +154,6 @@ class CommandTesterTest extends TestCase
 
     public function testCommandWithWrongInputsNumber()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Aborted.');
         $questions = [
             'What\'s your name?',
             'How are you?',
@@ -174,13 +172,15 @@ class CommandTesterTest extends TestCase
 
         $tester = new CommandTester($command);
         $tester->setInputs(['a', 'Bobby', 'Fine']);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Aborted.');
+
         $tester->execute([]);
     }
 
     public function testCommandWithQuestionsButNoInputs()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Aborted.');
         $questions = [
             'What\'s your name?',
             'How are you?',
@@ -198,6 +198,10 @@ class CommandTesterTest extends TestCase
         });
 
         $tester = new CommandTester($command);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Aborted.');
+
         $tester->execute([]);
     }
 

@@ -24,7 +24,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 {
     public function testExceptionOnAbstractTaggedListener()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $container = $this->createBuilder();
 
         $abstractDefinition = new Definition('stdClass');
@@ -32,6 +31,8 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $abstractDefinition->addTag('doctrine.event_listener', ['event' => 'test']);
 
         $container->setDefinition('a', $abstractDefinition);
+
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->process($container);
     }

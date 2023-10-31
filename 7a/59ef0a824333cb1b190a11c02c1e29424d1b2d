@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-18T09:40:57Z
+
+Fabbot is false positive
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-10-18T09:41:03Z
+
+The issue might be with unicode characters. Could you add an emoji in the values?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-18T09:42:07Z
+
+> The issue might be with unicode characters. Could you add an emoji in the values?
+
+Lets try the fix from the bug report
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-18T09:48:48Z
+
+What's the difference here?
+![CleanShot 2023-10-18 at 11 47 39@2x](https://github.com/symfony/symfony/assets/995707/2206624b-25fe-492c-87e2-392141c6a842)

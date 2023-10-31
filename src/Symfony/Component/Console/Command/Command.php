@@ -687,7 +687,7 @@ class Command
     /**
      * Adds a set of command usage examples.
      *
-     * @param array[string] $usages
+     * @param string[] $usages
      */
     public function addUsages(array $usages): static
     {

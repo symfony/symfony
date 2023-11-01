@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-11-01T04:11:33Z
+
+I don't know this particular part of the code but usually this kind of comparison `DIRECTORY_SEPARATOR` is used to detect windows systems. As the value is different on Windows and Unix systems.

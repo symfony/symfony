@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `--all` option to the `messenger:consume` command
+
 7.0
 ---
 

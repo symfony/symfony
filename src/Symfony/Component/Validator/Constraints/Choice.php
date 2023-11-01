@@ -32,6 +32,7 @@ class Choice extends Constraint
     public ?array $choices = null;
     /** @var callable|string|null */
     public $callback;
+    public array $callbackArgs = [];
     public bool $multiple = false;
     public bool $strict = true;
     public ?int $min = null;
@@ -51,6 +52,7 @@ class Choice extends Constraint
         string|array $options = [],
         array $choices = null,
         callable|string $callback = null,
+        array $callbackArgs = null,
         bool $multiple = null,
         bool $strict = null,
         int $min = null,
@@ -74,6 +76,7 @@ class Choice extends Constraint
         parent::__construct($options, $groups, $payload);
 
         $this->callback = $callback ?? $this->callback;
+        $this->callbackArgs = $callbackArgs ?? $this->callbackArgs;
         $this->multiple = $multiple ?? $this->multiple;
         $this->strict = $strict ?? $this->strict;
         $this->min = $min ?? $this->min;

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+* New events: `HandlerStartingEvent`, `HandlerSuccessEvent`, `HandlerFailureEvent`
+
 7.0
 ---
 

@@ -78,6 +78,7 @@ final class Window implements LimiterStateInterface
         }
 
         $inWindow = ceil($this->hitCount / $this->maxSize);
+
         return (int) ceil($this->timer + ($this->intervalInSeconds * $inWindow) - $now);
     }
 

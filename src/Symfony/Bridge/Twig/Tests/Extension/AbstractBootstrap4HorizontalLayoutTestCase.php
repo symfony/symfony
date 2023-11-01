@@ -31,7 +31,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
             '/div
     [
         ./label[@for="name"]
-        /following-sibling::div[@class="alert alert-danger d-block mb-1"]
+        /following-sibling::span[@class="alert alert-danger d-block mb-1"]
         [./span[@class="d-block"]
             [./span[.="[trans]Error[/trans]"]]
             [./span[.="[trans]Error![/trans]"]]

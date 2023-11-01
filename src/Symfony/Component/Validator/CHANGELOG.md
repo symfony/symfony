@@ -35,6 +35,7 @@ CHANGELOG
  * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
  * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
  * Add `GroupProviderInterface` to implement validation group providers outside the underlying class
+ * Add the `callbackArgs` option to the `Choice` constraint
 
 6.3
 ---

@@ -68,22 +68,26 @@ class SwitchUserListenerTest extends TestCase
 
     public function testExitUserThrowsAuthenticationExceptionIfNoCurrentToken()
     {
-        $this->expectException(AuthenticationCredentialsNotFoundException::class);
         $this->tokenStorage->setToken(null);
         $this->request->query->set('_switch_user', '_exit');
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+
+        $this->expectException(AuthenticationCredentialsNotFoundException::class);
+
         $listener($this->event);
     }
 
     public function testExitUserThrowsAuthenticationExceptionIfOriginalTokenCannotBeFound()
     {
-        $this->expectException(AuthenticationCredentialsNotFoundException::class);
         $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+
+        $this->expectException(AuthenticationCredentialsNotFoundException::class);
+
         $listener($this->event);
     }
 
@@ -134,7 +138,6 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserIsDisallowed()
     {
-        $this->expectException(AccessDeniedException::class);
         $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
         $user = new InMemoryUser('username', 'password', []);
 
@@ -146,12 +149,14 @@ class SwitchUserListenerTest extends TestCase
             ->willReturn(false);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+
+        $this->expectException(AccessDeniedException::class);
+
         $listener($this->event);
     }
 
     public function testSwitchUserTurnsAuthenticationExceptionTo403()
     {
-        $this->expectException(AccessDeniedException::class);
         $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_ALLOWED_TO_SWITCH']), 'key', ['ROLE_ALLOWED_TO_SWITCH']);
 
         $this->tokenStorage->setToken($token);
@@ -161,6 +166,9 @@ class SwitchUserListenerTest extends TestCase
             ->method('decide');
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+
+        $this->expectException(AccessDeniedException::class);
+
         $listener($this->event);
     }
 
@@ -303,10 +311,12 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserThrowsAuthenticationExceptionIfNoCurrentToken()
     {
-        $this->expectException(AuthenticationCredentialsNotFoundException::class);
         $this->tokenStorage->setToken(null);
         $this->request->query->set('_switch_user', 'username');
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+
+        $this->expectException(AuthenticationCredentialsNotFoundException::class);
+
         $listener($this->event);
     }
 

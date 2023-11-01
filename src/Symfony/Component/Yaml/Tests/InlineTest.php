@@ -827,20 +827,20 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */
-    public function testImplicitStringCastingOfMappingKeysThrows($yaml, $expected)
+    public function testImplicitStringCastingOfMappingKeysThrowsException(string $yaml)
     {
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Implicit casting of incompatible mapping keys to strings is not supported. Quote your evaluable mapping keys instead');
-        $this->assertSame($expected, Inline::parse($yaml));
+        Inline::parse($yaml);
     }
 
     public static function getNotPhpCompatibleMappingKeyData()
     {
         return [
-            'boolean-true' => ['{true: "foo"}', ['true' => 'foo']],
-            'boolean-false' => ['{false: "foo"}', ['false' => 'foo']],
-            'null' => ['{null: "foo"}', ['null' => 'foo']],
-            'float' => ['{0.25: "foo"}', ['0.25' => 'foo']],
+            'boolean-true' => ['{true: "foo"}'],
+            'boolean-false' => ['{false: "foo"}'],
+            'null' => ['{null: "foo"}'],
+            'float' => ['{0.25: "foo"}'],
         ];
     }
 

@@ -130,7 +130,6 @@ class PasswordHasherFactoryTest extends TestCase
 
     public function testGetInvalidNamedHasherForHasherAware()
     {
-        $this->expectException(\RuntimeException::class);
         $factory = new PasswordHasherFactory([
             HasherAwareUser::class => new MessageDigestPasswordHasher('sha1'),
             'hasher_name' => new MessageDigestPasswordHasher('sha256'),
@@ -138,6 +137,9 @@ class PasswordHasherFactoryTest extends TestCase
 
         $user = new HasherAwareUser();
         $user->hasherName = 'invalid_hasher_name';
+
+        $this->expectException(\RuntimeException::class);
+
         $factory->getPasswordHasher($user);
     }
 

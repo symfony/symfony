@@ -36,9 +36,7 @@ final class WhenTest extends TestCase
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The value "foo" is not an instance of Constraint in constraint "Symfony\Component\Validator\Constraints\When"');
-        new When('true', [
-            'foo',
-        ]);
+        new When('true', ['foo']);
     }
 
     public function testAttributes()

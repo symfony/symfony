@@ -231,11 +231,9 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
             'value' => 'foo',
         ]);
 
-        $constraintClass = $constraint::class;
-
         return [
-            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $constraintClass), new \DateTimeImmutable()],
-            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTime" instance in the "%s" constraint.', $constraintClass), new \DateTime()],
+            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $constraint::class), new \DateTimeImmutable()],
+            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTime" instance in the "%s" constraint.', $constraint::class), new \DateTime()],
         ];
     }
 

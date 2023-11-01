@@ -64,18 +64,20 @@ class DefinitionTest extends TestCase
 
     public function testAddTransitionAndFromPlaceIsNotDefined()
     {
+        $places = range('a', 'b');
+
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
-        $places = range('a', 'b');
 
         new Definition($places, [new Transition('name', 'c', $places[1])]);
     }
 
     public function testAddTransitionAndToPlaceIsNotDefined()
     {
+        $places = range('a', 'b');
+
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
-        $places = range('a', 'b');
 
         new Definition($places, [new Transition('name', $places[0], 'c')]);
     }

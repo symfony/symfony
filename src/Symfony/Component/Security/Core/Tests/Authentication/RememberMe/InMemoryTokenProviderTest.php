@@ -31,8 +31,7 @@ class InMemoryTokenProviderTest extends TestCase
     public function testLoadTokenBySeriesThrowsNotFoundException()
     {
         $this->expectException(TokenNotFoundException::class);
-        $provider = new InMemoryTokenProvider();
-        $provider->loadTokenBySeries('foo');
+        (new InMemoryTokenProvider())->loadTokenBySeries('foo');
     }
 
     public function testUpdateToken()
@@ -50,12 +49,14 @@ class InMemoryTokenProviderTest extends TestCase
 
     public function testDeleteToken()
     {
-        $this->expectException(TokenNotFoundException::class);
         $provider = new InMemoryTokenProvider();
 
         $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTimeImmutable());
         $provider->createNewToken($token);
         $provider->deleteTokenBySeries('foo');
+
+        $this->expectException(TokenNotFoundException::class);
+
         $provider->loadTokenBySeries('foo');
     }
 }

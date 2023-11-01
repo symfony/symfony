@@ -37,35 +37,31 @@ class QtFileLoaderTest extends TestCase
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);
-        $loader = new QtFileLoader();
-        $resource = __DIR__.'/../Fixtures/non-existing.ts';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new QtFileLoader())->load(__DIR__.'/../Fixtures/non-existing.ts', 'en', 'domain1');
     }
 
     public function testLoadNonLocalResource()
     {
         $this->expectException(InvalidResourceException::class);
-        $loader = new QtFileLoader();
-        $resource = 'http://domain1.com/resources.ts';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new QtFileLoader())->load('http://domain1.com/resources.ts', 'en', 'domain1');
     }
 
     public function testLoadInvalidResource()
     {
         $this->expectException(InvalidResourceException::class);
-        $loader = new QtFileLoader();
-        $resource = __DIR__.'/../Fixtures/invalid-xml-resources.xlf';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new QtFileLoader())->load(__DIR__.'/../Fixtures/invalid-xml-resources.xlf', 'en', 'domain1');
     }
 
     public function testLoadEmptyResource()
     {
-        $loader = new QtFileLoader();
         $resource = __DIR__.'/../Fixtures/empty.xlf';
 
         $this->expectException(InvalidResourceException::class);
         $this->expectExceptionMessage(sprintf('Unable to load "%s".', $resource));
 
-        $loader->load($resource, 'en', 'domain1');
+        (new QtFileLoader())->load($resource, 'en', 'domain1');
     }
 }

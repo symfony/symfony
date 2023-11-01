@@ -379,10 +379,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testReadProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -407,6 +403,10 @@ class PhraseProviderTest extends TestCase
             ],
         ]), endpoint: 'api.phrase.com/api/v2');
 
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
         $provider->read(['messages'], ['en_GB']);
     }
 
@@ -415,10 +415,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testInitLocalesExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -441,6 +437,10 @@ class PhraseProviderTest extends TestCase
                 'User-Agent' => 'myProject',
             ],
         ]), endpoint: 'api.phrase.com/api/v2');
+
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $provider->read(['messages'], ['en_GB']);
     }
@@ -539,10 +539,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testCreateLocaleExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -566,6 +562,10 @@ class PhraseProviderTest extends TestCase
                 'User-Agent' => 'myProject',
             ],
         ]), endpoint: 'api.phrase.com/api/v2');
+
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $provider->read(['messages'], ['nl_NL']);
     }
@@ -627,10 +627,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testDeleteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -660,6 +656,10 @@ class PhraseProviderTest extends TestCase
                 'key.to.delete' => 'translated value',
             ],
         ]));
+
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $provider->delete($bag);
     }
@@ -745,10 +745,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testWriteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -783,6 +779,10 @@ class PhraseProviderTest extends TestCase
                 'key.to.delete' => 'translated value',
             ],
         ]));
+
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $provider->write($bag);
     }

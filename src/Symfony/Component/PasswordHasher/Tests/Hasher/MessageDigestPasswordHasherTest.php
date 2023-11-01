@@ -38,15 +38,18 @@ class MessageDigestPasswordHasherTest extends TestCase
 
     public function testHashAlgorithmDoesNotExist()
     {
-        $this->expectException(\LogicException::class);
         $hasher = new MessageDigestPasswordHasher('foobar');
+
+        $this->expectException(\LogicException::class);
+
         $hasher->hash('password', '');
     }
 
     public function testHashLength()
     {
-        $this->expectException(InvalidPasswordException::class);
         $hasher = new MessageDigestPasswordHasher();
+
+        $this->expectException(InvalidPasswordException::class);
 
         $hasher->hash(str_repeat('a', 5000), 'salt');
     }

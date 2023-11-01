@@ -44,16 +44,14 @@ class CsvFileLoaderTest extends TestCase
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);
-        $loader = new CsvFileLoader();
-        $resource = __DIR__.'/../Fixtures/not-exists.csv';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new CsvFileLoader())->load(__DIR__.'/../Fixtures/not-exists.csv', 'en', 'domain1');
     }
 
     public function testLoadNonLocalResource()
     {
         $this->expectException(InvalidResourceException::class);
-        $loader = new CsvFileLoader();
-        $resource = 'http://example.com/resources.csv';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new CsvFileLoader())->load('http://example.com/resources.csv', 'en', 'domain1');
     }
 }

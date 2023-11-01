@@ -28,20 +28,20 @@ class SerializerPassTest extends TestCase
 {
     public function testThrowExceptionWhenNoNormalizers()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('You must tag at least one service as "serializer.normalizer" to use the "serializer" service');
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
         $container->register('serializer');
 
         $serializerPass = new SerializerPass();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('You must tag at least one service as "serializer.normalizer" to use the "serializer" service');
+
         $serializerPass->process($container);
     }
 
     public function testThrowExceptionWhenNoEncoders()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('You must tag at least one service as "serializer.encoder" to use the "serializer" service');
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
         $container->register('serializer')
@@ -50,6 +50,10 @@ class SerializerPassTest extends TestCase
         $container->register('normalizer')->addTag('serializer.normalizer');
 
         $serializerPass = new SerializerPass();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('You must tag at least one service as "serializer.encoder" to use the "serializer" service');
+
         $serializerPass->process($container);
     }
 

@@ -62,13 +62,13 @@ class PhraseProviderFactoryTest extends TestCase
      */
     public function testUnsupportedSchemeException(string $dsn, string $message)
     {
+        $factory = $this->createFactory();
+        $dsn = new Dsn($dsn);
+
         $this->expectException(UnsupportedSchemeException::class);
         $this->expectExceptionMessage($message);
 
-        $dsn = new Dsn($dsn);
-
-        $this->createFactory()
-            ->create($dsn);
+        $factory->create($dsn);
     }
 
     /**
@@ -76,24 +76,24 @@ class PhraseProviderFactoryTest extends TestCase
      */
     public function testIncompleteDsnException(string $dsn, string $message)
     {
+        $factory = $this->createFactory();
+        $dsn = new Dsn($dsn);
+
         $this->expectException(IncompleteDsnException::class);
         $this->expectExceptionMessage($message);
 
-        $dsn = new Dsn($dsn);
-
-        $this->createFactory()
-            ->create($dsn);
+        $factory->create($dsn);
     }
 
     public function testRequiredUserAgentOption()
     {
+        $factory = $this->createFactory();
+        $dsn = new Dsn('phrase://PROJECT_ID:API_TOKEN@default');
+
         $this->expectException(MissingRequiredOptionException::class);
         $this->expectExceptionMessage('The option "userAgent" is required but missing.');
 
-        $dsn = new Dsn('phrase://PROJECT_ID:API_TOKEN@default');
-
-        $this->createFactory()
-            ->create($dsn);
+        $factory->create($dsn);
     }
 
     public function testHttpClientConfig()

@@ -111,6 +111,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('bus handler resolver'),
                 false,
                 service('clock')->nullOnInvalid(),
+                service('event_dispatcher'),
             ])
             ->tag('monolog.logger', ['channel' => 'messenger'])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])

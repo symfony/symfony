@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `HandlerStartingEvent`, `HandlerSuccessEvent` and `HandlerFailureEvent`, dispatched around each handler call
  * Add `$serializedTypeNameAliases` parameter to `#[AsMessage]` to accept alternate serialized type names when decoding
  * Add `--failed-after` and `--failed-before` options to the `messenger:failed:retry`, `messenger:failed:remove` and `messenger:failed:show` commands, and a `--class-filter` option to `messenger:failed:retry`
  * `RedispatchMessage` now dispatches to the senders configured for the message (routing config or `#[AsMessage]`) when `$transportNames` is empty, instead of sending to no sender at all

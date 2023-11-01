@@ -261,33 +261,31 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Parse the input DOMNode attributes into an array.
      */
-    private function parseXmlAttributes(\DOMNode $node, array $context = []): array
-    {
-        if (!$node->hasAttributes()) {
-            return [];
-        }
-
-        $data = [];
-        $typeCastAttributes = (bool) ($context[self::TYPE_CAST_ATTRIBUTES] ?? $this->defaultContext[self::TYPE_CAST_ATTRIBUTES]);
-
-        foreach ($node->attributes as $attr) {
-            if (!is_numeric($attr->nodeValue) || !$typeCastAttributes || (isset($attr->nodeValue[1]) && '0' === $attr->nodeValue[0] && '.' !== $attr->nodeValue[1])) {
-                $data['@'.$attr->nodeName] = $attr->nodeValue;
-
-                continue;
-            }
-
-            if (false !== $val = filter_var($attr->nodeValue, \FILTER_VALIDATE_INT)) {
-                $data['@'.$attr->nodeName] = $val;
-
-                continue;
-            }
-
-            $data['@'.$attr->nodeName] = (float) $attr->nodeValue;
-        }
-
-        return $data;
+   private function parseXmlAttributes(\DOMNode $node, array $context = []): array
+{
+    if (!$node->hasAttributes()) {
+        return [];
     }
+
+    $data = [];
+    $typeCastAttributes = (bool) ($context[self::TYPE_CAST_ATTRIBUTES] ?? $this->defaultContext[self::TYPE_CAST_ATTRIBUTES]);
+
+    foreach ($node->attributes as $attr) {
+        // Check if the attribute has a namespace
+        $name = $attr->prefix ? $attr->prefix . ':' . $attr->localName : $attr->localName;
+        if (!is_numeric($attr->nodeValue) || !$typeCastAttributes || (isset($attr->nodeValue[1]) && '0' === $attr->nodeValue[0] && '.' !== $attr->nodeValue[1])) {
+            $data['@' . $name] = $attr->nodeValue;
+        } else {
+            if (false !== $val = filter_var($attr->nodeValue, \FILTER_VALIDATE_INT)) {
+                $data['@' . $name] = $val;
+            } else {
+                $data['@' . $name] = (float) $attr->nodeValue;
+            }
+        }
+    }
+
+    return $data;
+}
 
     /**
      * Parse the input DOMNode value (content and children) into an array or a string.

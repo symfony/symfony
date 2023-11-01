@@ -352,7 +352,7 @@ class ApplicationTest extends TestCase
         $this->expectException(NamespaceNotFoundException::class);
         $this->expectExceptionMessage('There are no commands defined in the "bar" namespace.');
 
-        (new Application)->findNamespace('bar');
+        (new Application())->findNamespace('bar');
     }
 
     public function testFindUniqueNameButNamespaceName()

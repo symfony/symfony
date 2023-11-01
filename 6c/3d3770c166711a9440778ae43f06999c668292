@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-11-01T12:28:00Z
+
+alternative solution: change the constraint in `require-dev` to `^6.3|^7.0` (as it's done in the Mailgun, Postmark and Sendgrid bridges)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-01T12:40:59Z
+
+if there is a solution that doesn't involve conflict that's better indeed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-11-01T13:14:30Z
+
+I updated the constraints in the `require-dev` section instead

@@ -6,7 +6,7 @@ CHANGELOG
 
  * Add methods `getConstraint()`, `getCause()` and `__toString()` to `ConstraintViolationInterface`
  * Add method `__toString()` to `ConstraintViolationListInterface`
- * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface
+ * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface`
  * Add the `callbackArgs` option to the `Choice` constraint
  * Remove static property `$errorNames` from all constraints, use const `ERROR_NAMES` instead
  * Remove static property `$versions` from the `Ip` constraint, use the `VERSIONS` constant instead
@@ -35,8 +35,7 @@ CHANGELOG
  * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
  * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
  * Add `GroupProviderInterface` to implement validation group providers outside the underlying class
- * Add the `callbackArgs` option to the `Choice` constraint
-
+ 
 6.3
 ---
 

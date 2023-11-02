@@ -110,7 +110,7 @@ class PasswordHasherFactoryTest extends TestCase
             'hasher_name' => new MessageDigestPasswordHasher('sha1'),
         ]);
 
-        $hasher = $factory->getPasswordHasher(new HasherAwareUser('user', 'pass'));
+        $hasher = $factory->getPasswordHasher(new HasherAwareUser());
         $expectedHasher = new MessageDigestPasswordHasher('sha1');
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
@@ -122,7 +122,7 @@ class PasswordHasherFactoryTest extends TestCase
             'hasher_name' => new MessageDigestPasswordHasher('sha256'),
         ]);
 
-        $user = new HasherAwareUser('mathilde', 'krogulec');
+        $user = new HasherAwareUser();
         $user->hasherName = null;
         $hasher = $factory->getPasswordHasher($user);
         $expectedHasher = new MessageDigestPasswordHasher('sha1');
@@ -137,7 +137,7 @@ class PasswordHasherFactoryTest extends TestCase
             'hasher_name' => new MessageDigestPasswordHasher('sha256'),
         ]);
 
-        $user = new HasherAwareUser('user', 'pass');
+        $user = new HasherAwareUser();
         $user->hasherName = 'invalid_hasher_name';
         $factory->getPasswordHasher($user);
     }
@@ -168,9 +168,9 @@ class PasswordHasherFactoryTest extends TestCase
         $hasher = $factory->getPasswordHasher(SomeUser::class);
         $this->assertInstanceOf(MigratingPasswordHasher::class, $hasher);
 
-        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo', null), 'foo', null));
-        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo', null), 'foo', null));
-        $this->assertTrue($hasher->verify($digest->hash('foo', null), 'foo', null));
+        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo'), 'foo', null));
+        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo'), 'foo', null));
+        $this->assertTrue($hasher->verify($digest->hash('foo'), 'foo', null));
         $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
     }
 
@@ -190,8 +190,8 @@ class PasswordHasherFactoryTest extends TestCase
         $hasher = $factory->getPasswordHasher(SomeUser::class);
         $this->assertInstanceOf(MigratingPasswordHasher::class, $hasher);
 
-        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo', null), 'foo', null));
-        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo', null), 'foo', null));
+        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo'), 'foo', null));
+        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo'), 'foo', null));
         $this->assertTrue($hasher->verify($digest->hash('foo', null), 'foo', null));
         $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
     }
@@ -213,8 +213,8 @@ class PasswordHasherFactoryTest extends TestCase
         $hasher = $factory->getPasswordHasher(SomeUser::class);
         $this->assertInstanceOf(MigratingPasswordHasher::class, $hasher);
 
-        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo', null), 'foo', null));
-        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo', null), 'foo', null));
+        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo'), 'foo', null));
+        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo'), 'foo', null));
         $this->assertTrue($hasher->verify($plaintext->encodePassword('foo', null), 'foo', null));
         $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
     }

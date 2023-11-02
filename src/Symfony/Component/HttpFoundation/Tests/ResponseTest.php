@@ -32,6 +32,13 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals('bar', $response->headers->get('foo'));
     }
 
+    public function testCreateWithoutConstructorArguments()
+    {
+        new Response();
+
+        $this->fail('this should not be reached');
+    }
+
     public function testToString()
     {
         $response = new Response();

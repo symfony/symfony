@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-11-02T13:07:24Z
+
+minor tweak after talking with @kbond about #49813
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-11-02T13:11:49Z
+
+also, @kbond is right in that we can make a similar change in `RunCommandContext` (introduced with #49814)

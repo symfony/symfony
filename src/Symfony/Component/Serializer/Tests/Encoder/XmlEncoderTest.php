@@ -400,6 +400,18 @@ XML;
 
         $this->assertEquals($source, $this->encoder->encode($array, 'xml'));
     }
+    public function testParseXmlAttributesWithNamespace()
+    {
+        $encoder = new XmlEncoder();
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>
+                <root xmlns:ns="http://example.com" ns:attribute="value"></root>';
+
+        $data = $encoder->decode($xml, 'xml');
+
+        $this->assertEquals(['@xmlns:ns' => 'http://example.com', '@ns:attribute' => 'value'], $data);
+    }
+
 
     public function testEncodeSerializerXmlRootNodeNameOption()
     {
@@ -473,6 +485,8 @@ XML;
 
         $this->assertEquals($array, $this->encoder->decode($source, 'xml'));
     }
+
+    
 
     public function testDecodeScalarWithAttribute()
     {

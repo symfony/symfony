@@ -634,9 +634,11 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testRouterRequiresResourceOption()
     {
-        $this->expectException(InvalidConfigurationException::class);
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
+
+        $this->expectException(InvalidConfigurationException::class);
+
         $loader->load([['http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true], 'router' => true]], $container);
     }
 

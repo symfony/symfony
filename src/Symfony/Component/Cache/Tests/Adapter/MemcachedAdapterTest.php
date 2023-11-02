@@ -101,11 +101,12 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function testOptionSerializer()
     {
-        $this->expectException(CacheException::class);
-        $this->expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
         if (!\Memcached::HAVE_JSON) {
             $this->markTestSkipped('Memcached::HAVE_JSON required');
         }
+
+        $this->expectException(CacheException::class);
+        $this->expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
 
         new MemcachedAdapter(MemcachedAdapter::createConnection([], ['serializer' => 'json']));
     }

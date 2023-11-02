@@ -180,8 +180,6 @@ class AddConsoleCommandPassTest extends TestCase
 
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must not be abstract.');
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -191,13 +189,14 @@ class AddConsoleCommandPassTest extends TestCase
         $definition->setAbstract(true);
         $container->setDefinition('my-command', $definition);
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must not be abstract.');
+
         $container->compile();
     }
 
     public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".');
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -205,6 +204,9 @@ class AddConsoleCommandPassTest extends TestCase
         $definition = new Definition('SplObjectStorage');
         $definition->addTag('console.command');
         $container->setDefinition('my-command', $definition);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".');
 
         $container->compile();
     }
@@ -281,8 +283,6 @@ class AddConsoleCommandPassTest extends TestCase
 
     public function testProcessOnChildDefinitionWithoutClass()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('The definition for "my-child-command" has no class.');
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
 
@@ -297,6 +297,9 @@ class AddConsoleCommandPassTest extends TestCase
 
         $container->setDefinition($parentId, $parentDefinition);
         $container->setDefinition($childId, $childDefinition);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The definition for "my-child-command" has no class.');
 
         $container->compile();
     }

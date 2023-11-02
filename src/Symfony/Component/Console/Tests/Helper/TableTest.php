@@ -1017,15 +1017,14 @@ TABLE;
 
     public function testThrowsWhenTheCellInAnArray()
     {
-        $table = new Table($this->getOutputStream());
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
+        $table = new Table($output = $this->getOutputStream());
         $table
             ->setHeaders(['ISBN', 'Title', 'Author', 'Price'])
             ->setRows([
                 ['99921-58-10-7', [], 'Dante Alighieri', '9.95'],
             ]);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
 
         $table->render();
     }

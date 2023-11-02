@@ -145,9 +145,6 @@ class AccessTokenFactoryTest extends TestCase
 
     public function testMultipleTokenHandlersSet()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('You cannot configure multiple token handlers.');
-
         $config = [
             'token_handler' => [
                 'id' => 'in_memory_token_handler_service_id',
@@ -156,6 +153,10 @@ class AccessTokenFactoryTest extends TestCase
         ];
 
         $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You cannot configure multiple token handlers.');
+
         $this->processConfig($config, $factory);
     }
 

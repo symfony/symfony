@@ -185,13 +185,13 @@ class HttpFoundationFactoryTest extends TestCase
 
     public function testCreateUploadedFileWithError()
     {
-        $this->expectException(FileException::class);
-        $this->expectExceptionMessage('The file "e" could not be written on disk.');
-
         $uploadedFile = $this->createUploadedFile('Error.', \UPLOAD_ERR_CANT_WRITE, 'e', 'text/plain');
         $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
 
         $this->assertEquals(\UPLOAD_ERR_CANT_WRITE, $symfonyUploadedFile->getError());
+
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('The file "e" could not be written on disk.');
 
         $symfonyUploadedFile->move($this->tmpDir, 'shouldFail.txt');
     }

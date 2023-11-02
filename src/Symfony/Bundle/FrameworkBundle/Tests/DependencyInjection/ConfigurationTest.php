@@ -61,8 +61,10 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidSessionName($sessionName)
     {
-        $this->expectException(InvalidConfigurationException::class);
         $processor = new Processor();
+
+        $this->expectException(InvalidConfigurationException::class);
+
         $processor->processConfiguration(
             new Configuration(true),
             [[
@@ -177,11 +179,12 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
     {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $processor = new Processor();
-        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, [
                 [
                     'http_method_override' => false,

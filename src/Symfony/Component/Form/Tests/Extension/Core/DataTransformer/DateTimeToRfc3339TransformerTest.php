@@ -20,8 +20,8 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
 {
     use DateTimeEqualsTrait;
 
-    protected ?\DateTime $dateTime;
-    protected ?\DateTime $dateTimeWithoutSeconds;
+    protected \DateTime $dateTime;
+    protected \DateTime $dateTimeWithoutSeconds;
 
     protected function setUp(): void
     {
@@ -29,12 +29,6 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
 
         $this->dateTime = new \DateTime('2010-02-03 04:05:06 UTC');
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
-    }
-
-    protected function tearDown(): void
-    {
-        $this->dateTime = null;
-        $this->dateTimeWithoutSeconds = null;
     }
 
     public static function allProvider(): array
@@ -49,12 +43,12 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
         ];
     }
 
-    public static function transformProvider()
+    public static function transformProvider(): array
     {
         return self::allProvider();
     }
 
-    public static function reverseTransformProvider()
+    public static function reverseTransformProvider(): array
     {
         return array_merge(self::allProvider(), [
             // format without seconds, as appears in some browsers
@@ -132,7 +126,7 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
         $transformer->reverseTransform($date);
     }
 
-    public static function invalidDateStringProvider()
+    public static function invalidDateStringProvider(): array
     {
         return [
             'invalid month' => ['2010-2010-01'],

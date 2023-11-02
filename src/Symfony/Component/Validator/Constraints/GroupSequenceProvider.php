@@ -18,9 +18,7 @@ use Symfony\Component\Validator\Attribute\HasNamedArguments;
  * Attribute to define a group sequence provider.
  *
  * @Annotation
- *
  * @NamedArgumentConstructor
- *
  * @Target({"CLASS", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>

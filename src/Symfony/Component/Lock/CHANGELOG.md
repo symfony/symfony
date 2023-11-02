@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Make `MongoDbStore` instantiable with the mongodb extension directly
+
 6.3
 ---
 

@@ -23,7 +23,7 @@ class RoleHierarchy implements RoleHierarchyInterface
      *
      * @var array<string,string>
      */
-    private array $rolePlaceholdersPatterns;
+    protected array $rolePlaceholdersPatterns;
 
     /** @var array<string, list<string>> */
     protected array $map;
@@ -72,7 +72,7 @@ class RoleHierarchy implements RoleHierarchyInterface
 
             $this->map[$main] = array_unique($this->map[$main]);
 
-            if (str_contains($main, '*') && false !== ($pattern = $this->getPlaceholderPattern($main))) {
+            if (str_contains($main, '*') && null !== ($pattern = $this->getPlaceholderPattern($main))) {
                 $this->rolePlaceholdersPatterns[$main] = $pattern;
             }
         }
@@ -104,12 +104,12 @@ class RoleHierarchy implements RoleHierarchyInterface
         return $reachableRoles;
     }
 
-    private function getMatchingPlaceholders(array $roles): array
+    protected function getMatchingPlaceholders(array $roles): array
     {
         $resolved = [];
 
         foreach ($this->rolePlaceholdersPatterns as $placeholder => $pattern) {
-            if (!\in_array($placeholder, $resolved) && \count(preg_grep($pattern, $roles) ?? null)) {
+            if (!\in_array($placeholder, $resolved) && \count(preg_grep($pattern, $roles) ?: [])) {
                 $resolved[] = $placeholder;
             }
         }
@@ -119,18 +119,18 @@ class RoleHierarchy implements RoleHierarchyInterface
 
     /**
      * Build the regex pattern for the given role:
-     *   - Replace valid wildcards with a non-wildcard matching pattern and
+     *   - Replace valid wildcards with a non-wildcard matching pattern.
      *   - Escape reserved regex characters.
      *
      * A valid wildcard is a * prefixed with _ and immediately followed by _ or EOL.
      *
-     * @return string|false The regex pattern, or false if there is no valid wildcard in the role
+     * @return string|null The regex pattern, or null if there is no valid wildcard in the role
      */
-    private function getPlaceholderPattern(string $role): string|false
+    private function getPlaceholderPattern(string $role): ?string
     {
         /** @var int $count */
-        $placeholderPattern = preg_replace(pattern: '/(?<=_)\\\\\*(?=_|$)/', replacement: '[^\*]*', subject: preg_quote($role), count: $count);
+        $placeholderPattern = preg_replace(pattern: '/(?<=_)\\\\\*(?=_|$)/', replacement: '.*', subject: preg_quote($role), count: $count);
 
-        return ($count > 0) ? sprintf('/^%s$/', $placeholderPattern) : false;
+        return ($count > 0) ? sprintf('/^%s$/', $placeholderPattern) : null;
     }
 }

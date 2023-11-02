@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-29T12:39:24Z
+
+Some test failures are related in the integration job apparently.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-10-29T20:51:07Z
+
+> Some test failures are related in the integration job apparently.
+
+Thanks. I fixed the tests, the CI uses an old version of the ext-mongodb. But that's fine, we don't set version constraint.

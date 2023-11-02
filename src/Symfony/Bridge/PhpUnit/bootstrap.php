@@ -12,10 +12,15 @@
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Deprecations\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
+use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestEventsCollectorForV10_2;
 
 // Detect if we need to serialize deprecations to a file.
 if (in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && $file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
-    DeprecationErrorHandler::collectDeprecations($file);
+    if (version_compare(\PHPUnit\Runner\Version::id(), '10.2.0', '>=')) {
+        SymfonyTestEventsCollectorForV10_2::instance()->collectDeprecations($file);
+    } else {
+        DeprecationErrorHandler::collectDeprecations($file);
+    }
 
     return;
 }
@@ -47,5 +52,9 @@ if (!class_exists(AnnotationRegistry::class, false) && class_exists(AnnotationRe
 }
 
 if ('disabled' !== getenv('SYMFONY_DEPRECATIONS_HELPER')) {
-    DeprecationErrorHandler::register(getenv('SYMFONY_DEPRECATIONS_HELPER'));
+    if (version_compare(\PHPUnit\Runner\Version::id(), '10.2.0', '>=')) {
+        SymfonyTestEventsCollectorForV10_2::init(getenv('SYMFONY_DEPRECATIONS_HELPER'));
+    } else {
+        DeprecationErrorHandler::register(getenv('SYMFONY_DEPRECATIONS_HELPER'));
+    }
 }

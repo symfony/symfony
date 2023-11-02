@@ -284,7 +284,7 @@ class DeprecationErrorHandler
      *
      * @return string
      */
-    private static function colorize($str, $red)
+    public static function colorize($str, $red)
     {
         if (!self::hasColorSupport()) {
             return $str;

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2023-10-26T19:24:40Z
+
+Added autoconfigured scheduler tests as discussed in https://github.com/symfony/symfony/pull/51525#discussion_r1342467103, but those are failing in the pipeline due to missing cron dev-dependency. Should I just remove cron attributes from DummyTask or how to proceed here @fabpot ?
+
+Locally with `dragonmantank/cron-expression` installed the tests pass just fine.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-10-26T19:26:42Z
+
+> Added autoconfigured scheduler tests as discussed in [#51525 (comment)](https://github.com/symfony/symfony/pull/51525#discussion_r1342467103), but those are failing in the pipeline due to missing cron dev-dependency. Should I just remove cron attributes from DummyTask or how to proceed here @fabpot ?
+>
+> Locally with `dragonmantank/cron-expression` installed the tests pass just fine.
+
+You can add `dragonmantank/cron-expression` as a `dev` dependency for the bundle and in the main `composer.json` file.

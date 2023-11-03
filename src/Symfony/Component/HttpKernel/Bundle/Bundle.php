@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 abstract class Bundle implements BundleInterface
 {
     protected string $name;
-    protected ExtensionInterface|false $extension;
+    protected ExtensionInterface|false|null $extension = null;
     protected string $path;
     protected ?ContainerInterface $container;
 

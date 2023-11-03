@@ -248,7 +248,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sContent-Type: application/x-www-form-urlencoded%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
-  --data %1$sfoobarbaz%1$s',
+  --data-raw %1$sfoobarbaz%1$s',
         ];
         yield 'POST with array body' => [
             [
@@ -286,7 +286,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sContent-Length: 211%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
-  --data %1$sfoo=fooval%1$s --data %1$sbar=barval%1$s --data %1$sbaz=bazval%1$s --data %1$sfoobar[baz]=bazval%1$s --data %1$sfoobar[qux]=quxval%1$s --data %1$sbazqux[0]=bazquxval1%1$s --data %1$sbazqux[1]=bazquxval2%1$s --data %1$sobject[fooprop]=foopropval%1$s --data %1$sobject[barprop]=barpropval%1$s --data %1$stostring=tostringval%1$s',
+  --data-raw %1$sfoo=fooval%1$s --data-raw %1$sbar=barval%1$s --data-raw %1$sbaz=bazval%1$s --data-raw %1$sfoobar[baz]=bazval%1$s --data-raw %1$sfoobar[qux]=quxval%1$s --data-raw %1$sbazqux[0]=bazquxval1%1$s --data-raw %1$sbazqux[1]=bazquxval2%1$s --data-raw %1$sobject[fooprop]=foopropval%1$s --data-raw %1$sobject[barprop]=barpropval%1$s --data-raw %1$stostring=tostringval%1$s',
         ];
 
         // escapeshellarg on Windows replaces double quotes & percent signs with spaces
@@ -337,7 +337,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sContent-Length: 120%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
-  --data %1$s{"foo":{"bar":"baz","qux":[1.1,1.0],"fred":["\u003Cfoo\u003E","\u0027bar\u0027","\u0022baz\u0022","\u0026blong\u0026"]}}%1$s',
+  --data-raw %1$s{"foo":{"bar":"baz","qux":[1.1,1.0],"fred":["\u003Cfoo\u003E","\u0027bar\u0027","\u0022baz\u0022","\u0026blong\u0026"]}}%1$s',
             ];
         }
     }
@@ -397,29 +397,7 @@ class HttpClientDataCollectorTest extends TestCase
     /**
      * @requires extension openssl
      */
-    public function testItDoesNotGeneratesCurlCommandsForNotEncodableBody()
-    {
-        $sut = new HttpClientDataCollector();
-        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
-            [
-                'method' => 'POST',
-                'url' => 'http://localhost:8057/json',
-                'options' => [
-                    'body' => "\0",
-                ],
-            ],
-        ]));
-        $sut->lateCollect();
-        $collectedData = $sut->getClients();
-        self::assertCount(1, $collectedData['http_client']['traces']);
-        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
-        self::assertNull($curlCommand);
-    }
-
-    /**
-     * @requires extension openssl
-     */
-    public function testItDoesNotGeneratesCurlCommandsForTooBigData()
+    public function testItDoesGenerateCurlCommandsForBigData()
     {
         $sut = new HttpClientDataCollector();
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
@@ -435,7 +413,7 @@ class HttpClientDataCollectorTest extends TestCase
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
-        self::assertNull($curlCommand);
+        self::assertNotNull($curlCommand);
     }
 
     private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient

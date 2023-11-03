@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class EnvVarProcessor implements EnvVarProcessorInterface
 {
-    private ContainerInterface $container;
     /** @var \Traversable<EnvVarLoaderInterface> */
     private \Traversable $loaders;
     private array $loadedVars = [];
@@ -28,9 +27,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     /**
      * @param \Traversable<EnvVarLoaderInterface>|null $loaders
      */
-    public function __construct(ContainerInterface $container, \Traversable $loaders = null)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container,
+        \Traversable $loaders = null
+    ) {
         $this->loaders = $loaders ?? new \ArrayIterator();
     }
 

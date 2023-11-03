@@ -83,7 +83,7 @@ class FragmentListenerTest extends TestCase
 
         $listener->onKernelRequest($event);
 
-        $this->assertEquals(['foo' => 'bar', '_controller' => 'foo'], $request->attributes->get('_route_params'));
+        $this->assertEquals(['foo' => 'bar', '_controller' => 'foo', '_check_controller_is_allowed' => -1], $request->attributes->get('_route_params'));
         $this->assertFalse($request->query->has('_path'));
     }
 

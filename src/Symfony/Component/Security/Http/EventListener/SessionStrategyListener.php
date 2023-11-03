@@ -48,7 +48,7 @@ class SessionStrategyListener implements EventSubscriberInterface
             $user = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
             $previousUser = method_exists($previousToken, 'getUserIdentifier') ? $previousToken->getUserIdentifier() : $previousToken->getUsername();
 
-            if ('' !== ($user ?? '') && $user === $previousUser) {
+            if ('' !== ($user ?? '') && $user === $previousUser && \get_class($token) === \get_class($previousToken)) {
                 return;
             }
         }

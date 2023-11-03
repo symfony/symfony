@@ -59,7 +59,7 @@ class Connection
     public static function fromDsn(string $dsn, array $options = []): self
     {
         if (false === $components = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Beanstalkd DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException('The given Beanstalkd DSN is invalid.');
         }
 
         $connectionCredentials = [

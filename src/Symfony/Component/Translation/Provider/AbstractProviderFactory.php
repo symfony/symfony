@@ -28,7 +28,7 @@ abstract class AbstractProviderFactory implements ProviderFactoryInterface
     protected function getUser(Dsn $dsn): string
     {
         if (null === $user = $dsn->getUser()) {
-            throw new IncompleteDsnException('User is not set.', $dsn->getOriginalDsn());
+            throw new IncompleteDsnException('User is not set.', $dsn->getScheme().'://'.$dsn->getHost());
         }
 
         return $user;

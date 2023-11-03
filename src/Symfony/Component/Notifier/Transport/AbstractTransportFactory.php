@@ -46,7 +46,7 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
     {
         $user = $dsn->getUser();
         if (null === $user) {
-            throw new IncompleteDsnException('User is not set.', $dsn->getOriginalDsn());
+            throw new IncompleteDsnException('User is not set.', $dsn->getScheme().'://'.$dsn->getHost());
         }
 
         return $user;

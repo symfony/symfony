@@ -70,7 +70,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             $this->conn = $connOrDsn;
         } elseif (\is_string($connOrDsn)) {
             if (!class_exists(DriverManager::class)) {
-                throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrDsn));
+                throw new InvalidArgumentException('Failed to parse DSN. Try running "composer require doctrine/dbal".');
             }
             if (class_exists(DsnParser::class)) {
                 $params = (new DsnParser([

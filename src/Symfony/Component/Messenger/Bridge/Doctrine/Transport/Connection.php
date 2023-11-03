@@ -87,7 +87,7 @@ class Connection implements ResetInterface
     public static function buildConfiguration(string $dsn, array $options = []): array
     {
         if (false === $components = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Doctrine Messenger DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException('The given Doctrine Messenger DSN is invalid.');
         }
 
         $query = [];

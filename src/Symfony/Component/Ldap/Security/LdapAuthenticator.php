@@ -60,7 +60,7 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
     public function authenticate(Request $request): Passport
     {
         $passport = $this->authenticator->authenticate($request);
-        $passport->addBadge(new LdapBadge($this->ldapServiceId, $this->dnString, $this->searchDn, $this->searchPassword, $this->queryString));
+        $passport->addBadge(new LdapBadge($this->ldapServiceId, $this->dnString, $this->searchDn, $this->searchPassword, $this->queryString, true));
 
         return $passport;
     }

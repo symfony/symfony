@@ -230,6 +230,11 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
                 break;
             }
 
+            if (str_starts_with('Due to a bug in curl ', $line)) {
+                // When the curl client disables debug info due to a curl bug, we cannot build the command.
+                return null;
+            }
+
             if ('' === $line || preg_match('/^[*<]|(Host: )/', $line)) {
                 continue;
             }

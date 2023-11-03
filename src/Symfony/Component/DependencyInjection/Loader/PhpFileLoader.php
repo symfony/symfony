@@ -34,14 +34,12 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 class PhpFileLoader extends FileLoader
 {
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
+    private ?ConfigBuilderGeneratorInterface $generator;
 
-    public function __construct(
-        ContainerBuilder $container,
-        FileLocatorInterface $locator,
-        string $env = null,
-        private ConfigBuilderGeneratorInterface $generator = null
-    ) {
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null, ConfigBuilderGeneratorInterface $generator = null)
+    {
         parent::__construct($container, $locator, $env);
+        $this->generator = $generator;
     }
 
     public function load(mixed $resource, string $type = null): mixed

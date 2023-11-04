@@ -416,9 +416,12 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())
             ->method('read')
-            ->willReturn($providerReadTranslatorBag);
+            ->willReturn(new TranslatorBag());
 
-        $tester = $this->createCommandTester(provider: $provider, dispatcher: $dispatcher);
+        $tester = $this->createCommandTester(
+            provider: $provider,
+            dispatcher: $dispatcher
+        );
 
         $tester->execute($command);
     }
@@ -452,7 +455,12 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
     private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], EventDispatcherInterface $dispatcher = null): CommandTester
     {
-        $command = $this->createCommand(provider: $provider, locales: $locales, domains: $domains, dispatcher: $dispatcher);
+        $command = $this->createCommand(
+            provider: $provider,
+            locales: $locales,
+            domains: $domains,
+            dispatcher: $dispatcher
+        );
         $application = new Application();
         $application->add($command);
 

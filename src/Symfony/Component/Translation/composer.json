@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=8.2",
+        "symfony/event-dispatcher-contracts": "^2.5|^3.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/translation-contracts": "^2.5|^3.0",
-        "symfony/event-dispatcher-contracts": "^2.5|^3.0"
+        "symfony/translation-contracts": "^2.5|^3.0"
     },
     "require-dev": {
         "nikic/php-parser": "^4.13",

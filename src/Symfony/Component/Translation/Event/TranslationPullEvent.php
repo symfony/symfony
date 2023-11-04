@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace Symfony\Component\Translation\Event;
 
 /**
+ * This event will be dispatched by the translation:pull command just before the translations pulled from the provider
+ * are written to the filesystem.
+ *
  * @author wicliff <wicliff.wolda@gmail.com>
  */
 class TranslationPullEvent extends AbstractTranslationEvent

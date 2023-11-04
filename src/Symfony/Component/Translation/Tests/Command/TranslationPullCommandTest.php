@@ -731,12 +731,10 @@ XLIFF
         $dispatcher->expects(self::once())
             ->method('dispatch')->with(self::callback(static fn (TranslationPullEvent $event): bool => true));
 
-        $providerReadTranslatorBag = new TranslatorBag();
-
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())
             ->method('read')
-            ->willReturn($providerReadTranslatorBag);
+            ->willReturn(new TranslatorBag());
 
         $tester = $this->createCommandTester(provider: $provider, dispatcher: $dispatcher);
 
@@ -763,7 +761,13 @@ XLIFF
 
     private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en', EventDispatcherInterface $dispatcher = null): CommandTester
     {
-        $command = $this->createCommand(provider: $provider, locales: $locales, domains: $domains, defaultLocale: $defaultLocale, dispatcher: $dispatcher);
+        $command = $this->createCommand(
+            provider: $provider,
+            locales: $locales,
+            domains: $domains,
+            defaultLocale: $defaultLocale,
+            dispatcher: $dispatcher
+        );
         $application = new Application();
         $application->add($command);
 

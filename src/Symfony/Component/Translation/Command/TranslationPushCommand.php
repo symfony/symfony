@@ -40,15 +40,15 @@ final class TranslationPushCommand extends Command
     private TranslationReaderInterface $reader;
     private array $transPaths;
     private array $enabledLocales;
-    private ?EventDispatcherInterface $eventDispatcher;
+    private ?EventDispatcherInterface $dispatcher;
 
-    public function __construct(TranslationProviderCollection $providers, TranslationReaderInterface $reader, array $transPaths = [], array $enabledLocales = [], ?EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(TranslationProviderCollection $providers, TranslationReaderInterface $reader, array $transPaths = [], array $enabledLocales = [], ?EventDispatcherInterface $dispatcher = null)
     {
         $this->providers = $providers;
         $this->reader = $reader;
         $this->transPaths = $transPaths;
         $this->enabledLocales = $enabledLocales;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->dispatcher = $dispatcher;
 
         parent::__construct();
     }
@@ -141,7 +141,7 @@ EOF
         }
 
         if (!$deleteMissing && $force) {
-            $this->eventDispatcher?->dispatch(new TranslationPushEvent($localTranslations));
+            $this->dispatcher?->dispatch(new TranslationPushEvent($localTranslations));
 
             $provider->write($localTranslations);
 
@@ -168,7 +168,7 @@ EOF
             $translationsToWrite->addBag($localTranslations->intersect($providerTranslations));
         }
 
-        $this->eventDispatcher?->dispatch(new TranslationPushEvent($translationsToWrite));
+        $this->dispatcher?->dispatch(new TranslationPushEvent($translationsToWrite));
 
         $provider->write($translationsToWrite);
 

@@ -1072,7 +1072,19 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testTranslator()
     {
-        $container = $this->createContainerFromFile('full');
+        require_once __DIR__.'/Fixtures/TestBundle/TestBundle.php';
+
+        $container = $this->createContainerFromFile('full', [
+            'kernel.bundles' => [
+                'FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
+                'TestBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\TestBundle',
+            ],
+            'kernel.bundles_metadata' => [
+                'FrameworkBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..'],
+                'TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle'],
+            ],
+        ]);
+
         $this->assertTrue($container->hasDefinition('translator.default'), '->registerTranslatorConfiguration() loads translation.php');
         $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
         $options = $container->getDefinition('translator.default')->getArgument(4);
@@ -1115,6 +1127,11 @@ abstract class FrameworkExtensionTestCase extends TestCase
             '->registerTranslatorConfiguration() finds translation resources with dots in domain'
         );
         $this->assertContains(strtr(__DIR__.'/translations/security.en.yaml', '/', \DIRECTORY_SEPARATOR), $files);
+        $this->assertContains(
+            strtr(__DIR__.'/Fixtures/TestBundle/Resources/translations/messages.en.yaml', '/', \DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds translation resources with in bundles'
+        );
 
         $positionOverridingTranslationFile = array_search(strtr(realpath(__DIR__.'/translations/security.en.yaml'), '/', \DIRECTORY_SEPARATOR), $files);
 
@@ -1140,7 +1157,38 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertNotEmpty($nonExistingDirectories, 'FrameworkBundle should pass non existing directories to Translator');
 
-        $this->assertSame('Fixtures/translations', $options['cache_vary']['scanned_directories'][3]);
+        $this->assertSame('Fixtures/translations', $options['cache_vary']['scanned_directories'][4]);
+
+        $transPaths = $container->getDefinition('console.command.translation_extract')->getArgument(6);
+
+        $ref = new \ReflectionClass(Validation::class);
+        $this->assertContains(
+            strtr(\dirname($ref->getFileName()).'/Resources/translations', '/', \DIRECTORY_SEPARATOR),
+            $transPaths,
+            '->registerTranslatorConfiguration() finds Validator translation resources to extract'
+        );
+        $ref = new \ReflectionClass(Form::class);
+        $this->assertContains(
+            strtr(\dirname($ref->getFileName()).'/Resources/translations', '/', \DIRECTORY_SEPARATOR),
+            $transPaths,
+            '->registerTranslatorConfiguration() finds Form translation resources to extract'
+        );
+        $ref = new \ReflectionClass(Security::class);
+        $this->assertContains(
+            strtr(\dirname($ref->getFileName()).'/Resources/translations', '/', \DIRECTORY_SEPARATOR),
+            $transPaths,
+            '->registerTranslatorConfiguration() finds Security translation resources to extract'
+        );
+        $this->assertContains(
+            strtr(__DIR__.'/Fixtures/translations', '/', \DIRECTORY_SEPARATOR),
+            $transPaths,
+            '->registerTranslatorConfiguration() finds translation resources in custom paths to extract'
+        );
+        $this->assertContains(
+            strtr(__DIR__.'/Fixtures/TestBundle/Resources/translations', '/', \DIRECTORY_SEPARATOR),
+            $transPaths,
+            '->registerTranslatorConfiguration() finds translation resources with in bundles to extract'
+        );
     }
 
     public function testTranslatorMultipleFallbacks()

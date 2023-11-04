@@ -1130,7 +1130,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertContains(
             strtr(__DIR__.'/Fixtures/TestBundle/Resources/translations/messages.en.yaml', '/', \DIRECTORY_SEPARATOR),
             $files,
-            '->registerTranslatorConfiguration() finds translation resources with in bundles'
+            '->registerTranslatorConfiguration() finds translation resources within bundles'
         );
 
         $positionOverridingTranslationFile = array_search(strtr(realpath(__DIR__.'/translations/security.en.yaml'), '/', \DIRECTORY_SEPARATOR), $files);

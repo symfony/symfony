@@ -18,7 +18,12 @@ use Twig\TwigFilter;
 /**
  * Twig extension relate to PHP code and used by the profiler and the default exception templates.
  *
+ * This extension should only be used for debugging tools code
+ * that is never executed in a production environment.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
  */
 final class CodeExtension extends AbstractExtension
 {

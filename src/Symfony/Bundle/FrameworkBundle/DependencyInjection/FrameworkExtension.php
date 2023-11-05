@@ -1482,6 +1482,12 @@ class FrameworkExtension extends Extension
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if ($container->fileExists($dir = $bundle['path'].'/Resources/translations') || $container->fileExists($dir = $bundle['path'].'/translations')) {
                 $dirs[] = $dir;
+                if (
+                    $config['include_bundles_translations_in_commands']['enabled']
+                    && !in_array($name, $config['include_bundles_translations_in_commands']['excluded_bundles'], true)
+                ) {
+                    $transPaths[] = $dir;
+                }
             } else {
                 $nonExistingDirs[] = $dir;
             }

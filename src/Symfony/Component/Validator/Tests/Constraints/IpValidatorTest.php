@@ -215,7 +215,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testValidPrivateIpsV4($ip)
     {
         $this->validator->validate($ip, new Ip([
-            'version' => Ip::V4_ONLY_PRIV,
+            'version' => Ip::V4_ONLY_PRIVATE,
         ]));
 
         $this->assertNoViolation();
@@ -227,7 +227,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidPrivateIpsV4($ip)
     {
         $constraint = new Ip([
-            'version' => Ip::V4_NO_PRIV,
+            'version' => Ip::V4_NO_PRIVATE,
             'message' => 'myMessage',
         ]);
 
@@ -245,7 +245,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidOnlyPrivateIpsV4($ip)
     {
         $constraint = new Ip([
-            'version' => Ip::V4_ONLY_PRIV,
+            'version' => Ip::V4_ONLY_PRIVATE,
             'message' => 'myMessage',
         ]);
 
@@ -277,7 +277,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testValidReservedIpsV4($ip)
     {
         $this->validator->validate($ip, new Ip([
-            'version' => Ip::V4_ONLY_RES,
+            'version' => Ip::V4_ONLY_RESERVED,
         ]));
 
         $this->assertNoViolation();
@@ -289,7 +289,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidReservedIpsV4($ip)
     {
         $constraint = new Ip([
-            'version' => Ip::V4_NO_RES,
+            'version' => Ip::V4_NO_RESERVED,
             'message' => 'myMessage',
         ]);
 
@@ -307,7 +307,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidOnlyReservedIpsV4($ip)
     {
         $constraint = new Ip([
-            'version' => Ip::V4_ONLY_RES,
+            'version' => Ip::V4_ONLY_RESERVED,
             'message' => 'myMessage',
         ]);
 
@@ -399,7 +399,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidPrivateIpsV6($ip)
     {
         $constraint = new Ip([
-            'version' => Ip::V6_NO_PRIV,
+            'version' => Ip::V6_NO_PRIVATE,
             'message' => 'myMessage',
         ]);
 
@@ -426,7 +426,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidReservedIpsV6($ip)
     {
         $constraint = new Ip([
-            'version' => Ip::V6_NO_RES,
+            'version' => Ip::V6_NO_RESERVED,
             'message' => 'myMessage',
         ]);
 
@@ -498,7 +498,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidPrivateIpsAll($ip)
     {
         $constraint = new Ip([
-            'version' => Ip::ALL_NO_PRIV,
+            'version' => Ip::ALL_NO_PRIVATE,
             'message' => 'myMessage',
         ]);
 
@@ -521,7 +521,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidReservedIpsAll($ip)
     {
         $constraint = new Ip([
-            'version' => Ip::ALL_NO_RES,
+            'version' => Ip::ALL_NO_RESERVED,
             'message' => 'myMessage',
         ]);
 

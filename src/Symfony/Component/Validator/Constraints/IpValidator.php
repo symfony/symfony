@@ -49,14 +49,14 @@ class IpValidator extends ConstraintValidator
         }
 
         $flag = match ($constraint->version) {
-            Ip::V4, Ip::V4_ONLY_PRIV, Ip::V4_ONLY_RES => \FILTER_FLAG_IPV4,
-            Ip::V6, Ip::V6_ONLY_PRIV, Ip::V6_ONLY_RES => \FILTER_FLAG_IPV6,
-            Ip::V4_NO_PRIV => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE,
-            Ip::V6_NO_PRIV => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE,
-            Ip::ALL_NO_PRIV => \FILTER_FLAG_NO_PRIV_RANGE,
-            Ip::V4_NO_RES => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_RES_RANGE,
-            Ip::V6_NO_RES => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_RES_RANGE,
-            Ip::ALL_NO_RES => \FILTER_FLAG_NO_RES_RANGE,
+            Ip::V4, Ip::V4_ONLY_PRIVATE, Ip::V4_ONLY_RESERVED => \FILTER_FLAG_IPV4,
+            Ip::V6, Ip::V6_ONLY_PRIVATE, Ip::V6_ONLY_RESERVED => \FILTER_FLAG_IPV6,
+            Ip::V4_NO_PRIVATE => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE,
+            Ip::V6_NO_PRIVATE => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE,
+            Ip::ALL_NO_PRIVATE => \FILTER_FLAG_NO_PRIV_RANGE,
+            Ip::V4_NO_RESERVED => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_RES_RANGE,
+            Ip::V6_NO_RESERVED => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_RES_RANGE,
+            Ip::ALL_NO_RESERVED => \FILTER_FLAG_NO_RES_RANGE,
             Ip::V4_ONLY_PUBLIC => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
             Ip::V6_ONLY_PUBLIC => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
             Ip::ALL_ONLY_PUBLIC => \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
@@ -73,8 +73,8 @@ class IpValidator extends ConstraintValidator
         }
 
         $inverseFlag = match ($constraint->version) {
-            Ip::V4_ONLY_PRIV, Ip::V6_ONLY_PRIV, Ip::ALL_ONLY_PRIV => \FILTER_FLAG_NO_PRIV_RANGE,
-            Ip::V4_ONLY_RES, Ip::V6_ONLY_RES, Ip::ALL_ONLY_RES => \FILTER_FLAG_NO_RES_RANGE,
+            Ip::V4_ONLY_PRIVATE, Ip::V6_ONLY_PRIVATE, Ip::ALL_ONLY_PRIVATE => \FILTER_FLAG_NO_PRIV_RANGE,
+            Ip::V4_ONLY_RESERVED, Ip::V6_ONLY_RESERVED, Ip::ALL_ONLY_RESERVED => \FILTER_FLAG_NO_RES_RANGE,
             default => 0,
         };
 

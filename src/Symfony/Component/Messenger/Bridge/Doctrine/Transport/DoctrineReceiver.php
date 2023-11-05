@@ -25,6 +25,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
+ * @author Herberto Graca <herberto.graca@gmail.com>
+ * @author Alexander Malyk <shu.rick.ifmo@gmail.com>
  */
 class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareInterface
 {
@@ -42,7 +44,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
     public function get(): iterable
     {
         try {
-            $doctrineEnvelope = $this->connection->get();
+            $doctrineEnvelopeList = $this->connection->get();
             $this->retryingSafetyCounter = 0; // reset counter
         } catch (RetryableException $exception) {
             // Do nothing when RetryableException occurs less than "MAX_RETRIES"
@@ -58,11 +60,16 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
 
-        if (null === $doctrineEnvelope) {
+        if (null === $doctrineEnvelopeList) {
             return [];
         }
 
-        return [$this->createEnvelopeFromData($doctrineEnvelope)];
+        $envelopeList = [];
+        foreach ($doctrineEnvelopeList as $doctrineEnvelope) {
+            $envelopeList[] = $this->createEnvelopeFromData($doctrineEnvelope);
+        }
+
+        return $envelopeList;
     }
 
     public function ack(Envelope $envelope): void
@@ -81,6 +88,11 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
+    }
+
+    public function undeliverNotHandled(): void
+    {
+        $this->connection->undeliverNotHandled();
     }
 
     public function getMessageCount(): int

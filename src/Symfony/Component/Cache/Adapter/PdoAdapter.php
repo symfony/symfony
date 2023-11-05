@@ -25,14 +25,14 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
     private string $dsn;
     private string $driver;
     private string $serverVersion;
-    private mixed $table = 'cache_items';
-    private mixed $idCol = 'item_id';
-    private mixed $dataCol = 'item_data';
-    private mixed $lifetimeCol = 'item_lifetime';
-    private mixed $timeCol = 'item_time';
-    private mixed $username = '';
-    private mixed $password = '';
-    private mixed $connectionOptions = [];
+    private string $table = 'cache_items';
+    private string $idCol = 'item_id';
+    private string $dataCol = 'item_data';
+    private string $lifetimeCol = 'item_lifetime';
+    private string $timeCol = 'item_time';
+    private ?string $username = '';
+    private ?string $password = '';
+    private array $connectionOptions = [];
     private string $namespace;
 
     /**

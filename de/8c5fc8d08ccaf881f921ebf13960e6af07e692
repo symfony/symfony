@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-11-05T17:58:51Z
+
+Don't know if I should ignore fabbot. Even though the default property values are useless on 5.4, they are required on 6.x because of the type hints.

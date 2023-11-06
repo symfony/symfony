@@ -31,7 +31,7 @@ class IpValidator extends ConstraintValidator
      *
      * @internal
      */
-    public static function checkIP(string $ip, mixed $version): bool
+    public static function checkIp(string $ip, mixed $version): bool
     {
         $flag = match ($version) {
             Ip::V4, Ip::V4_ONLY_PRIVATE, Ip::V4_ONLY_RESERVED => \FILTER_FLAG_IPV4,
@@ -88,7 +88,7 @@ class IpValidator extends ConstraintValidator
             $value = ($constraint->normalizer)($value);
         }
 
-        if(!self::checkIP($value, $constraint->version)) {
+        if(!self::checkIp($value, $constraint->version)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Ip::INVALID_IP_ERROR)

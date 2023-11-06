@@ -56,7 +56,7 @@ class CidrValidator extends ConstraintValidator
         $ipAddress = $cidrParts[0];
         $netmask = (int) $cidrParts[1];
 
-        if (!IpValidator::checkIP($ipAddress, $constraint->version)) {
+        if (!IpValidator::checkIp($ipAddress, $constraint->version)) {
             $this->context
                 ->buildViolation($constraint->message)
                 ->setCode(Cidr::INVALID_CIDR_ERROR)

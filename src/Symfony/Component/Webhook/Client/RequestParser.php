@@ -41,7 +41,7 @@ class RequestParser extends AbstractRequestParser
         ]);
     }
 
-    protected function doParse(Request $request, string $secret): RemoteEvent
+    protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent
     {
         $body = $request->toArray();
 
@@ -60,7 +60,7 @@ class RequestParser extends AbstractRequestParser
         );
     }
 
-    private function validateSignature(HeaderBag $headers, string $body, $secret): void
+    private function validateSignature(HeaderBag $headers, string $body, #[\SensitiveParameter] string $secret): void
     {
         $signature = $headers->get($this->signatureHeaderName);
         $event = $headers->get($this->eventHeaderName);

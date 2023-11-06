@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-06T17:00:53Z
+
+Up to fix the quote issue in the same PR for tests?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-11-06T17:54:51Z
+
+@nicolas-grekas I'm not sure what should be done regarding these double quotes since it seems to be Windows-specific 🤔
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-06T17:56:20Z
+
+I think we should just adjust the expected output depending on Windows or not. Failing tests should pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-06T17:56:50Z
+
+Or maybe @alexandre-daubois can provide the fix for the tests?

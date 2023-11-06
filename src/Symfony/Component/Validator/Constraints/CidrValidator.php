@@ -16,6 +16,13 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
+/**
+ * Validates whether a value is a valid CIDR notation.
+ *
+ * @author Sorin Pop <popsorin15@gmail.com>
+ * @author Calin Bolea <calin.bolea@gmail.com>
+ * @author Ninos Ego <me@ninosego.de>
+ */
 class CidrValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint): void

@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * @author Sorin Pop <popsorin15@gmail.com>
  * @author Calin Bolea <calin.bolea@gmail.com>
+ * @author Ninos Ego <me@ninosego.de>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Cidr extends Constraint

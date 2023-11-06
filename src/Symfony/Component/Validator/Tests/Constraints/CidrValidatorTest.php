@@ -203,7 +203,6 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
         return [
             ['192.168.1.0/-1'],
             ['0.0.0.0/foobar'],
-            ['10.0.0.0/128'],
             ['123.45.67.178/aaa'],
             ['172.16.0.0//'],
             ['255.255.255.255/1/4'],

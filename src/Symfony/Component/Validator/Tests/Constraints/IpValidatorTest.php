@@ -186,7 +186,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getValidIpsV4
+     * @dataProvider getValidPublicIpsV4
      */
     public function testInvalidNoPublicIpsV4($ip)
     {

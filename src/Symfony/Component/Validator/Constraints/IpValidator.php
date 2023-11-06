@@ -34,8 +34,8 @@ class IpValidator extends ConstraintValidator
     public static function checkIp(string $ip, mixed $version): bool
     {
         $flag = match ($version) {
-            Ip::V4, Ip::V4_ONLY_PRIVATE, Ip::V4_ONLY_RESERVED => \FILTER_FLAG_IPV4,
-            Ip::V6, Ip::V6_ONLY_PRIVATE, Ip::V6_ONLY_RESERVED => \FILTER_FLAG_IPV6,
+            Ip::V4, Ip::V4_NO_PUBLIC, Ip::V4_ONLY_PRIVATE, Ip::V4_ONLY_RESERVED => \FILTER_FLAG_IPV4,
+            Ip::V6, Ip::V6_NO_PUBLIC, Ip::V6_ONLY_PRIVATE, Ip::V6_ONLY_RESERVED => \FILTER_FLAG_IPV6,
             Ip::V4_NO_PRIVATE => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE,
             Ip::V6_NO_PRIVATE => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE,
             Ip::ALL_NO_PRIVATE => \FILTER_FLAG_NO_PRIV_RANGE,
@@ -53,6 +53,7 @@ class IpValidator extends ConstraintValidator
         }
 
         $inverseFlag = match ($version) {
+            Ip::V4_NO_PUBLIC, Ip::V6_NO_PUBLIC, Ip::ALL_NO_PUBLIC => \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
             Ip::V4_ONLY_PRIVATE, Ip::V6_ONLY_PRIVATE, Ip::ALL_ONLY_PRIVATE => \FILTER_FLAG_NO_PRIV_RANGE,
             Ip::V4_ONLY_RESERVED, Ip::V6_ONLY_RESERVED, Ip::ALL_ONLY_RESERVED => \FILTER_FLAG_NO_RES_RANGE,
             default => 0,

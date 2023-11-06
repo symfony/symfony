@@ -185,6 +185,24 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    /**
+     * @dataProvider getValidIpsV4
+     */
+    public function testInvalidNoPublicIpsV4($ip)
+    {
+        $constraint = new Ip([
+            'version' => Ip::V4_NO_PUBLIC,
+            'message' => 'myMessage',
+        ]);
+
+        $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidPublicIpsV4()
     {
         return [

@@ -32,6 +32,11 @@ class Ip extends Constraint
     public const V6 = '6';
     public const ALL = 'all';
 
+    // adds inverse FILTER_FLAG_NO_RES_RANGE and FILTER_FLAG_NO_PRIV_RANGE flags (skip both)
+    public const V4_NO_PUBLIC = '4_no_public';
+    public const V6_NO_PUBLIC = '6_no_public';
+    public const ALL_NO_PUBLIC = 'all_no_public';
+
     // adds FILTER_FLAG_NO_PRIV_RANGE flag (skip private ranges)
     public const V4_NO_PRIVATE = '4_no_private';
     public const V6_NO_PRIVATE = '6_no_private';
@@ -98,6 +103,10 @@ class Ip extends Constraint
         self::V4,
         self::V6,
         self::ALL,
+
+        self::V4_NO_PUBLIC,
+        self::V6_NO_PUBLIC,
+        self::ALL_NO_PUBLIC,
 
         self::V4_NO_PRIVATE,
         self::V6_NO_PRIVATE,

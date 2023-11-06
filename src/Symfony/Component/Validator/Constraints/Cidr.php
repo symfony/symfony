@@ -40,6 +40,10 @@ class Cidr extends Constraint
         Ip::V6 => 128,
         Ip::ALL => 128,
 
+        Ip::V4_NO_PUBLIC => 32,
+        Ip::V6_NO_PUBLIC => 128,
+        Ip::ALL_NO_PUBLIC => 128,
+
         Ip::V4_NO_PRIVATE => 32,
         Ip::V6_NO_PRIVATE => 128,
         Ip::ALL_NO_PRIVATE => 128,

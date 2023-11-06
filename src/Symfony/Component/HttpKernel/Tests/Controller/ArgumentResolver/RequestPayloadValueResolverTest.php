@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -147,6 +148,46 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
 
         $this->assertSame([null], $event->getArguments());
+    }
+
+    public function testMapQueryStringEmpty()
+    {
+        $payload = new RequestPayload(50);
+        $denormalizer = new RequestPayloadDenormalizer($payload);
+        $serializer = new Serializer([$denormalizer]);
+        $resolver = new RequestPayloadValueResolver($serializer);
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(mapEmpty: true),
+        ]);
+        $request = Request::create('/', 'GET');
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertSame([$payload], $event->getArguments());
+    }
+
+    public function testMapRequestPayloadEmpty()
+    {
+        $payload = new RequestPayload(50);
+        $denormalizer = new RequestPayloadDenormalizer($payload);
+        $serializer = new Serializer([$denormalizer]);
+        $resolver = new RequestPayloadValueResolver($serializer);
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(mapEmpty: true),
+        ]);
+        $request = Request::create('/', 'POST');
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertSame([$payload], $event->getArguments());
     }
 
     public function testNullPayloadAndNotDefaultOrNullableArgument()
@@ -685,5 +726,27 @@ class QueryPayload
 {
     public function __construct(public readonly float $page)
     {
+    }
+}
+
+class RequestPayloadDenormalizer implements DenormalizerInterface
+{
+    public function __construct(private RequestPayload $payload)
+    {
+    }
+
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    {
+        return $this->payload;
+    }
+
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    {
+        return RequestPayload::class === $type;
+    }
+
+    public function getSupportedTypes(string $format = null): array
+    {
+        return [RequestPayload::class => true];
     }
 }

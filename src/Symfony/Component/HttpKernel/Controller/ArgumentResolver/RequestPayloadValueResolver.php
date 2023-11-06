@@ -157,7 +157,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
     private function mapQueryString(Request $request, string $type, MapQueryString $attribute): ?object
     {
-        if (!$data = $request->query->all()) {
+        if ((!$data = $request->query->all()) && !$attribute->mapEmpty) {
             return null;
         }
 
@@ -174,11 +174,11 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             throw new HttpException(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
         }
 
-        if ($data = $request->request->all()) {
+        if (($data = $request->request->all()) || ($attribute->mapEmpty && '' === $content = $request->getContent())) {
             return $this->serializer->denormalize($data, $type, null, $attribute->serializationContext + self::CONTEXT_DENORMALIZE);
         }
 
-        if ('' === $data = $request->getContent()) {
+        if ('' === $content ??= $request->getContent()) {
             return null;
         }
 
@@ -187,7 +187,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         }
 
         try {
-            return $this->serializer->deserialize($data, $type, $format, self::CONTEXT_DESERIALIZE + $attribute->serializationContext);
+            return $this->serializer->deserialize($content, $type, $format, self::CONTEXT_DESERIALIZE + $attribute->serializationContext);
         } catch (UnsupportedFormatException $e) {
             throw new HttpException(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, sprintf('Unsupported format: "%s".', $format), $e);
         } catch (NotEncodableValueException $e) {

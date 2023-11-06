@@ -31,8 +31,6 @@ class TranslationFilesTest extends TestCase
 
     /**
      * @dataProvider provideTranslationFiles
-     *
-     * @group Legacy
      */
     public function testTranslationFileIsValidWithoutEntityLoader($filePath)
     {

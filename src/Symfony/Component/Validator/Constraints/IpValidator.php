@@ -25,6 +25,46 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class IpValidator extends ConstraintValidator
 {
+
+    /**
+     * Checks whether an IP address is valid.
+     *
+     * @internal
+     */
+    public static function checkIP(string $ip, mixed $version): bool
+    {
+        $flag = match ($version) {
+            Ip::V4, Ip::V4_ONLY_PRIVATE, Ip::V4_ONLY_RESERVED => \FILTER_FLAG_IPV4,
+            Ip::V6, Ip::V6_ONLY_PRIVATE, Ip::V6_ONLY_RESERVED => \FILTER_FLAG_IPV6,
+            Ip::V4_NO_PRIVATE => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE,
+            Ip::V6_NO_PRIVATE => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE,
+            Ip::ALL_NO_PRIVATE => \FILTER_FLAG_NO_PRIV_RANGE,
+            Ip::V4_NO_RESERVED => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_RES_RANGE,
+            Ip::V6_NO_RESERVED => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_RES_RANGE,
+            Ip::ALL_NO_RESERVED => \FILTER_FLAG_NO_RES_RANGE,
+            Ip::V4_ONLY_PUBLIC => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
+            Ip::V6_ONLY_PUBLIC => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
+            Ip::ALL_ONLY_PUBLIC => \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
+            default => 0,
+        };
+
+        if (!filter_var($ip, \FILTER_VALIDATE_IP, $flag)) {
+            return false;
+        }
+
+        $inverseFlag = match ($version) {
+            Ip::V4_ONLY_PRIVATE, Ip::V6_ONLY_PRIVATE, Ip::ALL_ONLY_PRIVATE => \FILTER_FLAG_NO_PRIV_RANGE,
+            Ip::V4_ONLY_RESERVED, Ip::V6_ONLY_RESERVED, Ip::ALL_ONLY_RESERVED => \FILTER_FLAG_NO_RES_RANGE,
+            default => 0,
+        };
+
+        if ($inverseFlag && filter_var($ip, \FILTER_VALIDATE_IP, $inverseFlag)) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @return void
      */
@@ -42,47 +82,19 @@ class IpValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        $value = (string) $value;
+        $value = (string)$value;
 
         if (null !== $constraint->normalizer) {
             $value = ($constraint->normalizer)($value);
         }
 
-        $flag = match ($constraint->version) {
-            Ip::V4, Ip::V4_ONLY_PRIVATE, Ip::V4_ONLY_RESERVED => \FILTER_FLAG_IPV4,
-            Ip::V6, Ip::V6_ONLY_PRIVATE, Ip::V6_ONLY_RESERVED => \FILTER_FLAG_IPV6,
-            Ip::V4_NO_PRIVATE => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE,
-            Ip::V6_NO_PRIVATE => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE,
-            Ip::ALL_NO_PRIVATE => \FILTER_FLAG_NO_PRIV_RANGE,
-            Ip::V4_NO_RESERVED => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_RES_RANGE,
-            Ip::V6_NO_RESERVED => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_RES_RANGE,
-            Ip::ALL_NO_RESERVED => \FILTER_FLAG_NO_RES_RANGE,
-            Ip::V4_ONLY_PUBLIC => \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
-            Ip::V6_ONLY_PUBLIC => \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
-            Ip::ALL_ONLY_PUBLIC => \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
-            default => 0,
-        };
-
-        if (!filter_var($value, \FILTER_VALIDATE_IP, $flag)) {
+        if(!self::checkIP($value, $constraint->version)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Ip::INVALID_IP_ERROR)
                 ->addViolation();
 
             return;
-        }
-
-        $inverseFlag = match ($constraint->version) {
-            Ip::V4_ONLY_PRIVATE, Ip::V6_ONLY_PRIVATE, Ip::ALL_ONLY_PRIVATE => \FILTER_FLAG_NO_PRIV_RANGE,
-            Ip::V4_ONLY_RESERVED, Ip::V6_ONLY_RESERVED, Ip::ALL_ONLY_RESERVED => \FILTER_FLAG_NO_RES_RANGE,
-            default => 0,
-        };
-
-        if ($inverseFlag && filter_var($value, \FILTER_VALIDATE_IP, $inverseFlag)) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Ip::INVALID_IP_ERROR)
-                ->addViolation();
         }
     }
 }

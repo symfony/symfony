@@ -35,9 +35,29 @@ class Cidr extends Constraint
     ];
 
     private const NET_MAXES = [
-        Ip::ALL => 128,
         Ip::V4 => 32,
         Ip::V6 => 128,
+        Ip::ALL => 128,
+
+        Ip::V4_NO_PRIVATE => 32,
+        Ip::V6_NO_PRIVATE => 128,
+        Ip::ALL_NO_PRIVATE => 128,
+
+        Ip::V4_NO_RESERVED => 32,
+        Ip::V6_NO_RESERVED => 128,
+        Ip::ALL_NO_RESERVED => 128,
+
+        Ip::V4_ONLY_PUBLIC => 32,
+        Ip::V6_ONLY_PUBLIC => 128,
+        Ip::ALL_ONLY_PUBLIC => 128,
+
+        Ip::V4_ONLY_PRIVATE => 32,
+        Ip::V6_ONLY_PRIVATE => 128,
+        Ip::ALL_ONLY_PRIVATE => 128,
+
+        Ip::V4_ONLY_RESERVED => 32,
+        Ip::V6_ONLY_RESERVED => 128,
+        Ip::ALL_ONLY_RESERVED => 128,
     ];
 
     /**

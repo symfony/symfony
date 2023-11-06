@@ -49,20 +49,17 @@ class CidrValidator extends ConstraintValidator
         $ipAddress = $cidrParts[0];
         $netmask = (int) $cidrParts[1];
 
-        $validV4 = Ip::V6 !== $constraint->version
-            && filter_var($ipAddress, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)
-            && $netmask <= 32;
-
-        $validV6 = Ip::V4 !== $constraint->version
-            && filter_var($ipAddress, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6);
-
-        if (!$validV4 && !$validV6) {
+        if (!IpValidator::checkIP($ipAddress, $constraint->version)) {
             $this->context
                 ->buildViolation($constraint->message)
                 ->setCode(Cidr::INVALID_CIDR_ERROR)
                 ->addViolation();
 
             return;
+        }
+
+        if(filter_var($ipAddress, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4) && $constraint->netmaskMax > 32) {
+            $constraint->netmaskMax = 32;
         }
 
         if ($netmask < $constraint->netmaskMin || $netmask > $constraint->netmaskMax) {

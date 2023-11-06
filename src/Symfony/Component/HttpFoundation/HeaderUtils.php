@@ -256,7 +256,7 @@ class HeaderUtils
     private static function groupParts(array $matches, string $separators, bool $first = true): array
     {
         $separator = $separators[0];
-        $separators = substr($separators, 1);
+        $separators = substr($separators, 1) ?: '';
         $i = 0;
 
         if ('' === $separators && !$first) {

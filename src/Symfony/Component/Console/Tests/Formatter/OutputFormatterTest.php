@@ -115,6 +115,16 @@ class OutputFormatterTest extends TestCase
         );
     }
 
+    public function testTagEscaping()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            'foo',
+            $formatter->escape('<info>foo</info>')
+        );
+    }
+
     public function testDeepNestedStyles()
     {
         $formatter = new OutputFormatter(true);

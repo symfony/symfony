@@ -2712,6 +2712,44 @@ YAML;
         return $tests;
     }
 
+    public function testBlockScalarArray()
+    {
+        $yaml = <<<'YAML'
+anyOf:
+  - $ref: >-
+      #/string/bar
+anyOfMultiline:
+  - $ref: >-
+      #/string/bar
+      second line
+nested:
+  anyOf:
+    - $ref: >-
+        #/string/bar
+YAML;
+        $expected = [
+            'anyOf' => [
+                0 => [
+                    '$ref' => '#/string/bar',
+                ],
+            ],
+            'anyOfMultiline' => [
+                0 => [
+                    '$ref' => '#/string/bar second line',
+                ],
+            ],
+            'nested' => [
+                'anyOf' => [
+                    0 => [
+                        '$ref' => '#/string/bar',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     /**
      * @dataProvider indentedMappingData
      */

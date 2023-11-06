@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Add `*_ONLY_PRIVATE` and `*_ONLY_RESERVED` versions to `Ip` constraint
- * Add `*_ONLY_PUBLIC`, `*_ONLY_PRIVATE` and `*_ONLY_RESERVED` versions to `Cidr` constraint
+ * Possibility to use all `Ip` constraint versions for `Cidr` constraint
  * Add `is_valid` function to the `Expression` constraint, its behavior is the same as `ValidatorInterface::validate`
  * Allow single integer for the `versions` option of the `Uuid` constraint
  * Allow single constraint to be passed to the `constraints` option of the `When` constraint

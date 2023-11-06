@@ -29,8 +29,8 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
 {
     private $conn;
     private $dsn;
-    private $username = '';
-    private $password = '';
+    private $username = null;
+    private $password = null;
     private $connectionOptions = [];
     private static $storeRegistry = [];
 

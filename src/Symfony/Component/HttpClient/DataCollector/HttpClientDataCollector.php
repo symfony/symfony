@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\DataCollector;
 
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\HttpFoundation\Request;
@@ -199,7 +200,11 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             if (\is_string($body)) {
                 $dataArg[] = '--data-raw '.$this->escapePayload($body);
             } elseif (\is_array($body)) {
-                $body = explode('&', self::normalizeBody($body));
+                try {
+                    $body = explode('&', self::normalizeBody($body));
+                } catch (TransportException) {
+                    return null;
+                }
                 foreach ($body as $value) {
                     $dataArg[] = '--data-raw '.$this->escapePayload(urldecode($value));
                 }

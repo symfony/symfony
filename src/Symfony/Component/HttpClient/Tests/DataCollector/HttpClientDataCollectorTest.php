@@ -165,8 +165,6 @@ class HttpClientDataCollectorTest extends TestCase
     }
 
     /**
-     * @requires extension openssl
-     *
      * @dataProvider provideCurlRequests
      */
     public function testItGeneratesCurlCommandsAsExpected(array $request, string $expectedCurlCommand)
@@ -342,9 +340,6 @@ class HttpClientDataCollectorTest extends TestCase
         }
     }
 
-    /**
-     * @requires extension openssl
-     */
     public function testItDoesNotFollowRedirectionsWhenGeneratingCurlCommands()
     {
         $sut = new HttpClientDataCollector();
@@ -372,9 +367,6 @@ class HttpClientDataCollectorTest extends TestCase
         );
     }
 
-    /**
-     * @requires extension openssl
-     */
     public function testItDoesNotGeneratesCurlCommandsForUnsupportedBodyType()
     {
         $sut = new HttpClientDataCollector();
@@ -394,9 +386,6 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertNull($curlCommand);
     }
 
-    /**
-     * @requires extension openssl
-     */
     public function testItDoesGenerateCurlCommandsForBigData()
     {
         $sut = new HttpClientDataCollector();
@@ -414,6 +403,25 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
         self::assertNotNull($curlCommand);
+    }
+
+    public function testItDoesNotGeneratesCurlCommandsForUploadedFiles()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+            [
+                'method' => 'POST',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'body' => ['file' => fopen('data://text/plain,', 'r')],
+                ],
+            ],
+        ]));
+        $sut->lateCollect();
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertNull($curlCommand);
     }
 
     private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient

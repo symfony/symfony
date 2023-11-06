@@ -40,7 +40,7 @@ class GlobalDefaultsClass
     }
 
     /**
-     * @Route("/redundant-scheme", name="redundant_scheme", methods="https")
+     * @Route("/redundant-scheme", name="redundant_scheme", schemes="https")
      */
     public function redundantScheme()
     {

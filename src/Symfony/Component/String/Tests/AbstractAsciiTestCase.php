@@ -1583,4 +1583,22 @@ abstract class AbstractAsciiTestCase extends TestCase
             [17, "\u{007f}\u{007f}f\u{001b}[0moo\u{0001}bar\u{007f}cccïf\u{008e}cy\u{0005}1", false], // f[0moobarcccïfcy1
         ];
     }
+
+    /**
+     * @dataProvider provideToByteString
+     */
+    public function testToByteString(string $origin, string $encoding)
+    {
+        $instance = static::createFromString($origin)->toByteString($encoding);
+        $this->assertInstanceOf(ByteString::class, $instance);
+    }
+
+    public static function provideToByteString(): array
+    {
+        return [
+            ['žsžsý', 'UTF-8'],
+            ['žsžsý', 'windows-1250'],
+            ['žsžsý', 'Windows-1252'],
+        ];
+    }
 }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-11-07T14:16:29Z
+
+this requires making sure that WebProfilerBundle 6.4 conflicts with TwigBundle 7.0 and TwigBridge 7.0

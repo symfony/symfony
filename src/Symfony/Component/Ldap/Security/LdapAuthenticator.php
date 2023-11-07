@@ -65,14 +65,6 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
         return $passport;
     }
 
-    /**
-     * @internal
-     */
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-    {
-        throw new \BadMethodCallException(sprintf('The "%s()" method cannot be called.', __METHOD__));
-    }
-
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         return $this->authenticator->createToken($passport, $firewallName);

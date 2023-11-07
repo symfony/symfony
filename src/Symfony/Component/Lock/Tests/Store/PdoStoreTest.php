@@ -20,8 +20,6 @@ use Symfony\Component\Lock\Store\PdoStore;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @requires extension pdo_sqlite
- *
- * @group integration
  */
 class PdoStoreTest extends AbstractStoreTestCase
 {
@@ -78,9 +76,9 @@ class PdoStoreTest extends AbstractStoreTestCase
     }
 
     /**
-     * @dataProvider provideDsn
+     * @dataProvider provideDsnWithSQLite
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, string $file = null)
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -96,10 +94,36 @@ class PdoStoreTest extends AbstractStoreTestCase
         }
     }
 
-    public static function provideDsn()
+    public static function provideDsnWithSQLite()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite:'.$dbFile.'2', $dbFile.'2'];
-        yield ['sqlite::memory:'];
+        yield 'SQLite file' => ['sqlite:'.$dbFile.'2', $dbFile.'2'];
+        yield 'SQLite in memory' => ['sqlite::memory:'];
+    }
+
+    /**
+     * @requires extension pdo_pgsql
+     *
+     * @group integration
+     */
+    public function testDsnWithPostgreSQL()
+    {
+        if (!$host = getenv('POSTGRES_HOST')) {
+            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+        }
+
+        $key = new Key(uniqid(__METHOD__, true));
+
+        $dsn = 'pgsql:host='.$host.';user=postgres;password=password';
+
+        try {
+            $store = new PdoStore($dsn);
+
+            $store->save($key);
+            $this->assertTrue($store->exists($key));
+        } finally {
+            $pdo = new \PDO($dsn);
+            $pdo->exec('DROP TABLE IF EXISTS lock_keys');
+        }
     }
 }

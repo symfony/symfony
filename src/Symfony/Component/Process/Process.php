@@ -77,7 +77,6 @@ class Process implements \IteratorAggregate
     private bool $pty;
     private array $options = ['suppress_errors' => true, 'bypass_shell' => true];
 
-    private bool $useFileHandles;
     private WindowsPipes|UnixPipes $processPipes;
 
     private ?int $latestSignal = null;
@@ -163,7 +162,6 @@ class Process implements \IteratorAggregate
 
         $this->setInput($input);
         $this->setTimeout($timeout);
-        $this->useFileHandles = '\\' === \DIRECTORY_SEPARATOR;
         $this->pty = false;
     }
 
@@ -320,7 +318,7 @@ class Process implements \IteratorAggregate
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $commandline = $this->prepareWindowsCommandLine($commandline, $env);
-        } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
+        } elseif ($this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = ['pipe', 'w'];
 

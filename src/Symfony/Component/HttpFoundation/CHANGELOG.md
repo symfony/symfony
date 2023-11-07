@@ -20,6 +20,7 @@ CHANGELOG
  * Add `UriSigner` from the HttpKernel component
  * Add `partitioned` flag to `Cookie` (CHIPS Cookie)
  * Add argument `bool $flush = true` to `Response::send()`
+* Make `MongoDbSessionHandler` instantiable with the mongodb extension directly
 
 6.3
 ---

@@ -82,6 +82,9 @@ class ConnectionTest extends TestCase
         $queryBuilder
             ->method('getParameterTypes')
             ->willReturn([]);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('SELECT FOR UPDATE');
         $driverConnection->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
@@ -120,7 +123,11 @@ class ConnectionTest extends TestCase
     {
         $driverConnection = $this->createMock(DBALConnection::class);
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE');
+
+        if (!method_exists(QueryBuilder::class, 'forUpdate')) {
+            $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE');
+        }
+
         $configuration = $this->createMock(\Doctrine\DBAL\Configuration::class);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $driverConnection->method('getConfiguration')->willReturn($configuration);
@@ -366,7 +373,9 @@ class ConnectionTest extends TestCase
         $driverConnection
             ->expects($this->once())
             ->method('executeQuery')
-            ->with($expectedSql)
+            ->with($this->callback(function ($sql) use ($expectedSql) {
+                return trim($expectedSql) === trim($sql);
+            }))
             ->willReturn($result)
         ;
         $driverConnection->expects($this->once())->method('commit');

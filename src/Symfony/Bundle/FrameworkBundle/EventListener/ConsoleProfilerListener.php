@@ -59,7 +59,8 @@ final class ConsoleProfilerListener implements EventSubscriberInterface
 
     public function initialize(ConsoleCommandEvent $event): void
     {
-        if (!$event->getInput()->getOption('profile')) {
+        $input = $event->getInput();
+        if (!$input->hasOption('profile') || !$input->getOption('profile')) {
             $this->profiler->disable();
 
             return;

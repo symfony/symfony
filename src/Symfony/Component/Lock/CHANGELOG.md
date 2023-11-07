@@ -7,6 +7,11 @@ CHANGELOG
  * Add parameter `$isSameDatabase` to `DoctrineDbalStore::configureSchema()`
  * Remove the `gcProbablity` (notice the typo) option, use `gcProbability` instead
 
+6.4
+---
+
+ * Make `MongoDbStore` instantiable with the mongodb extension directly
+
 6.3
 ---
 

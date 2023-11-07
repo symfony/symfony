@@ -190,9 +190,6 @@ jobs:
             exit 0
           fi
 
-          (cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
-          (cd src/Symfony/Component/Lock; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
-
           # matrix.mode = high-deps
           echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} 'cd {} && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
 
@@ -211,8 +208,6 @@ jobs:
               git fetch --depth=2 origin $SYMFONY_VERSION
               git checkout -m FETCH_HEAD
               PATCHED_COMPONENTS=$(echo "$PATCHED_COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort || true)
-              (cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
-              (cd src/Symfony/Component/Lock; composer require --dev --no-update mongodb/mongodb)
               if [[ $PATCHED_COMPONENTS ]]; then
                 echo "::group::install phpunit"
                 ./phpunit install

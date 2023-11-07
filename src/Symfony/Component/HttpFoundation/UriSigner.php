@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * Signs URIs.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class UriSigner
@@ -22,11 +20,14 @@ class UriSigner
     private string $parameter;
 
     /**
-     * @param string $secret    A secret
      * @param string $parameter Query string parameter to use
      */
     public function __construct(#[\SensitiveParameter] string $secret, string $parameter = '_hash')
     {
+        if (!$secret) {
+            throw new \InvalidArgumentException('A non-empty secret is required.');
+        }
+
         $this->secret = $secret;
         $this->parameter = $parameter;
     }

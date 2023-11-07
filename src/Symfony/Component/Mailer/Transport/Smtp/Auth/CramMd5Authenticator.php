@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Transport\Smtp\Auth;
 
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
@@ -41,6 +42,10 @@ class CramMd5Authenticator implements AuthenticatorInterface
      */
     private function getResponse(#[\SensitiveParameter] string $secret, string $challenge): string
     {
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
+
         if (\strlen($secret) > 64) {
             $secret = pack('H32', md5($secret));
         }

@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Tests\Extension;
+namespace Symfony\Bundle\WebProfilerBundle\Tests\Profiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Twig\Extension\CodeExtension;
+use Symfony\Bundle\WebProfilerBundle\Profiler\CodeExtension;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 
 class CodeExtensionTest extends TestCase

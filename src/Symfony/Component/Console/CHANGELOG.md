@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `assertCommandIsFaulty` assertion
+
 7.0
 ---
 

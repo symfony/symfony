@@ -179,7 +179,24 @@ class Connection implements ResetInterface
 
             // Append pessimistic write lock to FROM clause if db platform supports it
             $sql = $query->getSQL();
-            if (preg_match('/FROM (.+) WHERE/', (string) $sql, $matches)) {
+
+            // Wrap the rownum query in a sub-query to allow writelocks without ORA-02014 error
+            if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+                $query = $this->createQueryBuilder('w')
+                    ->where('w.id IN ('.str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql).')');
+
+                if (method_exists(QueryBuilder::class, 'forUpdate')) {
+                    $query->forUpdate();
+                }
+
+                $sql = $query->getSQL();
+            } elseif (method_exists(QueryBuilder::class, 'forUpdate')) {
+                $query->forUpdate();
+                try {
+                    $sql = $query->getSQL();
+                } catch (DBALException $e) {
+                }
+            } elseif (preg_match('/FROM (.+) WHERE/', (string) $sql, $matches)) {
                 $fromClause = $matches[1];
                 $sql = str_replace(
                     sprintf('FROM %s WHERE', $fromClause),
@@ -188,16 +205,13 @@ class Connection implements ResetInterface
                 );
             }
 
-            // Wrap the rownum query in a sub-query to allow writelocks without ORA-02014 error
-            if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
-                $sql = $this->createQueryBuilder('w')
-                    ->where('w.id IN ('.str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql).')')
-                    ->getSQL();
+            // use SELECT ... FOR UPDATE to lock table
+            if (!method_exists(QueryBuilder::class, 'forUpdate')) {
+                $sql .= ' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL();
             }
 
-            // use SELECT ... FOR UPDATE to lock table
             $stmt = $this->executeQuery(
-                $sql.' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
+                $sql,
                 $query->getParameters(),
                 $query->getParameterTypes()
             );

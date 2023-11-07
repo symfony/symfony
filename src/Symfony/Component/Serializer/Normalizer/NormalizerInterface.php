@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  *
- * @method getSupportedTypes(?string $format): array
+ * @method array getSupportedTypes(?string $format)
  */
 interface NormalizerInterface
 {

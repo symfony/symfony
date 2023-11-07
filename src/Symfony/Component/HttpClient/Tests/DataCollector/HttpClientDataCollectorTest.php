@@ -165,8 +165,6 @@ class HttpClientDataCollectorTest extends TestCase
     }
 
     /**
-     * @requires extension openssl
-     *
      * @dataProvider provideCurlRequests
      */
     public function testItGeneratesCurlCommandsAsExpected(array $request, string $expectedCurlCommand)
@@ -177,7 +175,9 @@ class HttpClientDataCollectorTest extends TestCase
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
-        self::assertEquals(sprintf($expectedCurlCommand, '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand);
+
+        $isWindows = '\\' === \DIRECTORY_SEPARATOR;
+        self::assertEquals(sprintf($expectedCurlCommand, $isWindows ? '"' : "'", $isWindows ? '' : "'"), $curlCommand);
     }
 
     public static function provideCurlRequests(): iterable
@@ -236,7 +236,7 @@ class HttpClientDataCollectorTest extends TestCase
                 'method' => 'POST',
                 'url' => 'http://localhost:8057/json',
                 'options' => [
-                    'body' => 'foobarbaz',
+                    'body' => 'foo bar baz',
                 ],
             ],
             'curl \\
@@ -244,11 +244,11 @@ class HttpClientDataCollectorTest extends TestCase
   --request POST \\
   --url %1$shttp://localhost:8057/json%1$s \\
   --header %1$sAccept: */*%1$s \\
-  --header %1$sContent-Length: 9%1$s \\
+  --header %1$sContent-Length: 11%1$s \\
   --header %1$sContent-Type: application/x-www-form-urlencoded%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
-  --data-raw %1$sfoobarbaz%1$s',
+  --data-raw %1$sfoo bar baz%1$s',
         ];
         yield 'POST with array body' => [
             [
@@ -286,7 +286,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sContent-Length: 211%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
-  --data-raw %1$sfoo=fooval%1$s --data-raw %1$sbar=barval%1$s --data-raw %1$sbaz=bazval%1$s --data-raw %1$sfoobar[baz]=bazval%1$s --data-raw %1$sfoobar[qux]=quxval%1$s --data-raw %1$sbazqux[0]=bazquxval1%1$s --data-raw %1$sbazqux[1]=bazquxval2%1$s --data-raw %1$sobject[fooprop]=foopropval%1$s --data-raw %1$sobject[barprop]=barpropval%1$s --data-raw %1$stostring=tostringval%1$s',
+  --data-raw %2$sfoo=fooval%2$s --data-raw %2$sbar=barval%2$s --data-raw %2$sbaz=bazval%2$s --data-raw %2$sfoobar[baz]=bazval%2$s --data-raw %2$sfoobar[qux]=quxval%2$s --data-raw %2$sbazqux[0]=bazquxval1%2$s --data-raw %2$sbazqux[1]=bazquxval2%2$s --data-raw %2$sobject[fooprop]=foopropval%2$s --data-raw %2$sobject[barprop]=barpropval%2$s --data-raw %2$stostring=tostringval%2$s',
         ];
 
         // escapeshellarg on Windows replaces double quotes & percent signs with spaces
@@ -342,9 +342,6 @@ class HttpClientDataCollectorTest extends TestCase
         }
     }
 
-    /**
-     * @requires extension openssl
-     */
     public function testItDoesNotFollowRedirectionsWhenGeneratingCurlCommands()
     {
         $sut = new HttpClientDataCollector();
@@ -372,9 +369,6 @@ class HttpClientDataCollectorTest extends TestCase
         );
     }
 
-    /**
-     * @requires extension openssl
-     */
     public function testItDoesNotGeneratesCurlCommandsForUnsupportedBodyType()
     {
         $sut = new HttpClientDataCollector();
@@ -394,9 +388,6 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertNull($curlCommand);
     }
 
-    /**
-     * @requires extension openssl
-     */
     public function testItDoesGenerateCurlCommandsForBigData()
     {
         $sut = new HttpClientDataCollector();
@@ -414,6 +405,25 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
         self::assertNotNull($curlCommand);
+    }
+
+    public function testItDoesNotGeneratesCurlCommandsForUploadedFiles()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+            [
+                'method' => 'POST',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'body' => ['file' => fopen('data://text/plain,', 'r')],
+                ],
+            ],
+        ]));
+        $sut->lateCollect();
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertNull($curlCommand);
     }
 
     private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient

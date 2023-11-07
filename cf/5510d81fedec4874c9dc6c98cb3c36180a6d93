@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-11-06T17:10:22Z
+
+As having an empty secret can only be a mistake, I would throw an exception in 6.4.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-11-06T17:11:57Z
+
+Would it make sense (in addition) to throw an exception at build time when the secret is empty (fail early)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-06T17:13:22Z
+
+> Would it make sense (in addition) to throw an exception at build time when the secret is empty (fail early)?
+
+at build time we reference an env var so we cannot check this reliably I think.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-06T17:20:46Z
+
+> As having an empty secret can only be a mistake, I would throw an exception in 6.4.
+
+Updated!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-11-07T10:02:39Z
+
+I like this, but I wonder if the error message is enough to fully understand the problem and how to solve it.
+
+Imagine reading this with not much additional context --> `A non-empty secret is required.`
+
+Would something like the following be acceptable?
+
+```
+The "secret" value cannot be empty. Configure it in the "framework.secret" option.
+```

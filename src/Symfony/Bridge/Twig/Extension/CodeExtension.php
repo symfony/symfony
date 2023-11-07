@@ -23,7 +23,7 @@ use Twig\TwigFilter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @internal
+ * @internal since Symfony 6.4
  */
 final class CodeExtension extends AbstractExtension
 {

@@ -16,13 +16,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-/**
- * Validates whether a value is a valid CIDR notation.
- *
- * @author Sorin Pop <popsorin15@gmail.com>
- * @author Calin Bolea <calin.bolea@gmail.com>
- * @author Ninos Ego <me@ninosego.de>
- */
 class CidrValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint): void
@@ -35,8 +28,14 @@ class CidrValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_string($value)) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
+        }
+
+        $value = (string)$value;
+
+        if (null !== $constraint->normalizer) {
+            $value = ($constraint->normalizer)($value);
         }
 
         $cidrParts = explode('/', $value, 2);
@@ -56,7 +55,7 @@ class CidrValidator extends ConstraintValidator
         $ipAddress = $cidrParts[0];
         $netmask = (int) $cidrParts[1];
 
-        if (!IpValidator::checkIp($ipAddress, $constraint->version)) {
+        if (!IpValidator::checkIP($ipAddress, $constraint->version)) {
             $this->context
                 ->buildViolation($constraint->message)
                 ->setCode(Cidr::INVALID_CIDR_ERROR)

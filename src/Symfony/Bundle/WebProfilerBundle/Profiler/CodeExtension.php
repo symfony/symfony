@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Extension;
+namespace Symfony\Bundle\WebProfilerBundle\Profiler;
 
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Twig\Extension\AbstractExtension;
@@ -23,7 +23,7 @@ use Twig\TwigFilter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @internal since Symfony 6.4
+ * @internal
  */
 final class CodeExtension extends AbstractExtension
 {

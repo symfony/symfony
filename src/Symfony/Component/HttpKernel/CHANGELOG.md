@@ -34,6 +34,7 @@ CHANGELOG
  * Deprecate `FileLinkFormatter`, use `FileLinkFormatter` from the ErrorHandler component instead
  * Add argument `$buildDir` to `WarmableInterface`
  * Add argument `$filter` to `Profiler::find()` and `FileProfilerStorage::find()`
+ * Add `ControllerResolver::allowControllers()` to define which callables are legit controllers when the `_check_controller_is_allowed` request attribute is set
 
 6.3
 ---

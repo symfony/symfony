@@ -36,9 +36,10 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
      */
     public function __construct(RateLimiterFactory $globalFactory, RateLimiterFactory $localFactory, #[\SensitiveParameter] string $secret = '')
     {
-        if ('' === $secret) {
+        if (!$secret) {
             throw new InvalidArgumentException('A non-empty secret is required.');
         }
+
         $this->globalFactory = $globalFactory;
         $this->localFactory = $localFactory;
         $this->secret = $secret;

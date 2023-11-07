@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-11-06T22:45:25Z
+
+see doctrine/dbal#6191
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-11-07T03:29:27Z
+
+The idea behind that feature was that Symfony could leverage the query builder for building the "skip locked rows" query.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-11-07T08:03:23Z
+
+Thanks for your feedback. I guess it's better now.

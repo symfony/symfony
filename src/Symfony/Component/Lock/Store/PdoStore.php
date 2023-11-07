@@ -38,8 +38,8 @@ class PdoStore implements PersistingStoreInterface
     private \PDO $conn;
     private string $dsn;
     private string $driver;
-    private string $username = '';
-    private string $password = '';
+    private ?string $username = null;
+    private ?string $password = null;
     private array $connectionOptions = [];
 
     /**

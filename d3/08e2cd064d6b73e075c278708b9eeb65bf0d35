@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by keulinho at 2023-11-03T09:37:57Z
+
+Unit test failure seems unrelated to this change :thinking:
+
+---------------------------------------------------------------------------
+
+by keulinho at 2023-11-03T09:57:04Z
+
+Also the fail in the appveyor CI seems unrelated as it is some error in the redis integration test for the messenger component :thinking:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-03T10:16:27Z
+
+friendly ping @HeahDude as you contributed this feature, thanks
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-11-03T10:21:14Z
+
+I could not reproduce the issue https://github.com/symfony/symfony/issues/52433.
+
+This listener is part of the `FrameworkBundle`, and so it should be used with `Symfony\Bundle\FrameworkBundle\Console
+\Application`. Could you provide more details on your application or test setup?
+
+---------------------------------------------------------------------------
+
+by keulinho at 2023-11-03T10:38:38Z
+
+Ok took a look again and seemed i messed something up with the command tester, that seems to work as it does not dispatch the event.
+
+However manually triggering events by dispatching the `ConsoleCommandEvent` does not work anymore.
+E.g.
+```php
+$commandEvent = new ConsoleCommandEvent($command, $input, $output);
+$kernel->getContainer()->get('event_dispatcher')->dispatch($commandEvent, ConsoleEvents::COMMAND);
+```
+
+We used something like that in an internal command tester, that's why i first assumed the issue is in the symfony command tester as well.
+
+However, I still think the fix makes sense, as you should not rely in the listener that the event was correctly configured in the application class. IMHO the benefit of using events is to decouple different parts of the system from each other, but this assumption (that there is always an `profile` option) in the listener basically couples the listener to the application class-
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-11-04T07:28:30Z
+
+I've no strong opinion here. I think I can live with that coupling, especially given it's part of a bundle

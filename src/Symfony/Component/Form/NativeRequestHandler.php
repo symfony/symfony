@@ -29,6 +29,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      */
     private const FILE_KEYS = [
         'error',
+        'full_path',
         'name',
         'size',
         'tmp_name',
@@ -186,9 +187,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             return $data;
         }
 
-        // Remove extra key added by PHP 8.1.
-        unset($data['full_path']);
-        $keys = array_keys($data);
+        $keys = array_keys($data + ['full_path' => null]);
         sort($keys);
 
         if (self::FILE_KEYS !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
@@ -207,7 +206,9 @@ class NativeRequestHandler implements RequestHandlerInterface
                 'type' => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
                 'size' => $data['size'][$key],
-            ]);
+            ] + (isset($data['full_path'][$key]) ? [
+                'full_path' => $data['full_path'][$key],
+            ] : []));
         }
 
         return $files;
@@ -219,7 +220,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             return $data;
         }
 
-        $keys = array_keys($data);
+        $keys = array_keys($data + ['full_path' => null]);
         sort($keys);
 
         if (self::FILE_KEYS === $keys) {

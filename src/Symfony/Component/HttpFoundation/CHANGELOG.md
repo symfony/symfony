@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `UploadedFile::getClientOriginalPath()`
+
 7.0
 ---
 

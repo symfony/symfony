@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class FileBag extends ParameterBag
 {
-    private const FILE_KEYS = ['error', 'name', 'size', 'tmp_name', 'type'];
+    private const FILE_KEYS = ['error', 'full_path', 'name', 'size', 'tmp_name', 'type'];
 
     /**
      * @param array|UploadedFile[] $parameters An array of HTTP files
@@ -65,18 +65,18 @@ class FileBag extends ParameterBag
         }
 
         $file = $this->fixPhpFilesArray($file);
-        $keys = array_keys($file);
+        $keys = array_keys($file + ['full_path' => null]);
         sort($keys);
 
-        if (self::FILE_KEYS == $keys) {
-            if (\UPLOAD_ERR_NO_FILE == $file['error']) {
+        if (self::FILE_KEYS === $keys) {
+            if (\UPLOAD_ERR_NO_FILE === $file['error']) {
                 $file = null;
             } else {
-                $file = new UploadedFile($file['tmp_name'], $file['name'], $file['type'], $file['error'], false);
+                $file = new UploadedFile($file['tmp_name'], $file['full_path'] ?? $file['name'], $file['type'], $file['error'], false);
             }
         } else {
             $file = array_map(fn ($v) => $v instanceof UploadedFile || \is_array($v) ? $this->convertFileInformation($v) : $v, $file);
-            if (array_keys($keys) === $keys) {
+            if (array_is_list($file)) {
                 $file = array_filter($file);
             }
         }
@@ -98,12 +98,10 @@ class FileBag extends ParameterBag
      */
     protected function fixPhpFilesArray(array $data): array
     {
-        // Remove extra key added by PHP 8.1.
-        unset($data['full_path']);
-        $keys = array_keys($data);
+        $keys = array_keys($data + ['full_path' => null]);
         sort($keys);
 
-        if (self::FILE_KEYS != $keys || !isset($data['name']) || !\is_array($data['name'])) {
+        if (self::FILE_KEYS !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
 
@@ -119,7 +117,9 @@ class FileBag extends ParameterBag
                 'type' => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
                 'size' => $data['size'][$key],
-            ]);
+            ] + (isset($data['full_path'][$key]) ? [
+                'full_path' => $data['full_path'][$key],
+            ] : []));
         }
 
         return $files;

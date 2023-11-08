@@ -597,8 +597,12 @@ class Parser
         }
 
         $data = [];
+        $isInMultiLineQuote = false;
 
         if ($this->getCurrentLineIndentation() >= $newIndent) {
+            if ($this->isCurrentLineMultiLineQuoteStart()) {
+                $isInMultiLineQuote = true;
+            }
             $data[] = substr($this->currentLine, $newIndent ?? 0);
         } elseif ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()) {
             $data[] = $this->currentLine;
@@ -634,6 +638,16 @@ class Parser
 
             if ($this->isCurrentLineBlank()) {
                 $data[] = substr($this->currentLine, $newIndent);
+                continue;
+            } elseif (!$isInMultiLineQuote && $this->isCurrentLineMultiLineQuoteStart()) {
+                $isInMultiLineQuote = true;
+                $data[] = substr($this->currentLine, $newIndent);
+                continue;
+            } elseif ($isInMultiLineQuote) {
+                $data[] = $this->currentLine;
+                if ("'" === (rtrim($this->currentLine)[-1] ?? '')) {
+                    $isInMultiLineQuote = false;
+                }
                 continue;
             }
 
@@ -965,6 +979,49 @@ class Parser
         return ($this->offset + $this->currentLineNb) >= ($this->totalNumberOfLines - 1);
     }
 
+    /**
+     * Returns true if the current line is the beginning of a multiline quoted block.
+     */
+    private function isCurrentLineMultiLineQuoteStart(): bool
+    {
+        $trimmedLine = trim($this->currentLine);
+        $trimmedLineLength = \strlen($trimmedLine);
+        $quoteCount = 0;
+        $value = '';
+        // check if the key is quoted
+        for ($i = 0; $i < $trimmedLineLength; ++$i) {
+            $char = $trimmedLine[$i];
+            if ("'" === $char) {
+                ++$quoteCount;
+            } elseif (':' === $char && 0 === $quoteCount % 2 && ($i === $trimmedLineLength - 1 || ' ' === $trimmedLine[$i + 1])) {
+                // key and value are separated by the first colon after the (quoted) key followed by a space or linebreak
+                $value = trim(substr($trimmedLine, ++$i), ' ');
+                break;
+            }
+        }
+
+        if (0 !== strpos($value, "'")) {
+            return false;
+        }
+
+        $lineEndQuoteCount = 0;
+        for ($i = \strlen($value) - 1; $i > 0; --$i) {
+            $char = $value[$i];
+            if ("'" === $char) {
+                ++$lineEndQuoteCount;
+            } else {
+                break;
+            }
+        }
+
+        return 0 === $lineEndQuoteCount % 2;
+    }
+
+    /**
+     * Cleanups a YAML string to be parsed.
+     *
+     * @param string $value The input YAML string
+     */
     private function cleanup(string $value): string
     {
         $value = str_replace(["\r\n", "\r"], "\n", $value);

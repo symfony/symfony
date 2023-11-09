@@ -1,0 +1,39 @@
+{
+    "name": "symfony/microsoft-graph-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony Microsoft Graph Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kevin Nguyen",
+            "homepage": "https://github.com/nguyenk"
+        },
+        {
+            "name": "The Coding Machine",
+            "homepage": "https://github.com/thecodingmachine"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/mailer": "^5.4|^6.4|^7.0",
+        "thecodingmachine/safe": "^2.5.0",
+        "microsoft/microsoft-graph": "^1.109.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^5.4|^6.4|^7.0",
+        "symfony/cache": "6.4.x-dev"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\MicrosoftGraph\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

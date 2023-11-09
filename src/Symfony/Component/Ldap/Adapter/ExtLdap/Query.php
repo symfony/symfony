@@ -107,7 +107,7 @@ class Query extends AbstractQuery
                         $this->resetPagination();
                     }
 
-                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
+                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError), $errno);
                 }
 
                 $this->results[] = $search;

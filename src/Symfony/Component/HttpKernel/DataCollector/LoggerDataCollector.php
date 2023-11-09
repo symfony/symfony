@@ -201,7 +201,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
     private function getContainerCompilerLogs(string $compilerLogsFilepath = null): array
     {
-        if (!is_file($compilerLogsFilepath)) {
+        if (!$compilerLogsFilepath || !is_file($compilerLogsFilepath)) {
             return [];
         }
 

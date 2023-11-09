@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Google\Tests\Transport;
+namespace Symfony\Component\Mailer\Bridge\MicrosoftGraph\Tests\Transport;
 
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport\MicrosoftGraphTransport;

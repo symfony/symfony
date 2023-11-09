@@ -36,7 +36,7 @@ class FileExistenceResourceTest extends TestCase
 
     public function testToString()
     {
-        $this->assertSame($this->file, (string) $this->resource);
+        $this->assertSame('existence.'.$this->file, (string) $this->resource);
     }
 
     public function testGetResource()

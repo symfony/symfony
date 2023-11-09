@@ -94,7 +94,7 @@ class CachedMappedAssetFactoryTest extends TestCase
         $deeplyNestedAsset = new MappedAsset('file4.js', realpath(__DIR__.'/../Fixtures/dir2/file4.js'));
 
         $file6Asset = new MappedAsset('file6.js', realpath(__DIR__.'/../Fixtures/dir2/subdir/file6.js'));
-        $deeplyNestedAsset->addJavaScriptImport(new JavaScriptImport('file6', asset: $file6Asset));
+        $deeplyNestedAsset->addJavaScriptImport(new JavaScriptImport('file6', assetLogicalPath: $file6Asset->logicalPath, assetSourcePath: $file6Asset->sourcePath));
 
         $dependentOnContentAsset->addDependency($deeplyNestedAsset);
         $mappedAsset->addDependency($dependentOnContentAsset);

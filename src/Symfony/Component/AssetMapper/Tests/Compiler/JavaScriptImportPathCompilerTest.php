@@ -58,7 +58,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('getAsset')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
-                    'module_in_importmap_local_asset.js' => new MappedAsset('module_in_importmap_local_asset.js', publicPathWithoutDigest: '/assets/module_in_importmap_local_asset.js'),
+                    'module_in_importmap_local_asset.js' => new MappedAsset('module_in_importmap_local_asset.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/module_in_importmap_local_asset.js'),
                     default => null,
                 };
             });
@@ -67,11 +67,11 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('getAssetFromSourcePath')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
-                    '/project/assets/other.js' => new MappedAsset('other.js', publicPathWithoutDigest: '/assets/other.js'),
-                    '/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
-                    '/project/assets/styles.css' => new MappedAsset('styles.css', publicPathWithoutDigest: '/assets/styles.css'),
-                    '/project/assets/vendor/module_in_importmap_remote.js' => new MappedAsset('module_in_importmap_remote.js', publicPathWithoutDigest: '/assets/module_in_importmap_remote.js'),
-                    '/project/assets/vendor/@popperjs/core.js' => new MappedAsset('assets/vendor/@popperjs/core.js', publicPathWithoutDigest: '/assets/@popperjs/core.js'),
+                    '/project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
+                    '/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
+                    '/project/assets/styles.css' => new MappedAsset('styles.css', '/can/be/anything.js', publicPathWithoutDigest: '/assets/styles.css'),
+                    '/project/assets/vendor/module_in_importmap_remote.js' => new MappedAsset('module_in_importmap_remote.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/module_in_importmap_remote.js'),
+                    '/project/assets/vendor/@popperjs/core.js' => new MappedAsset('assets/vendor/@popperjs/core.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/@popperjs/core.js'),
                     default => null,
                 };
             });
@@ -81,7 +81,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame($input, $compiler->compile($input, $asset, $assetMapper));
         $actualImports = [];
         foreach ($asset->getJavaScriptImports() as $import) {
-            $actualImports[$import->importName] = ['lazy' => $import->isLazy, 'asset' => $import->asset->logicalPath, 'add' => $import->addImplicitlyToImportMap];
+            $actualImports[$import->importName] = ['lazy' => $import->isLazy, 'asset' => $import->assetLogicalPath, 'add' => $import->addImplicitlyToImportMap];
         }
 
         $this->assertEquals($expectedJavaScriptImports, $actualImports);
@@ -304,9 +304,9 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('getAssetFromSourcePath')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
-                    '/project/assets/other.js' => new MappedAsset('other.js', publicPathWithoutDigest: '/assets/other.js'),
-                    '/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
-                    '/project/root_asset.js' => new MappedAsset('root_asset.js', publicPathWithoutDigest: '/assets/root_asset.js'),
+                    '/project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
+                    '/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
+                    '/project/root_asset.js' => new MappedAsset('root_asset.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/root_asset.js'),
                     default => throw new \RuntimeException(sprintf('Unexpected source path "%s"', $path)),
                 };
             });
@@ -320,9 +320,9 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $compiler = new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class));
         $compiler->compile($input, $inputAsset, $assetMapper);
         $this->assertCount(3, $inputAsset->getJavaScriptImports());
-        $this->assertSame('other.js', $inputAsset->getJavaScriptImports()[0]->asset->logicalPath);
-        $this->assertSame('subdir/foo.js', $inputAsset->getJavaScriptImports()[1]->asset->logicalPath);
-        $this->assertSame('root_asset.js', $inputAsset->getJavaScriptImports()[2]->asset->logicalPath);
+        $this->assertSame('other.js', $inputAsset->getJavaScriptImports()[0]->assetLogicalPath);
+        $this->assertSame('subdir/foo.js', $inputAsset->getJavaScriptImports()[1]->assetLogicalPath);
+        $this->assertSame('root_asset.js', $inputAsset->getJavaScriptImports()[2]->assetLogicalPath);
     }
 
     public function testCompileFindsRelativePathsWithWindowsPathsViaSourcePath()
@@ -337,9 +337,9 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('getAssetFromSourcePath')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
-                    'C://project/assets/other.js' => new MappedAsset('other.js', publicPathWithoutDigest: '/assets/other.js'),
-                    'C://project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
-                    'C://project/root_asset.js' => new MappedAsset('root_asset.js', publicPathWithoutDigest: '/assets/root_asset.js'),
+                    'C://project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
+                    'C://project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
+                    'C://project/root_asset.js' => new MappedAsset('root_asset.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/root_asset.js'),
                     default => throw new \RuntimeException(sprintf('Unexpected source path "%s"', $path)),
                 };
             });
@@ -366,7 +366,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $asset = new MappedAsset('app.js', '/path/to/assets/app.js', publicPathWithoutDigest: $inputAssetPublicPath);
 
         $assetMapper = $this->createMock(AssetMapperInterface::class);
-        $importedAsset = new MappedAsset('anything', publicPathWithoutDigest: $importedPublicPath);
+        $importedAsset = new MappedAsset('anything', '/can/be/anything.js', publicPathWithoutDigest: $importedPublicPath);
         $assetMapper->expects($this->once())
             ->method('getAssetFromSourcePath')
             ->willReturn($importedAsset);
@@ -436,7 +436,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $input = 'import "./other.js";';
         $compiler->compile($input, $appAsset, $assetMapper);
         $this->assertCount(1, $appAsset->getJavaScriptImports());
-        $this->assertSame($otherAsset, $appAsset->getJavaScriptImports()[0]->asset);
+        $this->assertSame($otherAsset->logicalPath, $appAsset->getJavaScriptImports()[0]->assetLogicalPath);
     }
 
     public function testCompileHandlesCircularBareImportAssets()
@@ -464,7 +464,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $input = 'import "@popperjs/core";';
         $compiler->compile($input, $bootstrapAsset, $assetMapper);
         $this->assertCount(1, $bootstrapAsset->getJavaScriptImports());
-        $this->assertSame($popperAsset, $bootstrapAsset->getJavaScriptImports()[0]->asset);
+        $this->assertSame($popperAsset->logicalPath, $bootstrapAsset->getJavaScriptImports()[0]->assetLogicalPath);
     }
 
     /**
@@ -490,7 +490,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('getAssetFromSourcePath')
             ->willReturnCallback(function ($sourcePath) {
                 return match ($sourcePath) {
-                    '/path/to/other.js' => new MappedAsset('other.js', publicPathWithoutDigest: '/assets/other.js'),
+                    '/path/to/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
                     default => null,
                 };
             }

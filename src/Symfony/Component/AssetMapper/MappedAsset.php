@@ -94,6 +94,8 @@ final class MappedAsset
     }
 
     /**
+     * Assets that the content of this asset depends on - for internal caching.
+     *
      * @return MappedAsset[]
      */
     public function getDependencies(): array

@@ -69,7 +69,7 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
         }
 
         foreach ($mappedAsset->getJavaScriptImports() as $import) {
-            $resources[] = new FileExistenceResource($import->asset->sourcePath);
+            $resources[] = new FileExistenceResource($import->assetSourcePath);
         }
 
         return $resources;

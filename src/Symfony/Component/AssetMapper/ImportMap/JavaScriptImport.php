@@ -11,21 +11,20 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
-use Symfony\Component\AssetMapper\MappedAsset;
-
 /**
  * Represents a module that was imported by a JavaScript file.
  */
 final class JavaScriptImport
 {
     /**
-     * @param string      $importName               The name of the import needed in the importmap, e.g. "/foo.js" or "react"
-     * @param MappedAsset $asset                    The asset that was imported
-     * @param bool        $addImplicitlyToImportMap Whether this import should be added to the importmap automatically
+     * @param string $importName               The name of the import needed in the importmap, e.g. "/foo.js" or "react"
+     * @param string $assetLogicalPath         Logical path to the mapped ass that was imported
+     * @param bool   $addImplicitlyToImportMap Whether this import should be added to the importmap automatically
      */
     public function __construct(
         public readonly string $importName,
-        public readonly MappedAsset $asset,
+        public readonly string $assetLogicalPath,
+        public readonly string $assetSourcePath,
         public readonly bool $isLazy = false,
         public bool $addImplicitlyToImportMap = false,
     ) {

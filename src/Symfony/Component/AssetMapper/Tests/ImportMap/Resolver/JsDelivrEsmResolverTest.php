@@ -463,12 +463,12 @@ class JsDelivrEsmResolverTest extends TestCase
             $expectedVersions[] = $packageData[1];
         }
         $actualNames = [];
-        foreach ($matches[1] as $i => $name) {
-            $actualNames[] = $name.$matches[3][$i];
+        foreach ($matches[2] as $i => $name) {
+            $actualNames[] = $name.$matches[4][$i];
         }
 
         $this->assertSame($expectedNames, $actualNames);
-        $this->assertSame($expectedVersions, $matches[2]);
+        $this->assertSame($expectedVersions, $matches[3]);
     }
 
     public static function provideImportRegex(): iterable
@@ -527,6 +527,26 @@ class JsDelivrEsmResolverTest extends TestCase
             [
                 ['prosemirror-transform/php/strings/vsprintf', ''],
                 ['prosemirror-state/php/strings/sprintf', '1.4.3'],
+            ],
+        ];
+
+        yield 'import without importing a value' => [
+            'import "/npm/jquery@3.7.1/+esm";',
+            [
+                ['jquery', '3.7.1'],
+            ],
+        ];
+
+        yield 'multiple imports and exports with and without values' => [
+            'import"/npm/jquery@3.7.1/+esm";import e from"/npm/datatables.net-bs5@1.13.7/+esm";export{default}from"/npm/datatables.net-bs5@1.13.7/+esm";import"/npm/datatables.net-select@1.7.0/+esm";
+            /*! Bootstrap 5 styling wrapper for Select
+             * © SpryMedia Ltd - datatables.net/license
+             */',
+            [
+                ['jquery', '3.7.1'],
+                ['datatables.net-bs5', '1.13.7'],
+                ['datatables.net-bs5', '1.13.7'],
+                ['datatables.net-select', '1.7.0'],
             ],
         ];
     }

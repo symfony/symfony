@@ -9,6 +9,7 @@
     errorBaseline=".github/psalm/psalm.baseline.xml"
     findUnusedBaselineEntry="false"
     findUnusedCode="false"
+    findUnusedIssueHandlerSuppression="false"
 >
     <projectFiles>
         <directory name="src" />

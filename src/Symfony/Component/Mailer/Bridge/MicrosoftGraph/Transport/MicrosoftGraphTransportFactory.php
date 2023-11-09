@@ -1,8 +1,11 @@
 <?php
 
 declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -39,17 +42,18 @@ final class MicrosoftGraphTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'microsoft graph', $this->getSupportedSchemes());
         }
         $tenantId = $dsn->getOption('tenant');
-        if ($tenantId === null){
+        if (null === $tenantId) {
             throw new IncompleteDsnException("Transport 'microsoft+graph' requires the 'tenant' option");
         }
 
         $graphEndpoint = $dsn->getOption('graphEndpoint', 'https://graph.microsoft.com');
         $authHost = 'default' === $dsn->getHost() ? 'https://login.microsoftonline.com' : $dsn->getHost();
+
         // This parses the MAILER_DSN containing Microsoft Graph API credentials
         return new MicrosoftGraphTransport(
             $this->getUser($dsn),
             $this->getPassword($dsn),
-            $authHost . '/' . $tenantId . '/oauth2/v2.0/token',
+            $authHost.'/'.$tenantId.'/oauth2/v2.0/token',
             $graphEndpoint,
             $this->cache
         );

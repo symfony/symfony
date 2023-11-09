@@ -43,11 +43,11 @@ class MicrosoftGraphTransportFactoryTest extends TransportFactoryTestCase
     public static function createProvider(): iterable
     {
         yield [
-            new Dsn('microsoft+graph', 'default', self::USER, self::PASSWORD, null, ["tenant" => self::TENANT]),
+            new Dsn('microsoft+graph', 'default', self::USER, self::PASSWORD, null, ['tenant' => self::TENANT]),
             new MicrosoftGraphTransport(self::USER, self::PASSWORD, 'https://login.microsoftonline.com/tenantId/oauth2/v2.0/token', 'https://graph.microsoft.com', new NullAdapter()),
         ];
         yield [
-            new Dsn('microsoft+graph', 'https://example.com', self::USER, self::PASSWORD, null, ["tenant" => self::TENANT, "graphEndpoint" => "https://another-example.com"]),
+            new Dsn('microsoft+graph', 'https://example.com', self::USER, self::PASSWORD, null, ['tenant' => self::TENANT, 'graphEndpoint' => 'https://another-example.com']),
             new MicrosoftGraphTransport(self::USER, self::PASSWORD, 'https://example.com/tenantId/oauth2/v2.0/token', 'https://another-example.com', new NullAdapter()),
         ];
     }

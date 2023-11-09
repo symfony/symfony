@@ -133,6 +133,9 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         if ($request->attributes->has('_stateless')) {
             $subRequest->attributes->set('_stateless', $request->attributes->get('_stateless'));
         }
+        if ($request->attributes->has('_check_controller_is_allowed')) {
+            $subRequest->attributes->set('_check_controller_is_allowed', $request->attributes->get('_check_controller_is_allowed'));
+        }
 
         return $subRequest;
     }

@@ -54,6 +54,10 @@ class ImportMapRendererTest extends TestCase
                     'path' => 'https://ga.jspm.io/npm:es-module-shims',
                     'type' => 'js',
                 ],
+                '/assets/implicitly-added' => [
+                    'path' => '/assets/implicitly-added-d1g35t.js',
+                    'type' => 'js',
+                ],
             ]);
 
         $assetPackages = $this->createMock(Packages::class);
@@ -92,6 +96,8 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringNotContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-nopreload-d1g35t.css">', $html);
         // remote js
         $this->assertStringContainsString('"remote_js": "https://cdn.example.com/assets/remote-d1g35t.js"', $html);
+        // both the key and value are prefixed with the subdirectory
+        $this->assertStringContainsString('"/subdirectory/assets/implicitly-added": "/subdirectory/assets/implicitly-added-d1g35t.js"', $html);
     }
 
     public function testNoPolyfill()

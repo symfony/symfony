@@ -27,8 +27,7 @@
         "symfony/cache": "6.4.x-dev"
     },
     "require-dev": {
-        "symfony/http-client": "^5.4|^6.4|^7.0",
-        "microsoft/microsoft-graph": "^1.109.0"
+        "symfony/http-client": "^5.4|^6.4|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\MicrosoftGraph\\": "" },

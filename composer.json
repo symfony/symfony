@@ -141,6 +141,7 @@
         "league/html-to-markdown": "^5.0",
         "league/uri": "^6.5|^7.0",
         "masterminds/html5": "^2.7.2",
+        "microsoft/microsoft-graph": "^1.109.0",
         "monolog/monolog": "^1.25.1|^2",
         "nyholm/psr7": "^1.0",
         "pda/pheanstalk": "^4.0",

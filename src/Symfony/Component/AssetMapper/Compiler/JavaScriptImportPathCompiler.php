@@ -72,7 +72,8 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             $addToImportMap = $isRelativeImport;
             $asset->addJavaScriptImport(new JavaScriptImport(
                 $addToImportMap ? $dependentAsset->publicPathWithoutDigest : $importedModule,
-                $dependentAsset,
+                $dependentAsset->logicalPath,
+                $dependentAsset->sourcePath,
                 $isLazy,
                 $addToImportMap,
             ));

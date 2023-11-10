@@ -89,6 +89,10 @@ class FileType extends AbstractType
             $view->vars['attr']['multiple'] = 'multiple';
         }
 
+        if ($options['webkitdirectory']) {
+            $view->vars['attr']['webkitdirectory'] = 'webkitdirectory';
+        }
+
         $view->vars = array_replace($view->vars, [
             'type' => 'file',
             'value' => '',
@@ -114,6 +118,7 @@ class FileType extends AbstractType
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'multiple' => false,
+            'webkitdirectory' => false,
             'allow_file_upload' => true,
             'invalid_message' => 'Please select a valid file.',
         ]);

@@ -263,6 +263,23 @@ class FileTypeTest extends BaseTypeTestCase
         }
     }
 
+    public function testDontPassWebkitdirectoryToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE)
+            ->createView();
+
+        $this->assertArrayNotHasKey('webkitdirectory', $view->vars['attr']);
+    }
+
+    public function testPassWebkitdirectoryToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, ['webkitdirectory' => true])
+            ->createView();
+
+        $this->assertArrayHasKey('webkitdirectory', $view->vars['attr']);
+        $this->assertEquals('webkitdirectory', $view->vars['attr']['webkitdirectory']);
+    }
+
     /**
      * @dataProvider uploadFileErrorCodes
      */

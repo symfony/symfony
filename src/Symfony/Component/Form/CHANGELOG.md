@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `webkitdirectory` to `FileType`
+
 7.0
 ---
 

@@ -224,7 +224,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 [
                     'url' => '/v1/packages/npm/bootstrap@5.2.0/entrypoints',
                     'response' => ['body' => ['entrypoints' => [
-                        'css' => ['file' => '/dist/css/bootstrap.min.css'],
+                        'css' => ['file' => '/dist/css/bootstrap.min.css', 'guessed' => false],
                     ]]],
                 ],
                 [

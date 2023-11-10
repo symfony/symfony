@@ -129,8 +129,9 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
             $entrypoints = $cssEntrypointResponse->toArray()['entrypoints'] ?? [];
             $cssFile = $entrypoints['css']['file'] ?? null;
+            $guessed = $entrypoints['css']['guessed'] ?? true;
 
-            if (!$cssFile) {
+            if (!$cssFile || $guessed) {
                 continue;
             }
 

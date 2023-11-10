@@ -7,6 +7,10 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.51 (2023-11-10)
+
+ * security #cve-2023-46734 [TwigBridge] Ensure CodeExtension's filters properly escape their input (nicolas-grekas, GromNaN)
+
 * 4.4.50 (2023-02-01)
 
  * security #cve-2022-24895 [Security/Http] Remove CSRF tokens from storage on successful login (nicolas-grekas)

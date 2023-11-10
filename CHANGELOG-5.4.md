@@ -7,6 +7,23 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.31 (2023-11-10)
+
+ * security #cve-2023-46734 [TwigBridge] Ensure CodeExtension's filters properly escape their input (nicolas-grekas, GromNaN)
+ * security #cve-2023-46733 [Security] Fix possible session fixation when only the *token* changes (RobertMe)
+ * bug #52506 [SecurityBundle] wire the secret for Symfony 6.4 compatibility (xabbuh)
+ * bug #52502 [Config] Prefixing `FileExistenceResource::__toString()` to avoid conflict with `FileResource` (weaverryan)
+ * bug #52491 [String] Method toByteString conversion using iconv is unreachable (Vincentv92)
+ * bug #52488 [HttpKernel] Fix PHP deprecation (nicolas-grekas)
+ * bug #52476 [Messenger] fix compatibility with Doctrine DBAL 4 (xabbuh)
+ * bug #52474 [HttpFoundation] ensure string type with mbstring func overloading enabled (xabbuh)
+ * bug #52457 [Cache][HttpFoundation][Lock] Fix empty username/password for PDO PostgreSQL (HypeMC)
+ * bug #52443 [Yaml] Fix uid binary parsing (mRoca)
+ * bug #52444 Remove full DSNs from exception messages (nicolas-grekas)
+ * bug #52428 [HttpKernel] Preventing error 500 when function putenv is disabled (ShaiMagal)
+ * bug #52408 [Yaml] Fix block scalar array parsing (NickSdot)
+ * bug #52329 [HttpClient] Psr18Client: parse HTTP Reason Phrase for Response (Hanmac)
+
 * 5.4.30 (2023-10-29)
 
  * bug #52332 [Yaml] Fix deprecated passing null to trim() (javaDeveloperKid)

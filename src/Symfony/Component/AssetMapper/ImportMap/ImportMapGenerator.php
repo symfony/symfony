@@ -179,10 +179,15 @@ class ImportMapGenerator
 
             // check if this import requires an automatic importmap entry
             if ($javaScriptImport->addImplicitlyToImportMap) {
+                if (!$importedAsset = $this->assetMapper->getAsset($javaScriptImport->assetLogicalPath)) {
+                    // should not happen at this point, unless something added a bogus JavaScriptImport to this asset
+                    throw new LogicException(sprintf('Cannot find imported JavaScript asset "%s" in asset mapper.', $javaScriptImport->assetLogicalPath));
+                }
+
                 $nextEntry = ImportMapEntry::createLocal(
                     $importName,
-                    ImportMapType::tryFrom($javaScriptImport->asset->publicExtension) ?: ImportMapType::JS,
-                    $javaScriptImport->asset->logicalPath,
+                    ImportMapType::tryFrom($importedAsset->publicExtension) ?: ImportMapType::JS,
+                    $importedAsset->logicalPath,
                     false,
                 );
 
@@ -223,7 +228,11 @@ class ImportMapGenerator
             $dependencies[] = $javaScriptImport->importName;
 
             // Follow its imports!
-            $dependencies = array_merge($dependencies, $this->findEagerImports($javaScriptImport->asset));
+            if (!$nextAsset = $this->assetMapper->getAsset($javaScriptImport->assetLogicalPath)) {
+                // should not happen at this point, unless something added a bogus JavaScriptImport to this asset
+                throw new LogicException(sprintf('Cannot find imported JavaScript asset "%s" in asset mapper.', $javaScriptImport->assetLogicalPath));
+            }
+            $dependencies = array_merge($dependencies, $this->findEagerImports($nextAsset));
         }
 
         return $dependencies;
@@ -232,7 +241,11 @@ class ImportMapGenerator
     private function createMissingImportMapAssetException(ImportMapEntry $entry): \InvalidArgumentException
     {
         if ($entry->isRemotePackage()) {
-            throw new LogicException(sprintf('The "%s" vendor asset is missing. Try running the "importmap:install" command.', $entry->importName));
+            if (!is_file($entry->path)) {
+                throw new LogicException(sprintf('The "%s" vendor asset is missing. Try running the "importmap:install" command.', $entry->importName));
+            }
+
+            throw new LogicException(sprintf('The "%s" vendor file exists locally (%s), but cannot be found in any asset map paths. Be sure the assets vendor directory is an asset mapper path.', $entry->importName, $entry->path));
         }
 
         throw new LogicException(sprintf('The asset "%s" cannot be found in any asset map paths.', $entry->path));

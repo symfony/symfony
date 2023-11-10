@@ -62,6 +62,11 @@ class ImportMapRenderer
                 continue;
             }
 
+            // for subdirectories or CDNs, the import name needs to be the full URL
+            if (str_starts_with($importName, '/') && $this->assetPackages) {
+                $importName = $this->assetPackages->getUrl(ltrim($importName, '/'));
+            }
+
             $preload = $data['preload'] ?? false;
             if ('css' !== $data['type']) {
                 $importMap[$importName] = $path;

@@ -97,68 +97,79 @@ class ImportMapGeneratorTest extends TestCase
 
         $importedFile1 = new MappedAsset(
             'imported_file1.js',
+            '/path/to/imported_file1.js',
             publicPathWithoutDigest: '/assets/imported_file1.js',
             publicPath: '/assets/imported_file1-d1g35t.js',
         );
         $importedFile2 = new MappedAsset(
             'imported_file2.js',
+            '/path/to/imported_file2.js',
             publicPathWithoutDigest: '/assets/imported_file2.js',
             publicPath: '/assets/imported_file2-d1g35t.js',
         );
         $importedFile3 = new MappedAsset(
             'imported_file3.js',
+            '/path/to/imported_file3.js',
             publicPathWithoutDigest: '/assets/imported_file3.js',
             publicPath: '/assets/imported_file3-d1g35t.js',
         );
         $normalJsFile = new MappedAsset(
             'normal_js_file.js',
+            '/path/to/normal_js_file.js',
             publicPathWithoutDigest: '/assets/normal_js_file.js',
             publicPath: '/assets/normal_js_file-d1g35t.js',
         );
         $importedCss1 = new MappedAsset(
             'styles/file1.css',
+            '/path/to/styles/file1.css',
             publicPathWithoutDigest: '/assets/styles/file1.css',
             publicPath: '/assets/styles/file1-d1g35t.css',
         );
         $importedCss2 = new MappedAsset(
             'styles/file2.css',
+            '/path/to/styles/file2.css',
             publicPathWithoutDigest: '/assets/styles/file2.css',
             publicPath: '/assets/styles/file2-d1g35t.css',
         );
         $importedCssInImportmap = new MappedAsset(
             'styles/css_in_importmap.css',
+            '/path/to/styles/css_in_importmap.css',
             publicPathWithoutDigest: '/assets/styles/css_in_importmap.css',
             publicPath: '/assets/styles/css_in_importmap-d1g35t.css',
         );
         $neverImportedCss = new MappedAsset(
             'styles/never_imported_css.css',
+            '/path/to/styles/never_imported_css.css',
             publicPathWithoutDigest: '/assets/styles/never_imported_css.css',
             publicPath: '/assets/styles/never_imported_css-d1g35t.css',
         );
         $this->mockAssetMapper([
             new MappedAsset(
                 'entry1.js',
+                '/path/to/entry1.js',
                 publicPath: '/assets/entry1-d1g35t.js',
                 javaScriptImports: [
-                    new JavaScriptImport('/assets/imported_file1.js', asset: $importedFile1, isLazy: false, addImplicitlyToImportMap: true),
-                    new JavaScriptImport('/assets/styles/file1.css', asset: $importedCss1, isLazy: false, addImplicitlyToImportMap: true),
-                    new JavaScriptImport('normal_js_file', asset: $normalJsFile, isLazy: false),
+                    new JavaScriptImport('/assets/imported_file1.js', assetLogicalPath: $importedFile1->logicalPath, assetSourcePath: $importedFile1->sourcePath, isLazy: false, addImplicitlyToImportMap: true),
+                    new JavaScriptImport('/assets/styles/file1.css', assetLogicalPath: $importedCss1->logicalPath, assetSourcePath: $importedCss1->sourcePath, isLazy: false, addImplicitlyToImportMap: true),
+                    new JavaScriptImport('normal_js_file', assetLogicalPath: $normalJsFile->logicalPath, assetSourcePath: $normalJsFile->sourcePath, isLazy: false),
                 ]
             ),
             new MappedAsset(
                 'entry2.js',
+                '/path/to/entry2.js',
                 publicPath: '/assets/entry2-d1g35t.js',
                 javaScriptImports: [
-                    new JavaScriptImport('/assets/imported_file2.js', asset: $importedFile2, isLazy: false, addImplicitlyToImportMap: true),
-                    new JavaScriptImport('css_in_importmap', asset: $importedCssInImportmap, isLazy: false),
-                    new JavaScriptImport('/assets/styles/file2.css', asset: $importedCss2, isLazy: false, addImplicitlyToImportMap: true),
+                    new JavaScriptImport('/assets/imported_file2.js', assetLogicalPath: $importedFile2->logicalPath, assetSourcePath: $importedFile2->sourcePath, isLazy: false, addImplicitlyToImportMap: true),
+                    new JavaScriptImport('css_in_importmap', assetLogicalPath: $importedCssInImportmap->logicalPath, assetSourcePath: $importedCssInImportmap->sourcePath, isLazy: false),
+                    new JavaScriptImport('/assets/styles/file2.css', assetLogicalPath: $importedCss2->logicalPath, assetSourcePath: $importedCss2->sourcePath, isLazy: false, addImplicitlyToImportMap: true),
                 ]
             ),
             new MappedAsset(
                 'entry3.js',
+                '/path/to/entry3.js',
                 publicPath: '/assets/entry3-d1g35t.js',
                 javaScriptImports: [
-                    new JavaScriptImport('/assets/imported_file3.js', asset: $importedFile3, isLazy: false),
+                    new JavaScriptImport('/assets/imported_file3.js', assetLogicalPath: $importedFile3->logicalPath, assetSourcePath: $importedFile3->sourcePath, isLazy: false),
                 ],
             ),
             $importedFile1,
@@ -335,6 +346,7 @@ class ImportMapGeneratorTest extends TestCase
 
         $simpleAsset = new MappedAsset(
             'simple.js',
+            '/path/to/simple.js',
             publicPathWithoutDigest: '/assets/simple.js',
             publicPath: '/assets/simple-d1g3st.js',
         );
@@ -349,7 +361,7 @@ class ImportMapGeneratorTest extends TestCase
                 new MappedAsset(
                     'app.js',
                     publicPath: '/assets/app-d1g3st.js',
-                    javaScriptImports: [new JavaScriptImport('/assets/simple.js', asset: $simpleAsset, isLazy: false, addImplicitlyToImportMap: true)]
+                    javaScriptImports: [new JavaScriptImport('/assets/simple.js', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath, isLazy: false, addImplicitlyToImportMap: true)]
                 ),
                 $simpleAsset,
             ],
@@ -378,7 +390,7 @@ class ImportMapGeneratorTest extends TestCase
                     'app.js',
                     sourcePath: '/assets/vendor/bootstrap.js',
                     publicPath: '/assets/vendor/bootstrap-d1g3st.js',
-                    javaScriptImports: [new JavaScriptImport('/assets/simple.js', asset: $simpleAsset, isLazy: false, addImplicitlyToImportMap: true)]
+                    javaScriptImports: [new JavaScriptImport('/assets/simple.js', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath, isLazy: false, addImplicitlyToImportMap: true)]
                 ),
                 $simpleAsset,
             ],
@@ -396,9 +408,10 @@ class ImportMapGeneratorTest extends TestCase
 
         $eagerImportsSimpleAsset = new MappedAsset(
             'imports_simple.js',
+            '/path/to/imports_simple.js',
             publicPathWithoutDigest: '/assets/imports_simple.js',
             publicPath: '/assets/imports_simple-d1g3st.js',
-            javaScriptImports: [new JavaScriptImport('/assets/simple.js', asset: $simpleAsset, isLazy: false, addImplicitlyToImportMap: true)]
+            javaScriptImports: [new JavaScriptImport('/assets/simple.js', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath, isLazy: false, addImplicitlyToImportMap: true)]
         );
         yield 'it processes imports recursively' => [
             [
@@ -411,7 +424,7 @@ class ImportMapGeneratorTest extends TestCase
                 new MappedAsset(
                     'app.js',
                     publicPath: '/assets/app-d1g3st.js',
-                    javaScriptImports: [new JavaScriptImport('/assets/imports_simple.js', asset: $eagerImportsSimpleAsset, isLazy: true, addImplicitlyToImportMap: true)]
+                    javaScriptImports: [new JavaScriptImport('/assets/imports_simple.js', assetLogicalPath: $eagerImportsSimpleAsset->logicalPath, assetSourcePath: $eagerImportsSimpleAsset->sourcePath, isLazy: true, addImplicitlyToImportMap: true)]
                 ),
                 $eagerImportsSimpleAsset,
                 $simpleAsset,
@@ -447,7 +460,7 @@ class ImportMapGeneratorTest extends TestCase
                 new MappedAsset(
                     'app.js',
                     publicPath: '/assets/app-d1g3st.js',
-                    javaScriptImports: [new JavaScriptImport('imports_simple', asset: $eagerImportsSimpleAsset, isLazy: true, addImplicitlyToImportMap: false)]
+                    javaScriptImports: [new JavaScriptImport('imports_simple', assetLogicalPath: $eagerImportsSimpleAsset->logicalPath, assetSourcePath: $eagerImportsSimpleAsset->logicalPath, isLazy: true, addImplicitlyToImportMap: false)]
                 ),
                 $eagerImportsSimpleAsset,
                 $simpleAsset,
@@ -479,7 +492,7 @@ class ImportMapGeneratorTest extends TestCase
                 new MappedAsset(
                     'app.js',
                     publicPath: '/assets/app-d1g3st.js',
-                    javaScriptImports: [new JavaScriptImport('simple', asset: $simpleAsset, isLazy: false)]
+                    javaScriptImports: [new JavaScriptImport('simple', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath, isLazy: false)]
                 ),
                 $simpleAsset,
             ],
@@ -503,7 +516,7 @@ class ImportMapGeneratorTest extends TestCase
                 new MappedAsset(
                     'app.css',
                     publicPath: '/assets/app-d1g3st.css',
-                    javaScriptImports: [new JavaScriptImport('/assets/simple.js', asset: $simpleAsset)]
+                    javaScriptImports: [new JavaScriptImport('/assets/simple.js', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath)]
                 ),
             ],
             [
@@ -586,10 +599,10 @@ class ImportMapGeneratorTest extends TestCase
     /**
      * @dataProvider getEagerEntrypointImportsTests
      */
-    public function testFindEagerEntrypointImports(MappedAsset $entryAsset, array $expected)
+    public function testFindEagerEntrypointImports(MappedAsset $entryAsset, array $expected, array $mappedAssets = [])
     {
         $manager = $this->createImportMapGenerator();
-        $this->mockAssetMapper([$entryAsset]);
+        $this->mockAssetMapper([$entryAsset, ...$mappedAssets]);
         // put the entry asset in the importmap
         $this->mockImportMap([
             ImportMapEntry::createLocal('the_entrypoint_name', ImportMapType::JS, path: $entryAsset->logicalPath, isEntrypoint: true),
@@ -610,47 +623,53 @@ class ImportMapGeneratorTest extends TestCase
 
         $simpleAsset = new MappedAsset(
             'simple.js',
+            '/path/to/simple.js',
             publicPathWithoutDigest: '/assets/simple.js',
         );
         yield 'an entry with a non-lazy dependency is included' => [
             new MappedAsset(
                 'app.js',
                 publicPath: '/assets/app.js',
-                javaScriptImports: [new JavaScriptImport('/assets/simple.js', asset: $simpleAsset, isLazy: false)]
+                javaScriptImports: [new JavaScriptImport('/assets/simple.js', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath, isLazy: false)]
             ),
             ['/assets/simple.js'], // path is the key in the importmap
+            [$simpleAsset],
         ];
 
         yield 'an entry with a non-lazy dependency with module name is included' => [
             new MappedAsset(
                 'app.js',
                 publicPath: '/assets/app.js',
-                javaScriptImports: [new JavaScriptImport('simple', asset: $simpleAsset, isLazy: false)]
+                javaScriptImports: [new JavaScriptImport('simple', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath, isLazy: false)]
             ),
             ['simple'], // path is the key in the importmap
+            [$simpleAsset],
         ];
 
         yield 'an entry with a lazy dependency is not included' => [
             new MappedAsset(
                 'app.js',
                 publicPath: '/assets/app.js',
-                javaScriptImports: [new JavaScriptImport('/assets/simple.js', asset: $simpleAsset, isLazy: true)]
+                javaScriptImports: [new JavaScriptImport('/assets/simple.js', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath, isLazy: true)]
             ),
             [],
+            [$simpleAsset],
         ];
 
         $importsSimpleAsset = new MappedAsset(
             'imports_simple.js',
+            '/path/to/imports_simple.js',
             publicPathWithoutDigest: '/assets/imports_simple.js',
-            javaScriptImports: [new JavaScriptImport('/assets/simple.js', asset: $simpleAsset, isLazy: false)]
+            javaScriptImports: [new JavaScriptImport('/assets/simple.js', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath, isLazy: false)]
         );
         yield 'an entry follows through dependencies recursively' => [
             new MappedAsset(
                 'app.js',
                 publicPath: '/assets/app.js',
-                javaScriptImports: [new JavaScriptImport('/assets/imports_simple.js', asset: $importsSimpleAsset, isLazy: false)]
+                javaScriptImports: [new JavaScriptImport('/assets/imports_simple.js', assetLogicalPath: $importsSimpleAsset->logicalPath, assetSourcePath: $importsSimpleAsset->sourcePath, isLazy: false)]
             ),
             ['/assets/imports_simple.js', '/assets/simple.js'],
+            [$simpleAsset, $importsSimpleAsset],
         ];
     }
 

@@ -26,7 +26,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     public const URL_PATTERN_DIST = self::URL_PATTERN_DIST_CSS.'/+esm';
     public const URL_PATTERN_ENTRYPOINT = 'https://data.jsdelivr.com/v1/packages/npm/%s@%s/entrypoints';
 
-    public const IMPORT_REGEX = '{from"/npm/((?:@[^/]+/)?[^@]+?)(?:@([^/]+))?((?:/[^/]+)*?)/\+esm"}';
+    public const IMPORT_REGEX = '#(?:import\s*(?:(?:\{[^}]*\}|\w+|\*\s*as\s+\w+)\s*\bfrom\s*)?|export\s*(?:\{[^}]*\}|\*)\s*from\s*)("/npm/((?:@[^/]+/)?[^@]+?)(?:@([^/]+))?((?:/[^/]+)*?)/\+esm")#';
 
     private HttpClientInterface $httpClient;
 
@@ -129,8 +129,9 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
             $entrypoints = $cssEntrypointResponse->toArray()['entrypoints'] ?? [];
             $cssFile = $entrypoints['css']['file'] ?? null;
+            $guessed = $entrypoints['css']['guessed'] ?? true;
 
-            if (!$cssFile) {
+            if (!$cssFile || $guessed) {
                 continue;
             }
 
@@ -221,9 +222,9 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         // imports from jsdelivr follow a predictable format
         preg_match_all(self::IMPORT_REGEX, $content, $matches);
         $dependencies = [];
-        foreach ($matches[1] as $index => $packageName) {
-            $version = $matches[2][$index] ?: null;
-            $packageName .= $matches[3][$index]; // add the path if any
+        foreach ($matches[2] as $index => $packageName) {
+            $version = $matches[3][$index] ?: null;
+            $packageName .= $matches[4][$index]; // add the path if any
 
             $dependencies[] = new PackageRequireOptions($packageName, $version);
         }
@@ -239,10 +240,11 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     private function makeImportsBare(string $content, array &$dependencies): string
     {
         $content = preg_replace_callback(self::IMPORT_REGEX, function ($matches) use (&$dependencies) {
-            $packageName = $matches[1].$matches[3]; // add the path if any
+            $packageName = $matches[2].$matches[4]; // add the path if any
             $dependencies[] = $packageName;
 
-            return sprintf('from"%s"', $packageName);
+            // replace the "/npm/package@version/+esm" with "package@version"
+            return str_replace($matches[1], sprintf('"%s"', $packageName), $matches[0]);
         }, $content);
 
         // source maps are not also downloaded - so remove the sourceMappingURL

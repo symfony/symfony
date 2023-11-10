@@ -89,12 +89,11 @@ class MicrosoftGraphTransportFactoryTest extends TransportFactoryTestCase
         yield [new Dsn('microsoft+graph', 'default', null, null)];
     }
 
-    public function testInvalidDsnHost(): void
+    public function testInvalidDsnHost()
     {
         $factory = $this->getFactory();
 
         $this->expectException(InvalidArgumentException::class);
         $factory->create(new Dsn('microsoft+graph', 'some-wrong-national-cloud', self::USER, self::PASSWORD, null, ['tenant' => self::TENANT]));
     }
-
 }

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport;
 
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Utils;
 use Microsoft\Graph\Generated\Models\BodyType;
@@ -26,7 +25,6 @@ use Microsoft\Graph\Generated\Models\Recipient;
 use Microsoft\Graph\Generated\Users\Item\SendMail\SendMailPostRequestBody;
 use Microsoft\Graph\GraphServiceClient;
 use Microsoft\Kiota\Authentication\Oauth\ClientCredentialContext;
-use Safe\Exceptions\JsonException;
 use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Exception\SenderNotFoundException;
 use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Exception\SendMailException;
 use Symfony\Component\Mailer\Envelope;
@@ -38,8 +36,6 @@ use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\Cache\CacheInterface;
-
-use function Safe\json_decode;
 
 class MicrosoftGraphTransport implements TransportInterface
 {
@@ -68,7 +64,6 @@ class MicrosoftGraphTransport implements TransportInterface
             throw new SendEmailError(sprintf("This mailer can only handle mails of class '%s' or it's subclasses, instance of %s passed", Email::class, $message::class));
         }
 
-
         $this->sendMail($message);
 
         return new SentMessage($message, $envelope);
@@ -85,7 +80,7 @@ class MicrosoftGraphTransport implements TransportInterface
         try {
             $this->graphServiceClient->users()->byUserId($senderAddress)->sendMail()->post($body)->wait();
         } catch (ODataError $error) {
-            if ('ErrorInvalidUser' === $error->getError()->getCode()){
+            if ('ErrorInvalidUser' === $error->getError()->getCode()) {
                 throw new SenderNotFoundException("Sender email address '".$senderAddress."' could not be found when calling the Graph API. This is usually because the email address doesn't exist in the tenant.", 404, $error);
             }
             throw new SendMailException('Something went wrong while sending email', $error->getCode(), $error);
@@ -104,19 +99,19 @@ class MicrosoftGraphTransport implements TransportInterface
         $message->setFrom(self::convertAddressToGraphRecipient($source->getFrom()[0]));
 
         // to
-        $message->setToRecipients(\array_map(
+        $message->setToRecipients(array_map(
             static fn (Address $address) => self::convertAddressToGraphRecipient($address),
             $source->getTo()
         ));
 
         // CC
-        $message->setCcRecipients(\array_map(
+        $message->setCcRecipients(array_map(
             static fn (Address $address) => self::convertAddressToGraphRecipient($address),
             $source->getCc()
         ));
 
         // BCC
-        $message->setBccRecipients(\array_map(
+        $message->setBccRecipients(array_map(
             static fn (Address $address) => self::convertAddressToGraphRecipient($address),
             $source->getBcc()
         ));
@@ -128,7 +123,7 @@ class MicrosoftGraphTransport implements TransportInterface
         $itemBody->setContentType(new BodyType(BodyType::HTML));
         $message->setBody($itemBody);
 
-        $message->setAttachments(\array_map(
+        $message->setAttachments(array_map(
             static fn (DataPart $attachment) => self::convertAttachmentGraphAttachment($attachment),
             $source->getAttachments()
         ));
@@ -143,6 +138,7 @@ class MicrosoftGraphTransport implements TransportInterface
         $emailAddress->setAddress($source->getAddress());
         $emailAddress->setName($source->getName());
         $recipient->setEmailAddress($emailAddress);
+
         return $recipient;
     }
 

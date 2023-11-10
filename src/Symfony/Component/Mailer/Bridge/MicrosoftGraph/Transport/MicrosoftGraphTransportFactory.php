@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport;
 
 use Microsoft\Graph\Core\NationalCloud;
-use phpDocumentor\Reflection\Exception\PcreException;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
@@ -28,9 +27,9 @@ final class MicrosoftGraphTransportFactory extends AbstractTransportFactory
     private const CLOUD_MAP = [
         'default' => NationalCloud::GLOBAL,
         'germany' => NationalCloud::GERMANY,
-        'china'   => NationalCloud::CHINA,
-        'us-dod'  => NationalCloud::US_DOD,
-        'us-gov'  => NationalCloud::US_GOV,
+        'china' => NationalCloud::CHINA,
+        'us-dod' => NationalCloud::US_DOD,
+        'us-gov' => NationalCloud::US_GOV,
     ];
 
     public function __construct(
@@ -56,8 +55,8 @@ final class MicrosoftGraphTransportFactory extends AbstractTransportFactory
         if (null === $tenantId) {
             throw new IncompleteDsnException("Transport 'microsoft+graph' requires the 'tenant' option");
         }
-        if (!isset(self::CLOUD_MAP[$dsn->getHost()])){
-            throw new InvalidArgumentException(sprintf("Transport 'microsoft+graph' one of these hosts : '%s'", implode(", ", self::CLOUD_MAP)));
+        if (!isset(self::CLOUD_MAP[$dsn->getHost()])) {
+            throw new InvalidArgumentException(sprintf("Transport 'microsoft+graph' one of these hosts : '%s'", implode(', ', self::CLOUD_MAP)));
         }
 
         // This parses the MAILER_DSN containing Microsoft Graph API credentials

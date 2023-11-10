@@ -18,9 +18,11 @@ namespace Symfony\Component\Serializer\Attribute;
  * @Target({"PROPERTY", "METHOD"})
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since Symfony 6.4
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
-final class Ignore
+class Ignore
 {
 }
 

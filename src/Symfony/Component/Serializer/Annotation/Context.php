@@ -17,7 +17,7 @@ class_exists(\Symfony\Component\Serializer\Attribute\Context::class);
 
 if (false) {
     #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-    class Context
+    class Context extends \Symfony\Component\Serializer\Attribute\Context
     {
     }
 }

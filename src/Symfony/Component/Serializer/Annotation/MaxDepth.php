@@ -15,7 +15,7 @@ class_exists(\Symfony\Component\Serializer\Attribute\MaxDepth::class);
 
 if (false) {
     #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
-    class MaxDepth
+    class MaxDepth extends \Symfony\Component\Serializer\Attribute\MaxDepth
     {
     }
 }

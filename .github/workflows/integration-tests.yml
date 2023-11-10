@@ -167,6 +167,9 @@ jobs:
           ./phpunit install
           echo "::endgroup::"
 
+      - name: Composer Validate
+        run: find . -regex ".*composer.json" | xargs -n1 composer validate --strict --no-ansi --no-interaction --with-dependencies
+
       - name: Run tests
         run: ./phpunit --group integration -v
         env:

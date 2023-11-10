@@ -7,6 +7,32 @@ in 6.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.3.0...v6.3.1
 
+* 6.3.8 (2023-11-10)
+
+ * bug #51666 [RateLimiter] CompoundLimiter was accepting requests even when some limiters already consumed all tokens (10n)
+ * security #cve-2023-46734 [TwigBridge] Ensure CodeExtension's filters properly escape their input (nicolas-grekas, GromNaN)
+ * security #cve-2023-46735 [Webhook] Remove user-submitted type from HTTP response (nicolas-grekas)
+ * security #cve-2023-46733 [Security] Fix possible session fixation when only the *token* changes (RobertMe)
+ * bug #52514 [FrameworkBundle] Don't reference SYMFONY_IDE env var in non-debug mode (nicolas-grekas)
+ * bug #52506 [SecurityBundle] wire the secret for Symfony 6.4 compatibility (xabbuh)
+ * bug #52496 [VarDumper] Accept mixed key on `DsPairStub` (marc-mabe)
+ * bug #52502 [Config] Prefixing `FileExistenceResource::__toString()` to avoid conflict with `FileResource` (weaverryan)
+ * bug #52491 [String] Method toByteString conversion using iconv is unreachable (Vincentv92)
+ * bug #52488 [HttpKernel] Fix PHP deprecation (nicolas-grekas)
+ * bug #52476 [Messenger] fix compatibility with Doctrine DBAL 4 (xabbuh)
+ * bug #52474 [HttpFoundation] ensure string type with mbstring func overloading enabled (xabbuh)
+ * bug #52472 [HttpClient][WebProfilerBundle] Do not generate cURL command when files are uploaded (MatTheCat)
+ * bug #52457 [Cache][HttpFoundation][Lock] Fix empty username/password for PDO PostgreSQL (HypeMC)
+ * bug #52443 [Yaml] Fix uid binary parsing (mRoca)
+ * bug #52429 [HttpClient] Replace `escapeshellarg` to prevent overpassing `ARG_MAX` (alexandre-daubois)
+ * bug #52442 Disable the "Copy as cURL" button when the debug info are disabled (stof)
+ * bug #52444 Remove full DSNs from exception messages (nicolas-grekas)
+ * bug #52428 [HttpKernel] Preventing error 500 when function putenv is disabled (ShaiMagal)
+ * bug #52408 [Yaml] Fix block scalar array parsing (NickSdot)
+ * bug #52132 [Console] Fix horizontal table top border is incorrectly rendered (OskarStark)
+ * bug #52367 [Uid] Fix UuidV7 collisions within the same ms (nicolas-grekas)
+ * bug #52222 [MonologBridge] Fix support for monolog 3.0 (louismariegaborit)
+
 * 6.3.7 (2023-10-29)
 
  * bug #52329 [HttpClient] Psr18Client: parse HTTP Reason Phrase for Response (Hanmac)

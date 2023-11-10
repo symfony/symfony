@@ -22,8 +22,6 @@ use Twig\TwigFilter;
  * that is never executed in a production environment.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @internal
  */
 final class CodeExtension extends AbstractExtension
 {

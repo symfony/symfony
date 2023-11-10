@@ -241,7 +241,11 @@ class ImportMapGenerator
     private function createMissingImportMapAssetException(ImportMapEntry $entry): \InvalidArgumentException
     {
         if ($entry->isRemotePackage()) {
-            throw new LogicException(sprintf('The "%s" vendor asset is missing. Try running the "importmap:install" command.', $entry->importName));
+            if (!is_file($entry->path)) {
+                throw new LogicException(sprintf('The "%s" vendor asset is missing. Try running the "importmap:install" command.', $entry->importName));
+            }
+
+            throw new LogicException(sprintf('The "%s" vendor file exists locally (%s), but cannot be found in any asset map paths. Be sure the assets vendor directory is an asset mapper path.', $entry->importName, $entry->path));
         }
 
         throw new LogicException(sprintf('The asset "%s" cannot be found in any asset map paths.', $entry->path));

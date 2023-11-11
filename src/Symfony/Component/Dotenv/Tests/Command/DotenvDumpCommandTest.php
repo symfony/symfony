@@ -92,6 +92,41 @@ EOF
         ], $vars);
     }
 
+    public function testExecuteWithDotenvPathOption()
+    {
+        @mkdir(__DIR__.'/some-path');
+        file_put_contents(__DIR__.'/some-path/some-name.env', <<<EOF
+APP_ENV=dev
+APP_SECRET=abc123
+EOF
+        );
+
+        file_put_contents(__DIR__.'/some-path/some-name.env.local', <<<EOF
+APP_LOCAL=yes
+EOF
+        );
+
+        $command = $this->createCommand();
+        $command->execute([
+            'env' => 'some-env',
+            '--dotenv-path' => 'some-path/some-name.env',
+        ]);
+
+        $this->assertFileExists(__DIR__.'/some-path/some-name.env.local.php');
+
+        $vars = require __DIR__.'/some-path/some-name.env.local.php';
+        $this->assertSame([
+            'APP_ENV' => 'some-env',
+            'APP_SECRET' => 'abc123',
+            'APP_LOCAL' => 'yes',
+        ], $vars);
+
+        @unlink(__DIR__.'/some-path/some-name.env');
+        @unlink(__DIR__.'/some-path/some-name.env.local');
+        @unlink(__DIR__.'/some-path/some-name.env.local.php');
+        @rmdir(__DIR__.'/some-path');
+    }
+
     private function createCommand(): CommandTester
     {
         $application = new Application();

@@ -47,6 +47,7 @@ final class DotenvDumpCommand extends Command
                 new InputArgument('env', null === $this->defaultEnv ? InputArgument::REQUIRED : InputArgument::OPTIONAL, 'The application environment to dump .env files for - e.g. "prod".'),
             ])
             ->addOption('empty', null, InputOption::VALUE_NONE, 'Ignore the content of .env files')
+            ->addOption('dotenv-path', null, InputOption::VALUE_OPTIONAL, 'Path to dot-env files')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command compiles .env files into a PHP-optimized file called .env.local.php.
 
@@ -66,7 +67,14 @@ EOT
 
         $composerFile = $projectDir.'/composer.json';
         $config += (is_file($composerFile) ? json_decode(file_get_contents($composerFile), true) : [])['extra']['runtime'] ?? [];
-        $dotenvPath = $projectDir.'/'.($config['dotenv_path'] ?? '.env');
+
+        if ($input->getOption('dotenv-path')) {
+            $dotenvPath = $input->getOption('dotenv-path');
+        } else {
+            $dotenvPath = $config['dotenv_path'] ?? '.env';
+        }
+        $dotenvPath = $projectDir.'/'.$dotenvPath;
+
         $env = $input->getArgument('env') ?? $this->defaultEnv;
         $envKey = $config['env_var_name'] ?? 'APP_ENV';
 

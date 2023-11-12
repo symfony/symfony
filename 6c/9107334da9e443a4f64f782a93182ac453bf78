@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-10T16:04:27Z
+
+We should do the same for all classes patched in #52294
+Can you please update them all?
+
+---------------------------------------------------------------------------
+
+by curry684 at 2023-11-10T16:06:34Z
+
+Yes, but not this weekend   :)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2023-11-10T22:32:00Z
+
+Turns out I had some time to spare, so done. I had to remove some `final` keywords but imho they were pretty useless anyway in these attributes.

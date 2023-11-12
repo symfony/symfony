@@ -151,6 +151,12 @@ jobs:
           entrypoint: /bin/bash
           args: -c "(/opt/bitnami/openldap/bin/ldapwhoami -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && /opt/bitnami/openldap/bin/ldapadd -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && /opt/bitnami/openldap/bin/ldapdelete -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"
 
+      - name: Composer Validate Main composer.json
+        run: composer validate --strict --no-ansi --no-interaction --with-dependencies
+
+      - name: Composer Validate composer.json Files in src/ Directory
+        run: find src -regex ".*composer.json" | xargs -n1 composer validate --strict --no-ansi --no-interaction --with-dependencies
+
       - name: Install dependencies
         run: |
           COMPOSER_HOME="$(composer config home)"

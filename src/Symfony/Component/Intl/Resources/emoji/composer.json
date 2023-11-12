@@ -1,4 +1,7 @@
 {
+    "name": "symfony/intl-emoji",
+    "description": "Import Unicode Common Locale Data Repository and dependencies for the Emoji Transliterator Builder",
+    "license": "Unicode-DFS-2016",
     "repositories": [
         {
             "type": "package",
@@ -18,6 +21,6 @@
         "symfony/filesystem": "^6",
         "symfony/finder": "^6",
         "symfony/var-exporter": "^6",
-        "unicode-org/cldr": "*"
+        "unicode-org/cldr": "^2022"
     }
 }

@@ -33,7 +33,7 @@ class UriResolver
         $uri = trim($uri);
 
         // absolute URL?
-        if (null !== parse_url($uri, \PHP_URL_SCHEME)) {
+        if (\is_string(parse_url($uri, \PHP_URL_SCHEME))) {
             return $uri;
         }
 

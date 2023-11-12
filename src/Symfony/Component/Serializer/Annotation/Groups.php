@@ -15,7 +15,7 @@ class_exists(\Symfony\Component\Serializer\Attribute\Groups::class);
 
 if (false) {
     #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS)]
-    class Groups
+    class Groups extends \Symfony\Component\Serializer\Attribute\Groups
     {
     }
 }

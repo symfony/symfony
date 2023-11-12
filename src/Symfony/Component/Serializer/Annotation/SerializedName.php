@@ -15,7 +15,7 @@ class_exists(\Symfony\Component\Serializer\Attribute\SerializedName::class);
 
 if (false) {
     #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
-    final class SerializedName
+    class SerializedName extends \Symfony\Component\Serializer\Attribute\SerializedName
     {
     }
 }

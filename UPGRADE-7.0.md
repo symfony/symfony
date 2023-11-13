@@ -46,6 +46,7 @@ Components
  * [Translation](#Translation)
  * [Validator](#Validator)
  * [VarDumper](#VarDumper)
+ * [VarExporter](#VarExporter)
  * [Workflow](#Workflow)
  * [Yaml](#Yaml)
 
@@ -607,6 +608,11 @@ VarDumper
 
  * Add parameter `string $label = null` to `VarDumper::dump()`
  * Require explicit argument when calling `VarDumper::setHandler()`
+
+VarExporter
+-----------
+
+ * Remove support for per-property lazy-initializers
 
 Workflow
 --------

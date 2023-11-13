@@ -14,6 +14,10 @@ namespace Symfony\Component\Messenger\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidOptionException;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -42,23 +46,7 @@ class ConsumeMessagesCommandTest extends TestCase
 
     public function testBasicRun()
     {
-        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
-
-        $receiver = $this->createMock(ReceiverInterface::class);
-        $receiver->expects($this->once())->method('get')->willReturn([$envelope]);
-
-        $receiverLocator = $this->createMock(ContainerInterface::class);
-        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver')->willReturn(true);
-        $receiverLocator->expects($this->once())->method('get')->with('dummy-receiver')->willReturn($receiver);
-
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())->method('dispatch');
-
-        $busLocator = $this->createMock(ContainerInterface::class);
-        $busLocator->expects($this->once())->method('has')->with('dummy-bus')->willReturn(true);
-        $busLocator->expects($this->once())->method('get')->with('dummy-bus')->willReturn($bus);
-
-        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+        $command = $this->getConsumeMessagesCommand();
 
         $application = new Application();
         $application->add($command);
@@ -70,6 +58,21 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
+    }
+
+    public function testBasicApplicationRun()
+    {
+        $command = $this->getConsumeMessagesCommand();
+        $command->setHelperSet(new HelperSet());
+
+        $application = new Application();
+        $doRunCommand = (new \ReflectionClass($application))->getMethod('doRunCommand');
+
+        $input = new ArrayInput([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+        ]);
+        $doRunCommand->invokeArgs($application, [$command, $input, new ConsoleOutput()]);
     }
 
     public function testRunWithBusOption()
@@ -233,5 +236,26 @@ class ConsumeMessagesCommandTest extends TestCase
         yield 'receiver (value)' => [['async'], ['async', 'async_high', 'failed']];
         yield 'receiver (no repeat)' => [['async', ''], ['async_high', 'failed']];
         yield 'option --bus' => [['--bus', ''], ['messenger.bus.default']];
+    }
+
+    private function getConsumeMessagesCommand(): ConsumeMessagesCommand
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver->expects($this->once())->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver')->willReturn(true);
+        $receiverLocator->expects($this->once())->method('get')->with('dummy-receiver')->willReturn($receiver);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch');
+
+        $busLocator = $this->createMock(ContainerInterface::class);
+        $busLocator->expects($this->once())->method('has')->with('dummy-bus')->willReturn(true);
+        $busLocator->expects($this->once())->method('get')->with('dummy-bus')->willReturn($bus);
+
+        return new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
     }
 }

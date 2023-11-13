@@ -430,7 +430,30 @@ class JsDelivrEsmResolverTest extends TestCase
             ],
         ];
 
-        yield 'css file removes importmap' => [
+        yield 'js sourcemap is correctly removed when sourceMapping appears in the JS' => [
+            [
+                'es-module-shims' => self::createRemoteEntry('es-module-shims', version: '1.8.2'),
+            ],
+            [
+                [
+                    'url' => '/es-module-shims@1.8.2/+esm',
+                    'body' => <<<'EOF'
+const je="\n//# sourceURL=",Ue="\n//# sourceMappingURL=",Me=/^(text|application)\/(x-)?javascript(;|$)/,_e=/^(application)\/wasm(;|$)/,Ie=/^(text|application)\/json(;|$)/,Re=/^(text|application)\/css(;|$)/,Te=/url\(\s*(?:(["'])((?:\\.|[^\n\\"'])+)\1|((?:\\.|[^\s,"'()\\])+))\s*\)/g;export{t as default};
+//# sourceMappingURL=/sm/ef3916de598f421a779ba0e69af94655b2043095cde2410cc01893452d893338.map
+EOF
+                ],
+            ],
+            [
+                'es-module-shims' => [
+                    'content' => <<<'EOF'
+const je="\n//# sourceURL=",Ue="\n//# sourceMappingURL=",Me=/^(text|application)\/(x-)?javascript(;|$)/,_e=/^(application)\/wasm(;|$)/,Ie=/^(text|application)\/json(;|$)/,Re=/^(text|application)\/css(;|$)/,Te=/url\(\s*(?:(["'])((?:\\.|[^\n\\"'])+)\1|((?:\\.|[^\s,"'()\\])+))\s*\)/g;export{t as default};
+EOF,
+                    'dependencies' => [],
+                ],
+            ],
+        ];
+
+        yield 'css file removes sourcemap' => [
             ['lodash' => self::createRemoteEntry('bootstrap/dist/bootstrap.css', version: '5.0.6', type: ImportMapType::CSS)],
             [
                 [

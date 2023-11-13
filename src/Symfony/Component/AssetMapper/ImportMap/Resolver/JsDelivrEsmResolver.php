@@ -248,7 +248,10 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         }, $content);
 
         // source maps are not also downloaded - so remove the sourceMappingURL
-        $content = preg_replace('{//# sourceMappingURL=.*$}m', '', $content);
+        // remove the final one only (in case sourceMappingURL is used in the code)
+        if (false !== $lastPos = strrpos($content, '//# sourceMappingURL=')) {
+            $content = substr($content, 0, $lastPos).preg_replace('{//# sourceMappingURL=.*$}m', '', substr($content, $lastPos));
+        }
 
         return preg_replace('{/\*# sourceMappingURL=[^ ]*+ \*/}', '', $content);
     }

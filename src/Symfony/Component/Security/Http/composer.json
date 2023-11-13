@@ -24,7 +24,7 @@
         "symfony/polyfill-php80": "^1.16",
         "symfony/property-access": "^4.4|^5.0|^6.0",
         "symfony/security-core": "^5.4.19|~6.0.19|~6.1.11|^6.2.5",
-        "symfony/service-contracts": "^1.10|^2|^3"
+        "symfony/service-contracts": "^1|^2|^3"
     },
     "require-dev": {
         "symfony/cache": "^4.4|^5.0|^6.0",

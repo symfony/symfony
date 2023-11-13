@@ -47,7 +47,7 @@ final class DotenvDumpCommand extends Command
                 new InputArgument('env', null === $this->defaultEnv ? InputArgument::REQUIRED : InputArgument::OPTIONAL, 'The application environment to dump .env files for - e.g. "prod".'),
             ])
             ->addOption('empty', null, InputOption::VALUE_NONE, 'Ignore the content of .env files')
-            ->addOption('dotenv-path', null, InputOption::VALUE_OPTIONAL, 'Path to .env files')
+            ->addOption('dotenv-path', null, InputOption::VALUE_OPTIONAL, 'Path to .env file')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command compiles .env files into a PHP-optimized file called .env.local.php.
 

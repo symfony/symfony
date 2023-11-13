@@ -29,7 +29,7 @@ use Symfony\Component\Workflow\Marking;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-final class MethodMarkingStore implements MarkingStoreInterface
+final class MethodMarkingStore extends AbstractMarkingStore
 {
     /** @var array<class-string, MarkingStoreMethod> */
     private array $getters = [];
@@ -43,8 +43,9 @@ final class MethodMarkingStore implements MarkingStoreInterface
      */
     public function __construct(
         private bool $singleState = false,
-        private string $property = 'marking',
+        string $property = 'marking',
     ) {
+        parent::__construct($property);
     }
 
     public function getMarking(object $subject): Marking

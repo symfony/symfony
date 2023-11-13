@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `AsMarkingStore` attribute
+
 7.0
 ---
 

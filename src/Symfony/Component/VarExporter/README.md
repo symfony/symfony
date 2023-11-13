@@ -105,18 +105,6 @@ $foo = FooLazyGhost::createLazyGhost(initializer: function (Foo $instance): void
 // be called only when and if a *property* is accessed.
 ```
 
-You can also partially initialize the objects on a property-by-property basis by
-adding two arguments to the initializer:
-
-```php
-$initializer = function (Foo $instance, string $propertyName, ?string $propertyScope): mixed {
-    if (Foo::class === $propertyScope && 'bar' === $propertyName) {
-        return 123;
-    }
-    // [...] Add more logic for the other properties
-};
-```
-
 ### `LazyProxyTrait`
 
 Alternatively, `LazyProxyTrait` can be used to create virtual proxies:

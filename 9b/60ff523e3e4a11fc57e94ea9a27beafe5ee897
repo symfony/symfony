@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-11-13T15:18:43Z
+
+Do you know any place where this feature has been used ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-13T15:24:37Z
+
+None. That's also why I'm proposing this :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-11-13T16:05:54Z
+
+> None. That's also why I'm proposing this :)
+
+😬
+
+https://github.com/doctrine/DoctrineBundle/blob/ca64ca70247d7b1b56a57c3b147b77253eaea2f5/Repository/LazyServiceEntityRepository.php#L52-L56
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-13T16:32:27Z
+
+Looks like this is actually used...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-13T18:17:32Z
+
+Here the PR to stop relying on this feature: https://github.com/doctrine/DoctrineBundle/pull/1727

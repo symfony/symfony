@@ -175,7 +175,8 @@ class Connection implements ResetInterface
             // Wrap the rownum query in a sub-query to allow writelocks without ORA-02014 error
             if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
                 $query = $this->createQueryBuilder('w')
-                    ->where('w.id IN ('.str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql).')');
+                    ->where('w.id IN ('.str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql).')')
+                    ->setParameters($query->getParameters());
 
                 if (method_exists(QueryBuilder::class, 'forUpdate')) {
                     $query->forUpdate();

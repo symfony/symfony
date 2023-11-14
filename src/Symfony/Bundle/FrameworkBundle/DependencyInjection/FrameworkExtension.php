@@ -2556,6 +2556,11 @@ class FrameworkExtension extends Extension
         } else {
             $mailer->replaceArgument(1, $messageBus ? new Reference($messageBus) : new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         }
+        $authenticators = [];
+        foreach ($config['smtp']['authenticators'] ?? [] as $authenticator) {
+            $authenticators[] = new Reference($authenticator);
+        }
+        $container->getDefinition('mailer.transport_factory.smtp')->setArgument(3, $authenticators);
 
         $classToServices = [
             MailerBridge\Brevo\Transport\BrevoTransportFactory::class => 'mailer.transport_factory.brevo',

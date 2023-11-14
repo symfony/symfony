@@ -2031,6 +2031,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('mailer.mailer')->getArgument(1));
     }
 
+    public function testMailerWithAuthenticators()
+    {
+        $container = $this->createContainerFromFile('mailer_with_authenticators');
+
+        $this->assertCount(2, $container->getDefinition('mailer.mailer')->getArgument(3));
+    }
+
     public function testHttpClientMockResponseFactory()
     {
         $container = $this->createContainerFromFile('http_client_mock_response_factory');

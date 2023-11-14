@@ -22,6 +22,13 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
  */
 class XOAuth2Authenticator implements AuthenticatorInterface
 {
+    private ?AuthTokenProviderInterface $tokenProvider;
+
+    public function __construct(AuthTokenProviderInterface $tokenProvider = null)
+    {
+        $this->tokenProvider = $tokenProvider;
+    }
+
     public function getAuthKeyword(): string
     {
         return 'XOAUTH2';
@@ -32,6 +39,7 @@ class XOAuth2Authenticator implements AuthenticatorInterface
      */
     public function authenticate(EsmtpTransport $client): void
     {
-        $client->executeCommand('AUTH XOAUTH2 '.base64_encode('user='.$client->getUsername()."\1auth=Bearer ".$client->getPassword()."\1\1")."\r\n", [235]);
+        $token = $this->tokenProvider ? $this->tokenProvider->getToken() : $client->getPassword();
+        $client->executeCommand('AUTH XOAUTH2 '.base64_encode('user='.$client->getUsername()."\1auth=Bearer ".$token."\1\1")."\r\n", [235]);
     }
 }

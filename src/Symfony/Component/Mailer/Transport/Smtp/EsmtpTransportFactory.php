@@ -11,23 +11,41 @@
 
 namespace Symfony\Component\Mailer\Transport\Smtp;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\Smtp\Auth\AuthenticatorInterface;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
  */
 final class EsmtpTransportFactory extends AbstractTransportFactory
 {
+    /**
+     * @var AuthenticatorInterface[]
+     */
+    private ?array $authenticators;
+
+    /**
+     * @param AuthenticatorInterface[]|null $authenticators
+     */
+    public function __construct(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null, array $authenticators = null)
+    {
+        parent::__construct($dispatcher, $client, $logger);
+        $this->authenticators = $authenticators;
+    }
+
     public function create(Dsn $dsn): TransportInterface
     {
         $tls = 'smtps' === $dsn->getScheme() ? true : null;
         $port = $dsn->getPort(0);
         $host = $dsn->getHost();
 
-        $transport = new EsmtpTransport($host, $port, $tls, $this->dispatcher, $this->logger);
+        $transport = new EsmtpTransport($host, $port, $tls, $this->dispatcher, $this->logger, null, $this->authenticators);
 
         /** @var SocketStream $stream */
         $stream = $transport->getStream();

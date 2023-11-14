@@ -258,7 +258,7 @@ EOF
 
     public function getSubscribedSignals(): array
     {
-        return $this->signals ?? (\defined('SIGTERM') ? [\SIGTERM, \SIGINT] : []);
+        return $this->signals ?? (\extension_loaded('pcntl') ? [\SIGTERM, \SIGINT] : []);
     }
 
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false

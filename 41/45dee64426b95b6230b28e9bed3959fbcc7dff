@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by SerheyDolgushev at 2023-11-14T19:44:37Z
+
+@derrabus thanks a lot for your patience and help on this case.
+
+---------------------------------------------------------------------------
+
+by SerheyDolgushev at 2023-11-14T21:58:53Z
+
+> works for me, but it might be worth to also report this to Swoole
+
+In theory, there might be other PHP extensions that will set `SIGTERM` constant. So it is not very accurate to assume that `pcntl`  PHP extension is enabled if `SIGTERM` is defined. It is much more straightforward and reliable to use `extension_loaded` for this purpose.

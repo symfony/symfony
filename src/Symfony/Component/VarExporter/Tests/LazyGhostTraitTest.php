@@ -186,6 +186,9 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(1, $counter);
     }
 
+    /**
+     * @group legacy
+     */
     public function testPartialInitialization()
     {
         $counter = 0;
@@ -243,6 +246,9 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame([123, 345, 456, 567, 234, 678], array_values($properties));
     }
 
+    /**
+     * @group legacy
+     */
     public function testPartialInitializationWithReset()
     {
         $initializer = static fn (ChildTestClass $instance, string $property, ?string $scope, mixed $default) => 234;
@@ -275,6 +281,9 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(234, $instance->public);
     }
 
+    /**
+     * @group legacy
+     */
     public function testPartialInitializationWithNastyPassByRef()
     {
         $instance = ChildTestClass::createLazyGhost(['public' => fn (ChildTestClass $instance, string &$property, ?string &$scope, mixed $default) => $property = $scope = 123]);
@@ -307,6 +316,9 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(-3, $r->getValue($obj));
     }
 
+    /**
+     * @group legacy
+     */
     public function testFullPartialInitialization()
     {
         $counter = 0;
@@ -335,6 +347,9 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(1000, $counter);
     }
 
+    /**
+     * @group legacy
+     */
     public function testPartialInitializationFallback()
     {
         $counter = 0;
@@ -357,6 +372,9 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(1000, $counter);
     }
 
+    /**
+     * @group legacy
+     */
     public function testFullInitializationAfterPartialInitialization()
     {
         $counter = 0;

@@ -23,29 +23,20 @@ trait LazyGhostTrait
     /**
      * Creates a lazy-loading ghost instance.
      *
-     * When the initializer is a closure, it should initialize all properties at
-     * once and is given the instance to initialize as argument.
-     *
-     * When the initializer is an array of closures, it should be indexed by
-     * properties and closures should accept 4 arguments: the instance to
-     * initialize, the property to initialize, its write-scope, and its default
-     * value. Each closure should return the value of the corresponding property.
-     * The special "\0" key can be used to define a closure that returns all
-     * properties at once when full-initialization is needed; it takes the
-     * instance and its default properties as arguments.
-     *
-     * Properties should be indexed by their array-cast name, see
+     * Skipped properties should be indexed by their array-cast identifier, see
      * https://php.net/manual/language.types.array#language.types.array.casting
      *
-     * @param (\Closure(static):void
-     *        |array<string, \Closure(static, string, ?string, mixed):mixed>
-     *        |array{"\0": \Closure(static, array<string, mixed>):array<string, mixed>}) $initializer
-     * @param array<string, true>|null $skippedProperties An array indexed by the properties to skip, aka the ones
-     *                                                    that the initializer doesn't set when its a closure
+     * @param (\Closure(static):void   $initializer       The closure should initialize the object it receives as argument
+     * @param array<string, true>|null $skippedProperties An array indexed by the properties to skip, a.k.a. the ones
+     *                                                    that the initializer doesn't initialize, if any
      * @param static|null              $instance
      */
     public static function createLazyGhost(\Closure|array $initializer, array $skippedProperties = null, object $instance = null): static
     {
+        if (\is_array($initializer)) {
+            trigger_deprecation('symfony/var-exporter', '6.4', 'Per-property lazy-initializers are deprecated and won\'t be supported anymore in 7.0, use an object initializer instead.');
+        }
+
         $onlyProperties = null === $skippedProperties && \is_array($initializer) ? $initializer : null;
 
         if (self::class !== $class = $instance ? $instance::class : static::class) {

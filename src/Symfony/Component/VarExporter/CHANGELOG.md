@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Deprecate per-property lazy-initializers
+
 6.2
 ---
 

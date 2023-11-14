@@ -38,6 +38,7 @@ Components
 * [Serializer](#Serializer)
 * [Templating](#Templating)
 * [Validator](#Validator)
+* [VarExporter](#VarExporter)
 * [Workflow](#Workflow)
 
 BrowserKit
@@ -229,6 +230,11 @@ Validator
  * Deprecate `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
  * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
  * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+
+VarExporter
+-----------
+
+ * Deprecate per-property lazy-initializers
 
 Workflow
 --------

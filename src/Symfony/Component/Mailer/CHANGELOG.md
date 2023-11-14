@@ -10,6 +10,7 @@ CHANGELOG
 ---
 
  * Add DSN parameter `peer_fingerprint` to verify TLS certificate fingerprint
+ * Change the default port for the `mailjet+smtp` transport from 465 to 587
 
 6.3
 ---

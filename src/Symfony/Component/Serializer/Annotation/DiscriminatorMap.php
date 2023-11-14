@@ -15,7 +15,7 @@ class_exists(\Symfony\Component\Serializer\Attribute\DiscriminatorMap::class);
 
 if (false) {
     #[\Attribute(\Attribute::TARGET_CLASS)]
-    class DiscriminatorMap
+    class DiscriminatorMap extends \Symfony\Component\Serializer\Attribute\DiscriminatorMap
     {
     }
 }

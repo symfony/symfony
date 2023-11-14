@@ -24,6 +24,6 @@ class StopWorkerOnSigtermSignalListener extends StopWorkerOnSignalsListener
 {
     public function __construct(LoggerInterface $logger = null)
     {
-        parent::__construct(\defined('SIGTERM') ? [SIGTERM] : [], $logger);
+        parent::__construct(\extension_loaded('pcntl') ? [SIGTERM] : [], $logger);
     }
 }

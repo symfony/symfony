@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-11-13T16:08:48Z
+
+⚠️ This PR will break DoctrineBundle which has already been made compatible with Symfony 7.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-13T16:10:43Z
+
+Ah, I forgot about this one. As I wrote on another PR, ORMv3 makes `LazyServiceEntityRepository` useless, we should deprecate and drop it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-11-13T16:17:50Z
+
+> ORMv3 makes `LazyServiceEntityRepository` useless
+
+Yes, but we still need a solution for ORM 2 which will stay around for a while.
+
+> we should deprecate and drop it.
+
+`LazyServiceEntityRepository` is marked as internal, so we can drop that class without deprecation. If we find a way to keep the laziness of `ServiceEntityRepository` for ORM 2, I'm fine with the late removal of this feature. I won't have time to work on that though. 😕

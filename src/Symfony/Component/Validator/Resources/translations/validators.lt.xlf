@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Tinklo kaukės reikšmė turi būti nuo {{ min }} iki {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Failo pavadinimas per ilgas. Jame turėtų būti {{ filename_max_length }} simbolis arba mažiau.|Failo pavadinimas per ilgas. Jame turėtų būti {{ filename_max_length }} simbolių arba mažiau.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Slaptažodis per silpnas. Naudokite stipresnį slaptažodį.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Šioje reikšmėje yra simbolių, kurių neleidžia dabartinis apribojimo lygis.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Naudoti nematomus simbolius draudžiama.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Draudžiama maišyti skaičius iš skirtingų scenarijų.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Draudžiama naudoti paslėptus perdangos simbolius.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

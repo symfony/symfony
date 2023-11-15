@@ -7,6 +7,17 @@ in 7.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.0.0...v7.0.1
 
+* 7.0.0-RC1 (2023-11-15)
+
+ * bug #52597 [DependencyInjection] Fix dumping containers with null-referenced services (nicolas-grekas)
+ * bug #52588 [Messenger] Use extension_loaded call to check if pcntl extension is loaded, as SIGTERM might be set be swoole (Sergii Dolgushev)
+ * feature #52569 [VarExporter] Drop support for partially initialized lazy object (nicolas-grekas)
+ * bug #52567 [AssetMapper] Fixing js sourceMappingURL extraction when sourceMappingURL used in code (weaverryan)
+ * bug #52579 [DomCrawler] UriResolver support path with colons (vdauchy)
+ * bug #52581 [Messenger] attach all required parameters to query (xabbuh)
+ * feature #52568 [VarExporter] Deprecate per-property lazy-initializers (nicolas-grekas)
+ * feature #52560 [Mailer] Update default Mailjet port (Katario)
+
 * 7.0.0-BETA3 (2023-11-10)
 
  * bug #51666 [RateLimiter] CompoundLimiter was accepting requests even when some limiters already consumed all tokens (10n)

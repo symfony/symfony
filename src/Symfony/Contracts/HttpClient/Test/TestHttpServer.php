@@ -18,9 +18,12 @@ class TestHttpServer
 {
     private static array $process = [];
 
-    public static function start(int $port = 8057, string $workingDirectory = null): Process
+    /**
+     * @param string|null $workingDirectory
+     */
+    public static function start(int $port = 8057/* , string $workingDirectory = null */): Process
     {
-        $workingDirectory ??= __DIR__.'/Fixtures/web';
+        $workingDirectory = \func_get_args()[1] ?? __DIR__.'/Fixtures/web';
 
         if (isset(self::$process[$port])) {
             self::$process[$port]->stop();

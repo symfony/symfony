@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  *
- * @final since Symfony 6.4
+ * @final
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Context

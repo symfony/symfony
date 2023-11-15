@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-11-15T15:31:32Z
+
+Why not adding a use statement with the other use statements in the file prolog instead of doing a dynamic constant access ? Wouldn't it be better for optimizations ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-15T15:38:17Z
+
+Updated :)

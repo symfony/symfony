@@ -90,8 +90,8 @@ abstract class AbstractDoctrineExtension extends Extension
                 if (!$mappingConfig) {
                     continue;
                 }
-            } else {
-                $mappingConfig['type'] ??= 'attribute';
+            } elseif (!$mappingConfig['type']) {
+                $mappingConfig['type'] = 'attribute';
             }
 
             $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);

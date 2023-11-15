@@ -374,7 +374,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
             if ($this->default) {
                 if (!\is_array($this->defaultValue)) {
-                    throw new \InvalidArgumentException(sprintf('%s: the default value of an array node has to be an array.', $node->getPath()));
+                    throw new \InvalidArgumentException(sprintf('"%s": the default value of an array node has to be an array.', $node->getPath()));
                 }
 
                 $node->setDefaultValue($this->defaultValue);
@@ -406,7 +406,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
         if (isset($this->normalization)) {
             $node->setNormalizationClosures($this->normalization->before);
-            $node->setNormalizedTypes($this->normalization->declaredTypes);
             $node->setXmlRemappings($this->normalization->remappings);
         }
 

@@ -20,7 +20,6 @@ class NormalizationBuilder
 {
     protected $node;
     public $before = [];
-    public $declaredTypes = [];
     public $remappings = [];
 
     public function __construct(NodeDefinition $node)

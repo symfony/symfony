@@ -699,7 +699,7 @@ class Definition
      */
     public function setConfigurator(string|array|Reference|null $configurator): static
     {
-        return $this->addConfigurator($configurator);
+        return $this->setConfigurators([$configurator]);
     }
 
     /**

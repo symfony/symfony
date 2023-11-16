@@ -145,4 +145,15 @@ class ChildDefinitionTest extends TestCase
 
         $this->assertSame($conditionals, $def->getInstanceofConditionals());
     }
+
+    public function testConfigurators()
+    {
+        $def = new ChildDefinition('foo');
+
+        $this->assertEmpty($def->getConfigurators());
+        $this->assertSame($def, $def->setConfigurators(['foo']));
+        $this->assertSame(['foo'], $def->getConfigurators());
+        $this->assertSame(['configurators' => true], $def->getChanges());
+        $this->assertSame(['foo', 'bar'], $def->addConfigurator('bar')->getConfigurators());
+    }
 }

@@ -216,6 +216,29 @@ class DefinitionTest extends TestCase
         $this->assertEquals('foo', $def->getConfigurator(), '->getConfigurator() returns the configurator');
     }
 
+    public function testSetGetConfigurators()
+    {
+        $def = new Definition('stdClass');
+        $this->assertSame($def, $def->setConfigurators(['foo']), '->setConfigurators() implements a fluent interface');
+        $this->assertSame($def, $def->addConfigurator('bar'), '->addConfigurator() implements a fluent interface');
+        $this->assertEquals(['foo', 'bar'], $def->getConfigurators(), '->getConfigurators() returns the configurator');
+        $this->assertEquals(['foo', 'bar'], $def->addConfigurator('foo')->getConfigurators(), '->addConfigurator() doesn\'t add if already present in the array');
+    }
+
+    public function testConfiguratorBackwardCompatibility()
+    {
+        $def1 = new Definition('stdClass');
+        $def2 = new Definition('stdClass');
+        // addConfigurator
+        $this->assertEquals($def1->addConfigurator('foo'), $def2->setConfigurator('foo'), '->setConfigurator() is the same as ->addConfigurator() on an empty configurator array');
+        $this->assertNotEquals($def1->addConfigurator('bar'), $def2->setConfigurator('bar'), '->setConfigurator() is not the same as ->addConfigurator() if the configurator array is not empty');
+        // setConfigurator
+        $this->assertEquals($def1->setConfigurators(['foo']), $def2->setConfigurator('foo'), '->setConfigurator($item) is the same as ->setConfigurators([$item])');
+        $this->assertEquals($def1->setConfigurators(['foo'])->setConfigurators(['bar']), $def2->setConfigurator('foo')->setConfigurator('bar'), '->setConfigurator($item) is the same as ->setConfigurators([$item]) whatever the number of time it is called');
+        // getConfigurator
+        $this->assertEquals($def1->getConfigurators()[0], $def2->getConfigurator(), '->getConfigurator() returns the first configurator');
+    }
+
     public function testClearTags()
     {
         $def = new Definition('stdClass');

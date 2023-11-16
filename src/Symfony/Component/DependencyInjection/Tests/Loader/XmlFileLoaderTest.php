@@ -340,6 +340,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals('sc_configure', $services['configurator1']->getConfigurators()[0], '->load() parses the configurator tag');
         $this->assertEquals([new Reference('baz'), 'configure'], $services['configurator2']->getConfigurators()[0], '->load() parses the configurator tag');
         $this->assertEquals(['BazClass', 'configureStatic'], $services['configurator3']->getConfigurators()[0], '->load() parses the configurator tag');
+        $this->assertEquals(['sc_configure', [new Reference('baz'), 'configure'], ['BazClass', 'configureStatic']], $services['configurator4']->getConfigurators(), '->load() parses the configurator tag');
         $this->assertEquals([['setBar', []], ['setBar', [new Expression('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')]]], $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals([['setBar', ['foo', new Reference('foo'), [true, false]]]], $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');

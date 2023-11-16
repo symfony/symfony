@@ -219,9 +219,11 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
         $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
         $this->assertEquals(['foo', new Reference('foo'), [true, false]], $services['arguments']->getArguments(), '->load() parses the argument tags');
-        $this->assertEquals('sc_configure', $services['configurator1']->getConfigurators()[0], '->load() parses the configurator tag');
-        $this->assertEquals([new Reference('baz'), 'configure'], $services['configurator2']->getConfigurators()[0], '->load() parses the configurator tag');
-        $this->assertEquals(['BazClass', 'configureStatic'], $services['configurator3']->getConfigurators()[0], '->load() parses the configurator tag');
+        $this->assertEquals('sc_configure', $services['configurator_legacy']->getConfigurator(), '->load() parses the legacy configurator tag');
+        $this->assertEquals('sc_configure', $services['configurator1']->getConfigurators()[0], '->load() parses the configurators tag');
+        $this->assertEquals([new Reference('baz'), 'configure'], $services['configurator2']->getConfigurators()[0], '->load() parses the configurators tag');
+        $this->assertEquals(['BazClass', 'configureStatic'], $services['configurator3']->getConfigurators()[0], '->load() parses the configurators tag');
+        $this->assertEquals(['sc_configure', [new Reference('baz'), 'configure'], ['BazClass', 'configureStatic']], $services['configurator4']->getConfigurators(), '->load() parses the configurators tag');
         $this->assertEquals([['setBar', []], ['setBar', []], ['setBar', [new Expression('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')]]], $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals([['setBar', ['foo', new Reference('foo'), [true, false]]]], $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');

@@ -4,9 +4,11 @@ services:
     not_shared: { class: FooClass, shared: false }
     file: { class: FooClass, file: '%path%/foo.php' }
     arguments: { class: FooClass, arguments: [foo, '@foo', [true, false]] }
-    configurator1: { class: FooClass, configurator: sc_configure }
-    configurator2: { class: FooClass, configurator: ['@baz', configure] }
-    configurator3: { class: FooClass, configurator: [BazClass, configureStatic] }
+    configurator_legacy: { class: FooClass, configurator: sc_configure }
+    configurator1: { class: FooClass, configurators: [sc_configure] }
+    configurator2: { class: FooClass, configurators: [['@baz', configure]] }
+    configurator3: { class: FooClass, configurators: [[BazClass, configureStatic]] }
+    configurator4: { class: FooClass, configurators: [sc_configure, ['@baz', configure], [BazClass, configureStatic]] }
     method_call1:
         class: FooClass
         calls:

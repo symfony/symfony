@@ -27,6 +27,11 @@
     <service id="configurator3" class="FooClass">
       <configurator class="BazClass" method="configureStatic" />
     </service>
+    <service id="configurator4" class="FooClass">
+      <configurator function="sc_configure" />
+      <configurator service="baz" method="configure" />
+      <configurator class="BazClass" method="configureStatic" />
+    </service>
     <service id="method_call1" class="FooClass">
       <call method="setBar" />
       <call method="setBar">

@@ -107,8 +107,8 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
                 }
                 $value->setFactory($factory);
             }
-            if (isset($changes['configurator'])) {
-                $value->setConfigurator($this->processValue($value->getConfigurator()));
+            if (isset($changes['configurators'])) {
+                $value->setConfigurators(array_map([$this, 'processValue'], $value->getConfigurators()));
             }
         }
 

@@ -55,6 +55,7 @@ class YamlFileLoader extends FileLoader
         'arguments' => 'arguments',
         'properties' => 'properties',
         'configurator' => 'configurator',
+        'configurators' => 'configurators',
         'calls' => 'calls',
         'tags' => 'tags',
         'decorates' => 'decorates',
@@ -81,6 +82,7 @@ class YamlFileLoader extends FileLoader
         'arguments' => 'arguments',
         'properties' => 'properties',
         'configurator' => 'configurator',
+        'configurators' => 'configurators',
         'calls' => 'calls',
         'tags' => 'tags',
         'autowire' => 'autowire',
@@ -95,6 +97,7 @@ class YamlFileLoader extends FileLoader
         'public' => 'public',
         'properties' => 'properties',
         'configurator' => 'configurator',
+        'configurators' => 'configurators',
         'calls' => 'calls',
         'tags' => 'tags',
         'autowire' => 'autowire',
@@ -542,8 +545,18 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['configurator'])) {
-            $definition->setConfigurator($this->parseCallable($service['configurator'], 'configurator', $id, $file));
+            $definition->addConfigurator($this->parseCallable($service['configurator'], 'configurator', $id, $file));
         }
+
+        if (isset($service['configurators'])) {
+            if (!\is_array($service['configurators'])) {
+                throw new InvalidArgumentException(sprintf('Parameter "configurators" must be an array for service "%s" in "%s". Check your YAML syntax.', $id, $file));
+            }
+            foreach ($service['configurators'] as $configurator) {
+                $definition->addConfigurator($this->parseCallable($configurator, 'configurator', $id, $file));
+            }
+        }
+
 
         if (isset($service['calls'])) {
             if (!\is_array($service['calls'])) {

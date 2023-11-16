@@ -34,6 +34,7 @@ class Definition
     private array $instanceof = [];
     private bool $autoconfigured = false;
     private string|array|null $configurator = null;
+    private array $configurators = [];
     private array $tags = [];
     private bool $public = false;
     private bool $synthetic = false;
@@ -694,10 +695,23 @@ class Definition
      * @param string|array|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
+     * @deprecated since Symfony 7.1 and will be removed in 8.0, use addConfigurator() or setConfigurators() instead
      */
     public function setConfigurator(string|array|Reference|null $configurator): static
     {
-        $this->changes['configurator'] = true;
+        return $this->addConfigurator($configurator);
+    }
+
+    /**
+     * Add a configurator to the configurator list.
+     *
+     * @param string|array|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
+     *
+     * @return $this
+     */
+    public function addConfigurator(string|array|Reference|null $configurator): static
+    {
+        $this->changes['configurators'] = true;
 
         if (\is_string($configurator) && str_contains($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
@@ -705,17 +719,47 @@ class Definition
             $configurator = [$configurator, '__invoke'];
         }
 
-        $this->configurator = $configurator;
+        if (!in_array($configurator, $this->configurators)) {
+            $this->configurators[] = $configurator;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the configurator list to call after the service is fully initialized.
+     *
+     * @param array $configurators A PHP function, reference or an array containing a class/Reference and a method to call
+     *
+     * @return $this
+     */
+    public function setConfigurators(array $configurators): static
+    {
+        $this->configurators = [];
+        foreach ($configurators as $configurator) {
+            $this->addConfigurator($configurator);
+        }
 
         return $this;
     }
 
     /**
      * Gets the configurator to call after the service is fully initialized.
+     * @deprecated since Symfony 7.1 and will be removed in 8.0, use getConfigurators() instead
      */
     public function getConfigurator(): string|array|null
     {
-        return $this->configurator;
+        return $this->configurators[0] ?? null;
+    }
+
+    /**
+     * Gets the configurators list after the service is fully initialized.
+     *
+     * @return array<array|callable>
+     */
+    public function getConfigurators(): array
+    {
+        return $this->configurators;
     }
 
     /**

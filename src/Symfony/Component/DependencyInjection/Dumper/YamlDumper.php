@@ -160,8 +160,13 @@ class YamlDumper extends Dumper
             }
         }
 
-        if ($callable = $definition->getConfigurator()) {
-            $code .= sprintf("        configurator: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
+        if (is_array($definition->getConfigurators()) && count($definition->getConfigurators()) > 0) {
+            $code .= "        configurators:\n";
+            foreach ($definition->getConfigurators() as $configurator) {
+                if ($configurator) {
+                    $code .= sprintf("            - %s\n", $this->dumper->dump($this->dumpCallable($configurator), 0));
+                }
+            }
         }
 
         return $code;

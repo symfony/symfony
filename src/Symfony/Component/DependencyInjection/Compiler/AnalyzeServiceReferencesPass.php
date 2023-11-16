@@ -185,7 +185,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
         if (!$this->onlyConstructorArguments) {
             $this->processValue($properties);
             $this->processValue($setters);
-            $this->processValue($value->getConfigurator());
+            array_map([$this, 'processValue'], $value->getConfigurators());
         }
         $this->lazy = $lazy;
 

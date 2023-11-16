@@ -22,7 +22,7 @@ trait ConfiguratorTrait
      */
     final public function configurator(string|array|ReferenceConfigurator $configurator): static
     {
-        $this->definition->setConfigurator(static::processValue($configurator, true));
+        $this->definition->addConfigurator(static::processValue($configurator, true));
 
         return $this;
     }

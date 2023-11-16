@@ -710,7 +710,7 @@ EOF;
         if ($definition->hasErrors()) {
             return true;
         }
-        if ($definition->isSynthetic() || $definition->getFile() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurator()) {
+        if ($definition->isSynthetic() || $definition->getFile() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurators()) {
             return false;
         }
         if ($definition->isDeprecated() || $definition->isLazy() || $definition->getFactory() || 3 < \count($definition->getArguments())) {
@@ -789,31 +789,40 @@ EOF;
 
     private function addServiceConfigurator(Definition $definition, string $variableName = 'instance'): string
     {
-        if (!$callable = $definition->getConfigurator()) {
-            return '';
+        $code = '';
+        foreach ($definition->getConfigurators() as $callable) {
+            if (!$callable) {
+                continue;
+            }
+
+            if (\is_array($callable)) {
+                if ($callable[0] instanceof Reference
+                    || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))
+                ) {
+                    $code.= sprintf("        %s->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
+                    continue;
+                }
+
+                $class = $this->dumpValue($callable[0]);
+                // If the class is a string we can optimize away
+                if (str_starts_with($class, "'") && !str_contains($class, '$')) {
+                    $code.= sprintf("        %s::%s(\$%s);\n", $this->dumpLiteralClass($class), $callable[1], $variableName);
+                    continue;
+                }
+
+                if (str_starts_with($class, 'new ')) {
+                    $code.= sprintf("        (%s)->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
+                    continue;
+                }
+
+                $code.= sprintf("        [%s, '%s'](\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
+                continue;
+            }
+
+            $code.= sprintf("        %s(\$%s);\n", $callable, $variableName);
         }
 
-        if (\is_array($callable)) {
-            if ($callable[0] instanceof Reference
-                || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))
-            ) {
-                return sprintf("        %s->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
-            }
-
-            $class = $this->dumpValue($callable[0]);
-            // If the class is a string we can optimize away
-            if (str_starts_with($class, "'") && !str_contains($class, '$')) {
-                return sprintf("        %s::%s(\$%s);\n", $this->dumpLiteralClass($class), $callable[1], $variableName);
-            }
-
-            if (str_starts_with($class, 'new ')) {
-                return sprintf("        (%s)->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
-            }
-
-            return sprintf("        [%s, '%s'](\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
-        }
-
-        return sprintf("        %s(\$%s);\n", $callable, $variableName);
+        return $code;
     }
 
     private function addService(string $id, Definition $definition): array
@@ -1052,7 +1061,7 @@ EOTXT
 
         $code .= $this->addInlineVariables($id, $definition, $arguments, $forConstructor);
 
-        if ($arguments = array_filter([$inlineDef->getProperties(), $inlineDef->getMethodCalls(), $inlineDef->getConfigurator()])) {
+        if ($arguments = array_filter([$inlineDef->getProperties(), $inlineDef->getMethodCalls(), $inlineDef->getConfigurators()])) {
             $isSimpleInstance = false;
         } elseif ($definition !== $inlineDef && 2 > $this->inlinedDefinitions[$inlineDef]) {
             return $code;
@@ -1792,7 +1801,7 @@ EOF;
                 $definitions[$argument] = 1;
                 $arguments = [$argument->getArguments(), $argument->getFactory()];
                 $this->getDefinitionsFromArguments($arguments, $definitions, $calls, null === $byConstructor || $byConstructor);
-                $arguments = [$argument->getProperties(), $argument->getMethodCalls(), $argument->getConfigurator()];
+                $arguments = [$argument->getProperties(), $argument->getMethodCalls(), $argument->getConfigurators()];
                 $this->getDefinitionsFromArguments($arguments, $definitions, $calls, null !== $byConstructor && $byConstructor);
             }
         }
@@ -1913,7 +1922,7 @@ EOF;
             if ($value->getProperties()) {
                 throw new RuntimeException('Cannot dump definitions which have properties.');
             }
-            if (null !== $value->getConfigurator()) {
+            if (0 !== count($value->getConfigurators())) {
                 throw new RuntimeException('Cannot dump definitions which have a configurator.');
             }
 

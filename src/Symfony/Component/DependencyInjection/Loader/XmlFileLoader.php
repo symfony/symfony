@@ -323,18 +323,19 @@ class XmlFileLoader extends FileLoader
             $definition->setFactory([null, $constructor]);
         }
 
-        if ($configurators = $this->getChildren($service, 'configurator')) {
-            $configurator = $configurators[0];
-            if ($function = $configurator->getAttribute('function')) {
-                $definition->setConfigurator($function);
-            } else {
-                if ($childService = $configurator->getAttribute('service')) {
-                    $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+        if ($configurators = array_merge($this->getChildren($service, 'configurator'), $this->getChildren($service, 'configurators'))) {
+            foreach ($configurators as $configurator) {
+                if ($function = $configurator->getAttribute('function')) {
+                    $definition->addConfigurator($function);
                 } else {
-                    $class = $configurator->getAttribute('class');
-                }
+                    if ($childService = $configurator->getAttribute('service')) {
+                        $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+                    } else {
+                        $class = $configurator->getAttribute('class');
+                    }
 
-                $definition->setConfigurator([$class, $configurator->getAttribute('method') ?: '__invoke']);
+                    $definition->addConfigurator([$class, $configurator->getAttribute('method') ?: '__invoke']);
+                }
             }
         }
 

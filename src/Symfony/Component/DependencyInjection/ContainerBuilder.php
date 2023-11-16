@@ -1143,22 +1143,24 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        if ($callable = $definition->getConfigurator()) {
-            if (\is_array($callable)) {
-                $callable[0] = $parameterBag->resolveValue($callable[0]);
+        foreach ($definition->getConfigurators() as $configurator) {
+            if ($callable = $configurator) {
+                if (\is_array($callable)) {
+                    $callable[0] = $parameterBag->resolveValue($callable[0]);
 
-                if ($callable[0] instanceof Reference) {
-                    $callable[0] = $this->doGet((string) $callable[0], $callable[0]->getInvalidBehavior(), $inlineServices);
-                } elseif ($callable[0] instanceof Definition) {
-                    $callable[0] = $this->createService($callable[0], $inlineServices);
+                    if ($callable[0] instanceof Reference) {
+                        $callable[0] = $this->doGet((string)$callable[0], $callable[0]->getInvalidBehavior(), $inlineServices);
+                    } elseif ($callable[0] instanceof Definition) {
+                        $callable[0] = $this->createService($callable[0], $inlineServices);
+                    }
                 }
-            }
 
-            if (!\is_callable($callable)) {
-                throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', get_debug_type($service)));
-            }
+                if (!\is_callable($callable)) {
+                    throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', get_debug_type($service)));
+                }
 
-            $callable($service);
+                $callable($service);
+            }
         }
 
         return $service;

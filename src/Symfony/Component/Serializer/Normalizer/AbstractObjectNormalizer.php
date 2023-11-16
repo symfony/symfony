@@ -288,6 +288,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
     }
+
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!isset($context['cache_key'])) {

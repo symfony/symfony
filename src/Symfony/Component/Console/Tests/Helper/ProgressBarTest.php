@@ -1092,6 +1092,20 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         );
     }
 
+    public function testEmptyInputWithDebugFormat()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setFormat('%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+
+        $this->assertEquals([], iterator_to_array($bar->iterate([])));
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 0/0 [============================] 100% < 1 sec/< 1 sec',
+            stream_get_contents($output->getStream())
+        );
+    }
+
     protected function getOutputStream($decorated = true, $verbosity = StreamOutput::VERBOSITY_NORMAL)
     {
         return new StreamOutput(fopen('php://memory', 'r+', false), $verbosity, $decorated);
@@ -1263,7 +1277,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             'Foo!'.\PHP_EOL.
             $this->generateOutput('[--->------------------------]').
             "\nProcessing \"foobar\"...".
-            $this->generateOutput("[----->----------------------]\nProcessing \"foobar\"..."),
+            $this->generateOutput("[============================]\nProcessing \"foobar\"..."),
             stream_get_contents($output->getStream())
         );
     }

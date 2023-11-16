@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+7.1
+---
+ * Add `configurations` option to service definitions to allow defining multiple configurations for a single service
+
 7.0
 ---
 

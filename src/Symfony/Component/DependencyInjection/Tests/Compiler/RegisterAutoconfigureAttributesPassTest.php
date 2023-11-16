@@ -40,7 +40,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
             ->setAutowired(true)
             ->setShared(true)
             ->setProperties(['bar' => 'baz'])
-            ->setConfigurator(new Reference('bla'))
+            ->addConfigurator(new Reference('bla'))
             ->addTag('a_tag')
             ->addTag('another_tag', ['attr' => 234])
             ->addMethodCall('setBar', [2, 3])

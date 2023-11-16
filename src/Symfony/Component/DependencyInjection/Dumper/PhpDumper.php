@@ -1923,7 +1923,7 @@ EOF;
                 throw new RuntimeException('Cannot dump definitions which have properties.');
             }
             if (0 !== count($value->getConfigurators())) {
-                throw new RuntimeException('Cannot dump definitions which have a configurator.');
+                throw new RuntimeException('Cannot dump definitions which have configurators.');
             }
 
             return $this->addNewInstance($value);

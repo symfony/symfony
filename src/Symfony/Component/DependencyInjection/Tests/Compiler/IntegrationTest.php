@@ -1039,7 +1039,7 @@ class IntegrationTest extends TestCase
                 $definition
                     ->addMethodCall('doSomething', [1, 2, 3])
                     ->setBindings(['string $foo' => 'bar'])
-                    ->setConfigurator(new Reference('my_configurator'))
+                    ->addConfigurator(new Reference('my_configurator'))
                 ;
             }
         );

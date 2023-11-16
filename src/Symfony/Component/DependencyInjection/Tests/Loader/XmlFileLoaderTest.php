@@ -337,9 +337,9 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
         $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
         $this->assertEquals(['foo', new Reference('foo'), [true, false]], $services['arguments']->getArguments(), '->load() parses the argument tags');
-        $this->assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');
-        $this->assertEquals([new Reference('baz'), 'configure'], $services['configurator2']->getConfigurator(), '->load() parses the configurator tag');
-        $this->assertEquals(['BazClass', 'configureStatic'], $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
+        $this->assertEquals('sc_configure', $services['configurator1']->getConfigurators()[0], '->load() parses the configurator tag');
+        $this->assertEquals([new Reference('baz'), 'configure'], $services['configurator2']->getConfigurators()[0], '->load() parses the configurator tag');
+        $this->assertEquals(['BazClass', 'configureStatic'], $services['configurator3']->getConfigurators()[0], '->load() parses the configurator tag');
         $this->assertEquals([['setBar', []], ['setBar', [new Expression('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')]]], $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals([['setBar', ['foo', new Reference('foo'), [true, false]]]], $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');
@@ -725,14 +725,14 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('Foobar', $container->getDefinition((string) $fooFactoryFactory[0])->getClass());
         $this->assertSame('createFooFactory', $fooFactoryFactory[1]);
 
-        $fooConfigurator = $foo->getConfigurator();
+        $fooConfigurator = $foo->getConfigurators()[0];
         $this->assertInstanceOf(Reference::class, $fooConfigurator[0]);
         $this->assertTrue($container->has((string) $fooConfigurator[0]));
         $fooConfiguratorDefinition = $container->getDefinition((string) $fooConfigurator[0]);
         $this->assertSame('Bar', $fooConfiguratorDefinition->getClass());
         $this->assertSame('configureFoo', $fooConfigurator[1]);
 
-        $barConfigurator = $fooConfiguratorDefinition->getConfigurator();
+        $barConfigurator = $fooConfiguratorDefinition->getConfigurators()[0];
         $this->assertInstanceOf(Reference::class, $barConfigurator[0]);
         $this->assertSame('Baz', $container->getDefinition((string) $barConfigurator[0])->getClass());
         $this->assertSame('configureBar', $barConfigurator[1]);

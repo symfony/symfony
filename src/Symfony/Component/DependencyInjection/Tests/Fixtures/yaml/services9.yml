@@ -22,17 +22,17 @@ services:
             - [initialize, {  }]
 
         constructor: getInstance
-        configurator: sc_configure
+        configurators: [sc_configure]
         public: true
     foo.baz:
         class: '%baz_class%'
         constructor: getInstance
-        configurator: ['%baz_class%', configureStatic1]
+        configurators: [['%baz_class%', configureStatic1]]
         public: true
     bar:
         class: Bar\FooClass
         arguments: [foo, '@foo.baz', '%foo_bar%']
-        configurator: ['@foo.baz', configure]
+        configurators: [['@foo.baz', configure]]
         public: true
     foo_bar:
         class: '%foo_class%'
@@ -79,14 +79,14 @@ services:
 
     configured_service:
         class: stdClass
-        configurator: ['@configurator_service', configureStdClass]
+        configurators: [['@configurator_service', configureStdClass]]
         public: true
     configurator_service_simple:
         class: ConfClass
         arguments: ['bar']
     configured_service_simple:
         class: stdClass
-        configurator: ['@configurator_service_simple', configureStdClass]
+        configurators: [['@configurator_service_simple', configureStdClass]]
         public: true
     decorated:
         class: stdClass

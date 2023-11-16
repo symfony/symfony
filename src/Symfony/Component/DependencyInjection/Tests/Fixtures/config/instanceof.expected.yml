@@ -15,7 +15,8 @@ services:
             - [setFoo, ['@foo']]
 
         shared: false
-        configurator: c
+        configurators:
+            - c
     foo:
         class: App\FooService
         public: true

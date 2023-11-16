@@ -24,19 +24,19 @@ $container
     ->setProperties(['foo' => 'bar', 'moo' => new Reference('foo.baz'), 'qux' => ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%']])
     ->addMethodCall('setBar', [new Reference('bar')])
     ->addMethodCall('initialize')
-    ->setConfigurator('sc_configure')
+    ->setConfigurators(['sc_configure'])
     ->setPublic(true)
 ;
 $container
     ->register('foo.baz', '%baz_class%')
     ->setFactory(['%baz_class%', 'getInstance'])
-    ->setConfigurator(['%baz_class%', 'configureStatic1'])
+    ->setConfigurators([['%baz_class%', 'configureStatic1']])
     ->setPublic(true)
 ;
 $container
     ->register('bar', 'Bar\FooClass')
     ->setArguments(['foo', new Reference('foo.baz'), new Parameter('foo_bar')])
-    ->setConfigurator([new Reference('foo.baz'), 'configure'])
+    ->setConfigurators([[new Reference('foo.baz'), 'configure']])
     ->setPublic(true)
 ;
 $container
@@ -87,7 +87,7 @@ $container
 ;
 $container
     ->register('configured_service', 'stdClass')
-    ->setConfigurator([new Reference('configurator_service'), 'configureStdClass'])
+    ->setConfigurators([[new Reference('configurator_service'), 'configureStdClass']])
     ->setPublic(true)
 ;
 $container
@@ -96,7 +96,7 @@ $container
 ;
 $container
     ->register('configured_service_simple', 'stdClass')
-    ->setConfigurator([new Reference('configurator_service_simple'), 'configureStdClass'])
+    ->setConfigurators([[new Reference('configurator_service_simple'), 'configureStdClass']])
     ->setPublic(true)
 ;
 $container

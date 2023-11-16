@@ -581,13 +581,13 @@ class ContainerBuilderTest extends TestCase
     public function testCreateServiceConfigurator()
     {
         $builder = new ContainerBuilder();
-        $builder->register('foo1', 'Bar\FooClass')->setConfigurator('sc_configure');
-        $builder->register('foo2', 'Bar\FooClass')->setConfigurator(['%class%', 'configureStatic']);
+        $builder->register('foo1', 'Bar\FooClass')->addConfigurator('sc_configure');
+        $builder->register('foo2', 'Bar\FooClass')->addConfigurator(['%class%', 'configureStatic']);
         $builder->setParameter('class', 'BazClass');
         $builder->register('baz', 'BazClass');
-        $builder->register('foo3', 'Bar\FooClass')->setConfigurator([new Reference('baz'), 'configure']);
-        $builder->register('foo4', 'Bar\FooClass')->setConfigurator([$builder->getDefinition('baz'), 'configure']);
-        $builder->register('foo5', 'Bar\FooClass')->setConfigurator('foo');
+        $builder->register('foo3', 'Bar\FooClass')->addConfigurator([new Reference('baz'), 'configure']);
+        $builder->register('foo4', 'Bar\FooClass')->addConfigurator([$builder->getDefinition('baz'), 'configure']);
+        $builder->register('foo5', 'Bar\FooClass')->addConfigurator('foo');
 
         $this->assertTrue($builder->get('foo1')->configured, '->createService() calls the configurator');
         $this->assertTrue($builder->get('foo2')->configured, '->createService() calls the configurator');

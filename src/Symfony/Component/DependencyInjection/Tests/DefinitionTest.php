@@ -369,7 +369,7 @@ class DefinitionTest extends TestCase
         $this->assertSame([
             'class' => true,
             'autowired' => true,
-            'configurator' => true,
+            'configurators' => true,
             'decorated_service' => true,
             'deprecated' => true,
             'factory' => true,

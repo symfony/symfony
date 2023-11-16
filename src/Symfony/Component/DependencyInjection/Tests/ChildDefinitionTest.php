@@ -45,7 +45,7 @@ class ChildDefinitionTest extends TestCase
         return [
             ['class', 'class'],
             ['factory', 'factory'],
-            ['configurator', 'configurator'],
+            ['configurator', 'configurators'],
             ['file', 'file'],
         ];
     }

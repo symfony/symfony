@@ -47,7 +47,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $container
             ->register('e')
-            ->setConfigurator([$ref6 = new Reference('b'), 'methodName'])
+            ->addConfigurator([$ref6 = new Reference('b'), 'methodName'])
         ;
 
         $graph = $this->process($container);

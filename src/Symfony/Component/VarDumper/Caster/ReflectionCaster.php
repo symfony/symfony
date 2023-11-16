@@ -98,7 +98,7 @@ class ReflectionCaster
 
         if ($c instanceof \ReflectionNamedType) {
             $a += [
-                $prefix.'name' => $c instanceof \ReflectionNamedType ? $c->getName() : (string) $c,
+                $prefix.'name' => $c->getName(),
                 $prefix.'allowsNull' => $c->allowsNull(),
                 $prefix.'isBuiltin' => $c->isBuiltin(),
             ];

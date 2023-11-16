@@ -688,7 +688,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars): array
     {
-        if (!\is_array($this->arrayMutatorPrefixes) && 2 !== \count($this->arrayMutatorPrefixes)) {
+        if (2 !== \count($this->arrayMutatorPrefixes)) {
             return [null, null, []];
         }
 

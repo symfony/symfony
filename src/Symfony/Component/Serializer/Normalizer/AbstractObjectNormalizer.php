@@ -300,9 +300,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return null;
         }
 
-        if (!isset($context[self::ENABLE_TYPE_CONVERSION]) && !isset($this->defaultContext[self::ENABLE_TYPE_CONVERSION]) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
-            $context[self::ENABLE_TYPE_CONVERSION] = true;
-        }
+        $context[self::ENABLE_TYPE_CONVERSION] = $context[self::ENABLE_TYPE_CONVERSION] ?? (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format);
 
         $allowedAttributes = $this->getAllowedAttributes($type, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);

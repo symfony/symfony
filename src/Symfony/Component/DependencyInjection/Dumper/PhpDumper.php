@@ -799,27 +799,27 @@ EOF;
                 if ($callable[0] instanceof Reference
                     || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))
                 ) {
-                    $code.= sprintf("        %s->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
+                    $code .= sprintf("        %s->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
                     continue;
                 }
 
                 $class = $this->dumpValue($callable[0]);
                 // If the class is a string we can optimize away
                 if (str_starts_with($class, "'") && !str_contains($class, '$')) {
-                    $code.= sprintf("        %s::%s(\$%s);\n", $this->dumpLiteralClass($class), $callable[1], $variableName);
+                    $code .= sprintf("        %s::%s(\$%s);\n", $this->dumpLiteralClass($class), $callable[1], $variableName);
                     continue;
                 }
 
                 if (str_starts_with($class, 'new ')) {
-                    $code.= sprintf("        (%s)->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
+                    $code .= sprintf("        (%s)->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
                     continue;
                 }
 
-                $code.= sprintf("        [%s, '%s'](\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
+                $code .= sprintf("        [%s, '%s'](\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
                 continue;
             }
 
-            $code.= sprintf("        %s(\$%s);\n", $callable, $variableName);
+            $code .= sprintf("        %s(\$%s);\n", $callable, $variableName);
         }
 
         return $code;
@@ -1922,7 +1922,7 @@ EOF;
             if ($value->getProperties()) {
                 throw new RuntimeException('Cannot dump definitions which have properties.');
             }
-            if (0 !== count($value->getConfigurators())) {
+            if (0 !== \count($value->getConfigurators())) {
                 throw new RuntimeException('Cannot dump definitions which have configurators.');
             }
 

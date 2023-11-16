@@ -557,7 +557,6 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-
         if (isset($service['calls'])) {
             if (!\is_array($service['calls'])) {
                 throw new InvalidArgumentException(sprintf('Parameter "calls" must be an array for service "%s" in "%s". Check your YAML syntax.', $id, $file));

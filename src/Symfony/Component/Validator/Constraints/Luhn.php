@@ -34,7 +34,7 @@ class Luhn extends Constraint
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
     ];
 
-    public $message = 'Invalid card number.';
+    public $message = 'This value is not a valid number for Lohn formula.';
 
     public function __construct(
         array $options = null,

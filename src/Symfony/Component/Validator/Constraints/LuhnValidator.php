@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates a PAN using the LUHN Algorithm.
  *
- * For a list of example card numbers that are used to test this
+ * For a list of example numbers that are used to test this
  * class, please see the LuhnValidatorTest class.
  *
  * @see    http://en.wikipedia.org/wiki/Luhn_algorithm
@@ -31,11 +31,11 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class LuhnValidator extends ConstraintValidator
 {
     /**
-     * Validates a credit card number with the Luhn algorithm.
+     * Validates a number with the Luhn algorithm.
      *
      * @param mixed $value
      *
-     * @throws UnexpectedTypeException when the given credit card number is no string
+     * @throws UnexpectedTypeException when the given number is no string
      */
     public function validate($value, Constraint $constraint)
     {

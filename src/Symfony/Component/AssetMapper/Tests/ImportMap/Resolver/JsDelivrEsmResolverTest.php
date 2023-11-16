@@ -497,11 +497,12 @@ EOF,
     public static function provideImportRegex(): iterable
     {
         yield 'standard import format' => [
-            'import{Color as t}from"/npm/@kurkle/color@0.3.2/+esm";import t from"/npm/jquery@3.7.0/+esm";import e from"/npm/popper.js@1.16.1/+esm";console.log("yo");',
+            'import{Color as t}from"/npm/@kurkle/color@0.3.2/+esm";import t from"/npm/jquery@3.7.0/+esm";import e from"/npm/popper.js@1.16.1/+esm";console.log("yo");import i,{Headers as a}from"/npm/@supabase/node-fetch@2.6.14/+esm";',
             [
                 ['@kurkle/color', '0.3.2'],
                 ['jquery', '3.7.0'],
                 ['popper.js', '1.16.1'],
+                ['@supabase/node-fetch', '2.6.14'],
             ],
         ];
 

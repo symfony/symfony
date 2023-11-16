@@ -699,6 +699,7 @@ class Definition
      */
     public function setConfigurator(string|array|Reference|null $configurator): static
     {
+        trigger_deprecation('symfony/dependency-injection', '7.1', 'Method "%s()" is deprecated, use "%s()" or "%s()" instead.', __METHOD__, 'setConfigurators', 'addConfigurator');
         return $this->setConfigurators([$configurator]);
     }
 
@@ -749,6 +750,7 @@ class Definition
      */
     public function getConfigurator(): string|array|null
     {
+        trigger_deprecation('symfony/dependency-injection', '7.1', 'Method "%s()" is deprecated, use "%s()" instead.', __METHOD__, 'getConfigurators');
         return $this->configurators[0] ?? null;
     }
 

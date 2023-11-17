@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-17T15:06:03Z
+
+Shouldn't we do this on 6.4 instead?
+
+---------------------------------------------------------------------------
+
+by vtsykun at 2023-11-17T15:11:26Z
+
+the PR https://github.com/symfony/symfony/pull/52142 in which this bug was introduced was for 7.0, so I think it’s enough only fixes for 7.0

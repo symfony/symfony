@@ -702,17 +702,17 @@ class Definition
     {
         trigger_deprecation('symfony/dependency-injection', '7.1', 'Method "%s()" is deprecated, use "%s()" or "%s()" instead.', __METHOD__, 'setConfigurators', 'addConfigurator');
 
-        return $this->setConfigurators([$configurator]);
+        return $this->setConfigurators(null === $configurator ? [] : [$configurator]);
     }
 
     /**
      * Add a configurator to the configurator list.
      *
-     * @param string|array|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param string|callable|Reference|array{0:class-string|Reference,1:string} $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
-    public function addConfigurator(string|array|Reference|null $configurator): static
+    public function addConfigurator(string|callable|Reference|array $configurator): static
     {
         $this->changes['configurators'] = true;
 
@@ -732,7 +732,7 @@ class Definition
     /**
      * Sets the configurator list to call after the service is fully initialized.
      *
-     * @param array $configurators A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param list<string|callable|Reference|array{0:class-string|Reference,1:string}> $configurators A list of PHP functions, references or an arrays containing a class/Reference and a method to call
      *
      * @return $this
      */
@@ -761,7 +761,7 @@ class Definition
     /**
      * Gets the configurators list after the service is fully initialized.
      *
-     * @return array<array|callable>
+     * @return list<string|callable|Reference|array{0:class-string|Reference,1:string}>
      */
     public function getConfigurators(): array
     {

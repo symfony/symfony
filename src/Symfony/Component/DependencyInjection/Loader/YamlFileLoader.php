@@ -545,6 +545,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['configurator'])) {
+            trigger_deprecation('symfony/dependency-injection', '7.1', 'Using the "configurator" key to configure the "%s" service is deprecated, use the "configurators" key instead.', $id);
             $definition->addConfigurator($this->parseCallable($service['configurator'], 'configurator', $id, $file));
         }
 

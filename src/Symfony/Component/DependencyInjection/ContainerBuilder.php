@@ -1156,7 +1156,18 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 }
 
                 if (!\is_callable($callable)) {
-                    throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', get_debug_type($service)));
+                    if (\is_object($callable)) {
+                        $stringConfigurator = \get_class($callable);
+                    } elseif (\is_array($callable)) {
+                        if (\is_object($callable[0]))
+                        {
+                            $callable[0] = \get_class($callable[0]);
+                        }
+                        $stringConfigurator = implode('::', array_splice($callable, 0, 2));
+                    } else {
+                        $stringConfigurator = $callable;
+                    }
+                    throw new InvalidArgumentException(sprintf('The configure callable "%s" for class "%s" is not a callable.', $stringConfigurator, get_debug_type($service)));
                 }
 
                 $callable($service);

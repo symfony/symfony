@@ -29,7 +29,11 @@ class Autoconfigure
         public ?bool $autowire = null,
         public ?array $properties = null,
         public array|string|null $configurator = null,
+        public array $configurators = [],
         public ?string $constructor = null,
     ) {
+        if(!is_null($this->configurator)) {
+            trigger_deprecation('symfony/dependency-injection', '7.1', 'The "configurator" option of #[Autoconfigure] is deprecated, use the "configurators" option instead.');
+        }
     }
 }

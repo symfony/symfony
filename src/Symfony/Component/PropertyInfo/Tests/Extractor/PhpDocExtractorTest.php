@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
+use phpDocumentor\Reflection\DocBlock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
@@ -38,9 +39,22 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtract($property, ?array $type, $shortDescription, $longDescription)
     {
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
-        $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
-        $this->assertSame($longDescription, $this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
+        $this->assertEquals($type, $this->extractor->getTypes(Dummy::class, $property));
+        $this->assertSame($shortDescription, $this->extractor->getShortDescription(Dummy::class, $property));
+        $this->assertSame($longDescription, $this->extractor->getLongDescription(Dummy::class, $property));
+    }
+
+    public function testGetDocBlock()
+    {
+        $docBlock = $this->extractor->getDocBlock(Dummy::class, 'g');
+        $this->assertInstanceOf(DocBlock::class, $docBlock);
+        $this->assertSame('Nullable array.', $docBlock->getSummary());
+
+        $docBlock = $this->extractor->getDocBlock(Dummy::class, 'noDocBlock;');
+        $this->assertNull($docBlock);
+
+        $docBlock = $this->extractor->getDocBlock(Dummy::class, 'notAvailable');
+        $this->assertNull($docBlock);
     }
 
     public function testParamTagTypeIsOmitted()
@@ -75,7 +89,7 @@ class PhpDocExtractorTest extends TestCase
     {
         $noPrefixExtractor = new PhpDocExtractor(null, [], [], []);
 
-        $this->assertEquals($type, $noPrefixExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
+        $this->assertEquals($type, $noPrefixExtractor->getTypes(Dummy::class, $property));
     }
 
     public static function typesProvider()
@@ -197,7 +211,7 @@ class PhpDocExtractorTest extends TestCase
     {
         $customExtractor = new PhpDocExtractor(null, ['add', 'remove'], ['is', 'can']);
 
-        $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
+        $this->assertEquals($type, $customExtractor->getTypes(Dummy::class, $property));
     }
 
     public static function typesWithCustomPrefixesProvider()

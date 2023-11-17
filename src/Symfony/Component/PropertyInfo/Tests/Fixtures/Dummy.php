@@ -155,6 +155,8 @@ class Dummy extends ParentDummy
      */
     public $arrayOfMixed;
 
+    public $noDocBlock;
+
     /**
      * @var list<string>
      */

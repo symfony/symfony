@@ -18,6 +18,7 @@ use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\Context;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyDocBlockExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
@@ -29,7 +30,7 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
  *
  * @final
  */
-class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, ConstructorArgumentTypeExtractorInterface
+class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, ConstructorArgumentTypeExtractorInterface, PropertyDocBlockExtractorInterface
 {
     public const PROPERTY = 0;
     public const ACCESSOR = 1;
@@ -74,7 +75,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
-        [$docBlock] = $this->getDocBlock($class, $property);
+        [$docBlock] = $this->findDocBlock($class, $property);
         if (!$docBlock) {
             return null;
         }
@@ -101,7 +102,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
-        [$docBlock] = $this->getDocBlock($class, $property);
+        [$docBlock] = $this->findDocBlock($class, $property);
         if (!$docBlock) {
             return null;
         }
@@ -114,7 +115,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         /** @var $docBlock DocBlock */
-        [$docBlock, $source, $prefix] = $this->getDocBlock($class, $property);
+        [$docBlock, $source, $prefix] = $this->findDocBlock($class, $property);
         if (!$docBlock) {
             return null;
         }
@@ -187,6 +188,13 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return array_merge([], ...$types);
     }
 
+    public function getDocBlock(string $class, string $property): ?DocBlock
+    {
+        $output = $this->findDocBlock($class, $property);
+
+        return $output[0];
+    }
+
     private function getDocBlockFromConstructor(string $class, string $property): ?DocBlock
     {
         try {
@@ -219,7 +227,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     /**
      * @return array{DocBlock|null, int|null, string|null}
      */
-    private function getDocBlock(string $class, string $property): array
+    private function findDocBlock(string $class, string $property): array
     {
         $propertyHash = sprintf('%s::%s', $class, $property);
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Introduce `PropertyDocBlockExtractorInterface` to extract a property's doc block
+
 6.4
 ---
 

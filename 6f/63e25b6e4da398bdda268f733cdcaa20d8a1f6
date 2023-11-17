@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-15T08:56:27Z
+
+I'm trying to understand what you mean here, I'm not deep enough into the topic :grimacing:
+
+Does you description also apply when there is no cache defined?
+
+How about this patch instead?
+
+```patch
+--- a/src/Symfony/Component/Scheduler/Generator/Checkpoint.php
++++ b/src/Symfony/Component/Scheduler/Generator/Checkpoint.php
+@@ -37,14 +37,12 @@ final class Checkpoint implements CheckpointInterface
+             return false;
+         }
+
+-        if ($this->reset) {
+-            $this->reset = false;
+-            $this->save($now, -1);
+-        }
+-
+         if ($this->cache) {
+             [$this->time, $this->index, $this->from] = $this->cache->get($this->name, fn () => [$now, -1, $now]) + [2 => $now];
+             $this->save($this->time, $this->index);
++        } elseif ($this->reset) {
++            $this->reset = false;
++            $this->save($now, -1);
+         }
+```
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-11-16T12:38:45Z
+
+> Does you description also apply when there is no cache defined?
+
+That's an interesting case. I think that may indeed be the thought behind this reset.
+Because if you have two processes running without shared cache, apparently you do not want them to continue from exactly the last saved time. So maybe to prevent re-processing a certain time frame in a second worker when it has acquired a lock after another worker, it gets reset.
+
+But, if they do have a shared cache, I think worker two can continue where worker one left off. As I'd say that is the purpose of the cache.
+
+> How about this patch instead?
+
+With the above reasoning, that patch does indeed work. I've added a test to specifically test a second checkpoint acquiring the lock after the first and test that it continues from the saved time.

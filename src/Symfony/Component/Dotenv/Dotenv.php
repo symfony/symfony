@@ -100,6 +100,8 @@ final class Dotenv
      */
     public function loadEnv(string $path, string $envKey = null, string $defaultEnv = 'dev', array $testEnvs = ['test'], bool $overrideExistingVars = false): void
     {
+        $this->populatePath($path);
+
         $k = $envKey ?? $this->envKey;
 
         if (is_file($path) || !is_file($p = "$path.dist")) {
@@ -144,6 +146,7 @@ final class Dotenv
         $k = $this->envKey;
 
         if (\is_array($env) && ($overrideExistingVars || !isset($env[$k]) || ($_SERVER[$k] ?? $_ENV[$k] ?? $env[$k]) === $env[$k])) {
+            $this->populatePath($path);
             $this->populate($env, $overrideExistingVars);
         } else {
             $this->loadEnv($path, $k, $defaultEnv, $testEnvs, $overrideExistingVars);
@@ -554,6 +557,15 @@ final class Dotenv
             }
 
             $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
+        }
+    }
+
+    private function populatePath(string $path): void
+    {
+        $_ENV['SYMFONY_DOTENV_PATH'] = $_SERVER['SYMFONY_DOTENV_PATH'] = $path;
+
+        if ($this->usePutenv) {
+            putenv('SYMFONY_DOTENV_PATH='.$path);
         }
     }
 }

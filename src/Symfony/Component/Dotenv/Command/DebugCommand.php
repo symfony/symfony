@@ -70,21 +70,23 @@ EOT
             return 1;
         }
 
-        $envFiles = $this->getEnvFiles();
-        $availableFiles = array_filter($envFiles, fn (string $file) => is_file($this->getFilePath($file)));
+        $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
 
-        if (\in_array('.env.local.php', $availableFiles, true)) {
-            $io->warning('Due to existing dump file (.env.local.php) all other dotenv files are skipped.');
+        $envFiles = $this->getEnvFiles($filePath);
+        $availableFiles = array_filter($envFiles, fn (string $file) => is_file($file));
+
+        if (\in_array(sprintf('%s.local.php', $filePath), $availableFiles, true)) {
+            $io->warning(sprintf('Due to existing dump file (%s.local.php) all other dotenv files are skipped.', $this->getRelativeName($filePath)));
         }
 
-        if (is_file($this->getFilePath('.env')) && is_file($this->getFilePath('.env.dist'))) {
-            $io->warning('The file .env.dist gets skipped due to the existence of .env.');
+        if (is_file($filePath) && is_file(sprintf('%s.dist', $filePath))) {
+            $io->warning(sprintf('The file %s.dist gets skipped due to the existence of %1$s.', $this->getRelativeName($filePath)));
         }
 
         $io->section('Scanned Files (in descending priority)');
-        $io->listing(array_map(static fn (string $envFile) => \in_array($envFile, $availableFiles, true)
-            ? sprintf('<fg=green>✓</> %s', $envFile)
-            : sprintf('<fg=red>⨯</> %s', $envFile), $envFiles));
+        $io->listing(array_map(fn (string $envFile) => \in_array($envFile, $availableFiles, true)
+            ? sprintf('<fg=green>✓</> %s', $this->getRelativeName($envFile))
+            : sprintf('<fg=red>⨯</> %s', $this->getRelativeName($envFile)), $envFiles));
 
         $nameFilter = $input->getArgument('filter');
         $variables = $this->getVariables($availableFiles, $nameFilter);
@@ -93,7 +95,7 @@ EOT
 
         if ($variables || null === $nameFilter) {
             $io->table(
-                array_merge(['Variable', 'Value'], $availableFiles),
+                array_merge(['Variable', 'Value'], array_map($this->getRelativeName(...), $availableFiles)),
                 $this->getVariables($availableFiles, $nameFilter)
             );
 
@@ -147,36 +149,38 @@ EOT
         return $vars;
     }
 
-    private function getEnvFiles(): array
+    private function getEnvFiles(string $filePath): array
     {
         $files = [
-            '.env.local.php',
-            sprintf('.env.%s.local', $this->kernelEnvironment),
-            sprintf('.env.%s', $this->kernelEnvironment),
+            sprintf('%s.local.php', $filePath),
+            sprintf('%s.%s.local', $filePath, $this->kernelEnvironment),
+            sprintf('%s.%s', $filePath, $this->kernelEnvironment),
         ];
 
         if ('test' !== $this->kernelEnvironment) {
-            $files[] = '.env.local';
+            $files[] = sprintf('%s.local', $filePath);
         }
 
-        if (!is_file($this->getFilePath('.env')) && is_file($this->getFilePath('.env.dist'))) {
-            $files[] = '.env.dist';
+        if (!is_file($filePath) && is_file(sprintf('%s.dist', $filePath))) {
+            $files[] = sprintf('%s.dist', $filePath);
         } else {
-            $files[] = '.env';
+            $files[] = $filePath;
         }
 
         return $files;
     }
 
-    private function getFilePath(string $file): string
+    private function getRelativeName(string $filePath): string
     {
-        return $this->projectDirectory.\DIRECTORY_SEPARATOR.$file;
+        if (str_starts_with($filePath, $this->projectDirectory)) {
+            return substr($filePath, \strlen($this->projectDirectory) + 1);
+        }
+
+        return basename($filePath);
     }
 
-    private function loadValues(string $file): array
+    private function loadValues(string $filePath): array
     {
-        $filePath = $this->getFilePath($file);
-
         if (str_ends_with($filePath, '.php')) {
             return include $filePath;
         }

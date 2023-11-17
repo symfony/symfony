@@ -63,7 +63,7 @@ class AbstractExtensionTest extends TestCase
                 $container->extension('third', ['foo' => 'append']);
 
                 // prepend config
-                $builder->prependExtensionConfig('third', ['foo' => 'prepend']);
+                $container->extension('third', ['foo' => 'prepend'], true);
             }
         };
 

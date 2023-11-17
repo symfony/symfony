@@ -85,9 +85,7 @@ class UriResolverTest extends TestCase
             ['foo', 'http://localhost?bar=1', 'http://localhost/foo'],
             ['foo', 'http://localhost#bar', 'http://localhost/foo'],
 
-            ['foo:1', 'http://localhost', 'http://localhost/foo:1'],
-            ['/bar:1', 'http://localhost', 'http://localhost/bar:1'],
-            ['foo/bar:1', 'http://localhost', 'http://localhost/foo/bar:1'],
+            ['http://', 'http://localhost', 'http://'],
         ];
     }
 }

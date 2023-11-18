@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-21T02:36:10Z
+
+Re-copying this there in case we need it in a following PR or to write doc :
+
+--> official [ICU list of special casings](https://github.com/unicode-org/icu/blob/main/icu4c/source/data/unidata/SpecialCasing.txt)

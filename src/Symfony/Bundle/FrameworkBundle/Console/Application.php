@@ -108,6 +108,12 @@ class Application extends BaseApplication
                 }
 
                 (new SymfonyStyle($input, $output))->warning('The "--profile" option needs the Stopwatch component. Try running "composer require symfony/stopwatch".');
+            } elseif (!$container->has('.virtual_request_stack')) {
+                if ($output instanceof ConsoleOutputInterface) {
+                    $output = $output->getErrorOutput();
+                }
+
+                (new SymfonyStyle($input, $output))->warning('The "--profile" option needs the profiler integration. Try enabling the "framework.profiler" option.');
             } else {
                 $command = new TraceableCommand($command, $container->get('debug.stopwatch'));
 

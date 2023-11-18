@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-07-19T12:08:36Z
+
+IIRC we overrode the tests in other cases. But we should add a comment that the overridden methods can be removed in the `7.0` branch.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-07-19T17:02:09Z
+
+Thanks @xabbuh, hope I did it correctly
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-11-07T15:00:03Z
+
+Is it still time to merge this in 6.4 or will I have to rebase on 7.1 when the branch will be created?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-07T16:27:32Z
+
+we should have a test ensuring that passing `null` explicitly (to not have any default protocol) works without triggering a deprecation. Otherwise it will make it impossible to have that behavior (which is the wanted one when you want an `<input type="url">`) without triggering a deprecation.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-11-07T16:41:04Z
+
+@stof thanks for the review :pray:
+
+Do you know how I can test whether a given code does not trigger a deprecation?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-07T16:53:04Z
+
+@MatTheCat Don't put the `@group legacy` on the test, and the phpunit bridge will already make the test fail if it triggers a deprecation.
+But looking at the test file in full (not visible in the diff of the PR), we already have some tests passing `null` explicitly so this will be fine.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-07T16:53:13Z
+
+You should add a test that runs into the situation, and if it triggers a deprecation, the CI will fail.

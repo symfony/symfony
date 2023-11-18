@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-11-10T09:19:55Z
+
+It's also used in `symfony/demo`. https://github.com/symfony/demo/blob/206f0c9aab07cdc9f7437640b12947d35e9d5e72/templates/debug/source_code.html.twig#L33-L34
+It will break if the demo is run with `env=prod`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-10T09:25:41Z
+
+Demo needs to adjust, we don't want to support such use cases.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-11-10T10:05:38Z
+
+If we don't want users to use this functions/filters, should we remove them from the [twig reference](https://symfony.com/doc/current/reference/twig_reference.html)?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-11-10T10:17:26Z
+
+> If we don't want users to use this functions/filters, should we remove them from the [twig reference](https://symfony.com/doc/current/reference/twig_reference.html)?
+
+Or add a warning that those are only available for web profiler.
+
+Is it a possible and good idea to register the extension conditionally in the profiler controller?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-10T11:24:46Z
+
+We cannot register extensions conditionally. Twig does allow registering new extensions after initialization is done, so this would be very fragile (and would break if your kernel handles multiple requests without a full shutdown for instance). It would also break the twig linting as it would complain about those functions not being available.
+
+For the documentation, it would make sense to document that those functions are defined by WebProfilerBundle and not by TwigBundle. But I would not remove them entirely. Bundles providing custom profiler panels can legitimately use them.

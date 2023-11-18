@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-11-09T23:50:28Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by paullallier at 2023-11-09T23:58:20Z
+
+There's a coding standards failure in code I didn't really change - at least not in a way that changes the style.  I'm happy to add the changes anyway, if appropriate?
+
+(The coding standard patch seems to use the str_contains function, which I think was new in PHP 8, so I assume we don't really want that in Symfony 5.4?)
+
+---------------------------------------------------------------------------
+
+by paullallier at 2023-11-10T21:27:03Z
+
+Looking at this again, history -> histories is probably valid (though there are situations where history is also a valid plural).
+
+Health is trickier.  There are a few places that suggest things like this:
+<img width="307" alt="Screenshot 2023-11-10 at 21 21 12" src="https://github.com/symfony/symfony/assets/42591123/488e6380-e913-46b8-bfd2-bca116a1d5ac">
+But, as a native (British) English speaker I can't think of a case where I'd use healths rather than health for the plural.   doctrine/inflector 2.0.8 does also offer healths though...
+
+So possibly we just conclude that English is an inconsistent mess.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-10T21:51:04Z
+
+regarding `health`, maybe we should offer both plural candidates
+
+---------------------------------------------------------------------------
+
+by paullallier at 2023-11-10T22:18:03Z
+
+> regarding `health`, maybe we should offer both plural candidates
+
+Perhaps yes, but I think it's mostly going to sounds strange with the s.  In fact, I think there's an argument to be made that nouns ending "LTH" are almost always uncountable.  Though I haven't even heard of some of these...
+https://word.tips/words-end-in/lth/

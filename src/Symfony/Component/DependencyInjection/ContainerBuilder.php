@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -130,6 +131,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var array<string, callable>
      */
     private array $autoconfiguredAttributes = [];
+
+    /**
+     * @var array<class-string>
+     */
+    private array $exclusionAttributes = [Exclude::class];
 
     /**
      * @var array<string, bool>
@@ -1342,6 +1348,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Registers an attribute that will be used for excluding all services from classes it is declared on.
+     *
+     * @param class-string $attributeClass
+     */
+    public function registerAttributeForExclusion(string $attributeClass): void
+    {
+        if (\in_array($attributeClass, $this->exclusionAttributes)) {
+            return;
+        }
+
+        $this->exclusionAttributes[] = $attributeClass;
+    }
+
+    /**
      * Registers an autowiring alias that only binds to a specific argument name.
      *
      * The argument name is derived from $name if provided (from $id otherwise)
@@ -1384,6 +1404,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getAutoconfiguredAttributes(): array
     {
         return $this->autoconfiguredAttributes;
+    }
+
+    /**
+     * @return array<class-string>
+     */
+    public function getExclusionAttributes(): array
+    {
+        return $this->exclusionAttributes;
     }
 
     /**

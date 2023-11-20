@@ -21,8 +21,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @Target({"PROPERTY", "METHOD"})
  *
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
- *
- * @final since Symfony 6.4
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 class SerializedName

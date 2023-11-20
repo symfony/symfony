@@ -11,6 +11,14 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
                 'night',
             ],
         ],
+        'Symfony\\Component\\VarExporter\\Tests\\GoodNight' => [
+            'foo' => [
+                'afternoon',
+            ],
+            'bar' => [
+                'morning',
+            ],
+        ],
     ],
     $o[0],
     []

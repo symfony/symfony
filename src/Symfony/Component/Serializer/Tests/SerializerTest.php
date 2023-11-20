@@ -884,7 +884,8 @@ class SerializerTest extends TestCase
             ],
             "php74FullWithConstructor": {},
             "php74FullWithTypedConstructor": {
-                "something": "not a float"
+                "something": "not a float",
+                "somethingElse": "not a bool"
             },
             "dummyMessage": {
             },
@@ -1045,6 +1046,24 @@ class SerializerTest extends TestCase
                 'path' => 'php74FullWithTypedConstructor.something',
                 'useMessageForUser' => false,
                 'message' => 'The type of the "something" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74FullWithTypedConstructor" must be one of "float" ("string" given).',
+            ],
+            [
+                'currentType' => 'string',
+                'expectedTypes' => [
+                    'float',
+                ],
+                'path' => 'php74FullWithTypedConstructor.something',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "something" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74FullWithTypedConstructor" must be one of "float" ("string" given).',
+            ],
+            [
+                'currentType' => 'string',
+                'expectedTypes' => [
+                    'bool',
+                ],
+                'path' => 'php74FullWithTypedConstructor.somethingElse',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "somethingElse" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74FullWithTypedConstructor" must be one of "bool" ("string" given).',
             ],
             $classMetadataFactory ?
                 [

@@ -119,6 +119,21 @@ class DateIntervalNormalizerTest extends TestCase
         $this->assertDateIntervalEquals($this->getInterval('P0Y0M0DT12H34M0S'), $normalizer->denormalize('PT12H34M', \DateInterval::class));
     }
 
+    /**
+     * Since PHP 8.0 DateInterval::construct supports periods containing both D and W period designators.
+     *
+     * @requires PHP 8
+     */
+    public function testDenormalizeIntervalWithBothWeeksAndDays()
+    {
+        $input = 'P1W1D';
+        $interval = $this->normalizer->denormalize($input, \DateInterval::class, null, [
+            DateIntervalNormalizer::FORMAT_KEY => '%rP%yY%mM%wW%dDT%hH%iM%sS',
+        ]);
+        $this->assertDateIntervalEquals($this->getInterval($input), $interval);
+        $this->assertSame(8, $interval->d);
+    }
+
     public function testDenormalizeExpectsString()
     {
         $this->expectException(NotNormalizableValueException::class);

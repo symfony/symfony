@@ -15,8 +15,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS)]
 class Groups

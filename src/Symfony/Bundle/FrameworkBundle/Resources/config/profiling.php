@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\EventListener\ConsoleProfilerListener;
+use Symfony\Component\HttpKernel\Debug\VirtualRequestStack;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -45,5 +46,9 @@ return static function (ContainerConfigurator $container) {
                 service('router'),
             ])
             ->tag('kernel.event_subscriber')
+
+        ->set('.virtual_request_stack', VirtualRequestStack::class)
+            ->args([service('request_stack')])
+            ->public()
     ;
 };

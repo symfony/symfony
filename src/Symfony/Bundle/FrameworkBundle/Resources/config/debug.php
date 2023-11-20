@@ -15,7 +15,6 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedController
 use Symfony\Component\HttpKernel\Controller\TraceableArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\TraceableControllerResolver;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
-use Symfony\Component\HttpKernel\Debug\VirtualRequestStack;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -47,9 +46,5 @@ return static function (ContainerConfigurator $container) {
         ->set('argument_resolver.not_tagged_controller', NotTaggedControllerValueResolver::class)
             ->args([abstract_arg('Controller argument, set in FrameworkExtension')])
             ->tag('controller.argument_value_resolver', ['priority' => -200])
-
-        ->set('.virtual_request_stack', VirtualRequestStack::class)
-            ->args([service('request_stack')])
-            ->public()
     ;
 };

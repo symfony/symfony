@@ -24,6 +24,8 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
 /**
+ * @requires extension pdo_sqlite
+ *
  * @group time-sensitive
  */
 class DoctrineDbalAdapterTest extends AdapterTestCase
@@ -32,10 +34,6 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!\extension_loaded('pdo_sqlite')) {
-            self::markTestSkipped('Extension pdo_sqlite required.');
-        }
-
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
     }
 
@@ -107,13 +105,12 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @dataProvider provideDsn
+     * @dataProvider provideDsnWithSQLite
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, string $file = null)
     {
         try {
             $pool = new DoctrineDbalAdapter($dsn);
-            $pool->createTable();
 
             $item = $pool->getItem('key');
             $item->set('value');
@@ -125,12 +122,35 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         }
     }
 
-    public static function provideDsn(): \Generator
+    public static function provideDsnWithSQLite()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
-        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
-        yield ['sqlite://localhost/:memory:'];
+        yield 'SQLite file' => ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
+        yield 'SQLite3 file' => ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
+        yield 'SQLite in memory' => ['sqlite://localhost/:memory:'];
+    }
+
+    /**
+     * @requires extension pdo_pgsql
+     *
+     * @group integration
+     */
+    public function testDsnWithPostgreSQL()
+    {
+        if (!$host = getenv('POSTGRES_HOST')) {
+            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+        }
+
+        try {
+            $pool = new DoctrineDbalAdapter('pgsql://postgres:password@'.$host);
+
+            $item = $pool->getItem('key');
+            $item->set('value');
+            $this->assertTrue($pool->save($item));
+        } finally {
+            $pdo = new \PDO('pgsql:host='.$host.';user=postgres;password=password');
+            $pdo->exec('DROP TABLE IF EXISTS cache_items');
+        }
     }
 
     protected function isPruned(DoctrineDbalAdapter $cache, string $name): bool

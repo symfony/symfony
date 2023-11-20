@@ -329,17 +329,21 @@ class MyArrayObject extends \ArrayObject
 class GoodNight
 {
     public $good;
+    protected $foo;
+    private $bar;
 
     public function __construct()
     {
         unset($this->good);
+        $this->foo = 'afternoon';
+        $this->bar = 'morning';
     }
 
     public function __sleep(): array
     {
         $this->good = 'night';
 
-        return ['good'];
+        return ['good', 'foo', "\0*\0foo", "\0".__CLASS__."\0bar"];
     }
 }
 

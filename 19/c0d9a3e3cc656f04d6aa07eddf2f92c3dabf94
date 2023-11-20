@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-20T07:53:39Z
+
+Apparently we made a mistake : the serializer attributes should not be final. We test them using `is_a`, which accounts for child classes:
+
+https://github.com/symfony/symfony/blob/80db69194176c1b0049b42ab9229484f1b139761/src/Symfony/Component/Serializer/Mapping/Loader/AttributeLoader.php#L254-L263
+
+Can you please update the PR accordingly?

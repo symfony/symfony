@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add argument `$prepend` to `ContainerConfigurator::extension()` to prepend the configuration instead of appending it
+
 7.0
 ---
 

@@ -1,0 +1,128 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-10-22T20:18:43Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-10-22T20:18:44Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "5.4" but it seems your PR description refers to branch "6.4 for features / 5.4 or 6.3 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by shubhalgupta at 2023-10-22T20:20:55Z
+
+@carsonbot now please review!
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-10-23T15:03:45Z
+
+Hey.
+
+Thank you for this PR. Are you a native Czech speaker?
+I tried my best to verify this with Google translate and it looks okey.
+
+Do you know a native that could verify this?
+
+---------------------------------------------------------------------------
+
+by shubhalgupta at 2023-10-23T15:05:40Z
+
+Yes, I am a native speaker!
+
+---------------------------------------------------------------------------
+
+by shubhalgupta at 2023-10-23T15:06:28Z
+
+@Nyholm please do merge this!
+
+---------------------------------------------------------------------------
+
+by shubhalgupta at 2023-10-23T15:09:58Z
+
+@Nyholm who is the second maintainer?
+
+---------------------------------------------------------------------------
+
+by shubhalgupta at 2023-10-23T15:10:09Z
+
+And thanks for your approval @Nyholm
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-10-23T15:11:55Z
+
+> @Nyholm who is the second maintainer?
+
+There are a few of us. See https://symfony.com/doc/current/contributing/code/core_team.html
+Im sure someone will look at this in the next 2-3 days.
+
+---------------------------------------------------------------------------
+
+by shubhalgupta at 2023-10-23T15:17:41Z
+
+@fabpot, @nicolas-grekas  kindly review this!
+
+---------------------------------------------------------------------------
+
+by shubhalgupta at 2023-10-23T15:20:18Z
+
+@stof can you merge this, please!
+
+---------------------------------------------------------------------------
+
+by shubhalgupta at 2023-10-24T03:59:40Z
+
+@Nyholm can you please get it merged?
+
+---------------------------------------------------------------------------
+
+by shubhalgupta at 2023-10-24T14:38:38Z
+
+@OskarStark now kindly check!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-24T14:51:11Z
+
+I have asked a Czech colleague to review the changes
+
+---------------------------------------------------------------------------
+
+by jan-simbera at 2023-10-24T18:25:44Z
+
+Hi, i have corrected the pluralization as i forgot it is also different for
+1. So we have 1 - znak, 2,3,4 - znaky and 5+ znaků.
+
+Sorry, missed thats special case in the first part.

@@ -4,7 +4,7 @@ CHANGELOG
 7.1
 ---
 
-* Deprecate not configuring the `default_protocol` option of the `UrlType`, it will default to `null` in 8.0
+ * Deprecate not configuring the `default_protocol` option of the `UrlType`, it will default to `null` in 8.0
 
 7.0
 ---

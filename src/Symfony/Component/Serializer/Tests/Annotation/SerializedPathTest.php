@@ -13,7 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Serializer\Annotation\SerializedPath;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
@@ -24,7 +24,7 @@ class SerializedPathTest extends TestCase
     public function testEmptyStringSerializedPathParameter()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedPath" must be a valid property path.');
+        $this->expectExceptionMessage('Parameter given to "Symfony\Component\Serializer\Attribute\SerializedPath" must be a valid property path.');
 
         new SerializedPath('');
     }

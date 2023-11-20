@@ -22,10 +22,7 @@ class MissingOptionsException extends ValidatorException
         $this->options = $options;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

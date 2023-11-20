@@ -171,11 +171,9 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
 
     private static function getDbalConnection(string $dsn): Connection
     {
-        $params = class_exists(DsnParser::class) ? (new DsnParser(['sqlite' => 'pdo_sqlite']))->parse($dsn) : ['url' => $dsn];
+        $params = (new DsnParser(['sqlite' => 'pdo_sqlite']))->parse($dsn);
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         return DriverManager::getConnection($params, $config);
     }

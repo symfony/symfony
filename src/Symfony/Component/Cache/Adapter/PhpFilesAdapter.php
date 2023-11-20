@@ -54,14 +54,11 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         };
     }
 
-    /**
-     * @return bool
-     */
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
 
-        return \function_exists('opcache_invalidate') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL) && (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) || filter_var(\ini_get('opcache.enable_cli'), \FILTER_VALIDATE_BOOL));
+        return \function_exists('opcache_invalidate') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL) && (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) || filter_var(\ini_get('opcache.enable_cli'), \FILTER_VALIDATE_BOOL));
     }
 
     public function prune(): bool
@@ -277,10 +274,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $this->doCommonDelete($ids);
     }
 
-    /**
-     * @return bool
-     */
-    protected function doUnlink(string $file)
+    protected function doUnlink(string $file): bool
     {
         unset(self::$valuesCache[$file]);
 

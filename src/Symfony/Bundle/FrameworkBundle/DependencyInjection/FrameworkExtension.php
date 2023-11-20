@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
-use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -33,8 +32,6 @@ use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -52,9 +49,10 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\DataCollector\CommandDataCollector;
+use Symfony\Component\Console\Debug\CliRequest;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -93,7 +91,6 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -109,9 +106,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge as MessengerBridge;
-use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalsListener;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
@@ -144,7 +139,8 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\RemoteEvent;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
+use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Security\Core\AuthenticationEvents;
@@ -156,7 +152,7 @@ use Symfony\Component\Semaphore\SemaphoreFactory;
 use Symfony\Component\Semaphore\Store\StoreFactory as SemaphoreStoreFactory;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -175,10 +171,10 @@ use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\GroupProviderInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
@@ -205,16 +201,14 @@ class FrameworkExtension extends Extension
     /**
      * Responds to the app.config configuration parameter.
      *
-     * @return void
-     *
      * @throws LogicException
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 
         if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('symfony/symfony') && 'symfony/symfony' !== (InstalledVersions::getRootPackage()['name'] ?? '')) {
-            trigger_deprecation('symfony/symfony', '6.1', 'Requiring the "symfony/symfony" package is deprecated; replace it with standalone components instead.');
+            throw new \LogicException('Requiring the "symfony/symfony" package is unsupported; replace it with standalone components instead.');
         }
 
         $loader->load('web.php');
@@ -263,7 +257,6 @@ class FrameworkExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         // warmup config enabled
-        $this->readConfigEnabled('annotations', $container, $config['annotations']);
         $this->readConfigEnabled('translator', $container, $config['translator']);
         $this->readConfigEnabled('property_access', $container, $config['property_access']);
         $this->readConfigEnabled('profiler', $container, $config['profiler']);
@@ -372,7 +365,6 @@ class FrameworkExtension extends Extension
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
-        $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
 
@@ -573,14 +565,6 @@ class FrameworkExtension extends Extension
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
         }
 
-        $this->addAnnotatedClassesToCompile([
-            '**\\Controller\\',
-            '**\\Entity\\',
-
-            // Added explicitly so that we don't rely on the class map being dumped to make it work
-            AbstractController::class,
-        ]);
-
         if (ContainerBuilder::willBeAvailable('symfony/mime', MimeTypes::class, ['symfony/framework-bundle'])) {
             $loader->load('mime_type.php');
         }
@@ -603,8 +587,6 @@ class FrameworkExtension extends Extension
             ->addTag('container.service_locator');
         $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
             ->addTag('container.service_subscriber');
-        $container->registerForAutoconfiguration(ArgumentValueResolverInterface::class)
-            ->addTag('controller.argument_value_resolver');
         $container->registerForAutoconfiguration(ValueResolverInterface::class)
             ->addTag('controller.argument_value_resolver');
         $container->registerForAutoconfiguration(AbstractController::class)
@@ -655,10 +637,10 @@ class FrameworkExtension extends Extension
             ->addTag('serializer.normalizer');
         $container->registerForAutoconfiguration(ConstraintValidatorInterface::class)
             ->addTag('validator.constraint_validator');
+        $container->registerForAutoconfiguration(GroupProviderInterface::class)
+            ->addTag('validator.group_provider');
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
-        $container->registerForAutoconfiguration(MessageHandlerInterface::class)
-            ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(BatchHandlerInterface::class)
             ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(MessengerTransportFactoryInterface::class)
@@ -702,6 +684,26 @@ class FrameworkExtension extends Extension
         $container->registerAttributeForAutoconfiguration(AsSchedule::class, static function (ChildDefinition $definition, AsSchedule $attribute): void {
             $definition->addTag('scheduler.schedule_provider', ['name' => $attribute->name]);
         });
+        foreach ([AsPeriodicTask::class, AsCronTask::class] as $taskAttributeClass) {
+            $container->registerAttributeForAutoconfiguration(
+                $taskAttributeClass,
+                static function (ChildDefinition $definition, AsPeriodicTask|AsCronTask $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+                    $tagAttributes = get_object_vars($attribute) + [
+                        'trigger' => match ($attribute::class) {
+                            AsPeriodicTask::class => 'every',
+                            AsCronTask::class => 'cron',
+                        },
+                    ];
+                    if ($reflector instanceof \ReflectionMethod) {
+                        if (isset($tagAttributes['method'])) {
+                            throw new LogicException(sprintf('"%s" attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
+                        }
+                        $tagAttributes['method'] = $reflector->getName();
+                    }
+                    $definition->addTag('scheduler.task', $tagAttributes);
+                }
+            );
+        }
 
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers
@@ -716,7 +718,6 @@ class FrameworkExtension extends Extension
             ->addTag('routing.route_loader');
 
         $container->setParameter('container.behavior_describing_tags', [
-            'annotations.cached_reader',
             'container.do_not_inline',
             'container.service_locator',
             'container.service_subscriber',
@@ -892,6 +893,14 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('profiler_listener')
             ->addArgument($config['collect_parameter']);
+
+        if (!$container->getParameter('kernel.debug') || !class_exists(CliRequest::class) || !$container->has('debug.stopwatch')) {
+            $container->removeDefinition('console_profiler_listener');
+        }
+
+        if (!class_exists(CommandDataCollector::class)) {
+            $container->removeDefinition('.data_collector.command');
+        }
     }
 
     private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
@@ -908,7 +917,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('workflow.php');
 
-        $registryDefinition = $container->getDefinition('.workflow.registry');
+        $registryDefinition = $container->getDefinition('workflow.registry');
 
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
@@ -1114,14 +1123,15 @@ class FrameworkExtension extends Extension
     {
         $loader->load('debug_prod.php');
 
+        $debug = $container->getParameter('kernel.debug');
+
         if (class_exists(Stopwatch::class)) {
             $container->register('debug.stopwatch', Stopwatch::class)
                 ->addArgument(true)
+                ->setPublic($debug)
                 ->addTag('kernel.reset', ['method' => 'reset']);
             $container->setAlias(Stopwatch::class, new Alias('debug.stopwatch', false));
         }
-
-        $debug = $container->getParameter('kernel.debug');
 
         if ($debug && !$container->hasParameter('debug.container.dump')) {
             $container->setParameter('debug.container.dump', '%kernel.build_dir%/%kernel.container_class%.xml');
@@ -1145,12 +1155,12 @@ class FrameworkExtension extends Extension
 
         if ($debug && class_exists(DebugProcessor::class)) {
             $definition = new Definition(DebugProcessor::class);
-            $definition->addArgument(new Reference('request_stack'));
+            $definition->addArgument(new Reference('.virtual_request_stack'));
             $definition->addTag('kernel.reset', ['method' => 'reset']);
             $container->setDefinition('debug.log_processor', $definition);
 
             $container->register('debug.debug_logger_configurator', DebugLoggerConfigurator::class)
-                ->setArguments([new Reference('debug.log_processor')]);
+                ->setArguments([new Reference('debug.log_processor'), '%kernel.runtime_mode.web%']);
         }
     }
 
@@ -1199,13 +1209,6 @@ class FrameworkExtension extends Extension
             $container->getDefinition('router.request_context')
                 ->replaceArgument(0, $config['default_uri']);
         }
-
-        if ($this->isInitializedConfigEnabled('annotations') && (new \ReflectionClass(AnnotationClassLoader::class))->hasProperty('reader')) {
-            $container->getDefinition('routing.loader.annotation')->setArguments([
-                new Reference('annotation_reader'),
-                '%kernel.environment%',
-            ]);
-        }
     }
 
     private function registerSessionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
@@ -1230,10 +1233,15 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)
-        if (null === $config['handler_id']) {
+        if (null === ($config['handler_id'] ?? $config['save_path'] ?? null)) {
             $config['save_path'] = null;
             $container->setAlias('session.handler', 'session.handler.native');
         } else {
+            $config['handler_id'] ??= 'session.handler.native_file';
+
+            if (!\array_key_exists('save_path', $config)) {
+                $config['save_path'] = '%kernel.cache_dir%/sessions';
+            }
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
 
             if ($usedEnvs || preg_match('#^[a-z]++://#', $config['handler_id'])) {
@@ -1319,13 +1327,17 @@ class FrameworkExtension extends Extension
             ->setArgument(0, $paths)
             ->setArgument(2, $excludedPathPatterns);
 
-        $publicDirName = $this->getPublicDirectoryName($container);
         $container->getDefinition('asset_mapper.public_assets_path_resolver')
-            ->setArgument(1, $config['public_prefix'])
-            ->setArgument(2, $publicDirName);
+            ->setArgument(0, $config['public_prefix']);
 
-        $container->getDefinition('asset_mapper.command.compile')
-            ->setArgument(5, $publicDirName);
+        $publicDirectory = $this->getPublicDirectory($container);
+        $publicAssetsDirectory = rtrim($publicDirectory.'/'.ltrim($config['public_prefix'], '/'), '/');
+        $container->getDefinition('asset_mapper.local_public_assets_filesystem')
+            ->setArgument(0, $publicDirectory)
+        ;
+
+        $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')
+            ->setArgument(0, $publicAssetsDirectory);
 
         if (!$config['server']) {
             $container->removeDefinition('asset_mapper.dev_server_subscriber');
@@ -1339,27 +1351,27 @@ class FrameworkExtension extends Extension
             ->setArgument(0, $config['missing_import_mode']);
 
         $container->getDefinition('asset_mapper.compiler.javascript_import_path_compiler')
-            ->setArgument(0, $config['missing_import_mode']);
+            ->setArgument(1, $config['missing_import_mode']);
 
         $container
-            ->getDefinition('asset_mapper.importmap.manager')
-            ->replaceArgument(2, $config['importmap_path'])
-            ->replaceArgument(3, $config['vendor_dir'])
+            ->getDefinition('asset_mapper.importmap.remote_package_storage')
+            ->replaceArgument(0, $config['vendor_dir'])
+        ;
+        $container
+            ->getDefinition('asset_mapper.mapped_asset_factory')
+            ->replaceArgument(2, $config['vendor_dir'])
         ;
 
         $container
-            ->getDefinition('asset_mapper.importmap.resolver')
-            ->replaceArgument(0, $config['provider'])
+            ->getDefinition('asset_mapper.importmap.config_reader')
+            ->replaceArgument(0, $config['importmap_path'])
         ;
 
         $container
             ->getDefinition('asset_mapper.importmap.renderer')
-            ->replaceArgument(2, $config['importmap_polyfill'] ?? ImportMapManager::POLYFILL_URL)
-            ->replaceArgument(3, $config['importmap_script_attributes'])
+            ->replaceArgument(3, $config['importmap_polyfill'])
+            ->replaceArgument(4, $config['importmap_script_attributes'])
         ;
-
-        $container->registerForAutoconfiguration(PackageResolverInterface::class)
-            ->addTag('asset_mapper.importmap.resolver');
     }
 
     /**
@@ -1635,10 +1647,7 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['email_validation_mode']);
 
         if (\array_key_exists('enable_attributes', $config) && $config['enable_attributes']) {
-            $validatorBuilder->addMethodCall('enableAttributeMapping', [true]);
-            if ($this->isInitializedConfigEnabled('annotations') && method_exists(ValidatorBuilder::class, 'setDoctrineAnnotationReader')) {
-                $validatorBuilder->addMethodCall('setDoctrineAnnotationReader', [new Reference('annotation_reader')]);
-            }
+            $validatorBuilder->addMethodCall('enableAttributeMapping');
         }
 
         if (\array_key_exists('static_method', $config) && $config['static_method']) {
@@ -1664,9 +1673,8 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(ExpressionLanguage::class)) {
             $container->removeDefinition('validator.expression_language');
-        }
-
-        if (!class_exists(ExpressionLanguageProvider::class)) {
+            $container->removeDefinition('validator.expression_language_provider');
+        } elseif (!class_exists(ExpressionLanguageProvider::class)) {
             $container->removeDefinition('validator.expression_language_provider');
         }
     }
@@ -1731,58 +1739,6 @@ class FrameworkExtension extends Extension
                 throw new \RuntimeException(sprintf('Could not open file or directory "%s".', $path));
             }
         }
-    }
-
-    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader): void
-    {
-        if (!$this->isInitializedConfigEnabled('annotations')) {
-            return;
-        }
-
-        if (!class_exists(\Doctrine\Common\Annotations\Annotation::class)) {
-            throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed. Try running "composer require doctrine/annotations".');
-        }
-
-        trigger_deprecation('symfony/framework-bundle', '6.4', 'Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
-
-        $loader->load('annotations.php');
-
-        if ('none' === $config['cache']) {
-            $container->removeDefinition('annotations.cached_reader');
-
-            return;
-        }
-
-        if ('php_array' === $config['cache']) {
-            $cacheService = 'annotations.cache_adapter';
-
-            // Enable warmer only if PHP array is used for cache
-            $definition = $container->findDefinition('annotations.cache_warmer');
-            $definition->addTag('kernel.cache_warmer');
-        } else {
-            $cacheService = 'annotations.filesystem_cache_adapter';
-            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-
-            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
-            }
-
-            $container
-                ->getDefinition('annotations.filesystem_cache_adapter')
-                ->replaceArgument(2, $cacheDir)
-            ;
-        }
-
-        $container
-            ->getDefinition('annotations.cached_reader')
-            ->replaceArgument(2, $config['debug'])
-            // reference the cache provider without using it until AddAnnotationsCachedReaderPass runs
-            ->addArgument(new ServiceClosureArgument(new Reference($cacheService)))
-        ;
-
-        $container->setAlias('annotation_reader', 'annotations.cached_reader');
-        $container->setAlias(Reader::class, new Alias('annotations.cached_reader', false));
-        $container->removeDefinition('annotations.psr_cached_reader');
     }
 
     private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
@@ -1906,12 +1862,9 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = [];
         if (isset($config['enable_attributes']) && $config['enable_attributes']) {
-            $annotationLoader = new Definition(
-                AnnotationLoader::class,
-                [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]
-            );
+            $attributeLoader = new Definition(AttributeLoader::class);
 
-            $serializerLoaders[] = $annotationLoader;
+            $serializerLoaders[] = $attributeLoader;
         }
 
         $fileRecorder = function ($extension, $path) use (&$serializerLoaders) {
@@ -2122,10 +2075,11 @@ class FrameworkExtension extends Extension
             $container->getDefinition('messenger.transport.beanstalkd.factory')->addTag('messenger.transport_factory');
         }
 
-        if (!class_exists(StopWorkerOnSignalsListener::class)) {
-            $container->removeDefinition('messenger.listener.stop_worker_signals_listener');
-        } elseif ($config['stop_worker_on_signals']) {
-            $container->getDefinition('messenger.listener.stop_worker_signals_listener')->replaceArgument(0, $config['stop_worker_on_signals']);
+        if ($config['stop_worker_on_signals'] && $this->hasConsole()) {
+            $container->getDefinition('console.command.messenger_consume_messages')
+                ->replaceArgument(8, $config['stop_worker_on_signals']);
+            $container->getDefinition('console.command.messenger_failed_messages_retry')
+                ->replaceArgument(6, $config['stop_worker_on_signals']);
         }
 
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
@@ -2612,11 +2566,9 @@ class FrameworkExtension extends Extension
             MailerBridge\Mailjet\Transport\MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
             MailerBridge\MailPace\Transport\MailPaceTransportFactory::class => 'mailer.transport_factory.mailpace',
             MailerBridge\Mailchimp\Transport\MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
-            MailerBridge\OhMySmtp\Transport\OhMySmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
             MailerBridge\Postmark\Transport\PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
             MailerBridge\Scaleway\Transport\ScalewayTransportFactory::class => 'mailer.transport_factory.scaleway',
             MailerBridge\Sendgrid\Transport\SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
-            MailerBridge\Sendinblue\Transport\SendinblueTransportFactory::class => 'mailer.transport_factory.sendinblue',
             MailerBridge\Amazon\Transport\SesTransportFactory::class => 'mailer.transport_factory.amazon',
         ];
 
@@ -2786,7 +2738,6 @@ class FrameworkExtension extends Extension
             NotifierBridge\RocketChat\RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
             NotifierBridge\Sendberry\SendberryTransportFactory::class => 'notifier.transport_factory.sendberry',
             NotifierBridge\SimpleTextin\SimpleTextinTransportFactory::class => 'notifier.transport_factory.simple-textin',
-            NotifierBridge\Sendinblue\SendinblueTransportFactory::class => 'notifier.transport_factory.sendinblue',
             NotifierBridge\Sinch\SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             NotifierBridge\Slack\SlackTransportFactory::class => 'notifier.transport_factory.slack',
             NotifierBridge\Sms77\Sms77TransportFactory::class => 'notifier.transport_factory.sms77',
@@ -2916,45 +2867,6 @@ class FrameworkExtension extends Extension
 
             $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
         }
-    }
-
-    /**
-     * @deprecated since Symfony 6.2
-     *
-     * @return void
-     */
-    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
-    {
-        trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s()" method is deprecated.', __METHOD__);
-
-        // default configuration (when used by other DI extensions)
-        $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
-
-        $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
-
-        if (null !== $limiterConfig['lock_factory']) {
-            if (!interface_exists(LockInterface::class)) {
-                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
-            }
-            if (!$container->hasDefinition('lock.factory.abstract')) {
-                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
-            }
-
-            $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
-        }
-        unset($limiterConfig['lock_factory']);
-
-        if (null === $storageId = $limiterConfig['storage_service'] ?? null) {
-            $container->register($storageId = 'limiter.storage.'.$name, CacheStorage::class)->addArgument(new Reference($limiterConfig['cache_pool']));
-        }
-
-        $limiter->replaceArgument(1, new Reference($storageId));
-        unset($limiterConfig['storage_service'], $limiterConfig['cache_pool']);
-
-        $limiterConfig['id'] = $name;
-        $limiter->replaceArgument(0, $limiterConfig);
-
-        $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
     }
 
     private function registerUidConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
@@ -3120,11 +3032,12 @@ class FrameworkExtension extends Extension
         $config['enabled'] = $value;
     }
 
-    private function getPublicDirectoryName(ContainerBuilder $container): string
+    private function getPublicDirectory(ContainerBuilder $container): string
     {
-        $defaultPublicDir = 'public';
+        $projectDir = $container->getParameter('kernel.project_dir');
+        $defaultPublicDir = $projectDir.'/public';
 
-        $composerFilePath = $container->getParameter('kernel.project_dir').'/composer.json';
+        $composerFilePath = $projectDir.'/composer.json';
 
         if (!file_exists($composerFilePath)) {
             return $defaultPublicDir;
@@ -3133,6 +3046,6 @@ class FrameworkExtension extends Extension
         $container->addResource(new FileResource($composerFilePath));
         $composerConfig = json_decode(file_get_contents($composerFilePath), true);
 
-        return $composerConfig['extra']['public-dir'] ?? $defaultPublicDir;
+        return isset($composerConfig['extra']['public-dir']) ? $projectDir.'/'.$composerConfig['extra']['public-dir'] : $defaultPublicDir;
     }
 }

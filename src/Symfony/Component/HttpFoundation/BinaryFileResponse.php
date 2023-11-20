@@ -25,16 +25,13 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class BinaryFileResponse extends Response
 {
-    protected static $trustXSendfileTypeHeader = false;
+    protected static bool $trustXSendfileTypeHeader = false;
 
-    /**
-     * @var File
-     */
-    protected $file;
-    protected $offset = 0;
-    protected $maxlen = -1;
-    protected $deleteFileAfterSend = false;
-    protected $chunkSize = 16 * 1024;
+    protected File $file;
+    protected int $offset = 0;
+    protected int $maxlen = -1;
+    protected bool $deleteFileAfterSend = false;
+    protected int $chunkSize = 16 * 1024;
 
     /**
      * @param \SplFileInfo|string $file               The file to stream
@@ -358,10 +355,8 @@ class BinaryFileResponse extends Response
 
     /**
      * Trust X-Sendfile-Type header.
-     *
-     * @return void
      */
-    public static function trustXSendfileTypeHeader()
+    public static function trustXSendfileTypeHeader(): void
     {
         self::$trustXSendfileTypeHeader = true;
     }

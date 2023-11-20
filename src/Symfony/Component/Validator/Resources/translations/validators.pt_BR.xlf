@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>O valor da máscara de rede deve estar entre {{ min }} e {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>O nome do arquivo é muito longo. Deve ter {{ filename_max_length }} caractere ou menos.|O nome do arquivo é muito longo. Deve ter {{ filename_max_length }} caracteres ou menos.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>A força da senha é muito baixa. Por favor, use uma senha mais forte.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Este valor contém caracteres que não são permitidos pelo nível de restrição atual.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>O uso de caracteres invisíveis não é permitido.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Misturar números de scripts diferentes não é permitido.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>O uso de caracteres de sobreposição ocultos não é permitido.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

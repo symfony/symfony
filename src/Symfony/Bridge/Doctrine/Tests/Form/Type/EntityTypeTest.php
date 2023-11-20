@@ -143,7 +143,7 @@ class EntityTypeTest extends BaseTypeTestCase
         }
     }
 
-    public static function choiceTranslationDomainProvider()
+    public static function choiceTranslationDomainProvider(): array
     {
         return [
             [false],
@@ -218,13 +218,11 @@ class EntityTypeTest extends BaseTypeTestCase
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => fn () => new \stdClass(),
         ]);
-
-        $field->submit('2');
     }
 
     public function testConfigureQueryBuilderWithClosureReturningNullUseDefault()

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add support for `sendLocation`, `sendAudio`, `sendDocument`, `sendVideo`, `sendAnimation`, `sendVenue`, `sendContact` and `sendSticker` API methods
+ * Add support for sending local files
+
 6.3
 ---
 

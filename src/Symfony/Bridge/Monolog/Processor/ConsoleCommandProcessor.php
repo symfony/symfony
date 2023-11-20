@@ -21,13 +21,9 @@ use Symfony\Contracts\Service\ResetInterface;
  * Adds the current console command information to the log entry.
  *
  * @author Piotr Stankowski <git@trakos.pl>
- *
- * @final since Symfony 6.1
  */
-class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface
+final class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface
 {
-    use CompatibilityProcessor;
-
     private array $commandData;
     private bool $includeArguments;
     private bool $includeOptions;
@@ -38,27 +34,21 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
         $this->includeOptions = $includeOptions;
     }
 
-    private function doInvoke(array|LogRecord $record): array|LogRecord
+    public function __invoke(LogRecord $record): LogRecord
     {
-        if (isset($this->commandData) && !isset($record['extra']['command'])) {
-            $record['extra']['command'] = $this->commandData;
+        if (isset($this->commandData) && !isset($record->extra['command'])) {
+            $record->extra['command'] = $this->commandData;
         }
 
         return $record;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         unset($this->commandData);
     }
 
-    /**
-     * @return void
-     */
-    public function addCommandData(ConsoleEvent $event)
+    public function addCommandData(ConsoleEvent $event): void
     {
         $this->commandData = [
             'name' => $event->getCommand()->getName(),

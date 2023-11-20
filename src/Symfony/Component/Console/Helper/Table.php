@@ -66,10 +66,8 @@ class Table
 
     /**
      * Sets a style definition.
-     *
-     * @return void
      */
-    public static function setStyleDefinition(string $name, TableStyle $style)
+    public static function setStyleDefinition(string $name, TableStyle $style): void
     {
         self::$styles ??= self::initStyles();
 
@@ -194,7 +192,7 @@ class Table
     /**
      * @return $this
      */
-    public function setRows(array $rows)
+    public function setRows(array $rows): static
     {
         $this->rows = [];
 
@@ -312,10 +310,8 @@ class Table
      *     | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
      *     | 960-425-059-0 | The Lord of the Rings | J. R. R. Tolkien |
      *     +---------------+-----------------------+------------------+
-     *
-     * @return void
      */
-    public function render()
+    public function render(): void
     {
         $divider = new TableSeparator();
         $isCellWithColspan = static fn ($cell) => $cell instanceof TableCell && $cell->getColspan() >= 2;
@@ -423,7 +419,7 @@ class Table
 
                 if ($isHeader && !$isHeaderSeparatorRendered) {
                     $this->renderRowSeparator(
-                        $isHeader ? self::SEPARATOR_TOP : self::SEPARATOR_TOP_BOTTOM,
+                        self::SEPARATOR_TOP,
                         $hasTitle ? $this->headerTitle : null,
                         $hasTitle ? $this->style->getHeaderTitleFormat() : null
                     );
@@ -433,7 +429,7 @@ class Table
 
                 if ($isFirstRow) {
                     $this->renderRowSeparator(
-                        $isHeader ? self::SEPARATOR_TOP : self::SEPARATOR_TOP_BOTTOM,
+                        $horizontal ? self::SEPARATOR_TOP : self::SEPARATOR_TOP_BOTTOM,
                         $hasTitle ? $this->headerTitle : null,
                         $hasTitle ? $this->style->getHeaderTitleFormat() : null
                     );

@@ -24,14 +24,14 @@ namespace Symfony\Component\HttpFoundation;
  */
 class JsonResponse extends Response
 {
-    protected $data;
-    protected $callback;
+    protected mixed $data;
+    protected ?string $callback = null;
 
     // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
     // 15 === JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
     public const DEFAULT_ENCODING_OPTIONS = 15;
 
-    protected $encodingOptions = self::DEFAULT_ENCODING_OPTIONS;
+    protected int $encodingOptions = self::DEFAULT_ENCODING_OPTIONS;
 
     /**
      * @param bool $json If the data is already a JSON string
@@ -75,11 +75,8 @@ class JsonResponse extends Response
      *
      * @throws \InvalidArgumentException When the callback name is not valid
      */
-    public function setCallback(string $callback = null): static
+    public function setCallback(?string $callback): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if (null !== $callback) {
             // partially taken from https://geekality.net/2011/08/03/valid-javascript-identifier/
             // partially taken from https://github.com/willdurand/JsonpCallbackValidator

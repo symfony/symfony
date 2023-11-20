@@ -37,14 +37,14 @@ abstract class FileLoader extends BaseFileLoader
 {
     public const ANONYMOUS_ID_REGEXP = '/^\.\d+_[^~]*+~[._a-zA-Z\d]{7}$/';
 
-    protected $container;
-    protected $isLoadingInstanceof = false;
-    protected $instanceof = [];
-    protected $interfaces = [];
-    protected $singlyImplemented = [];
+    protected ContainerBuilder $container;
+    protected bool $isLoadingInstanceof = false;
+    protected array $instanceof = [];
+    protected array $interfaces = [];
+    protected array $singlyImplemented = [];
     /** @var array<string, Alias> */
-    protected $aliases = [];
-    protected $autoRegisterAliasesForSinglyImplementedInterfaces = true;
+    protected array $aliases = [];
+    protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null)
     {
@@ -95,10 +95,8 @@ abstract class FileLoader extends BaseFileLoader
      * @param string               $resource  The directory to look for classes, glob-patterns allowed
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
      * @param string|null          $source    The path to the file that defines the auto-discovery rule
-     *
-     * @return void
      */
-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */)
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null, string $source = null): void
     {
         if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
@@ -115,7 +113,6 @@ abstract class FileLoader extends BaseFileLoader
             throw new InvalidArgumentException('The exclude list must not contain an empty value.');
         }
 
-        $source = \func_num_args() > 4 ? func_get_arg(4) : null;
         $autoconfigureAttributes = new RegisterAutoconfigureAttributesPass();
         $autoconfigureAttributes = $autoconfigureAttributes->accept($prototype) ? $autoconfigureAttributes : null;
         $classes = $this->findClasses($namespace, $resource, (array) $exclude, $autoconfigureAttributes, $source);
@@ -209,10 +206,7 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    /**
-     * @return void
-     */
-    public function registerAliasesForSinglyImplementedInterfaces()
+    public function registerAliasesForSinglyImplementedInterfaces(): void
     {
         foreach ($this->interfaces as $interface) {
             if (!empty($this->singlyImplemented[$interface]) && !isset($this->aliases[$interface]) && !$this->container->has($interface)) {
@@ -225,10 +219,8 @@ abstract class FileLoader extends BaseFileLoader
 
     /**
      * Registers a definition in the container with its instanceof-conditionals.
-     *
-     * @return void
      */
-    protected function setDefinition(string $id, Definition $definition)
+    protected function setDefinition(string $id, Definition $definition): void
     {
         $this->container->removeBindings($id);
 

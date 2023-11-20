@@ -36,7 +36,7 @@ final class WebhookController
     public function handle(string $type, Request $request): Response
     {
         if (!isset($this->parsers[$type])) {
-            return new Response(sprintf('No parser found for webhook of type "%s".', $type), 404);
+            return new Response('No webhook parser found for the type given in the URL.', 404, ['Content-Type' => 'text/plain']);
         }
         /** @var RequestParserInterface $parser */
         $parser = $this->parsers[$type]['parser'];

@@ -179,8 +179,6 @@ class CachePoolPassTest extends TestCase
 
     public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are');
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.project_dir', 'foo');
@@ -191,6 +189,9 @@ class CachePoolPassTest extends TestCase
         $cachePool = new ChildDefinition('app.cache_adapter');
         $cachePool->addTag('cache.pool', ['foobar' => 123]);
         $container->setDefinition('app.cache_pool', $cachePool);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are');
 
         $this->cachePoolPass->process($container);
     }

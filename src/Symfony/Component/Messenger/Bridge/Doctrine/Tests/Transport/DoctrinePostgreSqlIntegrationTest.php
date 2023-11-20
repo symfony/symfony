@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +37,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         }
 
         $url = "pdo-pgsql://postgres:password@$host";
-        $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($url) : ['url' => $url];
+        $params = (new DsnParser())->parse($url);
         $config = new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
@@ -51,7 +50,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->createSchemaManager()->dropTable('queue_table');
+        $this->driverConnection->createSchemaManager()->dropTable('queue_table');
         $this->driverConnection->close();
     }
 
@@ -64,12 +63,5 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
 
         $this->assertNull($this->connection->get());
-    }
-
-    private function createSchemaManager(): AbstractSchemaManager
-    {
-        return method_exists($this->driverConnection, 'createSchemaManager')
-            ? $this->driverConnection->createSchemaManager()
-            : $this->driverConnection->getSchemaManager();
     }
 }

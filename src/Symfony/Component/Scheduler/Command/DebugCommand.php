@@ -114,6 +114,6 @@ final class DebugCommand extends Command
             return null;
         }
 
-        return [(string) $trigger, $recurringMessage->getProvider()::class, $next];
+        return [(string) $trigger, $recurringMessage->getProvider()->getId(), $next];
     }
 }

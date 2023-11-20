@@ -14,6 +14,8 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -22,6 +24,7 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
+use Symfony\Component\Form\Tests\Extension\Type\ItemFileType;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**
@@ -56,7 +59,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->request = null;
     }
 
-    public static function methodExceptGetProvider()
+    public static function methodExceptGetProvider(): array
     {
         return [
             ['POST'],
@@ -66,7 +69,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         ];
     }
 
-    public static function methodProvider()
+    public static function methodProvider(): array
     {
         return array_merge([
             ['GET'],
@@ -227,6 +230,60 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertSame($file, $form->get('field2')->getData());
     }
 
+    public function testIntegerChildren()
+    {
+        $form = $this->createForm('root', 'POST', true);
+        $form->add('0', TextType::class);
+        $form->add('1', TextType::class);
+
+        $this->setRequestData('POST', [
+            'root' => [
+                '1' => 'bar',
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertNull($form->get('0')->getData());
+        $this->assertSame('bar', $form->get('1')->getData());
+    }
+
+    /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testMergeParamsAndFilesMultiple($method)
+    {
+        $form = $this->createForm('param1', $method, true);
+        $form->add($this->createBuilder('field1', false, ['allow_file_upload' => true, 'multiple' => true])->getForm());
+        $file1 = $this->getUploadedFile();
+        $file2 = $this->getUploadedFile();
+
+        $this->setRequestData($method, [
+            'param1' => [
+                'field1' => [
+                    'foo',
+                    'bar',
+                    'baz',
+                ],
+            ],
+        ], [
+            'param1' => [
+                'field1' => [
+                    $file1,
+                    $file2,
+                ],
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+        $data = $form->get('field1')->getData();
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertIsArray($data);
+        $this->assertCount(5, $data);
+        $this->assertSame(['foo', 'bar', 'baz', $file1, $file2], $data);
+    }
+
     /**
      * @dataProvider methodExceptGetProvider
      */
@@ -245,6 +302,48 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
 
         $this->assertTrue($form->isSubmitted());
         $this->assertSame('DATA', $form->getData());
+    }
+
+    public function testMergeZeroIndexedCollection()
+    {
+        $form = $this->createForm('root', 'POST', true);
+        $form->add('items', CollectionType::class, [
+            'entry_type' => ItemFileType::class,
+            'allow_add' => true,
+        ]);
+
+        $file = $this->getUploadedFile();
+
+        $this->setRequestData('POST', [
+            'root' => [
+                'items' => [
+                    0 => [
+                        'item' => 'test',
+                    ],
+                ],
+            ],
+        ], [
+            'root' => [
+                'items' => [
+                    0 => [
+                        'file' => $file,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $itemsForm = $form->get('items');
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertTrue($form->isValid());
+
+        $this->assertTrue($itemsForm->has('0'));
+        $this->assertFalse($itemsForm->has('1'));
+
+        $this->assertEquals('test', $itemsForm->get('0')->get('item')->getData());
+        $this->assertNotNull($itemsForm->get('0')->get('file'));
     }
 
     /**

@@ -94,10 +94,6 @@ class VarExporterTest extends TestCase
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
 
         $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
-
-        if (\PHP_VERSION_ID < 80200 && 'datetime' === $testName) {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
-        }
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
         if ('incomplete-class' === $testName || 'external-references' === $testName) {
@@ -259,7 +255,7 @@ class MyWakeup
         return ['sub', 'baz'];
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (123 === $this->sub) {
             $this->bis = 123;
@@ -333,17 +329,21 @@ class MyArrayObject extends \ArrayObject
 class GoodNight
 {
     public $good;
+    protected $foo;
+    private $bar;
 
     public function __construct()
     {
         unset($this->good);
+        $this->foo = 'afternoon';
+        $this->bar = 'morning';
     }
 
     public function __sleep(): array
     {
         $this->good = 'night';
 
-        return ['good'];
+        return ['good', 'foo', "\0*\0foo", "\0".__CLASS__."\0bar"];
     }
 }
 
@@ -411,7 +411,7 @@ class Php74Serializable implements \Serializable
         return [$this->foo = new \stdClass()];
     }
 
-    public function __unserialize(array $data)
+    public function __unserialize(array $data): void
     {
         [$this->foo] = $data;
     }
@@ -421,7 +421,7 @@ class Php74Serializable implements \Serializable
         throw new \BadMethodCallException();
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException();
     }

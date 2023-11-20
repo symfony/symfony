@@ -80,17 +80,24 @@ final class MessageGenerator implements MessageGeneratorInterface
 
             if ($yield) {
                 $context = new MessageContext($this->name, $id, $trigger, $time, $nextTime);
-                foreach ($recurringMessage->getMessages($context) as $message) {
-                    yield $context => $message;
+                try {
+                    foreach ($recurringMessage->getMessages($context) as $message) {
+                        yield $context => $message;
+                    }
+                } finally {
+                    $checkpoint->save($time, $index);
                 }
-
-                $checkpoint->save($time, $index);
             }
         }
 
         $this->waitUntil = $heap->isEmpty() ? null : $heap->top()[0];
 
         $checkpoint->release($now, $this->waitUntil);
+    }
+
+    public function getSchedule(): Schedule
+    {
+        return $this->schedule ??= $this->scheduleProvider->getSchedule();
     }
 
     private function heap(\DateTimeImmutable $time, \DateTimeImmutable $startTime): TriggerHeap
@@ -101,7 +108,7 @@ final class MessageGenerator implements MessageGeneratorInterface
 
         $heap = new TriggerHeap($time);
 
-        foreach ($this->schedule()->getRecurringMessages() as $index => $recurringMessage) {
+        foreach ($this->getSchedule()->getRecurringMessages() as $index => $recurringMessage) {
             $trigger = $recurringMessage->getTrigger();
 
             if ($trigger instanceof StatefulTriggerInterface) {
@@ -118,13 +125,8 @@ final class MessageGenerator implements MessageGeneratorInterface
         return $this->triggerHeap = $heap;
     }
 
-    private function schedule(): Schedule
-    {
-        return $this->schedule ??= $this->scheduleProvider->getSchedule();
-    }
-
     private function checkpoint(): Checkpoint
     {
-        return $this->checkpoint ??= new Checkpoint('scheduler_checkpoint_'.$this->name, $this->schedule()->getLock(), $this->schedule()->getState());
+        return $this->checkpoint ??= new Checkpoint('scheduler_checkpoint_'.$this->name, $this->getSchedule()->getLock(), $this->getSchedule()->getState());
     }
 }

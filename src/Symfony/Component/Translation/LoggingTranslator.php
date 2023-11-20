@@ -45,10 +45,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
         return $trans;
     }
 
-    /**
-     * @return void
-     */
-    public function setLocale(string $locale)
+    public function setLocale(string $locale): void
     {
         $prev = $this->translator->getLocale();
         $this->translator->setLocale($locale);
@@ -86,10 +83,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
         return [];
     }
 
-    /**
-     * @return mixed
-     */
-    public function __call(string $method, array $args)
+    public function __call(string $method, array $args): mixed
     {
         return $this->translator->{$method}(...$args);
     }

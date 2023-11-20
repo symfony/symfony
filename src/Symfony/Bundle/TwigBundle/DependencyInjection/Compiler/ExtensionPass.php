@@ -25,10 +25,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class ExtensionPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!class_exists(Packages::class)) {
             $container->removeDefinition('twig.extension.assets');
@@ -128,7 +125,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
         }
 
-        if (!class_exists(Workflow::class) || !$container->has('.workflow.registry')) {
+        if (!class_exists(Workflow::class) || !$container->has('workflow.registry')) {
             $container->removeDefinition('workflow.twig_extension');
         } else {
             $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');

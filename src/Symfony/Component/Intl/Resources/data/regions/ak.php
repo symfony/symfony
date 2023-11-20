@@ -92,7 +92,6 @@ return [
         'IE' => 'Aereland',
         'IL' => 'Israel',
         'IN' => 'India',
-        'IO' => 'Britenfo Hɔn Man Wɔ India Po No Mu',
         'IQ' => 'Irak',
         'IR' => 'Iran',
         'IS' => 'Aesland',

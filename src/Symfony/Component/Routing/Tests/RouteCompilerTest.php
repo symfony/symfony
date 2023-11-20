@@ -186,7 +186,7 @@ class RouteCompilerTest extends TestCase
     /**
      * @dataProvider provideCompileImplicitUtf8Data
      */
-    public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens, $deprecationType)
+    public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens)
     {
         $this->expectException(\LogicException::class);
         $r = new \ReflectionClass(Route::class);

@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Metadata for the LuhnValidator.
  *
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Tim Nagel <t.nagel@infinite.net.au>
  * @author Greg Knapp http://gregk.me/2011/php-implementation-of-bank-card-luhn-algorithm/
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -34,12 +31,7 @@ class Luhn extends Constraint
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'Invalid card number.';
+    public string $message = 'Invalid card number.';
 
     public function __construct(
         array $options = null,

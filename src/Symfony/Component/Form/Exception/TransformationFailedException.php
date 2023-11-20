@@ -34,11 +34,8 @@ class TransformationFailedException extends RuntimeException
      * @param string|null $invalidMessage           The message or message key
      * @param array       $invalidMessageParameters Data to be passed into the translator
      */
-    public function setInvalidMessage(string $invalidMessage = null, array $invalidMessageParameters = []): void
+    public function setInvalidMessage(?string $invalidMessage, array $invalidMessageParameters = []): void
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         $this->invalidMessage = $invalidMessage;
         $this->invalidMessageParameters = $invalidMessageParameters;
     }

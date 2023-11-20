@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -39,8 +39,10 @@ use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
@@ -66,8 +68,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TrueBuiltInDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\UpcomingDenormalizerInterface as DenormalizerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\UpcomingNormalizerInterface as NormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\WithTypedConstructor;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
 
@@ -92,7 +93,7 @@ class SerializerTest extends TestCase
     public function testNormalizeNoMatch()
     {
         $this->expectException(UnexpectedValueException::class);
-        $serializer = new Serializer([$this->createMock(CustomNormalizer::class)]);
+        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
         $serializer->normalize(new \stdClass(), 'xml');
     }
 
@@ -120,7 +121,7 @@ class SerializerTest extends TestCase
     public function testDenormalizeNoMatch()
     {
         $this->expectException(UnexpectedValueException::class);
-        $serializer = new Serializer([$this->createMock(CustomNormalizer::class)]);
+        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
         $serializer->denormalize('foo', 'stdClass');
     }
 
@@ -750,7 +751,7 @@ class SerializerTest extends TestCase
 
     public function testUnionTypeDeserializable()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $serializer = new Serializer(
             [
@@ -782,7 +783,7 @@ class SerializerTest extends TestCase
 
     public function testUnionTypeDeserializableWithoutAllowedExtraAttributes()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $serializer = new Serializer(
             [
@@ -815,9 +816,6 @@ class SerializerTest extends TestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testFalseBuiltInTypes()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
@@ -828,9 +826,6 @@ class SerializerTest extends TestCase
         $this->assertEquals(new FalseBuiltInDummy(), $actual);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testTrueBuiltInTypes()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
@@ -843,7 +838,7 @@ class SerializerTest extends TestCase
 
     private function serializerWithClassDiscriminator()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         return new Serializer([new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))], ['json' => new JsonEncoder()]);
     }
@@ -889,7 +884,8 @@ class SerializerTest extends TestCase
             ],
             "php74FullWithConstructor": {},
             "php74FullWithTypedConstructor": {
-                "something": "not a float"
+                "something": "not a float",
+                "somethingElse": "not a bool"
             },
             "dummyMessage": {
             },
@@ -1051,6 +1047,24 @@ class SerializerTest extends TestCase
                 'useMessageForUser' => false,
                 'message' => 'The type of the "something" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74FullWithTypedConstructor" must be one of "float" ("string" given).',
             ],
+            [
+                'currentType' => 'string',
+                'expectedTypes' => [
+                    'float',
+                ],
+                'path' => 'php74FullWithTypedConstructor.something',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "something" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74FullWithTypedConstructor" must be one of "float" ("string" given).',
+            ],
+            [
+                'currentType' => 'string',
+                'expectedTypes' => [
+                    'bool',
+                ],
+                'path' => 'php74FullWithTypedConstructor.somethingElse',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "somethingElse" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74FullWithTypedConstructor" must be one of "bool" ("string" given).',
+            ],
             $classMetadataFactory ?
                 [
                     'currentType' => 'null',
@@ -1208,6 +1222,85 @@ class SerializerTest extends TestCase
                 'useMessageForUser' => false,
                 'message' => 'The type of the "bool" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php80WithPromotedTypedConstructor" must be one of "bool" ("string" given).',
             ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    'unknown',
+                ],
+                'path' => null,
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the class misses the "string" property.',
+            ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    'unknown',
+                ],
+                'path' => null,
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the class misses the "int" property.',
+            ],
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
+    }
+
+    public function testCollectDenormalizationErrorsWithInvalidConstructorTypes()
+    {
+        $json = '{"string": "some string", "bool": "bool", "int": true}';
+
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+
+        $serializer = new Serializer(
+            [new ObjectNormalizer(null, null, null, $extractor)],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize($json, WithTypedConstructor::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $this->assertInstanceOf(WithTypedConstructor::class, $object = $th->getData());
+
+        $this->assertSame('some string', $object->string);
+        $this->assertTrue($object->bool);
+        $this->assertSame(1, $object->int);
+
+        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
+            return [
+                'currentType' => $e->getCurrentType(),
+                'expectedTypes' => $e->getExpectedTypes(),
+                'path' => $e->getPath(),
+                'useMessageForUser' => $e->canUseMessageForUser(),
+                'message' => $e->getMessage(),
+            ];
+        }, $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'string',
+                'expectedTypes' => [
+                    0 => 'bool',
+                ],
+                'path' => 'bool',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "bool" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\WithTypedConstructor" must be one of "bool" ("string" given).',
+            ],
+            [
+                'currentType' => 'bool',
+                'expectedTypes' => [
+                    0 => 'int',
+                ],
+                'path' => 'int',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "int" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\WithTypedConstructor" must be one of "int" ("bool" given).',
+            ],
         ];
 
         $this->assertSame($expected, $exceptionsAsArray);
@@ -1250,7 +1343,7 @@ class SerializerTest extends TestCase
 
     public function testCollectDenormalizationErrorsWithWrongPropertyWithoutConstruct()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $reflectionExtractor = new ReflectionExtractor();
         $propertyInfoExtractor = new PropertyInfoExtractor([], [$reflectionExtractor], [], [], []);
 
@@ -1335,7 +1428,7 @@ class SerializerTest extends TestCase
     {
         return [
             [null],
-            [new ClassMetadataFactory(new AnnotationLoader())],
+            [new ClassMetadataFactory(new AttributeLoader())],
         ];
     }
 

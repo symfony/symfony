@@ -39,10 +39,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
         $this->analyzingPass = $analyzingPass;
     }
 
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->container = $container;
         if ($this->analyzingPass) {

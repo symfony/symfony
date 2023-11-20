@@ -39,7 +39,7 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  *
  * @final
  */
-#[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files.')]
+#[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files')]
 class TranslationUpdateCommand extends Command
 {
     private const ASC = 'asc';
@@ -126,10 +126,6 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
-
-        if ('translation:update' === $input->getFirstArgument()) {
-            $errorIo->caution('Command "translation:update" is deprecated since version 5.4 and will be removed in Symfony 6.0. Use "translation:extract" instead.');
-        }
 
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();

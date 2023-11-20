@@ -25,9 +25,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class NumberToLocalizedStringTransformer implements DataTransformerInterface
 {
-    protected $grouping;
-
-    protected $roundingMode;
+    protected bool $grouping;
+    protected int $roundingMode;
 
     private ?int $scale;
     private ?string $locale;

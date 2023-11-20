@@ -18,12 +18,12 @@ use Monolog\Logger;
  */
 class DebugLoggerConfigurator
 {
-    private ?DebugLoggerInterface $processor = null;
+    private ?object $processor = null;
 
-    public function __construct(DebugLoggerInterface $processor, bool $enable = null)
+    public function __construct(callable $processor, bool $enable = null)
     {
-        if ($enable ?? !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
-            $this->processor = $processor;
+        if ($enable ?? !\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+            $this->processor = \is_object($processor) ? $processor : $processor(...);
         }
     }
 

@@ -31,34 +31,22 @@ class Marking
         }
     }
 
-    /**
-     * @return void
-     */
-    public function mark(string $place)
+    public function mark(string $place): void
     {
         $this->places[$place] = 1;
     }
 
-    /**
-     * @return void
-     */
-    public function unmark(string $place)
+    public function unmark(string $place): void
     {
         unset($this->places[$place]);
     }
 
-    /**
-     * @return bool
-     */
-    public function has(string $place)
+    public function has(string $place): bool
     {
         return isset($this->places[$place]);
     }
 
-    /**
-     * @return array
-     */
-    public function getPlaces()
+    public function getPlaces(): array
     {
         return $this->places;
     }

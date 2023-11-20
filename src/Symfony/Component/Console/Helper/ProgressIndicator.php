@@ -70,10 +70,8 @@ class ProgressIndicator
 
     /**
      * Sets the current indicator message.
-     *
-     * @return void
      */
-    public function setMessage(?string $message)
+    public function setMessage(?string $message): void
     {
         $this->message = $message;
 
@@ -82,10 +80,8 @@ class ProgressIndicator
 
     /**
      * Starts the indicator output.
-     *
-     * @return void
      */
-    public function start(string $message)
+    public function start(string $message): void
     {
         if ($this->started) {
             throw new LogicException('Progress indicator already started.');
@@ -102,10 +98,8 @@ class ProgressIndicator
 
     /**
      * Advances the indicator.
-     *
-     * @return void
      */
-    public function advance()
+    public function advance(): void
     {
         if (!$this->started) {
             throw new LogicException('Progress indicator has not yet been started.');
@@ -129,10 +123,8 @@ class ProgressIndicator
 
     /**
      * Finish the indicator with message.
-     *
-     * @return void
      */
-    public function finish(string $message)
+    public function finish(string $message): void
     {
         if (!$this->started) {
             throw new LogicException('Progress indicator has not yet been started.');
@@ -156,10 +148,8 @@ class ProgressIndicator
      * Sets a placeholder formatter for a given name.
      *
      * This method also allow you to override an existing placeholder.
-     *
-     * @return void
      */
-    public static function setPlaceholderFormatterDefinition(string $name, callable $callable)
+    public static function setPlaceholderFormatterDefinition(string $name, callable $callable): void
     {
         self::$formatters ??= self::initPlaceholderFormatters();
 
@@ -228,7 +218,7 @@ class ProgressIndicator
         return [
             'indicator' => fn (self $indicator) => $indicator->indicatorValues[$indicator->indicatorCurrent % \count($indicator->indicatorValues)],
             'message' => fn (self $indicator) => $indicator->message,
-            'elapsed' => fn (self $indicator) => Helper::formatTime(time() - $indicator->startTime),
+            'elapsed' => fn (self $indicator) => Helper::formatTime(time() - $indicator->startTime, 2),
             'memory' => fn () => Helper::formatMemory(memory_get_usage(true)),
         ];
     }

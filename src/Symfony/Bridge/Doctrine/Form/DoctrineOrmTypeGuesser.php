@@ -36,7 +36,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
-    protected $registry;
+    protected ManagerRegistry $registry;
 
     private array $cache = [];
 
@@ -61,7 +61,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         }
 
         return match ($metadata->getTypeOfField($property)) {
-            Types::ARRAY,
+            'array', // DBAL < 4
             Types::SIMPLE_ARRAY => new TypeGuess(CollectionType::class, [], Guess::MEDIUM_CONFIDENCE),
             Types::BOOLEAN => new TypeGuess(CheckboxType::class, [], Guess::HIGH_CONFIDENCE),
             Types::DATETIME_MUTABLE,
@@ -159,7 +159,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      *
      * @return array{0:ClassMetadata<T>, 1:string}|null
      */
-    protected function getMetadata(string $class)
+    protected function getMetadata(string $class): ?array
     {
         // normalize class name
         $class = self::getRealClass(ltrim($class, '\\'));

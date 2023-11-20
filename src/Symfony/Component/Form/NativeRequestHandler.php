@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**
@@ -40,11 +41,9 @@ class NativeRequestHandler implements RequestHandlerInterface
     }
 
     /**
-     * @return void
-     *
      * @throws Exception\UnexpectedTypeException If the $request is not null
      */
-    public function handleRequest(FormInterface $form, mixed $request = null)
+    public function handleRequest(FormInterface $form, mixed $request = null): void
     {
         if (null !== $request) {
             throw new UnexpectedTypeException($request, 'null');
@@ -106,7 +105,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             }
 
             if (\is_array($params) && \is_array($files)) {
-                $data = array_replace_recursive($params, $files);
+                $data = FormUtil::mergeParamsAndFiles($params, $files);
             } else {
                 $data = $params ?: $files;
             }

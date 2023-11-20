@@ -44,10 +44,7 @@ abstract class Output implements OutputInterface
         $this->formatter->setDecorated($decorated);
     }
 
-    /**
-     * @return void
-     */
-    public function setFormatter(OutputFormatterInterface $formatter)
+    public function setFormatter(OutputFormatterInterface $formatter): void
     {
         $this->formatter = $formatter;
     }
@@ -57,10 +54,7 @@ abstract class Output implements OutputInterface
         return $this->formatter;
     }
 
-    /**
-     * @return void
-     */
-    public function setDecorated(bool $decorated)
+    public function setDecorated(bool $decorated): void
     {
         $this->formatter->setDecorated($decorated);
     }
@@ -70,10 +64,7 @@ abstract class Output implements OutputInterface
         return $this->formatter->isDecorated();
     }
 
-    /**
-     * @return void
-     */
-    public function setVerbosity(int $level)
+    public function setVerbosity(int $level): void
     {
         $this->verbosity = $level;
     }
@@ -103,18 +94,12 @@ abstract class Output implements OutputInterface
         return self::VERBOSITY_DEBUG <= $this->verbosity;
     }
 
-    /**
-     * @return void
-     */
-    public function writeln(string|iterable $messages, int $options = self::OUTPUT_NORMAL)
+    public function writeln(string|iterable $messages, int $options = self::OUTPUT_NORMAL): void
     {
         $this->write($messages, true, $options);
     }
 
-    /**
-     * @return void
-     */
-    public function write(string|iterable $messages, bool $newline = false, int $options = self::OUTPUT_NORMAL)
+    public function write(string|iterable $messages, bool $newline = false, int $options = self::OUTPUT_NORMAL): void
     {
         if (!is_iterable($messages)) {
             $messages = [$messages];
@@ -148,8 +133,6 @@ abstract class Output implements OutputInterface
 
     /**
      * Writes a message to the output.
-     *
-     * @return void
      */
-    abstract protected function doWrite(string $message, bool $newline);
+    abstract protected function doWrite(string $message, bool $newline): void;
 }

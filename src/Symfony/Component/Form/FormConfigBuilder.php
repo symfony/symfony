@@ -26,13 +26,12 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
+    protected bool $locked = false;
+
     /**
      * Caches a globally unique {@link NativeRequestHandler} instance.
      */
     private static NativeRequestHandler $nativeRequestHandler;
-
-    /** @var bool */
-    protected $locked = false;
 
     private EventDispatcherInterface $dispatcher;
     private string $name;
@@ -347,11 +346,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @return $this
      */
-    public function setDataMapper(DataMapperInterface $dataMapper = null): static
+    public function setDataMapper(?DataMapperInterface $dataMapper): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
@@ -536,7 +532,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @return $this
      */
-    public function setFormFactory(FormFactoryInterface $formFactory)
+    public function setFormFactory(FormFactoryInterface $formFactory): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');

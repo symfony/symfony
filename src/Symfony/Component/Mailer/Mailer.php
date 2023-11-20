@@ -65,7 +65,7 @@ final class Mailer implements MailerInterface
         try {
             $this->bus->dispatch(new SendEmailMessage($message, $envelope), $stamps);
         } catch (HandlerFailedException $e) {
-            foreach ($e->getNestedExceptions() as $nested) {
+            foreach ($e->getWrappedExceptions() as $nested) {
                 if ($nested instanceof TransportExceptionInterface) {
                     throw $nested;
                 }

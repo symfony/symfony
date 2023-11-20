@@ -25,7 +25,7 @@ class IcuResFileLoaderTest extends LocalizedTestCase
     {
         // resource is build using genrb command
         $loader = new IcuResFileLoader();
-        $resource = __DIR__.'/../fixtures/resourcebundle/res';
+        $resource = __DIR__.'/../Fixtures/resourcebundle/res';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
@@ -37,13 +37,13 @@ class IcuResFileLoaderTest extends LocalizedTestCase
     {
         $this->expectException(NotFoundResourceException::class);
         $loader = new IcuResFileLoader();
-        $loader->load(__DIR__.'/../fixtures/non-existing.txt', 'en', 'domain1');
+        $loader->load(__DIR__.'/../Fixtures/non-existing.txt', 'en', 'domain1');
     }
 
     public function testLoadInvalidResource()
     {
         $this->expectException(InvalidResourceException::class);
         $loader = new IcuResFileLoader();
-        $loader->load(__DIR__.'/../fixtures/resourcebundle/corrupted', 'en', 'domain1');
+        $loader->load(__DIR__.'/../Fixtures/resourcebundle/corrupted', 'en', 'domain1');
     }
 }

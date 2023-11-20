@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Annotation\Context;
+use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -32,7 +32,7 @@ class ContextTest extends TestCase
     public function testThrowsOnEmptyContext()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('At least one of the "context", "normalizationContext", or "denormalizationContext" options of annotation "Symfony\Component\Serializer\Annotation\Context" must be provided as a non-empty array.');
+        $this->expectExceptionMessage('At least one of the "context", "normalizationContext", or "denormalizationContext" options must be provided as a non-empty array to "Symfony\Component\Serializer\Attribute\Context".');
 
         new Context();
     }
@@ -40,7 +40,7 @@ class ContextTest extends TestCase
     public function testInvalidGroupOption()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
+        $this->expectExceptionMessage(sprintf('Parameter "groups" given to "%s" must be a string or an array of strings, "stdClass" given', Context::class));
 
         new Context(context: ['foo' => 'bar'], groups: ['fine', new \stdClass()]);
     }
@@ -78,7 +78,7 @@ class ContextTest extends TestCase
         yield 'named arguments: with context option' => [
             fn () => new Context(context: ['foo' => 'bar']),
             <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
+Symfony\Component\Serializer\Attribute\Context {
   -groups: []
   -context: [
     "foo" => "bar",
@@ -92,7 +92,7 @@ DUMP
         yield 'named arguments: with normalization context option' => [
             fn () => new Context(normalizationContext: ['foo' => 'bar']),
             <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
+Symfony\Component\Serializer\Attribute\Context {
   -groups: []
   -context: []
   -normalizationContext: [
@@ -106,7 +106,7 @@ DUMP
         yield 'named arguments: with denormalization context option' => [
             fn () => new Context(denormalizationContext: ['foo' => 'bar']),
             <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
+Symfony\Component\Serializer\Attribute\Context {
   -groups: []
   -context: []
   -normalizationContext: []
@@ -120,7 +120,7 @@ DUMP
         yield 'named arguments: with groups option as string' => [
             fn () => new Context(context: ['foo' => 'bar'], groups: 'a'),
             <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
+Symfony\Component\Serializer\Attribute\Context {
   -groups: [
     "a",
   ]
@@ -136,7 +136,7 @@ DUMP
         yield 'named arguemnts: with groups option as array' => [
             fn () => new Context(context: ['foo' => 'bar'], groups: ['a', 'b']),
             <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
+Symfony\Component\Serializer\Attribute\Context {
   -groups: [
     "a",
     "b",

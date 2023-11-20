@@ -12,9 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -22,5 +19,5 @@ class Negative extends LessThan
 {
     use ZeroComparisonConstraintTrait;
 
-    public $message = 'This value should be negative.';
+    public string $message = 'This value should be negative.';
 }

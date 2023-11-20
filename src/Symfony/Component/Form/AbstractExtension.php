@@ -98,7 +98,7 @@ abstract class AbstractExtension implements FormExtensionInterface
      *
      * @return FormTypeInterface[]
      */
-    protected function loadTypes()
+    protected function loadTypes(): array
     {
         return [];
     }
@@ -115,10 +115,8 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Registers the type guesser.
-     *
-     * @return FormTypeGuesserInterface|null
      */
-    protected function loadTypeGuesser()
+    protected function loadTypeGuesser(): ?FormTypeGuesserInterface
     {
         return null;
     }

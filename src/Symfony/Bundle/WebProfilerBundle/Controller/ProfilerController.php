@@ -14,6 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Controller;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,7 +41,7 @@ class ProfilerController
     private ?ContentSecurityPolicyHandler $cspHandler;
     private ?string $baseDir;
 
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, ?Profiler $profiler, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
@@ -75,17 +76,20 @@ class ProfilerController
 
         $panel = $request->query->get('panel');
         $page = $request->query->get('page', 'home');
+        $profileType = $request->query->get('type', 'request');
 
-        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null))) {
+        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null, null, fn ($profile) => $profileType === $profile['virtual_type']))) {
             $token = $latest['token'];
         }
 
         if (!$profile = $this->profiler->loadProfile($token)) {
-            return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/info.html.twig', ['about' => 'no_token', 'token' => $token, 'request' => $request]);
+            return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/info.html.twig', ['about' => 'no_token', 'token' => $token, 'request' => $request, 'profile_type' => $profileType]);
         }
 
+        $profileType = $profile->getVirtualType() ?? 'request';
+
         if (null === $panel) {
-            $panel = 'request';
+            $panel = $profileType;
 
             foreach ($profile->getCollectors() as $collector) {
                 if ($collector instanceof ExceptionDataCollector && $collector->hasException()) {
@@ -114,6 +118,7 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
             'profiler_markup_version' => 3, // 1 = original profiler, 2 = Symfony 2.8+ profiler, 3 = Symfony 6.2+ profiler
+            'profile_type' => $profileType,
         ]);
     }
 
@@ -191,6 +196,7 @@ class ProfilerController
                 'limit' => $request->query->get('limit', $session?->get('_profiler_search_limit')),
                 'request' => $request,
                 'render_hidden_by_default' => false,
+                'profile_type' => $request->query->get('type', $session?->get('_profiler_search_type', 'request')),
             ]),
             200,
             ['Content-Type' => 'text/html']
@@ -217,12 +223,13 @@ class ProfilerController
         $start = $request->query->get('start', null);
         $end = $request->query->get('end', null);
         $limit = $request->query->get('limit');
+        $profileType = $request->query->get('type', 'request');
 
         return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/results.html.twig', [
             'request' => $request,
             'token' => $token,
             'profile' => $profile,
-            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode),
+            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode, fn ($profile) => $profileType === $profile['virtual_type']),
             'ip' => $ip,
             'method' => $method,
             'status_code' => $statusCode,
@@ -231,6 +238,7 @@ class ProfilerController
             'end' => $end,
             'limit' => $limit,
             'panel' => null,
+            'profile_type' => $profileType,
         ]);
     }
 
@@ -251,6 +259,7 @@ class ProfilerController
         $end = $request->query->get('end', null);
         $limit = $request->query->get('limit');
         $token = $request->query->get('token');
+        $profileType = $request->query->get('type', 'request');
 
         if (!$request->attributes->getBoolean('_stateless') && $request->hasSession()) {
             $session = $request->getSession();
@@ -263,13 +272,14 @@ class ProfilerController
             $session->set('_profiler_search_end', $end);
             $session->set('_profiler_search_limit', $limit);
             $session->set('_profiler_search_token', $token);
+            $session->set('_profiler_search_type', $profileType);
         }
 
         if (!empty($token)) {
             return new RedirectResponse($this->generator->generate('_profiler', ['token' => $token]), 302, ['Content-Type' => 'text/html']);
         }
 
-        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode);
+        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode, fn ($profile) => $profileType === $profile['virtual_type']);
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', [
             'token' => $tokens ? $tokens[0]['token'] : 'empty',
@@ -280,6 +290,7 @@ class ProfilerController
             'start' => $start,
             'end' => $end,
             'limit' => $limit,
+            'type' => $profileType,
         ]), 302, ['Content-Type' => 'text/html']);
     }
 
@@ -321,6 +332,28 @@ class ProfilerController
         $xdebugInfo = ob_get_clean();
 
         return new Response($xdebugInfo, 200, ['Content-Type' => 'text/html']);
+    }
+
+    /**
+     * Returns the custom web fonts used in the profiler.
+     *
+     * @throws NotFoundHttpException
+     */
+    public function fontAction(string $fontName): Response
+    {
+        $this->denyAccessIfProfilerDisabled();
+        if ('JetBrainsMono' !== $fontName) {
+            throw new NotFoundHttpException(sprintf('Font file "%s.woff2" not found.', $fontName));
+        }
+
+        $fontFile = \dirname(__DIR__).'/Resources/fonts/'.$fontName.'.woff2';
+        if (!is_file($fontFile) || !is_readable($fontFile)) {
+            throw new NotFoundHttpException(sprintf('Cannot read font file "%s".', $fontFile));
+        }
+
+        $this->profiler?->disable();
+
+        return new BinaryFileResponse($fontFile, 200, ['Content-Type' => 'font/woff2']);
     }
 
     /**

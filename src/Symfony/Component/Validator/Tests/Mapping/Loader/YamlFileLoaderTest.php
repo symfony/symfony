@@ -21,6 +21,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
+use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
@@ -161,6 +163,20 @@ class YamlFileLoaderTest extends TestCase
         $loader->loadClassMetadata($metadata);
 
         $expected = new ClassMetadata(GroupSequenceProviderEntity::class);
+        $expected->setGroupSequenceProvider(true);
+
+        $this->assertEquals($expected, $metadata);
+    }
+
+    public function testLoadGroupProvider()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
+        $metadata = new ClassMetadata(GroupProviderDto::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata(GroupProviderDto::class);
+        $expected->setGroupProvider(DummyGroupProvider::class);
         $expected->setGroupSequenceProvider(true);
 
         $this->assertEquals($expected, $metadata);

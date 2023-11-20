@@ -85,12 +85,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
         }
 
         $body = $this->streamFactory->createStreamFromResource($symfonyRequest->getContent(true));
-
-        if (method_exists(Request::class, 'getContentTypeFormat')) {
-            $format = $symfonyRequest->getContentTypeFormat();
-        } else {
-            $format = $symfonyRequest->getContentType();
-        }
+        $format = $symfonyRequest->getContentTypeFormat();
 
         if ('json' === $format) {
             $parsedBody = json_decode($symfonyRequest->getContent(), true, 512, \JSON_BIGINT_AS_STRING);

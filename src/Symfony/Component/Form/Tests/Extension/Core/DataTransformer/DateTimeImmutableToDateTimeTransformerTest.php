@@ -30,7 +30,7 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
         $this->assertEquals($expectedOutput->getTimezone(), $actualOutput->getTimezone());
     }
 
-    public static function provider()
+    public static function provider(): array
     {
         return [
             [

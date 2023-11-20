@@ -18,9 +18,9 @@ namespace Symfony\Component\ExpressionLanguage;
  */
 class Token
 {
-    public $value;
-    public $type;
-    public $cursor;
+    public string $type;
+    public string|int|float|null $value;
+    public ?int $cursor;
 
     public const EOF_TYPE = 'end of expression';
     public const NAME_TYPE = 'name';

@@ -277,6 +277,22 @@ class DateTimeNormalizerTest extends TestCase
         $this->normalizer->denormalize('  2016.01.01  ', \DateTime::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']);
     }
 
+    public function testDenormalizeTimestampWithFormatInContext()
+    {
+        $normalizer = new DateTimeNormalizer();
+        $denormalizedDate = $normalizer->denormalize(1698202249, \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'U']);
+
+        $this->assertSame('2023-10-25 02:50:49', $denormalizedDate->format('Y-m-d H:i:s'));
+    }
+
+    public function testDenormalizeTimestampWithFormatInDefaultContext()
+    {
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'U']);
+        $denormalizedDate = $normalizer->denormalize(1698202249, \DateTimeInterface::class);
+
+        $this->assertSame('2023-10-25 02:50:49', $denormalizedDate->format('Y-m-d H:i:s'));
+    }
+
     public function testDenormalizeDateTimeStringWithDefaultContextFormat()
     {
         $format = 'd/m/Y';

@@ -4,3 +4,5 @@
 /src/Symfony/Component/Messenger/Bridge export-ignore
 /src/Symfony/Component/Notifier/Bridge export-ignore
 /src/Symfony/Component/Runtime export-ignore
+/src/Symfony/Component/Translation/Bridge export-ignore
+/src/Symfony/Component/Intl/Resources/data/*/* linguist-generated=true

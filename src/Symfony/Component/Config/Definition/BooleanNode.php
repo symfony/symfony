@@ -20,10 +20,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  */
 class BooleanNode extends ScalarNode
 {
-    /**
-     * @return void
-     */
-    protected function validateType(mixed $value)
+    protected function validateType(mixed $value): void
     {
         if (!\is_bool($value)) {
             $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "bool", but got "%s".', $this->getPath(), get_debug_type($value)));

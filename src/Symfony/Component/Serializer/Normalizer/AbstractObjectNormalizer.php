@@ -106,14 +106,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
+    protected ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver;
+
     private array $typesCache = [];
     private array $attributesCache = [];
     private readonly \Closure $objectClassResolver;
-
-    /**
-     * @var ClassDiscriminatorResolverInterface|null
-     */
-    protected $classDiscriminatorResolver;
 
     public function __construct(
         ClassMetadataFactoryInterface $classMetadataFactory = null,
@@ -138,20 +135,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $this->objectClassResolver = ($objectClassResolver ?? 'get_class')(...);
     }
 
-    /**
-     * @param array $context
-     *
-     * @return bool
-     */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
 
-    /**
-     * @return array|string|int|float|bool|\ArrayObject|null
-     */
-    public function normalize(mixed $object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -232,10 +221,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return $data;
     }
 
-    /**
-     * @return object
-     */
-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
     {
         if ($class !== $mappedClass = $this->getMappedClass($data, $class, $context)) {
             return $this->instantiateObject($data, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
@@ -286,29 +272,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
+    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
 
     /**
      * Gets the attribute value.
-     *
-     * @return mixed
      */
-    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
+    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
 
-    /**
-     * @param array $context
-     *
-     * @return bool
-     */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
     }
 
-    /**
-     * @return mixed
-     */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -339,7 +315,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $normalizedData = $this->removeNestedValue($serializedPath->getElements(), $normalizedData);
         }
 
-        $normalizedData = array_merge($normalizedData, $nestedData);
+        $normalizedData = $nestedData + $normalizedData;
 
         $object = $this->instantiateObject($normalizedData, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
         $resolvedClass = ($this->objectClassResolver)($object);
@@ -349,7 +325,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $notConverted = $attribute;
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
                 if (isset($nestedData[$notConverted]) && !isset($originalNestedData[$attribute])) {
-                    throw new LogicException(sprintf('Duplicate values for key "%s" found. One value is set via the SerializedPath annotation: "%s", the other one is set via the SerializedName annotation: "%s".', $notConverted, implode('->', $nestedAttributes[$notConverted]->getElements()), $attribute));
+                    throw new LogicException(sprintf('Duplicate values for key "%s" found. One value is set via the SerializedPath attribute: "%s", the other one is set via the SerializedName attribute: "%s".', $notConverted, implode('->', $nestedAttributes[$notConverted]->getElements()), $attribute));
                 }
             }
 
@@ -413,10 +389,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return $object;
     }
 
-    /**
-     * @return void
-     */
-    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
+    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void;
 
     /**
      * Validates the submitted data and denormalizes it.
@@ -756,7 +729,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * Returns all attributes with a SerializedPath annotation and the respective path.
+     * Returns all attributes with a SerializedPath attribute and the respective path.
      */
     private function getNestedAttributes(string $class): array
     {

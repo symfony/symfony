@@ -21,37 +21,45 @@ class ArrayNodeTest extends TestCase
 {
     public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
     {
-        $this->expectException(InvalidTypeException::class);
         $node = new ArrayNode('root');
+
+        $this->expectException(InvalidTypeException::class);
+
         $node->normalize(false);
     }
 
     public function testExceptionThrownOnUnrecognizedChild()
     {
+        $node = new ArrayNode('root');
+
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Unrecognized option "foo" under "root"');
-        $node = new ArrayNode('root');
+
         $node->normalize(['foo' => 'bar']);
     }
 
     public function testNormalizeWithProposals()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Did you mean "alpha1", "alpha2"?');
         $node = new ArrayNode('root');
         $node->addChild(new ArrayNode('alpha1'));
         $node->addChild(new ArrayNode('alpha2'));
         $node->addChild(new ArrayNode('beta'));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Did you mean "alpha1", "alpha2"?');
+
         $node->normalize(['alpha3' => 'foo']);
     }
 
     public function testNormalizeWithoutProposals()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Available options are "alpha1", "alpha2".');
         $node = new ArrayNode('root');
         $node->addChild(new ArrayNode('alpha1'));
         $node->addChild(new ArrayNode('alpha2'));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Available options are "alpha1", "alpha2".');
+
         $node->normalize(['beta' => 'foo']);
     }
 
@@ -193,32 +201,38 @@ class ArrayNodeTest extends TestCase
 
     public function testAddChildEmptyName()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Child nodes must be named.');
         $node = new ArrayNode('root');
 
         $childNode = new ArrayNode('');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Child nodes must be named.');
+
         $node->addChild($childNode);
     }
 
     public function testAddChildNameAlreadyExists()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('A child node named "foo" already exists.');
         $node = new ArrayNode('root');
 
         $childNode = new ArrayNode('foo');
         $node->addChild($childNode);
 
         $childNodeWithSameName = new ArrayNode('foo');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A child node named "foo" already exists.');
+
         $node->addChild($childNodeWithSameName);
     }
 
     public function testGetDefaultValueWithoutDefaultValue()
     {
+        $node = new ArrayNode('foo');
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The node at path "foo" has no default value.');
-        $node = new ArrayNode('foo');
+
         $node->getDefaultValue();
     }
 
@@ -267,14 +281,15 @@ class ArrayNodeTest extends TestCase
      */
     public function testMergeWithoutIgnoringExtraKeys(array $prenormalizeds)
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('merge() expects a normalized config array.');
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));
         $node->addChild(new ScalarNode('bar'));
         $node->setIgnoreExtraKeys(false);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('merge() expects a normalized config array.');
 
         $r->invoke($node, ...$prenormalizeds);
     }
@@ -284,14 +299,15 @@ class ArrayNodeTest extends TestCase
      */
     public function testMergeWithIgnoringAndRemovingExtraKeys(array $prenormalizeds)
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('merge() expects a normalized config array.');
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));
         $node->addChild(new ScalarNode('bar'));
         $node->setIgnoreExtraKeys(true);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('merge() expects a normalized config array.');
 
         $r->invoke($node, ...$prenormalizeds);
     }

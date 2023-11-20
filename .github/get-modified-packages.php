@@ -66,8 +66,10 @@ foreach ($modifiedFiles as $file) {
 
 $output = [];
 foreach ($modifiedPackages as $directory => $bool) {
-    $name = json_decode(file_get_contents($directory.'/composer.json'), true)['name'] ?? 'unknown';
-    $output[] = ['name' => $name, 'directory' => $directory, 'new' => $newPackage[$directory] ?? false, 'type' => getPackageType($directory)];
+    $composerData = json_decode(file_get_contents($directory.'/composer.json'), true);
+    $name = $composerData['name'] ?? 'unknown';
+    $requiresDeprecationContracts = isset($composerData['require']['symfony/deprecation-contracts']);
+    $output[] = ['name' => $name, 'directory' => $directory, 'new' => $newPackage[$directory] ?? false, 'type' => getPackageType($directory), 'requires_deprecation_contracts' => $requiresDeprecationContracts];
 }
 
 echo json_encode($output);

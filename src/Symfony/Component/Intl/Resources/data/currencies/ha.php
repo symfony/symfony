@@ -514,9 +514,13 @@ return [
             'SHP',
             'Fam kin San Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'Kuɗin Salewo',
+        ],
         'SLL' => [
             'SLL',
-            'Kuɗin Salewo',
+            'Kuɗin Salewo (1964—2022)',
         ],
         'SOS' => [
             'SOS',

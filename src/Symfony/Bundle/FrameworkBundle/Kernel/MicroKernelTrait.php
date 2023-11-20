@@ -85,7 +85,7 @@ trait MicroKernelTrait
         }
 
         if (false !== ($fileName = (new \ReflectionObject($this))->getFileName())) {
-            $routes->import($fileName, 'annotation');
+            $routes->import($fileName, 'attribute');
         }
     }
 
@@ -138,10 +138,7 @@ trait MicroKernelTrait
         }
     }
 
-    /**
-     * @return void
-     */
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(function (ContainerBuilder $container) use ($loader) {
             $container->loadFromExtension('framework', [

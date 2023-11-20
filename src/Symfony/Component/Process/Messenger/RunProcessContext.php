@@ -16,16 +16,16 @@ use Symfony\Component\Process\Process;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class RunProcessContext extends RunProcessMessage
+final class RunProcessContext
 {
     public readonly ?int $exitCode;
     public readonly ?string $output;
     public readonly ?string $errorOutput;
 
-    public function __construct(RunProcessMessage $message, Process $process)
-    {
-        parent::__construct($message->command, $message->cwd, $message->env, $message->input, $message->timeout);
-
+    public function __construct(
+        public readonly RunProcessMessage $message,
+        Process $process,
+    ) {
         $this->exitCode = $process->getExitCode();
         $this->output = $process->isOutputDisabled() ? null : $process->getOutput();
         $this->errorOutput = $process->isOutputDisabled() ? null : $process->getErrorOutput();

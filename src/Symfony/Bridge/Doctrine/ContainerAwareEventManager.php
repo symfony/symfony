@@ -44,7 +44,7 @@ class ContainerAwareEventManager extends EventManager
         $this->listeners = $listeners;
     }
 
-    public function dispatchEvent($eventName, EventArgs $eventArgs = null): void
+    public function dispatchEvent(string $eventName, EventArgs $eventArgs = null): void
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -64,13 +64,8 @@ class ContainerAwareEventManager extends EventManager
         }
     }
 
-    public function getListeners($event = null): array
+    public function getListeners(string $event): array
     {
-        if (null === $event) {
-            trigger_deprecation('symfony/doctrine-bridge', '6.2', 'Calling "%s()" without an event name is deprecated. Call "getAllListeners()" instead.', __METHOD__);
-
-            return $this->getAllListeners();
-        }
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
         }
@@ -96,7 +91,7 @@ class ContainerAwareEventManager extends EventManager
         return $this->listeners;
     }
 
-    public function hasListeners($event): bool
+    public function hasListeners(string $event): bool
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -105,7 +100,7 @@ class ContainerAwareEventManager extends EventManager
         return isset($this->listeners[$event]) && $this->listeners[$event];
     }
 
-    public function addEventListener($events, $listener): void
+    public function addEventListener(string|array $events, object|string $listener): void
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -127,7 +122,7 @@ class ContainerAwareEventManager extends EventManager
         }
     }
 
-    public function removeEventListener($events, $listener): void
+    public function removeEventListener(string|array $events, object|string $listener): void
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -204,12 +199,8 @@ class ContainerAwareEventManager extends EventManager
                 $this->addEventListener(...$listener);
                 continue;
             }
-            if (\is_string($listener)) {
-                $listener = $this->container->get($listener);
-            }
-            // throw new \InvalidArgumentException(sprintf('Using Doctrine subscriber "%s" is not allowed, declare it as a listener instead.', \is_object($listener) ? $listener::class : $listener));
-            trigger_deprecation('symfony/doctrine-bridge', '6.3', 'Registering "%s" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.', \is_object($listener) ? get_debug_type($listener) : $listener);
-            parent::addEventSubscriber($listener);
+
+            throw new \InvalidArgumentException(sprintf('Using Doctrine subscriber "%s" is not allowed, declare it as a listener instead.', get_debug_type($listener)));
         }
     }
 

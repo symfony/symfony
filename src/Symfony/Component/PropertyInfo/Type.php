@@ -38,7 +38,7 @@ class Type
      *
      * @var string[]
      */
-    public static $builtinTypes = [
+    public static array $builtinTypes = [
         self::BUILTIN_TYPE_INT,
         self::BUILTIN_TYPE_FLOAT,
         self::BUILTIN_TYPE_STRING,
@@ -58,7 +58,7 @@ class Type
      *
      * @var string[]
      */
-    public static $builtinCollectionTypes = [
+    public static array $builtinCollectionTypes = [
         self::BUILTIN_TYPE_ARRAY,
         self::BUILTIN_TYPE_ITERABLE,
     ];
@@ -76,7 +76,7 @@ class Type
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $builtinType, bool $nullable = false, string $class = null, bool $collection = false, array|Type $collectionKeyType = null, array|Type $collectionValueType = null)
+    public function __construct(string $builtinType, bool $nullable = false, string $class = null, bool $collection = false, array|self $collectionKeyType = null, array|self $collectionValueType = null)
     {
         if (!\in_array($builtinType, self::$builtinTypes)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));
@@ -90,7 +90,7 @@ class Type
         $this->collectionValueType = $this->validateCollectionArgument($collectionValueType, 6, '$collectionValueType') ?? [];
     }
 
-    private function validateCollectionArgument(array|Type|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
+    private function validateCollectionArgument(array|self|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
     {
         if (null === $collectionArgument) {
             return null;

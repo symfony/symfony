@@ -165,6 +165,7 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.listener.reset_services')->nullOnInvalid(),
                 [], // Bus names
                 service('messenger.rate_limiter_locator')->nullOnInvalid(),
+                null,
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])
@@ -196,6 +197,7 @@ return static function (ContainerConfigurator $container) {
                 service('event_dispatcher'),
                 service('logger')->nullOnInvalid(),
                 service('messenger.transport.native_php_serializer')->nullOnInvalid(),
+                null,
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])

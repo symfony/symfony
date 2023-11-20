@@ -13,7 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Scaleway\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayApiTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mime\Address;
@@ -65,7 +65,7 @@ class ScalewayApiTransportTest extends TestCase
             $this->assertSame('Hello!', $body['subject']);
             $this->assertSame('Hello There!', $body['text']);
 
-            return new MockResponse(json_encode(['emails' => [['message_id' => 'foobar']]]), [
+            return new JsonMockResponse(['emails' => [['message_id' => 'foobar']]], [
                 'http_code' => 200,
             ]);
         });
@@ -86,11 +86,8 @@ class ScalewayApiTransportTest extends TestCase
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
+            return new JsonMockResponse(['message' => 'i\'m a teapot'], [
                 'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
             ]);
         });
         $transport = new ScalewayApiTransport('PROJECT_ID', 'TOKEN', 'fr-par', $client);

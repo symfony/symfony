@@ -250,9 +250,6 @@ class LazyProxyTraitTest extends TestCase
         $this->assertSame([123], $proxy->foo);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testReadOnlyClass()
     {
         if (\PHP_VERSION_ID < 80300) {
@@ -300,7 +297,7 @@ class LazyProxyTraitTest extends TestCase
         $class = str_replace('\\', '_', $class).'_'.md5($proxy);
 
         if (!class_exists($class, false)) {
-            eval((\PHP_VERSION_ID >= 80200 && $r->isReadOnly() ? 'readonly ' : '').'class '.$class.' '.$proxy);
+            eval(($r->isReadOnly() ? 'readonly ' : '').'class '.$class.' '.$proxy);
         }
 
         return $class::createLazyProxy($initializer);

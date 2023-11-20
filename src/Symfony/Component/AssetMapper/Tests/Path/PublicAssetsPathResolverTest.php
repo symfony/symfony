@@ -19,38 +19,17 @@ class PublicAssetsPathResolverTest extends TestCase
     public function testResolvePublicPath()
     {
         $resolver = new PublicAssetsPathResolver(
-            '/projectRootDir/',
             '/assets-prefix/',
-            'publicDirName',
         );
         $this->assertSame('/assets-prefix/', $resolver->resolvePublicPath(''));
         $this->assertSame('/assets-prefix/foo/bar', $resolver->resolvePublicPath('/foo/bar'));
         $this->assertSame('/assets-prefix/foo/bar', $resolver->resolvePublicPath('foo/bar'));
 
         $resolver = new PublicAssetsPathResolver(
-            '/projectRootDir/',
             '/assets-prefix', // The trailing slash should be added automatically
-            'publicDirName',
         );
         $this->assertSame('/assets-prefix/', $resolver->resolvePublicPath(''));
         $this->assertSame('/assets-prefix/foo/bar', $resolver->resolvePublicPath('/foo/bar'));
         $this->assertSame('/assets-prefix/foo/bar', $resolver->resolvePublicPath('foo/bar'));
-    }
-
-    public function testGetPublicFilesystemPath()
-    {
-        $resolver = new PublicAssetsPathResolver(
-            '/path/to/projectRootDir/',
-            '/assets-prefix',
-            'publicDirName',
-        );
-        $this->assertSame('/path/to/projectRootDir/publicDirName/assets-prefix', $resolver->getPublicFilesystemPath());
-
-        $resolver = new PublicAssetsPathResolver(
-            '/path/to/projectRootDir',
-            '/assets-prefix/',
-            'publicDirName',
-        );
-        $this->assertSame('/path/to/projectRootDir/publicDirName/assets-prefix', $resolver->getPublicFilesystemPath());
     }
 }

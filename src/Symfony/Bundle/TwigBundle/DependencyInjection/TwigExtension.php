@@ -22,6 +22,7 @@ use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Service\ResetInterface;
 use Twig\Extension\ExtensionInterface;
@@ -36,10 +37,7 @@ use Twig\Loader\LoaderInterface;
  */
 class TwigExtension extends Extension
 {
-    /**
-     * @return void
-     */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
@@ -84,6 +82,10 @@ class TwigExtension extends Extension
 
             if ($htmlToTextConverter = $config['mailer']['html_to_text_converter'] ?? null) {
                 $container->getDefinition('twig.mime_body_renderer')->setArgument('$converter', new Reference($htmlToTextConverter));
+            }
+
+            if (ContainerBuilder::willBeAvailable('symfony/translation', LocaleSwitcher::class, ['symfony/framework-bundle'])) {
+                $container->getDefinition('twig.mime_body_renderer')->setArgument('$localeSwitcher', new Reference('translation.locale_switcher', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE));
             }
         }
 
@@ -153,6 +155,8 @@ class TwigExtension extends Extension
 
         if (isset($config['autoescape_service'])) {
             $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method'] ?? '__invoke'];
+        } else {
+            $config['autoescape'] = 'name';
         }
 
         $container->getDefinition('twig')->replaceArgument(1, array_intersect_key($config, [

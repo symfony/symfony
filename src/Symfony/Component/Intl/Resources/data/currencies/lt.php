@@ -898,9 +898,13 @@ return [
             'SKK',
             'Slovakijos krona',
         ],
+        'SLE' => [
+            'SLE',
+            'Siera Leonės leonė',
+        ],
         'SLL' => [
             'SLL',
-            'Siera Leonės leonė',
+            'Siera Leonės leonė (1964—2022)',
         ],
         'SOS' => [
             'SOS',

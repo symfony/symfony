@@ -249,8 +249,8 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public static function provideDataForToleratesForGroup() {
-
+    public static function provideDataForToleratesForGroup(): iterable
+    {
         yield 'total threshold not reached' => ['max[total]=1', [
             'unsilenced' => 0,
             'self' => 0,

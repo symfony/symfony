@@ -141,7 +141,6 @@ class DoctrineLoaderTest extends TestCase
     public function testExtractEnum()
     {
         $validator = Validation::createValidatorBuilder()
-            ->addMethodMapping('loadValidatorMetadata')
             ->enableAttributeMapping()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
             ->getValidator()

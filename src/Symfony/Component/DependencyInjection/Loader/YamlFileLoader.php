@@ -110,12 +110,12 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private YamlParser $yamlParser;
+    protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
+    private YamlParser $yamlParser;
     private int $anonymousServicesCount;
     private string $anonymousServicesSuffix;
 
-    protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
     public function load(mixed $resource, string $type = null): mixed
     {
@@ -843,10 +843,6 @@ class YamlFileLoader extends FileLoader
                 }
 
                 $argument = $this->resolveServices($argument, $file, $isParameter);
-
-                if (isset($argument[0])) {
-                    trigger_deprecation('symfony/dependency-injection', '6.3', 'Using integers as keys in a "!service_locator" tag is deprecated. The keys will default to the IDs of the original services in 7.0.');
-                }
 
                 return new ServiceLocatorArgument($argument);
             }

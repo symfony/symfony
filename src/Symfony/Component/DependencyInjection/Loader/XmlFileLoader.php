@@ -39,7 +39,7 @@ class XmlFileLoader extends FileLoader
 {
     public const NS = 'http://symfony.com/schema/dic/services';
 
-    protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
+    protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
     public function load(mixed $resource, string $type = null): mixed
     {
@@ -583,11 +583,6 @@ class XmlFileLoader extends FileLoader
                     break;
                 case 'service_locator':
                     $arg = $this->getArgumentsAsPhp($arg, $name, $file);
-
-                    if (isset($arg[0])) {
-                        trigger_deprecation('symfony/dependency-injection', '6.3', 'Skipping "key" argument or using integers as values in a "service_locator" tag is deprecated. The keys will default to the IDs of the original services in 7.0.');
-                    }
-
                     $arguments[$key] = new ServiceLocatorArgument($arg);
                     break;
                 case 'tagged':

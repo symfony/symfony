@@ -334,6 +334,7 @@ class EntityValueResolverTest extends TestCase
             ->method('evaluate')
             ->with('repository.findOneByCustomMethod(id)', [
                 'repository' => $repository,
+                'request' => $request,
                 'id' => 5,
             ])
             ->willReturn($object = new \stdClass());

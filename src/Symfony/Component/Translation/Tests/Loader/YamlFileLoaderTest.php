@@ -22,7 +22,7 @@ class YamlFileLoaderTest extends TestCase
     public function testLoad()
     {
         $loader = new YamlFileLoader();
-        $resource = __DIR__.'/../fixtures/resources.yml';
+        $resource = __DIR__.'/../Fixtures/resources.yml';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
@@ -33,7 +33,7 @@ class YamlFileLoaderTest extends TestCase
     public function testLoadNonStringMessages()
     {
         $loader = new YamlFileLoader();
-        $resource = __DIR__.'/../fixtures/non-string.yml';
+        $resource = __DIR__.'/../Fixtures/non-string.yml';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertSame(['root.foo2' => '', 'root.bar' => 'bar'], $catalogue->all('domain1'));
@@ -42,7 +42,7 @@ class YamlFileLoaderTest extends TestCase
     public function testLoadDoesNothingIfEmpty()
     {
         $loader = new YamlFileLoader();
-        $resource = __DIR__.'/../fixtures/empty.yml';
+        $resource = __DIR__.'/../Fixtures/empty.yml';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals([], $catalogue->all('domain1'));
@@ -54,7 +54,7 @@ class YamlFileLoaderTest extends TestCase
     {
         $this->expectException(NotFoundResourceException::class);
         $loader = new YamlFileLoader();
-        $resource = __DIR__.'/../fixtures/non-existing.yml';
+        $resource = __DIR__.'/../Fixtures/non-existing.yml';
         $loader->load($resource, 'en', 'domain1');
     }
 
@@ -70,7 +70,7 @@ class YamlFileLoaderTest extends TestCase
     {
         $this->expectException(InvalidResourceException::class);
         $loader = new YamlFileLoader();
-        $resource = __DIR__.'/../fixtures/non-valid.yml';
+        $resource = __DIR__.'/../Fixtures/non-valid.yml';
         $loader->load($resource, 'en', 'domain1');
     }
 }

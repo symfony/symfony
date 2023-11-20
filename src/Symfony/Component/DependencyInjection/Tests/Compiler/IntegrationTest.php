@@ -55,6 +55,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3Configurator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService4;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -391,7 +392,12 @@ class IntegrationTest extends TestCase
 
     public function testLocatorConfiguredViaAttribute()
     {
+        if (!property_exists(SubscribedService::class, 'type')) {
+            $this->markTestSkipped('Requires symfony/service-contracts >= 3.2');
+        }
+
         $container = new ContainerBuilder();
+        $container->setParameter('some.parameter', 'foo');
         $container->register(BarTagClass::class)
             ->setPublic(true)
         ;
@@ -411,6 +417,8 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(BarTagClass::class), $s->locator->get(BarTagClass::class));
         self::assertSame($container->get(FooTagClass::class), $s->locator->get('with_key'));
         self::assertFalse($s->locator->has('nullable'));
+        self::assertSame('foo', $s->locator->get('subscribed'));
+        self::assertSame('foo', $s->locator->get('subscribed1'));
     }
 
     public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute()
@@ -613,7 +621,7 @@ class IntegrationTest extends TestCase
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
 
-        self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
+        self::assertSame([BarTagClass::class, FooTagClass::class], array_keys($factories->getValue($locator)));
     }
 
     public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
@@ -642,7 +650,7 @@ class IntegrationTest extends TestCase
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
 
-        self::assertSame(['foo_tag_class', 'bar_tag_class'], array_keys($factories->getValue($locator)));
+        self::assertSame(['bar_tag_class', 'foo_tag_class'], array_keys($factories->getValue($locator)));
         self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }

@@ -61,8 +61,10 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidSessionName($sessionName)
     {
-        $this->expectException(InvalidConfigurationException::class);
         $processor = new Processor();
+
+        $this->expectException(InvalidConfigurationException::class);
+
         $processor->processConfiguration(
             new Configuration(true),
             [[
@@ -132,9 +134,8 @@ class ConfigurationTest extends TestCase
             'missing_import_mode' => 'warn',
             'extensions' => [],
             'importmap_path' => '%kernel.project_dir%/importmap.php',
-            'importmap_polyfill' => null,
+            'importmap_polyfill' => 'es-module-shims',
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
-            'provider' => 'jsdelivr.esm',
             'importmap_script_attributes' => [],
         ];
 
@@ -164,7 +165,7 @@ class ConfigurationTest extends TestCase
         $this->assertArrayHasKey($packageName, $config['assets']['packages']);
     }
 
-    public static function provideValidAssetsPackageNameConfigurationTests()
+    public static function provideValidAssetsPackageNameConfigurationTests(): array
     {
         return [
             ['foobar'],
@@ -178,11 +179,12 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
     {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $processor = new Processor();
-        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, [
                 [
                     'http_method_override' => false,
@@ -193,7 +195,7 @@ class ConfigurationTest extends TestCase
             ]);
     }
 
-    public static function provideInvalidAssetConfigurationTests()
+    public static function provideInvalidAssetConfigurationTests(): iterable
     {
         // helper to turn config into embedded package config
         $createPackageConfig = fn (array $packageConfig) => [
@@ -247,7 +249,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($processedConfig, $config['lock']);
     }
 
-    public static function provideValidLockConfigurationTests()
+    public static function provideValidLockConfigurationTests(): iterable
     {
         yield [null, ['enabled' => true, 'resources' => ['default' => [class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock']]]];
 
@@ -602,12 +604,10 @@ class ConfigurationTest extends TestCase
                     'enabled' => true,
                     'endpoint' => null,
                 ],
+                'email_validation_mode' => 'html5',
             ],
             'annotations' => [
-                'cache' => 'php_array',
-                'file_cache_dir' => '%kernel.cache_dir%/annotations',
-                'debug' => true,
-                'enabled' => true,
+                'enabled' => false,
             ],
             'serializer' => [
                 'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
@@ -638,11 +638,10 @@ class ConfigurationTest extends TestCase
             'session' => [
                 'enabled' => false,
                 'storage_factory_id' => 'session.storage.factory.native',
-                'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
-                'cookie_samesite' => null,
+                'cookie_samesite' => 'lax',
+                'cookie_secure' => 'auto',
                 'gc_probability' => 1,
-                'save_path' => '%kernel.cache_dir%/sessions',
                 'metadata_update_threshold' => 0,
             ],
             'request' => [
@@ -669,9 +668,8 @@ class ConfigurationTest extends TestCase
                 'missing_import_mode' => 'warn',
                 'extensions' => [],
                 'importmap_path' => '%kernel.project_dir%/importmap.php',
-                'importmap_polyfill' => null,
+                'importmap_polyfill' => 'es-module-shims',
                 'vendor_dir' => '%kernel.project_dir%/assets/vendor',
-                'provider' => 'jsdelivr.esm',
                 'importmap_script_attributes' => [],
             ],
             'cache' => [
@@ -723,7 +721,6 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
-                'reset_on_message' => true,
                 'stop_worker_on_signals' => [],
             ],
             'disallow_search_engine_index' => true,
@@ -766,9 +763,9 @@ class ConfigurationTest extends TestCase
             ],
             'uid' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
-                'default_uuid_version' => 6,
+                'default_uuid_version' => 7,
                 'name_based_uuid_version' => 5,
-                'time_based_uuid_version' => 6,
+                'time_based_uuid_version' => 7,
             ],
             'html_sanitizer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),

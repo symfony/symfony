@@ -81,9 +81,11 @@ class RouterDebugCommandTest extends AbstractWebTestCase
 
     public function testSearchWithThrow()
     {
+        $tester = $this->createCommandTester();
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The route "gerard" does not exist.');
-        $tester = $this->createCommandTester();
+
         $tester->execute(['name' => 'gerard'], ['interactive' => true]);
     }
 
@@ -96,7 +98,21 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
-    public static function provideCompletionSuggestions()
+    /**
+     * @testWith    ["txt"]
+     *              ["xml"]
+     *              ["json"]
+     *              ["md"]
+     */
+    public function testShowAliases(string $format)
+    {
+        $tester = $this->createCommandTester();
+
+        $this->assertSame(0, $tester->execute(['--show-aliases' => true, '--format' => $format]));
+        $this->assertStringContainsString('my_custom_alias', $tester->getDisplay());
+    }
+
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'option --format' => [
             ['--format', ''],

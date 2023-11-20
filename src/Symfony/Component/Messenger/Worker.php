@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
@@ -117,6 +118,8 @@ class Worker
                 // this should prevent multiple lower priority receivers from
                 // blocking too long before the higher priority are checked
                 if ($envelopeHandled) {
+                    gc_collect_cycles();
+
                     break;
                 }
             }
@@ -186,7 +189,7 @@ class Worker
                     $receiver->reject($envelope);
                 }
 
-                if ($e instanceof HandlerFailedException) {
+                if ($e instanceof HandlerFailedException || ($e instanceof DelayedMessageHandlingException && null !== $e->getEnvelope())) {
                     $envelope = $e->getEnvelope();
                 }
 

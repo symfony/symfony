@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Doctrine\Common\Annotations\AnnotationException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
@@ -39,7 +38,7 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
         $this->validatorBuilder = $validatorBuilder;
     }
 
-    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter): bool
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, string $buildDir = null): bool
     {
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), $arrayAdapter);
@@ -50,8 +49,6 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
                     if ($metadataFactory->hasMetadataFor($mappedClass)) {
                         $metadataFactory->getMetadataFor($mappedClass);
                     }
-                } catch (AnnotationException) {
-                    // ignore failing annotations
                 } catch (\Exception $e) {
                     $this->ignoreAutoloadException($mappedClass, $e);
                 }

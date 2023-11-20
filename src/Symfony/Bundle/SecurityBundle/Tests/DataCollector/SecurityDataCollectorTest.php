@@ -103,7 +103,7 @@ class SecurityDataCollectorTest extends TestCase
         $adminToken = new UsernamePasswordToken(new InMemoryUser('yceruto', 'P4$$w0rD', ['ROLE_ADMIN']), 'provider', ['ROLE_ADMIN']);
 
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), 'provider', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $adminToken));
+        $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER']), 'provider', ['ROLE_USER'], $adminToken));
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
         $collector->collect(new Request(), new Response());
@@ -115,7 +115,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('yceruto', $collector->getImpersonatorUser());
         $this->assertSame(SwitchUserToken::class, $collector->getTokenClass()->getValue());
         $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertSame(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $collector->getRoles()->getValue(true));
+        $this->assertSame(['ROLE_USER'], $collector->getRoles()->getValue(true));
         $this->assertSame([], $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
     }
@@ -397,7 +397,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
     }
 
-    public static function provideRoles()
+    public static function provideRoles(): array
     {
         return [
             // Basic roles

@@ -427,8 +427,8 @@ class HtmlSanitizerAllTest extends TestCase
                 '<hr />',
             ],
             [
-                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title">',
-                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title" />',
+                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title" height="150" width="300">',
+                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title" height="150" width="300" />',
             ],
             [
                 '<img src="http://trusted.com/img/example.jpg" alt="Image alternative text" title="Image title" />',
@@ -560,5 +560,16 @@ class HtmlSanitizerAllTest extends TestCase
         foreach ($cases as $case) {
             yield $case[0] => $case;
         }
+    }
+
+    public function testUnlimitedLength()
+    {
+        $sanitizer = new HtmlSanitizer((new HtmlSanitizerConfig())->withMaxInputLength(-1));
+
+        $input = str_repeat('a', 10_000_000);
+
+        $sanitized = $sanitizer->sanitize($input);
+
+        $this->assertSame(\strlen($input), \strlen($sanitized));
     }
 }

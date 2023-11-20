@@ -57,21 +57,6 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
                     }
                     break;
                 }
-                if (false !== $doc = $r->getDocComment()) {
-                    if (false !== stripos($doc, '@required') && preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
-                        trigger_deprecation('symfony/dependency-injection', '6.3', 'Relying on the "@required" annotation on method "%s::%s()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.', $reflectionMethod->class, $reflectionMethod->name);
-
-                        if ($this->isWither($reflectionMethod, $doc)) {
-                            $withers[] = [$reflectionMethod->name, [], true];
-                        } else {
-                            $value->addMethodCall($reflectionMethod->name, []);
-                        }
-                        break;
-                    }
-                    if (false === stripos($doc, '@inheritdoc') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+(?:\{@inheritdoc\}|@inheritdoc)(?:\s|\*/$)#i', $doc)) {
-                        break;
-                    }
-                }
                 try {
                     $r = $r->getPrototype();
                 } catch (\ReflectionException) {

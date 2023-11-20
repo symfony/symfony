@@ -34,7 +34,7 @@ class HeaderUtilsTest extends TestCase
             [['foo', '123, bar'], 'foo=123, bar', '='],
             [['foo', '123, bar'], ' foo = 123, bar ', '='],
             [[['foo', '123'], ['bar']], 'foo=123, bar', ',='],
-            [[[['foo', '123']], [['bar'], ['foo', '456']]], 'foo=123, bar; foo=456', ',;='],
+            [[[['foo', '123']], [['bar'], ['foo', '456']]], 'foo=123, bar;; foo=456', ',;='],
             [[[['foo', 'a,b;c=d']]], 'foo="a,b;c=d"', ',;='],
 
             [['foo', 'bar'], 'foo,,,, bar', ','],
@@ -46,13 +46,15 @@ class HeaderUtilsTest extends TestCase
 
             [[['foo_cookie', 'foo=1&bar=2&baz=3'], ['expires', 'Tue, 22-Sep-2020 06:27:09 GMT'], ['path', '/']], 'foo_cookie=foo=1&bar=2&baz=3; expires=Tue, 22-Sep-2020 06:27:09 GMT; path=/', ';='],
             [[['foo_cookie', 'foo=='], ['expires', 'Tue, 22-Sep-2020 06:27:09 GMT'], ['path', '/']], 'foo_cookie=foo==; expires=Tue, 22-Sep-2020 06:27:09 GMT; path=/', ';='],
+            [[['foo_cookie', 'foo='], ['expires', 'Tue, 22-Sep-2020 06:27:09 GMT'], ['path', '/']], 'foo_cookie=foo=; expires=Tue, 22-Sep-2020 06:27:09 GMT; path=/', ';='],
             [[['foo_cookie', 'foo=a=b'], ['expires', 'Tue, 22-Sep-2020 06:27:09 GMT'], ['path', '/']], 'foo_cookie=foo="a=b"; expires=Tue, 22-Sep-2020 06:27:09 GMT; path=/', ';='],
 
             // These are not a valid header values. We test that they parse anyway,
             // and that both the valid and invalid parts are returned.
             [[], '', ','],
             [[], ',,,', ','],
-            [['foo', 'bar', 'baz'], 'foo, "bar", "baz', ','],
+            [[['', 'foo'], ['bar', '']], '=foo,bar=', ',='],
+            [['foo', 'foobar', 'baz'], 'foo, foo"bar", "baz', ','],
             [['foo', 'bar, baz'], 'foo, "bar, baz', ','],
             [['foo', 'bar, baz\\'], 'foo, "bar, baz\\', ','],
             [['foo', 'bar, baz\\'], 'foo, "bar, baz\\\\', ','],

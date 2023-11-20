@@ -22,11 +22,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentL
 
 class ServiceValueResolverTest extends TestCase
 {
-    /**
-     * In Symfony 7, keep this test case but remove the call to supports().
-     *
-     * @group legacy
-     */
     public function testDoNotSupportWhenControllerDoNotExists()
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([]));
@@ -34,7 +29,6 @@ class ServiceValueResolverTest extends TestCase
         $request = $this->requestWithAttributes(['_controller' => 'my_controller']);
 
         $this->assertSame([], $resolver->resolve($request, $argument));
-        $this->assertFalse($resolver->supports($request, $argument));
     }
 
     public function testExistingController()

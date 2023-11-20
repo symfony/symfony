@@ -25,14 +25,14 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
     private string $dsn;
     private string $driver;
     private string $serverVersion;
-    private mixed $table = 'cache_items';
-    private mixed $idCol = 'item_id';
-    private mixed $dataCol = 'item_data';
-    private mixed $lifetimeCol = 'item_lifetime';
-    private mixed $timeCol = 'item_time';
-    private mixed $username = '';
-    private mixed $password = '';
-    private mixed $connectionOptions = [];
+    private string $table = 'cache_items';
+    private string $idCol = 'item_id';
+    private string $dataCol = 'item_data';
+    private string $lifetimeCol = 'item_lifetime';
+    private string $timeCol = 'item_time';
+    private ?string $username = null;
+    private ?string $password = null;
+    private array $connectionOptions = [];
     private string $namespace;
 
     /**
@@ -95,12 +95,10 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
      * Cache ID are saved in a column of maximum length 255. Cache data is
      * saved in a BLOB.
      *
-     * @return void
-     *
      * @throws \PDOException    When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
-    public function createTable()
+    public function createTable(): void
     {
         // connect if we are not yet
         $conn = $this->getConnection();
@@ -286,7 +284,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         try {
             $stmt = $conn->prepare($sql);
         } catch (\PDOException) {
-            if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
             }
             $stmt = $conn->prepare($sql);
@@ -321,7 +319,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             try {
                 $stmt->execute();
             } catch (\PDOException) {
-                if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+                if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                     $this->createTable();
                 }
                 $stmt->execute();
@@ -368,5 +366,22 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
     private function getServerVersion(): string
     {
         return $this->serverVersion ??= $this->conn->getAttribute(\PDO::ATTR_SERVER_VERSION);
+    }
+
+    private function isTableMissing(\PDOException $exception): bool
+    {
+        $driver = $this->driver;
+        $code = $exception->getCode();
+
+        switch (true) {
+            case 'pgsql' === $driver && '42P01' === $code:
+            case 'sqlite' === $driver && str_contains($exception->getMessage(), 'no such table:'):
+            case 'oci' === $driver && 942 === $code:
+            case 'sqlsrv' === $driver && 208 === $code:
+            case 'mysql' === $driver && 1146 === $code:
+                return true;
+            default:
+                return false;
+        }
     }
 }

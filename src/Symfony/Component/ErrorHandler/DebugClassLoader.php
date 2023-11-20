@@ -104,6 +104,10 @@ class DebugClassLoader
         '__toString' => 'string',
         '__debugInfo' => 'array',
         '__serialize' => 'array',
+        '__set' => 'void',
+        '__unset' => 'void',
+        '__unserialize' => 'void',
+        '__wakeup' => 'void',
     ];
 
     /**
@@ -551,9 +555,7 @@ class DebugClassLoader
             $forcePatchTypes = $this->patchTypes['force'];
 
             if ($canAddReturnType = null !== $forcePatchTypes && !str_contains($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
-                if ('void' !== (self::MAGIC_METHODS[$method->name] ?? 'void')) {
-                    $this->patchTypes['force'] = $forcePatchTypes ?: 'docblock';
-                }
+                $this->patchTypes['force'] = $forcePatchTypes ?: 'docblock';
 
                 $canAddReturnType = 2 === (int) $forcePatchTypes
                     || false !== stripos($method->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
@@ -592,7 +594,7 @@ class DebugClassLoader
                 continue;
             }
 
-            if (isset($doc['return']) || 'void' !== (self::MAGIC_METHODS[$method->name] ?? 'void')) {
+            if (isset($doc['return'])) {
                 $this->setReturnType($doc['return'] ?? self::MAGIC_METHODS[$method->name], $method->class, $method->name, $method->getFileName(), $parent, $method->getReturnType());
 
                 if (isset(self::$returnTypes[$class][$method->name][0]) && $canAddReturnType) {

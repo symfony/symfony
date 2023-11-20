@@ -129,10 +129,16 @@ EOF
             $options['filter'] = $this->filterToServiceTypes(...);
         } elseif ($input->getOption('parameters')) {
             $parameters = [];
-            foreach ($object->getParameterBag()->all() as $k => $v) {
+            $parameterBag = $object->getParameterBag();
+            foreach ($parameterBag->all() as $k => $v) {
                 $parameters[$k] = $object->resolveEnvPlaceholders($v);
             }
             $object = new ParameterBag($parameters);
+            if ($parameterBag instanceof ParameterBag) {
+                foreach ($parameterBag->allDeprecated() as $k => $deprecation) {
+                    $object->deprecate($k, ...$deprecation);
+                }
+            }
             $options = [];
         } elseif ($parameter = $input->getOption('parameter')) {
             $options = ['parameter' => $parameter];

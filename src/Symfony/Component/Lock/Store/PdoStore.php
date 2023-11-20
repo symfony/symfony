@@ -38,8 +38,8 @@ class PdoStore implements PersistingStoreInterface
     private \PDO $conn;
     private string $dsn;
     private string $driver;
-    private string $username = '';
-    private string $password = '';
+    private ?string $username = null;
+    private ?string $password = null;
     private array $connectionOptions = [];
 
     /**
@@ -83,10 +83,7 @@ class PdoStore implements PersistingStoreInterface
         $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $key->reduceLifetime($this->initialTtl);
 
@@ -95,7 +92,7 @@ class PdoStore implements PersistingStoreInterface
         try {
             $stmt = $conn->prepare($sql);
         } catch (\PDOException) {
-            if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
             }
             $stmt = $conn->prepare($sql);
@@ -107,18 +104,25 @@ class PdoStore implements PersistingStoreInterface
         try {
             $stmt->execute();
         } catch (\PDOException) {
-            // the lock is already acquired. It could be us. Let's try to put off.
-            $this->putOffExpiration($key, $this->initialTtl);
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
+                $this->createTable();
+
+                try {
+                    $stmt->execute();
+                } catch (\PDOException $e) {
+                    $this->putOffExpiration($key, $this->initialTtl);
+                }
+            } else {
+                // the lock is already acquired. It could be us. Let's try to put off.
+                $this->putOffExpiration($key, $this->initialTtl);
+            }
         }
 
         $this->randomlyPrune();
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         if ($ttl < 1) {
             throw new InvalidTtlException(sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
@@ -143,10 +147,7 @@ class PdoStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";
         $stmt = $this->getConnection()->prepare($sql);
@@ -237,5 +238,22 @@ class PdoStore implements PersistingStoreInterface
             'sqlsrv' => 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())',
             default => (string) time(),
         };
+    }
+
+    private function isTableMissing(\PDOException $exception): bool
+    {
+        $driver = $this->getDriver();
+        $code = $exception->getCode();
+
+        switch (true) {
+            case 'pgsql' === $driver && '42P01' === $code:
+            case 'sqlite' === $driver && str_contains($exception->getMessage(), 'no such table:'):
+            case 'oci' === $driver && 942 === $code:
+            case 'sqlsrv' === $driver && 208 === $code:
+            case 'mysql' === $driver && 1146 === $code:
+                return true;
+            default:
+                return false;
+        }
     }
 }

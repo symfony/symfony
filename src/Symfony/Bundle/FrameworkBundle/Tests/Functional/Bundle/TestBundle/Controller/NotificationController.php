@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Cont
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
+use Symfony\Component\Notifier\Recipient\Recipient;
 
 final class NotificationController
 {
@@ -21,13 +22,16 @@ final class NotificationController
     {
         $firstNotification = new Notification('Hello World!', ['chat/slack']);
         $firstNotification->content('Symfony is awesome!');
-
         $notifier->send($firstNotification);
 
         $secondNotification = (new Notification('New urgent notification'))
             ->importance(Notification::IMPORTANCE_URGENT)
         ;
         $notifier->send($secondNotification);
+
+        $thirdNotification = new Notification('Hello World!', ['sms']);
+        $thirdNotification->content('Symfony is awesome!');
+        $notifier->send($thirdNotification, new Recipient('', '112'));
 
         return new Response();
     }

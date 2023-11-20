@@ -13,13 +13,14 @@ namespace Symfony\Component\Messenger\Exception;
 
 use Symfony\Component\Messenger\Envelope;
 
-class HandlerFailedException extends RuntimeException
+class HandlerFailedException extends RuntimeException implements WrappedExceptionsInterface
 {
-    private array $exceptions;
+    use WrappedExceptionsTrait;
+
     private Envelope $envelope;
 
     /**
-     * @param \Throwable[] $exceptions
+     * @param \Throwable[] $exceptions The name of the handler should be given as key
      */
     public function __construct(Envelope $envelope, array $exceptions)
     {
@@ -43,23 +44,5 @@ class HandlerFailedException extends RuntimeException
     public function getEnvelope(): Envelope
     {
         return $this->envelope;
-    }
-
-    /**
-     * @return \Throwable[]
-     */
-    public function getNestedExceptions(): array
-    {
-        return $this->exceptions;
-    }
-
-    public function getNestedExceptionOfClass(string $exceptionClassName): array
-    {
-        return array_values(
-            array_filter(
-                $this->exceptions,
-                fn ($exception) => is_a($exception, $exceptionClassName)
-            )
-        );
     }
 }

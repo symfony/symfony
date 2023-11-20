@@ -12,19 +12,19 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Bridge\Twig\Test\FormLayoutTestCase;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Form\Tests\VersionAwareTest;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
+abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 {
     use VersionAwareTest;
 
@@ -61,49 +61,6 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
         parent::tearDown();
     }
 
-    protected function assertXpathNodeValue(\DOMElement $element, $expression, $nodeValue)
-    {
-        $xpath = new \DOMXPath($element->ownerDocument);
-        $nodeList = $xpath->evaluate($expression);
-        $this->assertEquals(1, $nodeList->length);
-        $this->assertEquals($nodeValue, $nodeList->item(0)->nodeValue);
-    }
-
-    protected function assertMatchesXpath($html, $expression, $count = 1)
-    {
-        $dom = new \DOMDocument('UTF-8');
-
-        $html = preg_replace('/(<input [^>]+)(?<!\/)>/', '$1/>', $html);
-
-        try {
-            // Wrap in <root> node so we can load HTML with multiple tags at
-            // the top level
-            $dom->loadXML('<root>'.$html.'</root>');
-        } catch (\Exception $e) {
-            $this->fail(sprintf(
-                "Failed loading HTML:\n\n%s\n\nError: %s",
-                $html,
-                $e->getMessage()
-            ));
-        }
-        $xpath = new \DOMXPath($dom);
-        $nodeList = $xpath->evaluate('/root'.$expression);
-
-        if ($nodeList->length != $count) {
-            $dom->formatOutput = true;
-            $this->fail(sprintf(
-                "Failed asserting that \n\n%s\n\nmatches exactly %s. Matches %s in \n\n%s",
-                $expression,
-                1 == $count ? 'once' : $count.' times',
-                1 == $nodeList->length ? 'once' : $nodeList->length.' times',
-                // strip away <root> and </root>
-                substr($dom->saveHTML(), 6, -8)
-            ));
-        } else {
-            $this->addToAssertionCount(1);
-        }
-    }
-
     protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath)
     {
         // include ampersands everywhere to validate escaping
@@ -124,29 +81,6 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
 
         $this->assertMatchesXpath($html, $xpath);
     }
-
-    abstract protected function renderForm(FormView $view, array $vars = []);
-
-    abstract protected function renderLabel(FormView $view, $label = null, array $vars = []);
-
-    protected function renderHelp(FormView $view)
-    {
-        $this->markTestSkipped(sprintf('%s::renderHelp() is not implemented.', static::class));
-    }
-
-    abstract protected function renderErrors(FormView $view);
-
-    abstract protected function renderWidget(FormView $view, array $vars = []);
-
-    abstract protected function renderRow(FormView $view, array $vars = []);
-
-    abstract protected function renderRest(FormView $view, array $vars = []);
-
-    abstract protected function renderStart(FormView $view, array $vars = []);
-
-    abstract protected function renderEnd(FormView $view, array $vars = []);
-
-    abstract protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true);
 
     public function testLabel()
     {

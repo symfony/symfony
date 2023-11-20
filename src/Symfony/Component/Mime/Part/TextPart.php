@@ -222,7 +222,7 @@ class TextPart extends AbstractPart
     public function __sleep(): array
     {
         // convert resources to strings for serialization
-        if (null !== $this->seekable || $this->body instanceof File) {
+        if (null !== $this->seekable) {
             $this->body = $this->getBody();
             $this->seekable = null;
         }
@@ -232,10 +232,7 @@ class TextPart extends AbstractPart
         return ['_headers', 'body', 'charset', 'subtype', 'disposition', 'name', 'encoding'];
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');
         $r->setValue($this, $this->_headers);

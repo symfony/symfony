@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunApiTransport;
 use Symfony\Component\Mailer\Envelope;
@@ -61,6 +62,8 @@ class MailgunApiTransportTest extends TestCase
         $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeInterface::RFC2822);
 
         $email = new Email();
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+        $email->getHeaders()->addTextHeader('h:Sender', $envelope->getSender()->toString());
         $email->getHeaders()->addTextHeader('h:X-Mailgun-Variables', $json);
         $email->getHeaders()->addTextHeader('h:foo', 'foo-value');
         $email->getHeaders()->addTextHeader('t:text', 'text-value');
@@ -69,7 +72,6 @@ class MailgunApiTransportTest extends TestCase
         $email->getHeaders()->addTextHeader('template', 'template-value');
         $email->getHeaders()->addTextHeader('recipient-variables', 'recipient-variables-value');
         $email->getHeaders()->addTextHeader('amp-html', 'amp-html-value');
-        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
@@ -78,6 +80,8 @@ class MailgunApiTransportTest extends TestCase
         $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
         $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
 
+        $this->assertArrayHasKey('h:Sender', $payload);
+        $this->assertEquals($envelope->getSender()->toString(), $payload['h:Sender']);
         $this->assertArrayHasKey('h:foo', $payload);
         $this->assertEquals('foo-value', $payload['h:foo']);
         $this->assertArrayHasKey('t:text', $payload);
@@ -132,7 +136,7 @@ class MailgunApiTransportTest extends TestCase
             $this->assertStringContainsString('"Fabien" <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
 
-            return new MockResponse(json_encode(['id' => 'foobar']), [
+            return new JsonMockResponse(['id' => 'foobar'], [
                 'http_code' => 200,
             ]);
         });
@@ -161,7 +165,7 @@ class MailgunApiTransportTest extends TestCase
             $this->assertStringContainsString("Content-Disposition: form-data; name=\"o:tag\"\r\n\r\npassword-reset\r\n", $content);
             $this->assertStringContainsString("Content-Disposition: form-data; name=\"o:tag\"\r\n\r\nproduct-name\r\n", $content);
 
-            return new MockResponse(json_encode(['id' => 'foobar2']), [
+            return new JsonMockResponse(['id' => 'foobar2'], [
                 'http_code' => 200,
             ]);
         });
@@ -189,11 +193,8 @@ class MailgunApiTransportTest extends TestCase
             $this->assertSame('https://api.mailgun.net:8984/v3/symfony/messages', $url);
             $this->assertStringContainsStringIgnoringCase('Authorization: Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
-            return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
+            return new JsonMockResponse(['message' => 'i\'m a teapot'], [
                 'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
             ]);
         });
         $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us', $client);

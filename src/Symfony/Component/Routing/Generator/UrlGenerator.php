@@ -42,15 +42,10 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%2A' => '*',
     ];
 
-    protected $routes;
-    protected $context;
-
-    /**
-     * @var bool|null
-     */
-    protected $strictRequirements = true;
-
-    protected $logger;
+    protected RouteCollection $routes;
+    protected RequestContext $context;
+    protected ?bool $strictRequirements = true;
+    protected ?LoggerInterface $logger;
 
     private ?string $defaultLocale;
 
@@ -62,7 +57,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * "?" and "#" (would be interpreted wrongly as query and fragment identifier),
      * "'" and """ (are used as delimiters in HTML).
      */
-    protected $decodedChars = [
+    protected array $decodedChars = [
         // the slash can be used to designate a hierarchical structure and we want allow using it with this meaning
         // some webservers don't allow the slash in encoded form in the path for security reasons anyway
         // see http://stackoverflow.com/questions/4069002/http-400-if-2f-part-of-get-url-in-jboss
@@ -91,10 +86,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $this->defaultLocale = $defaultLocale;
     }
 
-    /**
-     * @return void
-     */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->context = $context;
     }
@@ -104,10 +96,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         return $this->context;
     }
 
-    /**
-     * @return void
-     */
-    public function setStrictRequirements(?bool $enabled)
+    public function setStrictRequirements(?bool $enabled): void
     {
         $this->strictRequirements = $enabled;
     }

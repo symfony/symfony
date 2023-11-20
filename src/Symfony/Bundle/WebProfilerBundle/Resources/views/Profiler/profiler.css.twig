@@ -167,6 +167,12 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --shadow: 0px 0px 1px rgba(128, 128, 128, .2);
     --border: 1px solid #e0e0e0;
     --background-error: var(--color-error);
+    --terminal-bg: var(--gray-800);
+    --terminal-border-color: var(--gray-600);
+    --terminal-warning-color: var(--yellow-300);
+    --terminal-warning-bg: var(--yellow-300);
+    --terminal-error-color: #fb6a89;
+    --terminal-error-bg: #fb6a89;
 
     --highlight-variable: #e36209;
     --highlight-string: #22863a;
@@ -303,6 +309,13 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --shadow: 0px 0px 1px rgba(32, 32, 32, .2);
     --border: 1px solid #666;
     --background-error: #b0413e;
+    --terminal-bg: var(--gray-800);
+    --terminal-border-color: var(--gray-600);
+    --terminal-warning-color: var(--yellow-400);
+    --terminal-warning-bg: var(--yellow-500);
+    --terminal-error-color: var(--red-400);
+    --terminal-error-bg: var(--red-400);
+
     --highlight-variable: #ffa657;
     --highlight-string: #7ee787;
     --highlight-comment: #8b949e;
@@ -324,9 +337,18 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --card-label-color: var(--tab-active-color);
 }
 
-{# Embedded font
+{# Webfonts
    ========================================================================= #}
-{{ include('@WebProfiler/Profiler/fonts.css.twig') }}
+@font-face {
+    font-family: 'JetBrainsMono';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src:
+        local('JetBrainsMono'),
+        local('JetBrains Mono'),
+        url('{{ url('_profiler_font', {fontName: 'JetBrainsMono'}) }}') format('woff2');
+}
 
 {# Basic styles
    ========================================================================= #}
@@ -981,6 +1003,10 @@ tr.status-warning td {
     font-size: 18px;
     margin: 0;
 }
+#header h1 a {
+    display: flex;
+    color: inherit;
+}
 .theme-dark #header h1 {
     color: var(--gray-200);
 }
@@ -1245,6 +1271,107 @@ tr.status-warning td {
     margin: 0 1.5em 0 0;
 }
 
+#summary .terminal {
+    --header-status-request-method-color: var(--gray-400);
+    --header-metadata-key: var(--gray-400);
+    --header-metadata-value: var(--gray-300);
+
+    background: var(--terminal-bg);
+    border: solid var(--terminal-border-color);
+    border-width: 30px 4px 4px 4px;
+    border-radius: 3px 3px 0 0;
+    box-shadow: none;
+    color: var(--gray-100);
+    padding: 10px 15px;
+    position: relative;
+}
+#summary .terminal .status-request-method {
+    font-size: 13px;
+    transform: translateY(7px) !important;
+    margin-right: 10px;
+}
+#summary .terminal.status-success .status-command {
+    color: var(--gray-100);
+}
+#summary .terminal.status-success .status-response-status-code {
+    margin-right: 1.5em;
+    text-transform: uppercase;
+}
+#summary .terminal.status-warning,
+#summary .terminal.status-warning .status-response-status-text {
+    color: var(--terminal-warning-color);
+}
+#summary .terminal.status-warning .status-response-status-code {
+    background: var(--terminal-warning-bg);
+    color: var(--black);
+    margin-right: 1.5em;
+    padding: 1px 5px;
+    text-transform: uppercase;
+}
+#summary .terminal.status-warning .status-command,
+#summary .terminal.status-warning .status-response-status-text {
+    color: var(--terminal-warning-color);
+}
+#summary .terminal.status-error .status-command,
+#summary .terminal.status-error .status-response-status-text {
+    color: var(--terminal-error-color);
+}
+#summary .terminal.status-error .status-response-status-code {
+    background: var(--terminal-error-bg);
+    color: var(--black);
+    margin-right: 1.5em;
+    padding: 1px 5px;
+    text-transform: uppercase;
+}
+#summary .terminal.status-error,
+#summary .terminal.status-error .status-response-status-text {
+    color: var(--terminal-error-color);
+}
+.macos #summary .terminal::before {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 20px 0 0 2px rgba(255, 255, 255, 0.3), 40px 0 0 2px rgba(255, 255, 255, 0.3);
+    content: '';
+    display: block;
+    height: 7px;
+    left: 8px;
+    position: absolute;
+    top: -18px;
+    width: 7px;
+}
+.windows #summary .terminal::before {
+    background-color: transparent;
+    background-image:
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="rgba(255, 255, 255, 0.3)" d="M464 352H48c-26.5 0-48 21.5-48 48v32c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48v-32c0-26.5-21.5-48-48-48z"></path></svg>'),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="rgba(255, 255, 255, 0.3)" d="M464 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm0 394c0 3.3-2.7 6-6 6H54c-3.3 0-6-2.7-6-6V192h416v234z"></path></svg>'),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="rgba(255, 255, 255, 0.3)" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>');
+    background-repeat: no-repeat;
+    background-position: right 80px top 5px, right 44px top 8px, right 8px top 8px;
+    background-size: 14px, 14px, 14px;
+    content: '';
+    display: block;
+    height: 30px;
+    position: absolute;
+    top: -30px;
+    width: 100%;
+}
+.linux #summary .terminal::before {
+    background-color: transparent;
+    background-image:
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="rgba(255, 255, 255, 0.3)" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"></path></svg>'),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="rgba(255, 255, 255, 0.3)" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zM124 296c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h264c6.6 0 12 5.4 12 12v56c0 6.6-5.4 12-12 12H124z"></path></svg>'),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="rgba(255, 255, 255, 0.3)" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm96 328c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V176c0-8.8 7.2-16 16-16h160c8.8 0 16 7.2 16 16v160z"></path></svg>');
+    background-repeat: no-repeat;
+    background-position: left 8px top 8px, left 28px top 8px, left 48px top 8px;
+    background-size: 14px, 14px, 14px;
+    content: '';
+    display: block;
+    height: 30px;
+    position: absolute;
+    top: -30px;
+    width: 100%;
+}
+
 {# Sidebar
    ========================================================================= #}
 #sidebar {
@@ -1267,6 +1394,9 @@ tr.status-warning td {
 #sidebar #sidebar-shortcuts {
     color: var(--gray-500);
     padding: 10px 15px;
+}
+#sidebar #sidebar-shortcuts .sf-tabs .tab-navigation {
+    margin: 5px 0 15px;
 }
 #sidebar #sidebar-shortcuts .shortcuts {
     display: flex;
@@ -1477,6 +1607,13 @@ tr.status-warning td {
     text-align: center;
     z-index: 1;
 }
+.tab-navigation .tab-control a {
+    color: var(--page-color);
+    text-decoration: none;
+}
+.tab-navigation .tab-control.active a {
+    color: var(--tab-active-color);
+}
 .sf-tabs-sm .tab-navigation .tab-control {
     font-size: 13px;
     padding: 2.5px 10px;
@@ -1570,6 +1707,10 @@ tr.status-warning td {
 .badge-warning {
     background: var(--badge-warning-background);
     color: var(--badge-warning-color);
+}
+.badge-danger {
+    background: var(--badge-danger-background);
+    color: var(--badge-danger-color);
 }
 
 {# Dumped contents (used in many different panels)

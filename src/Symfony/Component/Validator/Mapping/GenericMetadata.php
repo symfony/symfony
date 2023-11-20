@@ -38,7 +38,7 @@ class GenericMetadata implements MetadataInterface
     public array $constraints = [];
 
     /**
-     * @var array
+     * @var array<string, Constraint[]>
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
@@ -180,6 +180,9 @@ class GenericMetadata implements MetadataInterface
         return $this;
     }
 
+    /**
+     * @return Constraint[]
+     */
     public function getConstraints(): array
     {
         return $this->constraints;
@@ -195,6 +198,8 @@ class GenericMetadata implements MetadataInterface
 
     /**
      * Aware of the global group (* group).
+     *
+     * @return Constraint[]
      */
     public function findConstraints(string $group): array
     {

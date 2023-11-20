@@ -26,43 +26,47 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
 
     private array $assetsCache = [];
     private array $assetsBeingCreated = [];
-    private array $fileContentsCache = [];
 
     public function __construct(
-        private PublicAssetsPathResolverInterface $assetsPathResolver,
-        private AssetMapperCompiler $compiler,
+        private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
+        private readonly AssetMapperCompiler $compiler,
+        private readonly string $vendorDir,
     ) {
     }
 
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
     {
-        if (\in_array($logicalPath, $this->assetsBeingCreated, true)) {
-            throw new CircularAssetsException(sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
+        if (isset($this->assetsBeingCreated[$logicalPath])) {
+            throw new CircularAssetsException($this->assetsCache[$logicalPath], sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
         }
+        $this->assetsBeingCreated[$logicalPath] = $logicalPath;
 
         if (!isset($this->assetsCache[$logicalPath])) {
-            $this->assetsBeingCreated[] = $logicalPath;
+            $isVendor = $this->isVendor($sourcePath);
+            $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath), isVendor: $isVendor);
+            $this->assetsCache[$logicalPath] = $asset;
 
-            $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath));
-
-            [$digest, $isPredigested] = $this->getDigest($asset);
+            $content = $this->compileContent($asset);
+            [$digest, $isPredigested] = $this->getDigest($asset, $content);
 
             $asset = new MappedAsset(
                 $asset->logicalPath,
                 $asset->sourcePath,
                 $asset->publicPathWithoutDigest,
-                $this->getPublicPath($asset),
-                $this->calculateContent($asset),
+                $this->getPublicPath($asset, $content),
+                $content,
                 $digest,
                 $isPredigested,
+                $isVendor,
                 $asset->getDependencies(),
                 $asset->getFileDependencies(),
+                $asset->getJavaScriptImports(),
             );
 
             $this->assetsCache[$logicalPath] = $asset;
-
-            array_pop($this->assetsBeingCreated);
         }
+
+        unset($this->assetsBeingCreated[$logicalPath]);
 
         return $this->assetsCache[$logicalPath];
     }
@@ -72,40 +76,43 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
      *
      * @return array{0: string, 1: bool}
      */
-    private function getDigest(MappedAsset $asset): array
+    private function getDigest(MappedAsset $asset, ?string $content): array
     {
         // check for a pre-digested file
         if (preg_match(self::PREDIGESTED_REGEX, $asset->logicalPath, $matches)) {
             return [$matches[1], true];
         }
 
+        // Use the compiled content if any
+        if (null !== $content) {
+            return [hash('xxh128', $content), false];
+        }
+
         return [
-            hash('xxh128', $this->calculateContent($asset)),
+            hash_file('xxh128', $asset->sourcePath),
             false,
         ];
     }
 
-    private function calculateContent(MappedAsset $asset): string
+    private function compileContent(MappedAsset $asset): ?string
     {
-        if (isset($this->fileContentsCache[$asset->logicalPath])) {
-            return $this->fileContentsCache[$asset->logicalPath];
-        }
-
         if (!is_file($asset->sourcePath)) {
             throw new RuntimeException(sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
         }
 
+        if (!$this->compiler->supports($asset)) {
+            return null;
+        }
+
         $content = file_get_contents($asset->sourcePath);
-        $content = $this->compiler->compile($content, $asset);
+        $compiled = $this->compiler->compile($content, $asset);
 
-        $this->fileContentsCache[$asset->logicalPath] = $content;
-
-        return $content;
+        return $compiled !== $content ? $compiled : null;
     }
 
-    private function getPublicPath(MappedAsset $asset): ?string
+    private function getPublicPath(MappedAsset $asset, ?string $content): ?string
     {
-        [$digest, $isPredigested] = $this->getDigest($asset);
+        [$digest, $isPredigested] = $this->getDigest($asset, $content);
 
         if ($isPredigested) {
             return $this->assetsPathResolver->resolvePublicPath($asset->logicalPath);
@@ -114,5 +121,13 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         $digestedPath = preg_replace_callback('/\.(\w+)$/', fn ($matches) => "-{$digest}{$matches[0]}", $asset->logicalPath);
 
         return $this->assetsPathResolver->resolvePublicPath($digestedPath);
+    }
+
+    private function isVendor(string $sourcePath): bool
+    {
+        $sourcePath = realpath($sourcePath);
+        $vendorDir = realpath($this->vendorDir);
+
+        return $sourcePath && str_starts_with($sourcePath, $vendorDir);
     }
 }

@@ -15,9 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @Annotation
- * @Target({"CLASS"})
- *
  * @author Jules Pietri <jules@heahprod.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
@@ -28,7 +25,7 @@ class Cascade extends Constraint
     public function __construct(array|string $exclude = null, array $options = null)
     {
         if (\is_array($exclude) && !array_is_list($exclude)) {
-            $options = array_merge($exclude, $options);
+            $options = array_merge($exclude, $options ?? []);
         } else {
             $this->exclude = array_flip((array) $exclude);
         }

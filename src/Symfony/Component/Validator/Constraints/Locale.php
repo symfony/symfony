@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -30,13 +27,8 @@ class Locale extends Constraint
         self::NO_SUCH_LOCALE_ERROR => 'NO_SUCH_LOCALE_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value is not a valid locale.';
-    public $canonicalize = true;
+    public string $message = 'This value is not a valid locale.';
+    public bool $canonicalize = true;
 
     public function __construct(
         array $options = null,

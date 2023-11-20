@@ -25,12 +25,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Converts between objects and arrays using the PropertyAccess component.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final since Symfony 6.3
  */
-class ObjectNormalizer extends AbstractObjectNormalizer
+final class ObjectNormalizer extends AbstractObjectNormalizer
 {
-    protected $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     /** @var array<string, string|null> */
     private array $discriminatorCache = [];
@@ -52,17 +50,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     public function getSupportedTypes(?string $format): array
     {
-        return ['object' => __CLASS__ === static::class || $this->hasCacheableSupportsMethod()];
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this));
-
-        return __CLASS__ === static::class;
+        return ['object' => true];
     }
 
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
@@ -142,10 +130,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         return $attribute === $this->discriminatorCache[$cacheKey] ? $this->classDiscriminatorResolver->getTypeForMappedObject($object) : $this->propertyAccessor->getValue($object, $attribute);
     }
 
-    /**
-     * @return void
-     */
-    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
     {
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);

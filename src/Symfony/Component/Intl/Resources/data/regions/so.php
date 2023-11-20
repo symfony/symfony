@@ -107,7 +107,7 @@ return [
         'IL' => 'Israaʼiil',
         'IM' => 'Jasiiradda Isle of Man',
         'IN' => 'Hindiya',
-        'IO' => 'Dhul xadeedka Badweynta Hindiya ee Biritishka',
+        'IO' => 'Dhul xadeedka Badweynta Hindiya ee Ingiriiska',
         'IQ' => 'Ciraaq',
         'IR' => 'Iiraan',
         'IS' => 'Ayslaand',

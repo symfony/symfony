@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Middleware\Debug;
 
 use Doctrine\DBAL\Driver as DriverInterface;
+use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -24,20 +25,31 @@ final class Driver extends AbstractDriverMiddleware
 {
     public function __construct(
         DriverInterface $driver,
-        private DebugDataHolder $debugDataHolder,
-        private ?Stopwatch $stopwatch,
-        private string $connectionName,
+        private readonly DebugDataHolder $debugDataHolder,
+        private readonly ?Stopwatch $stopwatch,
+        private readonly string $connectionName,
     ) {
         parent::__construct($driver);
     }
 
-    public function connect(array $params): Connection
+    public function connect(array $params): ConnectionInterface
     {
+        $connection = parent::connect($params);
+
+        if ('void' !== (string) (new \ReflectionMethod(DriverInterface\Connection::class, 'commit'))->getReturnType()) {
+            return new DBAL3\Connection(
+                $connection,
+                $this->debugDataHolder,
+                $this->stopwatch,
+                $this->connectionName
+            );
+        }
+
         return new Connection(
-            parent::connect($params),
+            $connection,
             $this->debugDataHolder,
             $this->stopwatch,
-            $this->connectionName,
+            $this->connectionName
         );
     }
 }

@@ -107,10 +107,8 @@ class PhpDumper extends Dumper
 
     /**
      * Sets the dumper to be used when dumping proxies in the generated container.
-     *
-     * @return void
      */
-    public function setProxyDumper(DumperInterface $proxyDumper)
+    public function setProxyDumper(DumperInterface $proxyDumper): void
     {
         $this->proxyDumper = $proxyDumper;
         $this->hasProxyDumper = !$proxyDumper instanceof NullDumper;
@@ -145,8 +143,6 @@ class PhpDumper extends Dumper
             'debug' => true,
             'hot_path_tag' => 'container.hot_path',
             'preload_tags' => ['container.preload', 'container.no_preload'],
-            'inline_factories_parameter' => 'container.dumper.inline_factories', // @deprecated since Symfony 6.3
-            'inline_class_loader_parameter' => 'container.dumper.inline_class_loader', // @deprecated since Symfony 6.3
             'inline_factories' => null,
             'inline_class_loader' => null,
             'preload_classes' => [],
@@ -163,22 +159,11 @@ class PhpDumper extends Dumper
         $this->inlineFactories = false;
         if (isset($options['inline_factories'])) {
             $this->inlineFactories = $this->asFiles && $options['inline_factories'];
-        } elseif (!$options['inline_factories_parameter']) {
-            trigger_deprecation('symfony/dependency-injection', '6.3', 'Option "inline_factories_parameter" passed to "%s()" is deprecated, use option "inline_factories" instead.', __METHOD__);
-        } elseif ($this->container->hasParameter($options['inline_factories_parameter'])) {
-            trigger_deprecation('symfony/dependency-injection', '6.3', 'Option "inline_factories_parameter" passed to "%s()" is deprecated, use option "inline_factories" instead.', __METHOD__);
-            $this->inlineFactories = $this->asFiles && $this->container->getParameter($options['inline_factories_parameter']);
         }
 
         $this->inlineRequires = $options['debug'];
         if (isset($options['inline_class_loader'])) {
             $this->inlineRequires = $options['inline_class_loader'];
-        } elseif (!$options['inline_class_loader_parameter']) {
-            trigger_deprecation('symfony/dependency-injection', '6.3', 'Option "inline_class_loader_parameter" passed to "%s()" is deprecated, use option "inline_class_loader" instead.', __METHOD__);
-            $this->inlineRequires = false;
-        } elseif ($this->container->hasParameter($options['inline_class_loader_parameter'])) {
-            trigger_deprecation('symfony/dependency-injection', '6.3', 'Option "inline_class_loader_parameter" passed to "%s()" is deprecated, use option "inline_class_loader" instead.', __METHOD__);
-            $this->inlineRequires = $this->container->getParameter($options['inline_class_loader_parameter']);
         }
 
         $this->serviceLocatorTag = $options['service_locator_tag'];
@@ -258,6 +243,7 @@ class PhpDumper extends Dumper
 <?php
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /*{$this->docStar}
@@ -340,7 +326,7 @@ EOF;
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     return;
 }
 
@@ -388,6 +374,7 @@ return new \\Container{$hash}\\{$options['class']}([
     'container.build_hash' => '$hash',
     'container.build_id' => '$id',
     'container.build_time' => $time,
+    'container.runtime_mode' => \\in_array(\\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\\DIRECTORY_SEPARATOR.'Container{$hash}');
 
 EOF;
@@ -1591,7 +1578,7 @@ EOF;
             $export = $this->exportParameters([$value], '', 12, $hasEnum);
             $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);
 
-            if ($hasEnum || preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w++'\)|targetDir\.'')/", $export[1])) {
+            if ($hasEnum || preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w*+'\)|targetDir\.'')/", $export[1])) {
                 $dynamicPhp[$key] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
                 $this->dynamicParameters[$key] = true;
             } else {

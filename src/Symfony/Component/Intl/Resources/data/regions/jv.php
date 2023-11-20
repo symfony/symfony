@@ -107,7 +107,7 @@ return [
         'IL' => 'Israèl',
         'IM' => 'Pulo Man',
         'IN' => 'Indhia',
-        'IO' => 'Wilayah Inggris nang Segoro Hindia',
+        'IO' => 'Wilayah Inggris ing Segara Hindia',
         'IQ' => 'Irak',
         'IR' => 'Iran',
         'IS' => 'Èslan',

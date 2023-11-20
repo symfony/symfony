@@ -50,6 +50,8 @@ class SymfonyTestsListenerTrait
      */
     public function __construct(array $mockedNamespaces = [])
     {
+        setlocale(\LC_ALL, $_ENV['SYMFONY_PHPUNIT_LOCALE'] ?? 'C');
+
         if (class_exists(ExcludeList::class)) {
             (new ExcludeList())->getExcludedDirectories();
             ExcludeList::addDirectory(\dirname((new \ReflectionClass(__CLASS__))->getFileName(), 2));

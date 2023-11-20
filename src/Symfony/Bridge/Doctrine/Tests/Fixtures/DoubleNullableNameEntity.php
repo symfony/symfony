@@ -18,19 +18,15 @@ use Doctrine\ORM\Mapping\Id;
 #[Entity]
 class DoubleNullableNameEntity
 {
-    #[Id, Column(type: 'integer')]
-    protected $id;
+    public function __construct(
+        #[Id, Column]
+        protected int $id,
 
-    #[Column(type: 'string', nullable: true)]
-    public $name;
+        #[Column(nullable: true)]
+        public ?string $name,
 
-    #[Column(type: 'string', nullable: true)]
-    public $name2;
-
-    public function __construct($id, $name, $name2)
-    {
-        $this->id = $id;
-        $this->name = $name;
-        $this->name2 = $name2;
+        #[Column(nullable: true)]
+        public ?string $name2,
+    ) {
     }
 }

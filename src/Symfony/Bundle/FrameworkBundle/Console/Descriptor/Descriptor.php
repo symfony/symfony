@@ -43,6 +43,11 @@ abstract class Descriptor implements DescriptorInterface
             (new AnalyzeServiceReferencesPass(false, false))->process($object);
         }
 
+        $deprecatedParameters = [];
+        if ($object instanceof ContainerBuilder && isset($options['parameter']) && ($parameterBag = $object->getParameterBag()) instanceof ParameterBag) {
+            $deprecatedParameters = $parameterBag->allDeprecated();
+        }
+
         match (true) {
             $object instanceof RouteCollection => $this->describeRouteCollection($object, $options),
             $object instanceof Route => $this->describeRoute($object, $options),
@@ -50,7 +55,7 @@ abstract class Descriptor implements DescriptorInterface
             $object instanceof ContainerBuilder && !empty($options['env-vars']) => $this->describeContainerEnvVars($this->getContainerEnvVars($object), $options),
             $object instanceof ContainerBuilder && isset($options['group_by']) && 'tags' === $options['group_by'] => $this->describeContainerTags($object, $options),
             $object instanceof ContainerBuilder && isset($options['id']) => $this->describeContainerService($this->resolveServiceDefinition($object, $options['id']), $options, $object),
-            $object instanceof ContainerBuilder && isset($options['parameter']) => $this->describeContainerParameter($object->resolveEnvPlaceholders($object->getParameter($options['parameter'])), $options),
+            $object instanceof ContainerBuilder && isset($options['parameter']) => $this->describeContainerParameter($object->resolveEnvPlaceholders($object->getParameter($options['parameter'])), $deprecatedParameters[$options['parameter']] ?? null, $options),
             $object instanceof ContainerBuilder && isset($options['deprecations']) => $this->describeContainerDeprecations($object, $options),
             $object instanceof ContainerBuilder => $this->describeContainerServices($object, $options),
             $object instanceof Definition => $this->describeContainerDefinition($object, $options),
@@ -107,7 +112,7 @@ abstract class Descriptor implements DescriptorInterface
 
     abstract protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void;
 
-    abstract protected function describeContainerParameter(mixed $parameter, array $options = []): void;
+    abstract protected function describeContainerParameter(mixed $parameter, ?array $deprecation, array $options = []): void;
 
     abstract protected function describeContainerEnvVars(array $envs, array $options = []): void;
 
@@ -258,6 +263,19 @@ abstract class Descriptor implements DescriptorInterface
         usort($tag, fn ($a, $b) => ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0));
 
         return $tag;
+    }
+
+    /**
+     * @return array<string, string[]>
+     */
+    protected function getReverseAliases(RouteCollection $routes): array
+    {
+        $reverseAliases = [];
+        foreach ($routes->getAliases() as $name => $alias) {
+            $reverseAliases[$alias->getId()][] = $name;
+        }
+
+        return $reverseAliases;
     }
 
     public static function getClassDescription(string $class, string &$resolvedClass = null): string

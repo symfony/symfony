@@ -245,10 +245,8 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Removes a field from the form.
-     *
-     * @return void
      */
-    public function remove(string $name)
+    public function remove(string $name): void
     {
         $this->fields->remove($name);
     }
@@ -267,10 +265,8 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Sets a named field.
-     *
-     * @return void
      */
-    public function set(FormField $field)
+    public function set(FormField $field): void
     {
         $this->fields->add($field);
     }
@@ -353,11 +349,9 @@ class Form extends Link implements \ArrayAccess
      *
      * Expects a 'submit' button \DOMElement and finds the corresponding form element, or the form element itself.
      *
-     * @return void
-     *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
-    protected function setNode(\DOMElement $node)
+    protected function setNode(\DOMElement $node): void
     {
         $this->button = $node;
         if ('button' === $node->nodeName || ('input' === $node->nodeName && \in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image']))) {

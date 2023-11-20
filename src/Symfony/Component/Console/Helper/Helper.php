@@ -21,16 +21,10 @@ use Symfony\Component\String\UnicodeString;
  */
 abstract class Helper implements HelperInterface
 {
-    protected $helperSet;
+    protected ?HelperSet $helperSet = null;
 
-    /**
-     * @return void
-     */
-    public function setHelperSet(HelperSet $helperSet = null)
+    public function setHelperSet(?HelperSet $helperSet): void
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         $this->helperSet = $helperSet;
     }
 
@@ -91,42 +85,47 @@ abstract class Helper implements HelperInterface
         return mb_substr($string, $from, $length, $encoding);
     }
 
-    /**
-     * @return string
-     */
-    public static function formatTime(int|float $secs)
+    public static function formatTime(int|float $secs, int $precision = 1): string
     {
+        $secs = (int) floor($secs);
+
+        if (0 === $secs) {
+            return '< 1 sec';
+        }
+
         static $timeFormats = [
-            [0, '< 1 sec'],
-            [1, '1 sec'],
-            [2, 'secs', 1],
-            [60, '1 min'],
-            [120, 'mins', 60],
-            [3600, '1 hr'],
-            [7200, 'hrs', 3600],
-            [86400, '1 day'],
-            [172800, 'days', 86400],
+            [1, '1 sec', 'secs'],
+            [60, '1 min', 'mins'],
+            [3600, '1 hr', 'hrs'],
+            [86400, '1 day', 'days'],
         ];
 
+        $times = [];
         foreach ($timeFormats as $index => $format) {
-            if ($secs >= $format[0]) {
-                if ((isset($timeFormats[$index + 1]) && $secs < $timeFormats[$index + 1][0])
-                    || $index == \count($timeFormats) - 1
-                ) {
-                    if (2 == \count($format)) {
-                        return $format[1];
-                    }
+            $seconds = isset($timeFormats[$index + 1]) ? $secs % $timeFormats[$index + 1][0] : $secs;
 
-                    return floor($secs / $format[2]).' '.$format[1];
-                }
+            if (isset($times[$index - $precision])) {
+                unset($times[$index - $precision]);
             }
+
+            if (0 === $seconds) {
+                continue;
+            }
+
+            $unitCount = ($seconds / $format[0]);
+            $times[$index] = 1 === $unitCount ? $format[1] : $unitCount.' '.$format[2];
+
+            if ($secs === $seconds) {
+                break;
+            }
+
+            $secs -= $seconds;
         }
+
+        return implode(', ', array_reverse($times));
     }
 
-    /**
-     * @return string
-     */
-    public static function formatMemory(int $memory)
+    public static function formatMemory(int $memory): string
     {
         if ($memory >= 1024 * 1024 * 1024) {
             return sprintf('%.1f GiB', $memory / 1024 / 1024 / 1024);
@@ -143,10 +142,7 @@ abstract class Helper implements HelperInterface
         return sprintf('%d B', $memory);
     }
 
-    /**
-     * @return string
-     */
-    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
+    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string): string
     {
         $isDecorated = $formatter->isDecorated();
         $formatter->setDecorated(false);

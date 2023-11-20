@@ -12,8 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Tests;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Repository\RepositoryFactory;
-use Doctrine\Persistence\ObjectRepository;
 
 /**
  * @author Andreas Braun <alcaeus@alcaeus.org>
@@ -21,25 +21,25 @@ use Doctrine\Persistence\ObjectRepository;
 final class TestRepositoryFactory implements RepositoryFactory
 {
     /**
-     * @var array<string, ObjectRepository>
+     * @var array<string, EntityRepository>
      */
     private array $repositoryList = [];
 
-    public function getRepository(EntityManagerInterface $entityManager, $entityName): ObjectRepository
+    public function getRepository(EntityManagerInterface $entityManager, $entityName): EntityRepository
     {
         $repositoryHash = $this->getRepositoryHash($entityManager, $entityName);
 
         return $this->repositoryList[$repositoryHash] ??= $this->createRepository($entityManager, $entityName);
     }
 
-    public function setRepository(EntityManagerInterface $entityManager, string $entityName, ObjectRepository $repository): void
+    public function setRepository(EntityManagerInterface $entityManager, string $entityName, EntityRepository $repository): void
     {
         $repositoryHash = $this->getRepositoryHash($entityManager, $entityName);
 
         $this->repositoryList[$repositoryHash] = $repository;
     }
 
-    private function createRepository(EntityManagerInterface $entityManager, string $entityName): ObjectRepository
+    private function createRepository(EntityManagerInterface $entityManager, string $entityName): EntityRepository
     {
         $metadata = $entityManager->getClassMetadata($entityName);
         $repositoryClassName = $metadata->customRepositoryClassName ?: $entityManager->getConfiguration()->getDefaultRepositoryClassName();

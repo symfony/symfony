@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Monolog\Tests\Processor;
+namespace Symfony\Bridge\Monolog;
 
-use Monolog\Logger;
+use Monolog\Level;
 use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bridge\Monolog\Tests\Processor\ClassThatInheritDebugProcessor;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -47,7 +48,7 @@ class DebugProcessorTest extends TestCase
     {
         $processor = new DebugProcessor();
         $processor(self::getRecord());
-        $processor(self::getRecord(Logger::ERROR));
+        $processor(self::getRecord(Level::Error));
 
         $this->assertCount(2, $processor->getLogs());
         $this->assertSame(1, $processor->countErrors());
@@ -66,7 +67,7 @@ class DebugProcessorTest extends TestCase
         $stack = new RequestStack();
         $processor = new DebugProcessor($stack);
         $processor(self::getRecord());
-        $processor(self::getRecord(Logger::ERROR));
+        $processor(self::getRecord(Level::Error));
 
         $this->assertCount(2, $processor->getLogs());
         $this->assertSame(1, $processor->countErrors());
@@ -75,7 +76,7 @@ class DebugProcessorTest extends TestCase
         $stack->push($request);
 
         $processor(self::getRecord());
-        $processor(self::getRecord(Logger::ERROR));
+        $processor(self::getRecord(Level::Error));
 
         $this->assertCount(4, $processor->getLogs());
         $this->assertSame(2, $processor->countErrors());
@@ -99,7 +100,7 @@ class DebugProcessorTest extends TestCase
         $this->assertEquals(0, $debugProcessorChild->countErrors());
     }
 
-    private static function getRecord($level = Logger::WARNING, $message = 'test'): array|LogRecord
+    private static function getRecord($level = Level::Warning, $message = 'test'): LogRecord
     {
         return RecordFactory::create($level, $message);
     }

@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 /**
  * Validates that a value is a valid CIDR notation.
  *
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Sorin Pop <popsorin15@gmail.com>
  * @author Calin Bolea <calin.bolea@gmail.com>
  */
@@ -61,20 +58,11 @@ class Cidr extends Constraint
         Ip::ALL_ONLY_RESERVED => 128,
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $version = Ip::ALL;
-
-    public $message = 'This value is not a valid CIDR notation.';
-
-    public $netmaskRangeViolationMessage = 'The value of the netmask should be between {{ min }} and {{ max }}.';
-
-    public $netmaskMin = 0;
-
-    public $netmaskMax;
+    public string $version = Ip::ALL;
+    public string $message = 'This value is not a valid CIDR notation.';
+    public string $netmaskRangeViolationMessage = 'The value of the netmask should be between {{ min }} and {{ max }}.';
+    public int $netmaskMin = 0;
+    public int $netmaskMax;
 
     /** @var callable|null */
     public $normalizer;

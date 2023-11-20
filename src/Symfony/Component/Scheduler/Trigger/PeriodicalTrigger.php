@@ -30,18 +30,11 @@ class PeriodicalTrigger implements StatefulTriggerInterface
         $this->from = \is_string($from) ? new \DateTimeImmutable($from) : $from;
         $this->until = \is_string($until) ? new \DateTimeImmutable($until) : $until;
 
-        if (\is_int($interval) || \is_float($interval)) {
-            if (0 >= $interval) {
+        if (\is_int($interval) || \is_float($interval) || \is_string($interval) && ctype_digit($interval)) {
+            if (0 >= (int) $interval) {
                 throw new InvalidArgumentException('The "$interval" argument must be greater than zero.');
             }
 
-            $this->intervalInSeconds = $interval;
-            $this->description = sprintf('every %d seconds', $this->intervalInSeconds);
-
-            return;
-        }
-
-        if (\is_string($interval) && ctype_digit($interval)) {
             $this->intervalInSeconds = (int) $interval;
             $this->description = sprintf('every %d seconds', $this->intervalInSeconds);
 
@@ -62,7 +55,7 @@ class PeriodicalTrigger implements StatefulTriggerInterface
                 $i = \DateInterval::createFromDateString($interval);
             } else {
                 $a = (array) $interval;
-                $this->description = \PHP_VERSION_ID >= 80200 && $a['from_string'] ? $a['date_string'] : 'DateInterval';
+                $this->description = $a['from_string'] ? $a['date_string'] : 'DateInterval';
             }
 
             if ($this->canBeConvertedToSeconds($i)) {
@@ -126,12 +119,8 @@ class PeriodicalTrigger implements StatefulTriggerInterface
     private function canBeConvertedToSeconds(\DateInterval $interval): bool
     {
         $a = (array) $interval;
-        if (\PHP_VERSION_ID >= 80200) {
-            if ($a['from_string']) {
-                return preg_match('#^\s*\d+\s*(sec|second|min|minute|hour)s?\s*$#', $a['date_string']);
-            }
-        } elseif ($a['weekday'] || $a['weekday_behavior'] || $a['first_last_day_of'] || $a['days'] || $a['special_type'] || $a['special_amount'] || $a['have_weekday_relative'] || $a['have_special_relative']) {
-            return false;
+        if ($a['from_string']) {
+            return preg_match('#^\s*\d+\s*(sec|second|min|minute|hour)s?\s*$#', $a['date_string']);
         }
 
         return !$interval->y && !$interval->m && !$interval->d;

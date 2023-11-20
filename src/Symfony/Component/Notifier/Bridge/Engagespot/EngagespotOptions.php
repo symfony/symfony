@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class EngagespotOptions implements MessageOptionsInterface
 {
-    protected $options;
+    protected array $options;
 
     public function __construct(array $options = [])
     {

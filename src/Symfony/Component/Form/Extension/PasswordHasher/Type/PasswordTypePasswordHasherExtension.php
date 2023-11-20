@@ -29,20 +29,14 @@ class PasswordTypePasswordHasherExtension extends AbstractTypeExtension
     ) {
     }
 
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['hash_property_path']) {
             $builder->addEventListener(FormEvents::POST_SUBMIT, [$this->passwordHasherListener, 'registerPassword']);
         }
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'hash_property_path' => null,

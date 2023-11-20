@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -38,20 +35,15 @@ class Range extends Constraint
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
-    public $minMessage = 'This value should be {{ limit }} or more.';
-    public $maxMessage = 'This value should be {{ limit }} or less.';
-    public $invalidMessage = 'This value should be a valid number.';
-    public $invalidDateTimeMessage = 'This value should be a valid datetime.';
-    public $min;
-    public $minPropertyPath;
-    public $max;
-    public $maxPropertyPath;
+    public string $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
+    public string $minMessage = 'This value should be {{ limit }} or more.';
+    public string $maxMessage = 'This value should be {{ limit }} or less.';
+    public string $invalidMessage = 'This value should be a valid number.';
+    public string $invalidDateTimeMessage = 'This value should be a valid datetime.';
+    public mixed $min = null;
+    public ?string $minPropertyPath = null;
+    public mixed $max = null;
+    public ?string $maxPropertyPath = null;
 
     public function __construct(
         array $options = null,

@@ -18,10 +18,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGenerator;
-use Symfony\Component\HttpKernel\UriSigner;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
@@ -30,8 +30,9 @@ class HttpKernelExtensionTest extends TestCase
 {
     public function testFragmentWithError()
     {
-        $this->expectException(\Twig\Error\RuntimeError::class);
         $renderer = $this->getFragmentHandler($this->throwException(new \Exception('foo')));
+
+        $this->expectException(\Twig\Error\RuntimeError::class);
 
         $this->renderTemplate($renderer);
     }

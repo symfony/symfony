@@ -42,11 +42,8 @@ class Message extends RawMessage
     /**
      * @return $this
      */
-    public function setBody(AbstractPart $body = null): static
+    public function setBody(?AbstractPart $body): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/mime', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         $this->body = $body;
 
         return $this;
@@ -125,10 +122,7 @@ class Message extends RawMessage
         yield from $body->toIterable();
     }
 
-    /**
-     * @return void
-     */
-    public function ensureValidity()
+    public function ensureValidity(): void
     {
         if (!$this->headers->has('To') && !$this->headers->has('Cc') && !$this->headers->has('Bcc')) {
             throw new LogicException('An email must have a "To", "Cc", or "Bcc" header.');

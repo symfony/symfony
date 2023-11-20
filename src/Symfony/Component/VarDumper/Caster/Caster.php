@@ -177,6 +177,10 @@ class Caster
         $classProperties = [];
         $className = $class->name;
 
+        if ($parent = $class->getParentClass()) {
+            $classProperties += self::$classProperties[$parent->name] ??= self::getClassProperties($parent);
+        }
+
         foreach ($class->getProperties() as $p) {
             if ($p->isStatic()) {
                 continue;
@@ -187,10 +191,6 @@ class Caster
                 $p->isProtected() => self::PREFIX_PROTECTED.$p->name,
                 default => "\0".$className."\0".$p->name,
             }] = new UninitializedStub($p);
-        }
-
-        if ($parent = $class->getParentClass()) {
-            $classProperties += self::$classProperties[$parent->name] ??= self::getClassProperties($parent);
         }
 
         return $classProperties;

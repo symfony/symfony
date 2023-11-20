@@ -48,7 +48,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         $this->onlyOptionalsEnabled = $this->optionalsEnabled = true;
     }
 
-    public function warmUp(string $cacheDir, SymfonyStyle $io = null): array
+    public function warmUp(string $cacheDir, string $buildDir = null, SymfonyStyle $io = null): array
     {
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
             $collectedLogs = [];
@@ -96,8 +96,8 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                 }
 
                 $start = microtime(true);
-                foreach ((array) $warmer->warmUp($cacheDir) as $item) {
-                    if (is_dir($item) || (str_starts_with($item, \dirname($cacheDir)) && !is_file($item))) {
+                foreach ((array) $warmer->warmUp($cacheDir, $buildDir) as $item) {
+                    if (is_dir($item) || (str_starts_with($item, \dirname($cacheDir)) && !is_file($item)) || ($buildDir && str_starts_with($item, \dirname($buildDir)) && !is_file($item))) {
                         throw new \LogicException(sprintf('"%s::warmUp()" should return a list of files or classes but "%s" is none of them.', $warmer::class, $item));
                     }
                     $preload[] = $item;

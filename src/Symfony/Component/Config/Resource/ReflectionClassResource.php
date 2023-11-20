@@ -12,7 +12,6 @@
 namespace Symfony\Component\Config\Resource;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -189,13 +188,6 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         if (interface_exists(EventSubscriberInterface::class, false) && $class->isSubclassOf(EventSubscriberInterface::class)) {
             yield EventSubscriberInterface::class;
             yield print_r($class->name::getSubscribedEvents(), true);
-        }
-
-        if (interface_exists(MessageSubscriberInterface::class, false) && $class->isSubclassOf(MessageSubscriberInterface::class)) {
-            yield MessageSubscriberInterface::class;
-            foreach ($class->name::getHandledMessages() as $key => $value) {
-                yield $key.print_r($value, true);
-            }
         }
 
         if (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {

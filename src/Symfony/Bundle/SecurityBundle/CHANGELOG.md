@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Enabling SecurityBundle and not configuring it is not allowed
+ * Remove configuration options `enable_authenticator_manager`, `csrf_token_generator` and `require_previous_session`
+
 6.4
 ---
 
@@ -8,6 +14,7 @@ CHANGELOG
  * Allow an array of `pattern` in firewall configuration
  * Add `$badges` argument to `Security::login`
  * Deprecate the `require_previous_session` config option. Setting it has no effect anymore
+ * Add `LogoutRouteLoader`
 
 6.3
 ---

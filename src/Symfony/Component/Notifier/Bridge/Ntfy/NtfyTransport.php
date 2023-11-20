@@ -115,8 +115,8 @@ final class NtfyTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof PushMessage &&
-            (null === $message->getOptions() || $message->getOptions() instanceof NtfyOptions);
+        return $message instanceof PushMessage
+            && (null === $message->getOptions() || $message->getOptions() instanceof NtfyOptions);
     }
 
     public function __toString(): string

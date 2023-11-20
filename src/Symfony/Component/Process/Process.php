@@ -77,7 +77,6 @@ class Process implements \IteratorAggregate
     private bool $pty;
     private array $options = ['suppress_errors' => true, 'bypass_shell' => true];
 
-    private bool $useFileHandles;
     private WindowsPipes|UnixPipes $processPipes;
 
     private ?int $latestSignal = null;
@@ -89,7 +88,7 @@ class Process implements \IteratorAggregate
      *
      * User-defined errors must use exit codes in the 64-113 range.
      */
-    public static $exitCodes = [
+    public static array $exitCodes = [
         0 => 'OK',
         1 => 'General error',
         2 => 'Misuse of shell builtins',
@@ -163,7 +162,6 @@ class Process implements \IteratorAggregate
 
         $this->setInput($input);
         $this->setTimeout($timeout);
-        $this->useFileHandles = '\\' === \DIRECTORY_SEPARATOR;
         $this->pty = false;
     }
 
@@ -201,10 +199,7 @@ class Process implements \IteratorAggregate
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -289,13 +284,11 @@ class Process implements \IteratorAggregate
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
-     * @return void
-     *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
      * @throws LogicException   In case a callback is provided and output has been disabled
      */
-    public function start(callable $callback = null, array $env = [])
+    public function start(callable $callback = null, array $env = []): void
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running.');
@@ -304,7 +297,7 @@ class Process implements \IteratorAggregate
         $this->resetProcessData();
         $this->starttime = $this->lastOutputTime = microtime(true);
         $this->callback = $this->buildCallback($callback);
-        $descriptors = $this->getDescriptors();
+        $descriptors = $this->getDescriptors(null !== $callback);
 
         if ($this->env) {
             $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->env, $env, 'strcasecmp') : $this->env;
@@ -325,17 +318,13 @@ class Process implements \IteratorAggregate
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $commandline = $this->prepareWindowsCommandLine($commandline, $env);
-        } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
+        } elseif ($this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = ['pipe', 'w'];
 
             // See https://unix.stackexchange.com/questions/71205/background-process-pipe-input
             $commandline = '{ ('.$commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
             $commandline .= 'pid=$!; echo $pid >&3; wait $pid 2>/dev/null; code=$?; echo $code >&3; exit $code';
-
-            // Workaround for the bug, when PTS functionality is enabled.
-            // @see : https://bugs.php.net/69442
-            $ptsWorkaround = fopen(__FILE__, 'r');
         }
 
         $envPairs = [];
@@ -1146,11 +1135,9 @@ class Process implements \IteratorAggregate
      * In case you run a background process (with the start method), you should
      * trigger this method regularly to ensure the process timeout
      *
-     * @return void
-     *
      * @throws ProcessTimedOutException In case the timeout was reached
      */
-    public function checkTimeout()
+    public function checkTimeout(): void
     {
         if (self::STATUS_STARTED !== $this->status) {
             return;
@@ -1188,10 +1175,8 @@ class Process implements \IteratorAggregate
      *
      * Enabling the "create_new_console" option allows a subprocess to continue
      * to run after the main process exited, on both Windows and *nix
-     *
-     * @return void
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Setting options while the process is running is not possible.');
@@ -1240,15 +1225,15 @@ class Process implements \IteratorAggregate
     /**
      * Creates the descriptors needed by the proc_open.
      */
-    private function getDescriptors(): array
+    private function getDescriptors(bool $hasCallback): array
     {
         if ($this->input instanceof \Iterator) {
             $this->input->rewind();
         }
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $this->callback);
+            $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $hasCallback);
         } else {
-            $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $this->callback);
+            $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $hasCallback);
         }
 
         return $this->processPipes->getDescriptors();
@@ -1285,10 +1270,8 @@ class Process implements \IteratorAggregate
      * Updates the status of the process, reads pipes.
      *
      * @param bool $blocking Whether to use a blocking read call
-     *
-     * @return void
      */
-    protected function updateStatus(bool $blocking)
+    protected function updateStatus(bool $blocking): void
     {
         if (self::STATUS_STARTED !== $this->status) {
             return;

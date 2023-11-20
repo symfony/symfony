@@ -89,6 +89,7 @@ return [
         'Lydi' => 'Lidya',
         'Mahj' => 'Mahajani',
         'Mand' => 'Manden',
+        'Mani' => 'Maniheist',
         'Maya' => 'Maya Hiyeroglifleri',
         'Mend' => 'Mende',
         'Merc' => 'Meroitik El Yazısı',

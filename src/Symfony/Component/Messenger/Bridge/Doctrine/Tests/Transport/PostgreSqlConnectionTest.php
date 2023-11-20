@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Cache\ArrayResult;
-use Doctrine\DBAL\Cache\ArrayStatement;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -80,29 +79,16 @@ class PostgreSqlConnectionTest extends TestCase
             }
         };
 
-        // dbal 2.x
-        if (interface_exists(Result::class)) {
-            $driverConnection
-                ->expects(self::exactly(2))
-                ->method('getWrappedConnection')
-                ->willReturn($wrappedConnection);
+        $driverConnection
+            ->expects(self::exactly(2))
+            ->method('getNativeConnection')
+            ->willReturn($wrappedConnection);
 
-            $driverConnection
-                ->expects(self::any())
-                ->method('executeQuery')
-                ->willReturn(new ArrayStatement([]));
-        } else {
-            // dbal 3.x
-            $driverConnection
-                ->expects(self::exactly(2))
-                ->method('getNativeConnection')
-                ->willReturn($wrappedConnection);
+        $driverConnection
+            ->expects(self::any())
+            ->method('executeQuery')
+            ->willReturn(new Result(new ArrayResult([]), $driverConnection));
 
-            $driverConnection
-                ->expects(self::any())
-                ->method('executeQuery')
-                ->willReturn(new Result(new ArrayResult([]), $driverConnection));
-        }
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
         $connection->get(); // first time we have queueEmptiedAt === null, fallback on the parent implementation

@@ -29,10 +29,8 @@ interface LdapInterface
      * Return a connection bound to the ldap.
      *
      * @throws ConnectionException if dn / password could not be bound
-     *
-     * @return void
      */
-    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null);
+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void;
 
     /**
      * Queries a ldap server for entries matching the given criteria.

@@ -24,8 +24,9 @@ class RememberMeTokenProviderDoctrineSchemaListener extends AbstractSchemaListen
     /**
      * @param iterable<mixed, RememberMeHandlerInterface> $rememberMeHandlers
      */
-    public function __construct(private iterable $rememberMeHandlers)
-    {
+    public function __construct(
+        private readonly iterable $rememberMeHandlers,
+    ) {
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void

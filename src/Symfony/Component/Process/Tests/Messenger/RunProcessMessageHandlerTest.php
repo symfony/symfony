@@ -22,7 +22,7 @@ class RunProcessMessageHandlerTest extends TestCase
     {
         $context = (new RunProcessMessageHandler())(new RunProcessMessage(['ls'], cwd: __DIR__));
 
-        $this->assertSame(['ls'], $context->command);
+        $this->assertSame(['ls'], $context->message->command);
         $this->assertSame(0, $context->exitCode);
         $this->assertStringContainsString(basename(__FILE__), $context->output);
     }
@@ -32,7 +32,7 @@ class RunProcessMessageHandlerTest extends TestCase
         try {
             (new RunProcessMessageHandler())(new RunProcessMessage(['invalid']));
         } catch (RunProcessFailedException $e) {
-            $this->assertSame(['invalid'], $e->context->command);
+            $this->assertSame(['invalid'], $e->context->message->command);
             $this->assertSame('\\' === \DIRECTORY_SEPARATOR ? 1 : 127, $e->context->exitCode);
 
             return;

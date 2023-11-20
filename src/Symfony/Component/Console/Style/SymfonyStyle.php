@@ -60,10 +60,8 @@ class SymfonyStyle extends OutputStyle
 
     /**
      * Formats a message as a block of text.
-     *
-     * @return void
      */
-    public function block(string|array $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
+    public function block(string|array $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true): void
     {
         $messages = \is_array($messages) ? array_values($messages) : [$messages];
 
@@ -72,10 +70,7 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    /**
-     * @return void
-     */
-    public function title(string $message)
+    public function title(string $message): void
     {
         $this->autoPrependBlock();
         $this->writeln([
@@ -85,10 +80,7 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    /**
-     * @return void
-     */
-    public function section(string $message)
+    public function section(string $message): void
     {
         $this->autoPrependBlock();
         $this->writeln([
@@ -98,10 +90,7 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    /**
-     * @return void
-     */
-    public function listing(array $elements)
+    public function listing(array $elements): void
     {
         $this->autoPrependText();
         $elements = array_map(fn ($element) => sprintf(' * %s', $element), $elements);
@@ -110,10 +99,7 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    /**
-     * @return void
-     */
-    public function text(string|array $message)
+    public function text(string|array $message): void
     {
         $this->autoPrependText();
 
@@ -125,68 +111,46 @@ class SymfonyStyle extends OutputStyle
 
     /**
      * Formats a command comment.
-     *
-     * @return void
      */
-    public function comment(string|array $message)
+    public function comment(string|array $message): void
     {
         $this->block($message, null, null, '<fg=default;bg=default> // </>', false, false);
     }
 
-    /**
-     * @return void
-     */
-    public function success(string|array $message)
+    public function success(string|array $message): void
     {
         $this->block($message, 'OK', 'fg=black;bg=green', ' ', true);
     }
 
-    /**
-     * @return void
-     */
-    public function error(string|array $message)
+    public function error(string|array $message): void
     {
         $this->block($message, 'ERROR', 'fg=white;bg=red', ' ', true);
     }
 
-    /**
-     * @return void
-     */
-    public function warning(string|array $message)
+    public function warning(string|array $message): void
     {
         $this->block($message, 'WARNING', 'fg=black;bg=yellow', ' ', true);
     }
 
-    /**
-     * @return void
-     */
-    public function note(string|array $message)
+    public function note(string|array $message): void
     {
         $this->block($message, 'NOTE', 'fg=yellow', ' ! ');
     }
 
     /**
      * Formats an info message.
-     *
-     * @return void
      */
-    public function info(string|array $message)
+    public function info(string|array $message): void
     {
         $this->block($message, 'INFO', 'fg=green', ' ', true);
     }
 
-    /**
-     * @return void
-     */
-    public function caution(string|array $message)
+    public function caution(string|array $message): void
     {
         $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true);
     }
 
-    /**
-     * @return void
-     */
-    public function table(array $headers, array $rows)
+    public function table(array $headers, array $rows): void
     {
         $this->createTable()
             ->setHeaders($headers)
@@ -199,10 +163,8 @@ class SymfonyStyle extends OutputStyle
 
     /**
      * Formats a horizontal table.
-     *
-     * @return void
      */
-    public function horizontalTable(array $headers, array $rows)
+    public function horizontalTable(array $headers, array $rows): void
     {
         $this->createTable()
             ->setHorizontal(true)
@@ -221,10 +183,8 @@ class SymfonyStyle extends OutputStyle
      * * 'A title'
      * * ['key' => 'value']
      * * new TableSeparator()
-     *
-     * @return void
      */
-    public function definitionList(string|array|TableSeparator ...$list)
+    public function definitionList(string|array|TableSeparator ...$list): void
     {
         $headers = [];
         $row = [];
@@ -285,27 +245,18 @@ class SymfonyStyle extends OutputStyle
         return $this->askQuestion($questionChoice);
     }
 
-    /**
-     * @return void
-     */
-    public function progressStart(int $max = 0)
+    public function progressStart(int $max = 0): void
     {
         $this->progressBar = $this->createProgressBar($max);
         $this->progressBar->start();
     }
 
-    /**
-     * @return void
-     */
-    public function progressAdvance(int $step = 1)
+    public function progressAdvance(int $step = 1): void
     {
         $this->getProgressBar()->advance($step);
     }
 
-    /**
-     * @return void
-     */
-    public function progressFinish()
+    public function progressFinish(): void
     {
         $this->getProgressBar()->finish();
         $this->newLine(2);
@@ -366,10 +317,7 @@ class SymfonyStyle extends OutputStyle
         return $answer;
     }
 
-    /**
-     * @return void
-     */
-    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL)
+    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL): void
     {
         if (!is_iterable($messages)) {
             $messages = [$messages];
@@ -381,10 +329,7 @@ class SymfonyStyle extends OutputStyle
         }
     }
 
-    /**
-     * @return void
-     */
-    public function write(string|iterable $messages, bool $newline = false, int $type = self::OUTPUT_NORMAL)
+    public function write(string|iterable $messages, bool $newline = false, int $type = self::OUTPUT_NORMAL): void
     {
         if (!is_iterable($messages)) {
             $messages = [$messages];
@@ -396,10 +341,7 @@ class SymfonyStyle extends OutputStyle
         }
     }
 
-    /**
-     * @return void
-     */
-    public function newLine(int $count = 1)
+    public function newLine(int $count = 1): void
     {
         parent::newLine($count);
         $this->bufferedOutput->write(str_repeat("\n", $count));

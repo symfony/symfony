@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add argument `$label` to `VarDumper::dump()`
+ * Require explicit argument when calling `VarDumper::setHandler()`
+
 6.4
 ---
 

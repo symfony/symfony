@@ -16,10 +16,10 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Serializer\Annotation\Context;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
-use Symfony\Component\Serializer\Annotation\SerializedName;
-use Symfony\Component\Serializer\Annotation\SerializedPath;
+use Symfony\Component\Serializer\Attribute\Context;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -77,7 +77,7 @@ class AbstractObjectNormalizerTest extends TestCase
     {
         $this->expectException(ExtraAttributesException::class);
         $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo" is unknown).');
-        $factory = new ClassMetadataFactory(new AnnotationLoader());
+        $factory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new AbstractObjectNormalizerDummy($factory);
         $normalizer->denormalize(
             ['fooFoo' => 'foo'],
@@ -91,7 +91,7 @@ class AbstractObjectNormalizerTest extends TestCase
     {
         $this->expectException(ExtraAttributesException::class);
         $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
-        $factory = new ClassMetadataFactory(new AnnotationLoader());
+        $factory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new AbstractObjectNormalizerDummy($factory);
         $normalizer->denormalize(
             ['fooFoo' => 'foo', 'fooBar' => 'bar'],
@@ -143,7 +143,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeWithSnakeCaseNestedAttributes()
     {
-        $factory = new ClassMetadataFactory(new AnnotationLoader());
+        $factory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($factory, new CamelCaseToSnakeCaseNameConverter());
         $data = [
             'one' => [
@@ -156,7 +156,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testNormalizeWithSnakeCaseNestedAttributes()
     {
-        $factory = new ClassMetadataFactory(new AnnotationLoader());
+        $factory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($factory, new CamelCaseToSnakeCaseNameConverter());
         $dummy = new SnakeCaseNestedDummy();
         $dummy->fooBar = 'fooBar';
@@ -187,7 +187,7 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testDenormalizeWithNestedAttributesDuplicateKeys()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Duplicate values for key "quux" found. One value is set via the SerializedPath annotation: "one->four", the other one is set via the SerializedName annotation: "notquux".');
+        $this->expectExceptionMessage('Duplicate values for key "quux" found. One value is set via the SerializedPath attribute: "one->four", the other one is set via the SerializedName attribute: "notquux".');
         $normalizer = new AbstractObjectNormalizerWithMetadata();
         $data = [
             'one' => [
@@ -252,7 +252,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $foobar = new AlreadyPopulatedNestedDummy();
         $foobar->foo = 'foo';
         $foobar->bar = 'bar';
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
         $normalizer->normalize($foobar, 'any');
     }
@@ -264,7 +264,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $foobar = new DuplicateValueNestedDummy();
         $foobar->foo = 'foo';
         $foobar->bar = 'bar';
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
         $normalizer->normalize($foobar, 'any');
     }
@@ -286,7 +286,7 @@ class AbstractObjectNormalizerTest extends TestCase
             'foo' => 'notfoo',
             'baz' => 'baz',
         ];
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
         $test = $normalizer->normalize($foobar, 'any');
         $this->assertSame($data, $test);
@@ -312,7 +312,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testNormalizeWithNestedAttributesInConstructor()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
 
         $test = $normalizer->normalize(new NestedDummyWithConstructor('foo', 'quux', 'notfoo', 'baz'), 'any');
@@ -330,7 +330,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testNormalizeWithNestedAttributesInConstructorAndDiscriminatorMap()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
 
         $test1 = $normalizer->normalize(new FirstNestedDummyWithConstructorAndDiscriminator('foo', 'notfoo', 'baz'), 'any');
@@ -473,7 +473,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeWithDiscriminatorMapUsesCorrectClassname()
     {
-        $factory = new ClassMetadataFactory(new AnnotationLoader());
+        $factory = new ClassMetadataFactory(new AttributeLoader());
 
         $loaderMock = new class() implements ClassMetadataFactoryInterface {
             public function getMetadataFor($value): ClassMetadataInterface
@@ -508,7 +508,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeWithDiscriminatorMapAndObjectToPopulateUsesCorrectClassname()
     {
-        $factory = new ClassMetadataFactory(new AnnotationLoader());
+        $factory = new ClassMetadataFactory(new AttributeLoader());
 
         $loaderMock = new class() implements ClassMetadataFactoryInterface {
             public function getMetadataFor($value): ClassMetadataInterface
@@ -707,7 +707,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeUsesContextAttributeForPropertiesInConstructorWithSeralizedName()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
@@ -721,7 +721,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testNormalizeUsesContextAttributeForPropertiesInConstructorWithSerializedPath()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
@@ -736,7 +736,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testNormalizeUsesContextAttributeForProperties()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
@@ -775,7 +775,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $serializer = new Serializer([
             new BackedEnumNormalizer(),
             new ObjectNormalizer(
-                classMetadataFactory: new ClassMetadataFactory(new AnnotationLoader()),
+                classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()),
                 propertyTypeExtractor: new PropertyInfoExtractor([], [new ReflectionExtractor()]),
             ),
         ]);
@@ -785,6 +785,48 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $normalized = $serializer->normalize(new DummyWithEnumUnion(EnumB::B));
         $this->assertEquals(new DummyWithEnumUnion(EnumB::B), $serializer->denormalize($normalized, DummyWithEnumUnion::class));
+    }
+
+    public function testDenormalizeWithNumberAsSerializedNameAndNoArrayReindex()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+
+        $data = [
+            '1' => 'foo',
+            '99' => 'baz',
+        ];
+
+        $obj = new class() {
+            #[SerializedName('1')]
+            public $foo;
+
+            #[SerializedName('99')]
+            public $baz;
+        };
+
+        $test = $normalizer->denormalize($data, $obj::class);
+        $this->assertSame('foo', $test->foo);
+        $this->assertSame('baz', $test->baz);
+    }
+
+    public function testDenormalizeWithCorrectOrderOfAttributeAndProperty()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+
+        $data = [
+            'id' => 'root-level-id',
+            'data' => [
+                'id' => 'nested-id',
+            ],
+        ];
+
+        $obj = new class() {
+            #[SerializedPath('[data][id]')]
+            public $id;
+        };
+
+        $test = $normalizer->denormalize($data, $obj::class);
+        $this->assertSame('nested-id', $test->id);
     }
 }
 
@@ -961,7 +1003,7 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
 {
     public function __construct()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         parent::__construct($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
     }
 

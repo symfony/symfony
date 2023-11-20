@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Route;
@@ -606,7 +606,7 @@ class XmlFileLoaderTest extends TestCase
         new LoaderResolver([
             $loader = new XmlFileLoader($locator),
             new Psr4DirectoryLoader($locator),
-            new class() extends AnnotationClassLoader {
+            new class() extends AttributeClassLoader {
                 protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
@@ -631,7 +631,7 @@ class XmlFileLoaderTest extends TestCase
     {
         new LoaderResolver([
             $loader = new XmlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
-            new class() extends AnnotationClassLoader {
+            new class() extends AttributeClassLoader {
                 protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Translation\Bridge\Lokalise\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
 use Symfony\Component\Translation\Provider\Dsn;
 use Symfony\Component\Translation\Provider\ProviderFactoryInterface;
@@ -46,7 +46,7 @@ class LokaliseProviderFactoryTest extends ProviderFactoryTestCase
 
     public function testBaseUri()
     {
-        $response = new MockResponse(json_encode(['files' => []]));
+        $response = new JsonMockResponse(['files' => []]);
         $httpClient = new MockHttpClient([$response]);
         $factory = new LokaliseProviderFactory($httpClient, $this->getLogger(), $this->getDefaultLocale(), $this->getLoader());
         $provider = $factory->create(new Dsn('lokalise://PROJECT_ID:API_KEY@default'));

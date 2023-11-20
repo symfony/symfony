@@ -53,9 +53,11 @@ class EnumNodeTest extends TestCase
 
     public function testFinalizeWithInvalidValue()
     {
+        $node = new EnumNode('foo', null, ['foo', 'bar', TestEnum::Foo]);
+
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The value "foobar" is not allowed for path "foo". Permissible values: "foo", "bar", Symfony\Component\Config\Tests\Fixtures\TestEnum::Foo');
-        $node = new EnumNode('foo', null, ['foo', 'bar', TestEnum::Foo]);
+
         $node->finalize('foobar');
     }
 

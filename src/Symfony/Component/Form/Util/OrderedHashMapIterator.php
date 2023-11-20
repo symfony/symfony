@@ -32,7 +32,7 @@ class OrderedHashMapIterator implements \Iterator
     private int $cursorId;
     /** @var array<int, int> */
     private array $managedCursors;
-    private string|null $key = null;
+    private ?string $key = null;
     /** @var TValue|null */
     private mixed $current = null;
 
@@ -62,10 +62,7 @@ class OrderedHashMapIterator implements \Iterator
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }

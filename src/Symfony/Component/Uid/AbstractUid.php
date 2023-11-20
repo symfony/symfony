@@ -19,7 +19,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
     /**
      * The identifier in its canonic representation.
      */
-    protected $uid;
+    protected string $uid;
 
     /**
      * Whether the passed value is valid for the constructor of the current class.

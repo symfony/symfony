@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
@@ -102,7 +103,9 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($repositoryMock)
         ;
 
-        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata = $this->createMock(
+            class_exists(ClassMetadataInfo::class) ? ClassMetadataInfo::class : ClassMetadata::class
+        );
         $classMetadata
             ->expects($this->any())
             ->method('hasField')
@@ -468,7 +471,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public static function resultTypesProvider()
+    public static function resultTypesProvider(): array
     {
         $entity = new SingleIntIdEntity(1, 'foo');
 
@@ -614,8 +617,6 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testDedicatedEntityManagerNullObject()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('Object manager "foo" does not exist.');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name'],
@@ -629,13 +630,14 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         $entity = new SingleIntIdEntity(1, null);
 
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('Object manager "foo" does not exist.');
+
         $this->validator->validate($entity, $constraint);
     }
 
     public function testEntityManagerNullObject()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('Unable to find the object manager associated with an entity of class "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity"');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name'],
@@ -648,6 +650,9 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->validator->initialize($this->context);
 
         $entity = new SingleIntIdEntity(1, null);
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('Unable to find the object manager associated with an entity of class "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity"');
 
         $this->validator->validate($entity, $constraint);
     }
@@ -716,8 +721,6 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidateRepositoryForInheritance()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('The "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity" entity repository does not support the "Symfony\Bridge\Doctrine\Tests\Fixtures\Person" entity. The entity should be an instance of or extend "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity".');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name'],
@@ -726,6 +729,10 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ]);
 
         $entity = new Person(1, 'Foo');
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity" entity repository does not support the "Symfony\Bridge\Doctrine\Tests\Fixtures\Person" entity. The entity should be an instance of or extend "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity".');
+
         $this->validator->validate($entity, $constraint);
     }
 

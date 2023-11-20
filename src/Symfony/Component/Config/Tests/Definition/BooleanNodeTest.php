@@ -50,8 +50,11 @@ class BooleanNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException(InvalidTypeException::class);
+
         $node = new BooleanNode('test');
+
+        $this->expectException(InvalidTypeException::class);
+
         $node->normalize($value);
     }
 

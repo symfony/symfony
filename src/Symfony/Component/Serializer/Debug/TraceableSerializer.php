@@ -14,7 +14,6 @@ namespace Symfony\Component\Serializer\Debug;
 use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -34,9 +33,6 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         private SerializerInterface&NormalizerInterface&DenormalizerInterface&EncoderInterface&DecoderInterface $serializer,
         private SerializerDataCollector $dataCollector,
     ) {
-        if (!method_exists($serializer, 'getSupportedTypes')) {
-            trigger_deprecation('symfony/serializer', '6.3', 'Not implementing the "NormalizerInterface::getSupportedTypes()" in "%s" is deprecated.', get_debug_type($serializer));
-        }
     }
 
     public function serialize(mixed $data, string $format, array $context = []): string
@@ -131,11 +127,6 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
     public function getSupportedTypes(?string $format): array
     {
-        // @deprecated remove condition in 7.0
-        if (!method_exists($this->serializer, 'getSupportedTypes')) {
-            return ['*' => $this->serializer instanceof CacheableSupportsMethodInterface && $this->serializer->hasCacheableSupportsMethod()];
-        }
-
         return $this->serializer->getSupportedTypes($format);
     }
 

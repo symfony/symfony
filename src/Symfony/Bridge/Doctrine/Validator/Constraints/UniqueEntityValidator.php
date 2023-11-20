@@ -27,22 +27,18 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class UniqueEntityValidator extends ConstraintValidator
 {
-    private ManagerRegistry $registry;
-
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        private readonly ManagerRegistry $registry,
+    ) {
     }
 
     /**
      * @param object $entity
      *
-     * @return void
-     *
      * @throws UnexpectedTypeException
      * @throws ConstraintDefinitionException
      */
-    public function validate(mixed $entity, Constraint $constraint)
+    public function validate(mixed $entity, Constraint $constraint): void
     {
         if (!$constraint instanceof UniqueEntity) {
             throw new UnexpectedTypeException($constraint, UniqueEntity::class);

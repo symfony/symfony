@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HttpKernelBrowser extends AbstractBrowser
 {
-    protected $kernel;
+    protected HttpKernelInterface $kernel;
     private bool $catchExceptions = true;
 
     /**
@@ -47,20 +47,16 @@ class HttpKernelBrowser extends AbstractBrowser
 
     /**
      * Sets whether to catch exceptions when the kernel is handling a request.
-     *
-     * @return void
      */
-    public function catchExceptions(bool $catchExceptions)
+    public function catchExceptions(bool $catchExceptions): void
     {
         $this->catchExceptions = $catchExceptions;
     }
 
     /**
      * @param Request $request
-     *
-     * @return Response
      */
-    protected function doRequest(object $request)
+    protected function doRequest(object $request): Response
     {
         $response = $this->kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, $this->catchExceptions);
 
@@ -73,10 +69,8 @@ class HttpKernelBrowser extends AbstractBrowser
 
     /**
      * @param Request $request
-     *
-     * @return string
      */
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);
@@ -112,10 +106,7 @@ EOF;
         return $code.$this->getHandleScript();
     }
 
-    /**
-     * @return string
-     */
-    protected function getHandleScript()
+    protected function getHandleScript(): string
     {
         return <<<'EOF'
 $response = $kernel->handle($request);

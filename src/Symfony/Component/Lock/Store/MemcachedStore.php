@@ -30,10 +30,7 @@ class MemcachedStore implements PersistingStoreInterface
     private int $initialTtl;
     private bool $useExtendedReturn;
 
-    /**
-     * @return bool
-     */
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         return \extension_loaded('memcached');
     }
@@ -55,10 +52,7 @@ class MemcachedStore implements PersistingStoreInterface
         $this->initialTtl = $initialTtl;
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $token = $this->getUniqueToken($key);
         $key->reduceLifetime($this->initialTtl);
@@ -70,10 +64,7 @@ class MemcachedStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         if ($ttl < 1) {
             throw new InvalidTtlException(sprintf('"%s()" expects a TTL greater or equals to 1 second. Got %s.', __METHOD__, $ttl));
@@ -109,10 +100,7 @@ class MemcachedStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $token = $this->getUniqueToken($key);
 

@@ -118,7 +118,6 @@ class TranslationDebugCommandTest extends TestCase
 
     public function testDebugInvalidDirectory()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())
             ->method('getBundle')
@@ -126,6 +125,9 @@ class TranslationDebugCommandTest extends TestCase
             ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester([], [], $kernel);
+
+        $this->expectException(\InvalidArgumentException::class);
+
         $tester->execute(['locale' => 'en', 'bundle' => 'dir']);
     }
 
@@ -269,7 +271,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'locale' => [
             [''],

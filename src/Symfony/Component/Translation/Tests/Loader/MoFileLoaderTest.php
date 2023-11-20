@@ -22,7 +22,7 @@ class MoFileLoaderTest extends TestCase
     public function testLoad()
     {
         $loader = new MoFileLoader();
-        $resource = __DIR__.'/../fixtures/resources.mo';
+        $resource = __DIR__.'/../Fixtures/resources.mo';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
@@ -33,7 +33,7 @@ class MoFileLoaderTest extends TestCase
     public function testLoadPlurals()
     {
         $loader = new MoFileLoader();
-        $resource = __DIR__.'/../fixtures/plurals.mo';
+        $resource = __DIR__.'/../Fixtures/plurals.mo';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals([
@@ -48,7 +48,7 @@ class MoFileLoaderTest extends TestCase
     {
         $this->expectException(NotFoundResourceException::class);
         $loader = new MoFileLoader();
-        $resource = __DIR__.'/../fixtures/non-existing.mo';
+        $resource = __DIR__.'/../Fixtures/non-existing.mo';
         $loader->load($resource, 'en', 'domain1');
     }
 
@@ -56,14 +56,14 @@ class MoFileLoaderTest extends TestCase
     {
         $this->expectException(InvalidResourceException::class);
         $loader = new MoFileLoader();
-        $resource = __DIR__.'/../fixtures/empty.mo';
+        $resource = __DIR__.'/../Fixtures/empty.mo';
         $loader->load($resource, 'en', 'domain1');
     }
 
     public function testLoadEmptyTranslation()
     {
         $loader = new MoFileLoader();
-        $resource = __DIR__.'/../fixtures/empty-translation.mo';
+        $resource = __DIR__.'/../Fixtures/empty-translation.mo';
         $catalogue = $loader->load($resource, 'en', 'message');
 
         $this->assertEquals([], $catalogue->all('message'));

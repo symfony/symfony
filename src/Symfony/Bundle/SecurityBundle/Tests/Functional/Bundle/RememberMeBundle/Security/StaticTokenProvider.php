@@ -44,7 +44,7 @@ class StaticTokenProvider implements TokenProviderInterface
         unset(self::$db[$series]);
     }
 
-    public function updateToken(string $series, string $tokenValue, \DateTime $lastUsed): void
+    public function updateToken(string $series, string $tokenValue, \DateTimeInterface $lastUsed): void
     {
         $token = $this->loadTokenBySeries($series);
         $refl = new \ReflectionClass($token);

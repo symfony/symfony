@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Il valore della netmask dovrebbe essere compreso tra {{ min }} e {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Il nome del file è troppo lungo. Dovrebbe avere {{ filename_max_length }} carattere o meno.|Il nome del file è troppo lungo. Dovrebbe avere {{ filename_max_length }} caratteri o meno.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>La password non è abbastanza sicura. Per favore, utilizza una password più robusta.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Questo valore contiene caratteri che non sono consentiti dal livello di restrizione attuale.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Utilizzare caratteri invisibili non è consentito.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Non è consentito mescolare numeri provenienti da diversi script.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Non è consentito utilizzare caratteri sovrapposti nascosti.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -56,10 +56,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
  */
 class SecurityBundle extends Bundle
 {
-    /**
-     * @return void
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

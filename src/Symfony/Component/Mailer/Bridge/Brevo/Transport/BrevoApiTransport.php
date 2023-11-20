@@ -65,7 +65,7 @@ final class BrevoApiTransport extends AbstractApiTransport
         }
 
         if (201 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? $response->getContent(false)).sprintf(' (code %d).', $statusCode), $response);
         }
 
         $sentMessage->setMessageId($result['messageId']);
@@ -172,7 +172,7 @@ final class BrevoApiTransport extends AbstractApiTransport
 
     private function formatAddress(Address $address): array
     {
-        $formattedAddress = ['email' => $address->getAddress()];
+        $formattedAddress = ['email' => $address->getEncodedAddress()];
 
         if ($address->getName()) {
             $formattedAddress['name'] = $address->getName();

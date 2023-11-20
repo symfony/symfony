@@ -14,8 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- *
  * @author Laurent Clouet <laurent35240@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -33,12 +31,7 @@ class Ulid extends Constraint
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This is not a valid ULID.';
+    public string $message = 'This is not a valid ULID.';
 
     public function __construct(
         array $options = null,

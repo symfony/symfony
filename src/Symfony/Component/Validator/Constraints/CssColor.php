@@ -15,9 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -42,11 +39,6 @@ class CssColor extends Constraint
     ];
 
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    /**
      * @var string[]
      */
     private static array $validationModes = [
@@ -64,13 +56,13 @@ class CssColor extends Constraint
         self::HSLA,
     ];
 
-    public $message = 'This value is not a valid CSS color.';
-    public $formats;
+    public string $message = 'This value is not a valid CSS color.';
+    public array|string $formats;
 
     /**
      * @param array|string $formats The types of CSS colors allowed (e.g. hexadecimal only, RGB and HSL only, etc.).
      */
-    public function __construct($formats = [], string $message = null, array $groups = null, $payload = null, array $options = null)
+    public function __construct(array|string $formats = [], string $message = null, array $groups = null, $payload = null, array $options = null)
     {
         $validationModesAsString = implode(', ', self::$validationModes);
 

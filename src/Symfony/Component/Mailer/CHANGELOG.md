@@ -1,10 +1,16 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Remove the OhMySmtp bridge in favor of the MailPace bridge
+
 6.4
 ---
 
  * Add DSN parameter `peer_fingerprint` to verify TLS certificate fingerprint
+ * Change the default port for the `mailjet+smtp` transport from 465 to 587
 
 6.3
 ---

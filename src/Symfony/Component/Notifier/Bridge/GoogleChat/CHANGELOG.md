@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Remove `GoogleChatOptions::card()` in favor of `cardV2()`
+
 6.3
 ---
 

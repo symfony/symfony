@@ -245,7 +245,7 @@ EOF
         $warmer = $kernel->getContainer()->get('cache_warmer');
         // non optional warmers already ran during container compilation
         $warmer->enableOnlyOptionalWarmers();
-        $preload = (array) $warmer->warmUp($cacheDir, $io);
+        $preload = (array) $warmer->warmUp($cacheDir, $warmupDir, $io);
 
         if ($preload && file_exists($preloadFile = $warmupDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
             Preloader::append($preloadFile, $preload);

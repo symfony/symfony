@@ -16,13 +16,13 @@ namespace Symfony\Component\BrowserKit;
  */
 class Request
 {
-    protected $uri;
-    protected $method;
-    protected $parameters;
-    protected $files;
-    protected $cookies;
-    protected $server;
-    protected $content;
+    protected string $uri;
+    protected string $method;
+    protected array $parameters;
+    protected array $files;
+    protected array $cookies;
+    protected array $server;
+    protected ?string $content;
 
     /**
      * @param string $uri        The request URI

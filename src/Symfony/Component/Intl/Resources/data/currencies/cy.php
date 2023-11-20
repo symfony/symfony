@@ -262,10 +262,6 @@ return [
             'CRC',
             'Colón Costa Rica',
         ],
-        'CSD' => [
-            'CSD',
-            'CSD',
-        ],
         'CUC' => [
             'CUC',
             'Peso Trosadwy Ciwba',
@@ -329,10 +325,6 @@ return [
         'ERN' => [
             'ERN',
             'Nakfa Eritrea',
-        ],
-        'ESP' => [
-            'ESP',
-            'ESP',
         ],
         'ETB' => [
             'ETB',
@@ -398,17 +390,9 @@ return [
             'GQE',
             'Ekwele Guinea Gyhydeddol',
         ],
-        'GRD' => [
-            'GRD',
-            'GRD',
-        ],
         'GTQ' => [
             'GTQ',
             'Quetzal Guatemala',
-        ],
-        'GWE' => [
-            'GWE',
-            'GWE',
         ],
         'GWP' => [
             'GWP',
@@ -425,10 +409,6 @@ return [
         'HNL' => [
             'HNL',
             'Lempira Honduras',
-        ],
-        'HRD' => [
-            'HRD',
-            'HRD',
         ],
         'HRK' => [
             'HRK',
@@ -481,10 +461,6 @@ return [
         'ISK' => [
             'ISK',
             'Króna Gwlad yr Iâ',
-        ],
-        'ITL' => [
-            'ITL',
-            'ITL',
         ],
         'JMD' => [
             'JMD',
@@ -570,17 +546,9 @@ return [
             'LTT',
             'Talonas Lithwania',
         ],
-        'LUC' => [
-            'LUC',
-            'LUC',
-        ],
         'LUF' => [
             'LUF',
             'Ffranc Lwcsembwrg',
-        ],
-        'LUL' => [
-            'LUL',
-            'LUL',
         ],
         'LVL' => [
             'LVL',
@@ -622,10 +590,6 @@ return [
             'MKD',
             'Denar Macedonia',
         ],
-        'MKN' => [
-            'MKN',
-            'MKN',
-        ],
         'MLF' => [
             'MLF',
             'Ffranc Mali',
@@ -649,14 +613,6 @@ return [
         'MRU' => [
             'MRU',
             'Ouguiya Mauritania',
-        ],
-        'MTL' => [
-            'MTL',
-            'MTL',
-        ],
-        'MTP' => [
-            'MTP',
-            'MTP',
         ],
         'MUR' => [
             'MUR',
@@ -770,10 +726,6 @@ return [
             'PLN',
             'Zloty Gwlad Pwyl',
         ],
-        'PTE' => [
-            'PTE',
-            'PTE',
-        ],
         'PYG' => [
             'PYG',
             'Guarani Paraguay',
@@ -838,13 +790,13 @@ return [
             'SHP',
             'Punt St Helena',
         ],
-        'SIT' => [
-            'SIT',
-            'SIT',
+        'SLE' => [
+            'SLE',
+            'Leone Sierra Leone',
         ],
         'SLL' => [
             'SLL',
-            'Leone Sierra Leone',
+            'Leone Sierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',
@@ -958,10 +910,6 @@ return [
             'USS',
             'Doler UDA (yr un diwrnod)',
         ],
-        'UYI' => [
-            'UYI',
-            'UYI',
-        ],
         'UYP' => [
             'UYP',
             'Peso Uruguay (1975–1993)',
@@ -1029,22 +977,6 @@ return [
         'YER' => [
             'YER',
             'Rial Yemen',
-        ],
-        'YUD' => [
-            'YUD',
-            'YUD',
-        ],
-        'YUM' => [
-            'YUM',
-            'YUM',
-        ],
-        'YUN' => [
-            'YUN',
-            'YUN',
-        ],
-        'YUR' => [
-            'YUR',
-            'YUR',
         ],
         'ZAL' => [
             'ZAL',

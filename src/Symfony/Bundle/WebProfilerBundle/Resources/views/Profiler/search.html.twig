@@ -1,29 +1,60 @@
 <div id="sidebar-search" class="{{ (render_hidden_by_default ?? true) ? 'hidden' }}">
     <form action="{{ path('_profiler_search') }}" method="get">
         <div class="form-group">
-            <label for="ip">IP</label>
+            <label for="ip">
+                {% if 'command' == profile_type %}
+                    Application
+                {% else %}
+                    IP
+                {% endif %}
+            </label>
             <input type="text" name="ip" id="ip" value="{{ ip }}">
         </div>
 
         <div class="form-group-row">
             <div class="form-group">
-                <label for="method">Method</label>
+                <label for="method">
+                    {% if 'command' == profile_type %}
+                        Mode
+                    {% else %}
+                        Method
+                    {% endif %}
+                </label>
                 <select name="method" id="method">
                     <option value="">Any</option>
-                    {% for m in ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'] %}
+                    {% if 'command' == profile_type %}
+                        {% set methods = ['BATCH', 'INTERACTIVE'] %}
+                    {% else %}
+                        {% set methods = ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'] %}
+                    {% endif %}
+                    {% for m in methods %}
                         <option {{ m == method ? 'selected="selected"' }}>{{ m }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="status_code">Status</label>
-                <input type="number" name="status_code" id="status_code" min="100" max="599" value="{{ status_code }}">
+                <label for="status_code">
+                    {% if 'command' == profile_type %}
+                        Exit code
+                        {% set min_and_max = 'min=%d max=%d'|format(0, 255) %}
+                    {% else %}
+                        Status
+                        {% set min_and_max = 'min=%d max=%d'|format(100, 599) %}
+                    {% endif %}
+                </label>
+                <input type="number" name="status_code" id="status_code" {{ min_and_max }} value="{{ status_code }}">
             </div>
         </div>
 
         <div class="form-group">
-            <label for="url">URL</label>
+            <label for="url">
+                {% if 'command' == profile_type %}
+                    Command
+                {% else %}
+                    URL
+                {% endif %}
+            </label>
             <input type="text" name="url" id="url" value="{{ url }}">
         </div>
 
@@ -51,6 +82,8 @@
                     {% endfor %}
                 </select>
             </div>
+
+            <input type="hidden" name="type" value="{{ profile_type }}">
 
             <div class="form-group">
                 <button type="submit" class="btn btn-sm">Search</button>

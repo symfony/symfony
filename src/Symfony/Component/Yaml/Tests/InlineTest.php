@@ -29,7 +29,7 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getTestsForParse
      */
-    public function testParse($yaml, $value, $flags = 0)
+    public function testParse(string $yaml, $value, $flags = 0)
     {
         $this->assertSame($value, Inline::parse($yaml, $flags), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
     }
@@ -397,6 +397,9 @@ class InlineTest extends TestCase
 
             ['[foo, bar: { foo: bar }]', ['foo', '1' => ['bar' => ['foo' => 'bar']]]],
             ['[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']', ['foo', '@foo.baz', ['%foo%' => 'foo is %foo%', 'bar' => '%foo%'], true, '@service_container']],
+
+            // Binary string not utf8-compliant but starting with and utf8-equivalent "&" character
+            ['{ uid: !!binary Ju0Yh+uqSXOagJZFTlUt8g== }', ['uid' => hex2bin('26ed1887ebaa49739a8096454e552df2')]],
         ];
     }
 
@@ -824,7 +827,7 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */
-    public function testImplicitStringCastingOfMappingKeysIsDeprecated($yaml, $expected)
+    public function testImplicitStringCastingOfMappingKeysThrows($yaml, $expected)
     {
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Implicit casting of incompatible mapping keys to strings is not supported. Quote your evaluable mapping keys instead');

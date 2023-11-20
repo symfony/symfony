@@ -36,6 +36,10 @@
             }
 
             document.body.classList.add(localStorage.getItem('symfony/profiler/width') || 'width-normal');
+
+            document.body.classList.add(
+                (navigator.appVersion.indexOf('Win') !== -1) ? 'windows' : (navigator.appVersion.indexOf('Mac') !== -1) ? 'macos' : 'linux'
+            );
         </script>
 
         {% block body '' %}

@@ -103,11 +103,17 @@ class AssetMapperRepository
         foreach ($this->getDirectories() as $path => $namespace) {
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
             foreach ($iterator as $file) {
+                /** @var \SplFileInfo $file */
                 if (!$file->isFile()) {
                     continue;
                 }
 
                 if ($this->isExcluded($file->getPathname())) {
+                    continue;
+                }
+
+                // avoid potentially exposing PHP files
+                if ('php' === $file->getExtension()) {
                     continue;
                 }
 

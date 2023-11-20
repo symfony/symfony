@@ -6,7 +6,7 @@
     },
     "event-data": {
         "id": "CPgfbmQMTCKtHW6uIWtuVe",
-        "timestamp": 1521472262.908181,
+        "timestamp": 1521472262.000002,
         "log-level": "info",
         "event": "delivered",
         "delivery-status": {

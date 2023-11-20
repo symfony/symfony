@@ -14,8 +14,8 @@ namespace Symfony\Bridge\Doctrine\PropertyInfo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
@@ -30,11 +30,9 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+    ) {
     }
 
     public function getProperties(string $class, array $context = []): ?array
@@ -45,7 +43,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
         $properties = array_merge($metadata->getFieldNames(), $metadata->getAssociationNames());
 
-        if ($metadata instanceof ClassMetadataInfo && $metadata->embeddedClasses) {
+        if ($metadata instanceof ClassMetadata && $metadata->embeddedClasses) {
             $properties = array_filter($properties, fn ($property) => !str_contains($property, '.'));
 
             $properties = array_merge($properties, array_keys($metadata->embeddedClasses));
@@ -64,7 +62,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             $class = $metadata->getAssociationTargetClass($property);
 
             if ($metadata->isSingleValuedAssociation($property)) {
-                if ($metadata instanceof ClassMetadataInfo) {
+                if ($metadata instanceof ClassMetadata) {
                     $associationMapping = $metadata->getAssociationMapping($property);
 
                     $nullable = $this->isAssociationNullable($associationMapping);
@@ -77,11 +75,10 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
             $collectionKeyType = Type::BUILTIN_TYPE_INT;
 
-            if ($metadata instanceof ClassMetadataInfo) {
+            if ($metadata instanceof ClassMetadata) {
                 $associationMapping = $metadata->getAssociationMapping($property);
 
                 if (isset($associationMapping['indexBy'])) {
-                    /** @var ClassMetadataInfo $subMetadata */
                     $subMetadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
 
                     // Check if indexBy value is a property
@@ -93,7 +90,6 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                             // Maybe the column name is the association join column?
                             $associationMapping = $subMetadata->getAssociationMapping($fieldName);
 
-                            /** @var ClassMetadataInfo $subMetadata */
                             $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($fieldName);
                             $subMetadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
 
@@ -121,7 +117,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             )];
         }
 
-        if ($metadata instanceof ClassMetadataInfo && isset($metadata->embeddedClasses[$property])) {
+        if ($metadata instanceof ClassMetadata && isset($metadata->embeddedClasses[$property])) {
             return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $metadata->embeddedClasses[$property]['class'])];
         }
 
@@ -132,7 +128,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 return null;
             }
 
-            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
+            $nullable = $metadata instanceof ClassMetadata && $metadata->isNullable($property);
             $enumType = null;
             if (null !== $enumClass = $metadata->getFieldMapping($property)['enumType'] ?? null) {
                 $enumType = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
@@ -161,8 +157,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     break;
                 case Type::BUILTIN_TYPE_ARRAY:
                     switch ($typeOfField) {
-                        case Types::ARRAY:
-                        case 'json_array':
+                        case 'array':      // DBAL < 4
+                        case 'json_array': // DBAL < 3
                             // return null if $enumType is set, because we can't determine if collectionKeyType is string or int
                             if ($enumType) {
                                 return null;
@@ -218,9 +214,11 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * Determines whether an association is nullable.
      *
+     * @param array<string, mixed>|AssociationMapping $associationMapping
+     *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
      */
-    private function isAssociationNullable(array $associationMapping): bool
+    private function isAssociationNullable(array|AssociationMapping $associationMapping): bool
     {
         if (isset($associationMapping['id']) && $associationMapping['id']) {
             return false;
@@ -257,7 +255,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             Types::BOOLEAN => Type::BUILTIN_TYPE_BOOL,
             Types::BLOB,
             Types::BINARY => Type::BUILTIN_TYPE_RESOURCE,
-            Types::OBJECT,
+            'object', // DBAL < 4
             Types::DATE_MUTABLE,
             Types::DATETIME_MUTABLE,
             Types::DATETIMETZ_MUTABLE,
@@ -268,9 +266,9 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             Types::DATETIMETZ_IMMUTABLE,
             Types::TIME_IMMUTABLE,
             Types::DATEINTERVAL => Type::BUILTIN_TYPE_OBJECT,
-            Types::ARRAY,
-            Types::SIMPLE_ARRAY,
-            'json_array' => Type::BUILTIN_TYPE_ARRAY,
+            'array', // DBAL < 4
+            'json_array', // DBAL < 3
+            Types::SIMPLE_ARRAY => Type::BUILTIN_TYPE_ARRAY,
             default => null,
         };
     }

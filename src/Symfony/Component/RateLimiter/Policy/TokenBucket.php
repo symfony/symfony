@@ -67,8 +67,13 @@ final class TokenBucket implements LimiterStateInterface
     public function getAvailableTokens(float $now): int
     {
         $elapsed = max(0, $now - $this->timer);
+        $newTokens = $this->rate->calculateNewTokensDuringInterval($elapsed);
 
-        return min($this->burstSize, $this->tokens + $this->rate->calculateNewTokensDuringInterval($elapsed));
+        if ($newTokens > 0) {
+            $this->timer += $this->rate->calculateRefillInterval($elapsed);
+        }
+
+        return min($this->burstSize, $this->tokens + $newTokens);
     }
 
     public function getExpirationTime(): int

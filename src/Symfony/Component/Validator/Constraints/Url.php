@@ -15,9 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -29,14 +26,9 @@ class Url extends Constraint
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value is not a valid URL.';
-    public $protocols = ['http', 'https'];
-    public $relativeProtocol = false;
+    public string $message = 'This value is not a valid URL.';
+    public array $protocols = ['http', 'https'];
+    public bool $relativeProtocol = false;
     /** @var callable|null */
     public $normalizer;
 

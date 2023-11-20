@@ -35,7 +35,7 @@ trait ClockSensitiveTrait
             false === $when => self::saveClockBeforeTest(false),
             true === $when => new MockClock(),
             $when instanceof \DateTimeImmutable => new MockClock($when),
-            default => new MockClock(now()->modify($when)),
+            default => new MockClock(now($when)),
         });
 
         return Clock::get();

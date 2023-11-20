@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\SchemaListener\LockStoreSchemaListener;
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
 
 class LockStoreSchemaListenerTest extends TestCase
@@ -37,6 +38,22 @@ class LockStoreSchemaListenerTest extends TestCase
             ->with($schema, fn () => true);
 
         $subscriber = new LockStoreSchemaListener([$lockStore]);
+        $subscriber->postGenerateSchema($event);
+    }
+
+    public function testPostGenerateSchemaWithInvalidLockStore()
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($this->createMock(Connection::class));
+        $event = new GenerateSchemaEventArgs($entityManager, new Schema());
+
+        $subscriber = new LockStoreSchemaListener((static function (): \Generator {
+            yield $this->createMock(DoctrineDbalStore::class);
+
+            throw new InvalidArgumentException('Unsupported Connection');
+        })());
         $subscriber->postGenerateSchema($event);
     }
 }

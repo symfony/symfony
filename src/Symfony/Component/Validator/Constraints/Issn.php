@@ -14,9 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Antonio J. García Lagar <aj@garcialagar.es>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -39,14 +36,9 @@ class Issn extends Constraint
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value is not a valid ISSN.';
-    public $caseSensitive = false;
-    public $requireHyphen = false;
+    public string $message = 'This value is not a valid ISSN.';
+    public bool $caseSensitive = false;
+    public bool $requireHyphen = false;
 
     public function __construct(
         array $options = null,

@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer;
 use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
+use Symfony\Bundle\SecurityBundle\Routing\LogoutRouteLoader;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -35,7 +36,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -94,8 +94,6 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('authenticators'),
             ])
         ->alias(Security::class, 'security.helper')
-        ->alias(LegacySecurity::class, 'security.helper')
-            ->deprecate('symfony/security-bundle', '6.2', 'The "%alias_id%" service alias is deprecated, use "'.Security::class.'" instead.')
 
         ->set('security.user_value_resolver', UserValueResolver::class)
             ->args([
@@ -228,6 +226,13 @@ return static function (ContainerConfigurator $container) {
                 service('router')->nullOnInvalid(),
                 service('security.token_storage')->nullOnInvalid(),
             ])
+
+        ->set('security.route_loader.logout', LogoutRouteLoader::class)
+            ->args([
+                '%security.logout_uris%',
+                'security.logout_uris',
+            ])
+            ->tag('routing.route_loader')
 
         // Provisioning
         ->set('security.user.provider.missing', MissingUserProvider::class)

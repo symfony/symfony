@@ -575,7 +575,7 @@ class CompoundFormTest extends TestCase
         $this->assertSame('Bernhard', $object['name']);
     }
 
-    public static function requestMethodProvider()
+    public static function requestMethodProvider(): array
     {
         return [
             ['POST'],

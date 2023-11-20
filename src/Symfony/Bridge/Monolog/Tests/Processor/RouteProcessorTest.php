@@ -11,8 +11,10 @@
 
 namespace Symfony\Bridge\Monolog\Tests\Processor;
 
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\RouteProcessor;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
@@ -31,7 +33,7 @@ class RouteProcessorTest extends TestCase
         $processor = new RouteProcessor();
         $processor->addRouteData($this->getRequestEvent($request));
 
-        $record = $processor(['extra' => []]);
+        $record = $processor($this->createRecord());
 
         $this->assertArrayHasKey('requests', $record['extra']);
         $this->assertCount(1, $record['extra']['requests']);
@@ -47,7 +49,7 @@ class RouteProcessorTest extends TestCase
         $processor = new RouteProcessor(false);
         $processor->addRouteData($this->getRequestEvent($request));
 
-        $record = $processor(['extra' => []]);
+        $record = $processor($this->createRecord());
 
         $this->assertArrayHasKey('requests', $record['extra']);
         $this->assertCount(1, $record['extra']['requests']);
@@ -67,7 +69,7 @@ class RouteProcessorTest extends TestCase
         $processor->addRouteData($this->getRequestEvent($mainRequest));
         $processor->addRouteData($this->getRequestEvent($subRequest, HttpKernelInterface::SUB_REQUEST));
 
-        $record = $processor(['extra' => []]);
+        $record = $processor($this->createRecord());
 
         $this->assertArrayHasKey('requests', $record['extra']);
         $this->assertCount(2, $record['extra']['requests']);
@@ -90,7 +92,7 @@ class RouteProcessorTest extends TestCase
         $processor->addRouteData($this->getRequestEvent($mainRequest));
         $processor->addRouteData($this->getRequestEvent($subRequest, HttpKernelInterface::SUB_REQUEST));
         $processor->removeRouteData($this->getFinishRequestEvent($subRequest));
-        $record = $processor(['extra' => []]);
+        $record = $processor($this->createRecord());
 
         $this->assertArrayHasKey('requests', $record['extra']);
         $this->assertCount(1, $record['extra']['requests']);
@@ -100,7 +102,7 @@ class RouteProcessorTest extends TestCase
         );
 
         $processor->removeRouteData($this->getFinishRequestEvent($mainRequest));
-        $record = $processor(['extra' => []]);
+        $record = $processor($this->createRecord());
 
         $this->assertArrayNotHasKey('requests', $record['extra']);
     }
@@ -111,16 +113,16 @@ class RouteProcessorTest extends TestCase
         $processor = new RouteProcessor();
         $processor->addRouteData($this->getRequestEvent($request));
 
-        $record = $processor(['extra' => []]);
-        $this->assertEquals(['extra' => []], $record);
+        $record = $processor($this->createRecord());
+        $this->assertEquals($this->createRecord(), $record);
     }
 
     public function testProcessorDoesNothingWhenNoRequest()
     {
         $processor = new RouteProcessor();
 
-        $record = $processor(['extra' => []]);
-        $this->assertEquals(['extra' => []], $record);
+        $record = $processor($this->createRecord());
+        $this->assertEquals($this->createRecord(), $record);
     }
 
     private function getRequestEvent(Request $request, int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent
@@ -153,5 +155,10 @@ class RouteProcessorTest extends TestCase
         $request->attributes = new ParameterBag($attributes);
 
         return $request;
+    }
+
+    private function createRecord(): LogRecord
+    {
+        return RecordFactory::create(datetime: new \DateTimeImmutable('2023-07-25 00:00:00'));
     }
 }

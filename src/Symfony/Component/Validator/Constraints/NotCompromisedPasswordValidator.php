@@ -50,11 +50,9 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
     }
 
     /**
-     * @return void
-     *
      * @throws ExceptionInterface
      */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof NotCompromisedPassword) {
             throw new UnexpectedTypeException($constraint, NotCompromisedPassword::class);

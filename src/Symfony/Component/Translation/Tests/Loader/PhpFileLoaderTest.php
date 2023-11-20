@@ -22,7 +22,7 @@ class PhpFileLoaderTest extends TestCase
     public function testLoad()
     {
         $loader = new PhpFileLoader();
-        $resource = __DIR__.'/../fixtures/resources.php';
+        $resource = __DIR__.'/../Fixtures/resources.php';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
@@ -34,7 +34,7 @@ class PhpFileLoaderTest extends TestCase
     {
         $this->expectException(NotFoundResourceException::class);
         $loader = new PhpFileLoader();
-        $resource = __DIR__.'/../fixtures/non-existing.php';
+        $resource = __DIR__.'/../Fixtures/non-existing.php';
         $loader->load($resource, 'en', 'domain1');
     }
 

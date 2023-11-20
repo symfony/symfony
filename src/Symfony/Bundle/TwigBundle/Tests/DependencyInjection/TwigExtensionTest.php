@@ -49,7 +49,7 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
 
         if (class_exists(Mailer::class)) {
-            $this->assertCount(1, $container->getDefinition('twig.mime_body_renderer')->getArguments());
+            $this->assertCount(2, $container->getDefinition('twig.mime_body_renderer')->getArguments());
         }
     }
 
@@ -237,7 +237,7 @@ class TwigExtensionTest extends TestCase
         $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
     }
 
-    public static function stopwatchExtensionAvailabilityProvider()
+    public static function stopwatchExtensionAvailabilityProvider(): array
     {
         return [
             'debug-and-stopwatch-enabled' => [true, true, true],
@@ -286,7 +286,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $bodyRenderer = $container->getDefinition('twig.mime_body_renderer');
-        $this->assertCount(2, $bodyRenderer->getArguments());
+        $this->assertCount(3, $bodyRenderer->getArguments());
         $this->assertEquals(new Reference('my_converter'), $bodyRenderer->getArgument('$converter'));
     }
 

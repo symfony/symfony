@@ -38,10 +38,7 @@ final class PostgreSqlConnection extends Connection
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -67,16 +64,10 @@ final class PostgreSqlConnection extends Connection
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
         $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
 
-        if (method_exists($this->driverConnection, 'getNativeConnection')) {
-            $wrappedConnection = $this->driverConnection->getNativeConnection();
-        } else {
-            $wrappedConnection = $this->driverConnection;
-            while (method_exists($wrappedConnection, 'getWrappedConnection')) {
-                $wrappedConnection = $wrappedConnection->getWrappedConnection();
-            }
-        }
+        /** @var \PDO $nativeConnection */
+        $nativeConnection = $this->driverConnection->getNativeConnection();
 
-        $notification = $wrappedConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
+        $notification = $nativeConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
         if (
             // no notifications, or for another table or queue
             (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name'])

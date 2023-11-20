@@ -514,9 +514,13 @@ return [
             'SHP',
             'Muqaddas Yelena oroli funti',
         ],
+        'SLE' => [
+            'SLE',
+            'Syerra-Leone leonesi',
+        ],
         'SLL' => [
             'SLL',
-            'Syerra-Leone leonesi',
+            'Syerra-Leone leonesi (1964—2022)',
         ],
         'SOS' => [
             'SOS',

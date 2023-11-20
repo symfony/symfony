@@ -74,9 +74,9 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     }
 
     /**
-     * @dataProvider provideDsn
+     * @dataProvider provideDsnWithSQLite
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, string $file = null)
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -92,12 +92,36 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         }
     }
 
-    public static function provideDsn()
+    public static function provideDsnWithSQLite()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
-        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
-        yield ['sqlite://localhost/:memory:'];
+        yield 'SQLite file' => ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
+        yield 'SQLite3 file' => ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
+        yield 'SQLite in memory' => ['sqlite://localhost/:memory:'];
+    }
+
+    /**
+     * @requires extension pdo_pgsql
+     *
+     * @group integration
+     */
+    public function testDsnWithPostgreSQL()
+    {
+        if (!$host = getenv('POSTGRES_HOST')) {
+            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+        }
+
+        $key = new Key(uniqid(__METHOD__, true));
+
+        try {
+            $store = new DoctrineDbalStore('pgsql://postgres:password@'.$host);
+
+            $store->save($key);
+            $this->assertTrue($store->exists($key));
+        } finally {
+            $pdo = new \PDO('pgsql:host='.$host.';user=postgres;password=password');
+            $pdo->exec('DROP TABLE IF EXISTS lock_keys');
+        }
     }
 
     /**

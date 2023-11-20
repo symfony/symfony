@@ -95,7 +95,7 @@ class PdoStore implements PersistingStoreInterface
         try {
             $stmt = $conn->prepare($sql);
         } catch (\PDOException) {
-            if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
             }
             $stmt = $conn->prepare($sql);
@@ -107,8 +107,18 @@ class PdoStore implements PersistingStoreInterface
         try {
             $stmt->execute();
         } catch (\PDOException) {
-            // the lock is already acquired. It could be us. Let's try to put off.
-            $this->putOffExpiration($key, $this->initialTtl);
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
+                $this->createTable();
+
+                try {
+                    $stmt->execute();
+                } catch (\PDOException $e) {
+                    $this->putOffExpiration($key, $this->initialTtl);
+                }
+            } else {
+                // the lock is already acquired. It could be us. Let's try to put off.
+                $this->putOffExpiration($key, $this->initialTtl);
+            }
         }
 
         $this->randomlyPrune();
@@ -237,5 +247,22 @@ class PdoStore implements PersistingStoreInterface
             'sqlsrv' => 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())',
             default => (string) time(),
         };
+    }
+
+    private function isTableMissing(\PDOException $exception): bool
+    {
+        $driver = $this->getDriver();
+        $code = $exception->getCode();
+
+        switch (true) {
+            case 'pgsql' === $driver && '42P01' === $code:
+            case 'sqlite' === $driver && str_contains($exception->getMessage(), 'no such table:'):
+            case 'oci' === $driver && 942 === $code:
+            case 'sqlsrv' === $driver && 208 === $code:
+            case 'mysql' === $driver && 1146 === $code:
+                return true;
+            default:
+                return false;
+        }
     }
 }

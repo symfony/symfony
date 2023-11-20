@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
+ * @requires extension pdo_sqlite
+ *
  * @group time-sensitive
  */
 class PdoAdapterTest extends AdapterTestCase
@@ -24,10 +25,6 @@ class PdoAdapterTest extends AdapterTestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!\extension_loaded('pdo_sqlite')) {
-            throw new SkippedTestSuiteError('Extension pdo_sqlite required.');
-        }
-
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
 
         $pool = new PdoAdapter('sqlite:'.self::$dbFile);
@@ -69,13 +66,12 @@ class PdoAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @dataProvider provideDsn
+     * @dataProvider provideDsnSQLite
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, string $file = null)
     {
         try {
             $pool = new PdoAdapter($dsn);
-            $pool->createTable();
 
             $item = $pool->getItem('key');
             $item->set('value');
@@ -87,11 +83,36 @@ class PdoAdapterTest extends AdapterTestCase
         }
     }
 
-    public static function provideDsn()
+    public static function provideDsnSQLite()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite:'.$dbFile.'2', $dbFile.'2'];
-        yield ['sqlite::memory:'];
+        yield 'SQLite file' => ['sqlite:'.$dbFile.'2', $dbFile.'2'];
+        yield 'SQLite in memory' => ['sqlite::memory:'];
+    }
+
+    /**
+     * @requires extension pdo_pgsql
+     *
+     * @group integration
+     */
+    public function testDsnWithPostgreSQL()
+    {
+        if (!$host = getenv('POSTGRES_HOST')) {
+            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+        }
+
+        $dsn = 'pgsql:host='.$host.';user=postgres;password=password';
+
+        try {
+            $pool = new PdoAdapter($dsn);
+
+            $item = $pool->getItem('key');
+            $item->set('value');
+            $this->assertTrue($pool->save($item));
+        } finally {
+            $pdo = new \PDO($dsn);
+            $pdo->exec('DROP TABLE IF EXISTS cache_items');
+        }
     }
 
     protected function isPruned(PdoAdapter $cache, string $name): bool

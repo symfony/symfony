@@ -64,6 +64,7 @@ final class PostgreSqlConnection extends Connection
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
         $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
 
+        // The condition should be removed once support for DBAL <3.3 is dropped
         if (method_exists($this->driverConnection, 'getNativeConnection')) {
             $wrappedConnection = $this->driverConnection->getNativeConnection();
         } else {

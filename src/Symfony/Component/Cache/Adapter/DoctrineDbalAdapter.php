@@ -420,7 +420,8 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             return $this->serverVersion;
         }
 
-        $conn = $this->conn->getWrappedConnection();
+        // The condition should be removed once support for DBAL <3.3 is dropped
+        $conn = method_exists($this->conn, 'getNativeConnection') ? $this->conn->getNativeConnection() : $this->conn->getWrappedConnection();
         if ($conn instanceof ServerInfoAwareConnection) {
             return $this->serverVersion = $conn->getServerVersion();
         }

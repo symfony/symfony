@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-11-05T17:47:42Z
+
+Can we add a test?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-11-05T17:51:48Z
+
+@derrabus Didn't notice postgres was already part of the integration suit, I'll add a test.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-07T16:55:50Z
+
+There are some deprecations, are they related?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-11-07T17:31:43Z
+
+> There are some deprecations, are they related?
+
+@nicolas-grekas Should be good now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-15T08:31:43Z
+
+Aren't the remaining deprecations related?
+
+https://github.com/symfony/symfony/actions/runs/6788097634/job/18452337658?pr=52459#step:11:1001
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-11-15T17:02:25Z
+
+> Aren't the remaining deprecations related?
+>
+> https://github.com/symfony/symfony/actions/runs/6788097634/job/18452337658?pr=52459#step:11:1001
+
+@nicolas-grekas Yes, you're right, took me a while to figure this one out. I initially thought that it wasn't related to my changes cause I didn't make any in `DoctrinePostgreSqlIntegrationTest`. However, after a little debugging it turns out that the deprecations were being triggered because I never cleaned up the database (dropped the tables) after the tests were done, which then triggered some additional code paths in `DoctrinePostgreSqlIntegrationTest` that use deprecated Doctrine methods. Sorry for the confusion.

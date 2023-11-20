@@ -159,11 +159,11 @@ class Exporter
                     $n = substr($n, 1 + $i);
                 }
                 if (null !== $sleep) {
-                    if (!isset($sleep[$n]) || ($i && $c !== $class)) {
+                    if (!isset($sleep[$name]) && (!isset($sleep[$n]) || ($i && $c !== $class))) {
                         unset($arrayValue[$name]);
                         continue;
                     }
-                    $sleep[$n] = false;
+                    unset($sleep[$name], $sleep[$n]);
                 }
                 if (!\array_key_exists($name, $proto) || $proto[$name] !== $v || "\x00Error\x00trace" === $name || "\x00Exception\x00trace" === $name) {
                     $properties[$c][$n] = $v;
@@ -171,9 +171,7 @@ class Exporter
             }
             if ($sleep) {
                 foreach ($sleep as $n => $v) {
-                    if (false !== $v) {
-                        trigger_error(sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $n), \E_USER_NOTICE);
-                    }
+                    trigger_error(sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $n), \E_USER_NOTICE);
                 }
             }
             if (method_exists($class, '__unserialize')) {

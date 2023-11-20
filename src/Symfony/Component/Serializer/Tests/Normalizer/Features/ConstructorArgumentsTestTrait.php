@@ -58,7 +58,7 @@ trait ConstructorArgumentsTestTrait
     public function testConstructorWithMissingData()
     {
         $data = [
-            'foo' => 10,
+            'bar' => 10,
         ];
 
         $normalizer = $this->getDenormalizerForConstructArguments();
@@ -66,16 +66,16 @@ trait ConstructorArgumentsTestTrait
             $normalizer->denormalize($data, ConstructorArgumentsObject::class);
             self::fail(sprintf('Failed asserting that exception of type "%s" is thrown.', MissingConstructorArgumentsException::class));
         } catch (MissingConstructorArgumentsException $e) {
-            self::assertSame(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$bar", "$baz".', ConstructorArgumentsObject::class), $e->getMessage());
             self::assertSame(ConstructorArgumentsObject::class, $e->getClass());
-            self::assertSame(['bar', 'baz'], $e->getMissingConstructorArguments());
+            self::assertSame(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$foo", "$baz".', ConstructorArgumentsObject::class), $e->getMessage());
+            self::assertSame(['foo', 'baz'], $e->getMissingConstructorArguments());
         }
     }
 
     public function testExceptionsAreCollectedForConstructorWithMissingData()
     {
         $data = [
-            'foo' => 10,
+            'bar' => 10,
         ];
 
         $exceptions = [];
@@ -86,7 +86,7 @@ trait ConstructorArgumentsTestTrait
         ]);
 
         self::assertCount(2, $exceptions);
-        self::assertSame('Failed to create object because the class misses the "bar" property.', $exceptions[0]->getMessage());
+        self::assertSame('Failed to create object because the class misses the "foo" property.', $exceptions[0]->getMessage());
         self::assertSame('Failed to create object because the class misses the "baz" property.', $exceptions[1]->getMessage());
     }
 }

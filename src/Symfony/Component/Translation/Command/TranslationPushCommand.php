@@ -60,7 +60,7 @@ final class TranslationPushCommand extends Command
         if ($input->mustSuggestOptionValuesFor('domains')) {
             $provider = $this->providers->get($input->getArgument('provider'));
 
-            if ($provider && method_exists($provider, 'getDomains')) {
+            if (method_exists($provider, 'getDomains')) {
                 $domains = $provider->getDomains();
                 $suggestions->suggestValues($domains);
             }

@@ -36,11 +36,7 @@ class MessageFormatter implements MessageFormatterInterface, IntlFormatterInterf
 
     public function format(string $message, string $locale, array $parameters = []): string
     {
-        if ($this->translator instanceof TranslatorInterface) {
-            return $this->translator->trans($message, $parameters, null, $locale);
-        }
-
-        return strtr($message, $parameters);
+        return $this->translator->trans($message, $parameters, null, $locale);
     }
 
     public function formatIntl(string $message, string $locale, array $parameters = []): string

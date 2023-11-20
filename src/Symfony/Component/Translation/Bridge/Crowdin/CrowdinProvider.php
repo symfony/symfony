@@ -176,10 +176,6 @@ final class CrowdinProvider implements ProviderInterface
 
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
-        if (!$defaultCatalogue) {
-            $defaultCatalogue = $translatorBag->getCatalogues()[0];
-        }
-
         foreach ($defaultCatalogue->all() as $domain => $messages) {
             $fileId = $this->getFileIdByDomain($fileList, $domain);
 

@@ -82,7 +82,7 @@ class IpValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
         if (null !== $constraint->normalizer) {
             $value = ($constraint->normalizer)($value);

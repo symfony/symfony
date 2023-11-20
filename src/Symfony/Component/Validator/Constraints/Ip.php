@@ -61,32 +61,15 @@ class Ip extends Constraint
 
     public const INVALID_IP_ERROR = 'b1b427ae-9f6f-41b0-aa9b-84511fbb3c5b';
 
-    /**
-     * @deprecated since Symfony 6.4, use const V4_NO_PRIVATE instead
-     */
+    // BC: Aliases
     public const V4_NO_PRIV = '4_no_priv';
-    /**
-     * @deprecated since Symfony 6.4, use const V6_NO_PRIVATE instead
-     */
     public const V6_NO_PRIV = '6_no_priv';
-    /**
-     * @deprecated since Symfony 6.4, use const ALL_NO_PRIVATE instead
-     */
     public const ALL_NO_PRIV = 'all_no_priv';
-    /**
-     * @deprecated since Symfony 6.4, use const 4_NO_RESERVED instead
-     */
     public const V4_NO_RES = '4_no_res';
-    /**
-     * @deprecated since Symfony 6.4, use const 6_NO_RESERVED instead
-     */
     public const V6_NO_RES = '6_no_res';
-    /**
-     * @deprecated since Symfony 6.4, use const ALL_NO_RESERVED instead
-     */
     public const ALL_NO_RES = 'all_no_res';
 
-    protected const DEPRECATED_VERSIONS = [
+    protected const ALIAS_VERSIONS = [
         self::V4_NO_PRIV => self::V4_NO_PRIVATE,
         self::V6_NO_PRIV => self::V6_NO_PRIVATE,
         self::ALL_NO_PRIV => self::ALL_NO_PRIVATE,
@@ -149,8 +132,8 @@ class Ip extends Constraint
         $this->message = $message ?? $this->message;
         $this->normalizer = $normalizer ?? $this->normalizer;
 
-        if (isset(self::DEPRECATED_VERSIONS[$this->version])) {
-            $this->version = self::DEPRECATED_VERSIONS[$this->version];
+        if (isset(static::ALIAS_VERSIONS[$this->version])) {
+            $this->version = static::ALIAS_VERSIONS[$this->version];
         }
 
         if (!\in_array($this->version, static::VERSIONS, true)) {

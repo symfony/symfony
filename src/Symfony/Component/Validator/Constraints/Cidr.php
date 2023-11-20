@@ -73,25 +73,25 @@ class Cidr extends Constraint
         int $netmaskMin = null,
         int $netmaskMax = null,
         string $message = null,
-        callable $normalizer = null,
         array $groups = null,
-        $payload = null
+        $payload = null,
+        callable $normalizer = null
     ) {
         $this->version = $version ?? $options['version'] ?? $this->version;
 
-        if (!\in_array($this->version, array_keys(self::NET_MAXES))) {
-            throw new ConstraintDefinitionException(sprintf('The option "version" must be one of "%s".', implode('", "', array_keys(self::NET_MAXES))));
+        if (!\array_key_exists($this->version, self::NET_MAXES)) {
+            throw new ConstraintDefinitionException(sprintf('The option "version" must be one of "%s".', implode('", "', array_keys(static::NET_MAXES))));
         }
 
         $this->netmaskMin = $netmaskMin ?? $options['netmaskMin'] ?? $this->netmaskMin;
-        $this->netmaskMax = $netmaskMax ?? $options['netmaskMax'] ?? self::NET_MAXES[$this->version];
+        $this->netmaskMax = $netmaskMax ?? $options['netmaskMax'] ?? static::NET_MAXES[$this->version];
         $this->message = $message ?? $this->message;
         $this->normalizer = $normalizer ?? $this->normalizer;
 
         unset($options['netmaskMin'], $options['netmaskMax'], $options['version']);
 
-        if ($this->netmaskMin < 0 || $this->netmaskMax > self::NET_MAXES[$this->version] || $this->netmaskMin > $this->netmaskMax) {
-            throw new ConstraintDefinitionException(sprintf('The netmask range must be between 0 and %d.', self::NET_MAXES[$this->version]));
+        if ($this->netmaskMin < 0 || $this->netmaskMax > static::NET_MAXES[$this->version] || $this->netmaskMin > $this->netmaskMax) {
+            throw new ConstraintDefinitionException(sprintf('The netmask range must be between 0 and %d.', static::NET_MAXES[$this->version]));
         }
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {

@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2023-11-17T19:05:21Z
+
+Ideally, I would like to import configs from the `AbstractBundle::prependExtension()` method this way:
+```php
+$container->import('../config/packages/framework.yaml', prepend: true); // or using a new method
+```
+But the impact is currently too high, as this prepend value should pass across multiple interfaces and processes until reaching the final `ContainerBuilder::loadFromExtension()` invocation.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-11-17T19:26:05Z
+
+I was also thinking about a new marker in the config file, similar to `when@env`, but using it for the importing config strategy, e.g.:
+```yaml
+import@prepend:
+    framework:
+        messenger: ...
+```
+And then prepend that config instead of appending. Even with less impact on the code, I don't like it too much as the config itself shouldn't be aware of the importing strategy.
+
+Similarly, in the `imports` section:
+```yaml
+imports:
+    - { resource: 'config.yaml', prepend: true }
+```
+But still, I'm not sure as you will need to create two config files to achieve that and again the prepend value needs to by pass some loading interfaces where this prepend value doesn't mean anything.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-17T19:48:02Z
+
+> the append strategy requires the extension namespace to be loaded beforehand, which is not required when prepend is used.
+
+Can you please refresh my mind about this: why don't we check the namespace when prepending?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-11-17T19:50:42Z
+
+> Can you please refresh my mind about this: why don't we check the namespace when prepending?
+
+It's on purpose because the extension might not even exist. This feature was initially created to provide preset settings in bundles, so if the extension doesn't exist in your app, that prepended config is ignored.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-11-17T19:52:12Z
+
+Also because the extension order according to the `bundles.php`.

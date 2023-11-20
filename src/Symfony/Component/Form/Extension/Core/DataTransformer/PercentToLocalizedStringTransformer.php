@@ -180,9 +180,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
         $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->scale);
 
-        if (null !== $this->roundingMode) {
-            $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
-        }
+        $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
 
         return $formatter;
     }
@@ -192,43 +190,27 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      */
     private function round(int|float $number): int|float
     {
-        if (null !== $this->scale && null !== $this->roundingMode) {
-            // shift number to maintain the correct scale during rounding
-            $roundingCoef = 10 ** $this->scale;
+        // shift number to maintain the correct scale during rounding
+        $roundingCoef = 10 ** $this->scale;
 
-            if (self::FRACTIONAL == $this->type) {
-                $roundingCoef *= 100;
-            }
-
-            // string representation to avoid rounding errors, similar to bcmul()
-            $number = (string) ($number * $roundingCoef);
-
-            switch ($this->roundingMode) {
-                case \NumberFormatter::ROUND_CEILING:
-                    $number = ceil($number);
-                    break;
-                case \NumberFormatter::ROUND_FLOOR:
-                    $number = floor($number);
-                    break;
-                case \NumberFormatter::ROUND_UP:
-                    $number = $number > 0 ? ceil($number) : floor($number);
-                    break;
-                case \NumberFormatter::ROUND_DOWN:
-                    $number = $number > 0 ? floor($number) : ceil($number);
-                    break;
-                case \NumberFormatter::ROUND_HALFEVEN:
-                    $number = round($number, 0, \PHP_ROUND_HALF_EVEN);
-                    break;
-                case \NumberFormatter::ROUND_HALFUP:
-                    $number = round($number, 0, \PHP_ROUND_HALF_UP);
-                    break;
-                case \NumberFormatter::ROUND_HALFDOWN:
-                    $number = round($number, 0, \PHP_ROUND_HALF_DOWN);
-                    break;
-            }
-
-            $number = 1 === $roundingCoef ? (int) $number : $number / $roundingCoef;
+        if (self::FRACTIONAL === $this->type) {
+            $roundingCoef *= 100;
         }
+
+        // string representation to avoid rounding errors, similar to bcmul()
+        $number = (string) ($number * $roundingCoef);
+
+        $number = match ($this->roundingMode) {
+            \NumberFormatter::ROUND_CEILING => ceil($number),
+            \NumberFormatter::ROUND_FLOOR => floor($number),
+            \NumberFormatter::ROUND_UP => $number > 0 ? ceil($number) : floor($number),
+            \NumberFormatter::ROUND_DOWN => $number > 0 ? floor($number) : ceil($number),
+            \NumberFormatter::ROUND_HALFEVEN => round($number, 0, \PHP_ROUND_HALF_EVEN),
+            \NumberFormatter::ROUND_HALFUP => round($number, 0, \PHP_ROUND_HALF_UP),
+            \NumberFormatter::ROUND_HALFDOWN => round($number, 0, \PHP_ROUND_HALF_DOWN),
+        };
+
+        $number = 1 === $roundingCoef ? (int) $number : $number / $roundingCoef;
 
         return $number;
     }

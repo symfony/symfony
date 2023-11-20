@@ -39,7 +39,7 @@ class XOAuth2Authenticator implements AuthenticatorInterface
      */
     public function authenticate(EsmtpTransport $client): void
     {
-        $token = $this->tokenProvider ? $this->tokenProvider->getToken() : $client->getPassword();
+        $token = $this->tokenProvider?->getToken() : $client->getPassword();
         $client->executeCommand('AUTH XOAUTH2 '.base64_encode('user='.$client->getUsername()."\1auth=Bearer ".$token."\1\1")."\r\n", [235]);
     }
 }

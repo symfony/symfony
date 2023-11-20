@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+* Add `TranslationPullEvent` and `TranslationPushEvent`
+
 7.0
 ---
 

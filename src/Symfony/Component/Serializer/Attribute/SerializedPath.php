@@ -23,8 +23,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @Target({"PROPERTY", "METHOD"})
  *
  * @author Tobias Bönner <tobi@boenner.family>
- *
- * @final since Symfony 6.4
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 class SerializedPath

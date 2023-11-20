@@ -44,7 +44,7 @@ final class TranslationPullCommand extends Command
     private array $enabledLocales;
     private ?EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(TranslationProviderCollection $providerCollection, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, array $transPaths = [], array $enabledLocales = [], ?EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(TranslationProviderCollection $providerCollection, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, array $transPaths = [], array $enabledLocales = [], EventDispatcherInterface $eventDispatcher = null)
     {
         $this->providerCollection = $providerCollection;
         $this->writer = $writer;

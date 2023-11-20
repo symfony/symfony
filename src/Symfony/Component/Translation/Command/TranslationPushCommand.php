@@ -42,7 +42,7 @@ final class TranslationPushCommand extends Command
     private array $enabledLocales;
     private ?EventDispatcherInterface $dispatcher;
 
-    public function __construct(TranslationProviderCollection $providers, TranslationReaderInterface $reader, array $transPaths = [], array $enabledLocales = [], ?EventDispatcherInterface $dispatcher = null)
+    public function __construct(TranslationProviderCollection $providers, TranslationReaderInterface $reader, array $transPaths = [], array $enabledLocales = [], EventDispatcherInterface $dispatcher = null)
     {
         $this->providers = $providers;
         $this->reader = $reader;

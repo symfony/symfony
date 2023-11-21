@@ -54,25 +54,21 @@ final class NonBackedEnumNormalizer implements NormalizerInterface, Denormalizer
         }
 
         if (!\is_string($data) && !($context[BackedEnumNormalizer::ALLOW_INVALID_VALUES] ?? false)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(
-                "The data is not a string, you should pass a string that can be parsed as an enumeration case of type $type.",
-                $data, [ Type::BUILTIN_TYPE_STRING ], $context['deserialization_path'] ?? null, true
-            );
+            throw NotNormalizableValueException::createForUnexpectedDataType("The data is not a string, you should pass a string that can be parsed as an enumeration case of type $type.", $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         }
 
         try {
             $constantName = "$type::$data";
-            if (!defined($constantName)) {
-                throw new \ValueError("$data is not a valid case for enum $type");
+            if (!\defined($constantName)) {
+                throw new \ValueError("$data is not a valid case for enum $type.");
             }
 
-            $value = constant($constantName);
-            if (!is_object($value) || get_class($value) !== $type) {
-                throw new \ValueError("$constantName is not a valid enum case");
+            $value = \constant($constantName);
+            if (!\is_object($value) || $value::class !== $type) {
+                throw new \ValueError("$constantName is not a valid enum case.");
             }
 
             return $value;
-
         } catch (\ValueError $e) {
             if ($context[BackedEnumNormalizer::ALLOW_INVALID_VALUES] ?? false) {
                 return null;
@@ -80,10 +76,7 @@ final class NonBackedEnumNormalizer implements NormalizerInterface, Denormalizer
             if (isset($context['has_constructor'])) {
                 throw new InvalidArgumentException("The data must belong to a non-backed enumeration of type $type.");
             }
-            throw NotNormalizableValueException::createForUnexpectedDataType(
-                "The data must belong to a non-backed enumeration of type $type.",
-                $data, [ $type ], $context['deserialization_path'] ?? null, true, 0, $e
-            );
+            throw NotNormalizableValueException::createForUnexpectedDataType("The data must belong to a non-backed enumeration of type $type.", $data, [$type], $context['deserialization_path'] ?? null, true, 0, $e);
         }
     }
 

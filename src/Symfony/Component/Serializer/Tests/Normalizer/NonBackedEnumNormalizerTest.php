@@ -91,7 +91,7 @@ class NonBackedEnumNormalizerTest extends TestCase
     public function testDenormalizeBadCaseThrowsException()
     {
         $this->expectException(NotNormalizableValueException::class);
-        $this->expectExceptionMessage('The data must belong to a non-backed enumeration of type ' . UnitEnumDummy::class);
+        $this->expectExceptionMessage('The data must belong to a non-backed enumeration of type '.UnitEnumDummy::class);
 
         $this->normalizer->denormalize('POST', UnitEnumDummy::class);
     }
@@ -135,6 +135,7 @@ class NonBackedEnumNormalizerTest extends TestCase
 
     /**
      * @dataProvider providerInvalidCases
+     *
      * @return void
      */
     public function testItProducesNullForInvalidCasesIfContextIsPassed($normalized)
@@ -144,7 +145,7 @@ class NonBackedEnumNormalizerTest extends TestCase
                 $normalized,
                 UnitEnumDummy::class,
                 null,
-                [ BackedEnumNormalizer::ALLOW_INVALID_VALUES => true ]
+                [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]
             )
         );
     }
@@ -157,19 +158,18 @@ class NonBackedEnumNormalizerTest extends TestCase
                 'GET',
                 UnitEnumDummy::class,
                 null,
-                [ BackedEnumNormalizer::ALLOW_INVALID_VALUES => true ]
+                [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]
             )
         );
-
     }
 
     protected function providerInvalidCases()
     {
         return [
-            'integer'           => [ 1 ],
-            'empty string'      => [ '' ],
-            'non-existing case' => [ 'WRONG' ],
-            'null'              => [ null ],
+            'integer' => [1],
+            'empty string' => [''],
+            'non-existing case' => ['WRONG'],
+            'null' => [null],
         ];
     }
 }

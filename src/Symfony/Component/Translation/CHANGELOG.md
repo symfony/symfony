@@ -8,10 +8,6 @@ CHANGELOG
  * Add `--as-tree` option to `translation:pull` command to write YAML messages as a tree-like structure
  * [BC BREAK] Add argument `$buildDir` to `DataCollectorTranslator::warmUp()`
  * Add `DataCollectorTranslatorPass` and `LoggingTranslatorPass`  (moved from `FrameworkBundle`)
-
-6.3
----
-
  * Add `PhraseTranslationProvider`
 
 6.2.7

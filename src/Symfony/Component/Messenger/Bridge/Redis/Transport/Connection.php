@@ -108,7 +108,21 @@ class Connection
                         }
 
                         try {
-                            $sentinel = new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+                            if (\extension_loaded('redis') && version_compare(phpversion('redis'), '6.0.0', '>=')) {
+                                $params = [
+                                    'host' => $host,
+                                    'port' => $port,
+                                    'connectTimeout' => $options['timeout'],
+                                    'persistent' => $options['persistent_id'],
+                                    'retryInterval' => $options['retry_interval'],
+                                    'readTimeout' => $options['read_timeout'],
+                                ];
+
+                                $sentinel = new \RedisSentinel($params);
+                            } else {
+                                $sentinel = new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+                            }
+
                             if ($address = $sentinel->getMasterAddrByName($sentinelMaster)) {
                                 [$host, $port] = $address;
                             }

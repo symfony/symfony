@@ -285,7 +285,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $lifetime = $lifetime ?: null;
         try {
             $stmt = $conn->prepare($sql);
-        } catch (\PDOException) {
+        } catch (\PDOException $e) {
             if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
             }
@@ -320,7 +320,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         foreach ($values as $id => $data) {
             try {
                 $stmt->execute();
-            } catch (\PDOException) {
+            } catch (\PDOException $e) {
                 if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                     $this->createTable();
                 }

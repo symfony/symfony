@@ -16,6 +16,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\ProcessStartFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
@@ -64,6 +65,28 @@ class ProcessTest extends TestCase
 
         $cmd = new Process(['echo', 'test'], __DIR__.'/notfound/');
         $cmd->run();
+    }
+
+    /**
+     * @dataProvider invalidProcessProvider
+     */
+    public function testInvalidCommand(Process $process)
+    {
+        try {
+            $this->assertSame('\\' === \DIRECTORY_SEPARATOR ? 1 : 127, $process->run());
+        } catch (ProcessStartFailedException $e) {
+            // An invalid command might already fail during start since PHP 8.3 for platforms
+            // supporting posix_spawn(), see https://github.com/php/php-src/issues/12589
+            $this->assertStringContainsString('No such file or directory', $e->getMessage());
+        }
+    }
+
+    public function invalidProcessProvider()
+    {
+        return [
+            [new Process(['invalid'])],
+            [Process::fromShellCommandline('invalid')],
+        ];
     }
 
     /**

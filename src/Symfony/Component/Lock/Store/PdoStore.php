@@ -92,7 +92,7 @@ class PdoStore implements PersistingStoreInterface
         try {
             $stmt = $conn->prepare($sql);
         } catch (\PDOException $e) {
-            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->getDriver(), ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
             }
             $stmt = $conn->prepare($sql);
@@ -104,12 +104,12 @@ class PdoStore implements PersistingStoreInterface
         try {
             $stmt->execute();
         } catch (\PDOException $e) {
-            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->getDriver(), ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
 
                 try {
                     $stmt->execute();
-                } catch (\PDOException $e) {
+                } catch (\PDOException) {
                     $this->putOffExpiration($key, $this->initialTtl);
                 }
             } else {
@@ -187,11 +187,7 @@ class PdoStore implements PersistingStoreInterface
      */
     public function createTable(): void
     {
-        // connect if we are not yet
-        $conn = $this->getConnection();
-        $driver = $this->getDriver();
-
-        $sql = match ($driver) {
+        $sql = match ($driver = $this->getDriver()) {
             'mysql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(44) NOT NULL, $this->expirationCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB",
             'sqlite' => "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->tokenCol TEXT NOT NULL, $this->expirationCol INTEGER)",
             'pgsql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)",
@@ -200,7 +196,7 @@ class PdoStore implements PersistingStoreInterface
             default => throw new \DomainException(sprintf('Creating the lock table is currently not implemented for platform "%s".', $driver)),
         };
 
-        $conn->exec($sql);
+        $this->getConnection()->exec($sql);
     }
 
     /**
@@ -215,14 +211,7 @@ class PdoStore implements PersistingStoreInterface
 
     private function getDriver(): string
     {
-        if (isset($this->driver)) {
-            return $this->driver;
-        }
-
-        $conn = $this->getConnection();
-        $this->driver = $conn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-
-        return $this->driver;
+        return $this->driver ??= $this->getConnection()->getAttribute(\PDO::ATTR_DRIVER_NAME);
     }
 
     /**
@@ -245,15 +234,13 @@ class PdoStore implements PersistingStoreInterface
         $driver = $this->getDriver();
         $code = $exception->getCode();
 
-        switch (true) {
-            case 'pgsql' === $driver && '42P01' === $code:
-            case 'sqlite' === $driver && str_contains($exception->getMessage(), 'no such table:'):
-            case 'oci' === $driver && 942 === $code:
-            case 'sqlsrv' === $driver && 208 === $code:
-            case 'mysql' === $driver && 1146 === $code:
-                return true;
-            default:
-                return false;
-        }
+        return match ($driver) {
+            'pgsql' => '42P01' === $code,
+            'sqlite' => str_contains($exception->getMessage(), 'no such table:'),
+            'oci' => 942 === $code,
+            'sqlsrv' => 208 === $code,
+            'mysql' => 1146 === $code,
+            default => false,
+        };
     }
 }

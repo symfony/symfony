@@ -14,10 +14,15 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MariaDb1060Platform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
+use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -391,27 +396,93 @@ class ConnectionTest extends TestCase
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
         ];
 
+        if (class_exists(MySQL80Platform::class) && !method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'MySQL8 & DBAL<3.8' => [
+                new MySQL80Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+            ];
+        }
+
+        if (class_exists(MySQL80Platform::class) && method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'MySQL8 & DBAL>=3.8' => [
+                new MySQL80Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            ];
+        }
+
         yield 'MariaDB' => [
             new MariaDBPlatform(),
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
         ];
 
-        yield 'SQL Server' => [
-            class_exists(SQLServerPlatform::class) && !class_exists(SQLServer2012Platform::class) ? new SQLServerPlatform() : new SQLServer2012Platform(),
-            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
-        ];
+        if (class_exists(MariaDb1060Platform::class)) {
+            yield 'MariaDB106' => [
+                new MariaDb1060Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            ];
+        }
 
-        if (!class_exists(MySQL57Platform::class)) {
-            // DBAL >= 4
-            yield 'Oracle' => [
-                new OraclePlatform(),
-                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC FETCH NEXT 1 ROWS ONLY) FOR UPDATE',
+        if (class_exists(MySQL57Platform::class)) {
+            yield 'Postgres & DBAL<4' => [
+                new PostgreSQLPlatform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
             ];
         } else {
-            // DBAL < 4
-            yield 'Oracle' => [
+            yield 'Postgres & DBAL>=4' => [
+                new PostgreSQLPlatform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            ];
+        }
+
+        if (class_exists(PostgreSQL94Platform::class)) {
+            yield 'Postgres94' => [
+                new PostgreSQL94Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+            ];
+        }
+
+        if (class_exists(PostgreSQL100Platform::class) && !method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'Postgres10 & DBAL<3.8' => [
+                new PostgreSQL100Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+            ];
+        }
+
+        if (class_exists(PostgreSQL100Platform::class) && method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'Postgres10 & DBAL>=3.8' => [
+                new PostgreSQL100Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            ];
+        }
+
+        if (!method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'SQL Server & DBAL<3.8' => [
+                class_exists(SQLServerPlatform::class) && !class_exists(SQLServer2012Platform::class) ? new SQLServerPlatform() : new SQLServer2012Platform(),
+                'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+            ];
+        }
+
+        if (method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'SQL Server & DBAL>=3.8' => [
+                class_exists(SQLServerPlatform::class) && !class_exists(SQLServer2012Platform::class) ? new SQLServerPlatform() : new SQLServer2012Platform(),
+                'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK, READPAST) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+            ];
+        }
+
+        if (!method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'Oracle & DBAL<3.8' => [
                 new OraclePlatform(),
                 'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE',
+            ];
+        } elseif (class_exists(MySQL57Platform::class)) {
+            yield 'Oracle & 3.8<=DBAL<4' => [
+                new OraclePlatform(),
+                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE SKIP LOCKED',
+            ];
+        } else {
+            yield 'Oracle & DBAL>=4' => [
+                new OraclePlatform(),
+                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC FETCH NEXT 1 ROWS ONLY) FOR UPDATE SKIP LOCKED',
             ];
         }
     }

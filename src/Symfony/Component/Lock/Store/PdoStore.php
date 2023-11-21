@@ -91,7 +91,7 @@ class PdoStore implements PersistingStoreInterface
         $conn = $this->getConnection();
         try {
             $stmt = $conn->prepare($sql);
-        } catch (\PDOException) {
+        } catch (\PDOException $e) {
             if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
             }
@@ -103,7 +103,7 @@ class PdoStore implements PersistingStoreInterface
 
         try {
             $stmt->execute();
-        } catch (\PDOException) {
+        } catch (\PDOException $e) {
             if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
 

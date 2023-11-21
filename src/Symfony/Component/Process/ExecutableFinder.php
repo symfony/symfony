@@ -32,7 +32,10 @@ class ExecutableFinder
     }
 
     /**
-     * Adds new possible suffix to check for executable.
+     * Adds new possible suffix to check for executable, including the dot (.).
+     *
+     *     $finder = new ExecutableFinder();
+     *     $finder->addSuffix('.foo');
      *
      * @return void
      */

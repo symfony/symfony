@@ -94,7 +94,21 @@ class Connection
         } else {
             if (null !== $sentinelMaster) {
                 $sentinelClass = \extension_loaded('redis') ? \RedisSentinel::class : Sentinel::class;
-                $sentinelClient = new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+
+                if (\extension_loaded('redis') && version_compare(phpversion('redis'), '6.0.0', '>=')) {
+                    $params = [
+                        'host' => $host,
+                        'port' => $port,
+                        'connectTimeout' => $options['timeout'],
+                        'persistent' => $options['persistent_id'],
+                        'retryInterval' => $options['retry_interval'],
+                        'readTimeout' => $options['read_timeout'],
+                    ];
+
+                    $sentinelClient = new \RedisSentinel($params);
+                } else {
+                    $sentinelClient = new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+                }
 
                 if (!$address = $sentinelClient->getMasterAddrByName($sentinelMaster)) {
                     throw new InvalidArgumentException(sprintf('Failed to retrieve master information from master name "%s" and address "%s:%d".', $sentinelMaster, $host, $port));

@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by ausi at 2023-11-01T17:54:00Z
+
+The failing unit test in PHP 8.3 seems to be a bug in PHP: https://github.com/php/php-src/issues/12589
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-01T19:34:53Z
+
+It is a new feature and must therefore target 7.1 because of feature freeze period
+
+Should we wait wait for a PHP bugfix before merge?
+
+---------------------------------------------------------------------------
+
+by ausi at 2023-11-01T20:31:39Z
+
+> It is a new feature and must therefore target 7.1 because of feature freeze period
+
+Changed the base to 7.0 (there is no 7.1 branch yet)
+
+> Should we wait wait for a PHP bugfix before merge?
+
+I think so, yes.
+
+---------------------------------------------------------------------------
+
+by ausi at 2023-11-03T00:02:25Z
+
+> > Should we wait wait for a PHP bugfix before merge?
+>
+> I think so, yes.
+
+The PHP bug got closed, the new behavior is intended. I updated the pull request to handle that case.
+
+---------------------------------------------------------------------------
+
+by ausi at 2023-11-12T11:50:42Z
+
+~~The PHP bug https://github.com/php/php-src/issues/12589 got reopened, so we should wait until that was resolved there I think.~~ 
+UPDATE 2023-11-13: was closed again
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-11-13T08:37:03Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.0" but it seems your PR description refers to branch "7.1".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ausi at 2023-11-13T09:50:20Z
+
+@carsonbot the 7.1 branch does not exist yet.

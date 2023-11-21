@@ -761,13 +761,7 @@ XLIFF
 
     private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en', EventDispatcherInterface $dispatcher = null): CommandTester
     {
-        $command = $this->createCommand(
-            provider: $provider,
-            locales: $locales,
-            domains: $domains,
-            defaultLocale: $defaultLocale,
-            dispatcher: $dispatcher
-        );
+        $command = $this->createCommand($provider, $locales, $domains, $defaultLocale, ['loco'], $dispatcher);
         $application = new Application();
         $application->add($command);
 
@@ -785,13 +779,13 @@ XLIFF
         $reader->addLoader('yml', new YamlFileLoader());
 
         return new TranslationPullCommand(
-            providerCollection: $this->getProviderCollection($provider, $providerNames, $locales, $domains),
-            writer: $writer,
-            reader: $reader,
-            defaultLocale: $defaultLocale,
-            transPaths: [$this->translationAppDir.'/translations'],
-            enabledLocales: $locales,
-            eventDispatcher: $dispatcher
+            $this->getProviderCollection($provider, $providerNames, $locales, $domains),
+            $writer,
+            $reader,
+            $defaultLocale,
+            [$this->translationAppDir.'/translations'],
+            $locales,
+            $dispatcher
         );
     }
 }

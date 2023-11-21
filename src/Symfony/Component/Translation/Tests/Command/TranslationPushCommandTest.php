@@ -455,12 +455,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
     private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], EventDispatcherInterface $dispatcher = null): CommandTester
     {
-        $command = $this->createCommand(
-            provider: $provider,
-            locales: $locales,
-            domains: $domains,
-            dispatcher: $dispatcher
-        );
+        $command = $this->createCommand($provider, $locales, $domains, ['loco'], $dispatcher);
         $application = new Application();
         $application->add($command);
 

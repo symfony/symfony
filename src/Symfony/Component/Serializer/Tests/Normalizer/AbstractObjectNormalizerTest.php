@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -444,6 +445,14 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizedData = $normalizer->normalize(new EmptyDummy(), 'any', ['preserve_empty_objects' => true]);
         $this->assertEquals(new \ArrayObject(), $normalizedData);
     }
+
+    public function testNormalizeWithIgnoreAnnotationAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory)]);
+
+        $this->assertSame(['foo' => 'foo'], $serializer->normalize(new ObjectDummyWithIgnoreAnnotationAndPrivateProperty()));
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -482,6 +491,16 @@ class Dummy
 
 class EmptyDummy
 {
+}
+
+class ObjectDummyWithIgnoreAnnotationAndPrivateProperty
+{
+    public $foo = 'foo';
+
+    /** @Ignore */
+    public $ignored = 'ignored';
+
+    private $private = 'private';
 }
 
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer

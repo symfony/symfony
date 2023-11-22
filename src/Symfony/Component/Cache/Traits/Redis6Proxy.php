@@ -653,7 +653,14 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
 
     public function mget($keys): \Redis|array
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->mget(...\func_get_args());
+        /**
+         * Handle the special case where `mget()` returns false, waiting for the stub to be fixed.
+         *
+         * @see https://github.com/phpredis/phpredis/issues/1810
+         */
+        $v = ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->mget(...\func_get_args());
+
+        return $v === false ? [] : $v;
     }
 
     public function migrate($host, $port, $key, $dstdb, $timeout, $copy = false, $replace = false, #[\SensitiveParameter] $credentials = null): \Redis|bool

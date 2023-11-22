@@ -651,7 +651,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->ltrim(...\func_get_args());
     }
 
-    public function mget($keys): \Redis|array
+    public function mget($keys): \Redis|array|false
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->mget(...\func_get_args());
     }

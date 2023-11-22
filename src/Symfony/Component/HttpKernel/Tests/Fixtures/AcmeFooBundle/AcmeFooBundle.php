@@ -31,7 +31,7 @@ class AcmeFooBundle extends AbstractBundle
 
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        $container->extension('loaded', ['bar' => 'baz'], true);
+        $builder->prependExtensionConfig('loaded', ['bar' => 'baz']);
     }
 
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void

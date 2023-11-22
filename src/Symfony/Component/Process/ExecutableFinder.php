@@ -77,6 +77,8 @@ class ExecutableFinder
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $pathExt = getenv('PATHEXT');
             $suffixes = array_merge($pathExt ? explode(\PATH_SEPARATOR, $pathExt) : $this->suffixes, $suffixes);
+        } else {
+            $suffixes = array_merge($suffixes, $this->suffixes);
         }
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {

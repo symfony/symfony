@@ -30,8 +30,6 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 {
     protected $propertyAccessor;
 
-    private $discriminatorCache = [];
-
     private $objectClassResolver;
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
@@ -128,16 +126,14 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
     {
-        $cacheKey = \get_class($object);
-        if (!\array_key_exists($cacheKey, $this->discriminatorCache)) {
-            $this->discriminatorCache[$cacheKey] = null;
-            if (null !== $this->classDiscriminatorResolver) {
-                $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object);
-                $this->discriminatorCache[$cacheKey] = null === $mapping ? null : $mapping->getTypeProperty();
-            }
+        $discriminatorProperty = null;
+        if (null !== $this->classDiscriminatorResolver && null !== $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object)) {
+            $discriminatorProperty = $mapping->getTypeProperty();
         }
 
-        return $attribute === $this->discriminatorCache[$cacheKey] ? $this->classDiscriminatorResolver->getTypeForMappedObject($object) : $this->propertyAccessor->getValue($object, $attribute);
+        return $attribute === $discriminatorProperty
+            ? $this->classDiscriminatorResolver->getTypeForMappedObject($object)
+            : $this->propertyAccessor->getValue($object, $attribute);
     }
 
     /**

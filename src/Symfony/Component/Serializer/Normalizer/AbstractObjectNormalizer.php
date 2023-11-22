@@ -179,8 +179,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $attributeContext = $this->getAttributeNormalizationContext($object, $attribute, $context);
 
+            $discriminatorProperty = null;
+            if (null !== $this->classDiscriminatorResolver && null !== $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object)) {
+                $discriminatorProperty = $mapping->getTypeProperty();
+            }
+
             try {
-                $attributeValue = $this->getAttributeValue($object, $attribute, $format, $attributeContext);
+                $attributeValue = $attribute === $discriminatorProperty
+                    ? $this->classDiscriminatorResolver->getTypeForMappedObject($object)
+                    : $this->getAttributeValue($object, $attribute, $format, $attributeContext);
             } catch (UninitializedPropertyException $e) {
                 if ($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true) {
                     continue;
@@ -386,8 +393,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             if ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
+                $discriminatorProperty = null;
+                if (null !== $this->classDiscriminatorResolver && null !== $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object)) {
+                    $discriminatorProperty = $mapping->getTypeProperty();
+                }
+
                 try {
-                    $attributeContext[self::OBJECT_TO_POPULATE] = $this->getAttributeValue($object, $attribute, $format, $attributeContext);
+                    $attributeContext[self::OBJECT_TO_POPULATE] = $attribute === $discriminatorProperty
+                        ? $this->classDiscriminatorResolver->getTypeForMappedObject($object)
+                        : $this->getAttributeValue($object, $attribute, $format, $attributeContext);
                 } catch (NoSuchPropertyException $e) {
                 }
             }

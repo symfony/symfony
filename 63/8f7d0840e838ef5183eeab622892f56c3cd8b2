@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-10-18T09:23:51Z
+
+> I likely misunderstood your proposal but I was expecting the new method on class `ExceptionEvent`.
+
+Indeed I thought about it first, then I saw the kernel was accessible in the ExceptionEvent, this would have avoid an extra param. Also, it would have avoid having to think about passing both the kernel and the terminated state.
+
+I updated the PR to follow this strategy if it's preferred @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-18T10:01:27Z
+
+Don't miss adding a line to the changelog of the component.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-10-18T10:06:50Z
+
+> Don't miss adding a line to the changelog of the component.
+
+Should it be in the 6.4 changelog or should I create a 7.1 one ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-18T10:07:56Z
+
+7.1 indeed now

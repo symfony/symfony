@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-11-23T15:23:47Z
+
+This will not log deprecations at all when not using MonologBundle and also won't log them at all when using MonologBundle without explicitly creating a `deprecation` channel.
+
+This re-introduces the same issue than what was fixed previously. The "bug" you tried to fix is that someone was relying on the previous regression as a feature rather than a bug.
+
+So -1 for me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-23T15:25:32Z
+
+To me this will log deprecations on the php channel, as wanted
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-23T15:28:29Z
+
+I think you missed that deprecations will go on the logger defined as $logger argument when $deprecationLogger is null.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-23T15:32:08Z
+
+If this is indeed the case, why did we have to replace the usage of `service('monolog.logger.deprecation')->nullOnInvalid()` by a dynamic configuration in the compiler pass in the previous PR ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-23T15:33:16Z
+
+We did that to wire "logger" by default so that when monolog is not there, we still have a logger for the php notices/deprecations.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-23T15:39:14Z
+
+but you now wire `null` by default, not `logger`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-23T16:02:27Z
+
+Sure, that's the code in DebugHandlersListener that does the trick:
+
+https://github.com/symfony/symfony/blob/11990909dfaade1b86fcb5d22a71ed963b9be4cb/src/Symfony/Component/HttpKernel/EventListener/DebugHandlersListener.php#L169-L177

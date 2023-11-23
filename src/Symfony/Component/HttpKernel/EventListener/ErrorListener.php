@@ -96,6 +96,10 @@ class ErrorListener implements EventSubscriberInterface
             return;
         }
 
+        if (!$this->debug && $event->isKernelTerminating()) {
+            return;
+        }
+
         $throwable = $event->getThrowable();
 
         if ($exceptionHandler = set_exception_handler(var_dump(...))) {

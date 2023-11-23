@@ -489,6 +489,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
+        $parentContext['deserialization_path'] = ($parentContext['deserialization_path'] ?? false) ? $parentContext['deserialization_path'].'.'.$attribute : $attribute;
+
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];
         } else {

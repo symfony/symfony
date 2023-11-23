@@ -26,7 +26,7 @@ return static function (ContainerConfigurator $container) {
                 param('debug.error_handler.throw_at'),
                 param('kernel.debug'),
                 param('kernel.debug'),
-                service('logger')->nullOnInvalid(),
+                null, // Deprecation logger if different from the one above
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'php'])

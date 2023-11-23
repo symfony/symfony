@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-11-22T13:01:04Z
+
+We should honestly try to get rid of this server version detection. As far as I can tell, we're using it to filter out ancient database platforms:
+* Microsoft SQL Server before 2008
+* Postgres before 9.5 (released in Jan 2016, EOL since Feb 2021)
+
+FWIW, both platforms are not supported by DBAL 4.

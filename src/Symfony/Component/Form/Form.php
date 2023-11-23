@@ -21,7 +21,6 @@ use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
@@ -727,12 +726,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         if (!$child instanceof FormInterface) {
-            if (!\is_string($child) && !\is_int($child)) {
-                throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormInterface');
-            }
-
-            $child = (string) $child;
-
             // Never initialize child forms automatically
             $options['auto_initialize'] = false;
 

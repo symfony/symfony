@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2023-11-15T05:04:59Z
+
+fabbot errors are not related to that PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-20T09:24:24Z
+
+@mtarld can you please have a look at #52401 and help us decide which approach we should merge? It looks like the test cases are the same, right?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-11-20T09:43:17Z
+
+I think that there is an issue with https://github.com/symfony/symfony/pull/52401.
+
+Indeed, the following XML:
+```xml
+<?xml version="1.0"?>
+<response xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" app:foo="bar">
+</response>
+```
+will be decoded as:
+```php
+[
+    '@app:foo' => 'bar',
+    '#' => '',
+]
+```
+whereas it should in my opinion be decoded as:
+```php
+[
+    '@xmlns' => 'http://www.w3.org/2005/Atom',
+    '@xmlns:app' => 'http://www.w3.org/2007/app',
+    '@app:foo' => 'bar',
+    '#' => '',
+]
+```
+otherwise we lose the XML namespaces information.
+
+But this is valid only if we do want to care about XML namespaces, of course.

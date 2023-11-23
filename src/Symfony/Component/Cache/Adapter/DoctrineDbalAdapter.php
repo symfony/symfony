@@ -21,6 +21,7 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\ServerVersionProvider;
 use Doctrine\DBAL\Tools\DsnParser;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
@@ -418,6 +419,10 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     {
         if (isset($this->serverVersion)) {
             return $this->serverVersion;
+        }
+
+        if ($this->conn instanceof ServerVersionProvider) {
+            return $this->conn->getServerVersion();
         }
 
         // The condition should be removed once support for DBAL <3.3 is dropped

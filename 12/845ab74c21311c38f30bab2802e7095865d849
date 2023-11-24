@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-24T11:08:51Z
+
+Why not as a bug fix? This looks like one to me. For 5.4 then.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-11-24T12:35:31Z
+
+I addressed your comments and rebased on 5.4. The fix is different from other branches, I'll provide a fix for those if needed :slightly_smiling_face:

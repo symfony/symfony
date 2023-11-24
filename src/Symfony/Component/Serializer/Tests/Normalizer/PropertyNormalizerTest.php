@@ -16,7 +16,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -502,6 +504,27 @@ class PropertyNormalizerTest extends TestCase
     {
         return new PropertyNormalizer(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
     }
+
+    public function testNormalizeWithDiscriminator()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
+
+        $this->assertSame(['type' => 'one', 'url' => 'URL_ONE'], $normalizer->normalize(new PropertyDiscriminatedDummyOne()));
+    }
+
+    public function testDenormalizeWithDiscriminator()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
+
+        $denormalized = new PropertyDiscriminatedDummyTwo();
+        $denormalized->url = 'url';
+
+        $this->assertEquals($denormalized, $normalizer->denormalize(['type' => 'two', 'url' => 'url'], PropertyDummyInterface::class));
+    }
 }
 
 class PropertyDummy
@@ -604,4 +627,24 @@ class RootDummy
     {
         return $this->intMatrix;
     }
+}
+
+/**
+ * @DiscriminatorMap(typeProperty="type", mapping={
+ *     "one" = PropertyDiscriminatedDummyOne::class,
+ *     "two" = PropertyDiscriminatedDummyTwo::class,
+ * })
+ */
+interface PropertyDummyInterface
+{
+}
+
+class PropertyDiscriminatedDummyOne implements PropertyDummyInterface
+{
+    public string $url = 'URL_ONE';
+}
+
+class PropertyDiscriminatedDummyTwo implements PropertyDummyInterface
+{
+    public string $url = 'URL_TWO';
 }

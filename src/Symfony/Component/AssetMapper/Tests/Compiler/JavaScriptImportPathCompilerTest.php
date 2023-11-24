@@ -353,9 +353,9 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $compiler = new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class));
         $compiler->compile($input, $inputAsset, $assetMapper);
         $this->assertCount(3, $inputAsset->getJavaScriptImports());
-        $this->assertSame('other.js', $inputAsset->getJavaScriptImports()[0]->asset->logicalPath);
-        $this->assertSame('subdir/foo.js', $inputAsset->getJavaScriptImports()[1]->asset->logicalPath);
-        $this->assertSame('root_asset.js', $inputAsset->getJavaScriptImports()[2]->asset->logicalPath);
+        $this->assertSame('other.js', $inputAsset->getJavaScriptImports()[0]->assetLogicalPath);
+        $this->assertSame('subdir/foo.js', $inputAsset->getJavaScriptImports()[1]->assetLogicalPath);
+        $this->assertSame('root_asset.js', $inputAsset->getJavaScriptImports()[2]->assetLogicalPath);
     }
 
     /**

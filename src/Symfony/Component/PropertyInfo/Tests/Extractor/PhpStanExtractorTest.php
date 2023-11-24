@@ -467,6 +467,8 @@ class PhpStanExtractorTest extends TestCase
     public static function php80TypesProvider()
     {
         return [
+            [Php80Dummy::class, 'promotedWithDocCommentAndType', [new Type(Type::BUILTIN_TYPE_INT)]],
+            [Php80Dummy::class, 'promotedWithDocComment', [new Type(Type::BUILTIN_TYPE_STRING)]],
             [Php80Dummy::class, 'promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
             [Php80Dummy::class, 'promoted', null],
             [Php80Dummy::class, 'collection', [new Type(Type::BUILTIN_TYPE_ARRAY, collection: true, collectionValueType: new Type(Type::BUILTIN_TYPE_STRING))]],

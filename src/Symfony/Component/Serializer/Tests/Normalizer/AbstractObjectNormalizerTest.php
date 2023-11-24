@@ -18,11 +18,13 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -37,6 +39,7 @@ use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
+use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -48,6 +51,11 @@ use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChi
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyString;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithNotNormalizable;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrBool;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrNull;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithStringObject;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummyWithContextAttribute;
 
 class AbstractObjectNormalizerTest extends TestCase
@@ -828,6 +836,53 @@ class AbstractObjectNormalizerTest extends TestCase
         $test = $normalizer->denormalize($data, $obj::class);
         $this->assertSame('nested-id', $test->id);
     }
+
+    public function testNormalizeWithIgnoreAnnotationAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory)]);
+
+        $this->assertSame(['foo' => 'foo'], $serializer->normalize(new ObjectDummyWithIgnoreAnnotationAndPrivateProperty()));
+    }
+
+    public function testDenormalizeUntypedFormat()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['value' => ''], DummyWithObjectOrNull::class, 'xml');
+
+        $this->assertEquals(new DummyWithObjectOrNull(null), $actual);
+    }
+
+    public function testDenormalizeUntypedFormatNotNormalizable()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $serializer = new Serializer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $serializer->denormalize(['value' => 'test'], DummyWithNotNormalizable::class, 'xml');
+    }
+
+    public function testDenormalizeUntypedFormatMissingArg()
+    {
+        $this->expectException(MissingConstructorArgumentsException::class);
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $serializer->denormalize(['value' => 'invalid'], DummyWithObjectOrNull::class, 'xml');
+    }
+
+    public function testDenormalizeUntypedFormatScalar()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['value' => 'false'], DummyWithObjectOrBool::class, 'xml');
+
+        $this->assertEquals(new DummyWithObjectOrBool(false), $actual);
+    }
+
+    public function testDenormalizeUntypedStringObject()
+    {
+        $serializer = new Serializer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['value' => ''], DummyWithStringObject::class, 'xml');
+
+        $this->assertEquals(new DummyWithStringObject(new DummyString()), $actual);
+        $this->assertEquals('', $actual->value->value);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -997,6 +1052,16 @@ class ObjectDummyWithContextAttributeSkipNullValues
 
     #[Context([AbstractObjectNormalizer::SKIP_NULL_VALUES => true])]
     public ?string $propertyWithNullSkipNullValues = null;
+}
+
+class ObjectDummyWithIgnoreAnnotationAndPrivateProperty
+{
+    public $foo = 'foo';
+
+    /** @Ignore */
+    public $ignored = 'ignored';
+
+    private $private = 'private';
 }
 
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer

@@ -351,9 +351,13 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             $missingConstructorArguments = [];
             $params = [];
             $unsetKeys = [];
+            $objectDeserializationPath = $context['deserialization_path'] ?? null;
+
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
+
+                $context['deserialization_path'] = $objectDeserializationPath ? $objectDeserializationPath.'.'.$paramName : $paramName;
 
                 $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
@@ -410,12 +414,14 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name),
                         $data,
                         ['unknown'],
-                        $context['deserialization_path'] ?? null,
+                        $objectDeserializationPath,
                         true
                     );
                     $context['not_normalizable_value_exceptions'][] = $exception;
                 }
             }
+
+            $context['deserialization_path'] = $objectDeserializationPath;
 
             if ($missingConstructorArguments) {
                 throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$%s".', $class, implode('", "$', $missingConstructorArguments)), 0, null, $missingConstructorArguments);
@@ -489,8 +495,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
-        $parentContext['deserialization_path'] = ($parentContext['deserialization_path'] ?? false) ? $parentContext['deserialization_path'].'.'.$attribute : $attribute;
-
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];
         } else {

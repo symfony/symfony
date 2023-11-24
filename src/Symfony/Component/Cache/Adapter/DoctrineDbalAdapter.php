@@ -389,17 +389,14 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             return $this->serverVersion;
         }
 
-        if ($this->conn instanceof ServerVersionProvider) {
-            return $this->conn->getServerVersion();
+        if ($this->conn instanceof ServerVersionProvider || $this->conn instanceof ServerInfoAwareConnection) {
+            return $this->serverVersion = $this->conn->getServerVersion();
         }
 
         // The condition should be removed once support for DBAL <3.3 is dropped
         $conn = method_exists($this->conn, 'getNativeConnection') ? $this->conn->getNativeConnection() : $this->conn->getWrappedConnection();
-        if ($conn instanceof ServerInfoAwareConnection) {
-            return $this->serverVersion = $conn->getServerVersion();
-        }
 
-        return $this->serverVersion = '0';
+        return $this->serverVersion = $conn->getAttribute(\PDO::ATTR_SERVER_VERSION);
     }
 
     private function addTableToSchema(Schema $schema): void

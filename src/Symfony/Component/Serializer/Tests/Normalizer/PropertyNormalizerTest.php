@@ -641,10 +641,10 @@ interface PropertyDummyInterface
 
 class PropertyDiscriminatedDummyOne implements PropertyDummyInterface
 {
-    public string $url = 'URL_ONE';
+    public $url = 'URL_ONE';
 }
 
 class PropertyDiscriminatedDummyTwo implements PropertyDummyInterface
 {
-    public string $url = 'URL_TWO';
+    public $url = 'URL_TWO';
 }

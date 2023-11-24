@@ -15,15 +15,11 @@ use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
+/**
+ * @requires extension redis
+ */
 class RedisTraitTest extends TestCase
 {
-    public static function setUpBeforeClass(): void
-    {
-        if (!getenv('REDIS_CLUSTER_HOSTS')) {
-            throw new SkippedTestSuiteError('REDIS_CLUSTER_HOSTS env var is not defined.');
-        }
-    }
-
     /**
      * @dataProvider provideCreateConnection
      */
@@ -40,6 +36,19 @@ class RedisTraitTest extends TestCase
         $connection = $mock::createConnection($dsn);
 
         self::assertInstanceOf($expectedClass, $connection);
+    }
+
+    public function testUrlDecodeParameters()
+    {
+        if (!getenv('REDIS_AUTHENTICATED_HOST')) {
+            self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
+        }
+
+        $mock = self::getObjectForTrait(RedisTrait::class);
+        $connection = $mock::createConnection('redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST'));
+
+        self::assertInstanceOf(\Redis::class, $connection);
+        self::assertSame('p@ssword', $connection->getAuth());
     }
 
     public static function provideCreateConnection(): array

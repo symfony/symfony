@@ -253,6 +253,9 @@ final class EnglishInflector implements InflectorInterface
         // seasons (season), treasons (treason), poisons (poison), lessons (lesson)
         ['nos', 3, true, true, 'sons'],
 
+        // icons (icon)
+        ['noc', 3, true, true, 'cons'],
+
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
         ['no', 2, true, true, 'a'],
 

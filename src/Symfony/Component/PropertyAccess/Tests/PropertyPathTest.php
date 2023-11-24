@@ -199,7 +199,7 @@ class PropertyPathTest extends TestCase
         $propertyPath->isIndex(-1);
     }
 
-    public function testIsWildcard(): void
+    public function testIsWildcard()
     {
         $propertyPath = new PropertyPath('[*][parent][child].name');
 

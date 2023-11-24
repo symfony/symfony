@@ -156,12 +156,12 @@ class PropertyAccessorWildcardTest extends TestCase
     /**
      * @dataProvider provideWildcardPaths
      */
-    public function testAccessorWithWildcard(string $path, string|array $expected): void
+    public function testAccessorWithWildcard(string $path, string|array $expected)
     {
         self::assertSame($expected, $this->propertyAccessor->getValue(self::TEST_ARRAY, $path));
     }
 
-    public function testAccessorWithWildcardAndObject(): void
+    public function testAccessorWithWildcardAndObject()
     {
         $array = self::TEST_ARRAY;
 

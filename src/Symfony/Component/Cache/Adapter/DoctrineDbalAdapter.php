@@ -213,11 +213,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     protected function doClear(string $namespace): bool
     {
         if ('' === $namespace) {
-            if ('sqlite' === $this->getPlatformName()) {
-                $sql = "DELETE FROM $this->table";
-            } else {
-                $sql = "TRUNCATE TABLE $this->table";
-            }
+            $sql = $this->conn->getDatabasePlatform()->getTruncateTableSQL($this->table);
         } else {
             $sql = "DELETE FROM $this->table WHERE $this->idCol LIKE '$namespace%'";
         }

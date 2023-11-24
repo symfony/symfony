@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -494,7 +494,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testNormalizeWithDiscriminator()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, null, $discriminator);
 
@@ -503,7 +503,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testDenormalizeWithDiscriminator()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, null, $discriminator);
 
@@ -777,12 +777,10 @@ class ObjectWithMagicMethod
     }
 }
 
-/**
- * @DiscriminatorMap(typeProperty="type", mapping={
- *     "one" = GetSetMethodDiscriminatedDummyOne::class,
- *     "two" = GetSetMethodDiscriminatedDummyTwo::class,
- * })
- */
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'one' => GetSetMethodDiscriminatedDummyOne::class,
+    'two' => GetSetMethodDiscriminatedDummyTwo::class,
+])]
 interface GetSetMethodDummyInterface
 {
 }

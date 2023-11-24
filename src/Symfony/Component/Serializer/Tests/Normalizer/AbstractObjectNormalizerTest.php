@@ -837,12 +837,12 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('nested-id', $test->id);
     }
 
-    public function testNormalizeWithIgnoreAnnotationAndPrivateProperties()
+    public function testNormalizeWithIgnoreAttributeAndPrivateProperties()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory)]);
 
-        $this->assertSame(['foo' => 'foo'], $serializer->normalize(new ObjectDummyWithIgnoreAnnotationAndPrivateProperty()));
+        $this->assertSame(['foo' => 'foo'], $serializer->normalize(new ObjectDummyWithIgnoreAttributeAndPrivateProperty()));
     }
 
     public function testDenormalizeUntypedFormat()
@@ -1054,11 +1054,11 @@ class ObjectDummyWithContextAttributeSkipNullValues
     public ?string $propertyWithNullSkipNullValues = null;
 }
 
-class ObjectDummyWithIgnoreAnnotationAndPrivateProperty
+class ObjectDummyWithIgnoreAttributeAndPrivateProperty
 {
     public $foo = 'foo';
 
-    /** @Ignore */
+    #[Ignore]
     public $ignored = 'ignored';
 
     private $private = 'private';

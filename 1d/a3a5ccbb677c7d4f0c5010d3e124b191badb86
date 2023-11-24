@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nesl247 at 2023-11-22T14:58:18Z
+
+@mtarld am I misunderstanding the documentation though? It says
+
+> All attributes are included by default when serializing objects. There are two options to ignore some of those attributes.
+
+Which to mean means even private and protected. While I think the fix here makes sense, it doesn't align with the documentation. Should the documentation also be updated to say only publicly accessible attributes are included? Or is that what `attribute` means and I am missing the definition?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-22T15:00:30Z
+
+Private or protected properties are included if they have getters to access them publicly.
+
+---------------------------------------------------------------------------
+
+by nesl247 at 2023-11-22T19:05:34Z
+
+> Private or protected properties are included if they have getters to access them publicly.
+
+That's what I thought. Then the documentation should be updated to specify that instead of all attributes correct?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-11-23T02:22:04Z
+
+Indeed, we could go with something like: "All **accessible** attributes are included by default when serializing objects.".
+
+WDYT? Up for a PR?
+
+---------------------------------------------------------------------------
+
+by nesl247 at 2023-11-23T13:19:51Z
+
+> Indeed, we could go with something like: "All **accessible** attributes are included by default when serializing objects.".
+>
+> WDYT? Up for a PR?
+
+Yes. I’m out of the office until Tuesday, but when I get back I’m happy to submit a PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-23T17:35:06Z
+
+> PHP Parse error:  syntax error, unexpected 'string' (T_STRING), expecting function (T_FUNCTION) or const (T_CONST) in /home/runner/work/symfony/symfony/src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php on line 498
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-11-24T04:24:44Z
+
+Failures should be fixed in https://github.com/symfony/symfony/pull/52713

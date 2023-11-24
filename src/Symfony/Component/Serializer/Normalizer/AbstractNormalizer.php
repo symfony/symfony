@@ -342,10 +342,14 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             $missingConstructorArguments = [];
             $params = [];
             $unsetKeys = [];
+            $objectDeserializationPath = $context['deserialization_path'] ?? null;
+
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
                 $attributeContext = $this->getAttributeDenormalizationContext($class, $paramName, $context);
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
+
+                $context['deserialization_path'] = $objectDeserializationPath ? $objectDeserializationPath.'.'.$paramName : $paramName;
 
                 $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
@@ -402,12 +406,14 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name),
                         $data,
                         ['unknown'],
-                        $context['deserialization_path'] ?? null,
+                        $objectDeserializationPath,
                         true
                     );
                     $context['not_normalizable_value_exceptions'][] = $exception;
                 }
             }
+
+            $context['deserialization_path'] = $objectDeserializationPath;
 
             if ($missingConstructorArguments) {
                 throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$%s".', $class, implode('", "$', $missingConstructorArguments)), 0, null, $missingConstructorArguments, $class);

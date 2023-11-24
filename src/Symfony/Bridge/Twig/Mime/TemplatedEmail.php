@@ -100,7 +100,7 @@ class TemplatedEmail extends Email
      */
     public function __serialize(): array
     {
-        return [$this->htmlTemplate, $this->textTemplate, $this->context, parent::__serialize()];
+        return [$this->htmlTemplate, $this->textTemplate, $this->context, parent::__serialize(),  $this->locale];
     }
 
     /**
@@ -109,6 +109,7 @@ class TemplatedEmail extends Email
     public function __unserialize(array $data): void
     {
         [$this->htmlTemplate, $this->textTemplate, $this->context, $parentData] = $data;
+        $this->locale = $data[4] ?? null;
 
         parent::__unserialize($parentData);
     }

@@ -58,7 +58,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     private array $isNullSafe = [];
 
     /**
-     * Contains a Boolean for each property in $elements denoting whether this
+     * Contains a boolean for each property in $elements denoting whether this
      * element is wildcard or not.
      *
      * @var array<bool>

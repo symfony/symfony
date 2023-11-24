@@ -185,11 +185,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             $attributeContext = $this->getAttributeNormalizationContext($object, $attribute, $context);
-            $discriminatorMapping = $this->classDiscriminatorResolver?->getMappingForMappedObject($object);
 
             try {
-                $attributeValue = $attribute === $discriminatorMapping?->getTypeProperty()
-                    ? $discriminatorMapping
+                $attributeValue = $attribute === $this->classDiscriminatorResolver?->getMappingForMappedObject($object)?->getTypeProperty()
+                    ? $this->classDiscriminatorResolver?->getTypeForMappedObject($object)
                     : $this->getAttributeValue($object, $attribute, $format, $attributeContext);
             } catch (UninitializedPropertyException $e) {
                 if ($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true) {

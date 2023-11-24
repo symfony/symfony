@@ -318,12 +318,12 @@ class PropertyAccessor implements PropertyAccessorInterface
                 // replace wildcard with all posible values
                 // e.g. [*][foo] becomes [0][foo], [1][foo], ...
                 foreach (array_keys($zval[self::VALUE]) as $index) {
-                    $path = preg_replace('/\[\*\]/', "[$index]", (string) ($propertyPath), 1);
+                    $path = preg_replace('/\[\*\]/', "[$index]", (string) $propertyPath, 1);
                     $subPath = $this->readPropertiesUntil($zval, $this->getPropertyPath($path), $lastIndex, $ignoreInvalidIndices, $i);
 
                     // merge property values from all sub paths
                     // skip first because it's same for all paths and is already in $propertyValues
-                    for($j = 1; $j < count($subPath); $j++) {
+                    for ($j = 1; $j < \count($subPath); ++$j) {
                         $newPropertyValues[$j][self::VALUE][] = $subPath[$j][self::VALUE];
                     }
                 }
@@ -332,14 +332,14 @@ class PropertyAccessor implements PropertyAccessorInterface
                     $shouldMerge = true;
 
                     foreach ($newValue[self::VALUE] as $value) {
-                        $shouldMerge = is_array($value) && array_is_list($value);
+                        $shouldMerge = \is_array($value) && array_is_list($value);
 
-                        if(!$shouldMerge) {
+                        if (!$shouldMerge) {
                             break;
                         }
                     }
 
-                    if($shouldMerge) {
+                    if ($shouldMerge) {
                         $newValue[self::VALUE] = array_merge(...$newValue[self::VALUE]);
                     }
                 }

@@ -467,8 +467,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         $expectedTypes = [];
         $isUnionType = \count($types) > 1;
+        $e = null;
         $extraAttributesException = null;
         $missingConstructorArgumentException = null;
+        $isNullable = false;
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
                 return null;
@@ -491,18 +493,22 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 // In XML and CSV all basic datatypes are represented as strings, it is e.g. not possible to determine,
                 // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
                 // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
+                $builtinType = $type->getBuiltinType();
                 if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
                     if ('' === $data) {
-                        if (Type::BUILTIN_TYPE_ARRAY === $builtinType = $type->getBuiltinType()) {
+                        if (Type::BUILTIN_TYPE_ARRAY === $builtinType) {
                             return [];
                         }
 
-                        if ($type->isNullable() && \in_array($builtinType, [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)) {
-                            return null;
+                        if (Type::BUILTIN_TYPE_STRING === $builtinType) {
+                            return '';
                         }
+
+                        // Don't return null yet because Object-types that come first may accept empty-string too
+                        $isNullable = $isNullable ?: $type->isNullable();
                     }
 
-                    switch ($builtinType ?? $type->getBuiltinType()) {
+                    switch ($builtinType) {
                         case Type::BUILTIN_TYPE_BOOL:
                             // according to https://www.w3.org/TR/xmlschema-2/#boolean, valid representations are "false", "true", "0" and "1"
                             if ('false' === $data || '0' === $data) {
@@ -603,11 +609,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return $data;
                 }
             } catch (NotNormalizableValueException $e) {
-                if (!$isUnionType) {
+                if (!$isUnionType && !$isNullable) {
                     throw $e;
                 }
             } catch (ExtraAttributesException $e) {
-                if (!$isUnionType) {
+                if (!$isUnionType && !$isNullable) {
                     throw $e;
                 }
 
@@ -615,7 +621,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     $extraAttributesException = $e;
                 }
             } catch (MissingConstructorArgumentsException $e) {
-                if (!$isUnionType) {
+                if (!$isUnionType && !$isNullable) {
                     throw $e;
                 }
 
@@ -625,12 +631,20 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
+        if ($isNullable) {
+            return null;
+        }
+
         if ($extraAttributesException) {
             throw $extraAttributesException;
         }
 
         if ($missingConstructorArgumentException) {
             throw $missingConstructorArgumentException;
+        }
+
+        if (!$isUnionType && $e) {
+            throw $e;
         }
 
         if ($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false) {

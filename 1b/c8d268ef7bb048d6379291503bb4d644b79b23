@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-20T08:58:18Z
+
+Looks like a bugfix to me, in this case 🎯 `6.3`, but let's wait for advice of @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-20T09:21:16Z
+
+This would need tests for sure. But I'm no expert in the Serializer component so I'd appreciate if someone more familiar with it could review.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-10-23T09:16:26Z
+
+I've added tests. I also discovered that `$builtinType` isn't reset in the for-loop in some cases. Which means a `Object|bool` type wouldn't hit this switch-case: https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L471 (The added tests also cover this).
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-10-23T10:18:13Z
+
+Another interesting failure scenario:
+
+```php
+// this fails
+$this->serializer->denormalize(['element' => '0'], Example::class, context: [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]);
+
+class Example {
+    public function __construct(public Args|int $element) {}
+}
+
+class Args {
+    public function __construct(public Uuid $nested, private string $test)
+}
+
+//  [Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException]
+//  Cannot create an instance of "App\Args" from serialized data because its constructor requires the following parameters to be present : "$nested", "$test".
+
+// whereas this returns an instance succesfully
+$this->serializer->denormalize(['element' => '0'], Test::class, context: [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]);
+
+class Test {
+    public function __construct(public Uuid|int $element)
+}
+```
+
+Because the first denormalization throws `MissingConstructorArgumentsException`, which goes before the return on `DISABLE_TYPE_ENFORCEMENT`.
+The second throws `NotNormalizableValueException`, but is caught and will return `0` because of `DISABLE_TYPE_ENFORCEMENT`.
+
+I'm not sure what the reasoning was here or if this is actually not intended.
+
+It could be fixed by adding `$hasTypeMismatch = $builtinType !== Type::BUILTIN_TYPE_OBJECT` here:
+https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L565. To establish that it did not throw for at least one of the `$types`.
+And the later using that to return before `MissingConstructorArgumentsException`. (Or always return before that exception when DISABLE_TYPE_ENFORCEMENT is true?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-20T14:38:22Z
+
+Let's resume this one? Is this a bugfix as it's documented in the PR description? If yes can you please target the lowest affected branch?
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-11-21T09:23:06Z
+
+Applied feedback and targeting `6.3`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-21T13:38:03Z
+
+Isn't 5.4 affected also?
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-11-21T14:01:41Z
+
+Eh yes, I was looking into the wrong part when checking that branch. Now based on 5.4.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-21T14:58:54Z
+
+Parse error on PHP 7.2 ;)
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-11-23T10:30:35Z
+
+Serializer tests are ok now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-24T11:58:04Z
+
+(rebase needed ;) )

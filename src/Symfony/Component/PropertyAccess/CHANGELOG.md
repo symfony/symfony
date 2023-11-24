@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+* Allow wildcard `[*]` usage for reading multiple values
+
 7.0
 ---
 

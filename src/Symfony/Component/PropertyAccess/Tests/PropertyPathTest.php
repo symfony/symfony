@@ -198,4 +198,16 @@ class PropertyPathTest extends TestCase
 
         $propertyPath->isIndex(-1);
     }
+
+    public function testIsWildcard(): void
+    {
+        $propertyPath = new PropertyPath('[*][parent][child].name');
+
+        $this->assertTrue($propertyPath->isWildcard(0));
+        $this->assertFalse($propertyPath->isIndex(0));
+
+        $this->assertFalse($propertyPath->isWildcard(1));
+        $this->assertFalse($propertyPath->isWildcard(2));
+        $this->assertFalse($propertyPath->isWildcard(3));
+    }
 }

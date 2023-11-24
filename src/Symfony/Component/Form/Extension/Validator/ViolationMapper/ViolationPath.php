@@ -161,6 +161,11 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
         return false;
     }
 
+    public function isWildcard(int $index): bool
+    {
+        return false;
+    }
+
     /**
      * Returns whether an element maps directly to a form.
      *

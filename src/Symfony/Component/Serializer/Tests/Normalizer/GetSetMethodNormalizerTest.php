@@ -798,7 +798,7 @@ interface GetSetMethodDummyInterface
 
 class GetSetMethodDiscriminatedDummyOne implements GetSetMethodDummyInterface
 {
-    private string $url = 'URL_ONE';
+    private $url = 'URL_ONE';
 
     public function getUrl(): string
     {
@@ -813,7 +813,7 @@ class GetSetMethodDiscriminatedDummyOne implements GetSetMethodDummyInterface
 
 class GetSetMethodDiscriminatedDummyTwo implements GetSetMethodDummyInterface
 {
-    private string $url = 'URL_TWO';
+    private $url = 'URL_TWO';
 
     public function getUrl(): string
     {

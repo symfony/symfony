@@ -35,15 +35,15 @@ class PropertyAccessorWildcardTest extends TestCase
                     'title' => 'chef',
                     'info' => [
                         'experience' => 6,
-                        'salary' => 34
-                    ]
+                        'salary' => 34,
+                    ],
                 ],
                 [
                     'title' => 'waiter',
                     'info' => [
                         'experience' => 3,
-                        'salary' => 30
-                    ]
+                        'salary' => 30,
+                    ],
                 ],
             ],
             'info' => [
@@ -60,20 +60,20 @@ class PropertyAccessorWildcardTest extends TestCase
                     'title' => 'chef',
                     'info' => [
                         'experience' => 3,
-                        'salary' => 31
-                    ]
+                        'salary' => 31,
+                    ],
                 ],
                 [
                     'title' => 'bartender',
                     'info' => [
                         'experience' => 6,
-                        'salary' => 30
-                    ]
+                        'salary' => 30,
+                    ],
                 ],
             ],
             'info' => [
                 'age' => 28,
-            ]
+            ],
         ],
     ];
 
@@ -81,27 +81,27 @@ class PropertyAccessorWildcardTest extends TestCase
     {
         yield [
             'path' => '[*][id]',
-            'expected' => [1, 2]
+            'expected' => [1, 2],
         ];
 
         yield [
             'path' => '[*][name]',
-            'expected' => ['John', 'Luke']
+            'expected' => ['John', 'Luke'],
         ];
 
         yield [
             'path' => '[*][languages]',
-            'expected' => ['EN', 'EN', 'FR']
+            'expected' => ['EN', 'EN', 'FR'],
         ];
 
         yield [
             'path' => '[*][info][age]',
-            'expected' => [32, 28]
+            'expected' => [32, 28],
         ];
 
         yield [
             'path' => '[0][jobs][*][title]',
-            'expected' => ['chef', 'waiter']
+            'expected' => ['chef', 'waiter'],
         ];
 
         yield [
@@ -109,27 +109,27 @@ class PropertyAccessorWildcardTest extends TestCase
             'expected' => [
                 ['experience' => 6, 'salary' => 34],
                 ['experience' => 3, 'salary' => 30],
-            ]
+            ],
         ];
 
         yield [
             'path' => '[0][jobs][*][info][experience]',
-            'expected' => [6, 3]
+            'expected' => [6, 3],
         ];
 
         yield [
             'path' => '[*][jobs][0][title]',
-            'expected' => ['chef', 'chef']
+            'expected' => ['chef', 'chef'],
         ];
 
         yield [
             'path' => '[*][jobs][*][title]',
-            'expected' => ['chef', 'waiter', 'chef', 'bartender']
+            'expected' => ['chef', 'waiter', 'chef', 'bartender'],
         ];
 
         yield [
             'path' => '[*][jobs][*][info][*]',
-            'expected' => [6, 34, 3, 30, 3, 31, 6, 30]
+            'expected' => [6, 34, 3, 30, 3, 31, 6, 30],
         ];
 
         yield [
@@ -139,17 +139,17 @@ class PropertyAccessorWildcardTest extends TestCase
                 ['experience' => 3, 'salary' => 30],
                 ['experience' => 3, 'salary' => 31],
                 ['experience' => 6, 'salary' => 30],
-            ]
+            ],
         ];
 
         yield [
             'path' => '[0][\*]',
-            'expected' => 'wildcard1'
+            'expected' => 'wildcard1',
         ];
 
         yield [
             'path' => '[*][\*]',
-            'expected' => ['wildcard1', 'wildcard2']
+            'expected' => ['wildcard1', 'wildcard2'],
         ];
     }
 

@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
+use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -157,12 +159,11 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     /**
      * @param ImportMapEntry[] $importMapEntries
      *
-     * @return array<string, array{content: string, dependencies: string[]}>
+     * @return array<string, array{content: string, dependencies: string[], extraFiles: array<string, string>}>
      */
     public function downloadPackages(array $importMapEntries, callable $progressCallback = null): array
     {
         $responses = [];
-
         foreach ($importMapEntries as $package => $entry) {
             if (!$entry->isRemotePackage()) {
                 throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
@@ -171,12 +172,13 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $pattern = ImportMapType::CSS === $entry->type ? self::URL_PATTERN_DIST_CSS : self::URL_PATTERN_DIST;
             $url = sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
 
-            $responses[$package] = $this->httpClient->request('GET', $url);
+            $responses[$package] = [$this->httpClient->request('GET', $url), $entry];
         }
 
         $errors = [];
         $contents = [];
-        foreach ($responses as $package => $response) {
+        $extraFileResponses = [];
+        foreach ($responses as $package => [$response, $entry]) {
             if (200 !== $response->getStatusCode()) {
                 $errors[] = [$package, $response];
                 continue;
@@ -187,10 +189,21 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             }
 
             $dependencies = [];
+            $extraFiles = [];
+            /* @var ImportMapEntry $entry */
             $contents[$package] = [
-                'content' => $this->makeImportsBare($response->getContent(), $dependencies),
+                'content' => $this->makeImportsBare($response->getContent(), $dependencies, $extraFiles, $entry->type, $entry->getPackagePathString()),
                 'dependencies' => $dependencies,
+                'extraFiles' => [],
             ];
+
+            if (0 !== \count($extraFiles)) {
+                $extraFileResponses[$package] = [];
+                foreach ($extraFiles as $extraFile) {
+                    $extraFileResponses[$package][] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_DIST_CSS, $entry->getPackageName(), $entry->version, $extraFile)), $extraFile, $entry->getPackageName(), $entry->version];
+                }
+            }
+
             if ($progressCallback) {
                 $progressCallback($package, 'finished', $response, \count($responses));
             }
@@ -203,6 +216,47 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $packages = implode('", "', array_column($errors, 0));
 
             throw new RuntimeException(sprintf('Error %d downloading packages from jsDelivr for "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+        }
+
+        $extraFileErrors = [];
+        download_extra_files:
+        $packageFileResponses = $extraFileResponses;
+        $extraFileResponses = [];
+        foreach ($packageFileResponses as $package => $responses) {
+            foreach ($responses as [$response, $extraFile, $packageName, $version]) {
+                if (200 !== $response->getStatusCode()) {
+                    $extraFileErrors[] = [$package, $response];
+                    continue;
+                }
+
+                $extraFiles = [];
+
+                $content = $response->getContent();
+                if (str_ends_with($extraFile, '.css')) {
+                    $content = $this->makeImportsBare($content, $dependencies, $extraFiles, ImportMapType::CSS, $extraFile);
+                }
+                $contents[$package]['extraFiles'][$extraFile] = $content;
+
+                if (0 !== \count($extraFiles)) {
+                    $extraFileResponses[$package] = [];
+                    foreach ($extraFiles as $newExtraFile) {
+                        $extraFileResponses[$package][] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_DIST_CSS, $packageName, $version, $newExtraFile)), $newExtraFile, $packageName, $version];
+                    }
+                }
+            }
+        }
+
+        if ($extraFileResponses) {
+            goto download_extra_files;
+        }
+
+        try {
+            ($extraFileErrors[0][1] ?? null)?->getHeaders();
+        } catch (HttpExceptionInterface $e) {
+            $response = $e->getResponse();
+            $packages = implode('", "', array_column($extraFileErrors, 0));
+
+            throw new RuntimeException(sprintf('Error %d downloading extra imported files from jsDelivr for "%s". Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
         return $contents;
@@ -237,20 +291,37 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
      *
      * Replaces those with normal import "package/name" statements.
      */
-    private function makeImportsBare(string $content, array &$dependencies): string
+    private function makeImportsBare(string $content, array &$dependencies, array &$extraFiles, ImportMapType $type, string $sourceFilePath): string
     {
-        $content = preg_replace_callback(self::IMPORT_REGEX, function ($matches) use (&$dependencies) {
-            $packageName = $matches[2].$matches[4]; // add the path if any
-            $dependencies[] = $packageName;
+        if (ImportMapType::JS === $type) {
+            $content = preg_replace_callback(self::IMPORT_REGEX, function ($matches) use (&$dependencies) {
+                $packageName = $matches[2].$matches[4]; // add the path if any
+                $dependencies[] = $packageName;
 
-            // replace the "/npm/package@version/+esm" with "package@version"
-            return str_replace($matches[1], sprintf('"%s"', $packageName), $matches[0]);
-        }, $content);
+                // replace the "/npm/package@version/+esm" with "package@version"
+                return str_replace($matches[1], sprintf('"%s"', $packageName), $matches[0]);
+            }, $content);
 
-        // source maps are not also downloaded - so remove the sourceMappingURL
-        // remove the final one only (in case sourceMappingURL is used in the code)
-        if (false !== $lastPos = strrpos($content, '//# sourceMappingURL=')) {
-            $content = substr($content, 0, $lastPos).preg_replace('{//# sourceMappingURL=.*$}m', '', substr($content, $lastPos));
+            // source maps are not also downloaded - so remove the sourceMappingURL
+            // remove the final one only (in case sourceMappingURL is used in the code)
+            if (false !== $lastPos = strrpos($content, '//# sourceMappingURL=')) {
+                $content = substr($content, 0, $lastPos).preg_replace('{//# sourceMappingURL=.*$}m', '', substr($content, $lastPos));
+            }
+
+            return $content;
+        }
+
+        preg_match_all(CssAssetUrlCompiler::ASSET_URL_PATTERN, $content, $matches);
+        foreach ($matches[1] as $path) {
+            if (str_starts_with($path, 'data:')) {
+                continue;
+            }
+
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                continue;
+            }
+
+            $extraFiles[] = Path::join(\dirname($sourceFilePath), $path);
         }
 
         return preg_replace('{/\*# sourceMappingURL=[^ ]*+ \*/}', '', $content);

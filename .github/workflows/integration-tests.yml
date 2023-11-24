@@ -48,6 +48,12 @@ jobs:
         image: redis:6.2.8
         ports:
           - 16379:6379
+      redis-authenticated:
+        image: redis:6.2.8
+        ports:
+          - 16380:6379
+        env:
+          REDIS_ARGS: "--requirepass p@ssword"
       redis-cluster:
         image: grokzen/redis-cluster:6.2.8
         ports:
@@ -172,6 +178,7 @@ jobs:
         run: ./phpunit --group integration -v
         env:
           REDIS_HOST: 'localhost:16379'
+          REDIS_AUTHENTICATED_HOST: 'localhost:16380'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
           REDIS_SENTINEL_HOSTS: 'localhost:26379 localhost:26379 localhost:26379'
           REDIS_SENTINEL_SERVICE: redis_sentinel

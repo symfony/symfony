@@ -899,6 +899,11 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                             ->example(['*/assets/build/*', '*/*_.scss'])
                         ->end()
+                        // boolean called  defaulting to true
+                        ->booleanNode('exclude_dotfiles')
+                            ->info('If true, any files starting with "." will be excluded from the asset mapper')
+                            ->defaultTrue()
+                        ->end()
                         ->booleanNode('server')
                             ->info('If true, a "dev server" will return the assets from the public directory (true in "debug" mode only by default)')
                             ->defaultValue($this->debug)

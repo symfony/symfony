@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-11-24T14:57:27Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "7.0".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-11-24T20:57:23Z
+
+What will be the behavior if someone uses an old version of Postgres?
+
+This should be mentioned in the changelog and the minimum database server versions needs to be documented.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-11-25T08:40:21Z
+
+> What will be the behavior if someone uses an old version of Postgres?
+
+The adapter will use an SQL syntax the server won't understand. That's a hard exception.
+
+> This should be mentioned in the changelog and the minimum database server versions needs to be documented.
+
+I'll update the change log and open a PR for the docs.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-11-25T16:32:51Z
+
+I've opened symfony/symfony-docs#19187 for the docs.

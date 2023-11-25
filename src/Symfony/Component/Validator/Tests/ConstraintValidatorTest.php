@@ -21,14 +21,14 @@ class ConstraintValidatorTest extends TestCase
     /**
      * @dataProvider formatValueProvider
      */
-    public function testFormatValue($expected, $value, $format = 0)
+    public function testFormatValue(string $expected, mixed $value, int $format = 0)
     {
         \Locale::setDefault('en');
 
         $this->assertSame($expected, (new TestFormatValueConstraintValidator())->formatValueProxy($value, $format));
     }
 
-    public static function formatValueProvider()
+    public static function formatValueProvider(): array
     {
         $defaultTimezone = date_default_timezone_get();
         date_default_timezone_set('Europe/Moscow'); // GMT+3

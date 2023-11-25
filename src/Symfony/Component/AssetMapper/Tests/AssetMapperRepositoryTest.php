@@ -162,4 +162,24 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertNull($repository->find('file3.css'));
         $this->assertNull($repository->findLogicalPath(__DIR__.'/Fixtures/dir2/file3.css'));
     }
+
+    public function testDotFilesExcluded()
+    {
+        $repository = new AssetMapperRepository([
+            'dot_file' => '',
+        ], __DIR__.'/Fixtures', [], true);
+
+        $actualAssets = array_keys($repository->all());
+        $this->assertEquals([], $actualAssets);
+    }
+
+    public function testDotFilesNotExcluded()
+    {
+        $repository = new AssetMapperRepository([
+            'dot_file' => '',
+        ], __DIR__.'/Fixtures', [], false);
+
+        $actualAssets = array_keys($repository->all());
+        $this->assertEquals(['.dotfile'], $actualAssets);
+    }
 }

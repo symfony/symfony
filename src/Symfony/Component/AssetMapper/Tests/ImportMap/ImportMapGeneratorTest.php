@@ -671,6 +671,25 @@ class ImportMapGeneratorTest extends TestCase
             ['/assets/imports_simple.js', '/assets/simple.js'],
             [$simpleAsset, $importsSimpleAsset],
         ];
+
+        $importsSimpleAsset2 = new MappedAsset(
+            'imports_simple2.js',
+            '/path/to/imports_simple2.js',
+            publicPathWithoutDigest: '/assets/imports_simple2.js',
+            javaScriptImports: [new JavaScriptImport('/assets/simple.js', assetLogicalPath: $simpleAsset->logicalPath, assetSourcePath: $simpleAsset->sourcePath, isLazy: false)]
+        );
+        yield 'an entry recursive dependencies are deduplicated' => [
+            new MappedAsset(
+                'app.js',
+                publicPath: '/assets/app.js',
+                javaScriptImports: [
+                    new JavaScriptImport('/assets/imports_simple.js', assetLogicalPath: $importsSimpleAsset->logicalPath, assetSourcePath: $importsSimpleAsset->sourcePath, isLazy: false),
+                    new JavaScriptImport('/assets/imports_simple2.js', assetLogicalPath: $importsSimpleAsset2->logicalPath, assetSourcePath: $importsSimpleAsset2->sourcePath, isLazy: false),
+                ]
+            ),
+            ['/assets/imports_simple.js', '/assets/imports_simple2.js', '/assets/simple.js'],
+            [$simpleAsset, $importsSimpleAsset, $importsSimpleAsset2],
+        ];
     }
 
     public function testFindEagerEntrypointImportsUsesCacheFile()

@@ -44,12 +44,12 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         ], $options);
     }
 
-    public function createLoginLink(UserInterface $user, Request $request = null, int $lifetime = null): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, Request $request = null, int $lifetime = null, array $parameters = []): LoginLinkDetails
     {
         $expires = time() + ($lifetime ?: $this->options['lifetime']);
         $expiresAt = new \DateTimeImmutable('@'.$expires);
 
-        $parameters = [
+        $parameters += [
             'user' => $user->getUserIdentifier(),
             'expires' => $expires,
             'hash' => $this->signatureHasher->computeSignatureHash($user, $expires),

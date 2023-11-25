@@ -43,12 +43,14 @@ class TemplatedEmailTest extends TestCase
             ->textTemplate('text.txt.twig')
             ->htmlTemplate('text.html.twig')
             ->context($context = ['a' => 'b'])
+            ->locale($locale = 'fr_FR')
         ;
 
         $email = unserialize(serialize($email));
         $this->assertEquals('text.txt.twig', $email->getTextTemplate());
         $this->assertEquals('text.html.twig', $email->getHtmlTemplate());
         $this->assertEquals($context, $email->getContext());
+        $this->assertEquals($locale, $email->getLocale());
     }
 
     public function testSymfonySerialize()

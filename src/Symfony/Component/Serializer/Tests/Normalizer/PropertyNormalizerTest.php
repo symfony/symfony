@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -499,7 +499,7 @@ class PropertyNormalizerTest extends TestCase
 
     public function testNormalizeWithDiscriminator()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
         $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
 
@@ -508,7 +508,7 @@ class PropertyNormalizerTest extends TestCase
 
     public function testDenormalizeWithDiscriminator()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
         $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
 
@@ -621,12 +621,10 @@ class RootDummy
     }
 }
 
-/**
- * @DiscriminatorMap(typeProperty="type", mapping={
- *     "one" = PropertyDiscriminatedDummyOne::class,
- *     "two" = PropertyDiscriminatedDummyTwo::class,
- * })
- */
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'one' => PropertyDiscriminatedDummyOne::class,
+    'two' => PropertyDiscriminatedDummyTwo::class,
+])]
 interface PropertyDummyInterface
 {
 }

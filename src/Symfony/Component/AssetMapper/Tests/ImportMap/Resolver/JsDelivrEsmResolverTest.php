@@ -268,7 +268,7 @@ class JsDelivrEsmResolverTest extends TestCase
     /**
      * @dataProvider provideDownloadPackagesTests
      */
-    public function testDownloadPackages(array $importMapEntries, array $expectedRequests, array $expectedReturn, array $expectedDependencies = [])
+    public function testDownloadPackages(array $importMapEntries, array $expectedRequests, array $expectedReturn)
     {
         $responses = [];
         foreach ($expectedRequests as $expectedRequest) {
@@ -305,7 +305,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'lodash contents', 'dependencies' => []],
+                'lodash' => ['content' => 'lodash contents', 'dependencies' => [], 'extraFiles' => []],
             ],
         ];
 
@@ -318,7 +318,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'lodash contents', 'dependencies' => []],
+                'lodash' => ['content' => 'lodash contents', 'dependencies' => [], 'extraFiles' => []],
             ],
         ];
 
@@ -331,7 +331,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'chart.js contents', 'dependencies' => []],
+                'lodash' => ['content' => 'chart.js contents', 'dependencies' => [], 'extraFiles' => []],
             ],
         ];
 
@@ -344,7 +344,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'bootstrap.css contents', 'dependencies' => []],
+                'lodash' => ['content' => 'bootstrap.css contents', 'dependencies' => [], 'extraFiles' => []],
             ],
         ];
 
@@ -369,9 +369,9 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'lodash contents', 'dependencies' => []],
-                'chart.js/auto' => ['content' => 'chart.js contents', 'dependencies' => []],
-                'bootstrap/dist/bootstrap.css' => ['content' => 'bootstrap.css contents', 'dependencies' => []],
+                'lodash' => ['content' => 'lodash contents', 'dependencies' => [], 'extraFiles' => []],
+                'chart.js/auto' => ['content' => 'chart.js contents', 'dependencies' => [], 'extraFiles' => []],
+                'bootstrap/dist/bootstrap.css' => ['content' => 'bootstrap.css contents', 'dependencies' => [], 'extraFiles' => []],
             ],
         ];
 
@@ -389,6 +389,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 '@chart.js/auto' => [
                     'content' => 'import{Color as t}from"@kurkle/color";function e(){}const i=(()=',
                     'dependencies' => ['@kurkle/color'],
+                    'extraFiles' => [],
                 ],
             ],
         ];
@@ -407,6 +408,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 'twig' => [
                     'content' => 'import e from"locutus/php/strings/sprintf";console.log()',
                     'dependencies' => ['locutus/php/strings/sprintf'],
+                    'extraFiles' => [],
                 ],
             ],
         ];
@@ -426,6 +428,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 '@chart.js/auto' => [
                     'content' => 'as Ticks,ta as TimeScale,ia as TimeSeriesScale,oo as Title,wo as Tooltip,Ci as _adapters,us as _detectPlatform,Ye as animator,Si as controllers,tn as default,St as defaults,Pn as elements,qi as layouts,ko as plugins,na as registerables,Ps as registry,sa as scales};',
                     'dependencies' => [],
+                    'extraFiles' => [],
                 ],
             ],
         ];
@@ -449,6 +452,7 @@ EOF
 const je="\n//# sourceURL=",Ue="\n//# sourceMappingURL=",Me=/^(text|application)\/(x-)?javascript(;|$)/,_e=/^(application)\/wasm(;|$)/,Ie=/^(text|application)\/json(;|$)/,Re=/^(text|application)\/css(;|$)/,Te=/url\(\s*(?:(["'])((?:\\.|[^\n\\"'])+)\1|((?:\\.|[^\s,"'()\\])+))\s*\)/g;export{t as default};
 EOF,
                     'dependencies' => [],
+                    'extraFiles' => [],
                 ],
             ],
         ];
@@ -466,9 +470,118 @@ EOF,
                 'lodash' => [
                     'content' => 'print-table-row{display:table-row!important}.d-print-table-cell{display:table-cell!important}.d-print-flex{display:flex!important}.d-print-inline-flex{display:inline-flex!important}.d-print-none{display:none!important}}',
                     'dependencies' => [],
+                    'extraFiles' => [],
                 ],
             ],
         ];
+    }
+
+    public function testDownloadCssFileWithUrlReferences()
+    {
+        $expectedRequests = [
+            [
+                'url' => '/npm/bootstrap-icons@1.1.1/font/bootstrap-icons.min.css',
+                'body' => <<<EOF
+                @font-face{font-display:block;font-family:bootstrap-icons;src:
+                    url("fonts/bootstrap-icons.woff2?2820a3852bdb9a5832199cc61cec4e65") format("woff2"),
+                    url("fonts/bootstrap-icons.woff?2820a3852bdb9a5832199cc61cec4e65") format("woff")},
+                    url("./fonts/bootstrap-icons.woff-fake-dot-slash") format("woff-fake-dot-slash"),
+                    url("../fonts/bootstrap-icons.woff-fake-dot-dot-slash") format("woff-fake-dot-dot-slash"),
+                    url("data:will-be-ignored") format("woff-fake-data-format"),
+                    url("data:https://example.com/will-be-ignored") format("woff-fake-absolute-url"),
+                    .bi::before,[class*=" bi-"]::before,[class^=bi-]::before{display:inline-block;font-family:bootstrap-icons!important;font-style:normal;font-weight:400!important;font-variant:normal;text-transform:none;
+                EOF
+                ,
+            ],
+            [
+                'url' => '/npm/bootstrap-icons@1.1.1/font/fonts/bootstrap-icons.woff2',
+                'body' => 'woff2 font contents',
+            ],
+            [
+                'url' => '/npm/bootstrap-icons@1.1.1/font/fonts/bootstrap-icons.woff',
+                'body' => 'woff font contents',
+            ],
+            [
+                'url' => '/npm/bootstrap-icons@1.1.1/font/fonts/bootstrap-icons.woff-fake-dot-slash',
+                'body' => 'woff font fake dot slash contents',
+            ],
+            [
+                'url' => '/npm/bootstrap-icons@1.1.1/fonts/bootstrap-icons.woff-fake-dot-dot-slash',
+                'body' => 'woff font fake dot dot slash contents',
+            ],
+        ];
+        $responses = [];
+        foreach ($expectedRequests as $expectedRequest) {
+            $responses[] = function ($method, $url) use ($expectedRequest) {
+                $this->assertSame('GET', $method);
+                $this->assertStringEndsWith($expectedRequest['url'], $url);
+
+                return new MockResponse($expectedRequest['body']);
+            };
+        }
+
+        $httpClient = new MockHttpClient($responses);
+
+        $provider = new JsDelivrEsmResolver($httpClient);
+        $actualReturn = $provider->downloadPackages([
+            'bootstrap-icons/font/bootstrap-icons.min.css' => self::createRemoteEntry('bootstrap-icons/font/bootstrap-icons.min.css', version: '1.1.1', type: ImportMapType::CSS),
+        ]);
+        $this->assertSame(\count($responses), $httpClient->getRequestsCount());
+
+        $packageData = $actualReturn['bootstrap-icons/font/bootstrap-icons.min.css'];
+        $extraFiles = $packageData['extraFiles'];
+        $this->assertCount(4, $extraFiles);
+
+        $this->assertSame($extraFiles, [
+            '/font/fonts/bootstrap-icons.woff2' => 'woff2 font contents',
+            '/font/fonts/bootstrap-icons.woff' => 'woff font contents',
+            '/font/fonts/bootstrap-icons.woff-fake-dot-slash' => 'woff font fake dot slash contents',
+            '/fonts/bootstrap-icons.woff-fake-dot-dot-slash' => 'woff font fake dot dot slash contents',
+        ]);
+    }
+
+    public function testDownloadCssRecursivelyDownloadsUrlCss()
+    {
+        $expectedRequests = [
+            [
+                'url' => '/npm/bootstrap-icons@1.1.1/font/bootstrap-icons.min.css',
+                'body' => '@import url("../other.css");',
+            ],
+            [
+                'url' => '/npm/bootstrap-icons@1.1.1/other.css',
+                'body' => '@font-face{font-display:block;font-family:bootstrap-icons;src:url("fonts/bootstrap-icons.woff2?2820a3852bdb9a5832199cc61cec4e65") format("woff2"),',
+            ],
+            [
+                'url' => '/npm/bootstrap-icons@1.1.1/fonts/bootstrap-icons.woff2',
+                'body' => 'woff2 font contents',
+            ],
+        ];
+        $responses = [];
+        foreach ($expectedRequests as $expectedRequest) {
+            $responses[] = function ($method, $url) use ($expectedRequest) {
+                $this->assertSame('GET', $method);
+                $this->assertStringEndsWith($expectedRequest['url'], $url);
+
+                return new MockResponse($expectedRequest['body']);
+            };
+        }
+
+        $httpClient = new MockHttpClient($responses);
+
+        $provider = new JsDelivrEsmResolver($httpClient);
+        $actualReturn = $provider->downloadPackages([
+            'bootstrap-icons/font/bootstrap-icons.min.css' => self::createRemoteEntry('bootstrap-icons/font/bootstrap-icons.min.css', version: '1.1.1', type: ImportMapType::CSS),
+        ]);
+        $this->assertSame(\count($responses), $httpClient->getRequestsCount());
+
+        $packageData = $actualReturn['bootstrap-icons/font/bootstrap-icons.min.css'];
+        $extraFiles = $packageData['extraFiles'];
+        $this->assertCount(2, $extraFiles);
+
+        $this->assertSame($extraFiles, [
+            '/other.css' => '@font-face{font-display:block;font-family:bootstrap-icons;src:url("fonts/bootstrap-icons.woff2?2820a3852bdb9a5832199cc61cec4e65") format("woff2"),',
+            '/fonts/bootstrap-icons.woff2' => 'woff2 font contents',
+        ]);
     }
 
     /**

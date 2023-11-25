@@ -64,7 +64,7 @@ final class ImportMapInstallCommand extends Command
         }
 
         $io->success(sprintf(
-            'Downloaded %d asset%s into %s.',
+            'Downloaded %d package%s into %s.',
             \count($downloadedPackages),
             1 === \count($downloadedPackages) ? '' : 's',
             str_replace($this->projectDir.'/', '', $this->packageDownloader->getVendorDir()),

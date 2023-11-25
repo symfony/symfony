@@ -74,6 +74,10 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
      */
     private function supports(string $class): bool
     {
+        if ($this->classDiscriminatorResolver?->getMappingForClass($class)) {
+            return true;
+        }
+
         $class = new \ReflectionClass($class);
 
         // We look for at least one non-static property

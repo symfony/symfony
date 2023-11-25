@@ -137,6 +137,7 @@ class ConfigurationTest extends TestCase
             'importmap_polyfill' => 'es-module-shims',
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
             'importmap_script_attributes' => [],
+            'exclude_dotfiles' => true,
         ];
 
         $this->assertEquals($defaultConfig, $config['asset_mapper']);
@@ -671,6 +672,7 @@ class ConfigurationTest extends TestCase
                 'importmap_polyfill' => 'es-module-shims',
                 'vendor_dir' => '%kernel.project_dir%/assets/vendor',
                 'importmap_script_attributes' => [],
+                'exclude_dotfiles' => true,
             ],
             'cache' => [
                 'pools' => [],

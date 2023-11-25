@@ -217,25 +217,36 @@ class ImportMapGenerator
         return $this->assetMapper->getAssetFromSourcePath($this->importMapConfigReader->convertPathToFilesystemPath($path));
     }
 
+    /**
+     * Finds recursively all the non-lazy modules imported by an asset.
+     *
+     * @return array<string> The array of deduplicated import names
+     */
     private function findEagerImports(MappedAsset $asset): array
     {
         $dependencies = [];
-        foreach ($asset->getJavaScriptImports() as $javaScriptImport) {
-            if ($javaScriptImport->isLazy) {
-                continue;
-            }
+        $queue = [$asset];
 
-            $dependencies[] = $javaScriptImport->importName;
+        while ($asset = array_shift($queue)) {
+            foreach ($asset->getJavaScriptImports() as $javaScriptImport) {
+                if ($javaScriptImport->isLazy) {
+                    continue;
+                }
+                if (isset($dependencies[$javaScriptImport->importName])) {
+                    continue;
+                }
+                $dependencies[$javaScriptImport->importName] = true;
 
-            // Follow its imports!
-            if (!$nextAsset = $this->assetMapper->getAsset($javaScriptImport->assetLogicalPath)) {
-                // should not happen at this point, unless something added a bogus JavaScriptImport to this asset
-                throw new LogicException(sprintf('Cannot find imported JavaScript asset "%s" in asset mapper.', $javaScriptImport->assetLogicalPath));
+                // Follow its imports!
+                if (!$javaScriptAsset = $this->assetMapper->getAsset($javaScriptImport->assetLogicalPath)) {
+                    // should not happen at this point, unless something added a bogus JavaScriptImport to this asset
+                    throw new LogicException(sprintf('Cannot find JavaScript asset "%s" (imported in "%s") in asset mapper.', $javaScriptImport->assetLogicalPath, $asset->logicalPath));
+                }
+                $queue[] = $javaScriptAsset;
             }
-            $dependencies = array_merge($dependencies, $this->findEagerImports($nextAsset));
         }
 
-        return $dependencies;
+        return array_keys($dependencies);
     }
 
     private function createMissingImportMapAssetException(ImportMapEntry $entry): \InvalidArgumentException

@@ -101,9 +101,9 @@ trait RedisTrait
         $params = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
             if (isset($m['password'])) {
                 if (\in_array($m['user'], ['', 'default'], true)) {
-                    $auth = $m['password'];
+                    $auth = rawurldecode($m['password']);
                 } else {
-                    $auth = [$m['user'], $m['password']];
+                    $auth = [rawurldecode($m['user']), rawurldecode($m['password'])];
                 }
 
                 if ('' === $auth) {

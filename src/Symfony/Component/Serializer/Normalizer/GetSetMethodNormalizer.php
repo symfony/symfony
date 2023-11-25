@@ -58,6 +58,10 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
      */
     private function supports(string $class): bool
     {
+        if ($this->classDiscriminatorResolver?->getMappingForClass($class)) {
+            return true;
+        }
+
         $class = new \ReflectionClass($class);
         $methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $method) {

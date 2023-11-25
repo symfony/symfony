@@ -63,10 +63,10 @@ class RemotePackageDownloaderTest extends TestCase
                 $progressCallback
             )
             ->willReturn([
-                'foo' => ['content' => 'foo content', 'dependencies' => []],
-                'bar.js/file' => ['content' => 'bar content', 'dependencies' => []],
-                'baz' => ['content' => 'baz content', 'dependencies' => ['foo']],
-                'different_specifier' => ['content' => 'different content', 'dependencies' => []],
+                'foo' => ['content' => 'foo content', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff' => 'extra file contents']],
+                'bar.js/file' => ['content' => 'bar content', 'dependencies' => [], 'extraFiles' => []],
+                'baz' => ['content' => 'baz content', 'dependencies' => ['foo'], 'extraFiles' => []],
+                'different_specifier' => ['content' => 'different content', 'dependencies' => [], 'extraFiles' => []],
             ]);
 
         $downloader = new RemotePackageDownloader(
@@ -80,6 +80,8 @@ class RemotePackageDownloaderTest extends TestCase
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/bar.js/file.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/baz/baz.index.css');
         $this->assertEquals('foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
+        $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo/path/to/extra-file.woff');
+        $this->assertEquals('extra file contents', file_get_contents(self::$writableRoot.'/assets/vendor/foo/path/to/extra-file.woff'));
         $this->assertEquals('bar content', file_get_contents(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
         $this->assertEquals('baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
         $this->assertEquals('different content', file_get_contents(self::$writableRoot.'/assets/vendor/custom_specifier/custom_specifier.index.js'));
@@ -87,10 +89,10 @@ class RemotePackageDownloaderTest extends TestCase
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';
         $this->assertEquals(
             [
-                'foo' => ['version' => '1.0.0', 'dependencies' => []],
-                'bar.js/file' => ['version' => '1.0.0', 'dependencies' => []],
-                'baz' => ['version' => '1.0.0', 'dependencies' => ['foo']],
-                'different_specifier' => ['version' => '1.0.0', 'dependencies' => []],
+                'foo' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff']],
+                'bar.js/file' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
+                'baz' => ['version' => '1.0.0', 'dependencies' => ['foo'], 'extraFiles' => []],
+                'different_specifier' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
             ],
             $installed
         );
@@ -100,9 +102,9 @@ class RemotePackageDownloaderTest extends TestCase
     {
         $this->filesystem->mkdir(self::$writableRoot.'/assets/vendor');
         $installed = [
-            'foo' => ['version' => '1.0.0', 'dependencies' => []],
-            'bar.js/file' => ['version' => '1.0.0', 'dependencies' => []],
-            'baz' => ['version' => '1.0.0', 'dependencies' => []],
+            'foo' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
+            'bar.js/file' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
+            'baz' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
         ];
         file_put_contents(
             self::$writableRoot.'/assets/vendor/installed.php',
@@ -122,7 +124,9 @@ class RemotePackageDownloaderTest extends TestCase
         $entry3 = ImportMapEntry::createRemote('baz', ImportMapType::CSS, path: '/any', version: '1.1.0', packageModuleSpecifier: 'baz', isEntrypoint: false);
         @mkdir(self::$writableRoot.'/assets/vendor/baz', 0777, true);
         file_put_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css', 'original baz content');
-        $importMapEntries = new ImportMapEntries([$entry1, $entry2, $entry3]);
+        // matches installed & file exists, but has missing extra file
+        $entry4 = ImportMapEntry::createRemote('has-missing-extra', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'has-missing-extra', isEntrypoint: false);
+        $importMapEntries = new ImportMapEntries([$entry1, $entry2, $entry3, $entry4]);
 
         $configReader->expects($this->once())
             ->method('getEntries')
@@ -131,8 +135,9 @@ class RemotePackageDownloaderTest extends TestCase
         $packageResolver->expects($this->once())
             ->method('downloadPackages')
             ->willReturn([
-                'bar.js/file' => ['content' => 'new bar content', 'dependencies' => []],
-                'baz' => ['content' => 'new baz content', 'dependencies' => []],
+                'bar.js/file' => ['content' => 'new bar content', 'dependencies' => [], 'extraFiles' => []],
+                'baz' => ['content' => 'new baz content', 'dependencies' => [], 'extraFiles' => []],
+                'has-missing-extra' => ['content' => 'new content', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff' => 'extra file contents']],
             ]);
 
         $downloader = new RemotePackageDownloader(
@@ -148,13 +153,15 @@ class RemotePackageDownloaderTest extends TestCase
         $this->assertEquals('original foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
         $this->assertEquals('new bar content', file_get_contents(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
         $this->assertEquals('new baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
+        $this->assertFileExists(self::$writableRoot.'/assets/vendor/has-missing-extra/has-missing-extra.index.js');
 
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';
         $this->assertEquals(
             [
-                'foo' => ['version' => '1.0.0', 'dependencies' => []],
-                'bar.js/file' => ['version' => '1.0.0', 'dependencies' => []],
-                'baz' => ['version' => '1.1.0', 'dependencies' => []],
+                'foo' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
+                'bar.js/file' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
+                'baz' => ['version' => '1.1.0', 'dependencies' => [], 'extraFiles' => []],
+                'has-missing-extra' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff']],
             ],
             $installed
         );

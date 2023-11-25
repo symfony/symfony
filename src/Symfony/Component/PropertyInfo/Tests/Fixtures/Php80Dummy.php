@@ -17,9 +17,23 @@ class Php80Dummy
 
     /**
      * @param string $promotedAndMutated
+     * @param string $promotedWithDocComment
+     * @param string $promotedWithDocCommentAndType
      * @param array<string> $collection
      */
-    public function __construct(private mixed $promoted, private mixed $promotedAndMutated, private array $collection)
+    public function __construct(
+        private mixed $promoted,
+        private mixed $promotedAndMutated,
+        /**
+         * Comment without @var.
+         */
+        private mixed $promotedWithDocComment,
+        /**
+         * @var int
+         */
+        private mixed $promotedWithDocCommentAndType,
+        private array $collection,
+    )
     {
     }
 

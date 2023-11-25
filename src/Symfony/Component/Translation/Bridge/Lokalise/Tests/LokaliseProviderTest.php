@@ -560,7 +560,6 @@ class LokaliseProviderTest extends ProviderTestCase
             $expectedBody = json_encode([
                 'format' => 'symfony_xliff',
                 'original_filenames' => true,
-                'directory_prefix' => '%LANG_ISO%',
                 'filter_langs' => [$locale],
                 'filter_filenames' => [$domain.'.xliff'],
                 'export_empty_as' => 'skip',
@@ -582,15 +581,10 @@ class LokaliseProviderTest extends ProviderTestCase
             ]));
         };
 
-        $loader = $this->getLoader();
-        $loader->expects($this->once())
-            ->method('load')
-            ->willReturn((new XliffFileLoader())->load($responseContent, $locale, $domain));
-
         $provider = self::createProvider((new MockHttpClient($response))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
         $translatorBag = $provider->read([$domain], [$locale]);
 
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
@@ -760,6 +754,36 @@ class LokaliseProviderTest extends ProviderTestCase
 XLIFF
             ,
             $expectedTranslatorBagEn,
+        ];
+
+        $expectedTranslatorBagEnUS = new TranslatorBag();
+        $expectedTranslatorBagEnUS->addCatalogue($arrayLoader->load([
+            'index.hello' => 'Hello',
+            'index.greetings' => 'Welcome, {firstname}!',
+        ], 'en_US'));
+
+        yield ['en_US', 'messages', <<<'XLIFF'
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en-US">
+    <header>
+      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+    </header>
+    <body>
+      <trans-unit id="index.greetings" resname="index.greetings">
+        <source>index.greetings</source>
+        <target>Welcome, {firstname}!</target>
+      </trans-unit>
+      <trans-unit id="index.hello" resname="index.hello">
+        <source>index.hello</source>
+        <target>Hello</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+XLIFF
+            ,
+            $expectedTranslatorBagEnUS,
         ];
 
         $expectedTranslatorBagFr = new TranslatorBag();

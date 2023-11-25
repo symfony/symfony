@@ -194,8 +194,6 @@ jobs:
           echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} 'cd {} && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
 
           # get a list of the patched components (relies on .github/build-packages.php being called in the previous step)
-          (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
-          (cd src/Symfony/Component/Lock; mv composer.bak composer.json)
           PATCHED_COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
           # for 6.4 LTS, checkout and test previous major with the patched components (only for patched components)

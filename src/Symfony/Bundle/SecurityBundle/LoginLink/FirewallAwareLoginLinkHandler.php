@@ -38,9 +38,14 @@ class FirewallAwareLoginLinkHandler implements LoginLinkHandlerInterface
         $this->requestStack = $requestStack;
     }
 
-    public function createLoginLink(UserInterface $user, ?Request $request = null, ?int $lifetime = null): LoginLinkDetails
+    /**
+     * @param array<string, \Stringable|scalar> $parameters A list of additional query string parameters that should be part of the login link URL
+     */
+    public function createLoginLink(UserInterface $user, ?Request $request = null, ?int $lifetime = null/* , array $parameters = [] */): LoginLinkDetails
     {
-        return $this->getForFirewall()->createLoginLink($user, $request, $lifetime);
+        $parameters = 3 < \func_num_args() ? func_get_arg(3) : [];
+
+        return $this->getForFirewall()->createLoginLink($user, $request, $lifetime, $parameters);
     }
 
     public function consumeLoginLink(Request $request): UserInterface

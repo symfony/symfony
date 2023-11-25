@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow using wildcards as placeholders in the keys of the `RoleHierarchy` map
+ * Add argument `$parameters` to `SignatureHasher::computeSignatureHash()`, `acceptSignatureHash()` and `verifySignatureHash()`
 
 8.1
 ---

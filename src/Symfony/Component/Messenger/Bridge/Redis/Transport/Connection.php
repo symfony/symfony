@@ -294,10 +294,10 @@ class Connection
         $url = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
             if (isset($m['password'])) {
                 if (!\in_array($m['user'], ['', 'default'], true)) {
-                    $auth['user'] = $m['user'];
+                    $auth['user'] = rawurldecode($m['user']);
                 }
 
-                $auth['pass'] = $m['password'];
+                $auth['pass'] = rawurldecode($m['password']);
             }
 
             return 'file:'.($m[1] ?? '');

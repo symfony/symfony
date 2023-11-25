@@ -37,7 +37,7 @@ interface PackageResolverInterface
      *
      * @param array<string, ImportMapEntry> $importMapEntries
      *
-     * @return array<string, array{content: string, dependencies: string[]}>
+     * @return array<string, array{content: string, dependencies: string[], extraFiles: array<string, string>}>
      */
     public function downloadPackages(array $importMapEntries, callable $progressCallback = null): array;
 }

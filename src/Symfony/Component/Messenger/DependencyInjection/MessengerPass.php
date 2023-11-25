@@ -100,6 +100,7 @@ class MessengerPass implements CompilerPassInterface
                     unset($options['handles']);
                     $priority = $options['priority'] ?? 0;
                     $method = $options['method'] ?? '__invoke';
+                    $fromTransport = $options['from_transport'] ?? '';
 
                     if (isset($options['bus'])) {
                         if (!\in_array($options['bus'], $busIds)) {
@@ -121,10 +122,10 @@ class MessengerPass implements CompilerPassInterface
                         throw new RuntimeException(sprintf('Invalid handler service "%s": method "%s::%s()" does not exist.', $serviceId, $r->getName(), $method));
                     }
 
-                    if ('__invoke' !== $method) {
+                    if ('__invoke' !== $method || '' !== $fromTransport) {
                         $wrapperDefinition = (new Definition('Closure'))->addArgument([new Reference($serviceId), $method])->setFactory('Closure::fromCallable');
 
-                        $definitions[$definitionId = '.messenger.method_on_object_wrapper.'.ContainerBuilder::hash($message.':'.$priority.':'.$serviceId.':'.$method)] = $wrapperDefinition;
+                        $definitions[$definitionId = '.messenger.method_on_object_wrapper.'.ContainerBuilder::hash($message.':'.$priority.':'.$serviceId.':'.$method.':'.$fromTransport)] = $wrapperDefinition;
                     } else {
                         $definitionId = $serviceId;
                     }

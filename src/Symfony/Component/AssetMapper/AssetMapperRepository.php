@@ -33,6 +33,7 @@ class AssetMapperRepository
         private readonly array $paths,
         private readonly string $projectRootDir,
         private readonly array $excludedPathPatterns = [],
+        private readonly bool $excludeDotFiles = true,
     ) {
     }
 
@@ -183,6 +184,10 @@ class AssetMapperRepository
             if (preg_match($pattern, $filesystemPath)) {
                 return true;
             }
+        }
+
+        if ($this->excludeDotFiles && str_starts_with(basename($filesystemPath), '.')) {
+            return true;
         }
 
         return false;

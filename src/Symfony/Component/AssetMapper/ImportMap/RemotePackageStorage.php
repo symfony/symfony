@@ -34,6 +34,15 @@ class RemotePackageStorage
         return is_file($this->getDownloadPath($entry->packageModuleSpecifier, $entry->type));
     }
 
+    public function isExtraFileDownloaded(ImportMapEntry $entry, string $extraFilename): bool
+    {
+        if (!$entry->isRemotePackage()) {
+            throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
+        }
+
+        return is_file($this->getExtraFileDownloadPath($entry, $extraFilename));
+    }
+
     public function save(ImportMapEntry $entry, string $contents): void
     {
         if (!$entry->isRemotePackage()) {
@@ -41,6 +50,18 @@ class RemotePackageStorage
         }
 
         $vendorPath = $this->getDownloadPath($entry->packageModuleSpecifier, $entry->type);
+
+        @mkdir(\dirname($vendorPath), 0777, true);
+        file_put_contents($vendorPath, $contents);
+    }
+
+    public function saveExtraFile(ImportMapEntry $entry, string $extraFilename, string $contents): void
+    {
+        if (!$entry->isRemotePackage()) {
+            throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
+        }
+
+        $vendorPath = $this->getExtraFileDownloadPath($entry, $extraFilename);
 
         @mkdir(\dirname($vendorPath), 0777, true);
         file_put_contents($vendorPath, $contents);
@@ -67,5 +88,10 @@ class RemotePackageStorage
         }
 
         return $this->vendorDir.'/'.$filename;
+    }
+
+    private function getExtraFileDownloadPath(ImportMapEntry $entry, string $extraFilename): string
+    {
+        return $this->vendorDir.'/'.$entry->getPackageName().'/'.ltrim($extraFilename, '/');
     }
 }

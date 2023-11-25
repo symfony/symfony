@@ -52,6 +52,7 @@ class RemotePackageDownloader
                 isset($installed[$entry->importName])
                 && $installed[$entry->importName]['version'] === $entry->version
                 && $this->remotePackageStorage->isDownloaded($entry)
+                && $this->areAllExtraFilesDownloaded($entry, $installed[$entry->importName]['extraFiles'])
             ) {
                 $newInstalled[$entry->importName] = $installed[$entry->importName];
                 continue;
@@ -72,9 +73,14 @@ class RemotePackageDownloader
             }
 
             $this->remotePackageStorage->save($entry, $contents[$package]['content']);
+            foreach ($contents[$package]['extraFiles'] as $extraFilename => $extraFileContents) {
+                $this->remotePackageStorage->saveExtraFile($entry, $extraFilename, $extraFileContents);
+            }
+
             $newInstalled[$package] = [
                 'version' => $entry->version,
                 'dependencies' => $contents[$package]['dependencies'] ?? [],
+                'extraFiles' => array_keys($contents[$package]['extraFiles']),
             ];
 
             $downloadedPackages[] = $package;
@@ -109,7 +115,7 @@ class RemotePackageDownloader
     }
 
     /**
-     * @return array<string, array{path: string, version: string, dependencies: array<string, string>}>
+     * @return array<string, array{path: string, version: string, dependencies: array<string, string>, extraFiles: array<string, string>}>
      */
     private function loadInstalled(): array
     {
@@ -128,6 +134,10 @@ class RemotePackageDownloader
             if (!isset($data['dependencies'])) {
                 throw new \LogicException(sprintf('The package "%s" is missing its dependencies.', $package));
             }
+
+            if (!isset($data['extraFiles'])) {
+                $installed[$package]['extraFiles'] = [];
+            }
         }
 
         return $this->installed = $installed;
@@ -137,5 +147,16 @@ class RemotePackageDownloader
     {
         $this->installed = $installed;
         file_put_contents($this->remotePackageStorage->getStorageDir().'/installed.php', sprintf('<?php return %s;', var_export($installed, true)));
+    }
+
+    private function areAllExtraFilesDownloaded(ImportMapEntry $entry, array $extraFilenames): bool
+    {
+        foreach ($extraFilenames as $extraFilename) {
+            if (!$this->remotePackageStorage->isExtraFileDownloaded($entry, $extraFilename)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

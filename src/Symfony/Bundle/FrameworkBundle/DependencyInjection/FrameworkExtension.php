@@ -1325,7 +1325,8 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('asset_mapper.repository')
             ->setArgument(0, $paths)
-            ->setArgument(2, $excludedPathPatterns);
+            ->setArgument(2, $excludedPathPatterns)
+            ->setArgument(3, $config['exclude_dotfiles']);
 
         $container->getDefinition('asset_mapper.public_assets_path_resolver')
             ->setArgument(0, $config['public_prefix']);

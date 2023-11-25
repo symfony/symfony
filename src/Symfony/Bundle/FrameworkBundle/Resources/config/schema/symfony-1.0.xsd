@@ -194,6 +194,7 @@
             <xsd:element name="importmap-script-attribute" type="asset_mapper_attribute" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="exclude-dotfiles" type="xsd:boolean" />
         <xsd:attribute name="server" type="xsd:boolean" />
         <xsd:attribute name="public-prefix" type="xsd:string" />
         <xsd:attribute name="missing-import-mode" type="missing-import-mode" />

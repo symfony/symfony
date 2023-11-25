@@ -472,6 +472,17 @@ XML;
         $array = $this->getNamespacedArray();
 
         $this->assertEquals($array, $this->encoder->decode($source, 'xml'));
+
+        $source = '<?xml version="1.0"?>'."\n".
+            '<response xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" app:foo="bar">'.
+            '</response>'."\n";
+
+        $this->assertEquals([
+            '@xmlns' => 'http://www.w3.org/2005/Atom',
+            '@xmlns:app' => 'http://www.w3.org/2007/app',
+            '@app:foo' => 'bar',
+            '#' => '',
+        ], $this->encoder->decode($source, 'xml'));
     }
 
     public function testDecodeScalarWithAttribute()

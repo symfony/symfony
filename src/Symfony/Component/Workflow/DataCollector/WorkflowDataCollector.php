@@ -173,7 +173,7 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
             $r = new \ReflectionFunction($callable);
             if (str_contains($r->name, '{closure}')) {
                 $title = (string) $r;
-            } elseif ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
+            } elseif ($class = $r->getClosureCalledClass()) {
                 $title = $class->name.'::'.$r->name.'()';
             } else {
                 $title = $r->name;

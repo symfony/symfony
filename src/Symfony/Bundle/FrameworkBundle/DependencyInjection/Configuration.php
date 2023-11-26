@@ -899,7 +899,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                             ->example(['*/assets/build/*', '*/*_.scss'])
                         ->end()
-                        // boolean called  defaulting to true
+                        // boolean called defaulting to true
                         ->booleanNode('exclude_dotfiles')
                             ->info('If true, any files starting with "." will be excluded from the asset mapper')
                             ->defaultTrue()

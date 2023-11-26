@@ -18,12 +18,14 @@ final class ResponseHeaderSame extends Constraint
 {
     private string $headerName;
     private string $expectedValue;
+    private bool $logicalNot;
     private ?string $actualValue = null;
 
-    public function __construct(string $headerName, string $expectedValue)
+    public function __construct(string $headerName, string $expectedValue, bool $logicalNot = false)
     {
         $this->headerName = $headerName;
         $this->expectedValue = $expectedValue;
+        $this->logicalNot = $logicalNot;
     }
 
     public function toString(): string
@@ -34,7 +36,7 @@ final class ResponseHeaderSame extends Constraint
             $output .= sprintf(', header "%s" is not set', $this->headerName);
         }
 
-        if (null !== $this->actualValue) {
+        if (null !== $this->actualValue && !$this->logicalNot) {
             $output .= sprintf(', value of header "%s" is "%s"', $this->headerName, $this->actualValue);
         }
 

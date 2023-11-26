@@ -79,7 +79,7 @@ trait BrowserKitAssertionsTrait
 
     public static function assertResponseHeaderNotSame(string $headerName, string $expectedValue, string $message = ''): void
     {
-        self::assertThatForResponse(new LogicalNot(new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue)), $message);
+        self::assertThatForResponse(new LogicalNot(new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue, true)), $message);
     }
 
     public static function assertResponseHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void

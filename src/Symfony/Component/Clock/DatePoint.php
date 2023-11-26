@@ -45,16 +45,6 @@ final class DatePoint extends \DateTimeImmutable
             $now = $now->setTimezone($timezone);
         }
 
-        if (\PHP_VERSION_ID < 80200) {
-            $now = (array) $now;
-            $this->date = $now['date'];
-            $this->timezone_type = $now['timezone_type'];
-            $this->timezone = $now['timezone'];
-            $this->__wakeup();
-
-            return;
-        }
-
         $this->__unserialize((array) $now);
     }
 

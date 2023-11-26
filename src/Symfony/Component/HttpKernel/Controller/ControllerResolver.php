@@ -242,7 +242,7 @@ class ControllerResolver implements ControllerResolverInterface
 
             if (str_contains($name, '{closure}')) {
                 $name = $class = \Closure::class;
-            } elseif ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
+            } elseif ($class = $r->getClosureCalledClass()) {
                 $class = $class->name;
                 $name = $class.'::'.$name;
             }

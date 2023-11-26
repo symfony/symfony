@@ -56,17 +56,19 @@ class SignatureHasher
      *
      * @param int    $expires The expiry time as a unix timestamp
      * @param string $hash    The plaintext hash provided by the request
+     * @param array<string, mixed> $parameters  Additional key-value pairs that should be part of the signature
      *
      * @throws InvalidSignatureException If the signature does not match the provided parameters
      * @throws ExpiredSignatureException If the signature is no longer valid
      */
-    public function acceptSignatureHash(string $userIdentifier, int $expires, string $hash): void
+    public function acceptSignatureHash(string $userIdentifier, int $expires, string $hash, array $parameters = []): void
     {
         if ($expires < time()) {
             throw new ExpiredSignatureException('Signature has expired.');
         }
+
         $hmac = substr($hash, 0, 44);
-        $payload = substr($hash, 44).':'.$expires.':'.$userIdentifier;
+        $payload = substr($hash, 44).':'.$expires.':'.$userIdentifier.$this->squashParameters($parameters);
 
         if (!hash_equals($hmac, $this->generateHash($payload))) {
             throw new InvalidSignatureException('Invalid or expired signature.');
@@ -78,17 +80,18 @@ class SignatureHasher
      *
      * @param int    $expires The expiry time as a unix timestamp
      * @param string $hash    The plaintext hash provided by the request
+     * @param array<string, mixed> $parameters  Additional key-value pairs that should be part of the signature
      *
      * @throws InvalidSignatureException If the signature does not match the provided parameters
      * @throws ExpiredSignatureException If the signature is no longer valid
      */
-    public function verifySignatureHash(UserInterface $user, int $expires, string $hash): void
+    public function verifySignatureHash(UserInterface $user, int $expires, string $hash, array $parameters = []): void
     {
         if ($expires < time()) {
             throw new ExpiredSignatureException('Signature has expired.');
         }
 
-        if (!hash_equals($hash, $this->computeSignatureHash($user, $expires))) {
+        if (!hash_equals($hash, $this->computeSignatureHash($user, $expires, $parameters))) {
             throw new InvalidSignatureException('Invalid or expired signature.');
         }
 
@@ -105,8 +108,9 @@ class SignatureHasher
      * Computes the secure hash for the provided user and expire time.
      *
      * @param int $expires The expiry time as a unix timestamp
+     * @param array<string, mixed> $parameters Additional key-value pairs that should be part of the signature
      */
-    public function computeSignatureHash(UserInterface $user, int $expires): string
+    public function computeSignatureHash(UserInterface $user, int $expires, array $parameters = []): string
     {
         $userIdentifier = $user->getUserIdentifier();
         $fieldsHash = hash_init('sha256');
@@ -123,9 +127,42 @@ class SignatureHasher
             hash_update($fieldsHash, ':'.base64_encode($value));
         }
 
+        hash_update($fieldsHash, $this->squashParameters($parameters));
+
         $fieldsHash = strtr(base64_encode(hash_final($fieldsHash, true)), '+/=', '-_~');
 
-        return $this->generateHash($fieldsHash.':'.$expires.':'.$userIdentifier).$fieldsHash;
+        return $this->generateHash($fieldsHash.':'.$expires.':'.$userIdentifier.$this->squashParameters($parameters)).$fieldsHash;
+    }
+
+    /**
+     * Produces a single string of supplied key-value pairs usable during the hashing process.
+     *
+     * @param array<string, mixed> $parameters
+     * @return string
+     */
+    private function squashParameters(array $parameters): string
+    {
+        $result = '';
+
+        if (empty($parameters)) {
+            return $result;
+        }
+
+        ksort($parameters);
+
+        foreach ($parameters as $key => $value) {
+            if ($value instanceof \DateTimeInterface) {
+                $value = $value->format('c');
+            }
+
+            if (!\is_scalar($value) && !$value instanceof \Stringable) {
+                throw new \InvalidArgumentException(sprintf('Parameter "%s" must be a value that can be cast to a string, but "%s" was provided.', $key, $value));
+            }
+
+            $result .= ':'.base64_encode($key).'_'.base64_encode($value);
+        }
+
+        return $result;
     }
 
     private function generateHash(string $tokenValue): string

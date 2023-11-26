@@ -44,15 +44,20 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         ], $options);
     }
 
+    /**
+     * @param array<string, \Stringable|scalar> $parameters A list of additional query string parameters that should be part of the login link
+     */
     public function createLoginLink(UserInterface $user, Request $request = null, int $lifetime = null, array $parameters = []): LoginLinkDetails
     {
         $expires = time() + ($lifetime ?: $this->options['lifetime']);
         $expiresAt = new \DateTimeImmutable('@'.$expires);
 
+        $hash = $this->signatureHasher->computeSignatureHash($user, $expires, $parameters);
+
         $parameters += [
             'user' => $user->getUserIdentifier(),
             'expires' => $expires,
-            'hash' => $this->signatureHasher->computeSignatureHash($user, $expires),
+            'hash' => $hash,
         ];
 
         if ($request) {
@@ -90,12 +95,15 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             throw new InvalidLoginLinkException('Missing "expires" parameter.');
         }
 
+        $parameters = $request->query->all();
+        unset($parameters['hash'], $parameters['expires'], $parameters['user']);
+
         try {
-            $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash);
+            $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash, $parameters);
 
             $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
 
-            $this->signatureHasher->verifySignatureHash($user, $expires, $hash);
+            $this->signatureHasher->verifySignatureHash($user, $expires, $hash, $parameters);
         } catch (UserNotFoundException $e) {
             throw new InvalidLoginLinkException('User not found.', 0, $e);
         } catch (ExpiredSignatureException $e) {

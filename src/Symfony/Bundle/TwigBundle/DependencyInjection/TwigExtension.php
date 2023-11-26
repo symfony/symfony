@@ -170,8 +170,6 @@ class TwigExtension extends Extension
             'optimizations' => true,
         ]));
 
-        $container->registerForAutoconfiguration(\Twig_ExtensionInterface::class)->addTag('twig.extension');
-        $container->registerForAutoconfiguration(\Twig_LoaderInterface::class)->addTag('twig.loader');
         $container->registerForAutoconfiguration(ExtensionInterface::class)->addTag('twig.extension');
         $container->registerForAutoconfiguration(LoaderInterface::class)->addTag('twig.loader');
         $container->registerForAutoconfiguration(RuntimeExtensionInterface::class)->addTag('twig.runtime');

@@ -107,6 +107,11 @@ class DebugCommand extends Command
                 'normalizationContexts' => $attributeMetadata->getNormalizationContexts(),
                 'denormalizationContexts' => $attributeMetadata->getDenormalizationContexts(),
             ];
+
+            $mapping = $classMetadata->getClassDiscriminatorMapping();
+            if ($mapping && $mapping->getTypeProperty() === $attributeMetadata->getName()) {
+                $data[$attributeMetadata->getName()]['discriminatorMap'] = $mapping->getTypesMapping();
+            }
         }
 
         return $data;

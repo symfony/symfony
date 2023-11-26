@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Enable `#[AsTwigFilter]`, `#[AsTwigFunction]` and `#[AsTwigTest]` attributes to configure runtime extensions
+
 7.0
 ---
 

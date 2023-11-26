@@ -25,6 +25,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Service\ResetInterface;
+use Twig\Extension\AttributeExtension;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
@@ -176,6 +177,11 @@ class TwigExtension extends Extension
 
         if (false === $config['cache']) {
             $container->removeDefinition('twig.template_cache_warmer');
+        }
+
+        // Attributes declaration requires Twig 3.9+
+        if (!class_exists(AttributeExtension::class)) {
+            $container->removeDefinition('twig.extension.runtime');
         }
     }
 

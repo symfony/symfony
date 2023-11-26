@@ -34,7 +34,7 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
     /**
      * @param non-empty-string $secret A secret to use for hashing the IP address and username
      */
-    public function __construct(RateLimiterFactory $globalFactory, RateLimiterFactory $localFactory, #[\SensitiveParameter] string $secret = '')
+    public function __construct(RateLimiterFactory $globalFactory, RateLimiterFactory $localFactory, #[\SensitiveParameter] string $secret)
     {
         if (!$secret) {
             throw new InvalidArgumentException('A non-empty secret is required.');

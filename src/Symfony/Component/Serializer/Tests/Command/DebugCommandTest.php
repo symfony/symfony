@@ -46,6 +46,7 @@ class DebugCommandTest extends TestCase
             |          |   ],                                |
             |          |   "maxDepth" => 1,                  |
             |          |   "serializedName" => "identifier", |
+            |          |   "serializedPath" => null,         |
             |          |   "ignore" => true,                 |
             |          |   "normalizationContexts" => [      |
             |          |     "*" => [                        |
@@ -66,6 +67,7 @@ class DebugCommandTest extends TestCase
             |          |   "groups" => [],                   |
             |          |   "maxDepth" => null,               |
             |          |   "serializedName" => null,         |
+            |          |   "serializedPath" => [data][name], |
             |          |   "ignore" => false,                |
             |          |   "normalizationContexts" => [],    |
             |          |   "denormalizationContexts" => []   |

@@ -278,7 +278,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             $isWildcard = false;
             if (method_exists($propertyPath, 'isWildcard')) {
-                // To be removed in symfony 8 once we are sure isNullSafe is always implemented.
+                // To be removed in Symfony 8 once we are sure isWildcard is always implemented.
                 $isWildcard = $propertyPath->isWildcard($i);
             } else {
                 trigger_deprecation('symfony/property-access', '7.1', 'The "%s()" method in class "%s" needs to be implemented in version 8.0, not defining it is deprecated.', 'isWildcard', PropertyPathInterface::class);

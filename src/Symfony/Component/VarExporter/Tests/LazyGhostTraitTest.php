@@ -146,7 +146,13 @@ class LazyGhostTraitTest extends TestCase
         $instance->bar = 123;
         $serialized = serialize($instance);
         $clone = unserialize($serialized);
-        $this->assertSame(123, $clone->bar);
+
+        if ($instance instanceof ChildMagicClass) {
+            // ChildMagicClass redefines the $data property but not the __sleep() method
+            $this->assertFalse(isset($clone->bar));
+        } else {
+            $this->assertSame(123, $clone->bar);
+        }
     }
 
     public static function provideMagicClass()

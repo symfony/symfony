@@ -198,7 +198,7 @@ Security
  * [BC break] `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
  * [BC break] Make `PersistentToken` immutable
  * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead
- * [BC break] Added required `string $secret` parameter to the constructor of `DefaultLoginRateLimiter`
+ * [BC break] Add required `string $secret` parameter to the constructor of `DefaultLoginRateLimiter`
 
 SecurityBundle
 --------------

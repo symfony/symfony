@@ -65,8 +65,10 @@ class LazyGhostTraitTest extends TestCase
 
         $this->assertSame(["\0".TestClass::class."\0lazyObjectState"], array_keys((array) $instance));
         unset($instance->public);
-        $this->assertFalse(isset($instance->public));
         $this->assertSame(4, $instance->publicReadonly);
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('__isset(public)');
+        isset($instance->public);
     }
 
     public function testSetPublic()

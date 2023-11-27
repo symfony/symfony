@@ -20,9 +20,9 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 /**
  * @author Eduard Bulava <bulavaeduard@gmail.com>
  */
-final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerAwareInterface
+final class UnwrappingDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
-    use SerializerAwareTrait;
+    use DenormalizerAwareTrait;
 
     public const UNWRAP_PATH = 'unwrap_path';
 
@@ -51,11 +51,7 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
             $data = $this->propertyAccessor->getValue($data, $propertyPath);
         }
 
-        if (!$this->serializer instanceof DenormalizerInterface) {
-            throw new LogicException('Cannot unwrap path because the injected serializer is not a denormalizer.');
-        }
-
-        return $this->serializer->denormalize($data, $type, $format, $context);
+        return $this->denormalizer->denormalize($data, $type, $format, $context);
     }
 
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool

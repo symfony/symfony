@@ -355,7 +355,7 @@ trait LazyGhostTrait
         $data = [];
 
         foreach (parent::__sleep() as $name) {
-            $value = $properties[$k = $name] ?? $properties[$k = "\0*\0$name"] ?? $properties[$k = "\0$scope\0$name"] ?? $k = null;
+            $value = $properties[$k = $name] ?? $properties[$k = "\0*\0$name"] ?? $properties[$k = "\0$class\0$name"] ?? $properties[$k = "\0$scope\0$name"] ?? $k = null;
 
             if (null === $k) {
                 trigger_error(sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $name), \E_USER_NOTICE);

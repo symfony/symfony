@@ -318,7 +318,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         if (false !== $allowedAttributes) {
-            $attributes = array_intersect($attributes, $allowedAttributes);
+            $attributes = $attributes ? array_intersect($attributes, $allowedAttributes) : $allowedAttributes;
         }
 
         if ($context['cache_key'] && \stdClass::class !== $class) {

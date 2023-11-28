@@ -458,9 +458,39 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testNormalizeWithIgnoreAnnotationAndPrivateProperties()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory)]);
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
 
-        $this->assertSame(['foo' => 'foo'], $serializer->normalize(new ObjectDummyWithIgnoreAnnotationAndPrivateProperty()));
+        $this->assertSame(['foo' => 'foo'], $normalizer->normalize(new ObjectDummyWithIgnoreAnnotationAndPrivateProperty()));
+    }
+
+    public function testNormalizeBasedOnAllowedAttributes()
+    {
+        $normalizer = new class() extends AbstractObjectNormalizer {
+            protected function getAllowedAttributes($classOrObject, array $context, bool $attributesAsString = false)
+            {
+                return ['foo'];
+            }
+
+            protected function extractAttributes(object $object, string $format = null, array $context = []): array
+            {
+                return [];
+            }
+
+            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+            {
+                return $object->$attribute;
+            }
+
+            protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+            {
+            }
+        };
+
+        $object = new Dummy();
+        $object->foo = 'foo';
+        $object->bar = 'bar';
+
+        $this->assertSame(['foo' => 'foo'], $normalizer->normalize($object));
     }
 
     /**

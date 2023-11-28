@@ -172,10 +172,18 @@ trait LazyGhostTrait
             $scope = Registry::getScope($propertyScopes, $class, $name);
             $state = $this->lazyObjectState ?? null;
 
-            if ($state && (null === $scope || isset($propertyScopes["\0$scope\0$name"]))
-                && LazyObjectState::STATUS_UNINITIALIZED_PARTIAL !== $state->initialize($this, $name, $readonlyScope ?? $scope)
-            ) {
-                goto get_in_scope;
+            if ($state && (null === $scope || isset($propertyScopes["\0$scope\0$name"]))) {
+                if (LazyObjectState::STATUS_INITIALIZED_FULL === $state->status) {
+                    // Work around php/php-src#12695
+                    $property = $propertyScopes[null === $scope ? $name : "\0$scope\0$name"][3]
+                        ?? (Hydrator::$propertyScopes[$this::class] = Hydrator::getPropertyScopes($this::class))[3];
+                } else {
+                    $property = null;
+                }
+
+                if ($property?->isInitialized($this) ?? LazyObjectState::STATUS_UNINITIALIZED_PARTIAL !== $state->initialize($this, $name, $readonlyScope ?? $scope)) {
+                    goto get_in_scope;
+                }
             }
         }
 
@@ -237,7 +245,9 @@ trait LazyGhostTrait
             $scope = Registry::getScope($propertyScopes, $class, $name, $readonlyScope);
             $state = $this->lazyObjectState ?? null;
 
-            if ($state && ($readonlyScope === $scope || isset($propertyScopes["\0$scope\0$name"]))) {
+            if ($state && ($readonlyScope === $scope || isset($propertyScopes["\0$scope\0$name"]))
+                && LazyObjectState::STATUS_INITIALIZED_FULL !== $state->status
+            ) {
                 if (LazyObjectState::STATUS_UNINITIALIZED_FULL === $state->status) {
                     $state->initialize($this, $name, $readonlyScope ?? $scope);
                 }
@@ -271,6 +281,7 @@ trait LazyGhostTrait
             $state = $this->lazyObjectState ?? null;
 
             if ($state && (null === $scope || isset($propertyScopes["\0$scope\0$name"]))
+                && LazyObjectState::STATUS_INITIALIZED_FULL !== $state->status
                 && LazyObjectState::STATUS_UNINITIALIZED_PARTIAL !== $state->initialize($this, $name, $readonlyScope ?? $scope)
             ) {
                 goto isset_in_scope;
@@ -300,7 +311,9 @@ trait LazyGhostTrait
             $scope = Registry::getScope($propertyScopes, $class, $name, $readonlyScope);
             $state = $this->lazyObjectState ?? null;
 
-            if ($state && ($readonlyScope === $scope || isset($propertyScopes["\0$scope\0$name"]))) {
+            if ($state && ($readonlyScope === $scope || isset($propertyScopes["\0$scope\0$name"]))
+                && LazyObjectState::STATUS_INITIALIZED_FULL !== $state->status
+            ) {
                 if (LazyObjectState::STATUS_UNINITIALIZED_FULL === $state->status) {
                     $state->initialize($this, $name, $readonlyScope ?? $scope);
                 }

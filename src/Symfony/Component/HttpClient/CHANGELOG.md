@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Allow mocking `start_time` info in `MockResponse`
+
 7.0
 ---
 

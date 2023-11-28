@@ -58,6 +58,9 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, Denormalize
         return \array_key_exists(self::UNWRAP_PATH, $context) && !isset($context['unwrapped']);
     }
 
+    /**
+     * @deprecated Since symfony/serializer 7.1: The "setSerializer()" method is deprecated, use "setDenormalizer()" instead.
+     */
     public function setSerializer(SerializerInterface $serializer): void
     {
         trigger_deprecation('symfony/serializer', '7.1', 'The "%s()" method is deprecated, use "setDenormalizer()" instead.', __METHOD__);

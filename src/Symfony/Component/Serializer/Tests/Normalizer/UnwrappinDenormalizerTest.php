@@ -15,7 +15,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
 
 /**

@@ -37,6 +37,17 @@ class ParserTest extends TestCase
         $parser->parse($lexer->tokenize('foo'), [0]);
     }
 
+    public function testParseUnknownFunction()
+    {
+        $parser = new Parser([]);
+        $tokenized = (new Lexer())->tokenize('foo()');
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('The function "foo" does not exist around position 1 for expression `foo()`.');
+
+        $parser->parse($tokenized);
+    }
+
     /**
      * @dataProvider getParseData
      */
@@ -314,6 +325,14 @@ class ParserTest extends TestCase
                 'expression' => 'foo.bar',
                 'names' => null,
             ],
+            'array with trailing comma' => [
+                'expression' => '[value1, value2, value3,]',
+                'names' => ['value1', 'value2', 'value3'],
+            ],
+            'hashmap with trailing comma' => [
+                'expression' => '{val1: value1, val2: value2, val3: value3,}',
+                'names' => ['value1', 'value2', 'value3'],
+            ],
             'disallow expression without names' => [
                 'expression' => 'foo.bar',
                 'names' => [],
@@ -346,6 +365,11 @@ class ParserTest extends TestCase
                 'expression' => 'foo["some_key")',
                 'names' => ['foo'],
                 'exception' => 'Unclosed "[" around position 3 for expression `foo["some_key")`.',
+            ],
+            'incorrect hash key' => [
+                'expression' => '{+: value1}',
+                'names' => ['value1'],
+                'exception' => 'A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token "operator" of value "+" around position 2 for expression `{+: value1}`.',
             ],
             'missed array key' => [
                 'expression' => 'foo[]',

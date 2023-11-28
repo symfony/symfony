@@ -168,6 +168,14 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage->parse('node.', ['node']);
     }
 
+    public function testParseReturnsObjectOnAlreadyParsedExpression()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expression = $expressionLanguage->parse('1 + 1', []);
+
+        $this->assertSame($expression, $expressionLanguage->parse($expression, []));
+    }
+
     public static function shortCircuitProviderEvaluate()
     {
         $object = new class(static::fail(...)) {
@@ -438,6 +446,24 @@ class ExpressionLanguageTest extends TestCase
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
         $registerCallback($el);
+    }
+
+    public function testLintDoesntThrowOnValidExpression()
+    {
+        $el = new ExpressionLanguage();
+        $el->lint('1 + 1', null);
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testLintThrowsOnInvalidExpression()
+    {
+        $el = new ExpressionLanguage();
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
+
+        $el->lint('node.', ['node']);
     }
 
     public static function getRegisterCallbacks()

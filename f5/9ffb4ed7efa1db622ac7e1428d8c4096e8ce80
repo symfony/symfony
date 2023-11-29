@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-11-28T11:10:02Z
+
+ping @derrabus as you added one of the `@internal` annotations in #40911
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-28T11:11:48Z
+
+Shouldn't most properties become private (as they have getters anyway) ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-11-28T12:03:06Z
+
+> ping @derrabus as you added one of the `@internal` annotations in #40911
+
+ping @nicolas-grekas because https://github.com/symfony/symfony/pull/40911#issuecomment-824803787 😉
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-28T20:29:32Z
+
+>  All third-party providers should benefit from it.
+
+Do they currently? Do we use these classes cross components/providers?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-28T20:47:53Z
+
+> Do they currently? Do we use these classes cross components/providers?
+
+Yes the providers we have are using these test cases, or what do you mean?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-29T08:09:34Z
+
+Thank you @OskarStark.

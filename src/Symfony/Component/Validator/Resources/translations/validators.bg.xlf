@@ -402,6 +402,30 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Стойността на мрежовата маска трябва да бъде между {{ min }} и {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Името на файла е твърде дълго. Трябва да съдържа не повече от {{ filename_max_length }} символ.|Името на файла е твърде дълго. Трябва да съдържа не повече от {{ filename_max_length }} символа.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Сложността на паролата е твърде малка. Моля използвайте по-сложна парола.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Стойността съдържа символи, които не са позволени от текущото ниво на ограничение.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Използването на невидими символи не е позволено.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Смесването на числа от различни скриптове не е позволено.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Използването на скрити насложени символи не е позволено.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

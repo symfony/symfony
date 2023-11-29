@@ -35,7 +35,7 @@ class ImportMapAuditor
     {
         $entries = $this->configReader->getEntries();
 
-        /** @var array<string, array<string, ImportMapPackageAudit>> $installed */
+        /** @var array<string, ImportMapPackageAudit> $packageAudits */
         $packageAudits = [];
 
         /** @var array<string, list<string>> $installed */

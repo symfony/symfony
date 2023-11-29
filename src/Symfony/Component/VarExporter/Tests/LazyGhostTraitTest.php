@@ -64,8 +64,10 @@ class LazyGhostTraitTest extends TestCase
 
         $this->assertSame(["\0".TestClass::class."\0lazyObjectState"], array_keys((array) $instance));
         unset($instance->public);
-        $this->assertFalse(isset($instance->public));
         $this->assertSame(4, $instance->publicReadonly);
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('__isset(public)');
+        isset($instance->public);
     }
 
     public function testSetPublic()
@@ -145,7 +147,13 @@ class LazyGhostTraitTest extends TestCase
         $instance->bar = 123;
         $serialized = serialize($instance);
         $clone = unserialize($serialized);
-        $this->assertSame(123, $clone->bar);
+
+        if ($instance instanceof ChildMagicClass) {
+            // ChildMagicClass redefines the $data property but not the __sleep() method
+            $this->assertFalse(isset($clone->bar));
+        } else {
+            $this->assertSame(123, $clone->bar);
+        }
     }
 
     public static function provideMagicClass()

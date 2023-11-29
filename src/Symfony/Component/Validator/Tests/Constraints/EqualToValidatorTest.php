@@ -14,12 +14,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\EqualToValidator;
+use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
 class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
+    use IcuCompatibilityTrait;
+
     protected function createValidator(): EqualToValidator
     {
         return new EqualToValidator();
@@ -61,14 +64,14 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return [
             [1, '1', 2, '2', 'int'],
             ['22', '"22"', '333', '"333"', 'string'],
-            [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
-            [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
-            [new \DateTime('2001-01-01 UTC'), 'Jan 1, 2001, 12:00 AM', '2000-01-01 UTC', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
+            [new \DateTime('2001-01-01'), self::normalizeIcuSpaces("Jan 1, 2001, 12:00\u{202F}AM"), new \DateTime('2000-01-01'), self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
+            [new \DateTime('2001-01-01'), self::normalizeIcuSpaces("Jan 1, 2001, 12:00\u{202F}AM"), '2000-01-01', self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
+            [new \DateTime('2001-01-01 UTC'), self::normalizeIcuSpaces("Jan 1, 2001, 12:00\u{202F}AM"), '2000-01-01 UTC', self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
             [new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
         ];
     }
 
-    public static function provideComparisonsToNullValueAtPropertyPath()
+    public static function provideComparisonsToNullValueAtPropertyPath(): array
     {
         return [
             [5, '5', false],

@@ -138,6 +138,7 @@ class ConfigurationTest extends TestCase
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
             'importmap_script_attributes' => [],
             'exclude_dotfiles' => true,
+            'config_reader_id' => 'asset_mapper.importmap.config_reader.default',
         ];
 
         $this->assertEquals($defaultConfig, $config['asset_mapper']);
@@ -673,6 +674,7 @@ class ConfigurationTest extends TestCase
                 'vendor_dir' => '%kernel.project_dir%/assets/vendor',
                 'importmap_script_attributes' => [],
                 'exclude_dotfiles' => true,
+                'config_reader_id' => 'asset_mapper.importmap.config_reader.default',
             ],
             'cache' => [
                 'pools' => [],

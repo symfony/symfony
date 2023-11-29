@@ -20,7 +20,7 @@ use Symfony\Component\VarExporter\VarExporter;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-class ImportMapConfigReader
+class ImportMapConfigReader implements ImportMapConfigReaderInterface
 {
     private ImportMapEntries $rootImportMapEntries;
 
@@ -40,8 +40,9 @@ class ImportMapConfigReader
         $importMapConfig = is_file($this->importMapConfigPath) ? (static fn () => include $configPath)() : [];
 
         $entries = new ImportMapEntries();
+        $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
+
         foreach ($importMapConfig ?? [] as $importName => $data) {
-            $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
             }
@@ -64,7 +65,7 @@ class ImportMapConfigReader
 
             $version = $data['version'] ?? null;
 
-            if (null === $version && null === $path) {
+            if (null === $version) {
                 throw new RuntimeException(sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
             }
 
@@ -172,19 +173,5 @@ class ImportMapConfigReader
     private function getRootDirectory(): string
     {
         return \dirname($this->importMapConfigPath);
-    }
-
-    public static function splitPackageNameAndFilePath(string $packageName): array
-    {
-        $filePath = '';
-        $i = strpos($packageName, '/');
-
-        if ($i && (!str_starts_with($packageName, '@') || $i = strpos($packageName, '/', $i + 1))) {
-            // @vendor/package/filepath or package/filepath
-            $filePath = substr($packageName, $i);
-            $packageName = substr($packageName, 0, $i);
-        }
-
-        return [$packageName, $filePath];
     }
 }

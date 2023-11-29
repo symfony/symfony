@@ -25,7 +25,7 @@ class ImportMapManager
 {
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
-        private readonly ImportMapConfigReader $importMapConfigReader,
+        private readonly ImportMapConfigReaderInterface $importMapConfigReader,
         private readonly RemotePackageDownloader $packageDownloader,
         private readonly PackageResolverInterface $resolver,
     ) {

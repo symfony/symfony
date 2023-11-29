@@ -1312,6 +1312,8 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('asset_mapper.asset_package');
         }
 
+        $container->setAlias('asset_mapper.importmap.config_reader', $config['config_reader_id']);
+
         $paths = $config['paths'];
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if ($container->fileExists($dir = $bundle['path'].'/Resources/public') || $container->fileExists($dir = $bundle['path'].'/public')) {
@@ -1364,7 +1366,7 @@ class FrameworkExtension extends Extension
         ;
 
         $container
-            ->getDefinition('asset_mapper.importmap.config_reader')
+            ->getDefinition('asset_mapper.importmap.config_reader.default')
             ->replaceArgument(0, $config['importmap_path'])
         ;
 

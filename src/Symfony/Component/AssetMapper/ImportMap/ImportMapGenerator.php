@@ -27,7 +27,7 @@ class ImportMapGenerator
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
         private readonly CompiledAssetMapperConfigReader $compiledConfigReader,
-        private readonly ImportMapConfigReader $importMapConfigReader,
+        private readonly ImportMapConfigReaderInterface $importMapConfigReader,
     ) {
     }
 
@@ -58,6 +58,7 @@ class ImportMapGenerator
     {
         $rawImportMapData = $this->getRawImportMapData();
         $finalImportMapData = [];
+
         foreach ($entrypointNames as $entrypointName) {
             $entrypointImports = $this->findEagerEntrypointImports($entrypointName);
             // Entrypoint modules must be preloaded before their dependencies

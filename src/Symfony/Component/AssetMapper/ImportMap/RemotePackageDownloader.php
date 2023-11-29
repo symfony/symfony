@@ -22,7 +22,7 @@ class RemotePackageDownloader
 
     public function __construct(
         private readonly RemotePackageStorage $remotePackageStorage,
-        private readonly ImportMapConfigReader $importMapConfigReader,
+        private readonly ImportMapConfigReaderInterface $importMapConfigReader,
         private readonly PackageResolverInterface $packageResolver,
     ) {
     }

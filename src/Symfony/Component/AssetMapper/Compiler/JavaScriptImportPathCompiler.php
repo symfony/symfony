@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReaderInterface;
 use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\Filesystem\Path;
@@ -31,7 +31,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
     private const IMPORT_PATTERN = '/(?:import\s*(?:(?:\*\s*as\s+\w+|[\w\s{},*]+)\s*from\s*)?|\bimport\()\s*[\'"`](\.\/[^\'"`]+|(\.\.\/)*[^\'"`]+)[\'"`]\s*[;\)]?/m';
 
     public function __construct(
-        private readonly ImportMapConfigReader $importMapConfigReader,
+        private readonly ImportMapConfigReaderInterface $importMapConfigReader,
         private readonly string $missingImportMode = self::MISSING_IMPORT_WARN,
         private readonly ?LoggerInterface $logger = null,
     ) {

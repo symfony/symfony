@@ -24,7 +24,7 @@ class ImportMapVersionChecker
     private HttpClientInterface $httpClient;
 
     public function __construct(
-        private ImportMapConfigReader $importMapConfigReader,
+        private ImportMapConfigReaderInterface $importMapConfigReader,
         private RemotePackageDownloader $packageDownloader,
         HttpClientInterface $httpClient = null,
     ) {

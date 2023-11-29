@@ -155,7 +155,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('asset_mapper.compiler')
             ->tag('monolog.logger', ['channel' => 'asset_mapper'])
 
-        ->set('asset_mapper.importmap.config_reader', ImportMapConfigReader::class)
+        ->set('asset_mapper.importmap.config_reader.default', ImportMapConfigReader::class)
             ->args([
                 abstract_arg('importmap.php path'),
                 service('asset_mapper.importmap.remote_package_storage'),

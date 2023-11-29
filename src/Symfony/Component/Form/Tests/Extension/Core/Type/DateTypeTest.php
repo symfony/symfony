@@ -124,7 +124,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'datetime_immutable',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
         $this->assertEquals(new \DateTimeImmutable('2010-06-02 UTC'), $form->getData());

@@ -469,7 +469,7 @@ class SerializerTest extends TestCase
             'groups' => ['two'],
         ]);
 
-        $this->assertEquals('{"type":"one","two":2}', $serialized);
+        $this->assertEquals('{"two":2,"type":"one"}', $serialized);
     }
 
     public function testDeserializeAndSerializeNestedInterfacedObjectsWithTheClassMetadataDiscriminator()

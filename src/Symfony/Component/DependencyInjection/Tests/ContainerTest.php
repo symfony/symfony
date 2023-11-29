@@ -420,7 +420,6 @@ class ContainerTest extends TestCase
         $container->compile();
 
         $r = new \ReflectionMethod($container, 'getEnv');
-        $r->setAccessible(true);
         $this->assertNull($r->invoke($container, 'FOO'));
     }
 
@@ -436,7 +435,6 @@ class ContainerTest extends TestCase
         $container->compile();
 
         $r = new \ReflectionMethod($container, 'getEnv');
-        $r->setAccessible(true);
         $this->assertNull($r->invoke($container, 'FOO'));
     }
 }

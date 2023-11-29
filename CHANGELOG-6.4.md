@@ -7,6 +7,16 @@ in 6.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.4.0...v6.4.1
 
+* 6.4.0 (2023-11-29)
+
+ * bug #52786 [Serializer] Revert allowed attributes fix (mtarld)
+ * bug #52765 [Translation] Remove ``@internal`` from abstract testcases (OskarStark)
+ * bug #52780 [DependencyInjection] don't check parameter values if they are not set (xabbuh)
+ * bug #52762 [VarExporter] Work around php/php-src#12695 for lazy objects, fixing nullsafe-related behavior (nicolas-grekas)
+ * bug #52759 [VarExporter] Fix serializing objects that implement __sleep() and that are made lazy (nicolas-grekas)
+ * bug #52767 [Serializer] Fix normalization relying on allowed attributes only (mtarld)
+ * bug #52727 [String] Fix Inflector for 'icon' (podhy)
+
 * 6.4.0-RC2 (2023-11-26)
 
  * bug #52724 [Security] make secret required for DefaultLoginRateLimiter (RobertMe)

@@ -18,7 +18,6 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
-use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
@@ -837,14 +836,6 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('nested-id', $test->id);
     }
 
-    public function testNormalizeWithIgnoreAttributeAndPrivateProperties()
-    {
-        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
-        $normalizer = new ObjectNormalizer($classMetadataFactory);
-
-        $this->assertSame(['foo' => 'foo'], $normalizer->normalize(new ObjectDummyWithIgnoreAttributeAndPrivateProperty()));
-    }
-
     public function testNormalizeBasedOnAllowedAttributes()
     {
         $normalizer = new class() extends AbstractObjectNormalizer {
@@ -1087,16 +1078,6 @@ class ObjectDummyWithContextAttributeSkipNullValues
 
     #[Context([AbstractObjectNormalizer::SKIP_NULL_VALUES => true])]
     public ?string $propertyWithNullSkipNullValues = null;
-}
-
-class ObjectDummyWithIgnoreAttributeAndPrivateProperty
-{
-    public $foo = 'foo';
-
-    #[Ignore]
-    public $ignored = 'ignored';
-
-    private $private = 'private';
 }
 
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer

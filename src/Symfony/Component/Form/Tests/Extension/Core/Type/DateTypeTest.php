@@ -147,7 +147,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'string',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $this->assertEquals('2010-06-02', $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());

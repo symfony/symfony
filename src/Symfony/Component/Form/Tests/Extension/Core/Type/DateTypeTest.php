@@ -169,7 +169,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'timestamp',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 

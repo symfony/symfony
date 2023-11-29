@@ -18,6 +18,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -919,6 +920,31 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertSame($expected, $this->normalizer->normalize($object));
     }
+
+    public function testNormalizeWithIgnoreAnnotationAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $this->assertSame(['foo' => 'foo'], $normalizer->normalize(new ObjectDummyWithIgnoreAnnotationAndPrivateProperty()));
+    }
+
+    public function testDenormalizeWithIgnoreAnnotationAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $obj = $normalizer->denormalize([
+            'foo' => 'set',
+            'ignore' => 'set',
+            'private' => 'set',
+        ], ObjectDummyWithIgnoreAnnotationAndPrivateProperty::class);
+
+        $expected = new ObjectDummyWithIgnoreAnnotationAndPrivateProperty();
+        $expected->foo = 'set';
+
+        $this->assertEquals($expected, $obj);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy
@@ -1206,4 +1232,14 @@ class DummyWithNullableConstructorObject
     {
         return $this->inner;
     }
+}
+
+class ObjectDummyWithIgnoreAnnotationAndPrivateProperty
+{
+    public $foo = 'foo';
+
+    /** @Ignore */
+    public $ignored = 'ignored';
+
+    private $private = 'private';
 }

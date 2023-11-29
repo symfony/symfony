@@ -14,12 +14,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotIdenticalTo;
 use Symfony\Component\Validator\Constraints\NotIdenticalToValidator;
+use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
 class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
+    use IcuCompatibilityTrait;
+
     protected function createValidator(): NotIdenticalToValidator
     {
         return new NotIdenticalToValidator();
@@ -77,17 +80,15 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         $date = new \DateTime('2000-01-01');
         $object = new ComparisonTest_Class(2);
 
-        $comparisons = [
+        return [
             [3, '3', 3, '3', 'int'],
             ['a', '"a"', 'a', '"a"', 'string'],
-            [$date, 'Jan 1, 2000, 12:00 AM', $date, 'Jan 1, 2000, 12:00 AM', 'DateTime'],
+            [$date, self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), $date, self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
             [$object, '2', $object, '2', __NAMESPACE__.'\ComparisonTest_Class'],
         ];
-
-        return $comparisons;
     }
 
-    public static function provideComparisonsToNullValueAtPropertyPath()
+    public static function provideComparisonsToNullValueAtPropertyPath(): array
     {
         return [
             [5, '5', true],

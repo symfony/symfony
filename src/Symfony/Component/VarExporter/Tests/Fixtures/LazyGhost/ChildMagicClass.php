@@ -18,5 +18,14 @@ class ChildMagicClass extends MagicClass implements LazyObjectInterface
 {
     use LazyGhostTrait;
 
+    private const LAZY_OBJECT_PROPERTY_SCOPES = [
+        "\0".self::class."\0".'data' => [self::class, 'data', null],
+        "\0".self::class."\0".'lazyObjectState' => [self::class, 'lazyObjectState', null],
+        "\0".parent::class."\0".'data' => [parent::class, 'data', null],
+        'cloneCounter' => [self::class, 'cloneCounter', null],
+        'data' => [self::class, 'data', null],
+        'lazyObjectState' => [self::class, 'lazyObjectState', null],
+    ];
+
     private int $data = 123;
 }

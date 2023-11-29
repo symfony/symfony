@@ -102,7 +102,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'datetime',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());

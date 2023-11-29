@@ -246,16 +246,20 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $this->attributesCache[$key];
         }
 
+        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
+
+        if (false !== $allowedAttributes) {
+            if ($context['cache_key']) {
+                $this->attributesCache[$key] = $allowedAttributes;
+            }
+
+            return $allowedAttributes;
+        }
+
         $attributes = $this->extractAttributes($object, $format, $context);
 
         if ($mapping = $this->classDiscriminatorResolver?->getMappingForMappedObject($object)) {
             array_unshift($attributes, $mapping->getTypeProperty());
-        }
-
-        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
-
-        if (false !== $allowedAttributes) {
-            $attributes = $attributes ? array_intersect($attributes, $allowedAttributes) : $allowedAttributes;
         }
 
         if ($context['cache_key'] && \stdClass::class !== $class) {

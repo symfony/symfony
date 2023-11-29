@@ -25,7 +25,7 @@ if (false) {
     /**
      * @deprecated since Symfony 6.4, use FileLinkFormatter from the ErrorHandler component instead
      */
-    class FileLinkFormatter
+    class FileLinkFormatter extends ErrorHandlerFileLinkFormatter
     {
     }
 }

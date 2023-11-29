@@ -7,6 +7,32 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.32 (2023-11-29)
+
+ * bug #52786 [Serializer] Revert allowed attributes fix (mtarld)
+ * bug #52780 [DependencyInjection] don't check parameter values if they are not set (xabbuh)
+ * bug #52767 [Serializer] Fix normalization relying on allowed attributes only (mtarld)
+ * bug #52727 [String] Fix Inflector for 'icon' (podhy)
+ * bug #52677 [Translation] [Lokalise] Fix language format on Lokalise Provider (welcoMattic)
+ * bug #52715 [Cache] fix detecting the database server version (xabbuh)
+ * bug #52688 [Cache] Add url decoding of password in `RedisTrait` DSN (alexandre-daubois)
+ * bug #52172 [Serializer] Fix denormalizing empty string into `object|null` parameter (Jeroeny)
+ * bug #52681 [Serializer] Fix support for DiscriminatorMap in PropertyNormalizer (mtarld)
+ * bug #52680 [Serializer] Fix access to private properties/getters when using the ``@Ignore`` annotation (mtarld)
+ * bug #52713 [Serializer] Fix deserialization_path missing using contructor (mtarld)
+ * bug #52683 [Serializer] Fix constructor deserialization path (mtarld)
+ * bug #52707 [HttpKernel] Fix logging deprecations to the "php" channel when channel "deprecation" is not defined (nicolas-grekas)
+ * bug #52589 [Serializer] Fix XML attributes not added on empty node (mtarld)
+ * bug #52686 [Cache] fix detecting the server version with Doctrine DBAL 4 (xabbuh)
+ * bug #52459 [Cache][HttpFoundation][Lock] Fix PDO store not creating table + add tests (HypeMC)
+ * bug #52626 [Serializer] Fix denormalizing date intervals having both weeks and days (oneNevan)
+ * bug #52578 [Serializer] Fix denormalize constructor arguments (mtarld)
+ * bug #52526 Add some more non-countable English nouns (paullallier)
+ * bug #52631 [DomCrawler] Revert "bug #52579 UriResolver support path with colons" (lyrixx)
+ * bug #52618 [VarExporter] Fix handling mangled property names returned by __sleep() (nicolas-grekas)
+ * bug #52579 [DomCrawler] UriResolver support path with colons (vdauchy)
+ * bug #52581 [Messenger] attach all required parameters to query (xabbuh)
+
 * 5.4.31 (2023-11-10)
 
  * security #cve-2023-46734 [TwigBridge] Ensure CodeExtension's filters properly escape their input (nicolas-grekas, GromNaN)

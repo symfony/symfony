@@ -47,11 +47,11 @@ class LazyObjectState
 
     public function initialize($instance, $propertyName, $propertyScope)
     {
-        if (self::STATUS_INITIALIZED_FULL === $this->status) {
-            return self::STATUS_INITIALIZED_FULL;
+        if (self::STATUS_UNINITIALIZED_FULL !== $this->status) {
+            return $this->status;
         }
 
-        $this->status = self::STATUS_INITIALIZED_FULL;
+        $this->status = self::STATUS_INITIALIZED_PARTIAL;
 
         try {
             if ($defaultProperties = array_diff_key(LazyObjectRegistry::$defaultProperties[$instance::class], $this->skippedProperties)) {
@@ -66,7 +66,7 @@ class LazyObjectState
             throw $e;
         }
 
-        return self::STATUS_INITIALIZED_FULL;
+        return $this->status = self::STATUS_INITIALIZED_FULL;
     }
 
     public function reset($instance): void

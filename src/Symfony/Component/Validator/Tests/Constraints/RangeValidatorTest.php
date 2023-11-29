@@ -16,9 +16,12 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\RangeValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
 
 class RangeValidatorTest extends ConstraintValidatorTestCase
 {
+    use IcuCompatibilityTrait;
+
     protected function createValidator(): RangeValidator
     {
         return new RangeValidator();
@@ -31,7 +34,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public static function getTenToTwenty()
+    public static function getTenToTwenty(): array
     {
         return [
             [10.00001],
@@ -55,7 +58,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public static function getMoreThanTwenty()
+    public static function getMoreThanTwenty(): array
     {
         return [
             [20.000001, '20.000001'],
@@ -277,7 +280,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public static function getTenthToTwentiethMarch2014()
+    public static function getTenthToTwentiethMarch2014(): array
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
@@ -298,7 +301,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         return $tests;
     }
 
-    public static function getSoonerThanTenthMarch2014()
+    public static function getSoonerThanTenthMarch2014(): array
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
@@ -306,10 +309,10 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         date_default_timezone_set('UTC');
 
         $tests = [
-            [new \DateTime('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'],
-            [new \DateTime('March 9, 2014'), 'Mar 9, 2014, 12:00 AM'],
-            [new \DateTimeImmutable('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'],
-            [new \DateTimeImmutable('March 9, 2014'), 'Mar 9, 2014, 12:00 AM'],
+            [new \DateTime('March 20, 2013'), self::normalizeIcuSpaces("Mar 20, 2013, 12:00\u{202F}AM")],
+            [new \DateTime('March 9, 2014'), self::normalizeIcuSpaces("Mar 9, 2014, 12:00\u{202F}AM")],
+            [new \DateTimeImmutable('March 20, 2013'), self::normalizeIcuSpaces("Mar 20, 2013, 12:00\u{202F}AM")],
+            [new \DateTimeImmutable('March 9, 2014'), self::normalizeIcuSpaces("Mar 9, 2014, 12:00\u{202F}AM")],
         ];
 
         date_default_timezone_set($timezone);
@@ -317,7 +320,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         return $tests;
     }
 
-    public static function getLaterThanTwentiethMarch2014()
+    public static function getLaterThanTwentiethMarch2014(): array
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
@@ -325,10 +328,10 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         date_default_timezone_set('UTC');
 
         $tests = [
-            [new \DateTime('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'],
-            [new \DateTime('March 9, 2015'), 'Mar 9, 2015, 12:00 AM'],
-            [new \DateTimeImmutable('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'],
-            [new \DateTimeImmutable('March 9, 2015'), 'Mar 9, 2015, 12:00 AM'],
+            [new \DateTime('March 21, 2014'), self::normalizeIcuSpaces("Mar 21, 2014, 12:00\u{202F}AM")],
+            [new \DateTime('March 9, 2015'), self::normalizeIcuSpaces("Mar 9, 2015, 12:00\u{202F}AM")],
+            [new \DateTimeImmutable('March 21, 2014'), self::normalizeIcuSpaces("Mar 21, 2014, 12:00\u{202F}AM")],
+            [new \DateTimeImmutable('March 9, 2015'), self::normalizeIcuSpaces("Mar 9, 2015, 12:00\u{202F}AM")],
         ];
 
         date_default_timezone_set($timezone);
@@ -372,7 +375,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getSoonerThanTenthMarch2014
      */
-    public function testInvalidDatesMin($value, $dateTimeAsString)
+    public function testInvalidDatesMin(\DateTimeInterface $value, string $dateTimeAsString)
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
@@ -387,7 +390,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ limit }}', 'Mar 10, 2014, 12:00 AM')
+            ->setParameter('{{ limit }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
             ->setCode(Range::TOO_LOW_ERROR)
             ->assertRaised();
     }
@@ -395,7 +398,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getLaterThanTwentiethMarch2014
      */
-    public function testInvalidDatesMax($value, $dateTimeAsString)
+    public function testInvalidDatesMax(\DateTimeInterface $value, string $dateTimeAsString)
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
@@ -410,7 +413,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ limit }}', 'Mar 20, 2014, 12:00 AM')
+            ->setParameter('{{ limit }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
             ->setCode(Range::TOO_HIGH_ERROR)
             ->assertRaised();
     }
@@ -418,7 +421,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getLaterThanTwentiethMarch2014
      */
-    public function testInvalidDatesCombinedMax($value, $dateTimeAsString)
+    public function testInvalidDatesCombinedMax(\DateTimeInterface $value, string $dateTimeAsString)
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
@@ -434,8 +437,8 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ min }}', 'Mar 10, 2014, 12:00 AM')
-            ->setParameter('{{ max }}', 'Mar 20, 2014, 12:00 AM')
+            ->setParameter('{{ min }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
             ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
@@ -459,13 +462,13 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ min }}', 'Mar 10, 2014, 12:00 AM')
-            ->setParameter('{{ max }}', 'Mar 20, 2014, 12:00 AM')
+            ->setParameter('{{ min }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
             ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
 
-    public function getInvalidValues()
+    public function getInvalidValues(): array
     {
         return [
             [9.999999],
@@ -927,7 +930,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ limit }}', 'Mar 10, 2014, 12:00 AM')
+            ->setParameter('{{ limit }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
             ->setParameter('{{ min_limit_path }}', 'value')
             ->setCode(Range::TOO_LOW_ERROR)
             ->assertRaised();
@@ -953,7 +956,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ limit }}', 'Mar 20, 2014, 12:00 AM')
+            ->setParameter('{{ limit }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
             ->setParameter('{{ max_limit_path }}', 'value')
             ->setCode(Range::TOO_HIGH_ERROR)
             ->assertRaised();
@@ -980,8 +983,8 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ min }}', 'Mar 10, 2014, 12:00 AM')
-            ->setParameter('{{ max }}', 'Mar 20, 2014, 12:00 AM')
+            ->setParameter('{{ min }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
             ->setParameter('{{ max_limit_path }}', 'max')
             ->setParameter('{{ min_limit_path }}', 'min')
             ->setCode(Range::NOT_IN_RANGE_ERROR)
@@ -1009,8 +1012,8 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ min }}', 'Mar 10, 2014, 12:00 AM')
-            ->setParameter('{{ max }}', 'Mar 20, 2014, 12:00 AM')
+            ->setParameter('{{ min }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
             ->setParameter('{{ max_limit_path }}', 'max')
             ->setParameter('{{ min_limit_path }}', 'min')
             ->setCode(Range::NOT_IN_RANGE_ERROR)

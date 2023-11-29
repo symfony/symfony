@@ -21,7 +21,7 @@ if (false) {
     /**
      * @deprecated since Symfony 6.4, to be removed in 7.0, use {@link HttpFoundationUriSigner} instead
      */
-    class UriSigner
+    class UriSigner extends HttpFoundationUriSigner
     {
     }
 }

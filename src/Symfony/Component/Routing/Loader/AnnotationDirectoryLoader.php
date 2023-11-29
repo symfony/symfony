@@ -19,7 +19,7 @@ if (false) {
     /**
      * @deprecated since Symfony 6.4, to be removed in 7.0, use {@link AttributeDirectoryLoader} instead
      */
-    class AnnotationDirectoryLoader
+    class AnnotationDirectoryLoader extends AttributeDirectoryLoader
     {
     }
 }

@@ -14,12 +14,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Constraints\NotEqualToValidator;
+use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
 class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
+    use IcuCompatibilityTrait;
+
     protected function createValidator(): NotEqualToValidator
     {
         return new NotEqualToValidator();
@@ -61,14 +64,14 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
             [3, '3', 3, '3', 'int'],
             ['2', '"2"', 2, '2', 'int'],
             ['a', '"a"', 'a', '"a"', 'string'],
-            [new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
-            [new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
-            [new \DateTime('2000-01-01 UTC'), 'Jan 1, 2000, 12:00 AM', '2000-01-01 UTC', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
+            [new \DateTime('2000-01-01'), self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), new \DateTime('2000-01-01'), self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
+            [new \DateTime('2000-01-01'), self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), '2000-01-01', self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
+            [new \DateTime('2000-01-01 UTC'), self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), '2000-01-01 UTC', self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
         ];
     }
 
-    public static function provideComparisonsToNullValueAtPropertyPath()
+    public static function provideComparisonsToNullValueAtPropertyPath(): array
     {
         return [
             [5, '5', true],

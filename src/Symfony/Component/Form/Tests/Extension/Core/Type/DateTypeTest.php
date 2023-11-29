@@ -193,7 +193,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'array',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $output = [
             'day' => '2',

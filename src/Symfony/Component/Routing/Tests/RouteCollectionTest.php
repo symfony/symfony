@@ -225,11 +225,13 @@ class RouteCollectionTest extends TestCase
         $collection1->add('bar', $bar = new Route('/bar'));
         $collection->addCollection($collection1);
         $collection->add('last', $last = new Route('/last'));
+        $collection->addAlias('ccc_my_custom_alias', 'foo');
 
         $collection->remove('foo');
         $this->assertSame(['bar' => $bar, 'last' => $last], $collection->all(), '->remove() can remove a single route');
         $collection->remove(['bar', 'last']);
         $this->assertSame([], $collection->all(), '->remove() accepts an array and can remove multiple routes at once');
+        $this->assertNull($collection->getAlias('ccc_my_custom_alias'));
     }
 
     public function testSetHost()

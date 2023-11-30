@@ -157,15 +157,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function remove($name)
     {
-        $names = (array) $name;
-        foreach ($names as $n) {
-            unset($this->routes[$n], $this->priorities[$n]);
-        }
-
-        foreach ($this->aliases as $k => $alias) {
-            if (\in_array($alias->getId(), $names, true)) {
-                unset($this->aliases[$k]);
-            }
+        foreach ((array) $name as $n) {
+            unset($this->routes[$n], $this->priorities[$n], $this->aliases[$n]);
         }
     }
 

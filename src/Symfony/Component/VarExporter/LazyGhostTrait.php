@@ -108,8 +108,9 @@ trait LazyGhostTrait
             if ($state && (null === $scope || isset($propertyScopes["\0$scope\0$name"]))) {
                 if (LazyObjectState::STATUS_INITIALIZED_FULL === $state->status) {
                     // Work around php/php-src#12695
-                    $property = $propertyScopes[null === $scope ? $name : "\0$scope\0$name"][3]
-                        ?? (Hydrator::$propertyScopes[$this::class] = Hydrator::getPropertyScopes($this::class))[3];
+                    $property = null === $scope ? $name : "\0$scope\0$name";
+                    $property = $propertyScopes[$property][3]
+                        ?? Hydrator::$propertyScopes[$this::class][$property][3] = new \ReflectionProperty($scope ?? $class, $name);
                 } else {
                     $property = null;
                 }

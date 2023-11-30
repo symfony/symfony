@@ -1301,6 +1301,18 @@ class AutowirePassTest extends TestCase
         $this->assertEquals([new TypedReference(A::class, A::class), 'abc'], $container->getDefinition('foo')->getArguments());
     }
 
+    public function testAutowireUnderscoreNamedArgument()
+    {
+        $container = new ContainerBuilder();
+
+        $container->autowire(\DateTimeImmutable::class.' $now_datetime', \DateTimeImmutable::class);
+        $container->autowire('foo', UnderscoreNamedArgument::class)->setPublic(true);
+
+        (new AutowirePass())->process($container);
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $container->get('foo')->now_datetime);
+    }
+
     public function testAutowireDefaultValueParametersLike()
     {
         $container = new ContainerBuilder();

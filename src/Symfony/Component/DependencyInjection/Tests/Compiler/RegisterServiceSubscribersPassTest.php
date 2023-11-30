@@ -403,7 +403,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
         $expected = [
             'some.service' => new ServiceClosureArgument(new TypedReference('stdClass $someService', 'stdClass')),
-            'some_service' => new ServiceClosureArgument(new TypedReference('stdClass $someService', 'stdClass')),
+            'some_service' => new ServiceClosureArgument(new TypedReference('stdClass $some_service', 'stdClass')),
             'another_service' => new ServiceClosureArgument(new TypedReference('stdClass $anotherService', 'stdClass')),
         ];
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));

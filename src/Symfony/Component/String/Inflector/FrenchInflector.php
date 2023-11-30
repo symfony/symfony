@@ -80,7 +80,7 @@ final class FrenchInflector implements InflectorInterface
 
         // Words finishing with "al" are pluralized with a "aux" expected
         // Les mots finissant en "al" se terminent en "aux" sauf
-        ['/(amir|anim|arsen|boc|can|capit|capor|chev|crist|génér|hopit|hôpit|idé|journ|littor|loc|m|mét|minér|princip|radic|termin)aux$/i', '\1al'],
+        ['/(amir|anim|arsen|boc|can|capit|capor|chev|crist|génér|hopit|hôpit|idé|journ|littor|loc|m|mét|minér|princip|radic|termin|sign|médiév|flor|origin|géni)aux$/i', '\1al'],
 
         // Words finishing with "au" are pluralized with a "x" excepted "landau"
         // Les mots finissant par "au" prennent un "x" au pluriel sauf "landau"
@@ -141,7 +141,7 @@ final class FrenchInflector implements InflectorInterface
             }
         }
 
-        return [$singular.'s'];
+        return [$singular . 's'];
     }
 
     private function isInflectedWord(string $word): bool

@@ -141,7 +141,7 @@ final class FrenchInflector implements InflectorInterface
             }
         }
 
-        return [$singular . 's'];
+        return [$singular.'s'];
     }
 
     private function isInflectedWord(string $word): bool

@@ -52,8 +52,11 @@ class SlidingWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(10);
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertSame(10, $rateLimit->getLimit());
+    }
 
-        // Test without consuming a try
+    public function testConsumeZeroTokens()
+    {
+        $limiter = $this->createLimiter();
         $limiter->reset();
 
         $rateLimit = $limiter->consume(0);

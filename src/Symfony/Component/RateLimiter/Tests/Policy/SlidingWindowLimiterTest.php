@@ -52,6 +52,26 @@ class SlidingWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(10);
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertSame(10, $rateLimit->getLimit());
+
+        // Test without consuming a try
+        $limiter->reset();
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string)floor(microtime(true))),
+            $rateLimit->getRetryAfter()
+        );
+
+        $limiter->reset();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string)floor(microtime(true) + 12 / 10)),
+            $rateLimit->getRetryAfter()
+        );
     }
 
     public function testWaitIntervalOnConsumeOverLimit()

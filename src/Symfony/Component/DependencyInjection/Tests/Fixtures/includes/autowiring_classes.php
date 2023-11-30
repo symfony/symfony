@@ -462,3 +462,59 @@ class MyCallable
     {
     }
 }
+
+class MyInlineService
+{
+    public function __construct(private readonly ?string $someParam = null)
+    {
+    }
+
+    public function someMethod(): void
+    {
+    }
+
+    public function someMethod1(): void
+    {
+    }
+
+    public function someMethod2(): void
+    {
+    }
+
+    public function getSomeParam(): ?string
+    {
+        return $this->someParam;
+    }
+}
+
+class MyFactory
+{
+    public function __construct()
+    {
+    }
+
+    public function __invoke(mixed $someParam = null): MyInlineService
+    {
+        return new MyInlineService($someParam ?? 'someString');
+    }
+
+    public function createFoo(): MyInlineService
+    {
+        return new MyInlineService('someString');
+    }
+
+    public function createFooWithParam(mixed $someParam): MyInlineService
+    {
+        return new MyInlineService($someParam);
+    }
+
+    public static function staticCreateFoo(): MyInlineService
+    {
+        return new MyInlineService('someString');
+    }
+
+    public static function staticCreateFooWithParam(mixed $someParam): MyInlineService
+    {
+        return new MyInlineService($someParam);
+    }
+}

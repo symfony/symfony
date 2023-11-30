@@ -5,6 +5,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
+use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
@@ -149,5 +150,35 @@ class LazyAutowireServiceAttributesAutowiring
 {
     public function __construct(#[Lazy, Autowire(lazy: true)] A $a)
     {
+    }
+}
+
+class AutowireInlineAttributesBar
+{
+    public function __construct(Foo $foo, string $someString)
+    {
+    }
+}
+
+class AutowireInlineAttributes1
+{
+    public function __construct(
+        #[AutowireInline(AutowireInlineAttributesBar::class, [
+            '$foo' => Foo::class,
+            '$someString' => 'testString',
+        ])]
+        public AutowireInlineAttributesBar $inlined,
+    ) {
+    }
+}
+
+class AutowireInlineAttributes2
+{
+    public function __construct(
+        #[AutowireInline(AutowireInlineAttributesBar::class, [
+            '$someString' => 'testString',
+        ])]
+        public AutowireInlineAttributesBar $inlined,
+    ) {
     }
 }

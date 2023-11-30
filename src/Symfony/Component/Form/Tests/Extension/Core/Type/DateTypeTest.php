@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
@@ -90,6 +91,10 @@ class DateTypeTest extends BaseTypeTestCase
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
 
+        if ('71.1' === Intl::getIcuVersion()) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        }
+
         \Locale::setDefault('de_DE');
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -111,6 +116,10 @@ class DateTypeTest extends BaseTypeTestCase
     {
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
+
+        if ('71.1' === Intl::getIcuVersion()) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        }
 
         \Locale::setDefault('de_DE');
 
@@ -135,6 +144,10 @@ class DateTypeTest extends BaseTypeTestCase
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
 
+        if ('71.1' === Intl::getIcuVersion()) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        }
+
         \Locale::setDefault('de_DE');
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -156,6 +169,10 @@ class DateTypeTest extends BaseTypeTestCase
     {
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
+
+        if ('71.1' === Intl::getIcuVersion()) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        }
 
         \Locale::setDefault('de_DE');
 
@@ -180,6 +197,10 @@ class DateTypeTest extends BaseTypeTestCase
     {
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
+
+        if ('71.1' === Intl::getIcuVersion()) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        }
 
         \Locale::setDefault('de_DE');
 

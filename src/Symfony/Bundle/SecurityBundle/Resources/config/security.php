@@ -50,6 +50,7 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGeneratorInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
@@ -226,6 +227,7 @@ return static function (ContainerConfigurator $container) {
                 service('router')->nullOnInvalid(),
                 service('security.token_storage')->nullOnInvalid(),
             ])
+        ->alias(LogoutUrlGeneratorInterface::class, 'security.logout_url_generator')
 
         ->set('security.route_loader.logout', LogoutRouteLoader::class)
             ->args([

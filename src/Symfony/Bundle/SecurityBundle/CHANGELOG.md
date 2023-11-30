@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `Symfony\Component\Security\Http\Logout\LogoutUrlGeneratorInterface` as autowiring alias for `security.logout_url_generator`
+
 7.0
 ---
 

@@ -22,7 +22,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
-class LogoutUrlGenerator
+class LogoutUrlGenerator implements LogoutUrlGeneratorInterface
 {
     private ?RequestStack $requestStack;
     private ?UrlGeneratorInterface $router;

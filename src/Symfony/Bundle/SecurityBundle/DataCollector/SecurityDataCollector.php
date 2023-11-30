@@ -26,6 +26,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGeneratorInterface;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 
@@ -38,13 +39,13 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 {
     private ?TokenStorageInterface $tokenStorage;
     private ?RoleHierarchyInterface $roleHierarchy;
-    private ?LogoutUrlGenerator $logoutUrlGenerator;
+    private LogoutUrlGenerator|LogoutUrlGeneratorInterface|null $logoutUrlGenerator;
     private ?AccessDecisionManagerInterface $accessDecisionManager;
     private ?FirewallMapInterface $firewallMap;
     private ?TraceableFirewallListener $firewall;
     private bool $hasVarDumper;
 
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator|LogoutUrlGeneratorInterface $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `LogoutUrlGeneratorInterface` to generate logout URLs and Paths
+
 7.0
 ---
 

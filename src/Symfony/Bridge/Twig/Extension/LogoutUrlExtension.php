@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGeneratorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -22,9 +23,9 @@ use Twig\TwigFunction;
  */
 final class LogoutUrlExtension extends AbstractExtension
 {
-    private LogoutUrlGenerator $generator;
+    private LogoutUrlGenerator|LogoutUrlGeneratorInterface $generator;
 
-    public function __construct(LogoutUrlGenerator $generator)
+    public function __construct(LogoutUrlGenerator|LogoutUrlGeneratorInterface $generator)
     {
         $this->generator = $generator;
     }

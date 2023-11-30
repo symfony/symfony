@@ -52,6 +52,7 @@ class SlidingWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(10);
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertSame(10, $rateLimit->getLimit());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
     }
 
     public function testWaitIntervalOnConsumeOverLimit()
@@ -76,6 +77,9 @@ class SlidingWindowLimiterTest extends TestCase
 
         // 2 over the limit, causing the WaitDuration to become 2/10th of the 12s interval
         $this->assertEqualsWithDelta(12 / 5, $limiter->reserve(4)->getWaitDuration(), 1);
+
+        $limiter->reset();
+        $this->assertEquals(0, $limiter->reserve(10)->getWaitDuration());
     }
 
     public function testPeekConsume()
@@ -90,7 +94,7 @@ class SlidingWindowLimiterTest extends TestCase
             $this->assertTrue($rateLimit->isAccepted());
             $this->assertSame(10, $rateLimit->getLimit());
             $this->assertEquals(
-                \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true))),
+                \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true))),
                 $rateLimit->getRetryAfter()
             );
         }
@@ -101,7 +105,7 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertEquals(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertEquals(
-            \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true) + 12)),
+            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
             $rateLimit->getRetryAfter()
         );
     }

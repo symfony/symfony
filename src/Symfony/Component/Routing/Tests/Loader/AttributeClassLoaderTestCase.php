@@ -99,6 +99,15 @@ abstract class AttributeClassLoaderTestCase extends TestCase
         $this->assertEquals(new Alias('lol'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableController::__invoke'));
     }
 
+    public function testInvokableFQCNAliasConflictController()
+    {
+        $routes = $this->loader->load($this->getNamespace().'\InvokableFQCNAliasConflictController');
+        $this->assertCount(1, $routes);
+        $this->assertEquals('/foobarccc', $routes->get($this->getNamespace().'\InvokableFQCNAliasConflictController')->getPath());
+        $this->assertNull($routes->getAlias($this->getNamespace().'\InvokableFQCNAliasConflictController'));
+        $this->assertEquals(new Alias($this->getNamespace().'\InvokableFQCNAliasConflictController'), $routes->getAlias($this->getNamespace().'\InvokableFQCNAliasConflictController::__invoke'));
+    }
+
     public function testInvokableMethodControllerLoader()
     {
         $routes = $this->loader->load(InvokableMethodController::class);

@@ -30,6 +30,7 @@
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",
         "symfony/security-core": "^6.4|^7.0",
+        "symfony/stopwatch": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0"
     },
     "conflict": {

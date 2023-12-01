@@ -1857,7 +1857,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
         }
 
-        if (!class_exists(Translator::class)) {
+        if (!$this->readConfigEnabled('translator', $container, $config)) {
             $container->removeDefinition('serializer.normalizer.translatable');
         }
 

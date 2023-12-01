@@ -213,6 +213,14 @@ class MultipleArgumentsOptionalScalarLast
     }
 }
 
+class UnderscoreNamedArgument
+{
+    public function __construct(
+        public \DateTimeImmutable $now_datetime,
+    ) {
+    }
+}
+
 /*
  * Classes used for testing createResourceForClass
  */

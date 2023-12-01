@@ -1434,6 +1434,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals($container->getDefinition('serializer.normalizer.object')->getArgument(6)['max_depth_handler'], new Reference('my.max.depth.handler'));
     }
 
+    public function testSerializerWithoutTranslator()
+    {
+        $container = $this->createContainerFromFile('serializer_without_translator');
+        $this->assertFalse($container->hasDefinition('serializer.normalizer.translatable'));
+    }
+
     public function testRegisterSerializerExtractor()
     {
         $container = $this->createContainerFromFile('full');

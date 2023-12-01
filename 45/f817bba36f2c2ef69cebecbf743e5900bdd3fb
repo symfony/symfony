@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by paullallier at 2023-11-30T22:44:56Z
+
+Works for me - all my tests pass.  Thanks @nicolas-grekas!
+
+---------------------------------------------------------------------------
+
+by aboks at 2023-12-01T07:33:13Z
+
+Can confirm this also fixes the autowiring regressions in my application.

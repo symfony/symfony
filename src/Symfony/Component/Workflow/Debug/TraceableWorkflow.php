@@ -16,6 +16,7 @@ use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
+use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlockerList;
 use Symfony\Component\Workflow\WorkflowInterface;
 
@@ -53,6 +54,11 @@ class TraceableWorkflow implements WorkflowInterface
     }
 
     public function getEnabledTransitions(object $subject): array
+    {
+        return $this->callInner(__FUNCTION__, \func_get_args());
+    }
+
+    public function getEnabledTransition(object $subject, string $name): ?Transition
     {
         return $this->callInner(__FUNCTION__, \func_get_args());
     }

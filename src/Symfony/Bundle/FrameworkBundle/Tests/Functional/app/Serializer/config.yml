@@ -3,6 +3,7 @@ imports:
 
 framework:
     http_method_override: false
+    translator: true
     serializer:
         enabled: true
         default_context:

@@ -17,19 +17,26 @@ Installation
 Sponsor
 -------
 
-Symfony 6.4 is [backed][27] by
-- [SensioLabs][28]
-- [packagist.com][29]
+Symfony 7.0 is [backed][27] by
+- [Shopware][28]
+- [Sulu][29]
+- [Les-Tilleuls.coop][30]
 
-As the creator of Symfony, **SensioLabs** supports companies using Symfony,
-with an offering encompassing consultancy, expertise, services, training, and
-technical assistance to ensure the success of web application development projects.
+**Shopware** is an open headless commerce platform powered by Symfony and Vue.js
+that is used by thousands of shops and supported by a huge, worldwide community
+of developers, agencies and merchants.
 
-Private **Packagist.com** is a fast, reliable, and secure Composer repository for
-your private packages. It mirrors all your open-source dependencies for better
-availability and monitors them for security vulnerabilities.
+**Sulu** is the CMS for Symfony developers. It provides pre-built content-management
+features while giving developers the freedom to build, deploy, and maintain custom
+solutions using full-stack Symfony. Sulu is ideal for creating complex websites,
+integrating external tools, and building custom-built solutions.
 
-Help Symfony by [sponsoring][30] its development!
+**Les-Tilleuls.coop** is a team of 70+ Symfony experts who can help you design,
+develop and fix your projects. We provide a wide range of professional services
+including development, consulting, coaching, training and audits. We also are
+highly skilled in JS, Go and DevOps. We are a worker cooperative!
+
+Help Symfony by [sponsoring][31] its development!
 
 Documentation
 -------------
@@ -92,6 +99,7 @@ and supported by [Symfony contributors][19].
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
-[28]: https://sensiolabs.com
-[29]: https://packagist.com
-[30]: https://symfony.com/sponsor
+[28]: https://www.shopware.com
+[29]: https://sulu.io
+[30]: https://les-tilleuls.coop/
+[31]: https://symfony.com/sponsor

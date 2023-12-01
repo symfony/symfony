@@ -47,6 +47,21 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a PHP file resource');
     }
 
+    public function testPrependExtensionConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $container->prependExtensionConfig('acme', ['foo' => 'bar']);
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()), true);
+        $loader->load('config/config_builder.php');
+
+        $expected = [
+            ['color' => 'blue'],
+            ['foo' => 'bar'],
+        ];
+        $this->assertSame($expected, $container->getExtensionConfig('acme'));
+    }
+
     public function testConfigServices()
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');

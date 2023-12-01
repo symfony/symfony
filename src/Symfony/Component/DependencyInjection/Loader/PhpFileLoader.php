@@ -36,9 +36,9 @@ class PhpFileLoader extends FileLoader
     protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
     private ?ConfigBuilderGeneratorInterface $generator;
 
-    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, ?string $env = null, ?ConfigBuilderGeneratorInterface $generator = null)
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, ?string $env = null, ?ConfigBuilderGeneratorInterface $generator = null, bool $prepend = false)
     {
-        parent::__construct($container, $locator, $env);
+        parent::__construct($container, $locator, $env, $prepend);
         $this->generator = $generator;
     }
 
@@ -145,10 +145,19 @@ class PhpFileLoader extends FileLoader
 
         $callback(...$arguments);
 
-        /** @var ConfigBuilderInterface $configBuilder */
+        $this->loadFromExtensions($configBuilders);
+    }
+
+    /**
+     * @param iterable<ConfigBuilderInterface> $configBuilders
+     */
+    private function loadFromExtensions(iterable $configBuilders): void
+    {
         foreach ($configBuilders as $configBuilder) {
-            $containerConfigurator->extension($configBuilder->getExtensionAlias(), $configBuilder->toArray());
+            $this->loadExtensionConfig($configBuilder->getExtensionAlias(), $configBuilder->toArray());
         }
+
+        $this->loadExtensionConfigs();
     }
 
     /**

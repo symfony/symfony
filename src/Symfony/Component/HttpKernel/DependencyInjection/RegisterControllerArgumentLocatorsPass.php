@@ -128,6 +128,8 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     $type = preg_replace('/(^|[(|&])\\\\/', '\1', $target = ltrim(ProxyHelper::exportType($p) ?? '', '?'));
                     $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
                     $autowireAttributes = $autowire ? $emptyAutowireAttributes : [];
+                    $parsedName = $p->name;
+                    $k = null;
 
                     if (isset($arguments[$r->name][$p->name])) {
                         $target = $arguments[$r->name][$p->name];
@@ -138,7 +140,11 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         } elseif ($p->allowsNull() && !$p->isOptional()) {
                             $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                         }
-                    } elseif (isset($bindings[$bindingName = $type.' $'.$name = Target::parseName($p)]) || isset($bindings[$bindingName = '$'.$name]) || isset($bindings[$bindingName = $type])) {
+                    } elseif (isset($bindings[$bindingName = $type.' $'.$name = Target::parseName($p, $k, $parsedName)])
+                        || isset($bindings[$bindingName = $type.' $'.$parsedName])
+                        || isset($bindings[$bindingName = '$'.$name])
+                        || isset($bindings[$bindingName = $type])
+                    ) {
                         $binding = $bindings[$bindingName];
 
                         [$bindingValue, $bindingId, , $bindingType, $bindingFile] = $binding->getValues();

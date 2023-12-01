@@ -36,10 +36,12 @@ final class Target
         return lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $this->name))));
     }
 
-    public static function parseName(\ReflectionParameter $parameter, self &$attribute = null): string
+    public static function parseName(\ReflectionParameter $parameter, self &$attribute = null, string &$parsedName = null): string
     {
         $attribute = null;
         if (!$target = $parameter->getAttributes(self::class)[0] ?? null) {
+            $parsedName = (new self($parameter->name))->getParsedName();
+
             return $parameter->name;
         }
 
@@ -57,6 +59,6 @@ final class Target
             throw new InvalidArgumentException(sprintf('Invalid #[Target] name "%s" on parameter "$%s" of "%s()": the first character must be a letter.', $name, $parameter->name, $function));
         }
 
-        return $parsedName;
+        return preg_match('/^[a-zA-Z0-9_\x7f-\xff]++$/', $name) ? $name : $parsedName;
     }
 }

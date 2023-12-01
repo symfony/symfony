@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add methods `getConstraint()`, `getCause()` and `__toString()` to `ConstraintViolationInterface`
+ * Add method `__toString()` to `ConstraintViolationListInterface`
+ * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface`
+ * Remove static property `$errorNames` from all constraints, use const `ERROR_NAMES` instead
+ * Remove static property `$versions` from the `Ip` constraint, use the `VERSIONS` constant instead
+ * Remove `VALIDATION_MODE_LOOSE` from `Email` constraint, use `VALIDATION_MODE_HTML5` instead
+ * Remove constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove the annotation reader parameter from the constructor signature of `AnnotationLoader`
+ * Remove `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
+ * Remove `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
+
 6.4
 ---
 

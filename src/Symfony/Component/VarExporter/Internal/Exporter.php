@@ -119,7 +119,6 @@ class Exporter
                 $arrayValue = (array) $value;
             } elseif ($value instanceof \Serializable
                 || $value instanceof \__PHP_Incomplete_Class
-                || \PHP_VERSION_ID < 80200 && $value instanceof \DatePeriod
             ) {
                 ++$objectsCount;
                 $objectsPool[$value] = [$id = \count($objectsPool), serialize($value), [], 0];

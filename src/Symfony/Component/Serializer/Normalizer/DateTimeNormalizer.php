@@ -20,10 +20,8 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  * Denormalizes a date string to an instance of {@see \DateTime} or {@see \DateTimeImmutable}.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final since Symfony 6.3
  */
-class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     public const FORMAT_KEY = 'datetime_format';
     public const TIMEZONE_KEY = 'datetime_timezone';
@@ -51,12 +49,10 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
     public function getSupportedTypes(?string $format): array
     {
-        $isCacheable = __CLASS__ === static::class || $this->hasCacheableSupportsMethod();
-
         return [
-            \DateTimeInterface::class => $isCacheable,
-            \DateTimeImmutable::class => $isCacheable,
-            \DateTime::class => $isCacheable,
+            \DateTimeInterface::class => true,
+            \DateTimeImmutable::class => true,
+            \DateTime::class => true,
         ];
     }
 
@@ -80,10 +76,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         return $object->format($dateTimeFormat);
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof \DateTimeInterface;
     }
@@ -138,22 +131,9 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         }
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return isset(self::SUPPORTED_TYPES[$type]);
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this));
-
-        return __CLASS__ === static::class;
     }
 
     /**

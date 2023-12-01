@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\GuidType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\AbstractQuery;
@@ -42,12 +42,12 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
     public function testIdentifierTypeIsStringArray()
     {
-        $this->checkIdentifierType(SingleStringIdEntity::class, class_exists(ArrayParameterType::class) ? ArrayParameterType::STRING : Connection::PARAM_STR_ARRAY);
+        $this->checkIdentifierType(SingleStringIdEntity::class, ArrayParameterType::STRING);
     }
 
     public function testIdentifierTypeIsIntegerArray()
     {
-        $this->checkIdentifierType(SingleIntIdEntity::class, class_exists(ArrayParameterType::class) ? ArrayParameterType::INTEGER : Connection::PARAM_INT_ARRAY);
+        $this->checkIdentifierType(SingleIntIdEntity::class, ArrayParameterType::INTEGER);
     }
 
     protected function checkIdentifierType(string $classname, $expectedType)
@@ -93,7 +93,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $query->expects($this->once())
             ->method('setParameter')
-            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [1, 2, 3, '9223372036854775808'], class_exists(ArrayParameterType::class) ? ArrayParameterType::INTEGER : Connection::PARAM_INT_ARRAY)
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [1, 2, 3, '9223372036854775808'], ArrayParameterType::INTEGER)
             ->willReturn($query);
 
         $qb = $this->getMockBuilder(QueryBuilder::class)
@@ -127,7 +127,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $query->expects($this->once())
             ->method('setParameter')
-            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', 'b98e8e11-2897-44df-ad24-d2627eb7f499'], class_exists(ArrayParameterType::class) ? ArrayParameterType::STRING : Connection::PARAM_STR_ARRAY)
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', 'b98e8e11-2897-44df-ad24-d2627eb7f499'], ArrayParameterType::STRING)
             ->willReturn($query);
 
         $qb = $this->getMockBuilder(QueryBuilder::class)
@@ -170,7 +170,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $query->expects($this->once())
             ->method('setParameter')
-            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d')->toBinary(), Uuid::fromString('b98e8e11-2897-44df-ad24-d2627eb7f499')->toBinary()], class_exists(ArrayParameterType::class) ? ArrayParameterType::STRING : Connection::PARAM_STR_ARRAY)
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d')->toBinary(), Uuid::fromString('b98e8e11-2897-44df-ad24-d2627eb7f499')->toBinary()], ArrayParameterType::STRING)
             ->willReturn($query);
 
         $qb = $this->getMockBuilder(QueryBuilder::class)
@@ -236,7 +236,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $query->expects($this->once())
             ->method('setParameter')
-            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id_value', [1, 2, 3], class_exists(ArrayParameterType::class) ? ArrayParameterType::INTEGER : Connection::PARAM_INT_ARRAY)
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id_value', [1, 2, 3], ArrayParameterType::INTEGER)
             ->willReturn($query);
 
         $qb = $this->getMockBuilder(QueryBuilder::class)

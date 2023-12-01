@@ -28,10 +28,7 @@ class TransformationFailureExtension extends AbstractTypeExtension
         $this->translator = $translator;
     }
 
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!isset($options['constraints'])) {
             $builder->addEventSubscriber(new TransformationFailureListener($this->translator));

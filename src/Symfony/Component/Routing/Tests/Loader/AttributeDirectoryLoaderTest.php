@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\AttributeDirectoryLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AttributedClasses\BarClass;
@@ -23,8 +22,6 @@ use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
 class AttributeDirectoryLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private AttributeDirectoryLoader $loader;
     private TraceableAttributeClassLoader $classLoader;
 
@@ -57,17 +54,6 @@ class AttributeDirectoryLoaderTest extends TestCase
 
         $this->assertTrue($this->loader->supports($fixturesDir, 'attribute'), '->supports() checks the resource type if specified');
         $this->assertFalse($this->loader->supports($fixturesDir, 'foo'), '->supports() checks the resource type if specified');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSupportsAnnotations()
-    {
-        $fixturesDir = __DIR__.'/../Fixtures';
-
-        $this->expectDeprecation('Since symfony/routing 6.4: The "annotation" route type is deprecated, use the "attribute" route type instead.');
-        $this->assertTrue($this->loader->supports($fixturesDir, 'annotation'), '->supports() checks the resource type if specified');
     }
 
     public function testItSupportsAnyAttribute()

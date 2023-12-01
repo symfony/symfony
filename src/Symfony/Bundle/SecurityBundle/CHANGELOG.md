@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Enabling SecurityBundle and not configuring it is not allowed
+ * Remove configuration options `enable_authenticator_manager`, `csrf_token_generator` and `require_previous_session`
+
 6.4
 ---
 

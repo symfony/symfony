@@ -38,10 +38,7 @@ class FormType extends BaseType
         ]));
     }
 
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
 
@@ -69,10 +66,7 @@ class FormType extends BaseType
         $builder->setIsEmptyCallback($options['is_empty_callback']);
     }
 
-    /**
-     * @return void
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         parent::buildView($view, $form, $options);
 
@@ -111,10 +105,7 @@ class FormType extends BaseType
         ]);
     }
 
-    /**
-     * @return void
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $multipart = false;
 
@@ -128,10 +119,7 @@ class FormType extends BaseType
         $view->vars['multipart'] = $multipart;
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 

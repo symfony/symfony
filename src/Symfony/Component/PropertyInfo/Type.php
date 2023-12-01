@@ -38,7 +38,7 @@ class Type
      *
      * @var string[]
      */
-    public static $builtinTypes = [
+    public static array $builtinTypes = [
         self::BUILTIN_TYPE_INT,
         self::BUILTIN_TYPE_FLOAT,
         self::BUILTIN_TYPE_STRING,
@@ -58,7 +58,7 @@ class Type
      *
      * @var string[]
      */
-    public static $builtinCollectionTypes = [
+    public static array $builtinCollectionTypes = [
         self::BUILTIN_TYPE_ARRAY,
         self::BUILTIN_TYPE_ITERABLE,
     ];

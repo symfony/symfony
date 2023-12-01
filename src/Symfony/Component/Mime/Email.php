@@ -358,18 +358,6 @@ class Email extends Message
 
     /**
      * @return $this
-     *
-     * @deprecated since Symfony 6.2, use addPart() instead
-     */
-    public function attachPart(DataPart $part): static
-    {
-        @trigger_deprecation('symfony/mime', '6.2', 'The "%s()" method is deprecated, use "addPart()" instead.', __METHOD__);
-
-        return $this->addPart($part);
-    }
-
-    /**
-     * @return $this
      */
     public function addPart(DataPart $part): static
     {
@@ -396,10 +384,7 @@ class Email extends Message
         return $this->generateBody();
     }
 
-    /**
-     * @return void
-     */
-    public function ensureValidity()
+    public function ensureValidity(): void
     {
         $this->ensureBodyValid();
 

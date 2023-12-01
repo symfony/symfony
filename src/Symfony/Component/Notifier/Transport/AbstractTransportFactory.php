@@ -21,8 +21,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class AbstractTransportFactory implements TransportFactoryInterface
 {
-    protected $dispatcher;
-    protected $client;
+    protected ?EventDispatcherInterface $dispatcher;
+    protected ?HttpClientInterface $client;
 
     public function __construct(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
     {

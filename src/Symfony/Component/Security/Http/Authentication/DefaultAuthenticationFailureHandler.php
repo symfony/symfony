@@ -32,11 +32,11 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  */
 class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {
-    protected $httpKernel;
-    protected $httpUtils;
-    protected $logger;
-    protected $options;
-    protected $defaultOptions = [
+    protected HttpKernelInterface $httpKernel;
+    protected HttpUtils $httpUtils;
+    protected array $options;
+    protected ?LoggerInterface $logger;
+    protected array $defaultOptions = [
         'failure_path' => null,
         'failure_forward' => false,
         'login_path' => '/login',
@@ -59,10 +59,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         return $this->options;
     }
 
-    /**
-     * @return void
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = array_merge($this->defaultOptions, $options);
     }

@@ -16,7 +16,7 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
  */
 abstract class AbstractVault
 {
-    protected $lastMessage;
+    protected ?string $lastMessage = null;
 
     public function getLastMessage(): ?string
     {
@@ -40,10 +40,7 @@ abstract class AbstractVault
         }
     }
 
-    /**
-     * @return string
-     */
-    protected function getPrettyPath(string $path)
+    protected function getPrettyPath(string $path): string
     {
         return str_replace(getcwd().\DIRECTORY_SEPARATOR, '', $path);
     }

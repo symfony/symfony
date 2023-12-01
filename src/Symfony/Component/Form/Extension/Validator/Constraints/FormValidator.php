@@ -29,10 +29,7 @@ class FormValidator extends ConstraintValidator
      */
     private \SplObjectStorage $resolvedGroups;
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $form, Constraint $formConstraint)
+    public function validate(mixed $form, Constraint $formConstraint): void
     {
         if (!$formConstraint instanceof Form) {
             throw new UnexpectedTypeException($formConstraint, Form::class);

@@ -24,10 +24,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class IpValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Ip) {
             throw new UnexpectedTypeException($constraint, Ip::class);

@@ -22,10 +22,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class DebugBundle extends Bundle
 {
-    /**
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
         if ($this->container->getParameter('kernel.debug')) {
             $container = $this->container;
@@ -52,20 +49,14 @@ class DebugBundle extends Bundle
         }
     }
 
-    /**
-     * @return void
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
         $container->addCompilerPass(new DumpDataCollectorPass());
     }
 
-    /**
-     * @return void
-     */
-    public function registerCommands(Application $application)
+    public function registerCommands(Application $application): void
     {
         // noop
     }

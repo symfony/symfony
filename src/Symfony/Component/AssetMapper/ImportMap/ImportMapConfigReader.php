@@ -41,28 +41,9 @@ class ImportMapConfigReader
 
         $entries = new ImportMapEntries();
         foreach ($importMapConfig ?? [] as $importName => $data) {
-            $validKeys = ['path', 'version', 'type', 'entrypoint', 'url', 'package_specifier', 'downloaded_to', 'preload'];
+            $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
-            }
-
-            // should solve itself when the config is written again
-            if (isset($data['url'])) {
-                trigger_deprecation('symfony/asset-mapper', '6.4', 'The "url" option is deprecated, use "version" instead.');
-            }
-
-            // should solve itself when the config is written again
-            if (isset($data['downloaded_to'])) {
-                trigger_deprecation('symfony/asset-mapper', '6.4', 'The "downloaded_to" option is deprecated and will be removed.');
-                // remove deprecated downloaded_to
-                unset($data['downloaded_to']);
-            }
-
-            // should solve itself when the config is written again
-            if (isset($data['preload'])) {
-                trigger_deprecation('symfony/asset-mapper', '6.4', 'The "preload" option is deprecated, preloading is automatically done.');
-                // remove deprecated preload
-                unset($data['preload']);
             }
 
             $type = isset($data['type']) ? ImportMapType::tryFrom($data['type']) : ImportMapType::JS;
@@ -82,12 +63,8 @@ class ImportMapConfigReader
             }
 
             $version = $data['version'] ?? null;
-            if (null === $version && ($data['url'] ?? null)) {
-                // BC layer for 6.3->6.4
-                $version = $this->extractVersionFromLegacyUrl($data['url']);
-            }
 
-            if (null === $version) {
+            if (null === $version && null === $path) {
                 throw new RuntimeException(sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
             }
 
@@ -197,18 +174,17 @@ class ImportMapConfigReader
         return \dirname($this->importMapConfigPath);
     }
 
-    private function extractVersionFromLegacyUrl(string $url): ?string
+    public static function splitPackageNameAndFilePath(string $packageName): array
     {
-        // URL pattern https://ga.jspm.io/npm:bootstrap@5.3.2/dist/js/bootstrap.esm.js
-        if (false === $lastAt = strrpos($url, '@')) {
-            return null;
+        $filePath = '';
+        $i = strpos($packageName, '/');
+
+        if ($i && (!str_starts_with($packageName, '@') || $i = strpos($packageName, '/', $i + 1))) {
+            // @vendor/package/filepath or package/filepath
+            $filePath = substr($packageName, $i);
+            $packageName = substr($packageName, 0, $i);
         }
 
-        $nextSlash = strpos($url, '/', $lastAt);
-        if (false === $nextSlash) {
-            return null;
-        }
-
-        return substr($url, $lastAt + 1, $nextSlash - $lastAt - 1);
+        return [$packageName, $filePath];
     }
 }

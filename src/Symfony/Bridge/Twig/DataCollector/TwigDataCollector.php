@@ -131,7 +131,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
 
     public function getProfile(): Profile
     {
-        return $this->profile ??= unserialize($this->data['profile'], ['allowed_classes' => ['Twig_Profiler_Profile', Profile::class]]);
+        return $this->profile ??= unserialize($this->data['profile'], ['allowed_classes' => [Profile::class]]);
     }
 
     private function getComputedData(string $index): mixed

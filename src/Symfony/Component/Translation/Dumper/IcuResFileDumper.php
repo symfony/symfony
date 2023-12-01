@@ -20,7 +20,7 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class IcuResFileDumper extends FileDumper
 {
-    protected $relativePathTemplate = '%domain%/%locale%.%extension%';
+    protected string $relativePathTemplate = '%domain%/%locale%.%extension%';
 
     public function formatCatalogue(MessageCatalogue $messages, string $domain, array $options = []): string
     {

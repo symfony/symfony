@@ -410,7 +410,7 @@ class MarkdownDescriptor extends Descriptor
             }
             $string .= "\n".sprintf('- Name: `%s`', $r->name);
 
-            if ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
+            if ($class = $r->getClosureCalledClass()) {
                 $string .= "\n".sprintf('- Class: `%s`', $class->name);
                 if (!$r->getClosureThis()) {
                     $string .= "\n- Static: yes";

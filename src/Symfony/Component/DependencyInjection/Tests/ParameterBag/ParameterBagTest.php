@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -82,32 +83,29 @@ class ParameterBagTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * Test it will throw in 7.0
+     * @testWith [1001]
+     *           [10.0]
      */
-    public function testGetSetNumericName()
+    public function testSetNumericName(int|float $name)
     {
-        $bag = new ParameterBag(['foo']);
-        $bag->set(1001, 'foo');
-        $this->assertEquals('foo', $bag->get(1001), '->set() sets the value of a new parameter');
+        $bag = new ParameterBag();
 
-        $bag->set(10.0, 'foo');
-        $this->assertEquals('foo', $bag->get(10), '->set() sets the value of a new parameter');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The parameter name "%s" cannot be numeric.', $name));
 
-        $bag->set(0b0110, 'foo');
-        $this->assertEquals('foo', $bag->get(0b0110), '->set() sets the value of a new parameter');
+        $bag->set($name, 'foo');
+    }
 
-        $bag->set('0', 'baz');
-        $this->assertEquals('baz', $bag->get(0), '->set() overrides previously set parameter');
+    /**
+     * @testWith [1001]
+     *           [10.0]
+     */
+    public function testConstructorNumericName(int|float $name)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The parameter name "%s" cannot be numeric.', $name));
 
-        $this->assertTrue($bag->has(0));
-        $this->assertTrue($bag->has(1001));
-        $this->assertTrue($bag->has(10));
-        $this->assertTrue($bag->has(0b0110));
-
-        foreach (array_keys($bag->all()) as $key) {
-            $this->assertIsInt($key, 'Numeric string keys are cast to integers');
-        }
+        new ParameterBag([$name => 'foo']);
     }
 
     /**

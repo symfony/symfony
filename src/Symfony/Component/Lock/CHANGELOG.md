@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add parameter `$isSameDatabase` to `DoctrineDbalStore::configureSchema()`
+ * Remove the `gcProbablity` (notice the typo) option, use `gcProbability` instead
+
 6.4
 ---
 

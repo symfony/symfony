@@ -260,10 +260,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         return $values;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->clear();
     }

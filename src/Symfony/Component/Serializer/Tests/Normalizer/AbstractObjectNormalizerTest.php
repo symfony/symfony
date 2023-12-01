@@ -839,6 +839,11 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testNormalizeBasedOnAllowedAttributes()
     {
         $normalizer = new class() extends AbstractObjectNormalizer {
+            public function getSupportedTypes(?string $format): array
+            {
+                return ['*' => false];
+            }
+
             protected function getAllowedAttributes($classOrObject, array $context, bool $attributesAsString = false): array
             {
                 return ['foo'];

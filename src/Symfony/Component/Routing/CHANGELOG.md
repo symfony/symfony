@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add argument `$routeParameters` to `UrlMatcher::handleRouteRequirements()`
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove `AnnotationClassLoader`, use `AttributeClassLoader` instead
+ * Remove `AnnotationDirectoryLoader`, use `AttributeDirectoryLoader` instead
+ * Remove `AnnotationFileLoader`, use `AttributeFileLoader` instead
+
 6.4
 ---
 

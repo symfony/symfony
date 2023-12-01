@@ -110,12 +110,8 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->maxDepth;
     }
 
-    public function setSerializedName(string $serializedName = null): void
+    public function setSerializedName(?string $serializedName): void
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/serializer', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
-
         $this->serializedName = $serializedName;
     }
 

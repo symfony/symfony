@@ -46,20 +46,16 @@ class Profiler implements ResetInterface
 
     /**
      * Disables the profiler.
-     *
-     * @return void
      */
-    public function disable()
+    public function disable(): void
     {
         $this->enabled = false;
     }
 
     /**
      * Enables the profiler.
-     *
-     * @return void
      */
-    public function enable()
+    public function enable(): void
     {
         $this->enabled = true;
     }
@@ -110,10 +106,8 @@ class Profiler implements ResetInterface
 
     /**
      * Purges all data from the storage.
-     *
-     * @return void
      */
-    public function purge()
+    public function purge(): void
     {
         $this->storage->purge();
     }
@@ -128,10 +122,8 @@ class Profiler implements ResetInterface
      *
      * @see https://php.net/datetime.formats for the supported date/time formats
      */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?string $start, ?string $end, string $statusCode = null/* , \Closure $filter = null */): array
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?string $start, ?string $end, string $statusCode = null, \Closure $filter = null): array
     {
-        $filter = 7 < \func_num_args() ? func_get_arg(7) : null;
-
         return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end), $statusCode, $filter);
     }
 
@@ -175,10 +167,7 @@ class Profiler implements ResetInterface
         return $profile;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->collectors as $collector) {
             $collector->reset();
@@ -198,10 +187,8 @@ class Profiler implements ResetInterface
      * Sets the Collectors associated with this profiler.
      *
      * @param DataCollectorInterface[] $collectors An array of collectors
-     *
-     * @return void
      */
-    public function set(array $collectors = [])
+    public function set(array $collectors = []): void
     {
         $this->collectors = [];
         foreach ($collectors as $collector) {
@@ -211,10 +198,8 @@ class Profiler implements ResetInterface
 
     /**
      * Adds a Collector.
-     *
-     * @return void
      */
-    public function add(DataCollectorInterface $collector)
+    public function add(DataCollectorInterface $collector): void
     {
         $this->collectors[$collector->getName()] = $collector;
     }

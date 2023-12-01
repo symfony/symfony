@@ -25,10 +25,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class ExtensionPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!class_exists(Packages::class)) {
             $container->removeDefinition('twig.extension.assets');

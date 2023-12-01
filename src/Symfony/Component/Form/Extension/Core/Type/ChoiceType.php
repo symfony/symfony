@@ -62,10 +62,7 @@ class ChoiceType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $unknownValues = [];
         $choiceList = $this->createChoiceList($options);
@@ -217,10 +214,7 @@ class ChoiceType extends AbstractType
         }, 256);
     }
 
-    /**
-     * @return void
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $choiceTranslationDomain = $options['choice_translation_domain'];
         if ($view->parent && null === $choiceTranslationDomain) {
@@ -274,10 +268,7 @@ class ChoiceType extends AbstractType
         }
     }
 
-    /**
-     * @return void
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if ($options['expanded']) {
             // Radio buttons should have the same name as the parent
@@ -294,10 +285,7 @@ class ChoiceType extends AbstractType
         }
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $emptyData = static function (Options $options) {
             if ($options['expanded'] && !$options['multiple']) {

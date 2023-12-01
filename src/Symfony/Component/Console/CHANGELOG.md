@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add method `__toString()` to `InputInterface`
+ * Remove `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+ * Require explicit argument when calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()`
+ * Remove `StringInput::REGEX_STRING`
+
 6.4
 ---
 

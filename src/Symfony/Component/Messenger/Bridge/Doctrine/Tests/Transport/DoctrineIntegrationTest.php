@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\TestCase;
@@ -31,11 +30,9 @@ class DoctrineIntegrationTest extends TestCase
     protected function setUp(): void
     {
         $dsn = getenv('MESSENGER_DOCTRINE_DSN') ?: 'pdo-sqlite://:memory:';
-        $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($dsn) : ['url' => $dsn];
+        $params = (new DsnParser())->parse($dsn);
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $this->driverConnection = DriverManager::getConnection($params, $config);
         $this->connection = new Connection([], $this->driverConnection);
@@ -175,7 +172,7 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testTheTransportIsSetupOnGet()
     {
-        $this->assertFalse($this->createSchemaManager()->tablesExist(['messenger_messages']));
+        $this->assertFalse($this->driverConnection->createSchemaManager()->tablesExist(['messenger_messages']));
         $this->assertNull($this->connection->get());
 
         $this->connection->send('the body', ['my' => 'header']);
@@ -186,12 +183,5 @@ class DoctrineIntegrationTest extends TestCase
     private function formatDateTime(\DateTimeImmutable $dateTime): string
     {
         return $dateTime->format($this->driverConnection->getDatabasePlatform()->getDateTimeFormatString());
-    }
-
-    private function createSchemaManager(): AbstractSchemaManager
-    {
-        return method_exists($this->driverConnection, 'createSchemaManager')
-            ? $this->driverConnection->createSchemaManager()
-            : $this->driverConnection->getSchemaManager();
     }
 }

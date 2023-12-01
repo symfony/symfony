@@ -20,10 +20,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ValidValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Valid) {
             throw new UnexpectedTypeException($constraint, Valid::class);

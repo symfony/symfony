@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 /**
  * Validates that a value is a valid IP address.
  *
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
  */
@@ -70,20 +67,8 @@ class Ip extends Constraint
         self::INVALID_IP_ERROR => 'INVALID_IP_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const VERSIONS instead
-     */
-    protected static $versions = self::VERSIONS;
-
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $version = self::V4;
-
-    public $message = 'This is not a valid IP address.';
-
+    public string $version = self::V4;
+    public string $message = 'This is not a valid IP address.';
     /** @var callable|null */
     public $normalizer;
 
@@ -101,8 +86,8 @@ class Ip extends Constraint
         $this->message = $message ?? $this->message;
         $this->normalizer = $normalizer ?? $this->normalizer;
 
-        if (!\in_array($this->version, self::$versions)) {
-            throw new ConstraintDefinitionException(sprintf('The option "version" must be one of "%s".', implode('", "', self::$versions)));
+        if (!\in_array($this->version, static::VERSIONS, true)) {
+            throw new ConstraintDefinitionException(sprintf('The option "version" must be one of "%s".', implode('", "', static::VERSIONS)));
         }
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {

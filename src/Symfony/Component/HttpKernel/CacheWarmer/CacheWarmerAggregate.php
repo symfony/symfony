@@ -48,17 +48,8 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         $this->onlyOptionalsEnabled = $this->optionalsEnabled = true;
     }
 
-    /**
-     * @param string|null $buildDir
-     */
-    public function warmUp(string $cacheDir, string|SymfonyStyle $buildDir = null, SymfonyStyle $io = null): array
+    public function warmUp(string $cacheDir, string $buildDir = null, SymfonyStyle $io = null): array
     {
-        if ($buildDir instanceof SymfonyStyle) {
-            trigger_deprecation('symfony/http-kernel', '6.4', 'Passing a "%s" as second argument of "%s()" is deprecated, pass it as third argument instead, after the build directory.', SymfonyStyle::class, __METHOD__);
-            $io = $buildDir;
-            $buildDir = null;
-        }
-
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
             $collectedLogs = [];
             $previousHandler = set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {

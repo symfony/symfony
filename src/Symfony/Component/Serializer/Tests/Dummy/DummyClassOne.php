@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
 
 class DummyClassOne
 {
@@ -29,5 +30,6 @@ class DummyClassOne
     )]
     public string $code;
 
+    #[SerializedPath('[data][name]')]
     public string $name;
 }

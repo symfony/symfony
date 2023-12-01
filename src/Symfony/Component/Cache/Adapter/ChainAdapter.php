@@ -280,10 +280,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $pruned;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->adapters as $adapter) {
             if ($adapter instanceof ResetInterface) {

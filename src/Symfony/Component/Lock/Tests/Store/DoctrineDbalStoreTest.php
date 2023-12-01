@@ -22,8 +22,6 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
 
-class_exists(\Doctrine\DBAL\Platforms\PostgreSqlPlatform::class);
-
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
@@ -40,9 +38,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
 
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $store = new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config));
         $store->createTable();
@@ -125,6 +121,8 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     }
 
     /**
+     * @param class-string<AbstractPlatform>
+     *
      * @dataProvider providePlatforms
      */
     public function testCreatesTableInTransaction(string $platform)
@@ -156,7 +154,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             ->willReturn(true);
 
         $platform = $this->createMock($platform);
-        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
+        $platform->method('getCreateTablesSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')
@@ -215,7 +213,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             ->willReturn(true);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
+        $platform->method('getCreateTablesSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->expects($this->atLeast(2))
@@ -257,7 +255,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             ->willReturn(false);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
+        $platform->method('getCreateTablesSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')

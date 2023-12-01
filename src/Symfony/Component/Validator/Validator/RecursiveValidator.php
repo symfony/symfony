@@ -29,10 +29,10 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
  */
 class RecursiveValidator implements ValidatorInterface
 {
-    protected $contextFactory;
-    protected $metadataFactory;
-    protected $validatorFactory;
-    protected $objectInitializers;
+    protected ExecutionContextFactoryInterface $contextFactory;
+    protected MetadataFactoryInterface $metadataFactory;
+    protected ConstraintValidatorFactoryInterface $validatorFactory;
+    protected array $objectInitializers;
     protected ?ContainerInterface $groupProviderLocator;
 
     /**

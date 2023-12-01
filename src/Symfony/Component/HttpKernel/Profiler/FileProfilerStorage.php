@@ -42,12 +42,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
     }
 
-    /**
-     * @param \Closure|null $filter A filter to apply on the list of tokens
-     */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null/* , \Closure $filter = null */): array
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null, \Closure $filter = null): array
     {
-        $filter = 7 < \func_num_args() ? func_get_arg(7) : null;
         $file = $this->getIndexFilename();
 
         if (!file_exists($file)) {
@@ -109,10 +105,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return array_values($result);
     }
 
-    /**
-     * @return void
-     */
-    public function purge()
+    public function purge(): void
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
         $iterator = new \RecursiveDirectoryIterator($this->folder, $flags);
@@ -269,10 +262,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return '' === $line ? null : $line;
     }
 
-    /**
-     * @return Profile
-     */
-    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
+    protected function createProfileFromData(string $token, array $data, Profile $parent = null): Profile
     {
         $profile = new Profile($token);
         $profile->setIp($data['ip']);

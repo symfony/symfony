@@ -16,15 +16,14 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
-        "symfony/deprecation-contracts": "^2.5|^3",
+        "php": ">=8.2",
         "symfony/polyfill-ctype": "^1.8"
     },
     "require-dev": {
-        "symfony/console": "^5.4|^6.0|^7.0"
+        "symfony/console": "^6.4|^7.0"
     },
     "conflict": {
-        "symfony/console": "<5.4"
+        "symfony/console": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Yaml\\": "" },

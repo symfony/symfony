@@ -15,9 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @property int $maxSize
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -44,33 +41,28 @@ class File extends Constraint
         self::FILENAME_TOO_LONG => 'FILENAME_TOO_LONG',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $binaryFormat;
-    public $mimeTypes = [];
+    public ?bool $binaryFormat = null;
+    public array|string $mimeTypes = [];
     public ?int $filenameMaxLength = null;
-    public array|string|null $extensions = [];
-    public $notFoundMessage = 'The file could not be found.';
-    public $notReadableMessage = 'The file is not readable.';
-    public $maxSizeMessage = 'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.';
-    public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
+    public array|string $extensions = [];
+    public string $notFoundMessage = 'The file could not be found.';
+    public string $notReadableMessage = 'The file is not readable.';
+    public string $maxSizeMessage = 'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.';
+    public string $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
     public string $extensionsMessage = 'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.';
-    public $disallowEmptyMessage = 'An empty file is not allowed.';
-    public $filenameTooLongMessage = 'The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.';
+    public string $disallowEmptyMessage = 'An empty file is not allowed.';
+    public string $filenameTooLongMessage = 'The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.';
 
-    public $uploadIniSizeErrorMessage = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
-    public $uploadFormSizeErrorMessage = 'The file is too large.';
-    public $uploadPartialErrorMessage = 'The file was only partially uploaded.';
-    public $uploadNoFileErrorMessage = 'No file was uploaded.';
-    public $uploadNoTmpDirErrorMessage = 'No temporary folder was configured in php.ini.';
-    public $uploadCantWriteErrorMessage = 'Cannot write temporary file to disk.';
-    public $uploadExtensionErrorMessage = 'A PHP extension caused the upload to fail.';
-    public $uploadErrorMessage = 'The file could not be uploaded.';
+    public string $uploadIniSizeErrorMessage = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
+    public string $uploadFormSizeErrorMessage = 'The file is too large.';
+    public string $uploadPartialErrorMessage = 'The file was only partially uploaded.';
+    public string $uploadNoFileErrorMessage = 'No file was uploaded.';
+    public string $uploadNoTmpDirErrorMessage = 'No temporary folder was configured in php.ini.';
+    public string $uploadCantWriteErrorMessage = 'Cannot write temporary file to disk.';
+    public string $uploadExtensionErrorMessage = 'A PHP extension caused the upload to fail.';
+    public string $uploadErrorMessage = 'The file could not be uploaded.';
 
-    protected $maxSize;
+    protected int|string|null $maxSize = null;
 
     /**
      * @param array<string|string[]>|string $extensions
@@ -130,10 +122,7 @@ class File extends Constraint
         }
     }
 
-    /**
-     * @return void
-     */
-    public function __set(string $option, mixed $value)
+    public function __set(string $option, mixed $value): void
     {
         if ('maxSize' === $option) {
             $this->normalizeBinaryFormat($value);

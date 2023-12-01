@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Constraint for the Unique Entity validator.
  *
- * @Annotation
- * @Target({"CLASS", "ANNOTATION"})
- *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
@@ -30,26 +27,21 @@ class UniqueEntity extends Constraint
         self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
     ];
 
-    public $message = 'This value is already used.';
-    public $service = 'doctrine.orm.validator.unique';
-    public $em;
-    public $entityClass;
-    public $repositoryMethod = 'findBy';
-    public $fields = [];
-    public $errorPath;
-    public $ignoreNull = true;
-
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
+    public string $message = 'This value is already used.';
+    public string $service = 'doctrine.orm.validator.unique';
+    public ?string $em = null;
+    public ?string $entityClass = null;
+    public string $repositoryMethod = 'findBy';
+    public array|string $fields = [];
+    public ?string $errorPath = null;
+    public bool|array|string $ignoreNull = true;
 
     /**
      * @param array|string      $fields     The combination of fields that must contain unique values or a set of options
      * @param bool|array|string $ignoreNull The combination of fields that ignore null values
      */
     public function __construct(
-        $fields,
+        array|string $fields,
         string $message = null,
         string $service = null,
         string $em = null,

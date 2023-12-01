@@ -30,10 +30,7 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
     private array $erroredDefinitions = [];
     private array $sourceReferences = [];
 
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         try {
             parent::process($container);

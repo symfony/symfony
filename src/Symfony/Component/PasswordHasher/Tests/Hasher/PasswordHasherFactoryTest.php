@@ -232,10 +232,6 @@ class SomeUser implements PasswordAuthenticatedUserInterface
     {
     }
 
-    public function getUsername(): string
-    {
-    }
-
     public function getUserIdentifier(): string
     {
     }

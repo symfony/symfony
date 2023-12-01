@@ -46,10 +46,8 @@ class LogoutUrlGenerator
      * @param string|null $csrfTokenId   The ID of the CSRF token
      * @param string|null $csrfParameter The CSRF token parameter name
      * @param string|null $context       The listener context
-     *
-     * @return void
      */
-    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null)
+    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null): void
     {
         $this->listeners[$key] = [$logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context];
     }
@@ -70,10 +68,7 @@ class LogoutUrlGenerator
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
-    /**
-     * @return void
-     */
-    public function setCurrentFirewall(?string $key, string $context = null)
+    public function setCurrentFirewall(?string $key, string $context = null): void
     {
         $this->currentFirewallName = $key;
         $this->currentFirewallContext = $context;

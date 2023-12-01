@@ -51,7 +51,6 @@ class RedisProxiesTest extends TestCase
 
     /**
      * @requires extension relay
-     * @requires PHP 8.2
      */
     public function testRelayProxy()
     {

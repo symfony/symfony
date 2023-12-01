@@ -47,10 +47,7 @@ class ApcuAdapter extends AbstractAdapter
         $this->marshaller = $marshaller;
     }
 
-    /**
-     * @return bool
-     */
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         return \function_exists('apcu_fetch') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL);
     }

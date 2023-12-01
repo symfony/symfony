@@ -22,13 +22,13 @@ class Cookie
     public const SAMESITE_LAX = 'lax';
     public const SAMESITE_STRICT = 'strict';
 
-    protected $name;
-    protected $value;
-    protected $domain;
-    protected $expire;
-    protected $path;
-    protected $secure;
-    protected $httpOnly;
+    protected string $name;
+    protected ?string $value;
+    protected ?string $domain;
+    protected int $expire;
+    protected string $path;
+    protected ?bool $secure;
+    protected bool $httpOnly;
 
     private bool $raw;
     private ?string $sameSite = null;
@@ -75,12 +75,9 @@ class Cookie
      * @see self::__construct
      *
      * @param self::SAMESITE_*|''|null $sameSite
-     * @param bool                     $partitioned
      */
-    public static function create(string $name, string $value = null, int|string|\DateTimeInterface $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX /* , bool $partitioned = false */): self
+    public static function create(string $name, string $value = null, int|string|\DateTimeInterface $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX, bool $partitioned = false): self
     {
-        $partitioned = 9 < \func_num_args() ? func_get_arg(9) : false;
-
         return new self($name, $value, $expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite, $partitioned);
     }
 

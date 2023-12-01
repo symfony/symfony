@@ -129,12 +129,6 @@ final class InputBag extends ParameterBag
             return $value;
         }
 
-        $method = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS | \DEBUG_BACKTRACE_PROVIDE_OBJECT, 2)[1];
-        $method = ($method['object'] ?? null) === $this ? $method['function'] : 'filter';
-        $hint = 'filter' === $method ? 'pass' : 'use method "filter()" with';
-
-        trigger_deprecation('symfony/http-foundation', '6.3', 'Ignoring invalid values when using "%s::%s(\'%s\')" is deprecated and will throw a "%s" in 7.0; '.$hint.' flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.', $this::class, $method, $key, BadRequestException::class);
-
-        return false;
+        throw new BadRequestException(sprintf('Input value "%s" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.', $key));
     }
 }

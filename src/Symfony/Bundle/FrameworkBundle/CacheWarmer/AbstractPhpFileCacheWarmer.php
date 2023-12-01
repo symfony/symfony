@@ -34,12 +34,8 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
         return true;
     }
 
-    /**
-     * @param string|null $buildDir
-     */
-    public function warmUp(string $cacheDir /* , string $buildDir = null */): array
+    public function warmUp(string $cacheDir, string $buildDir = null): array
     {
-        $buildDir = 1 < \func_num_args() ? func_get_arg(1) : null;
         $arrayAdapter = new ArrayAdapter();
 
         spl_autoload_register([ClassExistenceResource::class, 'throwOnRequiredClass']);
@@ -79,9 +75,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * @param string|null $buildDir
-     *
      * @return bool false if there is nothing to warm-up
      */
-    abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter /* , string $buildDir = null */): bool;
+    abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, string $buildDir = null): bool;
 }

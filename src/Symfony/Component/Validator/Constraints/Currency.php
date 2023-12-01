@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Miha Vrhovnik <miha.vrhovnik@pagein.si>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -31,12 +28,7 @@ class Currency extends Constraint
         self::NO_SUCH_CURRENCY_ERROR => 'NO_SUCH_CURRENCY_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value is not a valid currency.';
+    public string $message = 'This value is not a valid currency.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {

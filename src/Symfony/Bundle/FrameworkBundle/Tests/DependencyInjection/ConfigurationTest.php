@@ -605,12 +605,10 @@ class ConfigurationTest extends TestCase
                     'enabled' => true,
                     'endpoint' => null,
                 ],
+                'email_validation_mode' => 'html5',
             ],
             'annotations' => [
-                'cache' => 'php_array',
-                'file_cache_dir' => '%kernel.cache_dir%/annotations',
-                'debug' => true,
-                'enabled' => true,
+                'enabled' => false,
             ],
             'serializer' => [
                 'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
@@ -641,11 +639,10 @@ class ConfigurationTest extends TestCase
             'session' => [
                 'enabled' => false,
                 'storage_factory_id' => 'session.storage.factory.native',
-                'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
-                'cookie_samesite' => null,
+                'cookie_samesite' => 'lax',
+                'cookie_secure' => 'auto',
                 'gc_probability' => 1,
-                'save_path' => '%kernel.cache_dir%/sessions',
                 'metadata_update_threshold' => 0,
             ],
             'request' => [
@@ -726,7 +723,6 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
-                'reset_on_message' => true,
                 'stop_worker_on_signals' => [],
             ],
             'disallow_search_engine_index' => true,
@@ -769,9 +765,9 @@ class ConfigurationTest extends TestCase
             ],
             'uid' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
-                'default_uuid_version' => 6,
+                'default_uuid_version' => 7,
                 'name_based_uuid_version' => 5,
-                'time_based_uuid_version' => 6,
+                'time_based_uuid_version' => 7,
             ],
             'html_sanitizer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),

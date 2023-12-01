@@ -15,12 +15,13 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 use Doctrine\DBAL\Driver\Middleware;
+use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
-use Symfony\Component\Cache\Tests\Fixtures\DriverWrapper;
 
 /**
  * @requires extension pdo_sqlite
@@ -56,7 +57,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $middleware = $this->createMock(Middleware::class);
         $middleware
             ->method('wrap')
-            ->willReturn(new DriverWrapper($connection->getDriver()));
+            ->willReturn(new class($connection->getDriver()) extends AbstractDriverMiddleware {});
 
         $config = $this->getDbalConfig();
         $config->setMiddlewares([$middleware]);
@@ -164,7 +165,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         return 1 !== (int) $result->fetchOne();
     }
 
-    private function createConnectionMock()
+    private function createConnectionMock(): Connection&MockObject
     {
         $connection = $this->createMock(Connection::class);
         $driver = $this->createMock(AbstractMySQLDriver::class);
@@ -175,12 +176,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         return $connection;
     }
 
-    private function getDbalConfig()
+    private function getDbalConfig(): Configuration
     {
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         return $config;
     }

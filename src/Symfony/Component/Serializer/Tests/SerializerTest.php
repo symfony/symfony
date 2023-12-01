@@ -40,8 +40,10 @@ use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
@@ -68,8 +70,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TrueBuiltInDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\UpcomingDenormalizerInterface as DenormalizerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\UpcomingNormalizerInterface as NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\WithTypedConstructor;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
@@ -95,7 +95,7 @@ class SerializerTest extends TestCase
     public function testNormalizeNoMatch()
     {
         $this->expectException(UnexpectedValueException::class);
-        $serializer = new Serializer([$this->createMock(CustomNormalizer::class)]);
+        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
         $serializer->normalize(new \stdClass(), 'xml');
     }
 
@@ -123,7 +123,7 @@ class SerializerTest extends TestCase
     public function testDenormalizeNoMatch()
     {
         $this->expectException(UnexpectedValueException::class);
-        $serializer = new Serializer([$this->createMock(CustomNormalizer::class)]);
+        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
         $serializer->denormalize('foo', 'stdClass');
     }
 
@@ -818,9 +818,6 @@ class SerializerTest extends TestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testFalseBuiltInTypes()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
@@ -831,9 +828,6 @@ class SerializerTest extends TestCase
         $this->assertEquals(new FalseBuiltInDummy(), $actual);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testTrueBuiltInTypes()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);

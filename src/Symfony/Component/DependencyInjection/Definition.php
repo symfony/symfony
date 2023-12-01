@@ -45,7 +45,7 @@ class Definition
     private array $bindings = [];
     private array $errors = [];
 
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * @internal

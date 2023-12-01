@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add argument `$badgeFqcn` to `Passport::addBadge()`
+ * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
+ * Throw when calling the constructor of `DefaultLoginRateLimiter` with an empty secret
+
 6.4
 ---
 

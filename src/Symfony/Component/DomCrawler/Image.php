@@ -26,10 +26,7 @@ class Image extends AbstractUriElement
         return $this->node->getAttribute('src');
     }
 
-    /**
-     * @return void
-     */
-    protected function setNode(\DOMElement $node)
+    protected function setNode(\DOMElement $node): void
     {
         if ('img' !== $node->nodeName) {
             throw new \LogicException(sprintf('Unable to visualize a "%s" tag.', $node->nodeName));

@@ -55,10 +55,7 @@ class TypeValidator extends ConstraintValidator
         'xdigit' => 'ctype_xdigit',
     ];
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Type) {
             throw new UnexpectedTypeException($constraint, Type::class);

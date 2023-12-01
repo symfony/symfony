@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -29,8 +28,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -441,37 +438,6 @@ class CommandTest extends TestCase
         $this->assertSame(['f'], $command->getAliases());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDefaultNameProperty()
-    {
-        $this->expectDeprecation('Since symfony/console 6.1: Relying on the static property "$defaultName" for setting a command name is deprecated. Add the "Symfony\Component\Console\Attribute\AsCommand" attribute to the "Symfony\Component\Console\Tests\Command\MyCommand" class instead.');
-
-        $this->assertSame('my:command', MyCommand::getDefaultName());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDefaultDescriptionProperty()
-    {
-        $this->expectDeprecation('Since symfony/console 6.1: Relying on the static property "$defaultDescription" for setting a command description is deprecated. Add the "Symfony\Component\Console\Attribute\AsCommand" attribute to the "Symfony\Component\Console\Tests\Command\MyCommand" class instead.');
-
-        $this->assertSame('This is a command I wrote all by myself', MyCommand::getDefaultDescription());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticDefaultProperties()
-    {
-        $command = new MyCommand();
-
-        $this->assertSame('my:command', $command->getName());
-        $this->assertSame('This is a command I wrote all by myself', $command->getDescription());
-    }
-
     public function testAttributeOverridesProperty()
     {
         $this->assertSame('my:command', MyAnnotatedCommand::getDefaultName());
@@ -517,29 +483,10 @@ class Php8Command2 extends Command
 {
 }
 
-class MyCommand extends Command
-{
-    /**
-     * @deprecated since Symfony 6.1
-     */
-    protected static $defaultName = 'my:command';
-
-    /**
-     * @deprecated since Symfony 6.1
-     */
-    protected static $defaultDescription = 'This is a command I wrote all by myself';
-}
-
 #[AsCommand(name: 'my:command', description: 'This is a command I wrote all by myself')]
 class MyAnnotatedCommand extends Command
 {
-    /**
-     * @deprecated since Symfony 6.1
-     */
     protected static $defaultName = 'i-shall-be-ignored';
 
-    /**
-     * @deprecated since Symfony 6.1
-     */
     protected static $defaultDescription = 'This description should be ignored.';
 }

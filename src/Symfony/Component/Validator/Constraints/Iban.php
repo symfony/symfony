@@ -14,9 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Manuel Reinhard <manu@sprain.ch>
  * @author Michael Schummel
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -38,12 +35,7 @@ class Iban extends Constraint
         self::NOT_SUPPORTED_COUNTRY_CODE_ERROR => 'NOT_SUPPORTED_COUNTRY_CODE_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This is not a valid International Bank Account Number (IBAN).';
+    public string $message = 'This is not a valid International Bank Account Number (IBAN).';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {

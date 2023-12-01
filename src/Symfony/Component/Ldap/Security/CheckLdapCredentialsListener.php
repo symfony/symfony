@@ -36,10 +36,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
         $this->ldapLocator = $ldapLocator;
     }
 
-    /**
-     * @return void
-     */
-    public function onCheckPassport(CheckPassportEvent $event)
+    public function onCheckPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
         if (!$passport->hasBadge(LdapBadge::class)) {

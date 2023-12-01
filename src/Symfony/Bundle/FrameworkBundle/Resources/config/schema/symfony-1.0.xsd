@@ -31,8 +31,7 @@
             <xsd:element name="cache" type="cache" minOccurs="0" maxOccurs="1" />
             <xsd:element name="workflow" type="workflow" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="php-errors" type="php-errors" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="exceptions" type="exceptions" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="exception" type="new-exception" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="exception" type="exception" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
             <xsd:element name="semaphore" type="semaphore" minOccurs="0" maxOccurs="1" />
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
@@ -68,7 +67,6 @@
             <xsd:element name="csrf-protection" type="form_csrf_protection" minOccurs="0" maxOccurs="1" />
         </xsd:all>
         <xsd:attribute name="enabled" type="xsd:boolean" />
-        <xsd:attribute name="legacy-error-messages" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="form_csrf_protection">
@@ -270,7 +268,6 @@
 
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="cache" type="xsd:string" />
-        <xsd:attribute name="enable-annotations" type="xsd:boolean" />
         <xsd:attribute name="enable-attributes" type="xsd:boolean" />
         <xsd:attribute name="static-method" type="xsd:boolean" />
         <xsd:attribute name="translation-domain" type="xsd:string" />
@@ -324,7 +321,6 @@
             <xsd:element name="default-context" type="metadata" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
         <xsd:attribute name="enabled" type="xsd:boolean" />
-        <xsd:attribute name="enable-annotations" type="xsd:boolean" />
         <xsd:attribute name="enable-attributes" type="xsd:boolean" />
         <xsd:attribute name="name-converter" type="xsd:string" />
         <xsd:attribute name="circular-reference-handler" type="xsd:string" />
@@ -415,31 +411,10 @@
         <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 
-    <xsd:complexType name="exceptions">
-        <xsd:sequence>
-            <xsd:element name="exception" type="old-exception" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-    </xsd:complexType>
-
-    <xsd:complexType name="exception" abstract="true">
+    <xsd:complexType name="exception">
         <xsd:attribute name="log-level" type="xsd:string" />
         <xsd:attribute name="status-code" type="xsd:integer" />
-    </xsd:complexType>
-
-    <xsd:complexType name="old-exception">
-        <xsd:complexContent>
-            <xsd:extension base="exception">
-                <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="new-exception">
-        <xsd:complexContent>
-            <xsd:extension base="exception">
-                <xsd:attribute name="class" type="xsd:string" use="required" />
-            </xsd:extension>
-        </xsd:complexContent>
+        <xsd:attribute name="class" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="marking_store">
@@ -589,7 +564,6 @@
         <xsd:attribute name="default-bus" type="xsd:string" />
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="failure-transport" type="xsd:string" />
-        <xsd:attribute name="reset-on-message" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_serializer">

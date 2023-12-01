@@ -98,9 +98,6 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('routing.loader', ['priority' => -10])
 
-        ->alias('routing.loader.annotation', 'routing.loader.attribute')
-            ->deprecate('symfony/routing', '6.4', 'The "%alias_id%" service is deprecated, use the "routing.loader.attribute" service instead.')
-
         ->set('routing.loader.attribute.directory', AttributeDirectoryLoader::class)
             ->args([
                 service('file_locator'),
@@ -108,18 +105,12 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('routing.loader', ['priority' => -10])
 
-        ->alias('routing.loader.annotation.directory', 'routing.loader.attribute.directory')
-            ->deprecate('symfony/routing', '6.4', 'The "%alias_id%" service is deprecated, use the "routing.loader.attribute.directory" service instead.')
-
         ->set('routing.loader.attribute.file', AttributeFileLoader::class)
             ->args([
                 service('file_locator'),
                 service('routing.loader.attribute'),
             ])
             ->tag('routing.loader', ['priority' => -10])
-
-        ->alias('routing.loader.annotation.file', 'routing.loader.attribute.file')
-            ->deprecate('symfony/routing', '6.4', 'The "%alias_id%" service is deprecated, use the "routing.loader.attribute.file" service instead.')
 
         ->set('routing.loader.psr4', Psr4DirectoryLoader::class)
             ->args([

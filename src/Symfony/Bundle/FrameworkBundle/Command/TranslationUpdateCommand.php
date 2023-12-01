@@ -127,10 +127,6 @@ EOF
         $io = new SymfonyStyle($input, $output);
         $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
 
-        if ('translation:update' === $input->getFirstArgument()) {
-            $errorIo->caution('Command "translation:update" is deprecated since version 5.4 and will be removed in Symfony 6.0. Use "translation:extract" instead.');
-        }
-
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 

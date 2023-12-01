@@ -106,7 +106,3 @@ class UriSigner
         return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;
     }
 }
-
-if (!class_exists(\Symfony\Component\HttpKernel\UriSigner::class, false)) {
-    class_alias(UriSigner::class, \Symfony\Component\HttpKernel\UriSigner::class);
-}

@@ -56,10 +56,8 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
 
     /**
      * Processes a ContainerBuilder object to populate the service reference graph.
-     *
-     * @return void
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->container = $container;
         $this->graph = $container->getCompiler()->getServiceReferenceGraph();

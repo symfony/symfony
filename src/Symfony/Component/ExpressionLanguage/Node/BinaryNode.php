@@ -30,8 +30,8 @@ class BinaryNode extends Node
     private const FUNCTIONS = [
         '**' => 'pow',
         '..' => 'range',
-        'in' => '\\'.self::class.'::inArray',
-        'not in' => '!\\'.self::class.'::inArray',
+        'in' => '\\in_array',
+        'not in' => '!\\in_array',
         'contains' => 'str_contains',
         'starts with' => 'str_starts_with',
         'ends with' => 'str_ends_with',
@@ -71,8 +71,13 @@ class BinaryNode extends Node
                 ->compile($this->nodes['left'])
                 ->raw(', ')
                 ->compile($this->nodes['right'])
-                ->raw(')')
             ;
+
+            if ('in' === $operator || 'not in' === $operator) {
+                $compiler->raw(', true');
+            }
+
+            $compiler->raw(')');
 
             return;
         }
@@ -100,12 +105,11 @@ class BinaryNode extends Node
         if (isset(self::FUNCTIONS[$operator])) {
             $right = $this->nodes['right']->evaluate($functions, $values);
 
-            if ('not in' === $operator) {
-                return !self::inArray($left, $right);
-            }
-            $f = self::FUNCTIONS[$operator];
-
-            return $f($left, $right);
+            return match ($operator) {
+                'in' => \in_array($left, $right, true),
+                'not in' => !\in_array($left, $right, true),
+                default => self::FUNCTIONS[$operator]($left, $right),
+            };
         }
 
         switch ($operator) {
@@ -143,9 +147,9 @@ class BinaryNode extends Node
             case '<=':
                 return $left <= $right;
             case 'not in':
-                return !self::inArray($left, $right);
+                return !\in_array($left, $right, true);
             case 'in':
-                return self::inArray($left, $right);
+                return \in_array($left, $right, true);
             case '+':
                 return $left + $right;
             case '-':
@@ -174,22 +178,6 @@ class BinaryNode extends Node
     public function toArray(): array
     {
         return ['(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')'];
-    }
-
-    /**
-     * @internal to be replaced by an inline strict call to in_array() in version 7.0
-     */
-    public static function inArray($value, array $array): bool
-    {
-        if (false === $key = array_search($value, $array)) {
-            return false;
-        }
-
-        if (!\in_array($value, $array, true)) {
-            trigger_deprecation('symfony/expression-language', '6.3', 'The "in" operator will use strict comparisons in Symfony 7.0. Loose match found with key "%s" for value %s. Normalize the array parameter so it only has the expected types or implement loose matching in your own expression function.', $key, json_encode($value));
-        }
-
-        return true;
     }
 
     private function evaluateMatches(string $regexp, ?string $str): int

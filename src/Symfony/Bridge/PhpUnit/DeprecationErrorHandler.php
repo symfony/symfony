@@ -278,13 +278,7 @@ class DeprecationErrorHandler
         return $this->configuration = Configuration::fromUrlEncodedString((string) $mode);
     }
 
-    /**
-     * @param string $str
-     * @param bool   $red
-     *
-     * @return string
-     */
-    private static function colorize($str, $red)
+    private static function colorize(string $str, bool $red): string
     {
         if (!self::hasColorSupport()) {
             return $str;
@@ -296,12 +290,9 @@ class DeprecationErrorHandler
     }
 
     /**
-     * @param string[]      $groups
-     * @param Configuration $configuration
-     *
-     * @throws \InvalidArgumentException
+     * @param string[] $groups
      */
-    private function displayDeprecations($groups, $configuration)
+    private function displayDeprecations(array $groups, Configuration $configuration): void
     {
         $cmp = function ($a, $b) {
             return $b->count() - $a->count();
@@ -397,10 +388,8 @@ class DeprecationErrorHandler
      *
      * Reference: Composer\XdebugHandler\Process::supportsColor
      * https://github.com/composer/xdebug-handler
-     *
-     * @return bool
      */
-    private static function hasColorSupport()
+    private static function hasColorSupport(): bool
     {
         if (!\defined('STDOUT')) {
             return false;

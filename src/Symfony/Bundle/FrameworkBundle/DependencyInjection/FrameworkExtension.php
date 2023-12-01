@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
-use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -54,7 +53,6 @@ use Symfony\Component\Console\DataCollector\CommandDataCollector;
 use Symfony\Component\Console\Debug\CliRequest;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -93,7 +91,6 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -109,9 +106,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge as MessengerBridge;
-use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalsListener;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
@@ -144,7 +139,6 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\RemoteEvent;
-use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
@@ -181,7 +175,6 @@ use Symfony\Component\Validator\GroupProviderInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
@@ -208,16 +201,14 @@ class FrameworkExtension extends Extension
     /**
      * Responds to the app.config configuration parameter.
      *
-     * @return void
-     *
      * @throws LogicException
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
 
         if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('symfony/symfony') && 'symfony/symfony' !== (InstalledVersions::getRootPackage()['name'] ?? '')) {
-            trigger_deprecation('symfony/symfony', '6.1', 'Requiring the "symfony/symfony" package is deprecated; replace it with standalone components instead.');
+            throw new \LogicException('Requiring the "symfony/symfony" package is unsupported; replace it with standalone components instead.');
         }
 
         $loader->load('web.php');
@@ -266,7 +257,6 @@ class FrameworkExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         // warmup config enabled
-        $this->readConfigEnabled('annotations', $container, $config['annotations']);
         $this->readConfigEnabled('translator', $container, $config['translator']);
         $this->readConfigEnabled('property_access', $container, $config['property_access']);
         $this->readConfigEnabled('profiler', $container, $config['profiler']);
@@ -375,7 +365,6 @@ class FrameworkExtension extends Extension
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
-        $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
 
@@ -576,14 +565,6 @@ class FrameworkExtension extends Extension
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
         }
 
-        $this->addAnnotatedClassesToCompile([
-            '**\\Controller\\',
-            '**\\Entity\\',
-
-            // Added explicitly so that we don't rely on the class map being dumped to make it work
-            AbstractController::class,
-        ]);
-
         if (ContainerBuilder::willBeAvailable('symfony/mime', MimeTypes::class, ['symfony/framework-bundle'])) {
             $loader->load('mime_type.php');
         }
@@ -606,8 +587,6 @@ class FrameworkExtension extends Extension
             ->addTag('container.service_locator');
         $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
             ->addTag('container.service_subscriber');
-        $container->registerForAutoconfiguration(ArgumentValueResolverInterface::class)
-            ->addTag('controller.argument_value_resolver');
         $container->registerForAutoconfiguration(ValueResolverInterface::class)
             ->addTag('controller.argument_value_resolver');
         $container->registerForAutoconfiguration(AbstractController::class)
@@ -662,8 +641,6 @@ class FrameworkExtension extends Extension
             ->addTag('validator.group_provider');
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
-        $container->registerForAutoconfiguration(MessageHandlerInterface::class)
-            ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(BatchHandlerInterface::class)
             ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(MessengerTransportFactoryInterface::class)
@@ -741,7 +718,6 @@ class FrameworkExtension extends Extension
             ->addTag('routing.route_loader');
 
         $container->setParameter('container.behavior_describing_tags', [
-            'annotations.cached_reader',
             'container.do_not_inline',
             'container.service_locator',
             'container.service_subscriber',
@@ -1233,13 +1209,6 @@ class FrameworkExtension extends Extension
             $container->getDefinition('router.request_context')
                 ->replaceArgument(0, $config['default_uri']);
         }
-
-        if ($this->isInitializedConfigEnabled('annotations') && (new \ReflectionClass(AttributeClassLoader::class))->hasProperty('reader')) {
-            $container->getDefinition('routing.loader.attribute')->setArguments([
-                new Reference('annotation_reader'),
-                '%kernel.environment%',
-            ]);
-        }
     }
 
     private function registerSessionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
@@ -1264,10 +1233,15 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)
-        if (null === $config['handler_id']) {
+        if (null === ($config['handler_id'] ?? $config['save_path'] ?? null)) {
             $config['save_path'] = null;
             $container->setAlias('session.handler', 'session.handler.native');
         } else {
+            $config['handler_id'] ??= 'session.handler.native_file';
+
+            if (!\array_key_exists('save_path', $config)) {
+                $config['save_path'] = '%kernel.cache_dir%/sessions';
+            }
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
 
             if ($usedEnvs || preg_match('#^[a-z]++://#', $config['handler_id'])) {
@@ -1674,10 +1648,7 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['email_validation_mode']);
 
         if (\array_key_exists('enable_attributes', $config) && $config['enable_attributes']) {
-            $validatorBuilder->addMethodCall('enableAttributeMapping', [true]);
-            if ($this->isInitializedConfigEnabled('annotations') && method_exists(ValidatorBuilder::class, 'setDoctrineAnnotationReader')) {
-                $validatorBuilder->addMethodCall('setDoctrineAnnotationReader', [new Reference('annotation_reader')]);
-            }
+            $validatorBuilder->addMethodCall('enableAttributeMapping');
         }
 
         if (\array_key_exists('static_method', $config) && $config['static_method']) {
@@ -1769,58 +1740,6 @@ class FrameworkExtension extends Extension
                 throw new \RuntimeException(sprintf('Could not open file or directory "%s".', $path));
             }
         }
-    }
-
-    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader): void
-    {
-        if (!$this->isInitializedConfigEnabled('annotations')) {
-            return;
-        }
-
-        if (!class_exists(\Doctrine\Common\Annotations\Annotation::class)) {
-            throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed. Try running "composer require doctrine/annotations".');
-        }
-
-        trigger_deprecation('symfony/framework-bundle', '6.4', 'Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
-
-        $loader->load('annotations.php');
-
-        if ('none' === $config['cache']) {
-            $container->removeDefinition('annotations.cached_reader');
-
-            return;
-        }
-
-        if ('php_array' === $config['cache']) {
-            $cacheService = 'annotations.cache_adapter';
-
-            // Enable warmer only if PHP array is used for cache
-            $definition = $container->findDefinition('annotations.cache_warmer');
-            $definition->addTag('kernel.cache_warmer');
-        } else {
-            $cacheService = 'annotations.filesystem_cache_adapter';
-            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-
-            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
-            }
-
-            $container
-                ->getDefinition('annotations.filesystem_cache_adapter')
-                ->replaceArgument(2, $cacheDir)
-            ;
-        }
-
-        $container
-            ->getDefinition('annotations.cached_reader')
-            ->replaceArgument(2, $config['debug'])
-            // reference the cache provider without using it until AddAnnotationsCachedReaderPass runs
-            ->addArgument(new ServiceClosureArgument(new Reference($cacheService)))
-        ;
-
-        $container->setAlias('annotation_reader', 'annotations.cached_reader');
-        $container->setAlias(Reader::class, new Alias('annotations.cached_reader', false));
-        $container->removeDefinition('annotations.psr_cached_reader');
     }
 
     private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
@@ -1944,12 +1863,9 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = [];
         if (isset($config['enable_attributes']) && $config['enable_attributes']) {
-            $annotationLoader = new Definition(
-                AttributeLoader::class,
-                [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]
-            );
+            $attributeLoader = new Definition(AttributeLoader::class);
 
-            $serializerLoaders[] = $annotationLoader;
+            $serializerLoaders[] = $attributeLoader;
         }
 
         $fileRecorder = function ($extension, $path) use (&$serializerLoaders) {
@@ -2165,15 +2081,6 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(8, $config['stop_worker_on_signals']);
             $container->getDefinition('console.command.messenger_failed_messages_retry')
                 ->replaceArgument(6, $config['stop_worker_on_signals']);
-        }
-
-        if ($this->hasConsole() && $container->hasDefinition('messenger.listener.stop_worker_signals_listener')) {
-            $container->getDefinition('messenger.listener.stop_worker_signals_listener')->clearTag('kernel.event_subscriber');
-        }
-        if (!class_exists(StopWorkerOnSignalsListener::class)) {
-            $container->removeDefinition('messenger.listener.stop_worker_signals_listener');
-        } elseif ($config['stop_worker_on_signals']) {
-            $container->getDefinition('messenger.listener.stop_worker_signals_listener')->replaceArgument(0, $config['stop_worker_on_signals']);
         }
 
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
@@ -2660,11 +2567,9 @@ class FrameworkExtension extends Extension
             MailerBridge\Mailjet\Transport\MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
             MailerBridge\MailPace\Transport\MailPaceTransportFactory::class => 'mailer.transport_factory.mailpace',
             MailerBridge\Mailchimp\Transport\MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
-            MailerBridge\OhMySmtp\Transport\OhMySmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
             MailerBridge\Postmark\Transport\PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
             MailerBridge\Scaleway\Transport\ScalewayTransportFactory::class => 'mailer.transport_factory.scaleway',
             MailerBridge\Sendgrid\Transport\SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
-            MailerBridge\Sendinblue\Transport\SendinblueTransportFactory::class => 'mailer.transport_factory.sendinblue',
             MailerBridge\Amazon\Transport\SesTransportFactory::class => 'mailer.transport_factory.amazon',
         ];
 
@@ -2834,7 +2739,6 @@ class FrameworkExtension extends Extension
             NotifierBridge\RocketChat\RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
             NotifierBridge\Sendberry\SendberryTransportFactory::class => 'notifier.transport_factory.sendberry',
             NotifierBridge\SimpleTextin\SimpleTextinTransportFactory::class => 'notifier.transport_factory.simple-textin',
-            NotifierBridge\Sendinblue\SendinblueTransportFactory::class => 'notifier.transport_factory.sendinblue',
             NotifierBridge\Sinch\SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             NotifierBridge\Slack\SlackTransportFactory::class => 'notifier.transport_factory.slack',
             NotifierBridge\Sms77\Sms77TransportFactory::class => 'notifier.transport_factory.sms77',
@@ -2964,45 +2868,6 @@ class FrameworkExtension extends Extension
 
             $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
         }
-    }
-
-    /**
-     * @deprecated since Symfony 6.2
-     *
-     * @return void
-     */
-    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
-    {
-        trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s()" method is deprecated.', __METHOD__);
-
-        // default configuration (when used by other DI extensions)
-        $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
-
-        $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
-
-        if (null !== $limiterConfig['lock_factory']) {
-            if (!interface_exists(LockInterface::class)) {
-                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
-            }
-            if (!$container->hasDefinition('lock.factory.abstract')) {
-                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
-            }
-
-            $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
-        }
-        unset($limiterConfig['lock_factory']);
-
-        if (null === $storageId = $limiterConfig['storage_service'] ?? null) {
-            $container->register($storageId = 'limiter.storage.'.$name, CacheStorage::class)->addArgument(new Reference($limiterConfig['cache_pool']));
-        }
-
-        $limiter->replaceArgument(1, new Reference($storageId));
-        unset($limiterConfig['storage_service'], $limiterConfig['cache_pool']);
-
-        $limiterConfig['id'] = $name;
-        $limiter->replaceArgument(0, $limiterConfig);
-
-        $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
     }
 
     private function registerUidConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

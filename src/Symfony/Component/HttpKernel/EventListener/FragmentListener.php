@@ -70,7 +70,7 @@ class FragmentListener implements EventSubscriberInterface
         }
 
         parse_str($request->query->get('_path', ''), $attributes);
-        $attributes['_check_controller_is_allowed'] = -1; // @deprecated, switch to true in Symfony 7
+        $attributes['_check_controller_is_allowed'] = true;
         $request->attributes->add($attributes);
         $request->attributes->set('_route_params', array_replace($request->attributes->get('_route_params', []), $attributes));
         $request->query->remove('_path');

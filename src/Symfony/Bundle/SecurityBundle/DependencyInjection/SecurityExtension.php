@@ -79,10 +79,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private array $sortedFactories = [];
     private array $userProviderFactories = [];
 
-    /**
-     * @return void
-     */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         foreach ($this->getSortedFactories() as $factory) {
             if ($factory instanceof PrependExtensionInterface) {
@@ -91,16 +88,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         if (!array_filter($configs)) {
-            trigger_deprecation('symfony/security-bundle', '6.3', 'Enabling bundle "%s" and not configuring it is deprecated.', SecurityBundle::class);
-            // uncomment the following line in 7.0
-            // throw new InvalidConfigurationException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
-            return;
+            throw new InvalidConfigurationException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
         }
 
         $mainConfig = $this->getConfiguration($configs, $container);
@@ -113,11 +104,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $loader->load('security.php');
         $loader->load('password_hasher.php');
         $loader->load('security_listeners.php');
-
-        if (!$config['enable_authenticator_manager']) {
-            throw new InvalidConfigurationException('"security.enable_authenticator_manager" must be set to "true".');
-        }
-
         $loader->load('security_authenticator.php');
         $loader->load('security_authenticator_access_token.php');
 
@@ -193,11 +179,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $container->registerForAutoconfiguration(VoterInterface::class)
             ->addTag('security.voter');
-
-        // required for compatibility with Symfony 5.4
-        $container->getDefinition('security.access_listener')->setArgument(3, false);
-        $container->getDefinition('security.authorization_checker')->setArgument(2, false);
-        $container->getDefinition('security.authorization_checker')->setArgument(3, false);
     }
 
     private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition
@@ -682,15 +663,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return $this->createMissingUserProvider($container, $id, $factoryKey);
         }
 
-        if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey || 'custom_authenticators' === $factoryKey) {
-            if ('custom_authenticators' === $factoryKey) {
-                trigger_deprecation('symfony/security-bundle', '5.4', 'Not configuring explicitly the provider for the "%s" firewall is deprecated because it\'s ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.', $id);
-            }
-
+        if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey) {
             return 'security.user_providers';
         }
 
-        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" authenticator on "%s" firewall is ambiguous as there is more than one registered provider.', $factoryKey, $id));
+        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" authenticator on "%s" firewall is ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.', $factoryKey, $id));
     }
 
     private function createMissingUserProvider(ContainerBuilder $container, string $id, string $factoryKey): string

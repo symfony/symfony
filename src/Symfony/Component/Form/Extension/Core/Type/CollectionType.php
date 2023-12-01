@@ -21,10 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionType extends AbstractType
 {
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $resizePrototypeOptions = null;
         if ($options['allow_add'] && $options['prototype']) {
@@ -54,10 +51,7 @@ class CollectionType extends AbstractType
         $builder->addEventSubscriber($resizeListener);
     }
 
-    /**
-     * @return void
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars = array_replace($view->vars, [
             'allow_add' => $options['allow_add'],
@@ -70,10 +64,7 @@ class CollectionType extends AbstractType
         }
     }
 
-    /**
-     * @return void
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $prefixOffset = -2;
         // check if the entry type also defines a block prefix
@@ -104,10 +95,7 @@ class CollectionType extends AbstractType
         }
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $entryOptionsNormalizer = static function (Options $options, $value) {
             $value['block_name'] = 'entry';

@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add argument `$label` to `VarDumper::dump()`
+ * Require explicit argument when calling `VarDumper::setHandler()`
+ * Remove display of backtrace in `Twig_Template`, only `Twig\Template` is supported
+
 6.4
 ---
 

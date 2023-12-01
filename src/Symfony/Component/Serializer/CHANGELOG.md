@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add method `getSupportedTypes()` to `DenormalizerInterface` and `NormalizerInterface`
+ * Remove denormalization support for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
+ * Denormalizing to an abstract class in `UidNormalizer` now throws an `\Error`
+ * Remove `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
+ * Remove `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
+ * Remove `CacheableSupportsMethodInterface`, use `NormalizerInterface` and `DenormalizerInterface` instead
+ * Require explicit argument when calling `AttributeMetadata::setSerializedName()` and `ClassMetadata::setClassDiscriminatorMapping()`
+ * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
+
 6.4
 ---
 

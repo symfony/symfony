@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '8.1'
+          - php: '8.2'
           - php: '8.2'
             mode: high-deps
           - php: '8.2'
@@ -139,19 +139,19 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "matrix.php == '8.1' && ! matrix.mode"
+        if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
           patch -sp1 < .github/expected-missing-return-types.diff
           git add .
           composer install -q --optimize-autoloader || composer install --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.2' php .github/patch-types.php
           git checkout src/Symfony/Contracts/Service/ResetInterface.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php # ensure the script is idempotent
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.2' php .github/patch-types.php # ensure the script is idempotent
           git checkout src/Symfony/Contracts/Service/ResetInterface.php
           git diff --exit-code
 
       - name: Check return types
-        if: "matrix.php == '8.1' && ! matrix.mode"
+        if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
           php .github/patch-types.php lint
 
@@ -222,12 +222,12 @@ jobs:
             script -e -c './phpunit --group tty' /dev/null
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "matrix.php == '8.1' && ! matrix.mode"
+        if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.1.2-pcntl-sigchild.tar.bz2
-          tar -xjf php-8.1.2-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.2.0-pcntl-sigchild.tar.bz2
           cd ..
 
           mkdir -p /opt/php/lib

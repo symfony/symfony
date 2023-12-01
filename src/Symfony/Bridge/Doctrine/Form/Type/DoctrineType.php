@@ -31,10 +31,7 @@ use Symfony\Contracts\Service\ResetInterface;
 
 abstract class DoctrineType extends AbstractType implements ResetInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
+    protected ManagerRegistry $registry;
 
     /**
      * @var IdReader[]
@@ -97,10 +94,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $this->registry = $registry;
     }
 
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['multiple'] && interface_exists(Collection::class)) {
             $builder
@@ -110,10 +104,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $choiceLoader = function (Options $options) {
             // Unless the choices are given explicitly, load them on demand
@@ -238,10 +229,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         return ChoiceType::class;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->idReaders = [];
         $this->entityLoaders = [];

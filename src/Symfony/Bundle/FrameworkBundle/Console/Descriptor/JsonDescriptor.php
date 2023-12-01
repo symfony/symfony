@@ -398,7 +398,7 @@ class JsonDescriptor extends Descriptor
             }
             $data['name'] = $r->name;
 
-            if ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
+            if ($class = $r->getClosureCalledClass()) {
                 $data['class'] = $class->name;
                 if (!$r->getClosureThis()) {
                     $data['static'] = true;

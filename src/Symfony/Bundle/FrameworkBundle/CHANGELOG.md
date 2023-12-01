@@ -1,6 +1,38 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Remove command `translation:update`, use `translation:extract` instead
+ * Make the `http_method_override` config option default to `false`
+ * Remove `AbstractController::renderForm()`, use `render()` instead
+ * Remove the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
+   `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
+   `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
+ * Remove the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
+ * Remove the integration of Doctrine annotations, use native attributes instead
+ * Remove `EnableLoggerDebugModePass`, use argument `$debug` of HttpKernel's `Logger` instead
+ * Remove `AddDebugLogProcessorPass::configureLogger()`, use HttpKernel's `DebugLoggerConfigurator` instead
+ * Make the `framework.handle_all_throwables` config option default to `true`
+ * Make the `framework.php_errors.log` config option default to `true`
+ * Make the `framework.session.cookie_secure` config option default to `auto`
+ * Make the `framework.session.cookie_samesite` config option default to `lax`
+ * Make the `framework.session.handler_id` default to null if `save_path` is not set and to `session.handler.native_file` otherwise
+ * Make the `framework.uid.default_uuid_version` config option default to `7`
+ * Make the `framework.uid.time_based_uuid_version` config option default to `7`
+ * Make the `framework.validation.email_validation_mode` config option default to `html5`
+ * Remove the `framework.validation.enable_annotations` config option, use `framework.validation.enable_attributes` instead
+ * Remove the `framework.serializer.enable_annotations` config option, use `framework.serializer.enable_attributes` instead
+ * Remove the `routing.loader.annotation` service, use the `routing.loader.attribute` service instead
+ * Remove the `routing.loader.annotation.directory` service, use the `routing.loader.attribute.directory` service instead
+ * Remove the `routing.loader.annotation.file` service, use the `routing.loader.attribute.file` service instead
+ * Remove `AnnotatedRouteControllerLoader`, use `AttributeRouteControllerLoader` instead
+ * Remove `AddExpressionLanguageProvidersPass`, use `Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass` instead
+ * Remove `DataCollectorTranslatorPass`, use `Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass` instead
+ * Remove `LoggingTranslatorPass`, use `Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass` instead
+ * Remove `WorkflowGuardListenerPass`, use `Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass` instead
+
 6.4
 ---
 

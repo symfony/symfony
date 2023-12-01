@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
+ * Remove `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+ * Remove `StopWorkerOnSigtermSignalListener` in favor of using the `SignalableCommandInterface`
+ * Remove `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+ * Remove `Symfony\Component\Messenger\Transport\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Remove `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
+   and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
+
 6.4
 ---
 

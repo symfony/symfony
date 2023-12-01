@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RedirectResponse extends Response
 {
-    protected $targetUrl;
+    protected string $targetUrl;
 
     /**
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.

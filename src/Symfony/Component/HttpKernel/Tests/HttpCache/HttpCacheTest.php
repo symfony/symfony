@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +26,6 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class HttpCacheTest extends HttpCacheTestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
     {
         $storeMock = $this->getMockBuilder(StoreInterface::class)
@@ -37,7 +34,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         // does not implement TerminableInterface
         $kernel = new TestKernel();
-        $httpCache = new HttpCache($kernel, $storeMock, null, ['terminate_on_cache_hit' => false]);
+        $httpCache = new HttpCache($kernel, $storeMock);
         $httpCache->terminate(Request::create('/'), new Response());
 
         $this->assertFalse($kernel->terminateCalled, 'terminate() is never called if the kernel class does not implement TerminableInterface');
@@ -51,7 +48,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $kernelMock->expects($this->once())
             ->method('terminate');
 
-        $kernel = new HttpCache($kernelMock, $storeMock, null, ['terminate_on_cache_hit' => false]);
+        $kernel = new HttpCache($kernelMock, $storeMock);
         $kernel->terminate(Request::create('/'), new Response());
     }
 
@@ -99,58 +96,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->cache->terminate($this->request, $this->response);
 
         $this->assertCount(1, $terminateEvents);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDoesCallTerminateOnFreshResponseIfConfigured()
-    {
-        $this->expectDeprecation('Since symfony/http-kernel 6.2: Setting "terminate_on_cache_hit" to "true" is deprecated and will be changed to "false" in Symfony 7.0.');
-
-        $terminateEvents = [];
-
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher
-            ->expects($this->any())
-            ->method('dispatch')
-            ->with($this->callback(function ($event) use (&$terminateEvents) {
-                if ($event instanceof TerminateEvent) {
-                    $terminateEvents[] = $event;
-                }
-
-                return true;
-            }));
-
-        $this->setNextResponse(
-            200,
-            [
-                'ETag' => '1234',
-                'Cache-Control' => 'public, s-maxage=60',
-            ],
-            'Hello World',
-            null,
-            $eventDispatcher
-        );
-        $this->cacheConfig['terminate_on_cache_hit'] = true;
-
-        $this->request('GET', '/');
-        $this->assertHttpKernelIsCalled();
-        $this->assertEquals(200, $this->response->getStatusCode());
-        $this->assertTraceContains('miss');
-        $this->assertTraceContains('store');
-        $this->cache->terminate($this->request, $this->response);
-
-        sleep(2);
-
-        $this->request('GET', '/');
-        $this->assertHttpKernelIsNotCalled();
-        $this->assertEquals(200, $this->response->getStatusCode());
-        $this->assertTraceContains('fresh');
-        $this->assertEquals(2, $this->response->headers->get('Age'));
-        $this->cache->terminate($this->request, $this->response);
-
-        $this->assertCount(2, $terminateEvents);
     }
 
     public function testPassesOnNonGetHeadRequests()

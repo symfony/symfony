@@ -26,11 +26,6 @@ class BaseUser
         return $this->id;
     }
 
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->username;

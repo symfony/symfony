@@ -59,10 +59,7 @@ class DebugCommand extends Command
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([

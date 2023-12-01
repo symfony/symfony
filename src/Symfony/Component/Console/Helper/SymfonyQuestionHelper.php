@@ -25,10 +25,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class SymfonyQuestionHelper extends QuestionHelper
 {
-    /**
-     * @return void
-     */
-    protected function writePrompt(OutputInterface $output, Question $question)
+    protected function writePrompt(OutputInterface $output, Question $question): void
     {
         $text = OutputFormatter::escapeTrailingBackslash($question->getQuestion());
         $default = $question->getDefault();
@@ -83,10 +80,7 @@ class SymfonyQuestionHelper extends QuestionHelper
         $output->write($prompt);
     }
 
-    /**
-     * @return void
-     */
-    protected function writeError(OutputInterface $output, \Exception $error)
+    protected function writeError(OutputInterface $output, \Exception $error): void
     {
         if ($output instanceof SymfonyStyle) {
             $output->newLine();

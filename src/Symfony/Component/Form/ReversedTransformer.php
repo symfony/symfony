@@ -21,7 +21,7 @@ namespace Symfony\Component\Form;
  */
 class ReversedTransformer implements DataTransformerInterface
 {
-    protected $reversedTransformer;
+    protected DataTransformerInterface $reversedTransformer;
 
     public function __construct(DataTransformerInterface $reversedTransformer)
     {

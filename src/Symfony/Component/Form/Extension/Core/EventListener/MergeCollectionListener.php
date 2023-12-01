@@ -41,10 +41,7 @@ class MergeCollectionListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @return void
-     */
-    public function onSubmit(FormEvent $event)
+    public function onSubmit(FormEvent $event): void
     {
         $dataToMergeInto = $event->getForm()->getNormData();
         $data = $event->getData() ?? [];

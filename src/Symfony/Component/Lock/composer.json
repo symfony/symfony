@@ -16,17 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
-        "psr/log": "^1|^2|^3",
-        "symfony/deprecation-contracts": "^2.5|^3"
+        "php": ">=8.2",
+        "psr/log": "^1|^2|^3"
     },
     "require-dev": {
-        "doctrine/dbal": "^2.13|^3|^4",
+        "doctrine/dbal": "^3.6|^4",
         "predis/predis": "^1.1|^2.0"
     },
     "conflict": {
-        "doctrine/dbal": "<2.13",
-        "symfony/cache": "<6.2"
+        "doctrine/dbal": "<3.6",
+        "symfony/cache": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Lock\\": "" },

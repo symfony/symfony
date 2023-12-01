@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
+abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     use ObjectToPopulateTrait;
     use SerializerAwareTrait;
@@ -123,22 +123,14 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
 
-    protected $defaultContext = [
+    protected array $defaultContext = [
         self::ALLOW_EXTRA_ATTRIBUTES => true,
         self::CIRCULAR_REFERENCE_HANDLER => null,
         self::CIRCULAR_REFERENCE_LIMIT => 1,
         self::IGNORED_ATTRIBUTES => [],
     ];
-
-    /**
-     * @var ClassMetadataFactoryInterface|null
-     */
-    protected $classMetadataFactory;
-
-    /**
-     * @var NameConverterInterface|null
-     */
-    protected $nameConverter;
+    protected ?ClassMetadataFactoryInterface $classMetadataFactory;
+    protected ?NameConverterInterface $nameConverter;
 
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
@@ -154,16 +146,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         if (isset($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER]) && !\is_callable($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER])) {
             throw new InvalidArgumentException(sprintf('Invalid callback found in the "%s" default context option.', self::CIRCULAR_REFERENCE_HANDLER));
         }
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this));
-
-        return false;
     }
 
     /**
@@ -220,7 +202,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @throws LogicException if the 'allow_extra_attributes' context variable is false and no class metadata factory is provided
      */
-    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false)
+    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
     {
         $allowExtraAttributes = $context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES];
         if (!$this->classMetadataFactory) {
@@ -267,10 +249,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
     /**
      * Is this attribute allowed?
-     *
-     * @return bool
      */
-    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = [])
+    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
     {
         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
         if (\in_array($attribute, $ignoredAttributes)) {
@@ -316,12 +296,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * is removed from the context before being returned to avoid side effects
      * when recursively normalizing an object graph.
      *
-     * @return object
-     *
      * @throws RuntimeException
      * @throws MissingConstructorArgumentsException
      */
-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
             unset($context[self::OBJECT_TO_POPULATE]);

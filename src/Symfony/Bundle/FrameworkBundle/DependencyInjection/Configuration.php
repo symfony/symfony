@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LogLevel;
 use Seld\JsonLint\JsonParser;
@@ -82,26 +81,12 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
-            ->validate()
-                ->always(function ($v) {
-                    if (!isset($v['http_method_override'])) {
-                        trigger_deprecation('symfony/framework-bundle', '6.1', 'Not setting the "framework.http_method_override" config option is deprecated. It will default to "false" in 7.0.');
-
-                        $v['http_method_override'] = true;
-                    }
-                    if (!isset($v['handle_all_throwables'])) {
-                        trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.handle_all_throwables" config option is deprecated. It will default to "true" in 7.0.');
-                    }
-
-                    return $v;
-                })
-            ->end()
             ->fixXmlConfig('enabled_locale')
             ->children()
                 ->scalarNode('secret')->end()
                 ->booleanNode('http_method_override')
                     ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests. Note: When using the HttpCache, you need to call the method in your front controller instead")
-                    ->treatNullLike(false)
+                    ->defaultFalse()
                 ->end()
                 ->scalarNode('trust_x_sendfile_type_header')
                     ->info('Set true to enable support for xsendfile in binary file responses.')
@@ -142,7 +127,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('error_controller')
                     ->defaultValue('error_controller')
                 ->end()
-                ->booleanNode('handle_all_throwables')->info('HttpKernel will handle all kinds of \Throwable')->end()
+                ->booleanNode('handle_all_throwables')->info('HttpKernel will handle all kinds of \Throwable')->defaultTrue()->end()
             ->end()
         ;
 
@@ -170,7 +155,7 @@ class Configuration implements ConfigurationInterface
         $this->addAssetMapperSection($rootNode, $enableIfStandalone);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
         $this->addValidationSection($rootNode, $enableIfStandalone);
-        $this->addAnnotationsSection($rootNode, $willBeAvailable);
+        $this->addAnnotationsSection($rootNode);
         $this->addSerializerSection($rootNode, $enableIfStandalone);
         $this->addPropertyAccessSection($rootNode, $willBeAvailable);
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
@@ -247,9 +232,6 @@ class Configuration implements ConfigurationInterface
                                 ->booleanNode('enabled')->defaultNull()->end() // defaults to framework.csrf_protection.enabled
                                 ->scalarNode('field_name')->defaultValue('_token')->end()
                             ->end()
-                        ->end()
-                        ->booleanNode('legacy_error_messages')
-                            ->setDeprecated('symfony/framework-bundle', '6.2')
                         ->end()
                     ->end()
                 ->end()
@@ -657,38 +639,15 @@ class Configuration implements ConfigurationInterface
     private function addSessionSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
-            ->validate()
-                ->always(function (array $v): array {
-                    if ($v['session']['enabled']) {
-                        if (!\array_key_exists('cookie_secure', $v['session'])) {
-                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.session.cookie_secure" config option is deprecated. It will default to "auto" in 7.0.');
-                        }
-
-                        if (!\array_key_exists('cookie_samesite', $v['session'])) {
-                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.session.cookie_samesite" config option is deprecated. It will default to "lax" in 7.0.');
-                        }
-
-                        if (!\array_key_exists('handler_id', $v['session']) && !\array_key_exists('save_path', $v['session'])) {
-                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting either "framework.session.handler_id" or "save_path" config options is deprecated; "handler_id" will default to null in 7.0 if "save_path" is not set and to "session.handler.native_file" otherwise.');
-                        }
-                    }
-
-                    $v['session'] += [
-                        'cookie_samesite' => null,
-                        'handler_id' => 'session.handler.native_file',
-                        'save_path' => '%kernel.cache_dir%/sessions',
-                    ];
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->arrayNode('session')
                     ->info('session configuration')
                     ->canBeEnabled()
                     ->children()
                         ->scalarNode('storage_factory_id')->defaultValue('session.storage.factory.native')->end()
-                        ->scalarNode('handler_id')->end()
+                        ->scalarNode('handler_id')
+                            ->info('Defaults to using the native session handler, or to the native *file* session handler if "save_path" is not null.')
+                        ->end()
                         ->scalarNode('name')
                             ->validate()
                                 ->ifTrue(function ($v) {
@@ -702,14 +661,16 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cookie_lifetime')->end()
                         ->scalarNode('cookie_path')->end()
                         ->scalarNode('cookie_domain')->end()
-                        ->enumNode('cookie_secure')->values([true, false, 'auto'])->end()
+                        ->enumNode('cookie_secure')->values([true, false, 'auto'])->defaultValue('auto')->end()
                         ->booleanNode('cookie_httponly')->defaultTrue()->end()
-                        ->enumNode('cookie_samesite')->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->end()
+                        ->enumNode('cookie_samesite')->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->defaultValue('lax')->end()
                         ->booleanNode('use_cookies')->end()
                         ->scalarNode('gc_divisor')->end()
                         ->scalarNode('gc_probability')->defaultValue(1)->end()
                         ->scalarNode('gc_maxlifetime')->end()
-                        ->scalarNode('save_path')->end()
+                        ->scalarNode('save_path')
+                            ->info('Defaults to "%kernel.cache_dir%/sessions" if the "handler_id" option is not null')
+                        ->end()
                         ->integerNode('metadata_update_threshold')
                             ->defaultValue(0)
                             ->info('seconds to wait between 2 session metadata updates')
@@ -943,9 +904,6 @@ class Configuration implements ConfigurationInterface
                             ->info('The directory to store JavaScript vendors.')
                             ->defaultValue('%kernel.project_dir%/assets/vendor')
                         ->end()
-                        ->scalarNode('provider')
-                            ->setDeprecated('symfony/framework-bundle', '6.4', 'Option "%node%" at "%path%" is deprecated and does nothing. Remove it.')
-                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -1025,35 +983,12 @@ class Configuration implements ConfigurationInterface
     private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
-            ->validate()
-                ->always(function ($v) {
-                    if ($v['validation']['enabled'] && !\array_key_exists('email_validation_mode', $v['validation'])) {
-                        trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.validation.email_validation_mode" config option is deprecated. It will default to "html5" in 7.0.');
-                    }
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->arrayNode('validation')
-                    ->beforeNormalization()
-                        ->ifTrue(fn ($v) => isset($v['enable_annotations']))
-                        ->then(function ($v) {
-                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Option "enable_annotations" at "framework.validation" is deprecated. Use the "enable_attributes" option instead.');
-
-                            if (isset($v['enable_attributes'])) {
-                                throw new LogicException('The "enable_annotations" and "enable_attributes" options at path "framework.validation" must not be both set. Only the "enable_attributes" option must be used.');
-                            }
-                            $v['enable_attributes'] = $v['enable_annotations'];
-
-                            return $v;
-                        })
-                    ->end()
                     ->info('validation configuration')
                     ->{$enableIfStandalone('symfony/validator', Validation::class)}()
                     ->children()
                         ->scalarNode('cache')->end()
-                        ->booleanNode('enable_annotations')->end()
                         ->booleanNode('enable_attributes')->{class_exists(FullStack::class) ? 'defaultFalse' : 'defaultTrue'}()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(['loadValidatorMetadata'])
@@ -1062,7 +997,7 @@ class Configuration implements ConfigurationInterface
                             ->validate()->castToArray()->end()
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
-                        ->enumNode('email_validation_mode')->values(['html5', 'loose', 'strict'])->end()
+                        ->enumNode('email_validation_mode')->values(['html5', 'loose', 'strict'])->defaultValue('html5')->end()
                         ->arrayNode('mapping')
                             ->addDefaultsIfNotSet()
                             ->fixXmlConfig('path')
@@ -1135,21 +1070,15 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addAnnotationsSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
+    private function addAnnotationsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
                 ->arrayNode('annotations')
-                    ->info('annotation configuration')
-                    ->{$willBeAvailable('doctrine/annotations', Annotation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
-                    ->children()
-                        ->enumNode('cache')
-                            ->values(['none', 'php_array', 'file'])
-                            ->defaultValue('php_array')
-                        ->end()
-                        ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
-                        ->booleanNode('debug')->defaultValue($this->debug)->end()
-                    ->end()
+                    ->canBeEnabled()
+                    ->validate()
+                        ->ifTrue(static fn (array $v) => $v['enabled'])
+                        ->thenInvalid('Enabling the doctrine/annotations integration is not supported anymore.')
                 ->end()
             ->end()
         ;
@@ -1160,23 +1089,9 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('serializer')
-                    ->beforeNormalization()
-                        ->ifTrue(fn ($v) => isset($v['enable_annotations']))
-                        ->then(function ($v) {
-                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Option "enable_annotations" at "framework.serializer" is deprecated. Use the "enable_attributes" option instead.');
-
-                            if (isset($v['enable_attributes'])) {
-                                throw new LogicException('The "enable_annotations" and "enable_attributes" options at path "framework.serializer" must not be both set. Only the "enable_attributes" option must be used.');
-                            }
-                            $v['enable_attributes'] = $v['enable_annotations'];
-
-                            return $v;
-                        })
-                    ->end()
                     ->info('serializer configuration')
                     ->{$enableIfStandalone('symfony/serializer', Serializer::class)}()
                     ->children()
-                        ->booleanNode('enable_annotations')->end()
                         ->booleanNode('enable_attributes')->{class_exists(FullStack::class) ? 'defaultFalse' : 'defaultTrue'}()->end()
                         ->scalarNode('name_converter')->end()
                         ->scalarNode('circular_reference_handler')->end()
@@ -1332,17 +1247,6 @@ class Configuration implements ConfigurationInterface
     private function addPhpErrorsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
-            ->validate()
-                ->always(function (array $v): array {
-                    if (!\array_key_exists('log', $v['php_errors'])) {
-                        trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.php_errors.log" config option is deprecated. It will default to "true" in 7.0.');
-
-                        $v['php_errors']['log'] = $this->debug;
-                    }
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->arrayNode('php_errors')
                     ->info('PHP errors handling configuration')
@@ -1352,6 +1256,7 @@ class Configuration implements ConfigurationInterface
                             ->info('Use the application logger instead of the PHP logger for logging PHP errors.')
                             ->example('"true" to use the default configuration: log all errors. "false" to disable. An integer bit field of E_* constants, or an array mapping E_* constants to log levels.')
                             ->treatNullLike($this->debug)
+                            ->defaultTrue()
                             ->beforeNormalization()
                                 ->ifArray()
                                 ->then(function (array $v): array {
@@ -1395,27 +1300,6 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('exceptions')
                     ->info('Exception handling configuration')
                     ->useAttributeAsKey('class')
-                    ->beforeNormalization()
-                        // Handle legacy XML configuration
-                        ->ifArray()
-                        ->then(function (array $v): array {
-                            if (!\array_key_exists('exception', $v)) {
-                                return $v;
-                            }
-
-                            trigger_deprecation('symfony/framework-bundle', '6.3', '"framework:exceptions" tag is deprecated. Unwrap it and replace your "framework:exception" tags\' "name" attribute by "class".');
-
-                            $v = $v['exception'];
-                            unset($v['exception']);
-
-                            foreach ($v as &$exception) {
-                                $exception['class'] = $exception['name'];
-                                unset($exception['name']);
-                            }
-
-                            return $v;
-                        })
-                    ->end()
                     ->prototype('array')
                         ->children()
                             ->scalarNode('log_level')
@@ -1711,15 +1595,6 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('failure_transport')
                             ->defaultNull()
                             ->info('Transport name to send failed messages to (after all retries have failed).')
-                        ->end()
-                        ->booleanNode('reset_on_message')
-                            ->defaultTrue()
-                            ->info('Reset container services after each message.')
-                            ->setDeprecated('symfony/framework-bundle', '6.1', 'Option "%node%" at "%path%" is deprecated. It does nothing and will be removed in version 7.0.')
-                            ->validate()
-                                ->ifTrue(fn ($v) => true !== $v)
-                                ->thenInvalid('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.')
-                            ->end()
                         ->end()
                         ->arrayNode('stop_worker_on_signals')
                             ->defaultValue([])
@@ -2394,23 +2269,6 @@ class Configuration implements ConfigurationInterface
     private function addUidSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
-            ->validate()
-                ->always(function ($v) {
-                    if ($v['uid']['enabled']) {
-                        if (!\array_key_exists('default_uuid_version', $v['uid'])) {
-                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.uid.default_uuid_version" config option is deprecated. It will default to "7" in 7.0.');
-                        }
-
-                        if (!\array_key_exists('time_based_uuid_version', $v['uid'])) {
-                            trigger_deprecation('symfony/framework-bundle', '6.4', 'Not setting the "framework.uid.time_based_uuid_version" config option is deprecated. It will default to "7" in 7.0.');
-                        }
-                    }
-
-                    $v['uid'] += ['default_uuid_version' => 6, 'time_based_uuid_version' => 6];
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->arrayNode('uid')
                     ->info('Uid configuration')
@@ -2419,6 +2277,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->enumNode('default_uuid_version')
                             ->values([7, 6, 4, 1])
+                            ->defaultValue(7)
                         ->end()
                         ->enumNode('name_based_uuid_version')
                             ->defaultValue(5)
@@ -2429,6 +2288,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->enumNode('time_based_uuid_version')
                             ->values([7, 6, 1])
+                            ->defaultValue(7)
                         ->end()
                         ->scalarNode('time_based_uuid_node')
                             ->cannotBeEmpty()

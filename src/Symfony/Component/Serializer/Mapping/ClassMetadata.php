@@ -90,11 +90,8 @@ class ClassMetadata implements ClassMetadataInterface
         return $this->classDiscriminatorMapping;
     }
 
-    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null): void
+    public function setClassDiscriminatorMapping(?ClassDiscriminatorMapping $mapping): void
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/serializer', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         $this->classDiscriminatorMapping = $mapping;
     }
 

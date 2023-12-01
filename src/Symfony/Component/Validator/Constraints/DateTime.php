@@ -14,9 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -32,13 +29,8 @@ class DateTime extends Constraint
         self::INVALID_TIME_ERROR => 'INVALID_TIME_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $format = 'Y-m-d H:i:s';
-    public $message = 'This value is not a valid datetime.';
+    public string $format = 'Y-m-d H:i:s';
+    public string $message = 'This value is not a valid datetime.';
 
     public function __construct(string|array $format = null, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {

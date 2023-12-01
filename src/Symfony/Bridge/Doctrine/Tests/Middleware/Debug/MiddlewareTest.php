@@ -52,9 +52,7 @@ class MiddlewareTest extends TestCase
         $this->stopwatch = $withStopwatch ? new Stopwatch() : null;
 
         $config = ORMSetup::createConfiguration(true);
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         $config->setLazyGhostObjectEnabled(true);
         $this->debugDataHolder = new DebugDataHolder();
         $config->setMiddlewares([new Middleware($this->debugDataHolder, $this->stopwatch)]);

@@ -23,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.1']
+        php: ['8.2']
       fail-fast: false
 
     services:
@@ -188,7 +188,7 @@ jobs:
           POSTGRES_HOST: localhost
 
       #- name: Run HTTP push tests
-      #  if: matrix.php == '8.1'
+      #  if: matrix.php == '8.2'
       #  run: |
       #    [ -d .phpunit ] && mv .phpunit .phpunit.bak
       #    wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin

@@ -37,7 +37,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
-use Symfony\Component\Serializer\Tests\Fixtures\FormatAndContextAwareNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
@@ -739,20 +738,6 @@ class ObjectNormalizerTest extends TestCase
             /** @var self::*|null */
             public $foo;
         })::class)->foo);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testExtractAttributesRespectsFormat()
-    {
-        $normalizer = new FormatAndContextAwareNormalizer();
-
-        $data = new ObjectDummy();
-        $data->setFoo('bar');
-        $data->bar = 'foo';
-
-        $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $normalizer->normalize($data, 'foo_and_bar_included'));
     }
 
     public function testExtractAttributesRespectsContext()

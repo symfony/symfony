@@ -95,13 +95,6 @@ class MongoDbStore implements PersistingStoreInterface
      */
     public function __construct(Collection|Database|Client|Manager|string $mongo, array $options = [], float $initialTtl = 300.0)
     {
-        if (isset($options['gcProbablity'])) {
-            trigger_deprecation('symfony/lock', '6.3', 'The "gcProbablity" option (notice the typo in its name) is deprecated in "%s"; use the "gcProbability" option instead.', __CLASS__);
-
-            $options['gcProbability'] = $options['gcProbablity'];
-            unset($options['gcProbablity']);
-        }
-
         $this->options = array_merge([
             'gcProbability' => 0.001,
             'database' => null,
@@ -202,13 +195,11 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @see http://docs.mongodb.org/manual/tutorial/expire-data/
      *
-     * @return void
-     *
      * @throws UnsupportedException          if options are not supported by the selected server
      * @throws MongoInvalidArgumentException for parameter/option parsing errors
      * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
      */
-    public function createTtlIndex(int $expireAfterSeconds = 0)
+    public function createTtlIndex(int $expireAfterSeconds = 0): void
     {
         $server = $this->getManager()->selectServer();
         $server->executeCommand($this->options['database'], new Command([
@@ -226,11 +217,9 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * @return void
-     *
      * @throws LockExpiredException when save is called on an expired lock
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $key->reduceLifetime($this->initialTtl);
 
@@ -251,12 +240,10 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * @return void
-     *
      * @throws LockStorageException
      * @throws LockExpiredException
      */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         $key->reduceLifetime($ttl);
 
@@ -272,10 +259,7 @@ class MongoDbStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $write = new BulkWrite();
         $write->delete(

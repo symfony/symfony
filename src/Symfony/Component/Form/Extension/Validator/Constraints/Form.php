@@ -26,11 +26,6 @@ class Form extends Constraint
         self::NO_SUCH_FIELD_ERROR => 'NO_SUCH_FIELD_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

@@ -113,6 +113,17 @@ class AbstractObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testDenormalizePlainObject()
+    {
+        $extractor = new PhpDocExtractor();
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $dummy = $normalizer->denormalize(['plainObject' => (object) ['foo' => 'bar']], DummyWithPlainObject::class);
+
+        $this->assertInstanceOf(DummyWithPlainObject::class, $dummy);
+        $this->assertInstanceOf(\stdClass::class, $dummy->plainObject);
+        $this->assertSame('bar', $dummy->plainObject->foo);
+    }
+
     public function testDenormalizeCollectionDecodedFromXmlWithOneChild()
     {
         $denormalizer = $this->getDenormalizerForDummyCollection();
@@ -596,6 +607,12 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
     {
         $object->$attribute = $value;
     }
+}
+
+class DummyWithPlainObject
+{
+    /** @var object */
+    public $plainObject;
 }
 
 class ObjectWithBasicProperties

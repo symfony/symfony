@@ -265,6 +265,22 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
+    public function testConstructorWithObjectDenormalizeForStdClass()
+    {
+        $data = [
+            'foo' => ['bar' => 'baz'],
+            'oof' => 'rab',
+        ];
+
+        $obj = $this->normalizer->denormalize($data, \stdClass::class, 'any');
+
+        $expected = new \stdClass();
+        $expected->foo = ['bar' => 'baz'];
+        $expected->oof = 'rab';
+
+        self::assertEquals($expected, $obj);
+    }
+
     public function testConstructorWithObjectTypeHintDenormalize()
     {
         $data = [

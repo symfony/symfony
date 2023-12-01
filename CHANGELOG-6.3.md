@@ -7,6 +7,16 @@ in 6.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.3.0...v6.3.1
 
+* 6.3.10 (2023-12-01)
+
+ * bug #52804 [Serializer] Fix support of plain object types denormalization (andersonamuller)
+ * bug #52845 [Routing] Restore aliases removal in RouteCollection::remove() (fancyweb)
+ * bug #52846 [PhpUnitBridge]  run composer update for compatibility with PHPUnit versions shipping composer.lock (xabbuh)
+ * bug #52823 add parameter types in query builder (javiercno)
+ * bug #52808 [DependencyInjection] Fix dumping containers with null-referenced services (nicolas-grekas)
+ * bug #52797 [VarExporter] Fix lazy ghost trait when using nullsafe operator (nicolas-grekas)
+ * bug #52806 [Routing] Fix removing aliases pointing to removed route in `RouteCollection::remove()` (fancyweb)
+
 * 6.3.9 (2023-11-29)
 
  * bug #52786 [Serializer] Revert allowed attributes fix (mtarld)

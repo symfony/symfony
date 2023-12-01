@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-29T15:26:18Z
+
+Can you please add test case to avoid further regressions? Thank you!
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2023-11-29T23:22:21Z
+
+> Can you please add test case to avoid further regressions? Thank you!
+
+I added a test case
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-30T07:01:50Z
+
+friendly ping @mtarld as you are deeply involved in the serializer component, thanks!
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2023-12-01T10:35:03Z
+
+> I'd do instead:
+>
+> ```
+> if (Type::BUILTIN_TYPE_OBJECT === $builtinType && null !== $class) {
+> ```
+>
+> By doing that, it'll fallback to:
+>
+> ```
+> if (('is_'.$builtinType)($data)) {
+> ```
+>
+> And IMHO, it might be better to handle a raw object as a builtin type. WDYT?
+
+Makes sense, I have pushed the change.

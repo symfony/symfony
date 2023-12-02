@@ -1189,7 +1189,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'kernel.bundles' => [
                 'FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
                 'TestBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\TestBundle',
-                'CustomPathBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\CustomPathBundle'
+                'CustomPathBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\CustomPathBundle',
             ],
             'kernel.bundles_metadata' => [
                 'FrameworkBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..'],

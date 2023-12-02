@@ -1484,7 +1484,7 @@ class FrameworkExtension extends Extension
                 $dirs[] = $dir;
                 if (
                     $config['include_bundles_translations_in_commands']['enabled']
-                    && !in_array($name, $config['include_bundles_translations_in_commands']['excluded_bundles'], true)
+                    && !\in_array($name, $config['include_bundles_translations_in_commands']['excluded_bundles'], true)
                 ) {
                     $transPaths[] = $dir;
                 }

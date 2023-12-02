@@ -92,7 +92,7 @@ final class AsyncContext
         if (\is_callable($pause = $this->response->getInfo('pause_handler'))) {
             $pause($duration);
         } elseif (0 < $duration) {
-            usleep(1E6 * $duration);
+            usleep((int) (1E6 * $duration));
         }
     }
 

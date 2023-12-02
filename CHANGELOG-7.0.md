@@ -7,6 +7,21 @@ in 7.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.0.0...v7.0.1
 
+* 7.0.1 (2023-12-01)
+
+ * bug #52814 [Workflow] Add `getEnabledTransition()` to TraceableWorkflow (alexandre-daubois)
+ * bug #52852 [Serializer] Fix TranslatableNormalizer when the Translator is disabled (Jean-Beru)
+ * bug #52836 [DependencyInjection] Fix parsing named autowiring aliases that contain underscores (nicolas-grekas)
+ * bug #52804 [Serializer] Fix support of plain object types denormalization (andersonamuller)
+ * bug #52845 [Routing] Restore aliases removal in RouteCollection::remove() (fancyweb)
+ * bug #52846 [PhpUnitBridge]  run composer update for compatibility with PHPUnit versions shipping composer.lock (xabbuh)
+ * bug #52823 add parameter types in query builder (javiercno)
+ * bug #52825 [AssetMapper] Upgrade asset mapper to 6.4 fails due to invalid entries "downloaded_to" and "preload" (redflo)
+ * bug #52808 [DependencyInjection] Fix dumping containers with null-referenced services (nicolas-grekas)
+ * bug #52797 [VarExporter] Fix lazy ghost trait when using nullsafe operator (nicolas-grekas)
+ * bug #52806 [Routing] Fix removing aliases pointing to removed route in `RouteCollection::remove()` (fancyweb)
+ * bug #52805 [Routing] Fix conflicting FQCN aliases with route name (fancyweb)
+
 * 7.0.0 (2023-11-29)
 
  * bug #52786 [Serializer] Revert allowed attributes fix (mtarld)
@@ -374,4 +389,3 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #43 Create PSR-7 messages using PSR-17 factories (ajgarlag)
  * feature #45 Fixed broken build (Nyholm)
  * feature #1 Initial support (dunglas)
-

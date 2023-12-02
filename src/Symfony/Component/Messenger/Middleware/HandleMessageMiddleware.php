@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\HandlerFailureEvent;
+use Symfony\Component\Messenger\Event\HandlerStartingEvent;
+use Symfony\Component\Messenger\Event\HandlerSuccessEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
@@ -35,6 +39,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
     public function __construct(
         private HandlersLocatorInterface $handlersLocator,
         private bool $allowNoHandlers = false,
+        private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -57,6 +62,10 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 $alreadyHandled = true;
                 continue;
             }
+
+            $this->eventDispatcher?->dispatch(new HandlerStartingEvent($envelope, $handlerDescriptor));
+
+            $e = null;
 
             try {
                 $handler = $handlerDescriptor->getHandler();
@@ -96,6 +105,14 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 $this->logger?->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {
                 $exceptions[$handlerDescriptor->getName()] = $e;
+            }
+
+            if (null !== $this->eventDispatcher) {
+                $event = (null !== $e)
+                    ? new HandlerFailureEvent($envelope, $handlerDescriptor, $e)
+                    : new HandlerSuccessEvent($envelope, $handlerDescriptor);
+
+                $this->eventDispatcher->dispatch($event);
             }
         }
 

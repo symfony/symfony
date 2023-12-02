@@ -78,7 +78,7 @@ class ImportMapRenderer
                 // importmap entry is a noop
                 $importMap[$importName] = 'data:application/javascript,';
             } else {
-                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(sprintf('const d=document,l=d.createElement("link");l.rel="stylesheet",l.href="%s",(d.head||d.getElementsByTagName("head")[0]).appendChild(l)', $path));
+                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(sprintf('document.head.appendChild(Object.assign(document.createElement("link"),{rel:"stylesheet",href:"%s"}))', addslashes($path)));
             }
         }
 

@@ -296,7 +296,7 @@ trait TransportResponseTrait
             }
 
             if (-1 === self::select($multi, min($timeoutMin, $timeoutMax - $elapsedTimeout))) {
-                usleep(min(500, 1E6 * $timeoutMin));
+                usleep((int) min(500, 1E6 * $timeoutMin));
             }
 
             $elapsedTimeout = hrtime(true) / 1E9 - $lastActivity;

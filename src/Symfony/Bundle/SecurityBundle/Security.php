@@ -30,6 +30,9 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
+if (class_exists(InternalSecurity::class, false)) {
+    return;
+}
 if (class_exists(LegacySecurity::class)) {
     class_alias(LegacySecurity::class, InternalSecurity::class);
 } else {

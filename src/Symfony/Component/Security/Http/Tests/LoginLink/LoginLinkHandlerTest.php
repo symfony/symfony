@@ -54,6 +54,10 @@ class LoginLinkHandlerTest extends TestCase
      */
     public function testCreateLoginLink($user, array $extraProperties, Request $request = null, array $queryStringParameters = [])
     {
+        if (!empty($queryStringParameters)) {
+            $queryStringParameters['_hash_parameters'] = implode(',', array_keys($queryStringParameters));
+        }
+
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
@@ -179,14 +183,28 @@ class LoginLinkHandlerTest extends TestCase
     public function testConsumeLoginLinkWithQueryStringParameters()
     {
         $expires = time() + 500;
-        $signature = $this->createSignatureHash('weaverryan', $expires, ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], ['_target_path' => '/welcome']);
-        $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires).'&_target_path='.urlencode('/welcome'));
+
+        $parameters = [
+            '_hash_parameters' => '_target_path,foo',
+            '_target_path' => '/welcome',
+            'foo' => 'bar',
+        ];
+
+        $signature = $this->createSignatureHash('weaverryan', $expires, ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], $parameters);
+
+        $request = Request::create('/login/verify?'.http_build_query([
+            ...$parameters,
+            '_user' => 'weaverryan',
+            '_expires' => $expires,
+            '_hash' => $signature,
+        ]));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->createUser($user);
 
         $linker = $this->createLinker(['max_uses' => 3]);
         $actualUser = $linker->consumeLoginLink($request);
+
         $this->assertEquals($user, $actualUser);
 
         $item = $this->expiredLinkCache->getItem(rawurlencode($signature));

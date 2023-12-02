@@ -52,13 +52,12 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         $expires = time() + ($lifetime ?: $this->options['lifetime']);
         $expiresAt = new \DateTimeImmutable('@'.$expires);
 
-        $hash = $this->signatureHasher->computeSignatureHash($user, $expires, $parameters);
+        ksort($parameters);
 
-        $parameters += [
-            'user' => $user->getUserIdentifier(),
-            'expires' => $expires,
-            'hash' => $hash,
-        ];
+        unset($parameters['_hash_parameters']);
+        if (!empty($parameters)) {
+            $parameters['_hash_parameters'] = implode(',', array_keys($parameters));
+        }
 
         if ($request) {
             $currentRequestContext = $this->urlGenerator->getContext();
@@ -72,7 +71,12 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         try {
             $url = $this->urlGenerator->generate(
                 $this->options['route_name'],
-                $parameters,
+                [
+                    ...$parameters,
+                    '_user' => $user->getUserIdentifier(),
+                    '_expires' => $expires,
+                    '_hash' => $this->signatureHasher->computeSignatureHash($user, $expires, $parameters),
+                ],
                 UrlGeneratorInterface::ABSOLUTE_URL
             );
         } finally {
@@ -86,17 +90,27 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     public function consumeLoginLink(Request $request): UserInterface
     {
-        $userIdentifier = $request->get('user');
+        $userIdentifier = $request->get('_user');
 
-        if (!$hash = $request->get('hash')) {
-            throw new InvalidLoginLinkException('Missing "hash" parameter.');
+        if (!$hash = $request->get('_hash')) {
+            throw new InvalidLoginLinkException('Missing "_hash" parameter.');
         }
-        if (!$expires = $request->get('expires')) {
-            throw new InvalidLoginLinkException('Missing "expires" parameter.');
+        if (!$expires = $request->get('_expires')) {
+            throw new InvalidLoginLinkException('Missing "_expires" parameter.');
         }
 
-        $parameters = $request->query->all();
-        unset($parameters['hash'], $parameters['expires'], $parameters['user']);
+        $parameters = [];
+
+        if (!empty($hashParameters = $request->query->get('_hash_parameters'))) {
+            $parameters['_hash_parameters'] = $hashParameters;
+            foreach(explode(',', $hashParameters) as $hashParameter) {
+                if (!$request->query->has($hashParameter)) {
+                    throw new InvalidLoginLinkException(sprintf('Missing "%s" parameter.', $hashParameter));
+                }
+
+                $parameters[$hashParameter] = $request->query->get($hashParameter);
+            }
+        }
 
         try {
             $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash, $parameters);

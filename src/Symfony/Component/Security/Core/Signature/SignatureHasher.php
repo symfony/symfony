@@ -148,8 +148,6 @@ class SignatureHasher
             return $result;
         }
 
-        ksort($parameters);
-
         foreach ($parameters as $key => $value) {
             if ($value instanceof \DateTimeInterface) {
                 $value = $value->format('c');

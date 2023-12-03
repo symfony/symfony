@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -192,12 +192,12 @@ class PropertyAccessor implements PropertyAccessorInterface
         if (preg_match('/^\S+::\S+\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/', $message, $matches)) {
             [, $expectedType, $actualType] = $matches;
 
-            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $expectedType, 'NULL' === $actualType ? 'null' : $actualType, $propertyPath), 0, $previous);
+            throw new InvalidTypeException($expectedType, $actualType, $propertyPath, $previous);
         }
         if (preg_match('/^Cannot assign (\S+) to property \S+::\$\S+ of type (\S+)$/', $message, $matches)) {
             [, $actualType, $expectedType] = $matches;
 
-            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $expectedType, 'NULL' === $actualType ? 'null' : $actualType, $propertyPath), 0, $previous);
+            throw new InvalidTypeException($expectedType, $actualType, $propertyPath, $previous);
         }
     }
 

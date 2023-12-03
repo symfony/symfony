@@ -178,7 +178,7 @@ class ConnectionTest extends TestCase
     /**
      * @dataProvider buildConfigurationProvider
      */
-    public function testBuildConfiguration(string $dsn, array $options, string $expectedConnection, string $expectedTableName, int $expectedRedeliverTimeout, string $expectedQueue, bool $expectedAutoSetup)
+    public function testBuildConfiguration(string $dsn, array $options, string $expectedConnection, string $expectedTableName, int $expectedRedeliverTimeout, string $expectedQueue, bool $expectedAutoSetup, bool $expectedBinaryBody)
     {
         $config = Connection::buildConfiguration($dsn, $options);
         $this->assertEquals($expectedConnection, $config['connection']);
@@ -186,6 +186,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals($expectedRedeliverTimeout, $config['redeliver_timeout']);
         $this->assertEquals($expectedQueue, $config['queue_name']);
         $this->assertEquals($expectedAutoSetup, $config['auto_setup']);
+        $this->assertEquals($expectedBinaryBody, $config['binary_body']);
     }
 
     public static function buildConfigurationProvider(): iterable
@@ -198,6 +199,7 @@ class ConnectionTest extends TestCase
             'expectedRedeliverTimeout' => 3600,
             'expectedQueue' => 'default',
             'expectedAutoSetup' => true,
+            'expectedBinaryBody' => false,
         ];
 
         yield 'test options array' => [
@@ -213,6 +215,7 @@ class ConnectionTest extends TestCase
             'expectedRedeliverTimeout' => 1800,
             'expectedQueue' => 'important',
             'expectedAutoSetup' => false,
+            'expectedBinaryBody' => false,
         ];
 
         yield 'options from dsn' => [
@@ -223,6 +226,7 @@ class ConnectionTest extends TestCase
             'expectedRedeliverTimeout' => 1200,
             'expectedQueue' => 'normal',
             'expectedAutoSetup' => false,
+            'expectedBinaryBody' => false,
         ];
 
         yield 'options from dsn array wins over options from options' => [
@@ -238,6 +242,7 @@ class ConnectionTest extends TestCase
             'expectedRedeliverTimeout' => 1200,
             'expectedQueue' => 'normal',
             'expectedAutoSetup' => true,
+            'expectedBinaryBody' => false,
         ];
 
         yield 'options from dsn with falsey boolean' => [
@@ -248,6 +253,7 @@ class ConnectionTest extends TestCase
             'expectedRedeliverTimeout' => 3600,
             'expectedQueue' => 'default',
             'expectedAutoSetup' => false,
+            'expectedBinaryBody' => false,
         ];
 
         yield 'options from dsn with thruthy boolean' => [
@@ -258,6 +264,7 @@ class ConnectionTest extends TestCase
             'expectedRedeliverTimeout' => 3600,
             'expectedQueue' => 'default',
             'expectedAutoSetup' => true,
+            'expectedBinaryBody' => false,
         ];
     }
 

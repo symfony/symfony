@@ -67,6 +67,7 @@ class Connection implements ResetInterface
 
     private ?SchemaSynchronizer $schemaSynchronizer;
     private bool $autoSetup;
+    private bool $binaryBody;
 
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
@@ -74,6 +75,7 @@ class Connection implements ResetInterface
         $this->driverConnection = $driverConnection;
         $this->schemaSynchronizer = $schemaSynchronizer;
         $this->autoSetup = $this->configuration['auto_setup'];
+        $this->binaryBody = ($this->configuration['binary_body'] ?? false);
     }
 
     public function reset(): void
@@ -97,19 +99,19 @@ class Connection implements ResetInterface
             parse_str($components['query'], $query);
         }
 
-        $configuration = ['connection' => $components['host']];
+        $configuration = ['connection' => $components['host'], 'binary_body' => false];
         $configuration += $query + $options + static::DEFAULT_OPTIONS;
 
         $configuration['auto_setup'] = filter_var($configuration['auto_setup'], \FILTER_VALIDATE_BOOL);
 
         // check for extra keys in options
-        $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));
+        $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS + ['binary_body']));
         if (0 < \count($optionsExtraKeys)) {
             throw new InvalidArgumentException(sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
 
         // check for extra keys in options
-        $queryExtraKeys = array_diff(array_keys($query), array_keys(static::DEFAULT_OPTIONS));
+        $queryExtraKeys = array_diff(array_keys($query), array_keys(static::DEFAULT_OPTIONS + ['binary_body']));
         if (0 < \count($queryExtraKeys)) {
             throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
@@ -146,7 +148,7 @@ class Connection implements ResetInterface
             $now,
             $availableAt,
         ], [
-            Types::STRING,
+            $this->binaryBody ? Types::BINARY : Types::STRING,
             Types::STRING,
             Types::STRING,
             Types::DATETIME_IMMUTABLE,
@@ -448,7 +450,7 @@ class Connection implements ResetInterface
         $table->addColumn('id', Types::BIGINT)
             ->setAutoincrement(true)
             ->setNotnull(true);
-        $table->addColumn('body', Types::TEXT)
+        $table->addColumn('body', $this->binaryBody ? Types::BINARY : Types::TEXT)
             ->setNotnull(true);
         $table->addColumn('headers', Types::TEXT)
             ->setNotnull(true);

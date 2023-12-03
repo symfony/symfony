@@ -54,9 +54,9 @@ class SignatureHasher
      *
      * This method must be called before the user object is loaded from a provider.
      *
-     * @param int    $expires The expiry time as a unix timestamp
-     * @param string $hash    The plaintext hash provided by the request
-     * @param array<string, mixed> $parameters  Additional key-value pairs that should be part of the signature
+     * @param int                  $expires    The expiry time as a unix timestamp
+     * @param string               $hash       The plaintext hash provided by the request
+     * @param array<string, mixed> $parameters Additional key-value pairs that should be part of the signature
      *
      * @throws InvalidSignatureException If the signature does not match the provided parameters
      * @throws ExpiredSignatureException If the signature is no longer valid
@@ -78,9 +78,9 @@ class SignatureHasher
     /**
      * Verifies the hash using the provided user and expire time.
      *
-     * @param int    $expires The expiry time as a unix timestamp
-     * @param string $hash    The plaintext hash provided by the request
-     * @param array<string, mixed> $parameters  Additional key-value pairs that should be part of the signature
+     * @param int                  $expires    The expiry time as a unix timestamp
+     * @param string               $hash       The plaintext hash provided by the request
+     * @param array<string, mixed> $parameters Additional key-value pairs that should be part of the signature
      *
      * @throws InvalidSignatureException If the signature does not match the provided parameters
      * @throws ExpiredSignatureException If the signature is no longer valid
@@ -107,7 +107,7 @@ class SignatureHasher
     /**
      * Computes the secure hash for the provided user and expire time.
      *
-     * @param int $expires The expiry time as a unix timestamp
+     * @param int                  $expires    The expiry time as a unix timestamp
      * @param array<string, mixed> $parameters Additional key-value pairs that should be part of the signature
      */
     public function computeSignatureHash(UserInterface $user, int $expires, array $parameters = []): string
@@ -138,7 +138,6 @@ class SignatureHasher
      * Produces a single string of supplied key-value pairs usable during the hashing process.
      *
      * @param array<string, mixed> $parameters
-     * @return string
      */
     private function squashParameters(array $parameters): string
     {

@@ -110,10 +110,10 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         $hashParametersList = $request->query->get('_hash_parameters');
         if (!empty($hashParametersList)) {
             $hashParameters = [
-                '_hash_parameters' => $hashParametersList
+                '_hash_parameters' => $hashParametersList,
             ];
 
-            foreach(explode(',', $hashParametersList) as $hashParameterName) {
+            foreach (explode(',', $hashParametersList) as $hashParameterName) {
                 if (!$request->query->has($hashParameterName)) {
                     throw new InvalidLoginLinkException(sprintf('Missing "%s" parameter.', $hashParameterName));
                 }

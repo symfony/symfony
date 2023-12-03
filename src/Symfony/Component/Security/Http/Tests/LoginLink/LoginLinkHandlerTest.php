@@ -128,7 +128,7 @@ class LoginLinkHandlerTest extends TestCase
             new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),
             ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'],
             null,
-            ['_target_path' => '/welcome']
+            ['_target_path' => '/welcome'],
         ];
     }
 

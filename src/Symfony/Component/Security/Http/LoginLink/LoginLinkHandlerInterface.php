@@ -24,9 +24,10 @@ interface LoginLinkHandlerInterface
     /**
      * Generate a link that can be used to authenticate as the given user.
      *
-     * @param int|null $lifetime When not null, the argument overrides any default lifetime previously set
+     * @param int|null                          $lifetime   When not null, the argument overrides any default lifetime previously set
+     * @param array<string, \Stringable|scalar> $parameters A list of additional query string parameters that should be part of the login link URL
      */
-    public function createLoginLink(UserInterface $user, Request $request = null, int $lifetime = null): LoginLinkDetails;
+    public function createLoginLink(UserInterface $user, Request $request = null, int $lifetime = null/* , array $parameters = [] */): LoginLinkDetails;
 
     /**
      * Validates if this request contains a login link and returns the associated User.

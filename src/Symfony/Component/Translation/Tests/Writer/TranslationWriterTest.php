@@ -55,9 +55,12 @@ class TranslationWriterTest extends TestCase
         $writer = new TranslationWriter();
         $writer->addDumper('foo', $this->createMock(DumperInterface::class));
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Translation Writer was not able to create directory "/foo/bar/baz".');
+        $path = tempnam(sys_get_temp_dir(), '');
+        file_put_contents($path, '');
 
-        $writer->write(new MessageCatalogue('en'), 'foo', ['path' => '/foo/bar/baz']);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf('Translation Writer was not able to create directory "%s".', $path));
+
+        $writer->write(new MessageCatalogue('en'), 'foo', ['path' => $path]);
     }
 }

@@ -90,34 +90,44 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     public function consumeLoginLink(Request $request): UserInterface
     {
-        $userIdentifier = $request->get('_user');
+        /** @var array{_user: string, _hash: string, _expires: string|int} $requiredParameters */
+        $requiredParameters = ['_user' => 'user', '_hash' => 'hash', '_expires' => 'expires'];
 
-        if (!$hash = $request->get('_hash')) {
-            throw new InvalidLoginLinkException('Missing "_hash" parameter.');
+        foreach ($requiredParameters as $parameterName => $deprecatedParameterName) {
+            if ($fallback = $request->query->getString($deprecatedParameterName)) {
+                trigger_deprecation('symfony/security', '7.1', 'Login link parameters "user", "hash" and "expires" were renamed to include an underscore prefix: "_user", "_hash" and "_expires". Update your login link to reflect this.');
+            }
+
+            if (!$requiredParameters[$parameterName] = $request->query->getString($parameterName, $fallback)) {
+                throw new InvalidLoginLinkException(sprintf('Missing "%s" parameter.', $parameterName));
+            }
         }
-        if (!$expires = $request->get('_expires')) {
-            throw new InvalidLoginLinkException('Missing "_expires" parameter.');
-        }
 
-        $parameters = [];
+        $requiredParameters['_expires'] = (int) $requiredParameters['_expires'];
 
-        if (!empty($hashParameters = $request->query->get('_hash_parameters'))) {
-            $parameters['_hash_parameters'] = $hashParameters;
-            foreach(explode(',', $hashParameters) as $hashParameter) {
-                if (!$request->query->has($hashParameter)) {
-                    throw new InvalidLoginLinkException(sprintf('Missing "%s" parameter.', $hashParameter));
+        /** @var array<string, string> $hashParameters */
+        $hashParameters = [];
+        $hashParametersList = $request->query->get('_hash_parameters');
+        if (!empty($hashParametersList)) {
+            $hashParameters = [
+                '_hash_parameters' => $hashParametersList
+            ];
+
+            foreach(explode(',', $hashParametersList) as $hashParameterName) {
+                if (!$request->query->has($hashParameterName)) {
+                    throw new InvalidLoginLinkException(sprintf('Missing "%s" parameter.', $hashParameterName));
                 }
 
-                $parameters[$hashParameter] = $request->query->get($hashParameter);
+                $hashParameters[$hashParameterName] = $request->query->get($hashParameterName);
             }
         }
 
         try {
-            $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash, $parameters);
+            $this->signatureHasher->acceptSignatureHash($requiredParameters['_user'], $requiredParameters['_expires'], $requiredParameters['_hash'], $hashParameters);
 
-            $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
+            $user = $this->userProvider->loadUserByIdentifier($requiredParameters['_user']);
 
-            $this->signatureHasher->verifySignatureHash($user, $expires, $hash, $parameters);
+            $this->signatureHasher->verifySignatureHash($user, $requiredParameters['_expires'], $requiredParameters['_hash'], $hashParameters);
         } catch (UserNotFoundException $e) {
             throw new InvalidLoginLinkException('User not found.', 0, $e);
         } catch (ExpiredSignatureException $e) {

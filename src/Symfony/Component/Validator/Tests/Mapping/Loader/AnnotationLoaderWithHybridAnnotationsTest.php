@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
@@ -46,6 +48,14 @@ class AnnotationLoaderWithHybridAnnotationsTest extends AttributeLoaderTest
         parent::testLoadClassMetadataAndMerge();
     }
 
+    public function testLoadClassMetadataWithOtherAnnotations()
+    {
+        $loader = $this->createAnnotationLoader();
+        $metadata = new ClassMetadata(EntityWithOtherAnnotations::class);
+
+        $this->assertTrue($loader->loadClassMetadata($metadata));
+    }
+
     protected function createAnnotationLoader(): AnnotationLoader
     {
         return new AnnotationLoader(new AnnotationReader());
@@ -55,4 +65,21 @@ class AnnotationLoaderWithHybridAnnotationsTest extends AttributeLoaderTest
     {
         return 'Symfony\Component\Validator\Tests\Fixtures\Attribute';
     }
+}
+
+/**
+ * @Annotation
+ * @Target({"PROPERTY"})
+ */
+class SomeAnnotation
+{
+}
+
+class EntityWithOtherAnnotations
+{
+    /**
+     * @SomeAnnotation
+     */
+    #[NotBlank]
+    public ?string $name = null;
 }

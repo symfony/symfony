@@ -118,13 +118,13 @@ class AnnotationLoader implements LoaderInterface
         $annotations = [];
 
         if ($reflection instanceof \ReflectionClass && $annotations = $this->reader->getClassAnnotations($reflection)) {
-            trigger_deprecation('symfony/validator', '6.4', 'Class "%s" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.', $reflection->getName());
+            $this->triggerDeprecationIfAnnotationIsUsed($annotations, sprintf('Class "%s"', $reflection->getName()));
         }
         if ($reflection instanceof \ReflectionMethod && $annotations = $this->reader->getMethodAnnotations($reflection)) {
-            trigger_deprecation('symfony/validator', '6.4', 'Method "%s::%s()" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.', $reflection->getDeclaringClass()->getName(), $reflection->getName());
+            $this->triggerDeprecationIfAnnotationIsUsed($annotations, sprintf('Method "%s::%s()"', $reflection->getDeclaringClass()->getName(), $reflection->getName()));
         }
         if ($reflection instanceof \ReflectionProperty && $annotations = $this->reader->getPropertyAnnotations($reflection)) {
-            trigger_deprecation('symfony/validator', '6.4', 'Property "%s::$%s" uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.', $reflection->getDeclaringClass()->getName(), $reflection->getName());
+            $this->triggerDeprecationIfAnnotationIsUsed($annotations, sprintf('Property "%s::$%s"', $reflection->getDeclaringClass()->getName(), $reflection->getName()));
         }
 
         foreach ($dedup as $annotation) {
@@ -139,6 +139,20 @@ class AnnotationLoader implements LoaderInterface
             }
             if (!\in_array($annotation, $dedup, false)) {
                 yield $annotation;
+            }
+        }
+    }
+
+    private function triggerDeprecationIfAnnotationIsUsed(array $annotations, string $messagePrefix): void
+    {
+        foreach ($annotations as $annotation) {
+            if (
+                $annotation instanceof Constraint
+                || $annotation instanceof GroupSequence
+                || $annotation instanceof GroupSequenceProvider
+            ) {
+                trigger_deprecation('symfony/validator', '6.4', sprintf('%s uses Doctrine Annotations to configure validation constraints, which is deprecated. Use PHP attributes instead.', $messagePrefix));
+                break;
             }
         }
     }

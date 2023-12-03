@@ -97,6 +97,7 @@ EOF
         }
 
         $this->phpSerializer?->acceptPhpIncompleteClass();
+        $this->igbinarySerializer?->acceptPhpIncompleteClass();
         try {
             foreach ($envelopes as $envelope) {
                 $currentClassName = $envelope->getMessage()::class;
@@ -119,6 +120,7 @@ EOF
             }
         } finally {
             $this->phpSerializer?->rejectPhpIncompleteClass();
+            $this->igbinarySerializer?->rejectPhpIncompleteClass();
         }
 
         $rowsCount = \count($rows);
@@ -149,6 +151,7 @@ EOF
         $countPerClass = [];
 
         $this->phpSerializer?->acceptPhpIncompleteClass();
+        $this->igbinarySerializer?->acceptPhpIncompleteClass();
         try {
             foreach ($envelopes as $envelope) {
                 $c = $envelope->getMessage()::class;
@@ -161,6 +164,7 @@ EOF
             }
         } finally {
             $this->phpSerializer?->rejectPhpIncompleteClass();
+            $this->igbinarySerializer?->rejectPhpIncompleteClass();
         }
 
         if (0 === \count($countPerClass)) {
@@ -177,10 +181,12 @@ EOF
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver($failedTransportName);
         $this->phpSerializer?->acceptPhpIncompleteClass();
+        $this->igbinarySerializer?->acceptPhpIncompleteClass();
         try {
             $envelope = $receiver->find($id);
         } finally {
             $this->phpSerializer?->rejectPhpIncompleteClass();
+            $this->igbinarySerializer?->rejectPhpIncompleteClass();
         }
         if (null === $envelope) {
             throw new RuntimeException(sprintf('The message "%s" was not found.', $id));

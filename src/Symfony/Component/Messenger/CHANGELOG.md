@@ -26,6 +26,7 @@ CHANGELOG
  * Add `WrappedExceptionsInterface` interface for exceptions that hold multiple individual exceptions
  * Deprecate `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
    and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
+ * Add support for `igbinary` serializer for Doctrine transport by setting transport serializer to `messenger.transport.igbinary_serializer`
 
 6.3
 ---

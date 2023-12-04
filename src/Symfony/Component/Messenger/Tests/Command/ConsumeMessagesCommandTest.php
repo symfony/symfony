@@ -214,6 +214,42 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
+    public function testRunWithAllOption()
+    {
+        $envelope1 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+        $envelope2 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver1 = $this->createMock(ReceiverInterface::class);
+        $receiver1->expects($this->once())->method('get')->willReturn([$envelope1]);
+        $receiver2 = $this->createMock(ReceiverInterface::class);
+        $receiver2->expects($this->once())->method('get')->willReturn([$envelope2]);
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver1')->willReturn(true);
+        $receiverLocator->expects($this->once())->method('get')->with('dummy-receiver1')->willReturn($receiver1);
+        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver2')->willReturn(true);
+        $receiverLocator->expects($this->once())->method('get')->with('dummy-receiver2')->willReturn($receiver2);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->exactly(2))->method('dispatch');
+
+        $busLocator = $this->createMock(ContainerInterface::class);
+        $busLocator->expects($this->once())->method('has')->with('dummy-bus')->willReturn(true);
+        $busLocator->expects($this->once())->method('get')->with('dummy-bus')->willReturn($bus);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            '--all' => null,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver1, dummy-receiver2"', $tester->getDisplay());
+    }
+
     /**
      * @dataProvider provideCompletionSuggestions
      */

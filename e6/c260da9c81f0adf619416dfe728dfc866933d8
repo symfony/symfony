@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-09T13:58:50Z
+
+That's a new feature for sure so for 7.1
+What about also adding support for the `webkitdirectory` attribute in the Form component?
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-11-10T01:39:21Z
+
+> What about also adding support for the `webkitdirectory` attribute in the Form component?
+
+I haven't contributed to the form component yet, so I will check it out. Should be fairly simple though.
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-11-10T02:17:00Z
+
+I just realized that merging this should break many legacy test cases where a file upload is manually submitted.
+See [FormTypeTest](https://github.com/symfony/symfony/blob/7.0/src/Symfony/Component/Form/Tests/Extension/Core/Type/FileTypeTest.php) as an example. These submit the mock file upload without the "full_path" option.
+
+Even though it is more work than simply making this option optional in FileBag, these tests SOULD be fixed because they do not adhere to the default PHP behaviour and in my opinion the FileBag should not account for that. It would also require to rework the entire logic of the FileBag.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-11-10T16:49:14Z
+
+> That's a new feature for sure so for 7.1 What about also adding support for the `webkitdirectory` attribute in the Form component?
+
+See this answer from stof: https://github.com/symfony/symfony/pull/52528#issuecomment-1805529461
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-21T09:31:23Z
+
+I think the failure on `PsrHttpFactoryTest::testUploadErrNoFile` is related, maybe the ones of Form also.
+Can you please have a look?
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-11-21T10:47:04Z
+
+Yeah, this failure is related. Like I mentioned [here](https://github.com/symfony/symfony/pull/52493#issuecomment-1804971961), pretty much every test that submits a file upload manually will fail now and will have to be migrated because they don't include the `full_path` key.
+
+This is standard PHP behaviour since 8.1 and thats also the minimum required PHP version now. So I don't really see the "point" in supporting these legacy cases and they should be updated to include `full_path`.
+
+If it is the teams desire to keep this legacy behaviour, the logic of FileBag has to be heavily modified because it requires that every possible "file key" in $_FILES is included.
+
+IMO fixing all of these test cases should be a separate PR which I'm willing to create after this is merged.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-21T10:58:31Z
+
+I think we could support it more gracefully by using `$file['full_path'] ?? $file['name']` so that passing a file without a `full_path` key still works like before.
+
+However, it might be great to update the tests emulating file uploads to include this `full_path` key.
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-11-21T11:19:46Z
+
+I had a quick look at where files are submitted manually and what tests will have to be fixed:
+
+- PsrHttpMessage (Bridge)
+- Form
+
+It looks like these aren't that many and we can literally just copy the value `name` and set it to `full_path`.
+I changed the tests I found locally and the tests now pass. **Should I add them to this PR?**
+
+BrowserKit/DomCrawler also submits files but their logic seem to be independant.
+
+---
+
+I also discovered `NativeRequestHandler` in the Form component includes basically just a copy of FileBag and probably should be updated to support directory uploads as well. Add to this PR or new?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-21T11:30:20Z
+
+I think updating NativeRequestHandler in this PR makes sense as well.
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-11-21T12:18:13Z
+
+> I think we could support it more gracefully by using `$file['full_path'] ?? $file['name']` so that passing a file without a `full_path` key still works like before.
+
+Adding something like the following in FileBag should in theory work:
+
+```php
+protected function convertFileInformation(array|UploadedFile $file): array|UploadedFile|null
+{
+    if ($file instanceof UploadedFile) {
+        return $file;
+    }
+
+    if (!\array_key_exists('full_path', $file) && \array_key_exists('name', $file)) {
+        $file['full_path'] = $file['name'];
+    }
+
+    // ...
+}
+```
+
+This should then both work with "fixed file arrays and "normal" ones.

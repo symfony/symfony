@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-12-04T10:54:06Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nikophil at 2023-12-04T11:58:09Z
+
+@nicolas-grekas done
+
+the problem only occurs with nullable types properties, hence the `@requires PHP 8` tag

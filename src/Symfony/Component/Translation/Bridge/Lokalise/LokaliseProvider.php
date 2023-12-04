@@ -61,10 +61,6 @@ final class LokaliseProvider implements ProviderInterface
     {
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
-        if (!$defaultCatalogue) {
-            $defaultCatalogue = $translatorBag->getCatalogues()[0];
-        }
-
         $this->ensureAllLocalesAreCreated($translatorBag);
         $existingKeysByDomain = [];
 
@@ -110,10 +106,6 @@ final class LokaliseProvider implements ProviderInterface
     public function delete(TranslatorBagInterface $translatorBag): void
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
 
         $keysIds = [];
 

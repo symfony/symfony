@@ -57,10 +57,6 @@ final class LocoProvider implements ProviderInterface
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
-
         foreach ($catalogue->all() as $domain => $messages) {
             $createdIds = $this->createAssets(array_keys($messages), $domain);
             if ($createdIds) {
@@ -174,10 +170,6 @@ final class LocoProvider implements ProviderInterface
     public function delete(TranslatorBagInterface $translatorBag): void
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
 
         $responses = [];
 

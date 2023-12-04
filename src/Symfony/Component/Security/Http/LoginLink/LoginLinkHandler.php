@@ -44,9 +44,6 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         ], $options);
     }
 
-    /**
-     * @param array<string, \Stringable|scalar> $parameters A list of additional query string parameters that should be part of the login link
-     */
     public function createLoginLink(UserInterface $user, Request $request = null, int $lifetime = null, array $parameters = []): LoginLinkDetails
     {
         $expires = time() + ($lifetime ?: $this->options['lifetime']);

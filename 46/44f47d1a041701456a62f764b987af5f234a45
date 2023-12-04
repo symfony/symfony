@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-11-17T14:55:09Z
+
+As this method does returns a shape with 3 info and not just the docblock, I would not make it public. I don't think we want to provide BC for the current API.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-11-17T14:59:59Z
+
+Good point.
+I suggest to create a new public method then with a simpler API. What do you think about that?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-11-17T16:43:20Z
+
+> Help me figure out why it would be a bad idea to make this method public.
+
+I think because it's not a component responsibility, as per current contracts.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-11-17T16:45:48Z
+
+Hm.. Im not sure I agree with that. You could expect the "property info" component to be able to extract the Doc Block of a property.
+
+Or maybe I misunderstand you. Are you suggesting I should introduce a proper interface for this method?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-11-17T16:46:02Z
+
+Shouldn't you be using https://github.com/phpDocumentor/ReflectionDocBlock instead?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-11-17T16:47:41Z
+
+> You could expect the "property info" component to be able to extract the Doc Block of a property
+
+Yes, but there's no real contract for it currently
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-11-18T07:54:23Z
+
+> Shouldn't you be using https://github.com/phpDocumentor/ReflectionDocBlock instead?
+
+I looked into that. But I do like the feature from PropertyInfo component that would find where the docblock is. Ie, if the property is not documented it goes to the mutator.
+
+I'll make sure to prepare a proper contract and prepare this PR.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-11-19T07:43:53Z
+
+I've updated the PR with a proper interface and a good return value.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-11-23T07:31:51Z
+
+Thank you for the reviews. I've updated according to the suggestions.

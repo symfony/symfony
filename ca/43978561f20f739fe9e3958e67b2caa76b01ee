@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-11-23T12:22:48Z
+
+Out of curiosity, how did you identify this unreachable code? Should this tool be added to the CI of the project?
+
+---------------------------------------------------------------------------
+
+by alamirault at 2023-11-23T18:40:57Z
+
+> Out of curiosity, how did you identify this unreachable code? Should this tool be added to the CI of the project?
+
+I found them with phpstorm "Inspect code". But there are a lot a false positive and need to be checked manually

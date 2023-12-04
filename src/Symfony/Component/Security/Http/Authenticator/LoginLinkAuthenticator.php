@@ -54,8 +54,12 @@ final class LoginLinkAuthenticator extends AbstractAuthenticator implements Inte
 
     public function authenticate(Request $request): Passport
     {
-        if (!$username = $request->get('user')) {
-            throw new InvalidLoginLinkAuthenticationException('Missing user from link.');
+        if ($fallbackUsername = $request->get('user')) {
+            trigger_deprecation('symfony/security', '7.1', 'Login link parameters "user", "hash" and "expires" were renamed to include an underscore prefix: "_user", "_hash" and "_expires". Update your login link to reflect this.');
+        }
+
+        if (!$username = $request->get('_user', $fallbackUsername)) {
+            throw new InvalidLoginLinkAuthenticationException('Missing _user from link.');
         }
 
         $userBadge = new UserBadge($username, function () use ($request) {

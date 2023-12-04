@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add argument `$parameters` to `LoginLinkHandlerInterface::createLoginLink()`
+
 7.0
 ---
 

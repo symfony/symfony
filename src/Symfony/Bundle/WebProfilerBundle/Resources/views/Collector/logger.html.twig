@@ -409,7 +409,7 @@
         <script>Sfjs.initializeLogsTable();</script>
     {% endif %}
 
-    {% set compilerLogTotal = collector.compilerLogs|reduce((total, logs) => total + logs|length, 0) %}
+    {% set compilerLogTotal = collector.compilerLogs|default([])|reduce((total, logs) => total + logs|length, 0) %}
     <details class="container-compilation-logs">
         <summary>
             <h4>Container Compilation Logs <span class="text-muted">({{ compilerLogTotal }})</span></h4>

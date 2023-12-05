@@ -68,7 +68,7 @@ class ChoiceFormField extends FormField
 
     /**
      * Sets the value of a select field by it's text content.
-     * 
+     *
      * @throws \LogicException When the type provided is not correct
      */
     public function selectByTextContent(string $value): void
@@ -78,8 +78,9 @@ class ChoiceFormField extends FormField
         }
 
         foreach ($this->node->childNodes as $option) {
-            if($value === $option->textContent) {
+            if ($value === $option->textContent) {
                 $this->select($option->getAttribute('value'));
+
                 return;
             }
         }

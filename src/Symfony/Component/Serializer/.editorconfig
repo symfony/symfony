@@ -1,0 +1,9 @@
+# Ignore paths
+[Tests/CodeGenerator/Fixtures/**]
+trim_trailing_whitespace = false
+
+[Tests/Fixtures/CustomNormalizer/**/ExpectedNormalizer/**]
+trim_trailing_whitespace = false
+insert_final_newline = false
+indent_size = unset
+indent_style = unset

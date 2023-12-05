@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add attribute `Serializable` to automatically build a normalizer from a PHP class
+
 7.0
 ---
 

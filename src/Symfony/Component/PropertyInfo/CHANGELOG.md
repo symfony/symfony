@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Introduce `PropertyDocBlockExtractorInterface` to extract a property's doc block
+ * Make ConstructorArgumentTypeExtractorInterface non-internal
+ * Add `ConstructorArgumentTypeExtractorAggregate` to aggregate multiple `ConstructorArgumentTypeExtractorInterface` implementations
 
 6.4
 ---

@@ -1124,6 +1124,40 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue([])
                             ->prototype('variable')->end()
                         ->end()
+                        ->arrayNode('auto_normalizer')
+                            ->addDefaultsIfNotSet()
+                            ->fixXmlConfig('path')
+                            ->children()
+                                ->arrayNode('paths')
+                                    ->validate()
+                                        ->ifTrue(function ($data): bool {
+                                            foreach ($data as $key => $value) {
+                                                if (!\is_string($key)) {
+                                                    return true;
+                                                }
+                                                if (!\is_string($value)) {
+                                                    return true;
+                                                }
+                                            }
+
+                                            return false;
+                                        })
+                                        ->thenInvalid('The value must be an array with keys and values. Keys should be the start of a namespace and the values should be a file path.')
+                                    ->end()
+                                    ->info('Paths where we store classes we want to automatically create normalizers for.')
+                                    ->normalizeKeys(false)
+                                    ->defaultValue([])
+                                    ->example(['App\\Model' => 'src/Model', 'App\\Entity' => 'src/Entity'])
+                                    ->useAttributeAsKey('name')
+                                    ->variablePrototype()
+                                        ->validate()
+                                            ->ifTrue(fn ($value): bool => !\is_string($value))
+                                            ->thenInvalid('The value must be a string representing a path relative to the project root.')
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

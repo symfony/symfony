@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
@@ -24,8 +25,10 @@ use Symfony\Component\Serializer\Debug\TraceableNormalizer;
  * Adds all services with the tags "serializer.encoder" and "serializer.normalizer" as
  * encoders and normalizers to the "serializer" service.
  *
- * @author Javier Lopez <f12loalf@gmail.com>
+ * It also builds all custom Normalizer classes.
+ *
  * @author Robin Chalas <robin.chalas@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class SerializerPass implements CompilerPassInterface
 {
@@ -36,6 +39,8 @@ class SerializerPass implements CompilerPassInterface
         if (!$container->hasDefinition('serializer')) {
             return;
         }
+
+        $this->buildNormalizers($container);
 
         if (!$normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container)) {
             throw new RuntimeException('You must tag at least one service as "serializer.normalizer" to use the "serializer" service.');
@@ -70,5 +75,23 @@ class SerializerPass implements CompilerPassInterface
         $serializerDefinition = $container->getDefinition('serializer');
         $serializerDefinition->replaceArgument(0, $normalizers);
         $serializerDefinition->replaceArgument(1, $encoders);
+    }
+
+    public function buildNormalizers(ContainerBuilder $container): void
+    {
+        if (!$container->hasDefinition('serializer.custom_normalizer_helper')) {
+            return;
+        }
+
+        $directory = $container->getParameter('kernel.build_dir').\DIRECTORY_SEPARATOR.'Symfony'.\DIRECTORY_SEPARATOR.'Serializer'.\DIRECTORY_SEPARATOR.'Normalizer';
+
+        /** @var CustomNormalizerHelper $builder */
+        $builder = $container->get('serializer.custom_normalizer_helper');
+        foreach ($builder->build($directory) as $result) {
+            $definition = new Definition($result->classNs);
+            $definition->setFile($result->filePath);
+            $definition->addTag('serializer.normalizer', ['priority' => 110]);
+            $container->setDefinition('serializer.normalizer.'.$result->className, $definition);
+        }
     }
 }

@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Loader\AnnotationClassLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -457,5 +460,28 @@ class YamlFileLoaderTest extends TestCase
         $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
 
         $this->assertEquals($expectedRoutes('yaml'), $routes);
+    }
+
+    public function testPriorityWithPrefix()
+    {
+        new LoaderResolver([
+            $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/localized')),
+            new class(new AnnotationReader(), null) extends AnnotationClassLoader {
+                protected function configureRoute(
+                    Route $route,
+                    \ReflectionClass $class,
+                    \ReflectionMethod $method,
+                    object $annot
+                ): void {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $routes = $loader->load('localized-prefix.yml');
+
+        $this->assertSame(2, $routes->getPriority('important.cs'));
+        $this->assertSame(2, $routes->getPriority('important.en'));
+        $this->assertSame(1, $routes->getPriority('also_important'));
     }
 }

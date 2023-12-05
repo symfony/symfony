@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Builder\CodeGenerator;
 
-
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Builder\CodeGenerator\Attribute;
 use Symfony\Component\Serializer\Builder\CodeGenerator\ClassGenerator;

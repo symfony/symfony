@@ -323,6 +323,35 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
     }
 
+    public function testSelectByText()
+    {
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name']);
+        $field = new ChoiceFormField($node);
+
+        try {
+            $field->selectByTextContent('');
+            $this->fail('->selectByTextContent() throws a \LogicException for checkbox');
+        } catch (\LogicException $e) {
+            $this->assertTrue(true, '->selectByTextContent() throws a \LogicException for checkbox');
+        }
+
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name']);
+        $field = new ChoiceFormField($node);
+
+        try {
+            $field->selectByTextContent('');
+            $this->fail('->selectByTextContent() throws a \LogicException for radio');
+        } catch (\LogicException $e) {
+            $this->assertTrue(true, '->selectByTextContent() throws a \LogicException for radio');
+        }
+
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
+        $field = new ChoiceFormField($node);
+
+        $field->selectByTextContent('bar');
+        $this->assertEquals('bar', $field->getValue(), '->selectByTextContent() changes the selected option');
+    }
+
     public function testOptionWithNoValue()
     {
         $node = $this->createSelectNodeWithEmptyOption(['foo' => false, 'bar' => false]);

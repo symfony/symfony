@@ -390,6 +390,10 @@ class FrameworkExtension extends Extension
 
         if ($propertyInfoEnabled) {
             $this->registerPropertyInfoConfiguration($container, $loader);
+        } else {
+            // Remove services depending on PropertyInfo
+            $container->removeDefinition('serializer.auto_normalizer.definition_extractor');
+            $container->removeDefinition('serializer.custom_normalizer_helper');
         }
 
         if ($this->readConfigEnabled('lock', $container, $config['lock'])) {
@@ -1942,14 +1946,14 @@ class FrameworkExtension extends Extension
         ) {
             $definition = $container->register('property_info.phpstan_extractor', PhpStanExtractor::class);
             $definition->addTag('property_info.type_extractor', ['priority' => -1000]);
-            $definition->addTag('property_info.property_info.constructor_argument_type_extractor');
+            $definition->addTag('property_info.constructor_argument_type_extractor');
         }
 
         if (ContainerBuilder::willBeAvailable('phpdocumentor/reflection-docblock', DocBlockFactoryInterface::class, ['symfony/framework-bundle', 'symfony/property-info'], true)) {
             $definition = $container->register('property_info.php_doc_extractor', PhpDocExtractor::class);
             $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
             $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
-            $definition->addTag('property_info.property_info.constructor_argument_type_extractor');
+            $definition->addTag('property_info.constructor_argument_type_extractor');
         }
 
         if ($container->getParameter('kernel.debug')) {

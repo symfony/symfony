@@ -40,12 +40,12 @@ class ClassGenerator
         $this->namespace = $namespace;
     }
 
-    public function setExtends(?string $class)
+    public function setExtends(?string $class): void
     {
         $this->extends = $class;
     }
 
-    public function addImplements(string $class)
+    public function addImplements(string $class): void
     {
         $this->implements[] = $class;
     }

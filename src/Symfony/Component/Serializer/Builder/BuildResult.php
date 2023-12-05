@@ -28,7 +28,7 @@ class BuildResult
     ) {
     }
 
-    public function loadClass()
+    public function loadClass(): void
     {
         require_once $this->filePath;
     }

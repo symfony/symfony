@@ -148,7 +148,7 @@ class AddressTest extends TestCase
                 'Jane Doe <3 <example@example.com>',
                 'Jane Doe <3',
                 'example@example.com'
-            ]
+            ],
         ];
     }
 

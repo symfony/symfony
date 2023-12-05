@@ -615,6 +615,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
                 'enable_attributes' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
+                'auto_normalizer' => ['paths'=>[]],
             ],
             'property_access' => [
                 'enabled' => true,

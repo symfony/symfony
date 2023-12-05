@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Serializer\Tests\Builder\CodeGenerator;
 
-use App\CodeGenerator\_Attribute;
-use App\CodeGenerator\_Method;
-use App\CodeGenerator\_Property;
-use App\CodeGenerator\ClassGenerator;
+
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Builder\CodeGenerator\Attribute;
+use Symfony\Component\Serializer\Builder\CodeGenerator\ClassGenerator;
+use Symfony\Component\Serializer\Builder\CodeGenerator\Method;
+use Symfony\Component\Serializer\Builder\CodeGenerator\Property;
 
 class ClassGeneratorTest extends TestCase
 {
@@ -23,16 +24,16 @@ class ClassGeneratorTest extends TestCase
     {
         $generator = new ClassGenerator('Person', 'Test\\CodeGenerator\\Fixtures');
 
-        $generator->addProperty(_Property::create('name')
+        $generator->addProperty(Property::create('name')
             ->setVisibility('private')
             ->setType('string')
         );
-        $generator->addProperty(_Property::create('age')
+        $generator->addProperty(Property::create('age')
             ->setVisibility('private')
             ->setType('int')
         );
 
-        $generator->addMethod(_Method::create('__construct')
+        $generator->addMethod(Method::create('__construct')
             ->addArgument('name', 'string')
             ->addArgument('age', 'int')
             ->setBody(<<<PHP
@@ -41,12 +42,12 @@ class ClassGeneratorTest extends TestCase
 PHP
             ));
 
-        $generator->addMethod(_Method::create('getName')
+        $generator->addMethod(Method::create('getName')
             ->setReturnType('string')
             ->setBody('return $this->name;')
         );
 
-        $generator->addMethod(_Method::create('getAge')
+        $generator->addMethod(Method::create('getAge')
             ->setReturnType('int')
             ->setBody('return $this->age;')
         );
@@ -62,17 +63,17 @@ PHP
     {
         $generator = new ClassGenerator('Cat', 'Test\\CodeGenerator\\Fixtures');
 
-        $generator->addMethod(_Method::create('__construct')
+        $generator->addMethod(Method::create('__construct')
             ->addArgument('name', 'private string')
             ->addArgument('age', 'private int')
         );
 
-        $generator->addMethod(_Method::create('getName')
+        $generator->addMethod(Method::create('getName')
             ->setReturnType('string')
             ->setBody('return $this->name;')
         );
 
-        $generator->addMethod(_Method::create('getAge')
+        $generator->addMethod(Method::create('getAge')
             ->setReturnType('int')
             ->setBody('return $this->age;')
         );
@@ -104,19 +105,19 @@ It has some lines
 TEXT
         );
 
-        $generator->addProperty(_Property::create('name')
+        $generator->addProperty(Property::create('name')
             ->setVisibility('private')
             ->setType('string')
         );
 
-        $generator->addMethod(_Method::create('__construct')
+        $generator->addMethod(Method::create('__construct')
             ->addArgument('name', 'string', 'foobar')
             ->setBody(<<<PHP
 \$this->name = \$name;
 PHP
             ));
 
-        $generator->addMethod(_Method::create('getName')
+        $generator->addMethod(Method::create('getName')
             ->setReturnType('string')
             ->setBody('return $this->name;')
             ->setComment(<<<TEXT
@@ -125,7 +126,7 @@ Returns the name of the cat
 @return string
 TEXT));
 
-        $generator->addAttribute(_Attribute::create('MyAttribute')
+        $generator->addAttribute(Attribute::create('MyAttribute')
             ->addParameter('name', 'test')
         );
 

@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Serializer\Tests\Builder\CodeGenerator;
 
-use App\CodeGenerator\_Method;
+
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Builder\CodeGenerator\Method;
 
 class MethodTest extends TestCase
 {
     public function testEmpty()
     {
-        $output = _Method::create('foobar')->toString();
+        $output = Method::create('foobar')->toString();
         $this->assertEquals('public function foobar()
 {
 }', $output);
@@ -26,24 +27,24 @@ class MethodTest extends TestCase
 
     public function testAbstractMethod()
     {
-        $output = _Method::create('foobar')->setVisibility('protected')->setBody(null)->toString();
+        $output = Method::create('foobar')->setVisibility('protected')->setBody(null)->toString();
         $this->assertEquals('abstract protected function foobar();', $output);
     }
 
     public function testVisibility()
     {
-        $output = _Method::create('foobar')->setVisibility('private')->toString();
+        $output = Method::create('foobar')->setVisibility('private')->toString();
         $this->assertEquals('private function foobar()
 {
 }', $output);
 
-        $output = _Method::create('foobar')->setVisibility('protected')->toString();
+        $output = Method::create('foobar')->setVisibility('protected')->toString();
         $this->assertEquals('protected function foobar()
 {
 }', $output);
 
         // We dont care about logic
-        $output = _Method::create('foobar')->setVisibility('crazy')->toString();
+        $output = Method::create('foobar')->setVisibility('crazy')->toString();
         $this->assertEquals('crazy function foobar()
 {
 }', $output);
@@ -51,17 +52,17 @@ class MethodTest extends TestCase
 
     public function testReturnType()
     {
-        $output = _Method::create('foobar')->setReturnType('int')->toString();
+        $output = Method::create('foobar')->setReturnType('int')->toString();
         $this->assertEquals('public function foobar(): int
 {
 }', $output);
 
-        $output = _Method::create('foobar')->setReturnType('mixed')->toString();
+        $output = Method::create('foobar')->setReturnType('mixed')->toString();
         $this->assertEquals('public function foobar(): mixed
 {
 }', $output);
 
-        $output = _Method::create('foobar')->setReturnType('?string')->toString();
+        $output = Method::create('foobar')->setReturnType('?string')->toString();
         $this->assertEquals('public function foobar(): ?string
 {
 }', $output);
@@ -69,7 +70,7 @@ class MethodTest extends TestCase
 
     public function testArguments()
     {
-        $output = _Method::create('foobar')
+        $output = Method::create('foobar')
             ->addArgument('foo')
             ->addArgument('bar', null, 'test')
             ->addArgument('baz', null, null)
@@ -78,7 +79,7 @@ class MethodTest extends TestCase
 {
 }', $output);
 
-        $output = _Method::create('foobar')
+        $output = Method::create('foobar')
             ->addArgument('foo', 'int')
             ->addArgument('bar', 'string')
             ->addArgument('baz', '?string', null)
@@ -90,7 +91,7 @@ class MethodTest extends TestCase
 
     public function testBody()
     {
-        $output = _Method::create('foobar')
+        $output = Method::create('foobar')
             ->setBody('return 2;')
             ->toString('    ');
         $this->assertEquals('public function foobar()

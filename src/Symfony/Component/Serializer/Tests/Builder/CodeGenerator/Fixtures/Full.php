@@ -1,27 +1,23 @@
 <?php
 
 /*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This is a fixture class.
+ * We use it for verifying the code generation.
  */
 
-namespace Symfony\Component\Serializer\Tests\Builder\CodeGenerator\Fixtures;
+namespace Test\CodeGenerator\Fixtures;
 
-use Test\CodeGenerator\Fixtures\Bar;
 use Test\CodeGenerator\Fixtures\Cat;
 use Test\CodeGenerator\Fixtures\Foo;
+use Test\CodeGenerator\Fixtures\Bar;
 use Test\CodeGenerator\Fixtures\MyAttribute;
 
 /**
  * Perfect class comment.
- *
+ * 
  * It has some lines
  */
-#[MyAttribute(name: 'test')]
+#[MyAttribute(name: "test")]
 class Full extends Cat implements Foo, Bar
 {
     private string $name;
@@ -32,10 +28,13 @@ class Full extends Cat implements Foo, Bar
     }
 
     /**
-     * Returns the name of the cat.
+     * Returns the name of the cat
+     * 
+     * @return string
      */
     public function getName(): string
     {
         return $this->name;
     }
+
 }

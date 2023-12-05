@@ -40,7 +40,7 @@ class FixtureHelper
     public static function getFixturesAndResultFiles(): iterable
     {
         $rootDir = \dirname(__DIR__).'/Fixtures/CustomNormalizer';
-        $data = [
+        return [
             NoTypeHints\PublicProperties::class => $rootDir.'/NoTypeHints/ExpectedNormalizer/PublicProperties.php',
             NoTypeHints\ConstructorInjection::class => $rootDir.'/NoTypeHints/ExpectedNormalizer/ConstructorInjection.php',
             NoTypeHints\SetterInjection::class => $rootDir.'/NoTypeHints/ExpectedNormalizer/SetterInjection.php',
@@ -59,10 +59,6 @@ class FixtureHelper
             FullTypeHints\ExtraSetter::class => $rootDir.'/FullTypeHints/ExpectedNormalizer/ExtraSetter.php',
             FullTypeHints\NonReadableProperty::class => $rootDir.'/FullTypeHints/ExpectedNormalizer/NonReadableProperty.php',
         ];
-
-        foreach ($data as $class => $normalizerFile) {
-            yield $class => [$class, $normalizerFile];
-        }
     }
 
     private static function getPropertyInfoExtractor(): PropertyInfoExtractor

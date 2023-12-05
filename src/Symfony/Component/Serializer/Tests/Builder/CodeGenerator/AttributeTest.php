@@ -11,28 +11,28 @@
 
 namespace Symfony\Component\Serializer\Tests\Builder\CodeGenerator;
 
-use App\CodeGenerator\_Attribute;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Builder\CodeGenerator\Attribute;
 
 class AttributeTest extends TestCase
 {
     public function testNoParameters()
     {
-        $output = _Attribute::create('Foobar')->toString();
+        $output = Attribute::create('Foobar')->toString();
         $this->assertEquals('#[Foobar]', $output);
 
-        $output = _Attribute::create('Foo\\Bar')->toString();
+        $output = Attribute::create('Foo\\Bar')->toString();
         $this->assertEquals('#[Foo\\Bar]', $output);
     }
 
     public function testParameters()
     {
-        $output = _Attribute::create('Foobar')
+        $output = Attribute::create('Foobar')
             ->addParameter(null, 7)
             ->toString();
         $this->assertEquals('#[Foobar(7)]', $output);
 
-        $output = _Attribute::create('Foobar')
+        $output = Attribute::create('Foobar')
             ->addParameter(null, 7)
             ->addParameter(null, true)
             ->addParameter(null, false)
@@ -46,12 +46,12 @@ class AttributeTest extends TestCase
 
     public function testNamedParameters()
     {
-        $output = _Attribute::create('Foobar')
+        $output = Attribute::create('Foobar')
             ->addParameter('seven', 7)
             ->toString();
         $this->assertEquals('#[Foobar(seven: 7)]', $output);
 
-        $output = _Attribute::create('Foobar')
+        $output = Attribute::create('Foobar')
             ->addParameter('seven', 7)
             ->addParameter('true', true)
             ->addParameter('false', false)
@@ -65,10 +65,10 @@ class AttributeTest extends TestCase
 
     public function testNested()
     {
-        $nested = _Attribute::create('Baz')
+        $nested = Attribute::create('Baz')
             ->addParameter('name', 'tobias');
 
-        $output = _Attribute::create('Foobar')
+        $output = Attribute::create('Foobar')
             ->addParameter('seven', 7)
             ->addParameter('nested', $nested)
             ->toString();

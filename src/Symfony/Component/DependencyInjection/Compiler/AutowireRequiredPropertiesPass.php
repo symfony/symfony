@@ -24,9 +24,6 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class AutowireRequiredPropertiesPass extends AbstractRecursivePass
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue($value, bool $isRoot = false)
     {
         if (\PHP_VERSION_ID < 70400) {

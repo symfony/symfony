@@ -54,6 +54,21 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertSame(10, $rateLimit->getLimit());
     }
 
+    public function testConsumeLastToken()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->reset();
+        $limiter->consume(9);
+
+        $rateLimit = $limiter->consume(1);
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12 / 10)),
+            $rateLimit->getRetryAfter()
+        );
+    }
+
     public function testConsumeZeroTokens()
     {
         $limiter = $this->createLimiter();
@@ -70,7 +85,7 @@ class SlidingWindowLimiterTest extends TestCase
         $limiter->consume(10);
 
         $rateLimit = $limiter->consume(0);
-        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertTrue($rateLimit->isAccepted());
         $this->assertEquals(
             \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12 / 10)),
             $rateLimit->getRetryAfter()

@@ -146,7 +146,7 @@ class DoctrineDataCollector extends DataCollector
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getTime()
     {

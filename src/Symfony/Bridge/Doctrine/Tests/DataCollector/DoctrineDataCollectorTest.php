@@ -183,7 +183,7 @@ class DoctrineDataCollectorTest extends TestCase
             $debugDataHolder->addQuery('default', $query);
 
             if (isset($queryData['executionMS'])) {
-                sleep($queryData['executionMS']);
+                usleep($queryData['executionMS'] * 1000000);
             }
             $query->stop();
         }

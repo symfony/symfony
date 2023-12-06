@@ -42,7 +42,7 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
         }
 
         $properties = $value->getProperties();
-        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+        foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflectionProperty) {
             if (!($type = $reflectionProperty->getType()) instanceof \ReflectionNamedType) {
                 continue;
             }

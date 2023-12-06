@@ -25,4 +25,10 @@ class AutowireProperty
 {
     #[Required]
     public Foo $foo;
+
+    #[Required]
+    protected Foo $fooProtected;
+
+    #[Required]
+    private Foo $fooPrivate;
 }

@@ -43,6 +43,9 @@ class AutowireRequiredPropertiesPassTest extends TestCase
 
         $this->assertArrayHasKey('plop', $properties);
         $this->assertEquals(Bar::class, (string) $properties['plop']);
+
+        $this->assertArrayNotHasKey('plopProtected', $properties);
+        $this->assertArrayNotHasKey('plopPrivate', $properties);
     }
 
     /**
@@ -67,5 +70,8 @@ class AutowireRequiredPropertiesPassTest extends TestCase
 
         $this->assertArrayHasKey('foo', $properties);
         $this->assertEquals(Foo::class, (string) $properties['foo']);
+
+        $this->assertArrayNotHasKey('fooProtected', $properties);
+        $this->assertArrayNotHasKey('fooPrivate', $properties);
     }
 }

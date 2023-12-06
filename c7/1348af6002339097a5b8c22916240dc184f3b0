@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by iluuu1994 at 2023-12-06T11:43:36Z
+
+We have the same issue in our nightly build: https://github.com/php/php-src/actions/runs/7094900203/job/19310980511 Thank you for fixing this!

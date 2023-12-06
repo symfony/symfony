@@ -275,6 +275,29 @@ class HtmlSanitizerConfig
     }
 
     /**
+     * Configures the given elements as allowed.
+     *
+     * Allowed elements are elements the sanitizer should retain from the input.
+     *
+     * A list of allowed attributes for this element can be passed as a second argument.
+     * Passing "*" will allow all standard attributes on this element. By default, no
+     * attributes are allowed on the element.
+     *
+     * @param list<string>        $elements
+     * @param list<string>|string $allowedAttributes
+     */
+    public function allowElements(array $elements, array|string $allowedAttributes = []): static
+    {
+        $clone = clone $this;
+
+        foreach ($elements as $element) {
+            $clone = $clone->allowElement($element, $allowedAttributes);
+        }
+
+        return $clone;
+    }
+
+    /**
      * Configures the given element as blocked.
      *
      * Blocked elements are elements the sanitizer should remove from the input, but retain
@@ -293,6 +316,23 @@ class HtmlSanitizerConfig
     }
 
     /**
+     * Configures the given elements as blocked.
+     *
+     * Blocked elements are elements the sanitizer should remove from the input, but retain
+     * their children.
+     */
+    public function blockElements(array $elements): static
+    {
+        $clone = clone $this;
+
+        foreach ($elements as $element) {
+            $clone = $clone->blockElement($element);
+        }
+
+        return $clone;
+    }
+
+    /**
      * Configures the given element as dropped.
      *
      * Dropped elements are elements the sanitizer should remove from the input, including
@@ -306,6 +346,29 @@ class HtmlSanitizerConfig
     {
         $clone = clone $this;
         unset($clone->allowedElements[$element], $clone->blockedElements[$element]);
+
+        return $clone;
+    }
+
+    /**
+     * Configures the given elements as dropped.
+     *
+     * Dropped elements are elements the sanitizer should remove from the input, including
+     * their children.
+     *
+     * Note: when using an empty configuration, all unknown elements are dropped
+     * automatically. This method let you drop elements that were allowed earlier
+     * in the configuration.
+     *
+     * @param list<string> $elements
+     */
+    public function dropElements(array $elements): static
+    {
+        $clone = clone $this;
+
+        foreach ($elements as $element) {
+            $clone = $clone->dropElement($element);
+        }
 
         return $clone;
     }
@@ -340,6 +403,30 @@ class HtmlSanitizerConfig
     }
 
     /**
+     * Configures the given attributes as allowed.
+     *
+     * Allowed attributes are attributes the sanitizer should retain from the input.
+     *
+     * A list of allowed elements for these attributes can be passed as a second argument.
+     * Passing "*" will allow all currently allowed elements to use this attribute.
+     *
+     * To configure each attribute for a specific element, please use the allowAttribute method instead.
+     *
+     * @param list<string>        $attributes
+     * @param list<string>|string $allowedElements
+     */
+    public function allowAttributes(array $attributes, array|string $allowedElements): static
+    {
+        $clone = clone $this;
+
+        foreach ($attributes as $attribute) {
+            $clone = $clone->allowAttribute($attribute, $allowedElements);
+        }
+
+        return $clone;
+    }
+
+    /**
      * Configures the given attribute as dropped.
      *
      * Dropped attributes are attributes the sanitizer should remove from the input.
@@ -362,6 +449,32 @@ class HtmlSanitizerConfig
             if (isset($clone->allowedElements[$element][$attribute])) {
                 unset($clone->allowedElements[$element][$attribute]);
             }
+        }
+
+        return $clone;
+    }
+
+    /**
+     * Configures the given attributes as dropped.
+     *
+     * Dropped attributes are attributes the sanitizer should remove from the input.
+     *
+     * A list of elements on which to drop these attributes can be passed as a second argument.
+     * Passing "*" will drop this attribute from all currently allowed elements.
+     *
+     * Note: when using an empty configuration, all unknown attributes are dropped
+     * automatically. This method let you drop attributes that were allowed earlier
+     * in the configuration.
+     *
+     * @param list<string>        $attributes
+     * @param list<string>|string $droppedElements
+     */
+    public function dropAttributes(array $attributes, array|string $droppedElements): static
+    {
+        $clone = clone $this;
+
+        foreach ($attributes as $attribute) {
+            $clone = $clone->dropAttribute($attribute, $droppedElements);
         }
 
         return $clone;

@@ -13,6 +13,8 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\Postmark\Event\PostmarkDeliveryEventFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Event\PostmarkEvents;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -33,6 +35,8 @@ class PostmarkApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.postmarkapp.com';
 
+    private ?EventDispatcherInterface $dispatcher;
+
     private string $key;
 
     private ?string $messageStream = null;
@@ -40,6 +44,7 @@ class PostmarkApiTransport extends AbstractApiTransport
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
+        $this->dispatcher = $dispatcher;
 
         parent::__construct($client, $dispatcher, $logger);
     }
@@ -69,6 +74,18 @@ class PostmarkApiTransport extends AbstractApiTransport
         }
 
         if (200 !== $statusCode) {
+            $eventFactory = new PostmarkDeliveryEventFactory();
+
+            // Some delivery issues can be handled silently - route those through EventDispatcher
+            if (null !== $this->dispatcher && $eventFactory->supports($result['ErrorCode'])) {
+                $this->dispatcher->dispatch(
+                    $eventFactory->create($result['ErrorCode'], $result['Message'], $email),
+                    PostmarkEvents::DELIVERY,
+                );
+
+                return $response;
+            }
+
             throw new HttpTransportException('Unable to send an email: '.$result['Message'].sprintf(' (code %d).', $result['ErrorCode']), $response);
         }
 

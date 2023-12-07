@@ -260,16 +260,7 @@ class HtmlSanitizerConfig
     public function allowElement(string $element, array|string $allowedAttributes = []): static
     {
         $clone = clone $this;
-
-        // Unblock the element is necessary
-        unset($clone->blockedElements[$element]);
-
-        $clone->allowedElements[$element] = [];
-
-        $attrs = ('*' === $allowedAttributes) ? array_keys(W3CReference::ATTRIBUTES) : (array) $allowedAttributes;
-        foreach ($attrs as $allowedAttr) {
-            $clone->allowedElements[$element][$allowedAttr] = true;
-        }
+        $this->handleAllowElement($clone, $element, $allowedAttributes);
 
         return $clone;
     }
@@ -279,11 +270,11 @@ class HtmlSanitizerConfig
      *
      * Allowed elements are elements the sanitizer should retain from the input.
      *
-     * A list of allowed attributes for this element can be passed as a second argument.
+     * A list of allowed attributes for these elements can be passed as a second argument.
      * Passing "*" will allow all standard attributes on this element. By default, no
      * attributes are allowed on the element.
      *
-     * @param list<string>        $elements
+     * @param string[]            $elements
      * @param list<string>|string $allowedAttributes
      */
     public function allowElements(array $elements, array|string $allowedAttributes = []): static
@@ -291,7 +282,7 @@ class HtmlSanitizerConfig
         $clone = clone $this;
 
         foreach ($elements as $element) {
-            $clone = $clone->allowElement($element, $allowedAttributes);
+            $this->handleAllowElement($clone, $element, $allowedAttributes);
         }
 
         return $clone;
@@ -306,11 +297,7 @@ class HtmlSanitizerConfig
     public function blockElement(string $element): static
     {
         $clone = clone $this;
-
-        // Disallow the element is necessary
-        unset($clone->allowedElements[$element]);
-
-        $clone->blockedElements[$element] = true;
+        $this->handleBlockElement($clone, $element);
 
         return $clone;
     }
@@ -326,7 +313,7 @@ class HtmlSanitizerConfig
         $clone = clone $this;
 
         foreach ($elements as $element) {
-            $clone = $clone->blockElement($element);
+            $this->handleBlockElement($clone, $element);
         }
 
         return $clone;
@@ -345,7 +332,7 @@ class HtmlSanitizerConfig
     public function dropElement(string $element): static
     {
         $clone = clone $this;
-        unset($clone->allowedElements[$element], $clone->blockedElements[$element]);
+        $this->handleDropElement($clone, $element);
 
         return $clone;
     }
@@ -360,14 +347,14 @@ class HtmlSanitizerConfig
      * automatically. This method let you drop elements that were allowed earlier
      * in the configuration.
      *
-     * @param list<string> $elements
+     * @param string[] $elements
      */
     public function dropElements(array $elements): static
     {
         $clone = clone $this;
 
         foreach ($elements as $element) {
-            $clone = $clone->dropElement($element);
+            $this->handleDropElement($clone, $element);
         }
 
         return $clone;
@@ -386,18 +373,7 @@ class HtmlSanitizerConfig
     public function allowAttribute(string $attribute, array|string $allowedElements): static
     {
         $clone = clone $this;
-        $allowedElements = ('*' === $allowedElements) ? array_keys($clone->allowedElements) : (array) $allowedElements;
-
-        // For each configured element ...
-        foreach ($clone->allowedElements as $element => $attrs) {
-            if (\in_array($element, $allowedElements, true)) {
-                // ... if the attribute should be allowed, add it
-                $clone->allowedElements[$element][$attribute] = true;
-            } else {
-                // ... if the attribute should not be allowed, remove it
-                unset($clone->allowedElements[$element][$attribute]);
-            }
-        }
+        $this->handleAllowAttribute($clone, $allowedElements, $attribute);
 
         return $clone;
     }
@@ -412,7 +388,7 @@ class HtmlSanitizerConfig
      *
      * To configure each attribute for a specific element, please use the allowAttribute method instead.
      *
-     * @param list<string>        $attributes
+     * @param string[]            $attributes
      * @param list<string>|string $allowedElements
      */
     public function allowAttributes(array $attributes, array|string $allowedElements): static
@@ -420,7 +396,7 @@ class HtmlSanitizerConfig
         $clone = clone $this;
 
         foreach ($attributes as $attribute) {
-            $clone = $clone->allowAttribute($attribute, $allowedElements);
+            $this->handleAllowAttribute($clone, $allowedElements, $attribute);
         }
 
         return $clone;
@@ -443,13 +419,7 @@ class HtmlSanitizerConfig
     public function dropAttribute(string $attribute, array|string $droppedElements): static
     {
         $clone = clone $this;
-        $droppedElements = ('*' === $droppedElements) ? array_keys($clone->allowedElements) : (array) $droppedElements;
-
-        foreach ($droppedElements as $element) {
-            if (isset($clone->allowedElements[$element][$attribute])) {
-                unset($clone->allowedElements[$element][$attribute]);
-            }
-        }
+        $this->handleDropAttribute($clone, $droppedElements, $attribute);
 
         return $clone;
     }
@@ -466,7 +436,7 @@ class HtmlSanitizerConfig
      * automatically. This method let you drop attributes that were allowed earlier
      * in the configuration.
      *
-     * @param list<string>        $attributes
+     * @param string[]            $attributes
      * @param list<string>|string $droppedElements
      */
     public function dropAttributes(array $attributes, array|string $droppedElements): static
@@ -474,7 +444,7 @@ class HtmlSanitizerConfig
         $clone = clone $this;
 
         foreach ($attributes as $attribute) {
-            $clone = $clone->dropAttribute($attribute, $droppedElements);
+            $this->handleDropAttribute($clone, $droppedElements, $attribute);
         }
 
         return $clone;
@@ -616,5 +586,67 @@ class HtmlSanitizerConfig
     public function getAttributeSanitizers(): array
     {
         return $this->attributeSanitizers;
+    }
+
+    /**
+     * @param string[]|string $allowedElements
+     */
+    public function handleAllowAttribute(self $clone, array|string $allowedElements, string $attribute): void
+    {
+        $allowedElements = ('*' === $allowedElements) ? array_keys($clone->allowedElements) : (array) $allowedElements;
+
+        // For each configured element ...
+        foreach ($clone->allowedElements as $element => $attrs) {
+            if (\in_array($element, $allowedElements, true)) {
+                // ... if the attribute should be allowed, add it
+                $clone->allowedElements[$element][$attribute] = true;
+            } else {
+                // ... if the attribute should not be allowed, remove it
+                unset($clone->allowedElements[$element][$attribute]);
+            }
+        }
+    }
+
+    /**
+     * @param string[]|string $allowedAttributes
+     */
+    private function handleAllowElement(self $clone, string $element, array|string $allowedAttributes): void
+    {
+        // Unblock the element is necessary
+        unset($clone->blockedElements[$element]);
+
+        $clone->allowedElements[$element] = [];
+
+        $attrs = ('*' === $allowedAttributes) ? array_keys(W3CReference::ATTRIBUTES) : (array) $allowedAttributes;
+        foreach ($attrs as $allowedAttr) {
+            $clone->allowedElements[$element][$allowedAttr] = true;
+        }
+    }
+
+    private function handleBlockElement(self $clone, string $element): void
+    {
+        // Disallow the element is necessary
+        unset($clone->allowedElements[$element]);
+
+        $clone->blockedElements[$element] = true;
+    }
+
+    /**
+     * @param string[]|string $droppedElements
+     */
+    private function handleDropAttribute(self $clone, array|string $droppedElements, string $attribute): void
+    {
+        $droppedElements = ('*' === $droppedElements) ? array_keys($clone->allowedElements) : (array) $droppedElements;
+
+        foreach ($droppedElements as $element) {
+            if (isset($clone->allowedElements[$element][$attribute])) {
+                unset($clone->allowedElements[$element][$attribute]);
+            }
+        }
+    }
+
+    private function handleDropElement(self $clone, string $element): void
+    {
+        unset($clone->allowedElements[$element], $clone->blockedElements[$element]);
     }
 }

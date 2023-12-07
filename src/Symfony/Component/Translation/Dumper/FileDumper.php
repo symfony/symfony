@@ -55,7 +55,7 @@ abstract class FileDumper implements DumperInterface
             }
 
             $intlDomain = $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX;
-            $intlMessages = $messages->all($intlDomain);
+            $intlMessages = $messages->all($intlDomain, $options['sort']);
 
             if ($intlMessages) {
                 $intlPath = $options['path'].'/'.$this->getRelativePath($intlDomain, $messages->getLocale());
@@ -64,7 +64,7 @@ abstract class FileDumper implements DumperInterface
                 $messages->replace([], $intlDomain);
 
                 try {
-                    if ($messages->all($domain)) {
+                    if ($messages->all($domain, $options['sort'])) {
                         file_put_contents($fullpath, $this->formatCatalogue($messages, $domain, $options));
                     }
                     continue;

@@ -90,7 +90,7 @@ class XliffFileDumper extends FileDumper
         }
 
         $xliffBody = $xliffFile->appendChild($dom->createElement('body'));
-        foreach ($messages->all($domain) as $source => $target) {
+        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
             $translation = $dom->createElement('trans-unit');
 
             $translation->setAttribute('id', strtr(substr(base64_encode(hash('sha256', $source, true)), 0, 7), '/+', '._'));
@@ -165,7 +165,7 @@ class XliffFileDumper extends FileDumper
             }
         }
 
-        foreach ($messages->all($domain) as $source => $target) {
+        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
             $translation = $dom->createElement('unit');
             $translation->setAttribute('id', strtr(substr(base64_encode(hash('sha256', $source, true)), 0, 7), '/+', '._'));
 

@@ -30,7 +30,7 @@ class PoFileDumper extends FileDumper
         $output .= "\n";
 
         $newLine = false;
-        foreach ($messages->all($domain) as $source => $target) {
+        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
             if ($newLine) {
                 $output .= "\n";
             } else {

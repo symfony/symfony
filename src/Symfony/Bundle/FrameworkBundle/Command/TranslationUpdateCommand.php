@@ -277,7 +277,14 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write($operation->getResult(), $format, ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $xliffVersion, 'as_tree' => $input->getOption('as-tree'), 'inline' => $input->getOption('as-tree') ?? 0]);
+            $this->writer->write($operation->getResult(), $format, [
+                'path' => $bundleTransPath,
+                'default_locale' => $this->defaultLocale,
+                'xliff_version' => $xliffVersion,
+                'as_tree' => $input->getOption('as-tree'),
+                'inline' => $input->getOption('as-tree') ?? 0,
+                'sort' => $input->getOption('sort'),
+            ]);
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

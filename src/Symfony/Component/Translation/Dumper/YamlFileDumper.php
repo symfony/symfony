@@ -36,7 +36,7 @@ class YamlFileDumper extends FileDumper
             throw new LogicException('Dumping translations in the YAML format requires the Symfony Yaml component.');
         }
 
-        $data = $messages->all($domain);
+        $data = $messages->all($domain, $options['sort']);
 
         if (isset($options['as_tree']) && $options['as_tree']) {
             $data = ArrayConverter::expandToTree($data);

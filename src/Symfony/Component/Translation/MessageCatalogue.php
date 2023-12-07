@@ -55,15 +55,25 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         return array_values($domains);
     }
 
-    public function all(string $domain = null): array
+    public function all(string $domain = null, ?string $sort = null): array
     {
+        $sort = $sort ? strtolower($sort) : null;
+
         if (null !== $domain) {
             // skip messages merge if intl-icu requested explicitly
             if (str_ends_with($domain, self::INTL_DOMAIN_SUFFIX)) {
-                return $this->messages[$domain] ?? [];
+                $messages = $this->messages[$domain] ?? [];
+            } else {
+                $messages = ($this->messages[$domain.self::INTL_DOMAIN_SUFFIX] ?? []) + ($this->messages[$domain] ?? []);
             }
 
-            return ($this->messages[$domain.self::INTL_DOMAIN_SUFFIX] ?? []) + ($this->messages[$domain] ?? []);
+            if ('desc' === $sort) {
+                krsort($messages);
+            } elseif ('asc' === $sort) {
+                ksort($messages);
+            }
+
+            return $messages;
         }
 
         $allMessages = [];
@@ -71,10 +81,18 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         foreach ($this->messages as $domain => $messages) {
             if (str_ends_with($domain, self::INTL_DOMAIN_SUFFIX)) {
                 $domain = substr($domain, 0, -\strlen(self::INTL_DOMAIN_SUFFIX));
-                $allMessages[$domain] = $messages + ($allMessages[$domain] ?? []);
+                $messages = $messages + ($allMessages[$domain] ?? []);
             } else {
-                $allMessages[$domain] = ($allMessages[$domain] ?? []) + $messages;
+                $messages = ($allMessages[$domain] ?? []) + $messages;
             }
+
+            if ('desc' === $sort) {
+                krsort($messages);
+            } elseif ('asc' === $sort) {
+                ksort($messages);
+            }
+
+            $allMessages[$domain] = $messages;
         }
 
         return $allMessages;

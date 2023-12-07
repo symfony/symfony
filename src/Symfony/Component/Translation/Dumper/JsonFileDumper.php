@@ -24,7 +24,7 @@ class JsonFileDumper extends FileDumper
     {
         $flags = $options['json_encoding'] ?? \JSON_PRETTY_PRINT;
 
-        return json_encode($messages->all($domain), $flags);
+        return json_encode($messages->all($domain, $options['sort']), $flags);
     }
 
     protected function getExtension(): string

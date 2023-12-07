@@ -1,0 +1,17 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    http_method_override: false
+    feature_flag:
+        enabled: true
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\ClassFeature:
+        autoconfigure: true
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\ClassMethodFeature:
+        autoconfigure: true
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\MethodFeature:
+        autoconfigure: true
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\NamedFeature:
+        autoconfigure: true

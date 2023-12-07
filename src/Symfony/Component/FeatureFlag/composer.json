@@ -1,0 +1,34 @@
+{
+    "name": "symfony/feature-flag",
+    "type": "library",
+    "description": "Provides a feature flag mechanism",
+    "keywords": ["feature", "flag", "flags", "toggle", "ab test", "rollout", "canary", "blue green", "kill switch"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4",
+        "psr/container": "^1.1|^2.0",
+        "symfony/service-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "symfony/http-kernel": "^8.0",
+        "symfony/var-dumper": "^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\FeatureFlag\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

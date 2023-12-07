@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPas
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FeatureFlagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonPathPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
@@ -218,6 +219,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, TransformerPass::class);
         $this->addCompilerPassIfExists($container, ReverseMappingPass::class);
         $this->addCompilerPassIfExists($container, JsonPathPass::class);
+        $container->addCompilerPass(new FeatureFlagPass());
 
         if ($container->getParameter('kernel.debug')) {
             if ($container->hasParameter('.kernel.config_dir') && $container->hasParameter('.kernel.bundles_definition')) {

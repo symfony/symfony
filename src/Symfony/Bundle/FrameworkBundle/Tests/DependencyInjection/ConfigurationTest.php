@@ -25,6 +25,7 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\FeatureFlag\FeatureChecker;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
@@ -1153,6 +1154,9 @@ class ConfigurationTest extends TestCase
                 'default_options' => [
                     'include_null_properties' => false,
                 ],
+            ],
+            'feature_flag' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(FeatureChecker::class),
             ],
         ];
     }

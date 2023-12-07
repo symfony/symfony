@@ -71,6 +71,9 @@ use Symfony\Component\Dotenv\Command\DebugCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\FeatureFlag\Attribute\AsFeature;
+use Symfony\Component\FeatureFlag\FeatureChecker;
+use Symfony\Component\FeatureFlag\FeatureRegistryInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Glob;
@@ -273,6 +276,7 @@ class FrameworkExtension extends Extension
         $this->readConfigEnabled('property_access', $container, $config['property_access']);
         $this->readConfigEnabled('profiler', $container, $config['profiler']);
         $this->readConfigEnabled('workflows', $container, $config['workflows']);
+        $this->readConfigEnabled('feature_flag', $container, $config['feature_flag']);
 
         // A translator must always be registered (as support is included by
         // default in the Form and Validator component). If disabled, an identity
@@ -573,6 +577,13 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
+        }
+
+        if ($this->readConfigEnabled('feature_flag', $container, $config['feature_flag'])) {
+            if (!class_exists(FeatureChecker::class)) {
+                throw new LogicException('FeatureFlag support cannot be enabled as the FeatureFlag component is not installed. Try running "composer require symfony/feature-flag".');
+            }
+            $this->registerFeatureFlagConfiguration($config['feature_flag'], $container, $loader);
         }
 
         if (ContainerBuilder::willBeAvailable('symfony/mime', MimeTypes::class, ['symfony/framework-bundle'])) {
@@ -888,6 +899,10 @@ class FrameworkExtension extends Extension
 
         if ($this->isInitializedConfigEnabled('serializer') && $config['collect_serializer_data']) {
             $loader->load('serializer_debug.php');
+        }
+
+        if ($this->isInitializedConfigEnabled('feature_flag')) {
+            $loader->load('feature_flag_debug.php');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
@@ -3135,6 +3150,64 @@ class FrameworkExtension extends Extension
                 $container->registerAliasForArgument($sanitizerId, HtmlSanitizerInterface::class, $sanitizerName);
             }
         }
+    }
+
+    private function registerFeatureFlagConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        $loader->load('feature_flag.php');
+
+        $container->registerForAutoconfiguration(FeatureRegistryInterface::class)
+            ->addTag('feature_flag.feature_registry')
+        ;
+
+        $container->registerAttributeForAutoconfiguration(AsFeature::class,
+            static function (ChildDefinition $definition, AsFeature $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+                $featureName = $attribute->name;
+
+                if ($reflector instanceof \ReflectionClass) {
+                    $className = $reflector->getName();
+                    $method = $attribute->method;
+
+                    $featureName ??= $className;
+                } else {
+                    $className = $reflector->getDeclaringClass()->getName();
+                    if (null !== $attribute->method && $reflector->getName() !== $attribute->method) {
+                        throw new \LogicException(sprintf('Using the #[%s(method: %s)] attribute on a method is not valid. Either remove the method value or move this to the top of the class (%s)', AsFeature::class, $attribute->method, $className));
+                    }
+
+                    $method = $reflector->getName();
+                    $featureName ??= "{$className}::{$method}";
+                }
+
+                $definition->addTag('feature_flag.feature', [
+                    'feature' => $featureName,
+                    'method' => $method,
+                ]);
+            },
+        );
+
+        if (ContainerBuilder::willBeAvailable('symfony/routing', Router::class, ['symfony/framework-bundle', 'symfony/routing'])) {
+            $loader->load('feature_flag_routing.php');
+        }
+    }
+
+    private function resolveTrustedHeaders(array $headers): int
+    {
+        $trustedHeaders = 0;
+
+        foreach ($headers as $h) {
+            $trustedHeaders |= match ($h) {
+                'forwarded' => Request::HEADER_FORWARDED,
+                'x-forwarded-for' => Request::HEADER_X_FORWARDED_FOR,
+                'x-forwarded-host' => Request::HEADER_X_FORWARDED_HOST,
+                'x-forwarded-proto' => Request::HEADER_X_FORWARDED_PROTO,
+                'x-forwarded-port' => Request::HEADER_X_FORWARDED_PORT,
+                'x-forwarded-prefix' => Request::HEADER_X_FORWARDED_PREFIX,
+                default => 0,
+            };
+        }
+
+        return $trustedHeaders;
     }
 
     public function getXsdValidationBasePath(): string|false

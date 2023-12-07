@@ -959,6 +959,9 @@ class ConfigurationTest extends TestCase
             'remote-event' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
             ],
+            'feature_flag' => [
+                'enabled' => false,
+            ],
         ];
     }
 

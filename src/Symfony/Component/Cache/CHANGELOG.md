@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add option `sentinel_master` as an alias for `redis_sentinel`
+
 7.0
 ---
 

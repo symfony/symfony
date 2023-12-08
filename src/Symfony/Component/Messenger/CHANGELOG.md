@@ -4,6 +4,7 @@ CHANGELOG
 7.1
 ---
 
+ * Add option `redis_sentinel` as an alias for `sentinel_master`
  * Add `--all` option to the `messenger:consume` command
 
 7.0

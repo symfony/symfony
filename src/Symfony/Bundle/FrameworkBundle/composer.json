@@ -75,7 +75,7 @@
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/asset": "<5.3",
-        "symfony/console": "<5.2.5",
+        "symfony/console": "<5.2.5|>=7.0",
         "symfony/dotenv": "<5.1",
         "symfony/dom-crawler": "<4.4",
         "symfony/http-client": "<4.4",

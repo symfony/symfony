@@ -95,15 +95,17 @@ class StreamOutput extends Output
             return false;
         }
 
-        if (\DIRECTORY_SEPARATOR === '\\') {
-            return (\function_exists('sapi_windows_vt100_support')
-                && @sapi_windows_vt100_support($this->stream))
-                || false !== getenv('ANSICON')
-                || 'ON' === getenv('ConEmuANSI')
-                || str_starts_with((string) getenv('TERM'), 'xterm');
+        if (\DIRECTORY_SEPARATOR === '\\'
+            && \function_exists('sapi_windows_vt100_support')
+            && @sapi_windows_vt100_support($this->stream)
+        ) {
+            return true;
         }
 
         return 'Hyper' === getenv('TERM_PROGRAM')
+            || false !== getenv('ANSICON')
+            || 'ON' === getenv('ConEmuANSI')
+            || str_starts_with((string) getenv('TERM'), 'xterm')
             || stream_isatty($this->stream);
     }
 }

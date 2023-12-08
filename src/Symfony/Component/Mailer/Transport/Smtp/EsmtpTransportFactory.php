@@ -23,7 +23,7 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
-        $tls = 'smtps' === $dsn->getScheme() ? true : null;
+        $tls = 'smtps' === $dsn->getScheme();
         $port = $dsn->getPort(0);
         $host = $dsn->getHost();
 

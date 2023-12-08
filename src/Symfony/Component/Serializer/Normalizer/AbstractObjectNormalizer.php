@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException as PropertyAccessInvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -374,7 +375,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $exception = NotNormalizableValueException::createForUnexpectedDataType(
                     sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type),
                     $data,
-                    ['unknown'],
+                    $e instanceof InvalidTypeException ? [$e->expectedType] : ['unknown'],
                     $context['deserialization_path'] ?? null,
                     false,
                     $e->getCode(),

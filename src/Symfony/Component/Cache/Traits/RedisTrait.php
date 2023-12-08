@@ -169,6 +169,12 @@ trait RedisTrait
 
         $params += $query + $options + self::$defaultConnectionOptions;
 
+        if (isset($params['redis_sentinel']) && isset($params['sentinel_master'])) {
+            throw new InvalidArgumentException('Cannot use both "redis_sentinel" and "sentinel_master" at the same time.');
+        }
+
+        $params['redis_sentinel'] ??= $params['sentinel_master'] ?? null;
+
         if (isset($params['redis_sentinel']) && !class_exists(\Predis\Client::class) && !class_exists(\RedisSentinel::class) && !class_exists(Sentinel::class)) {
             throw new CacheException('Redis Sentinel support requires one of: "predis/predis", "ext-redis >= 5.2", "ext-relay".');
         }

@@ -220,7 +220,10 @@ class RedisExtIntegrationTest extends TestCase
         $connection->ack($message['id']);
     }
 
-    public function testSentinel()
+    /**
+     * @dataProvider
+     */
+    public function testSentinel(string $sentinelOptionName)
     {
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
             $this->markTestSkipped('REDIS_SENTINEL_HOSTS env var is not defined.');
@@ -234,7 +237,7 @@ class RedisExtIntegrationTest extends TestCase
 
         $connection = Connection::fromDsn($dsn,
             ['delete_after_ack' => true,
-             'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+             $sentinelOptionName => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
             ], $this->redis);
 
         $connection->add('1', []);
@@ -247,6 +250,12 @@ class RedisExtIntegrationTest extends TestCase
         ], $message['data']);
         $connection->reject($message['id']);
         $connection->cleanup();
+    }
+
+    public function sentinelOptionNames(): iterable
+    {
+        yield 'redis_sentinel';
+        yield 'sentinel_master';
     }
 
     public function testLazySentinel()

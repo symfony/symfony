@@ -8,8 +8,8 @@ so called user providers that hold the users credentials.
 Getting Started
 ---------------
 
-```
-$ composer require symfony/security-core
+```bash
+composer require symfony/security-core
 ```
 
 ```php

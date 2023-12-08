@@ -8,8 +8,8 @@ provides authenticators to authenticate visitors.
 Getting Started
 ---------------
 
-```
-$ composer require symfony/security-http
+```bash
+composer require symfony/security-http
 ```
 
 Sponsor

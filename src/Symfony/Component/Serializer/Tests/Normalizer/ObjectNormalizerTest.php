@@ -14,11 +14,13 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -834,6 +836,24 @@ class ObjectNormalizerTest extends TestCase
         $o2->baz = 'baz';
 
         $this->assertSame(['baz' => 'baz'], $this->normalizer->normalize($o2));
+    }
+
+    public function testNotNormalizableValueInvalidType()
+    {
+        if (!class_exists(InvalidTypeException::class)) {
+            $this->markTestSkipped('Skipping test as the improvements on PropertyAccess are required.');
+        }
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "array" given at property path "initialized"');
+
+        try {
+            $this->normalizer->denormalize(['initialized' => ['not a string']], TypedPropertiesObject::class, 'array');
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame(['string'], $e->getExpectedTypes());
+
+            throw $e;
+        }
     }
 }
 

@@ -6,8 +6,8 @@ The Routing component maps an HTTP request to a set of configuration variables.
 Getting Started
 ---------------
 
-```
-$ composer require symfony/routing
+```bash
+composer require symfony/routing
 ```
 
 ```php

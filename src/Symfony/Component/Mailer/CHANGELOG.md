@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Dispatch Postmark's "406 - Inactive recipient" API error code as a `PostmarkDeliveryEvent` instead of throwing an exception
+
 7.0
 ---
 

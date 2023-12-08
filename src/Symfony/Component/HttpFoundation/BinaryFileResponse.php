@@ -134,7 +134,7 @@ class BinaryFileResponse extends Response
      */
     public function setAutoEtag(): static
     {
-        $this->setEtag(base64_encode(hash_file('sha256', $this->file->getPathname(), true)));
+        $this->setEtag(base64_encode(hash_file('xxh128', $this->file->getPathname(), true)));
 
         return $this;
     }

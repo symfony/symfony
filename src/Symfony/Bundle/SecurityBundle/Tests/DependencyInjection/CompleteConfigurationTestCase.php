@@ -137,7 +137,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             [
                 'simple',
                 'security.user_checker',
-                '.security.request_matcher.h5ibf38',
+                '.security.request_matcher.rud_2nr',
                 false,
                 false,
                 '',
@@ -187,7 +187,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             [
                 'host',
                 'security.user_checker',
-                '.security.request_matcher.bcmu4fb',
+                '.security.request_matcher.ap9sh8g',
                 true,
                 false,
                 'security.user.provider.concrete.default',

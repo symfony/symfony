@@ -78,14 +78,14 @@ class Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute extends Container
     protected static function getFoo2Service($container, $lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $container->privates['.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo'] = $container->createProxy('FooProxy4048957', static fn () => \FooProxy4048957::createLazyProxy(static fn () => self::getFoo2Service($container, false)));
+            return $container->privates['.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo'] = $container->createProxy('FooProxyCd8d23a', static fn () => \FooProxyCd8d23a::createLazyProxy(static fn () => self::getFoo2Service($container, false)));
         }
 
         return ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo());
     }
 }
 
-class FooProxy4048957 extends \Symfony\Component\DependencyInjection\Tests\Compiler\Foo implements \Symfony\Component\VarExporter\LazyObjectInterface
+class FooProxyCd8d23a extends \Symfony\Component\DependencyInjection\Tests\Compiler\Foo implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
     use \Symfony\Component\VarExporter\LazyProxyTrait;
 

@@ -1693,7 +1693,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                     ->replaceArgument(0, $expectedSeed)
                     ->replaceArgument(1, 12),
                 (new ChildDefinition('cache.adapter.redis'))
-                    ->replaceArgument(0, new Reference('.cache_connection.kYdiLgf'))
+                    ->replaceArgument(0, new Reference('.cache_connection.U5HliuY'))
                     ->replaceArgument(1, $expectedSeed)
                     ->replaceArgument(2, 12),
             ],

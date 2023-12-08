@@ -146,6 +146,6 @@ final class LazyServiceDumper implements DumperInterface
 
         return preg_replace('/^.*\\\\/', '', $definition->getClass())
             .($asGhostObject ? 'Ghost' : 'Proxy')
-            .ucfirst(substr(hash('sha256', $this->salt.'+'.$class->name.'+'.serialize($definition->getTag('proxy'))), -7));
+            .ucfirst(substr(hash('xxh128', $this->salt.'+'.$class->name.'+'.serialize($definition->getTag('proxy'))), -7));
     }
 }

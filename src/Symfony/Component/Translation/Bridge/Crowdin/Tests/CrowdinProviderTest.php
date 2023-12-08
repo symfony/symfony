@@ -75,7 +75,7 @@ class CrowdinProviderTest extends ProviderTestCase
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="qW_vcFr" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -93,7 +93,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="is7pld7" resname="post.num_comments">
+      <trans-unit id="9dF75ai" resname="post.num_comments">
         <source>post.num_comments</source>
         <target>{count, plural, one {# comment} other {# comments}}</target>
       </trans-unit>
@@ -171,7 +171,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="qW_vcFr" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -236,7 +236,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="qW_vcFr" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -308,7 +308,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="qW_vcFr" resname="a">
         <source>a</source>
         <target>trans_fr_a</target>
       </trans-unit>
@@ -326,7 +326,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="qW_vcFr" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -415,11 +415,11 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="qW_vcFr" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
-      <trans-unit id="PiPoFgA" resname="b">
+      <trans-unit id="SyIS4xr" resname="b">
         <source>b</source>
         <target>trans_en_b</target>
       </trans-unit>
@@ -489,7 +489,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="qW_vcFr" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -575,7 +575,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="qW_vcFr" resname="a">
         <source>a</source>
         <target>trans_fr_a</target>
       </trans-unit>
@@ -602,7 +602,7 @@ XLIFF
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="qW_vcFr" resname="a">
         <source>a</source>
         <target>trans_en_gb_a</target>
       </trans-unit>

@@ -1592,7 +1592,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public static function hash(mixed $value): string
     {
-        $hash = substr(base64_encode(hash('sha256', serialize($value), true)), 0, 7);
+        $hash = substr(base64_encode(hash('xxh128', serialize($value), true)), 0, 7);
 
         return str_replace(['/', '+'], ['.', '_'], $hash);
     }

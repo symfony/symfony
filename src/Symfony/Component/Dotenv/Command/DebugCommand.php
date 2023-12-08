@@ -82,7 +82,13 @@ final class DebugCommand extends Command
 
     private function getVariables(array $envFiles): array
     {
-        $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');
+        $dotenvVars = $_SERVER['SYMFONY_DOTENV_VARS'] ?? '';
+
+        if ('' === $dotenvVars) {
+            return [];
+        }
+
+        $vars = explode(',', $dotenvVars);
         sort($vars);
 
         $output = [];

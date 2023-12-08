@@ -64,9 +64,6 @@ class StreamOutput extends Output
         return $this->stream;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite(string $message, bool $newline)
     {
         if ($newline) {
@@ -103,7 +100,7 @@ class StreamOutput extends Output
                 && @sapi_windows_vt100_support($this->stream))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
-                || 'xterm' === getenv('TERM');
+                || str_starts_with((string) getenv('TERM'), 'xterm');
         }
 
         return 'Hyper' === getenv('TERM_PROGRAM')

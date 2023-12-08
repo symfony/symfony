@@ -1,0 +1,122 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-12-02T12:53:43Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "all".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-12-02T12:57:38Z
+
+We have a lot more README files with that issue. If we change it here, we should change it everywhere.
+
+---------------------------------------------------------------------------
+
+by tacman at 2023-12-02T13:02:36Z
+
+Agreed!  If it gets accepted I can do the rest as well.  If it's rejected
+(I think it has been in the past), I won't bother.
+
+But it's always bugged me.  clip, switch to terminal, paste, ctrl-a,
+forward-arrow twice, backspace twice, enter.
+
+On Sat, Dec 2, 2023 at 7:57 AM Alexander M. Turek ***@***.***>
+wrote:
+
+> We have a lot more README files with that issue. If we change it here, we
+> should change it everywhere.
+>
+> —
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/52865#issuecomment-1837142704>,
+> or unsubscribe
+> <https://github.com/notifications/unsubscribe-auth/AAEXIQO344CXK6U32HPF6CLYHMQU3AVCNFSM6AAAAABAD7YYX6VHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMYTQMZXGE2DENZQGQ>
+> .
+> You are receiving this because you authored the thread.Message ID:
+> ***@***.***>
+>
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-12-02T15:36:46Z
+
+> If it's rejected (I think it has been in the past), I won't bother.
+
+If you have a link to a previous discussion, this might help getting a decision here.
+
+---------------------------------------------------------------------------
+
+by tacman at 2023-12-02T17:05:40Z
+
+Not sure -- I've submitted this issue to many repositories, but even if it
+was rejected, it shouldn't be.  Nobody wants the $ in the clipboard when
+they're pasting.
+
+And the $ isn't even the prompt for windows, so it's not like it's so
+important that we need to have it even though it makes it look like it
+doesn't work.
+
+On Sat, Dec 2, 2023 at 10:36 AM Alexander M. Turek ***@***.***>
+wrote:
+
+> If it's rejected (I think it has been in the past), I won't bother.
+>
+> If you have a link to a previous discussion, this might help getting a
+> decision here.
+>
+> —
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/52865#issuecomment-1837184033>,
+> or unsubscribe
+> <https://github.com/notifications/unsubscribe-auth/AAEXIQKLN3BB6E2C2JF6SA3YHNDJRAVCNFSM6AAAAABAD7YYX6VHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMYTQMZXGE4DIMBTGM>
+> .
+> You are receiving this because you authored the thread.Message ID:
+> ***@***.***>
+>
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-03T02:21:42Z
+
+It was discussed recently there https://symfony.com/blog/new-in-symfony-6-4-assetmapper-improvements
+
+Maybe it is possible to filter this char for Windows users just before it’s copied into the clipboard ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-12-03T14:23:24Z
+
+👍 for every README file across the board, once for all.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-03T18:20:54Z
+
+13 in this repo it seems
+
+```
+```\s?\n\s?\$
+```
+
+```
+src/Symfony/Component/WebLink/README.md
+src/Symfony/Component/Translation/README.md
+src/Symfony/Component/Templating/README.md
+src/Symfony/Component/Stopwatch/README.md
+src/Symfony/Component/Security/Http/README.md
+src/Symfony/Component/Security/Core/README.md
+src/Symfony/Component/Routing/README.md
+src/Symfony/Component/RateLimiter/README.md
+src/Symfony/Component/PasswordHasher/README.md
+src/Symfony/Component/Mailer/README.md
+src/Symfony/Component/ErrorHandler/README.md
+src/Symfony/Component/Dotenv/README.md
+src/Symfony/Component/Clock/README.md
+```

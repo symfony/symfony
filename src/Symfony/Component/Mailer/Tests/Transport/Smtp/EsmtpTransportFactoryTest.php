@@ -157,5 +157,12 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtps', 'example.com', '', '', 465, ['ping_threshold' => '10']),
             $transport,
         ];
+
+        $transport = new EsmtpTransport('example.com', 465, false, null, $logger);
+
+        yield [
+            new Dsn('smtp', 'example.com', '', '', 465),
+            $transport,
+        ];
     }
 }

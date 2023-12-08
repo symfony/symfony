@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-12-08T10:07:06Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-08T10:12:44Z
+
+The referenced issue mentioned 5.4, should this PR target 5.4 too?
+
+---------------------------------------------------------------------------
+
+by theofidry at 2023-12-08T10:22:45Z
+
+>The referenced issue mentioned 5.4, should this PR target 5.4 too?
+
+Ah indeed, my bad I forgot 5.4 is still supported.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2023-12-08T10:32:55Z
+
+Waiting on #52941 and #52942.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2023-12-08T11:12:33Z
+
+Yo @carsonbot not cool
+
+---------------------------------------------------------------------------
+
+by theofidry at 2023-12-08T11:15:10Z
+
+thanks @xabbuh ❤️

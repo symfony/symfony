@@ -63,9 +63,10 @@ class TraceableMessageBus implements MessageBusInterface
         $line = $trace[1]['line'] ?? null;
 
         $handleTraitFile = (new \ReflectionClass(HandleTrait::class))->getFileName();
+        $singleHandlingTraitFile = (new \ReflectionClass(SingleHandlingTrait::class))->getFileName();
         $found = false;
         for ($i = 1; $i < 8; ++$i) {
-            if (isset($trace[$i]['file'], $trace[$i + 1]['file'], $trace[$i + 1]['line']) && $trace[$i]['file'] === $handleTraitFile) {
+            if (isset($trace[$i]['file'], $trace[$i + 1]['file'], $trace[$i + 1]['line']) && ($trace[$i]['file'] === $singleHandlingTraitFile || $trace[$i]['file'] === $handleTraitFile)) {
                 $file = $trace[$i + 1]['file'];
                 $line = $trace[$i + 1]['line'];
                 $found = true;

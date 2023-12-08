@@ -20,6 +20,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
+/**
+ * @group legacy
+ */
 class HandleTraitTest extends TestCase
 {
     public function testItThrowsOnNoMessageBusInstance()

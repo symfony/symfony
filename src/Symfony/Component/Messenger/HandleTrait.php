@@ -14,10 +14,14 @@ namespace Symfony\Component\Messenger;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
+trigger_deprecation('symfony/messenger', '7.1', 'The "%s" class is deprecated, use "%s" instead.', HandleTrait::class, SingleHandlingTrait::class);
+
 /**
  * Leverages a message bus to expect a single, synchronous message handling and return its result.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+ *
+ * @deprecated since Symfony 7.1, use SingleHandlingTrait instead.
  */
 trait HandleTrait
 {

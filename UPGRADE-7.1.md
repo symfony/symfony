@@ -10,6 +10,7 @@ Messenger
 ---------
 
  * Make `#[AsMessageHandler]` final
+ * Deprecate `HandleTrait`, use `SingleHandlingTrait` instead
 
 Workflow
 --------

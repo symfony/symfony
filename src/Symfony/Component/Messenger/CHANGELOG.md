@@ -7,6 +7,7 @@ CHANGELOG
  * Add option `redis_sentinel` as an alias for `sentinel_master`
  * Add `--all` option to the `messenger:consume` command
  * Make `#[AsMessageHandler]` final
+ * Deprecate `HandleTrait`, use `SingleHandlingTrait` instead
 
 7.0
 ---

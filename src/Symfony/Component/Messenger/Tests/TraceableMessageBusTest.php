@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -19,12 +20,20 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\TestTracesWithHandleTraitAction;
+use Symfony\Component\Messenger\Tests\Fixtures\TestTracesWithSingleHandlingTraitAction;
 use Symfony\Component\Messenger\TraceableMessageBus;
 
 class TraceableMessageBusTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testItTracesDispatch()
     {
+        $this->expectDeprecation('Since symfony/messenger 7.1: The "Symfony\Component\Messenger\HandleTrait" class is deprecated, use "Symfony\Component\Messenger\SingleHandlingTrait" instead.');
+
         $message = new DummyMessage('Hello');
 
         $stamp = new DelayStamp(5);
@@ -49,6 +58,9 @@ class TraceableMessageBusTest extends TestCase
         ], $actualTracedMessage);
     }
 
+    /**
+     * @group legacy
+     */
     public function testItTracesDispatchWhenHandleTraitIsUsed()
     {
         $message = new DummyMessage('Hello');
@@ -69,6 +81,30 @@ class TraceableMessageBusTest extends TestCase
                 'name' => 'TestTracesWithHandleTraitAction.php',
                 'file' => (new \ReflectionClass(TestTracesWithHandleTraitAction::class))->getFileName(),
                 'line' => (new \ReflectionMethod(TestTracesWithHandleTraitAction::class, '__invoke'))->getStartLine() + 2,
+            ],
+        ], $actualTracedMessage);
+    }
+
+    public function testItTracesDispatchWhenSingleHandlingTraitIsUsed()
+    {
+        $message = new DummyMessage('Hello');
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn((new Envelope($message))->with($stamp = new HandledStamp('result', 'handlerName')));
+
+        $traceableBus = new TraceableMessageBus($bus);
+        (new TestTracesWithSingleHandlingTraitAction($traceableBus))($message);
+        $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
+        $actualTracedMessage = $tracedMessages[0];
+        unset($actualTracedMessage['callTime']); // don't check, too variable
+        $this->assertEquals([
+            'message' => $message,
+            'stamps' => [],
+            'stamps_after_dispatch' => [$stamp],
+            'caller' => [
+                'name' => 'TestTracesWithSingleHandlingTraitAction.php',
+                'file' => (new \ReflectionClass(TestTracesWithSingleHandlingTraitAction::class))->getFileName(),
+                'line' => (new \ReflectionMethod(TestTracesWithSingleHandlingTraitAction::class, '__invoke'))->getStartLine() + 2,
             ],
         ], $actualTracedMessage);
     }

@@ -32,6 +32,7 @@ use Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
+use Symfony\Component\Messenger\Middleware\UnwrapHandlerExceptionMiddleware;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
@@ -110,6 +111,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('router'),
             ])
+
+        ->set('messenger.middleware.unwrap_handler_exception', UnwrapHandlerExceptionMiddleware::class)
 
         // Discovery
         ->set('messenger.receiver_locator', ServiceLocator::class)

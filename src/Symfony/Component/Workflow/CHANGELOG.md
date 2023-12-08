@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add method `getEnabledTransition()` to `WorkflowInterface`
+
 7.0
 ---
 

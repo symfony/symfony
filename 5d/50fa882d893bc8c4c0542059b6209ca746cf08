@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2023-12-04T12:02:15Z
+
+Even if it looks like a bug, I have doubts about whether this should go to `7.1` as an improvement.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-06T08:49:44Z
+
+the `composer.json` file to update is located in `src/Symfony/Component/HttpKernel`
+
+---------------------------------------------------------------------------
+
+by seferov at 2023-12-06T09:09:10Z
+
+> the `composer.json` file to update is located in `src/Symfony/Component/HttpKernel`
+
+@xabbuh correct me if I am wrong but these unit tests on HttpKernel component runs with Serializer & ProperyAccess with version 7.1.x-dev, not with the code that are on the PR. That's why they fail.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-07T09:26:14Z
+
+@seferov Can you please rebase your changes on the latest `7.1` branch?
+
+---------------------------------------------------------------------------
+
+by seferov at 2023-12-07T09:40:35Z
+
+> @seferov Can you please rebase your changes on the latest `7.1` branch?
+
+@xabbuh done
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-07T10:06:02Z
+
+> @xabbuh correct me if I am wrong but these unit tests on HttpKernel component runs with Serializer & ProperyAccess with version 7.1.x-dev, not with the code that are on the PR.
+
+In fact, our pipeline is a bit more complex and takes the changes from the PR into account: https://github.com/symfony/symfony/blob/7.1/.github/workflows/unit-tests.yml#L91
+
+---------------------------------------------------------------------------
+
+by seferov at 2023-12-07T10:20:18Z
+
+> In fact, our pipeline is a bit more complex and takes the changes from the PR into account: https://github.com/symfony/symfony/blob/7.1/.github/workflows/unit-tests.yml#L91
+
+@xabbuh I see.
+
+Btw, only 8.2 (high deps) is failing now. The rest is passing

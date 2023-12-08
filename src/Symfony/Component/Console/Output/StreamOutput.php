@@ -98,10 +98,6 @@ class StreamOutput extends Output
             return false;
         }
 
-        if ('Hyper' === getenv('TERM_PROGRAM')) {
-            return true;
-        }
-
         if (\DIRECTORY_SEPARATOR === '\\') {
             return (\function_exists('sapi_windows_vt100_support')
                 && @sapi_windows_vt100_support($this->stream))
@@ -110,6 +106,7 @@ class StreamOutput extends Output
                 || 'xterm' === getenv('TERM');
         }
 
-        return stream_isatty($this->stream);
+        return 'Hyper' === getenv('TERM_PROGRAM')
+            || stream_isatty($this->stream);
     }
 }

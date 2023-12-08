@@ -117,6 +117,10 @@ class Connection
      */
     private static function initializeRedis(\Redis $redis, string $host, int $port, $auth, int $serializer, int $dbIndex): \Redis
     {
+        if ($redis->isConnected()) {
+            return $redis;
+        }
+
         $redis->connect($host, $port);
         $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
 

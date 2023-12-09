@@ -24,8 +24,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class JsDelivrEsmResolver implements PackageResolverInterface
 {
     public const URL_PATTERN_VERSION = 'https://data.jsdelivr.com/v1/packages/npm/%s/resolved';
-    public const URL_PATTERN_DIST_CSS = 'https://cdn.jsdelivr.net/npm/%s@%s%s';
-    public const URL_PATTERN_DIST = self::URL_PATTERN_DIST_CSS.'/+esm';
+    public const URL_PATTERN_DIST_STYLE = 'https://cdn.jsdelivr.net/npm/%s@%s%s';
+    public const URL_PATTERN_DIST = self::URL_PATTERN_DIST_STYLE.'/+esm';
     public const URL_PATTERN_ENTRYPOINT = 'https://data.jsdelivr.com/v1/packages/npm/%s@%s/entrypoints';
 
     public const IMPORT_REGEX = '#(?:import\s*(?:\w+,)?(?:(?:\{[^}]*\}|\w+|\*\s*as\s+\w+)\s*\bfrom\s*)?|export\s*(?:\{[^}]*\}|\*)\s*from\s*)("/npm/((?:@[^/]+/)?[^@]+?)(?:@([^/]+))?((?:/[^/]+)*?)/\+esm")#';
@@ -78,7 +78,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new RuntimeException(sprintf('Unable to find the latest version for package "%s" - try specifying the version manually.', $packageName));
             }
 
-            $pattern = str_ends_with($filePath, '.css') ? self::URL_PATTERN_DIST_CSS : self::URL_PATTERN_DIST;
+            $pattern = str_ends_with($filePath, '.css') || str_ends_with($filePath, '.scss') ? self::URL_PATTERN_DIST_STYLE : self::URL_PATTERN_DIST;
             $requiredPackages[$i][1] = $this->httpClient->request('GET', sprintf($pattern, $packageName, $version, $filePath));
             $requiredPackages[$i][4] = $version;
 
@@ -106,7 +106,13 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             }
 
             $contentType = $response->getHeaders()['content-type'][0] ?? '';
-            $type = str_starts_with($contentType, 'text/css') ? ImportMapType::CSS : ImportMapType::JS;
+            if (str_starts_with($contentType, 'text/css')) {
+                $type = ImportMapType::CSS;
+            } else if (str_starts_with($contentType, 'text/x-scss')) {
+                $type = ImportMapType::SCSS;
+            } else {
+                $type = ImportMapType::JS;
+            }
             $resolvedPackages[$options->packageModuleSpecifier] = new ResolvedImportMapPackage($options, $version, $type);
 
             $packagesToRequire = array_merge($packagesToRequire, $this->fetchPackageRequirementsFromImports($response->getContent()));
@@ -169,7 +175,11 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
             }
 
-            $pattern = ImportMapType::CSS === $entry->type ? self::URL_PATTERN_DIST_CSS : self::URL_PATTERN_DIST;
+            if (ImportMapType::CSS === $entry->type || ImportMapType::SCSS === $entry->type) {
+                $pattern = self::URL_PATTERN_DIST_STYLE;
+            } else {
+                $pattern = self::URL_PATTERN_DIST;
+            }
             $url = sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
 
             $responses[$package] = [$this->httpClient->request('GET', $url), $entry];
@@ -200,7 +210,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             if (0 !== \count($extraFiles)) {
                 $extraFileResponses[$package] = [];
                 foreach ($extraFiles as $extraFile) {
-                    $extraFileResponses[$package][] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_DIST_CSS, $entry->getPackageName(), $entry->version, $extraFile)), $extraFile, $entry->getPackageName(), $entry->version];
+                    $extraFileResponses[$package][] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_DIST_STYLE, $entry->getPackageName(), $entry->version, $extraFile)), $extraFile, $entry->getPackageName(), $entry->version];
                 }
             }
 
@@ -240,7 +250,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 if (0 !== \count($extraFiles)) {
                     $extraFileResponses[$package] = [];
                     foreach ($extraFiles as $newExtraFile) {
-                        $extraFileResponses[$package][] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_DIST_CSS, $packageName, $version, $newExtraFile)), $newExtraFile, $packageName, $version];
+                        $extraFileResponses[$package][] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_DIST_STYLE, $packageName, $version, $newExtraFile)), $newExtraFile, $packageName, $version];
                     }
                 }
             }

@@ -186,12 +186,10 @@
 
                     copyToClipboardElement.textContent = `✅ Copied!`;
                     copyToClipboardElement.disabled = true;
-                    copyToClipboardElement.classList.add('status-success');
 
                     setTimeout(() => {
                         copyToClipboardElement.textContent = oldContent;
                         copyToClipboardElement.disabled = false;
-                        copyToClipboardElement.classList.remove('status-success');
                     }, 7000);
                 });
             });

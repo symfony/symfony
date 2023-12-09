@@ -200,12 +200,11 @@ class ImportMapManager
 
     private static function getImportMapTypeFromFilename(string $path): ImportMapType
     {
-        if (str_ends_with($path, '.css')) {
-            return ImportMapType::CSS;
-        } else if (str_ends_with($path, '.scss')) {
-            return ImportMapType::SCSS;
-        }
-        return ImportMapType::JS;
+        return match (true) {
+            str_ends_with($path, '.css') => ImportMapType::CSS,
+            str_ends_with($path, '.scss') => ImportMapType::SCSS,
+            default => ImportMapType::JS,
+        };
     }
 
     /**

@@ -39,7 +39,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
         return [
             [
                 new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY']))),
-                'ses+api://ACCESS_KEY@us-east-1',
+                'ses+api://ACCESS_KEY@eu-west-1',
             ],
             [
                 new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'region' => 'us-west-1']))),
@@ -55,7 +55,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
             ],
             [
                 new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'sessionToken' => 'SESSION_TOKEN']))),
-                'ses+api://ACCESS_KEY@us-east-1',
+                'ses+api://ACCESS_KEY@eu-west-1',
             ],
             [
                 new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'region' => 'us-west-1', 'sessionToken' => 'SESSION_TOKEN']))),
@@ -76,7 +76,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://email.us-east-1.amazonaws.com/v2/email/outbound-emails', $url);
+            $this->assertSame('https://email.eu-west-1.amazonaws.com/v2/email/outbound-emails', $url);
 
             $content = json_decode($options['body'], true);
 

@@ -175,11 +175,10 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
             }
 
-            if (ImportMapType::CSS === $entry->type || ImportMapType::SCSS === $entry->type) {
-                $pattern = self::URL_PATTERN_DIST_STYLE;
-            } else {
-                $pattern = self::URL_PATTERN_DIST;
-            }
+            $pattern = match ($entry->type) {
+                ImportMapType::CSS, ImportMapType::SCSS => self::URL_PATTERN_DIST_STYLE,
+                default => self::URL_PATTERN_DIST,
+            };
             $url = sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
 
             $responses[$package] = [$this->httpClient->request('GET', $url), $entry];

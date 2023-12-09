@@ -106,13 +106,11 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             }
 
             $contentType = $response->getHeaders()['content-type'][0] ?? '';
-            if (str_starts_with($contentType, 'text/css')) {
-                $type = ImportMapType::CSS;
-            } else if (str_starts_with($contentType, 'text/x-scss')) {
-                $type = ImportMapType::SCSS;
-            } else {
-                $type = ImportMapType::JS;
-            }
+            $type = match (true) {
+                str_starts_with($contentType, 'text/css') => ImportMapType::CSS,
+                str_starts_with($contentType, 'text/x-scss') => ImportMapType::SCSS,
+                default => ImportMapType::JS,
+            };
             $resolvedPackages[$options->packageModuleSpecifier] = new ResolvedImportMapPackage($options, $version, $type);
 
             $packagesToRequire = array_merge($packagesToRequire, $this->fetchPackageRequirementsFromImports($response->getContent()));

@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2023-12-09T13:56:33Z
+
+I know the name of the proposed attribute is inline with the `#[IsGranted]` one and I'm fundamentally fine with it, yet I'm wondering if some more imperative name wouldn't read better  e.g. `#[ValidateCsrfToken]`, `#[ValidCsrfToken]`  or even `#[RequireValidCsrfToken`. Thoughts?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-09T13:59:39Z
+
+> I know the name of the proposed attribute is inline with the #[IsGranted] one and I'm fundamentally fine with it, yet I'm wondering if some more imperative name wouldn't read better e.g. #[ValidateCsrfToken], #[ValidCsrfToken] or even #[RequireValidCsrfToken. Thoughts?
+
+`#[HasValidCsrfToken]` ?
+
+---------------------------------------------------------------------------
+
+by yguedidi at 2023-12-09T14:14:26Z
+
+@chalasr it's more inline with the `AbstractController` helper function `->isCsrfTokenValid()`, like the `#[IsGranted]` is with `->isGranted()`
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-12-09T14:26:51Z
+
+> @chalasr it's more inline with the AbstractController helper function ->isCsrfTokenValid(), like the #[IsGranted] is with ->isGranted()
+
+Sounds valid to me :+1: (I honestly didn't know we had this helper method in the abstract controller)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-09T16:10:41Z
+
+@yguedidi Can you have a look at the tests, they seem broken by this PR.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-09T16:23:53Z
+
+Let's go with the name then 👍🏻
+
+Thanks for the explanation ℹ️
+
+---------------------------------------------------------------------------
+
+by yguedidi at 2023-12-09T16:24:28Z
+
+> Can you have a look at the tests, they seem broken by this PR.
+
+@fabpot Indeed low deps unit tests are broken by this PR!
+I checked and I'm wondering what is the right fix.
+Issue is that SecurityBundle will install security/http 6.4, so without the new listener.
+Should I just upgrade the requirement to 7.1 or conditionally add the service if the class exists? or something else?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-09T16:28:03Z
+
+> > Can you have a look at the tests, they seem broken by this PR.
+>
+> @fabpot Indeed low deps unit tests are broken by this PR! I checked and I'm wondering what is the right fix. Issue is that SecurityBundle will install security/http 6.4, so without the new listener. Should I just upgrade the requirement to 7.1 or conditionally add the service if the class exists? or something else?
+
+You need to bump the minimum version in SecurityBundle.
+
+---------------------------------------------------------------------------
+
+by yguedidi at 2023-12-09T16:48:40Z
+
+@fabpot SecurityBundle tests now pass! other failures seems unrelated

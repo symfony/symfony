@@ -78,7 +78,10 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new RuntimeException(sprintf('Unable to find the latest version for package "%s" - try specifying the version manually.', $packageName));
             }
 
-            $pattern = str_ends_with($filePath, '.css') || str_ends_with($filePath, '.scss') ? self::URL_PATTERN_DIST_STYLE : self::URL_PATTERN_DIST;
+            $pattern = match (true) {
+                str_ends_with($filePath, '.css'), str_ends_with($filePath, '.scss') => self::URL_PATTERN_DIST_STYLE,
+                default => self::URL_PATTERN_DIST,
+            };
             $requiredPackages[$i][1] = $this->httpClient->request('GET', sprintf($pattern, $packageName, $version, $filePath));
             $requiredPackages[$i][4] = $version;
 

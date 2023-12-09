@@ -427,4 +427,33 @@ class UuidTest extends TestCase
     {
         $this->assertInstanceOf(Uuid::class, Uuid::fromString('111111111u9QRyVM94rdmZ'));
     }
+
+    public function testV6FromV1()
+    {
+        $uuidV1 = new UuidV1('8189d3de-9670-11ee-b9d1-0242ac120002');
+        $uuidV6 = UuidV6::fromV1($uuidV1);
+
+        $this->assertEquals($uuidV1->getDateTime(), $uuidV6->getDateTime());
+        $this->assertSame($uuidV1->getNode(), $uuidV6->getNode());
+        $this->assertEquals($uuidV6, UuidV6::fromV1($uuidV1));
+    }
+
+    public function testV7FromV1BeforeUnixEpochThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('UUIDv1 with a timestamp before Unix epoch cannot be converted to UUIDv7');
+
+        UuidV7::fromV1(new UuidV1('9aba8000-ff00-11b0-b3db-3b3fc83afdfc')); // Timestamp is 1969-01-01 00:00:00.0000000
+    }
+
+    public function testV7FromV1()
+    {
+        $uuidV1 = new UuidV1('eb248d80-ea4f-11ec-9d2a-839425e6fb88');
+        $sameUuidV1100NanosecondsLater = new UuidV1('eb248d81-ea4f-11ec-9d2a-839425e6fb88');
+        $uuidV7 = UuidV7::fromV1($uuidV1);
+
+        $this->assertEquals($uuidV1->getDateTime(), $uuidV7->getDateTime());
+        $this->assertEquals($uuidV7, UuidV7::fromV1($uuidV1));
+        $this->assertNotEquals($uuidV7, UuidV7::fromV1($sameUuidV1100NanosecondsLater));
+    }
 }

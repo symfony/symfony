@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `UuidV6::fromV1()` and `UuidV7::fromV1()`
+
 6.2
 ---
 

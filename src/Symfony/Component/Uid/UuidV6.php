@@ -43,6 +43,13 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
         return substr($this->uid, 24);
     }
 
+    public static function fromV1(UuidV1 $uuidV1): self
+    {
+        $uuidV1 = $uuidV1->toRfc4122();
+
+        return new self(substr($uuidV1, 15, 3).substr($uuidV1, 9, 4).$uuidV1[0].'-'.substr($uuidV1, 1, 4).'-6'.substr($uuidV1, 5, 3).substr($uuidV1, 18, 6).substr($uuidV1, 24));
+    }
+
     public static function generate(\DateTimeInterface $time = null, Uuid $node = null): string
     {
         $uuidV1 = UuidV1::generate($time, $node);

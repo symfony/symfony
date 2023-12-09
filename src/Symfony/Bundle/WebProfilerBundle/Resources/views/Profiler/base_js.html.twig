@@ -13,6 +13,7 @@
         constructor() {
             this.#createTabs();
             this.#createToggles();
+            this.#createCopyToClipboard();
             this.#convertDateTimesToUserTimezone();
         }
 
@@ -161,15 +162,38 @@
                     });
                 });
 
-                /* Prevents from disallowing clicks on "copy to clipboard" elements inside toggles */
-                const copyToClipboardElements = toggle.querySelectorAll('span[data-clipboard-text]');
-                copyToClipboardElements.forEach((copyToClipboardElement) => {
-                    copyToClipboardElement.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                    });
-                });
-
                 toggle.setAttribute('data-processed', 'true');
+            });
+        }
+
+        #createCopyToClipboard() {
+            if (!navigator.clipboard) {
+                return;
+            }
+
+            const copyToClipboardElements = document.querySelectorAll('[data-clipboard-text]');
+
+            copyToClipboardElements.forEach((copyToClipboardElement) => {
+                copyToClipboardElement.classList.remove('hidden');
+
+                copyToClipboardElement.addEventListener('click', (e) => {
+                    /* Prevents from disallowing clicks on "copy to clipboard" elements inside toggles */
+                    e.stopPropagation();
+
+                    navigator.clipboard.writeText(copyToClipboardElement.getAttribute('data-clipboard-text'));
+
+                    let oldContent = copyToClipboardElement.textContent;
+
+                    copyToClipboardElement.textContent = `✅ Copied!`;
+                    copyToClipboardElement.disabled = true;
+                    copyToClipboardElement.classList.add('status-success');
+
+                    setTimeout(() => {
+                        copyToClipboardElement.textContent = oldContent;
+                        copyToClipboardElement.disabled = false;
+                        copyToClipboardElement.classList.remove('status-success');
+                    }, 7000);
+                });
             });
         }
 

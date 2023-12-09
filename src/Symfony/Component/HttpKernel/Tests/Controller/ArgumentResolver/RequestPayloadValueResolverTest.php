@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
@@ -253,7 +254,7 @@ class RequestPayloadValueResolverTest extends TestCase
             $validationFailedException = $e->getPrevious();
             $this->assertSame(422, $e->getStatusCode());
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
-            $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
+            $this->assertSame(sprintf('This value should be of type %s.', class_exists(InvalidTypeException::class) ? 'string' : 'unknown'), $validationFailedException->getViolations()[0]->getMessage());
             $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());
         }
     }
@@ -665,7 +666,7 @@ class RequestPayloadValueResolverTest extends TestCase
             $validationFailedException = $e->getPrevious();
             $this->assertSame(400, $e->getStatusCode());
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
-            $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
+            $this->assertSame(sprintf('This value should be of type %s.', class_exists(InvalidTypeException::class) ? 'string' : 'unknown'), $validationFailedException->getViolations()[0]->getMessage());
             $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());
         }
     }

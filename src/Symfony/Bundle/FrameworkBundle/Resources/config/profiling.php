@@ -43,7 +43,8 @@ return static function (ContainerConfigurator $container) {
                 service('profiler'),
                 service('.virtual_request_stack'),
                 service('debug.stopwatch'),
-                service('router'),
+                param('kernel.runtime_mode.cli'),
+                service('router')->nullOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
 

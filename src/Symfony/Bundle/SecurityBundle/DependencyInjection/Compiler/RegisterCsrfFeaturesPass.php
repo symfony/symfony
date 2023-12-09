@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
 use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLogoutListener;
+use Symfony\Component\Security\Http\EventListener\IsCsrfTokenValidAttributeListener;
 
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
@@ -39,6 +40,10 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
         }
 
         $container->register('security.listener.csrf_protection', CsrfProtectionListener::class)
+            ->addArgument(new Reference('security.csrf.token_manager'))
+            ->addTag('kernel.event_subscriber');
+
+        $container->register('controller.is_csrf_token_valid_attribute_listener', IsCsrfTokenValidAttributeListener::class)
             ->addArgument(new Reference('security.csrf.token_manager'))
             ->addTag('kernel.event_subscriber');
     }

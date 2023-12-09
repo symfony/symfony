@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `#[IsCsrfTokenValid]` attribute
+
 7.0
 ---
 

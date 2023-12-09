@@ -44,7 +44,7 @@ return static function (ContainerConfigurator $container) {
                 service('.virtual_request_stack'),
                 service('debug.stopwatch'),
                 param('kernel.runtime_mode.cli'),
-                service('router'),
+                service('router')->nullOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
 

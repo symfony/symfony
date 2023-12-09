@@ -37,35 +37,35 @@ class SesApiAsyncAwsTransportTest extends TestCase
     {
         return [
             [
-                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY']))),
+                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false, 'accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY']))),
                 'ses+api://ACCESS_KEY@us-east-1',
             ],
             [
-                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'region' => 'us-west-1']))),
+                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false, 'accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'region' => 'us-west-1']))),
                 'ses+api://ACCESS_KEY@us-west-1',
             ],
             [
-                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com']))),
+                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false, 'accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com']))),
                 'ses+api://ACCESS_KEY@example.com',
             ],
             [
-                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com:99']))),
+                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false, 'accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com:99']))),
                 'ses+api://ACCESS_KEY@example.com:99',
             ],
             [
-                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'sessionToken' => 'SESSION_TOKEN']))),
+                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false, 'accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'sessionToken' => 'SESSION_TOKEN']))),
                 'ses+api://ACCESS_KEY@us-east-1',
             ],
             [
-                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'region' => 'us-west-1', 'sessionToken' => 'SESSION_TOKEN']))),
+                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false, 'accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'region' => 'us-west-1', 'sessionToken' => 'SESSION_TOKEN']))),
                 'ses+api://ACCESS_KEY@us-west-1',
             ],
             [
-                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com', 'sessionToken' => 'SESSION_TOKEN']))),
+                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false, 'accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com', 'sessionToken' => 'SESSION_TOKEN']))),
                 'ses+api://ACCESS_KEY@example.com',
             ],
             [
-                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com:99', 'sessionToken' => 'SESSION_TOKEN']))),
+                new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false, 'accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com:99', 'sessionToken' => 'SESSION_TOKEN']))),
                 'ses+api://ACCESS_KEY@example.com:99',
             ],
         ];
@@ -97,7 +97,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
             ]);
         });
 
-        $transport = new SesApiAsyncAwsTransport(new SesClient(Configuration::create([]), new NullProvider(), $client));
+        $transport = new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false]), new NullProvider(), $client));
 
         $mail = new Email();
         $mail->subject('Hello!')

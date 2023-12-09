@@ -20,11 +20,13 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 {
     /**
-     * @param string $phpArrayFile The PHP file where metadata are cached
+     * @param string|null $phpArrayFile The PHP file where metadata are cached
      */
-    public function __construct(
-        private string $phpArrayFile,
-    ) {
+    public function __construct(private ?string $phpArrayFile = null)
+    {
+        if (\func_num_args() > 0) {
+            trigger_deprecation('symfony/framework-bundle', '7.1', 'Setting "string $phpArrayFile" argument is deprecated. The argument will be removed in 8.0.');
+        }
     }
 
     public function isOptional(): bool
@@ -50,7 +52,12 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
         // so here we un-serialize the values first
         $values = array_map(fn ($val) => null !== $val ? unserialize($val) : null, $arrayAdapter->getValues());
 
-        return $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($this->phpArrayFile, new NullAdapter()), $values);
+        $filepath = $this->getPhpArrayFile($cacheDir, $buildDir);
+        if (!$filepath) {
+            return [];
+        }
+
+        return $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($filepath, new NullAdapter()), $values);
     }
 
     /**
@@ -76,4 +83,17 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
      * @return bool false if there is nothing to warm-up
      */
     abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool;
+
+    /**
+     * @return string|null the PHP file where metadata are cached, or null if metadata should not be cached
+     *
+     * @abstract
+     */
+    protected function getPhpArrayFile(string $cacheDir, ?string $buildDir = null): ?string
+    {
+        // Deprecate directly so it can be marked abstract in 8.0
+        trigger_deprecation('symfony/framework-bundle', '7.1', 'Not overriding %s() method is deprecated. The method will be marked as abstract in 8.0.', __METHOD__);
+
+        return $this->phpArrayFile ?? throw new \LogicException(sprintf('Either override the "%s()" method, or provide $phpArrayFile argument in the constructor.', __METHOD__));
+    }
 }

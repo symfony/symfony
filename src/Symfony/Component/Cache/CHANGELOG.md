@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add option `sentinel_master` as an alias for `redis_sentinel`
+ * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter`
 
 7.0
 ---

@@ -16,8 +16,12 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
+trigger_deprecation('symfony/cache', '7.1', 'The "%s" class is deprecated, use "%s" instead.', CouchbaseBucketAdapter::class, CouchbaseCollectionAdapter::class);
+
 /**
  * @author Antonio Jose Cerezo Aranda <aj.cerezo@gmail.com>
+ *
+ * @deprecated since Symfony 7.1, use {@see CouchbaseCollectionAdapter} instead
  */
 class CouchbaseBucketAdapter extends AbstractAdapter
 {

@@ -43,7 +43,7 @@ final class ConsoleProfilerListener implements EventSubscriberInterface
         private readonly RequestStack $requestStack,
         private readonly Stopwatch $stopwatch,
         private readonly bool $cliMode,
-        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly ?UrlGeneratorInterface $urlGenerator = null,
     ) {
         $this->profiles = new \SplObjectStorage();
         $this->parents = new \SplObjectStorage();
@@ -140,12 +140,14 @@ final class ConsoleProfilerListener implements EventSubscriberInterface
             $p = $this->profiles[$r];
             $this->profiler->saveProfile($p);
 
-            $token = $p->getToken();
-            $output?->writeln(sprintf(
-                'See profile <href=%s>%s</>',
-                $this->urlGenerator->generate('_profiler', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL),
-                $token
-            ));
+            if ($this->urlGenerator && $output) {
+                $token = $p->getToken();
+                $output->writeln(sprintf(
+                    'See profile <href=%s>%s</>',
+                    $this->urlGenerator->generate('_profiler', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL),
+                    $token
+                ));
+            }
         }
 
         $this->profiles = new \SplObjectStorage();

@@ -976,6 +976,7 @@
             <xsd:element name="service" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="secret" type="xsd:string" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
+        <xsd:attribute name="type" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="remote-event">

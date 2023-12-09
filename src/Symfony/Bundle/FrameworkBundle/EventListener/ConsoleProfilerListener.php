@@ -42,6 +42,7 @@ final class ConsoleProfilerListener implements EventSubscriberInterface
         private readonly Profiler $profiler,
         private readonly RequestStack $requestStack,
         private readonly Stopwatch $stopwatch,
+        private readonly bool $cliMode,
         private readonly UrlGeneratorInterface $urlGenerator,
     ) {
         $this->profiles = new \SplObjectStorage();
@@ -59,6 +60,10 @@ final class ConsoleProfilerListener implements EventSubscriberInterface
 
     public function initialize(ConsoleCommandEvent $event): void
     {
+        if (!$this->cliMode) {
+            return;
+        }
+
         $input = $event->getInput();
         if (!$input->hasOption('profile') || !$input->getOption('profile')) {
             $this->profiler->disable();
@@ -78,12 +83,16 @@ final class ConsoleProfilerListener implements EventSubscriberInterface
 
     public function catch(ConsoleErrorEvent $event): void
     {
+        if (!$this->cliMode) {
+            return;
+        }
+
         $this->error = $event->getError();
     }
 
     public function profile(ConsoleTerminateEvent $event): void
     {
-        if (!$this->profiler->isEnabled()) {
+        if (!$this->cliMode || !$this->profiler->isEnabled()) {
             return;
         }
 

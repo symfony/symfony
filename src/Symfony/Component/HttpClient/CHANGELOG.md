@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `NoRetryStrategy` to simplify testing errors going through `RetryableHttpClient`
+
 7.0
 ---
 

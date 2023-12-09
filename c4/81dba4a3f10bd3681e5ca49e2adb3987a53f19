@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2023-11-19T10:58:06Z
+
+Maybe we could do this computation in the Controller directly ?
+
+Currently the code look like this (just formatted for clarity)
+
+[WebProfilerBundle/EventListener/WebDebugToolbarListener.php](https://github.com/symfony/symfony/blob/19f52407d9e151e660dc15dc1fb2f2a0ca6af2de/src/Symfony/Bundle/WebProfilerBundle/EventListener/WebDebugToolbarListener.php#L116)
+
+```php
+$content = $this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', [
+    'location' => $response->headers->get('Location'),
+    'host' => $request->getSchemeAndHttpHost()
+]);
+$response->setContent($content);
+$response->setStatusCode(200);
+$response->headers->remove('Location');
+```
+
+Something like this could do the job WDYT ?
+
+```php
+$content = $this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', [
+    'location' => $location = $response->headers->get('Location'),
+    'absolute_location' => (new UrlHelper($requestStack))->getAbsoluteUrl($location),
+]);
+$response->setContent($content);
+$response->setStatusCode(200);
+$response->headers->remove('Location');
+```
+And that'd allow to keep in one place all those 'Location' manipulation / transformations.
+
+Because, even with the best intentions, i'm not sure the template code would be ever "obvious" (e g : `host` in the template is in fact "scheme + host" but not `app.request.host` )
+
+WDYT ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-20T09:06:51Z
+
+I agree with @smnandre's proposal, the template can't contain this logic.

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add Sass require support to the `importmap:require` command
+
 6.4
 ---
 

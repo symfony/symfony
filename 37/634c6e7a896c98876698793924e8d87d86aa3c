@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-12-10T19:13:19Z
+
+Hey!
+
+I didn't know that was capable of this emotion. I really really like reviewing this PR. Well done.
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-12T07:58:47Z
+
+@StevioStudio Sorry, your PR somehow slipped through. Thank you for taking the time to create a failing test case. That's really appreciated. 👍  I will try to look into a possible fix soon.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-17T13:37:13Z
+
+As your test also asserts the entry form types of the collection type are not renamed. So after submitting we only have entry types named `0`, `2`, and `3`. However, due to how `removeAuthor()` is implemented the submitted data is mapped to an indexed array. Thus when the form is displayed again, we now have data indexed with `0`, `1`, and `2` while the form still has `0`, `2`, `3`.
+
+With the current implementation I do not see how we can actually fix this as inside the `ResizeFormListener` we do not know whether or not the index is important.
+
+For your project I see two possible workarounds:
+
+* Change the implementation in your model class to not reindex the collection when the form data is mapped back (which might not be suitable depending on how you deal with the data).
+* Register a custom event listener that runs after the built-in `ResizeFormListener` and changes the form names.
+
+---------------------------------------------------------------------------
+
+by cristoforocervino at 2021-01-17T14:16:56Z
+
+> For your project I see two possible workarounds:
+>
+> * Change the implementation in your model class to not reindex the collection when the form data is mapped back (which might not be suitable depending on how you deal with the data).
+> * Register a custom event listener that runs after the built-in `ResizeFormListener` and changes the form names.
+
+Wait, this is not only related to the model I'm using in this unit test.
+`CollectionType` is usually used with Doctrine Collections. Doctrine collections `removeElement` method also reindex the collection the same way. Shouldn't Symfony Form at least provide an option to handle this (common) situation?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-17T15:25:36Z
+
+While I agree I don't see a way to fix this without introducing a new option (like proposed in #7828). So that would go into a future minor version instead of a patch release.
+
+By the way, is it really a common use case to use the `CollectionType` with Doctrine entities? What are the use case where the `EntityType` isn't sufficient?
+
+---------------------------------------------------------------------------
+
+by cristoforocervino at 2021-01-17T20:59:56Z
+
+Well, you know that `CollectionType` and `EntityType` are meant to handle completely different situations.
+I do not have numbers or statistics to show you, but it's pretty common, for example, to have a `CollectionType` with the option `entry_type` set to `EntityType`.
+
+I think the new option with a minor version release could be a good idea.
+Like a `sequential_keys` option set to `false` by default.
+If `sequential_keys` is set to `true`, `ResizeFormListener` is going to handle a situation like the one described by my unit test in the right way.
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-18T08:51:56Z
+
+I have a feature like that on my to-do list. Though not sure when I will find the time for it. Hopefully it will make it to 5.3.
+
+---------------------------------------------------------------------------
+
+by cristoforocervino at 2021-01-18T20:37:37Z
+
+I came up with a new `reindex_on_submit` boolean option set to `false` by default.
+I updated code and test. What do you think? Did you have in mind something different?
+
+---------------------------------------------------------------------------
+
+by cristoforocervino at 2021-04-13T18:31:29Z
+
+This PR initially started as a bug fix with unit test provided to explain the issue.
+I changed it into a new feature by introducing a new `keep_as_list` option for `CollectionType`.
+I'm still open to suggestions on how to improve this code and find the right way to solve the highlighted issue.
+
+---------------------------------------------------------------------------
+
+by andimg93 at 2021-12-14T21:30:33Z
+
+What is the current status? Really need this feature - Keep as list behavior should be by default true, because you always run into problems by removing and adding collection items - Unless you reindex all elements manually in the frontend, which is my current "solution" to this 🙈 (btw we deal with this bug -  this is a bug in my opinion - since 2013, check early reports like this https://github.com/symfony/symfony/issues/7468)
+
+---------------------------------------------------------------------------
+
+by andimg93 at 2022-04-01T11:29:28Z
+
+@xabbuh, @yceruto, @chalasr, @dunglas, @jderusse, @lyrixx, @sroze, @wouterj
+Please look into that issue fix, there are so many issues that all trace back to this bug and have been around since 2013 - it's really important, even if it's annoying to ask for focus here. Without a solution collections are simply not decently usable, it can and must not be a solution to re-index it all via javascript (frontend). Simply that you can't find a nice solution here (frontend based), but have to search out the individual parts via regex.
+
+The real solution must be in the backend, because it is simply a bug and not a feature.

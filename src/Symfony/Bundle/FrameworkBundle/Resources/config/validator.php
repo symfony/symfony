@@ -28,7 +28,7 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 return static function (ContainerConfigurator $container) {
     $container->parameters()
-        ->set('validator.mapping.cache.file', param('kernel.cache_dir').'/validation.php');
+        ->set('validator.mapping.cache.file', 'validation.php');
 
     $validatorsDir = \dirname((new \ReflectionClass(EmailValidator::class))->getFileName());
 
@@ -63,7 +63,7 @@ return static function (ContainerConfigurator $container) {
         ->set('validator.mapping.cache.adapter', PhpArrayAdapter::class)
             ->factory([PhpArrayAdapter::class, 'create'])
             ->args([
-                param('validator.mapping.cache.file'),
+                param('kernel.build_dir').'/'.param('validator.mapping.cache.file'),
                 service('cache.validator'),
             ])
 

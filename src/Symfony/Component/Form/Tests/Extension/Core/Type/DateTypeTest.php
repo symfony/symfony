@@ -106,7 +106,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'datetime',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());
@@ -132,7 +132,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'datetime_immutable',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
         $this->assertEquals(new \DateTimeImmutable('2010-06-02 UTC'), $form->getData());
@@ -159,7 +159,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'string',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $this->assertEquals('2010-06-02', $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());
@@ -185,7 +185,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'timestamp',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
@@ -213,7 +213,7 @@ class DateTypeTest extends BaseTypeTestCase
             'input' => 'array',
         ]);
 
-        $form->submit('2.6.2010');
+        $form->submit('02.06.2010');
 
         $output = [
             'day' => '2',

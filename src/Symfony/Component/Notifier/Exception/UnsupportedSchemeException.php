@@ -256,6 +256,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Smsmode\SmsmodeTransportFactory::class,
             'package' => 'symfony/smsmode-notifier',
         ],
+        'sms-sluzba' => [
+            'class' => Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
+            'package' => 'symfony/sms-sluzba-notifier',
+        ],
         'sns' => [
             'class' => Bridge\AmazonSns\AmazonSnsTransportFactory::class,
             'package' => 'symfony/amazon-sns-notifier',

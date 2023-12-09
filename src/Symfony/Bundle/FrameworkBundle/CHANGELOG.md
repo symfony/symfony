@@ -10,6 +10,7 @@ CHANGELOG
    invokable Kernel class, and register `FrameworkBundle` by default when the `bundles.php` file is missing
  * [BC BREAK] The `secrets:decrypt-to-local` command terminates with a non-zero exit code when a secret could not be read
  * Make `ValidatorCacheWarmer` use `kernel.build_dir` instead of `cache_dir`
+ * Make `SerializeCacheWarmer` use `kernel.build_dir` instead of `cache_dir`
 
 7.1
 ---

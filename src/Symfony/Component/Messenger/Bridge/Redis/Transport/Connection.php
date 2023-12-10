@@ -147,6 +147,10 @@ class Connection
      */
     private static function initializeRedis(\Redis|Relay $redis, string $host, int $port, string|array|null $auth, array $params): \Redis|Relay
     {
+        if ($redis->isConnected()) {
+            return $redis;
+        }
+
         $connect = isset($params['persistent_id']) ? 'pconnect' : 'connect';
         $redis->{$connect}($host, $port, $params['timeout'], $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...(\defined('Redis::SCAN_PREFIX') || \extension_loaded('relay')) ? [['stream' => $params['ssl'] ?? null]] : []);
 

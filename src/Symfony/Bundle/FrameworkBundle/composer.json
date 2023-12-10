@@ -79,7 +79,7 @@
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/asset": "<5.4",
         "symfony/clock": "<6.3",
-        "symfony/console": "<5.4",
+        "symfony/console": "<5.4|>=7.0",
         "symfony/dotenv": "<5.4",
         "symfony/dom-crawler": "<6.3",
         "symfony/http-client": "<6.3",

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `#[IsCsrfTokenValid]` attribute
+ * Add argument `$identifierNormalizer` to `UserBadge::__construct()` to allow normalizing the identifier
 
 7.0
 ---

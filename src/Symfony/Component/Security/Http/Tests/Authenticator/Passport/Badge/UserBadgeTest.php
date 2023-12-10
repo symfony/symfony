@@ -14,6 +14,10 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator\Passport\Badge;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\String\UnicodeString;
+
+use function Symfony\Component\String\u;
 
 class UserBadgeTest extends TestCase
 {
@@ -22,5 +26,30 @@ class UserBadgeTest extends TestCase
         $badge = new UserBadge('dummy', fn () => null);
         $this->expectException(UserNotFoundException::class);
         $badge->getUser();
+    }
+
+    /**
+     * @dataProvider provideUserIdentifierNormalizationData
+     */
+    public function testUserIdentifierNormalization(string $identifier, string $expectedNormalizedIdentifier, callable $normalizer)
+    {
+        $badge = new UserBadge($identifier, fn () => null, identifierNormalizer: $normalizer);
+
+        static::assertSame($expectedNormalizedIdentifier, $badge->getUserIdentifier());
+    }
+
+    public static function provideUserIdentifierNormalizationData(): iterable
+    {
+        $lowerAndNFKC = fn (string $identifier) => u($identifier)->normalize(UnicodeString::NFKC)->lower()->toString();
+        $upperAndAscii = fn (string $identifier) => u($identifier)->ascii()->upper()->toString();
+        $slugger = new AsciiSlugger('en');
+        $asciiWithPrefix = fn (string $identifier) => u($slugger->slug($identifier))->ascii()->lower()->prepend('USERID--')->toString();
+
+        yield 'Simple lower conversion' => ['SmiTh', 'smith', $lowerAndNFKC];
+        yield 'Normalize ﬁ to fi. Other unicode characters are preserved (р, с, ѕ and а)' => ['рrinсeѕѕ.ﬁonа', 'рrinсeѕѕ.fionа', $lowerAndNFKC];
+        yield 'Greek characters' => ['ΝιΚόΛΑος', 'νικόλαος', $lowerAndNFKC];
+        yield 'Greek to ASCII' => ['ΝιΚόΛΑος', 'NIKOLAOS', $upperAndAscii];
+        yield 'Katakana to ASCII' => ['たなかそういち', 'TANAKASOUICHI', $upperAndAscii];
+        yield 'Username with prefix' => ['John Doe 1', 'USERID--john-doe-1', $asciiWithPrefix];
     }
 }

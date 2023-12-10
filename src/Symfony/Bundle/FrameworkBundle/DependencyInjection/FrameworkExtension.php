@@ -1990,21 +1990,23 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.name_converter.metadata_aware')->setArgument(1, new Reference($config['name_converter']));
         }
 
+        $defaultContext = $config['default_context'] ?? [];
+
+        if ($defaultContext) {
+            $container->setParameter('serializer.default_context', $defaultContext);
+        }
+
         if (isset($config['circular_reference_handler']) && $config['circular_reference_handler']) {
             $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
-            $context = ($arguments[6] ?? []) + ['circular_reference_handler' => new Reference($config['circular_reference_handler'])];
+            $context = ($arguments[6] ?? $defaultContext) + ['circular_reference_handler' => new Reference($config['circular_reference_handler'])];
             $container->getDefinition('serializer.normalizer.object')->setArgument(5, null);
             $container->getDefinition('serializer.normalizer.object')->setArgument(6, $context);
         }
 
         if ($config['max_depth_handler'] ?? false) {
-            $defaultContext = $container->getDefinition('serializer.normalizer.object')->getArgument(6);
-            $defaultContext += ['max_depth_handler' => new Reference($config['max_depth_handler'])];
-            $container->getDefinition('serializer.normalizer.object')->replaceArgument(6, $defaultContext);
-        }
-
-        if (isset($config['default_context']) && $config['default_context']) {
-            $container->setParameter('serializer.default_context', $config['default_context']);
+            $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
+            $context = ($arguments[6] ?? $defaultContext) + ['max_depth_handler' => new Reference($config['max_depth_handler'])];
+            $container->getDefinition('serializer.normalizer.object')->setArgument(6, $context);
         }
     }
 

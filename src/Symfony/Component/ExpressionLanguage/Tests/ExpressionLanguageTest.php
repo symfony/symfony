@@ -424,6 +424,9 @@ class ExpressionLanguageTest extends TestCase
         yield ['foo["bar"]["baz"] ?? "default"', ['bar' => null]];
         yield ['foo["bar"].baz ?? "default"', ['bar' => null]];
         yield ['foo.bar().baz ?? "default"', $foo];
+        yield ['foo.bar.baz.bam ?? "default"', (object) ['bar' => null]];
+        yield ['foo?.bar?.baz?.qux ?? "default"', (object) ['bar' => null]];
+        yield ['foo[123][456][789] ?? "default"', [123 => []]];
     }
 
     /**

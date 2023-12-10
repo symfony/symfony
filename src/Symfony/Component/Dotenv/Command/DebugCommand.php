@@ -151,7 +151,13 @@ EOT
 
     private function getAvailableVars(): array
     {
-        $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');
+        $dotenvVars = $_SERVER['SYMFONY_DOTENV_VARS'] ?? '';
+
+        if ('' === $dotenvVars) {
+            return [];
+        }
+
+        $vars = explode(',', $dotenvVars);
         sort($vars);
 
         return $vars;

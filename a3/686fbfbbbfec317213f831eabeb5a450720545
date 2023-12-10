@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by RobertMe at 2023-12-09T21:39:52Z
+
+> Issues: 	Fix #52898
+
+I don't think that's really the case. This "fix" changes something which didn't work into something which still doesn't work, but just for a different reason. So while it does relate to my feature request, it doesn't fix it. And I'm not even sure that the acceptation of this change would also answer my feature request. It does close of one possibility to support / implement the feature request. But it doesn't void the feature request to be able to "shortcut" `#[AsMessageHandler]` so not to have to repeat (for example) the `bus` for every usage of the attribute. So personally I would prefer a separate discussion on whether such a feature would be possible, with or without `AsMessageHandler` being `final`. While such discussion would be ended "automatically" when the fixes / closes "tag" is applied.
+
+Furthermore, for the reasons given by @chalasr in #52898 it is my believe that _all_ attribute classes should be made `final`. While when only checking the `DependencyInjection\Attribute` namespace there are more attribute classes _not_ `final` than ones which actually _are_ final. And as a matter of fact, there are also some attributes which are "open" on purpose as other attributes extend from them (for example `Autowire` which is extended by `AutowireCallable`, `AutowireIterator`, `AutowireLocator` and `AutowireServiceClosure`). So while I understand the reasoning to make attribute classes final (as extending them and adding extra properties / functionality doesn't magically work), it would be my believe that _all_ attribute classes should be final.
+
+So to conclude it is my believe that Symfony should have some guideline / "code style" on whether (all) attribute classes must always be final, or whether they may or should be open. And in that discussion the point made by @chalasr obviously should be taken into consideration (but also that fact that said argument is already "violated" by for example all the mentioned `Autowire*` tags where it previously was considered fine to extend the attribute class).

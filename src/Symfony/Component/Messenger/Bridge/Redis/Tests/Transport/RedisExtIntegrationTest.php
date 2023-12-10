@@ -221,7 +221,7 @@ class RedisExtIntegrationTest extends TestCase
     }
 
     /**
-     * @dataProvider
+     * @dataProvider sentinelOptionNames
      */
     public function testSentinel(string $sentinelOptionName)
     {
@@ -252,10 +252,10 @@ class RedisExtIntegrationTest extends TestCase
         $connection->cleanup();
     }
 
-    public function sentinelOptionNames(): iterable
+    public static function sentinelOptionNames(): \Generator
     {
-        yield 'redis_sentinel';
-        yield 'sentinel_master';
+        yield ['redis_sentinel'];
+        yield ['sentinel_master'];
     }
 
     public function testLazySentinel()

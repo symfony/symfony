@@ -14,6 +14,8 @@ namespace Symfony\Component\Messenger\Attribute;
 /**
  * Service tag to autoconfigure message handlers.
  *
+ * @final since Symfony 7.1
+ *
  * @author Alireza Mirsepassi <alirezamirsepassi@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]

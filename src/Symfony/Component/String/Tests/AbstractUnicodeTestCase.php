@@ -134,14 +134,21 @@ END'],
 
     public static function provideCodePointsAt(): array
     {
-        return [
+        $data = [
             [[], '', 0],
             [[], 'a', 1],
             [[0x53], 'Späßchen', 0],
             [[0xE4], 'Späßchen', 2],
             [[0xDF], 'Späßchen', -5],
-            [[0x260E], '☢☎❄', 1],
         ];
+
+        // Skip this set if we encounter an issue in PCRE2
+        // @see https://github.com/PCRE2Project/pcre2/issues/361
+        if (3 === grapheme_strlen('☢☎❄')) {
+            $data[] = [[0x260E], '☢☎❄', 1];
+        }
+
+        return $data;
     }
 
     public static function provideLength(): array

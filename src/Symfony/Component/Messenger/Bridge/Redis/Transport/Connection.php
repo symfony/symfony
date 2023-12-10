@@ -47,6 +47,7 @@ class Connection
         'auth' => null,
         'serializer' => 1, // see \Redis::SERIALIZER_PHP,
         'sentinel_master' => null, // String, master to look for (optional, default is NULL meaning Sentinel support is disabled)
+        'redis_sentinel' => null, // String, alias for 'sentinel_master'
         'timeout' => 0.0, // Float, value in seconds (optional, default is 0 meaning unlimited)
         'read_timeout' => 0.0, //  Float, value in seconds (optional, default is 0 meaning unlimited)
         'retry_interval' => 0, //  Int, value in milliseconds (optional, default is 0)

@@ -152,7 +152,7 @@ return static function (ContainerConfigurator $container) {
         ->set('twig.runtime_loader', ContainerRuntimeLoader::class)
             ->args([abstract_arg('runtime locator')])
 
-        ->set('twig.extension.runtime', AttributeExtension::class)
+        ->set('twig.extension.attributes', AttributeExtension::class)
             ->args([abstract_arg('runtime classes')])
             ->tag('twig.extension')
 

@@ -181,7 +181,7 @@ class TwigExtension extends Extension
 
         // Attributes declaration requires Twig 3.9+
         if (!class_exists(AttributeExtension::class)) {
-            $container->removeDefinition('twig.extension.runtime');
+            $container->removeDefinition('twig.extension.attributes');
         }
     }
 

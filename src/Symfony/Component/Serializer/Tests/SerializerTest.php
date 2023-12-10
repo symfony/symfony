@@ -18,6 +18,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -58,6 +59,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberThree;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyNullableInt;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumProperty;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrNull;
@@ -749,6 +751,19 @@ class SerializerTest extends TestCase
         $serializer = new Serializer([new UnwrappingDenormalizer()], ['json' => new JsonEncoder()]);
 
         $this->assertSame(42, $serializer->deserialize('{"wrapper": 42}', 'int', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[wrapper]']));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testDeserializeNullableIntInXml()
+    {
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, $extractor)], ['xml' => new XmlEncoder()]);
+
+        $obj = $serializer->deserialize('<?xml version="1.0" encoding="UTF-8"?><DummyNullableInt><value/></DummyNullableInt>', DummyNullableInt::class, 'xml');
+        $this->assertInstanceOf(DummyNullableInt::class, $obj);
+        $this->assertNull($obj->value);
     }
 
     public function testUnionTypeDeserializable()

@@ -27,6 +27,8 @@ class DebugCommandTest extends TestCase
      */
     public function testErrorOnUninitializedDotenv()
     {
+        unset($_SERVER['SYMFONY_DOTENV_VARS']);
+
         $command = new DebugCommand('dev', __DIR__.'/Fixtures/Scenario1');
         $command->setHelperSet(new HelperSet([new FormatterHelper()]));
         $tester = new CommandTester($command);
@@ -34,6 +36,30 @@ class DebugCommandTest extends TestCase
         $output = $tester->getDisplay();
 
         $this->assertStringContainsString('[ERROR] Dotenv component is not initialized', $output);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testEmptyDotEnvVarsList()
+    {
+        $_SERVER['SYMFONY_DOTENV_VARS'] = '';
+
+        $command = new DebugCommand('dev', __DIR__.'/Fixtures/Scenario1');
+        $command->setHelperSet(new HelperSet([new FormatterHelper()]));
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+        $expectedFormat = <<<'OUTPUT'
+%a
+ ---------- ------- ------------ ------%S
+  Variable   Value   .env.local   .env%S
+ ---------- ------- ------------ ------%S
+
+ // Note that values might be different between web and CLI.%S
+%a
+OUTPUT;
+
+        $this->assertStringMatchesFormat($expectedFormat, $tester->getDisplay());
     }
 
     public function testScenario1InDevEnv()

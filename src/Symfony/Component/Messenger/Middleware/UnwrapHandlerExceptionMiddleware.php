@@ -25,7 +25,7 @@ class UnwrapHandlerExceptionMiddleware implements MiddlewareInterface
             $wrappedExceptions = $exception->getWrappedExceptions();
 
             if (1 !== \count($wrappedExceptions)) {
-                throw new LogicException(sprintf('"%s" can only unwrap a single exception, but got %d.', __CLASS__, \count($wrappedExceptions)));
+                throw new LogicException(sprintf('%s can only unwrap a single exception, but got %d.', __CLASS__, \count($wrappedExceptions)));
             }
 
             throw reset($wrappedExceptions);

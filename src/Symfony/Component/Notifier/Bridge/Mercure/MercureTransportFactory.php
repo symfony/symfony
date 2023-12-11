@@ -18,6 +18,8 @@ use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -26,9 +28,9 @@ final class MercureTransportFactory extends AbstractTransportFactory
 {
     private $registry;
 
-    public function __construct(HubRegistry $registry)
+    public function __construct(HubRegistry $registry, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
     {
-        parent::__construct();
+        parent::__construct($dispatcher, $client);
 
         $this->registry = $registry;
     }
@@ -51,7 +53,7 @@ final class MercureTransportFactory extends AbstractTransportFactory
             throw new IncompleteDsnException(sprintf('Hub "%s" not found. Did you mean one of: "%s"?', $hubId, implode('", "', array_keys($this->registry->all()))));
         }
 
-        return new MercureTransport($hub, $hubId, $topic);
+        return new MercureTransport($hub, $hubId, $topic, $this->client, $this->dispatcher);
     }
 
     protected function getSupportedSchemes(): array

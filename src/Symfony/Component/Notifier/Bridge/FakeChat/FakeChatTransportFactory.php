@@ -17,6 +17,8 @@ use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
@@ -27,9 +29,9 @@ final class FakeChatTransportFactory extends AbstractTransportFactory
     protected $mailer;
     protected $logger;
 
-    public function __construct(MailerInterface $mailer, LoggerInterface $logger)
+    public function __construct(MailerInterface $mailer, LoggerInterface $logger, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
     {
-        parent::__construct();
+        parent::__construct($dispatcher, $client);
 
         $this->mailer = $mailer;
         $this->logger = $logger;
@@ -47,11 +49,11 @@ final class FakeChatTransportFactory extends AbstractTransportFactory
             $to = $dsn->getRequiredOption('to');
             $from = $dsn->getRequiredOption('from');
 
-            return (new FakeChatEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
+            return (new FakeChatEmailTransport($this->mailer, $to, $from, $this->client, $this->dispatcher))->setHost($mailerTransport);
         }
 
         if ('fakechat+logger' === $scheme) {
-            return new FakeChatLoggerTransport($this->logger);
+            return new FakeChatLoggerTransport($this->logger, $this->client, $this->dispatcher);
         }
 
         throw new UnsupportedSchemeException($dsn, 'fakechat', $this->getSupportedSchemes());

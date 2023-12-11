@@ -164,7 +164,8 @@ EOF
                 $record['channel'],
                 Level::fromValue($record['level']),
                 $record['message'],
-                $record['context']->getContext(),
+                $record['context']->getValue(true),
+                $record['extra']->getValue(true),
             );
         }
 

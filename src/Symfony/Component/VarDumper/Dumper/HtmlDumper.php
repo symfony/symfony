@@ -905,12 +905,12 @@ EOHTML
         $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
             $s = $b = '<span class="sf-dump-default';
             $c = $c[$i = 0];
-            if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
+            if ($ns = \in_array($c[$i], ["\t", "\n", "\v", "\f", "\r"], true)) {
                 $s .= ' sf-dump-ns';
             }
             $s .= '">';
             do {
-                if (("\r" === $c[$i] || "\n" === $c[$i]) !== $ns) {
+                if (\in_array($c[$i], ["\t", "\n", "\v", "\f", "\r"], true) !== $ns) {
                     $s .= '</span>'.$b;
                     if ($ns = !$ns) {
                         $s .= ' sf-dump-ns';

@@ -30,6 +30,8 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
     public const IMPORT_REGEX = '#(?:import\s*(?:\w+,)?(?:(?:\{[^}]*\}|\w+|\*\s*as\s+\w+)\s*\bfrom\s*)?|export\s*(?:\{[^}]*\}|\*)\s*from\s*)("/npm/((?:@[^/]+/)?[^@]+?)(?:@([^/]+))?((?:/[^/]+)*?)/\+esm")#';
 
+    private const ES_MODULE_SHIMS = 'es-module-shims';
+
     private HttpClientInterface $httpClient;
 
     public function __construct(
@@ -78,7 +80,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new RuntimeException(sprintf('Unable to find the latest version for package "%s" - try specifying the version manually.', $packageName));
             }
 
-            $pattern = str_ends_with($filePath, '.css') ? self::URL_PATTERN_DIST_CSS : self::URL_PATTERN_DIST;
+            $pattern = $this->resolveUrlPattern($packageName, $filePath);
             $requiredPackages[$i][1] = $this->httpClient->request('GET', sprintf($pattern, $packageName, $version, $filePath));
             $requiredPackages[$i][4] = $version;
 
@@ -169,7 +171,11 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
             }
 
-            $pattern = ImportMapType::CSS === $entry->type ? self::URL_PATTERN_DIST_CSS : self::URL_PATTERN_DIST;
+            $pattern = $this->resolveUrlPattern(
+                $entry->getPackageName(),
+                $entry->getPackagePathString(),
+                $entry->type,
+            );
             $url = sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
 
             $responses[$package] = [$this->httpClient->request('GET', $url), $entry];
@@ -325,5 +331,20 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         }
 
         return preg_replace('{/\*# sourceMappingURL=[^ ]*+ \*/}', '', $content);
+    }
+
+    /**
+     * Determine the URL pattern to be used by the HTTP Client.
+     */
+    private function resolveUrlPattern(string $packageName, string $path, ImportMapType $type = null): string
+    {
+        // The URL for the es-module-shims polyfill package uses the CSS pattern to
+        // prevent a syntax error in the browser console, so check the package name
+        // as part of the condition.
+        if (self::ES_MODULE_SHIMS === $packageName || str_ends_with($path, '.css') || ImportMapType::CSS === $type) {
+            return self::URL_PATTERN_DIST_CSS;
+        }
+
+        return self::URL_PATTERN_DIST;
     }
 }

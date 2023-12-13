@@ -1181,6 +1181,10 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('router.resource', $config['resource']);
         $container->setParameter('router.cache_dir', $config['cache_dir']);
+        if ($config['ignore_cache']) {
+            $container->setParameter('router.cache_dir', null);
+        }
+
         $router = $container->findDefinition('router.default');
         $argument = $router->getArgument(2);
         $argument['strict_requirements'] = $config['strict_requirements'];

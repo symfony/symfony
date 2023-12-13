@@ -715,6 +715,7 @@ class ConfigurationTest extends TestCase
                 'strict_requirements' => true,
                 'utf8' => true,
                 'cache_dir' => '%kernel.build_dir%',
+                'ignore_cache' => false,
             ],
             'session' => [
                 'enabled' => false,

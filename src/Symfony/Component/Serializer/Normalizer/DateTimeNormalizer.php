@@ -25,10 +25,12 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
 {
     public const FORMAT_KEY = 'datetime_format';
     public const TIMEZONE_KEY = 'datetime_timezone';
+    public const CAST_KEY = 'datetime_cast';
 
     private array $defaultContext = [
         self::FORMAT_KEY => \DateTimeInterface::RFC3339,
         self::TIMEZONE_KEY => null,
+        self::CAST_KEY => null,
     ];
 
     private const SUPPORTED_TYPES = [
@@ -59,7 +61,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
     /**
      * @throws InvalidArgumentException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): int|float|string
     {
         if (!$object instanceof \DateTimeInterface) {
             throw new InvalidArgumentException('The object must implement the "\DateTimeInterface".');
@@ -73,7 +75,11 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
             $object = $object->setTimezone($timezone);
         }
 
-        return $object->format($dateTimeFormat);
+        return match ($context[self::CAST_KEY] ?? $this->defaultContext[self::CAST_KEY] ?? false) {
+            'int' => (int) $object->format($dateTimeFormat),
+            'float' => (float) $object->format($dateTimeFormat),
+            default => $object->format($dateTimeFormat),
+        };
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Användning av dolda överlagringstecken är inte tillåtet.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Filtillägget är ogiltigt ({{ extension }}). Tillåtna filtillägg är {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

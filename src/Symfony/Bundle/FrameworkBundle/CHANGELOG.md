@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Move the Router `cache_dir` to `kernel.build_dir`
+ * Deprecate the `router.cache_dir` config option
+
 7.0
 ---
 

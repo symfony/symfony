@@ -114,6 +114,9 @@ class SlidingWindowLimiterTest extends TestCase
 
         // 2 over the limit, causing the WaitDuration to become 2/10th of the 12s interval
         $this->assertEqualsWithDelta(12 / 5, $limiter->reserve(4)->getWaitDuration(), 1);
+
+        $limiter->reset();
+        $this->assertEquals(0, $limiter->reserve(10)->getWaitDuration());
     }
 
     private function createLimiter(): SlidingWindowLimiter

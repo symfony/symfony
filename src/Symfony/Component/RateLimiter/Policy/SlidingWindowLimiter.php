@@ -87,11 +87,13 @@ final class SlidingWindowLimiter implements LimiterInterface
 
                 if ($availableTokens === $tokens || 0 === $tokens) {
                     $accepted = true;
+                    $timeToAct = $now;
                 } else {
                     $accepted = false;
+                    $timeToAct = $now + $waitDuration;
                 }
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), $accepted, $this->limit));
+                $reservation = new Reservation($timeToAct, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), $accepted, $this->limit));
             }
 
             if (0 < $tokens) {

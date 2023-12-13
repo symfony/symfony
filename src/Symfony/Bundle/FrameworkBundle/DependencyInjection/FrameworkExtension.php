@@ -2686,7 +2686,7 @@ class FrameworkExtension extends Extension
             ];
 
             foreach ($webhookRequestParsers as $class => $service) {
-                $package = substr($service, \strlen('mailer.transport_factory.'));
+                $package = substr($service, \strlen('mailer.webhook.request_parser.'));
 
                 if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
                     $container->removeDefinition($service);
@@ -2898,6 +2898,18 @@ class FrameworkExtension extends Extension
 
         if ($webhookEnabled) {
             $loader->load('notifier_webhook.php');
+
+            $webhookRequestParsers = [
+                NotifierBridge\Twilio\Webhook\TwilioRequestParser::class => 'notifier.webhook.request_parser.twilio',
+            ];
+
+            foreach ($webhookRequestParsers as $class => $service) {
+                $package = substr($service, \strlen('notifier.webhook.request_parser.'));
+
+                if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $class, ['symfony/framework-bundle', 'symfony/notifier'])) {
+                    $container->removeDefinition($service);
+                }
+            }
         }
     }
 

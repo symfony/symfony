@@ -57,6 +57,21 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertEquals($retryAfter, $rateLimit->getRetryAfter());
     }
 
+    public function testConsumeLastToken()
+    {
+        $now = time();
+        $limiter = $this->createLimiter();
+        $limiter->consume(9);
+
+        $rateLimit = $limiter->consume(1);
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', $now + 60),
+            $rateLimit->getRetryAfter()
+        );
+    }
+
     /**
      * @dataProvider provideConsumeOutsideInterval
      */
@@ -74,6 +89,15 @@ class FixedWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(10);
         $this->assertEquals(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
+    }
+
+    public function testReserve()
+    {
+        $limiter = $this->createLimiter('PT1S');
+
+        $this->assertEquals(0, $limiter->reserve(5)->getWaitDuration());
+        $this->assertEquals(0, $limiter->reserve(5)->getWaitDuration());
+        $this->assertEquals(1, $limiter->reserve(5)->getWaitDuration());
     }
 
     public function testWaitIntervalOnConsumeOverLimit()

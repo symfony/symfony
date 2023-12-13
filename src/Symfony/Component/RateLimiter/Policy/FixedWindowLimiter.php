@@ -63,21 +63,35 @@ final class FixedWindowLimiter implements LimiterInterface
 
             $now = microtime(true);
             $availableTokens = $window->getAvailableTokens($now);
-            if ($availableTokens >= $tokens) {
+            if (0 !== $tokens && $availableTokens > $tokens) {
                 $window->add($tokens, $now);
 
                 $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->limit));
             } else {
+                if ($availableTokens === $tokens) {
+                    $window->add($tokens, $now);
+                }
+
                 $waitDuration = $window->calculateTimeForTokens($tokens, $now);
 
-                if (null !== $maxTime && $waitDuration > $maxTime) {
+                if ($availableTokens !== $tokens && 0 !== $tokens && null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
                     throw new MaxWaitDurationExceededException(sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
                 }
 
-                $window->add($tokens, $now);
+                if ($availableTokens !== $tokens) {
+                    $window->add($tokens, $now);
+                }
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
+                if ($availableTokens === $tokens || 0 === $tokens) {
+                    $accepted = true;
+                    $timeToAct = $now;
+                } else {
+                    $accepted = false;
+                    $timeToAct = $now + $waitDuration;
+                }
+
+                $reservation = new Reservation($timeToAct, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), $accepted, $this->limit));
             }
             $this->storage->save($window);
         } finally {

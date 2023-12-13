@@ -67,16 +67,22 @@ final class TokenBucketLimiter implements LimiterInterface
 
             $now = microtime(true);
             $availableTokens = $bucket->getAvailableTokens($now);
-            if ($availableTokens >= $tokens) {
+            if (0 !== $tokens && $availableTokens > $tokens) {
                 // tokens are now available, update bucket
                 $bucket->setTokens($availableTokens - $tokens);
 
                 $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->maxBurst));
             } else {
-                $remainingTokens = $tokens - $availableTokens;
-                $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);
+                if ($availableTokens === $tokens) {
+                    $waitDuration = $this->rate->calculateTimeForTokens($tokens);
+                } elseif (0 === $tokens) {
+                    $waitDuration = 0;
+                } else {
+                    $remainingTokens = $tokens - $availableTokens;
+                    $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);
+                }
 
-                if (null !== $maxTime && $waitDuration > $maxTime) {
+                if ($availableTokens !== $tokens && 0 !== $tokens && null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
                     $rateLimit = new RateLimit($availableTokens, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst);
 
@@ -87,7 +93,15 @@ final class TokenBucketLimiter implements LimiterInterface
                 // so no tokens are left for other processes.
                 $bucket->setTokens($availableTokens - $tokens);
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst));
+                if ($availableTokens === $tokens || 0 === $tokens) {
+                    $accepted = true;
+                    $timeToAct = $now;
+                } else {
+                    $accepted = false;
+                    $timeToAct = $now + $waitDuration;
+                }
+
+                $reservation = new Reservation($timeToAct, new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), $accepted, $this->maxBurst));
             }
 
             $this->storage->save($bucket);

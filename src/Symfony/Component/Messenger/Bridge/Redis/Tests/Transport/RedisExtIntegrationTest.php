@@ -246,15 +246,19 @@ class RedisExtIntegrationTest extends TestCase
         $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', ['delete_after_ack' => true], $redis);
 
         $connection->add('1', []);
-        $this->assertNotEmpty($message = $connection->get());
-        $this->assertSame([
-            'message' => json_encode([
-                'body' => '1',
-                'headers' => [],
-            ]),
-        ], $message['data']);
-        $connection->reject($message['id']);
-        $redis->del('messenger-lazy');
+
+        try {
+            $this->assertNotEmpty($message = $connection->get());
+            $this->assertSame([
+                'message' => json_encode([
+                    'body' => '1',
+                    'headers' => [],
+                ]),
+            ], $message['data']);
+            $connection->reject($message['id']);
+        } finally {
+            $redis->del('messenger-lazy');
+        }
     }
 
     public function testDbIndex()
@@ -283,13 +287,16 @@ class RedisExtIntegrationTest extends TestCase
     public function testJsonError()
     {
         $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/json-error', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-json-error', ['delete_after_ack' => true], $redis);
         try {
             $connection->add("\xB1\x31", []);
-        } catch (TransportException $e) {
-        }
 
-        $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
+            $this->fail('Expected exception to be thrown.');
+        } catch (TransportException $e) {
+            $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
+        } finally {
+            $redis->del('messenger-json-error');
+        }
     }
 
     public function testGetNonBlocking()
@@ -298,11 +305,14 @@ class RedisExtIntegrationTest extends TestCase
 
         $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['delete_after_ack' => true], $redis);
 
-        $this->assertNull($connection->get()); // no message, should return null immediately
-        $connection->add('1', []);
-        $this->assertNotEmpty($message = $connection->get());
-        $connection->reject($message['id']);
-        $redis->del('messenger-getnonblocking');
+        try {
+            $this->assertNull($connection->get()); // no message, should return null immediately
+            $connection->add('1', []);
+            $this->assertNotEmpty($message = $connection->get());
+            $connection->reject($message['id']);
+        } finally {
+            $redis->del('messenger-getnonblocking');
+        }
     }
 
     public function testGetAfterReject()
@@ -310,16 +320,18 @@ class RedisExtIntegrationTest extends TestCase
         $redis = new \Redis();
         $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true], $redis);
 
-        $connection->add('1', []);
-        $connection->add('2', []);
+        try {
+            $connection->add('1', []);
+            $connection->add('2', []);
 
-        $failing = $connection->get();
-        $connection->reject($failing['id']);
+            $failing = $connection->get();
+            $connection->reject($failing['id']);
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true]);
-        $this->assertNotNull($connection->get());
-
-        $redis->del('messenger-rejectthenget');
+            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true]);
+            $this->assertNotNull($connection->get());
+        } finally {
+            $redis->del('messenger-rejectthenget');
+        }
     }
 
     public function testItProperlyHandlesEmptyMessages()

@@ -573,4 +573,14 @@ class MockHttpClientTest extends HttpClientTestCase
         $client->request('GET', 'https://example.com');
         $client->request('GET', 'https://example.com');
     }
+
+    public function testMockStartTimeInfo()
+    {
+        $client = new MockHttpClient(new MockResponse('foobarccc', [
+            'start_time' => 1701187598.313123,
+        ]));
+
+        $response = $client->request('GET', 'https://example.com');
+        $this->assertSame(1701187598.313123, $response->getInfo('start_time'));
+    }
 }

@@ -217,6 +217,9 @@ class MockResponse implements ResponseInterface, StreamableInterface
     {
         $onProgress = $options['on_progress'] ?? static function () {};
         $response->info += $mock->getInfo() ?: [];
+        if (null !== $mock->getInfo('start_time')) {
+            $response->info['start_time'] = $mock->getInfo('start_time');
+        }
 
         // simulate "size_upload" if it is set
         if (isset($response->info['size_upload'])) {

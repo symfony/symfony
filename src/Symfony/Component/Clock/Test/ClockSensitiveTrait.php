@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Clock\Test;
 
-use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\MockClock;
 

@@ -47,7 +47,7 @@ class HandlersLocator implements HandlersLocatorInterface
                 }
 
                 $name = $handlerDescriptor->getName();
-                if (\in_array($name, $seen)) {
+                if (\in_array($name, $seen, true)) {
                     continue;
                 }
 

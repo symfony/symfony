@@ -99,7 +99,7 @@ final class NtfyTransportTest extends TransportTestCase
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
             $expectedAuthorization = 'Authorization: Basic dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ';
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
-            $this->assertTrue(\in_array($expectedAuthorization, $options['headers']));
+            $this->assertTrue(\in_array($expectedAuthorization, $options['headers'], true));
 
             return $response;
         });

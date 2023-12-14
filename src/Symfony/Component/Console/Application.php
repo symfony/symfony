@@ -716,7 +716,7 @@ class Application implements ResetInterface
 
                 $aliases[$nameOrAlias] = $commandName;
 
-                return $commandName === $nameOrAlias || !\in_array($commandName, $commands);
+                return $commandName === $nameOrAlias || !\in_array($commandName, $commands, true);
             }));
         }
 

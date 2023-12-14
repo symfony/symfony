@@ -163,7 +163,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             }
 
             if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
-                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
+                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods, true))) {
                     return $this->allow = $this->allowSchemes = [];
                 }
                 continue;
@@ -174,7 +174,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            if ($requiredMethods && !\in_array($method, $requiredMethods)) {
+            if ($requiredMethods && !\in_array($method, $requiredMethods, true)) {
                 $this->allow = array_merge($this->allow, $requiredMethods);
                 continue;
             }

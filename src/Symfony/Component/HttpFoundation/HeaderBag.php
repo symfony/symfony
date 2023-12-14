@@ -165,7 +165,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     public function contains(string $key, string $value): bool
     {
-        return \in_array($value, $this->all($key));
+        return \in_array($value, $this->all($key), true);
     }
 
     /**

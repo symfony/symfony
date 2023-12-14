@@ -178,7 +178,7 @@ final class PhpDocTypeHelper
 
     private function getPhpTypeAndClass(string $docType): array
     {
-        if (\in_array($docType, Type::$builtinTypes)) {
+        if (\in_array($docType, Type::$builtinTypes, true)) {
             return [$docType, null];
         }
 

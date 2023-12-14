@@ -32,7 +32,7 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
 
     public function supports(Dsn $dsn): bool
     {
-        return \in_array($dsn->getScheme(), $this->getSupportedSchemes());
+        return \in_array($dsn->getScheme(), $this->getSupportedSchemes(), true);
     }
 
     /**

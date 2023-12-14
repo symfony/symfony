@@ -78,7 +78,7 @@ class Type
      */
     public function __construct(string $builtinType, bool $nullable = false, string $class = null, bool $collection = false, array|self $collectionKeyType = null, array|self $collectionValueType = null)
     {
-        if (!\in_array($builtinType, self::$builtinTypes)) {
+        if (!\in_array($builtinType, self::$builtinTypes, true)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));
         }
 

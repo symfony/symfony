@@ -334,7 +334,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $attributeContext = $this->getAttributeDenormalizationContext($resolvedClass, $attribute, $context);
 
-            if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($resolvedClass, $attribute, $format, $context)) {
+            if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes, true)) || !$this->isAllowedAttribute($resolvedClass, $attribute, $format, $context)) {
                 if (!($context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES])) {
                     $extraAttributes[] = $attribute;
                 }

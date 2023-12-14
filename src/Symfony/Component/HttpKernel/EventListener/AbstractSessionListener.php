@@ -36,13 +36,15 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @internal
  */
 abstract class AbstractSessionListener implements EventSubscriberInterface, ResetInterface
 {
     public const NO_AUTO_CACHE_CONTROL_HEADER = 'Symfony-Session-NoAutoCacheControl';
 
+
+    /**
+     * @internal
+     */
     protected $container;
     private $sessionUsageStack = [];
     private $debug;
@@ -52,6 +54,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
      */
     private $sessionOptions;
 
+    /**
+     * @internal
+     */
     public function __construct(ContainerInterface $container = null, bool $debug = false, array $sessionOptions = [])
     {
         $this->container = $container;
@@ -59,6 +64,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         $this->sessionOptions = $sessionOptions;
     }
 
+    /**
+     * @internal
+     */
     public function onKernelRequest(RequestEvent $event)
     {
         if (!$event->isMainRequest()) {
@@ -94,6 +102,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         $this->sessionUsageStack[] = $session instanceof Session ? $session->getUsageIndex() : 0;
     }
 
+    /**
+     * @internal
+     */
     public function onKernelResponse(ResponseEvent $event)
     {
         if (!$event->isMainRequest() || (!$this->container->has('initialized_session') && !$event->getRequest()->hasSession())) {
@@ -222,6 +233,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         }
     }
 
+    /**
+     * @internal
+     */
     public function onFinishRequest(FinishRequestEvent $event)
     {
         if ($event->isMainRequest()) {
@@ -229,6 +243,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         }
     }
 
+    /**
+     * @internal
+     */
     public function onSessionUsage(): void
     {
         if (!$this->debug) {
@@ -264,6 +281,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         throw new UnexpectedSessionUsageException('Session was used while the request was declared stateless.');
     }
 
+    /**
+     * @internal
+     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -274,6 +294,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         ];
     }
 
+    /**
+     * @internal
+     */
     public function reset(): void
     {
         if (\PHP_SESSION_ACTIVE === session_status()) {
@@ -290,6 +313,8 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
 
     /**
      * Gets the session object.
+     *
+     * @internal
      *
      * @return SessionInterface|null
      */

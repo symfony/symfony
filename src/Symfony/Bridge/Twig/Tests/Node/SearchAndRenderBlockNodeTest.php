@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode;
 use Twig\Compiler;
 use Twig\Environment;
+use Twig\Extension\CoreExtension;
 use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConditionalExpression;
@@ -226,8 +227,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
-                $this->getVariableGetter('form')
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', (%s($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
+                $this->getVariableGetter('form'),
+                method_exists(CoreExtension::class, 'testEmpty') ? 'CoreExtension::testEmpty' : 'twig_test_empty'
             ),
             trim($compiler->compile($node)->getSource())
         );
@@ -263,8 +265,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in attributes"] + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
-                $this->getVariableGetter('form')
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in attributes"] + (%s($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
+                $this->getVariableGetter('form'),
+                method_exists(CoreExtension::class, 'testEmpty') ? 'CoreExtension::testEmpty' : 'twig_test_empty'
             ),
             trim($compiler->compile($node)->getSource())
         );

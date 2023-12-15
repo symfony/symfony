@@ -89,7 +89,7 @@ class DoctrineIntegrationTest extends TestCase
         $availableAt = new \DateTimeImmutable($result->fetchOne());
 
         $now = new \DateTimeImmutable('now - 60 seconds');
-        $this->assertLessThan($now, $available_at);
+        $this->assertLessThan($now, $availableAt);
     }
 
     public function testItRetrieveTheFirstAvailableMessage()

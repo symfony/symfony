@@ -22,6 +22,10 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([service('event_dispatcher'), service('http_client')->ignoreOnInvalid()])
 
+        ->set('notifier.transport_factory.bluesky', Bridge\Bluesky\BlueskyTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('chatter.transport_factory')
+
         ->set('notifier.transport_factory.brevo', Bridge\Brevo\BrevoTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')

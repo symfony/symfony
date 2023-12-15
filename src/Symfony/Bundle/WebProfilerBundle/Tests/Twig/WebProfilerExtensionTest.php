@@ -15,8 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Twig\Environment;
-use Twig\Extension\CoreExtension;
-use Twig\Extension\EscaperExtension;
 
 class WebProfilerExtensionTest extends TestCase
 {
@@ -25,9 +23,6 @@ class WebProfilerExtensionTest extends TestCase
      */
     public function testDumpHeaderIsDisplayed(string $message, array $context, bool $dump1HasHeader, bool $dump2HasHeader)
     {
-        class_exists(CoreExtension::class); // Load twig_convert_encoding()
-        class_exists(EscaperExtension::class); // Load twig_escape_filter()
-
         $twigEnvironment = $this->mockTwigEnvironment();
         $varCloner = new VarCloner();
 

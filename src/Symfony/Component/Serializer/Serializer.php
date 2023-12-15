@@ -193,6 +193,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 
     /**
      * @throws NotNormalizableValueException
+     * @throws PartialDenormalizationException Occurs when one or more properties of $type fails to denormalize
      */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {

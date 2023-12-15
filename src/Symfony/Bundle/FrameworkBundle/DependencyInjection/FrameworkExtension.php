@@ -2860,7 +2860,8 @@ class FrameworkExtension extends Extension
             // default configuration (when used by other DI extensions)
             $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
 
-            $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
+            $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'))
+                ->addTag('rate_limiter', ['name' => $name]);
 
             if (null !== $limiterConfig['lock_factory']) {
                 if (!interface_exists(LockInterface::class)) {

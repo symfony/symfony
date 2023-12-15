@@ -2585,13 +2585,15 @@ class FrameworkExtension extends Extension
 
         if ($webhookEnabled) {
             $webhookRequestParsers = [
+                MailerBridge\Brevo\Webhook\BrevoRequestParser::class => 'mailer.webhook.request_parser.brevo',
                 MailerBridge\Mailgun\Webhook\MailgunRequestParser::class => 'mailer.webhook.request_parser.mailgun',
+                MailerBridge\Mailjet\Webhook\MailjetRequestParser::class => 'mailer.webhook.request_parser.mailjet',
                 MailerBridge\Postmark\Webhook\PostmarkRequestParser::class => 'mailer.webhook.request_parser.postmark',
                 MailerBridge\Sendgrid\Webhook\SendgridRequestParser::class => 'mailer.webhook.request_parser.sendgrid',
             ];
 
             foreach ($webhookRequestParsers as $class => $service) {
-                $package = substr($service, \strlen('mailer.transport_factory.'));
+                $package = substr($service, \strlen('mailer.webhook.request_parser.'));
 
                 if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
                     $container->removeDefinition($service);
@@ -2802,6 +2804,19 @@ class FrameworkExtension extends Extension
 
         if ($webhookEnabled) {
             $loader->load('notifier_webhook.php');
+
+            $webhookRequestParsers = [
+                NotifierBridge\Twilio\Webhook\TwilioRequestParser::class => 'notifier.webhook.request_parser.twilio',
+                NotifierBridge\Vonage\Webhook\VonageRequestParser::class => 'notifier.webhook.request_parser.vonage',
+            ];
+
+            foreach ($webhookRequestParsers as $class => $service) {
+                $package = substr($service, \strlen('notifier.webhook.request_parser.'));
+
+                if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $class, ['symfony/framework-bundle', 'symfony/notifier'])) {
+                    $container->removeDefinition($service);
+                }
+            }
         }
     }
 

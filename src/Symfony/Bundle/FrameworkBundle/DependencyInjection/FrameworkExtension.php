@@ -2760,6 +2760,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\TurboSms\TurboSmsTransport::class => 'notifier.transport_factory.turbo-sms',
             NotifierBridge\Twilio\TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             NotifierBridge\Twitter\TwitterTransportFactory::class => 'notifier.transport_factory.twitter',
+            NotifierBridge\Unifonic\UnifonicTransportFactory::class => 'notifier.transport_factory.unifonic',
             NotifierBridge\Vonage\VonageTransportFactory::class => 'notifier.transport_factory.vonage',
             NotifierBridge\Yunpian\YunpianTransportFactory::class => 'notifier.transport_factory.yunpian',
             NotifierBridge\Zendesk\ZendeskTransportFactory::class => 'notifier.transport_factory.zendesk',

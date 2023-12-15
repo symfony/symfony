@@ -280,6 +280,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Twitter\TwitterTransportFactory::class,
             'package' => 'symfony/twitter-notifier',
         ],
+        'unifonic' => [
+            'class' => Bridge\Unifonic\UnifonicTransportFactory::class,
+            'package' => 'symfony/unifonic-notifier',
+        ],
         'vonage' => [
             'class' => Bridge\Vonage\VonageTransportFactory::class,
             'package' => 'symfony/vonage-notifier',

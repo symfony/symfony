@@ -91,6 +91,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\TurboSms\TurboSmsTransportFactory::class => false,
             Bridge\Twilio\TwilioTransportFactory::class => false,
             Bridge\Twitter\TwitterTransportFactory::class => false,
+            Bridge\Unifonic\UnifonicTransportFactory::class => false,
             Bridge\Vonage\VonageTransportFactory::class => false,
             Bridge\Yunpian\YunpianTransportFactory::class => false,
             Bridge\Zendesk\ZendeskTransportFactory::class => false,
@@ -169,6 +170,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['turbosms', 'symfony/turbo-sms-notifier'];
         yield ['twilio', 'symfony/twilio-notifier'];
         yield ['twitter', 'symfony/twitter-notifier'];
+        yield ['unifonic', 'symfony/unifonic-notifier'];
         yield ['zendesk', 'symfony/zendesk-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
         yield ['goip', 'symfony/go-ip-notifier'];

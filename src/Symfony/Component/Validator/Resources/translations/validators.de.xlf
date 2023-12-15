@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Verstecke Overlay-Zeichen sind nicht erlaubt.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Die Dateiendung ist ungültig ({{ extension }}). Gültige Dateiendungen sind {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

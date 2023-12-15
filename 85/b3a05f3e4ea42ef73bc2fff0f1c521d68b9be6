@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-11T10:45:38Z
+
+The same seems to be needed for `twig_escape_filter `
+
+>  11x: Since twig/twig 3.9.0: Using the internal "twig_escape_filter" function is deprecated.
+>    11x in WebProfilerExtensionTest::testDumpHeaderIsDisplayed from Symfony\Bundle\WebProfilerBundle\Tests\Twig

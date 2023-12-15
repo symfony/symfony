@@ -343,19 +343,11 @@ class RedisExtIntegrationTest extends TestCase
             $failing = $connection->get();
             $connection->reject($failing['id']);
 
-<<<<<<< HEAD
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null]);
-
-        $this->assertNotNull($connection->get());
-
-        $redis->del('messenger-rejectthenget');
-=======
-            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true]);
+            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null]);
             $this->assertNotNull($connection->get());
         } finally {
             $redis->del('messenger-rejectthenget');
         }
->>>>>>> 5.4
     }
 
     public function testItProperlyHandlesEmptyMessages()

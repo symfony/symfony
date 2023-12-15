@@ -85,6 +85,15 @@ class InMemoryTransportTest extends TestCase
         $this->assertSame([$envelope1], $this->transport->get());
     }
 
+    public function testQueueWithNegativeDelay()
+    {
+        $envelope1 = new Envelope(new \stdClass());
+        $envelope1 = $this->transport->send($envelope1);
+        $envelope2 = (new Envelope(new \stdClass()))->with(new DelayStamp(-10_000));
+        $envelope2 = $this->transport->send($envelope2);
+        $this->assertSame([$envelope1, $envelope2], $this->transport->get());
+    }
+
     public function testQueueWithSerialization()
     {
         $envelope = new Envelope(new \stdClass());

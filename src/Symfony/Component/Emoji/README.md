@@ -1,16 +1,17 @@
-Intl Component
-=============
+Emoji Component
+===============
 
-The Intl component provides access to the localization data of the ICU library.
+The Emoji component provides access to emoji characters and sequences from
+the [Unicode CLDR](https://cldr.unicode.org/index).
 
 If you have the zlib extension enabled, you can compress the data by running:
 
-    php vendor/symfony/intl/Resources/bin/compress
+    php vendor/symfony/emoji/Resources/bin/compress
 
 Resources
 ---------
 
- * [Documentation](https://symfony.com/doc/current/components/intl.html)
+ * [Documentation](https://symfony.com/doc/current/components/emoji.html)
  * [Contributing](https://symfony.com/doc/current/contributing/index.html)
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)

@@ -24,7 +24,7 @@ class BlueskyTransportFactoryTest extends TransportFactoryTestCase
     public static function createProvider(): iterable
     {
         yield [
-            'bluesky://bsky.social',
+            'bluesky://default',
             'bluesky://user:pass@default',
         ];
 

@@ -27,6 +27,11 @@ class BlueskyTransportFactoryTest extends TransportFactoryTestCase
             'bluesky://bsky.social',
             'bluesky://user:pass@default',
         ];
+
+        yield [
+            'bluesky://custom.bsky.social',
+            'bluesky://user:pass@custom.bsky.social',
+        ];
     }
 
     public static function supportsProvider(): iterable

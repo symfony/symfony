@@ -25,14 +25,14 @@ class BlueskyTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             'bluesky://bsky.social',
-            'bluesky://user:pass@bsky.social',
+            'bluesky://user:pass@default',
         ];
     }
 
     public static function supportsProvider(): iterable
     {
-        yield [true, 'bluesky://foo:bar@bsky.social'];
-        yield [false, 'somethingElse://foo:bar@bsky.social'];
+        yield [true, 'bluesky://foo:bar@default'];
+        yield [false, 'somethingElse://foo:bar@default'];
     }
 
     public static function incompleteDsnProvider(): iterable

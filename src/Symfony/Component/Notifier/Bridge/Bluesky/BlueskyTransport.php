@@ -30,6 +30,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class BlueskyTransport extends AbstractTransport
 {
+    protected const HOST = 'bsky.social';
+
     private array $authSession = [];
 
     public function __construct(

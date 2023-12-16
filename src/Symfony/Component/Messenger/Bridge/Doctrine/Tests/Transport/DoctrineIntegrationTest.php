@@ -67,10 +67,10 @@ class DoctrineIntegrationTest extends TestCase
         // DBAL 2 compatibility
         $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
 
-        $available_at = new \DateTimeImmutable($result->fetchOne());
+        $availableAt = new \DateTimeImmutable($result->fetchOne());
 
         $now = new \DateTimeImmutable('now + 60 seconds');
-        $this->assertGreaterThan($now, $available_at);
+        $this->assertGreaterThan($now, $availableAt);
     }
 
     public function testSendWithNegativeDelay()

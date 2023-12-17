@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-09T13:47:54Z
+
+I am not really sold on the new `$json` parameter 🤔 Could't we just check if the data `is_string()` and remove the additional parameter?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-12-09T13:51:57Z
+
+We can't do the `is_string` trick because we already allow passing a string.

@@ -1,13 +1,17 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add the `callbackArgs` option to the `Choice` constraint
+
 7.0
 ---
 
  * Add methods `getConstraint()`, `getCause()` and `__toString()` to `ConstraintViolationInterface`
  * Add method `__toString()` to `ConstraintViolationListInterface`
  * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface`
- * Add the `callbackArgs` option to the `Choice` constraint
  * Remove static property `$errorNames` from all constraints, use const `ERROR_NAMES` instead
  * Remove static property `$versions` from the `Ip` constraint, use the `VERSIONS` constant instead
  * Remove `VALIDATION_MODE_LOOSE` from `Email` constraint, use `VALIDATION_MODE_HTML5` instead

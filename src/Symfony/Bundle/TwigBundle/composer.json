@@ -23,7 +23,7 @@
         "symfony/twig-bridge": "^6.4|^7.0",
         "symfony/http-foundation": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
-        "twig/twig": "^3.0.4"
+        "twig/twig": "^3.0.4|^4.0"
     },
     "require-dev": {
         "symfony/asset": "^6.4|^7.0",

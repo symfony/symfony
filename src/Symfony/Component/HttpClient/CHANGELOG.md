@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow mocking `start_time` info in `MockResponse`
+ * Add `MockResponse::fromFile()` and `JsonMockResponse::fromFile()` methods to help using fixtures files
 
 7.0
 ---

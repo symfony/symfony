@@ -64,6 +64,15 @@ class MockResponse implements ResponseInterface, StreamableInterface
         self::addResponseHeaders($responseHeaders, $this->info, $this->headers);
     }
 
+    public static function fromFile(string $path, array $info = []): static
+    {
+        if (!is_file($path)) {
+            throw new \InvalidArgumentException(sprintf('File not found: "%s".', $path));
+        }
+
+        return new static(file_get_contents($path), $info);
+    }
+
     /**
      * Returns the options used when doing the request.
      */

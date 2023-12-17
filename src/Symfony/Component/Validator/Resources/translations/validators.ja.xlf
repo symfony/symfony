@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>隠れたオーバレイ文字は使用できません。</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>ファイルの拡張子が無効です({{ extension }})。有効な拡張子は{{ extensions }}です。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

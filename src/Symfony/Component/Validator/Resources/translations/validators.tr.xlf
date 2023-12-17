@@ -364,7 +364,7 @@
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>Bu değer arasında olmalıdır {{ min }} ve {{ max }}.</target>
+                <target>Bu değer {{ min }} ve {{ max }} arasında olmalıdır.</target>
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
@@ -425,6 +425,10 @@
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Gizli üstü kaplama karakterlerinin kullanılması izin verilmez.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Dosya uzantısı geçersiz ({{ extension }}). İzin verilen uzantılar {{ extensions }}.</target>
             </trans-unit>
         </body>
     </file>

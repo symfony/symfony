@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Sử dụng các ký tự lớp phủ ẩn không được phép.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Phần mở rộng của tệp không hợp lệ ({{ extension }}). Phần mở rộng cho phép là {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

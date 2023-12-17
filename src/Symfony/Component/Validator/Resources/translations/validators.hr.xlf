@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Korištenje skrivenih preklapajućih znakova nije dopušteno.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Ekstenzija datoteke nije valjana ({{ extension }}). Dozvoljene ekstenzije su {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

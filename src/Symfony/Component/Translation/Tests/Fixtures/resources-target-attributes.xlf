@@ -5,7 +5,7 @@
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="LCa0a2j" resname="foo">
+      <trans-unit id="ea75LoN" resname="foo">
         <source>foo</source>
         <target state="needs-translation">bar</target>
       </trans-unit>

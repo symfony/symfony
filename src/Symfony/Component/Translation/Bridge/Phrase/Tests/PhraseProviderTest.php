@@ -797,11 +797,11 @@ class PhraseProviderTest extends TestCase
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qdGDk9Z" resname="general.back">
+      <trans-unit id="YQ5EBNy" resname="general.back">
         <source>general.back</source>
         <target><![CDATA[back &!]]></target>
       </trans-unit>
-      <trans-unit id="0ESGki9" resname="general.cancel">
+      <trans-unit id="QoyA.iN" resname="general.cancel">
         <source>general.cancel</source>
         <target>Cancel</target>
       </trans-unit>
@@ -837,11 +837,11 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qdGDk9Z" resname="general.back">
+      <trans-unit id="YQ5EBNy" resname="general.back">
         <source>general.back</source>
         <target>zurück</target>
       </trans-unit>
-      <trans-unit id="0ESGki9" resname="general.cancel">
+      <trans-unit id="QoyA.iN" resname="general.cancel">
         <source>general.cancel</source>
         <target>Abbrechen</target>
       </trans-unit>

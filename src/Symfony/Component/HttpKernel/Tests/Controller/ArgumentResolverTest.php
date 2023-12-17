@@ -328,7 +328,7 @@ class ArgumentResolverTest extends TestCase
 
         $request = Request::create('/');
         $request->attributes->set('foo', $object = new Post('Random '.time()));
-        $controller = $this->controllerTargetingResolverWithTestEntity(...);
+        $controller = (new ArgumentResolverTestController())->controllerTargetingResolverWithTestEntity(...);
 
         $this->assertSame([$object], $resolver->getArguments($request, $controller));
     }

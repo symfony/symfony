@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Rejtett módosító karakterek használata nem megengedett.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>A fájl kiterjesztése érvénytelen ({{ extension }}). Engedélyezett kiterjesztések: {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

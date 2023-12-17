@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\Exception\ResolverNotFoundException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
@@ -278,22 +280,37 @@ class ArgumentResolverTest extends TestCase
 
     public function testTargetedResolverWithDefaultValue()
     {
-        $resolver = self::getResolver([], [RequestAttributeValueResolver::class => new RequestAttributeValueResolver()]);
+        $resolver = self::getResolver([], [TestEntityValueResolver::class => new TestEntityValueResolver()]);
 
         $request = Request::create('/');
         $controller = (new ArgumentResolverTestController())->controllerTargetingResolverWithDefaultValue(...);
 
-        $this->assertSame([2], $resolver->getArguments($request, $controller));
+        /** @var Post[] $arguments */
+        $arguments = $resolver->getArguments($request, $controller);
+
+        $this->assertCount(1, $arguments);
+        $this->assertSame('Default', $arguments[0]->title);
     }
 
     public function testTargetedResolverWithNullableValue()
     {
-        $resolver = self::getResolver([], [RequestAttributeValueResolver::class => new RequestAttributeValueResolver()]);
+        $resolver = self::getResolver([], [TestEntityValueResolver::class => new TestEntityValueResolver()]);
 
         $request = Request::create('/');
         $controller = (new ArgumentResolverTestController())->controllerTargetingResolverWithNullableValue(...);
 
         $this->assertSame([null], $resolver->getArguments($request, $controller));
+    }
+
+    public function testTargetedResolverWithRequestAttributeValue()
+    {
+        $resolver = self::getResolver([], [TestEntityValueResolver::class => new TestEntityValueResolver()]);
+
+        $request = Request::create('/');
+        $request->attributes->set('foo', $object = new Post('Random '.time()));
+        $controller = $this->controllerTargetingResolverWithTestEntity(...);
+
+        $this->assertSame([$object], $resolver->getArguments($request, $controller));
     }
 
     public function testDisabledResolver()
@@ -376,11 +393,15 @@ class ArgumentResolverTestController
     {
     }
 
-    public function controllerTargetingResolverWithDefaultValue(#[ValueResolver(RequestAttributeValueResolver::class)] int $foo = 2)
+    public function controllerTargetingResolverWithDefaultValue(#[ValueResolver(TestEntityValueResolver::class)] Post $foo = new Post('Default'))
     {
     }
 
-    public function controllerTargetingResolverWithNullableValue(#[ValueResolver(RequestAttributeValueResolver::class)] ?int $foo)
+    public function controllerTargetingResolverWithNullableValue(#[ValueResolver(TestEntityValueResolver::class)] ?Post $foo)
+    {
+    }
+
+    public function controllerTargetingResolverWithTestEntity(#[ValueResolver(TestEntityValueResolver::class)] Post $foo)
     {
     }
 
@@ -404,4 +425,22 @@ class ArgumentResolverTestController
 
 function controller_function($foo, $foobar)
 {
+}
+
+class TestEntityValueResolver implements ValueResolverInterface
+{
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    {
+        return Post::class === $argument->getType() && $request->request->has('title')
+            ? [new Post($request->request->get('title'))]
+            : [];
+    }
+}
+
+class Post
+{
+    public function __construct(
+        public readonly string $title,
+    ) {
+    }
 }

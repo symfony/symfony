@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-12-11T08:42:37Z
+
+Why don't we target 6.4?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-11T08:48:15Z
+
+> Why don't we target 6.4?
+
+I considered this change as a new feature. If we chose 6.4 as the target, then why not 5.4?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-11T08:54:11Z
+
+Twig 4.x will probably never be released as is; this is "just" a branch that allows me to work on the next version that should be part of Symfony (7.1 hopefully). So, allowing it only on 7.1 for now works for me until we have a solid migration plan.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-12-11T10:55:58Z
+
+> I considered this change as a new feature.
+
+We usually don't consider supporting new versions of 3rd party libraries as a new feature, but what @fabpot says makes sense to me. If Twig 4.x is a transitional branch that will eventually become symfony/twig 7.1, we should limit this change to the 7.1.x branch.

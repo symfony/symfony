@@ -66,6 +66,10 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
 
+        ->set('notifier.transport_factory.unifonic', Bridge\Unifonic\UnifonicTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
         ->set('notifier.transport_factory.all-my-sms', Bridge\AllMySms\AllMySmsTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')

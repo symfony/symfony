@@ -414,7 +414,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name),
                         $data,
                         ['unknown'],
-                        $objectDeserializationPath,
+                        $context['deserialization_path'],
                         true
                     );
                     $context['not_normalizable_value_exceptions'][] = $exception;

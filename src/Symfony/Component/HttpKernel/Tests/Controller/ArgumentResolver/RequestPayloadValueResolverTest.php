@@ -27,7 +27,6 @@ use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -226,14 +225,11 @@ class RequestPayloadValueResolverTest extends TestCase
     public function testValidationNotPassed()
     {
         $content = '{"price": 50, "title": ["not a string"]}';
-        $payload = new RequestPayload(50);
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
 
         $validator = $this->createMock(ValidatorInterface::class);
-        $validator->expects($this->once())
-            ->method('validate')
-            ->with($payload)
-            ->willReturn(new ConstraintViolationList([new ConstraintViolation('Test', null, [], '', null, '')]));
+        $validator->expects($this->never())
+            ->method('validate');
 
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
@@ -253,7 +249,36 @@ class RequestPayloadValueResolverTest extends TestCase
             $validationFailedException = $e->getPrevious();
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
             $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
-            $this->assertSame('Test', $validationFailedException->getViolations()[1]->getMessage());
+        }
+    }
+
+    public function testValidationNotPerformedWhenPartialDenormalizationReturnsViolation()
+    {
+        $content = '{"password": "abc"}';
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())
+            ->method('validate');
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('invalid', User::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: $content);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
         }
     }
 
@@ -610,5 +635,26 @@ class RequestPayload
 
     public function __construct(public readonly float $price)
     {
+    }
+}
+
+class User
+{
+    public function __construct(
+        #[Assert\NotBlank, Assert\Email]
+        private string $email,
+        #[Assert\NotBlank]
+        private string $password,
+    ) {
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
     }
 }

@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Slēptu pārklājuma rakstzīmju izmantošana nav atļauta.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Faila paplašinājums nav derīgs ({{ extension }}). Atļautie paplašinājumi ir {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

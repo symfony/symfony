@@ -72,6 +72,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
 
                     $argumentValueResolvers = [
                         $this->namedResolvers->get($resolverName),
+                        new RequestAttributeValueResolver(),
                         new DefaultValueResolver(),
                     ];
                 }

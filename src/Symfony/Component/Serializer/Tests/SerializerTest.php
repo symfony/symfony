@@ -69,6 +69,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrNull;
 use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
+use Symfony\Component\Serializer\Tests\Fixtures\Php80WithOptionalConstructorParameter;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\WithTypedConstructor;
@@ -1432,6 +1433,61 @@ class SerializerTest extends TestCase
             [null],
             [new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))],
         ];
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testPartialDenormalizationWithMissingConstructorTypes()
+    {
+        $json = '{"one": "one string", "three": "three string"}';
+
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+
+        $serializer = new Serializer(
+            [new ObjectNormalizer(null, null, null, $extractor)],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize($json, Php80WithOptionalConstructorParameter::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $this->assertInstanceOf(Php80WithOptionalConstructorParameter::class, $object = $th->getData());
+
+        $this->assertSame('one string', $object->one);
+        $this->assertFalse(isset($object->two));
+        $this->assertSame('three string', $object->three);
+
+        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
+            return [
+                'currentType' => $e->getCurrentType(),
+                'expectedTypes' => $e->getExpectedTypes(),
+                'path' => $e->getPath(),
+                'useMessageForUser' => $e->canUseMessageForUser(),
+                'message' => $e->getMessage(),
+            ];
+        }, $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    'unknown',
+                ],
+                'path' => null,
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the class misses the "two" property.',
+            ],
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
     }
 }
 

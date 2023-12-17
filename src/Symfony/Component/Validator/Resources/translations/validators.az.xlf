@@ -402,6 +402,34 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Şəbəkə maskasının dəyəri {{ min }} və {{ max }} arasında olmalıdır.</target>
             </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Fayl adı çox uzundur. {{ filename_max_length }} və ya daha az simvol olmalıdır.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Parolun gücü çox zəifdir. Zəhmət olmasa, daha güclü bir parol istifadə edin.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Bu dəyərdə cari məhdudiyyət səviyyəsi tərəfindən icazə verilməyən simvollar var.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Görünməz simvolların istifadəsinə icazə verilmir.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Fərqli skriptlərdən nömrələrin qarışdırılmasına icazə verilmir.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Gizli örtülü simvolların istifadəsinə icazə verilmir.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Faylın uzantısı yanlışdır ({{ extension }}). İcazə verilən uzantılar {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

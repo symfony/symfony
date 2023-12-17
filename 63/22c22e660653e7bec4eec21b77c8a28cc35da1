@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-09T16:29:36Z
+
+@javiereguiluz Can you have a look at the tests as they seem to be broken by the changes made here.
+
+---------------------------------------------------------------------------
+
+by mahono at 2023-12-10T16:52:19Z
+
+Why not xxh3? (just asking for curiosity)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-12-11T09:06:18Z
+
+> Why not xxh3? (just asking for curiosity)
+
+In fact, where the hash is substr, `xxh3` is sufficient and [slightly faster](https://xxhash.com/).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-12-11T09:16:49Z
+
+I think it's better to use `xxh128` instead of `xxh3` because:
+
+* We already use `xxh128` in other parts of Symfony
+* `xxh3` is faster, but only 3% faster
+* We're moving from 256 bits (sha256) to 128 bits (xxh128) ... using xxh3 would mean going to 64 bits ... maybe it's too low compared to the original

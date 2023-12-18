@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add static `create` method to `DatePoint` to allow chaining of methods
+
 6.4
 ---
 

@@ -49,6 +49,14 @@ final class DatePoint extends \DateTimeImmutable
     }
 
     /**
+     * @throws \DateMalformedStringException
+     */
+    public static function create(string $datetime = 'now', \DateTimeZone $timezone = null, parent $reference = null): self
+    {
+        return new self($datetime, $timezone, $reference);
+    }
+
+    /**
      * @throws \DateMalformedStringException When $format or $datetime are invalid
      */
     public static function createFromFormat(string $format, string $datetime, \DateTimeZone $timezone = null): static

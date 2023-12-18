@@ -57,4 +57,16 @@ class DatePointTest extends TestCase
         $this->expectExceptionMessage('Failed to parse time string (Bad Date)');
         $date->modify('Bad Date');
     }
+
+    public function testCreate()
+    {
+        $date = DatePoint::create('2010-01-28 15:00:00');
+
+        $this->assertInstanceOf(DatePoint::class, $date);
+        $this->assertSame('2010-01-28 15:00:00', $date->format('Y-m-d H:i:s'));
+
+        $this->expectException(\DateMalformedStringException::class);
+        $this->expectExceptionMessage('Failed to parse time string (Bad Date)');
+        DatePoint::create('Bad Date');
+    }
 }

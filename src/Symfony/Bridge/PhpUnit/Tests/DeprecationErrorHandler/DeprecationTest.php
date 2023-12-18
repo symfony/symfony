@@ -265,7 +265,7 @@ class DeprecationTest extends TestCase
         rmdir($dir);
     }
 
-    public static function setupBeforeClass(): void
+    public static function setUpBeforeClass(): void
     {
         foreach (get_declared_classes() as $class) {
             if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {

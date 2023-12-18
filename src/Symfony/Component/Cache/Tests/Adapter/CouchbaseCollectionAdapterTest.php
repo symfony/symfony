@@ -33,7 +33,7 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
     /** @var Collection */
     protected static $client;
 
-    public static function setupBeforeClass(): void
+    public static function setUpBeforeClass(): void
     {
         if (!CouchbaseCollectionAdapter::isSupported()) {
             self::markTestSkipped('Couchbase >= 3.0.0 < 4.0.0 is required.');

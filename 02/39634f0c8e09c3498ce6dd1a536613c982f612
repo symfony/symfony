@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-18T13:02:12Z
+
+@diimpp Symfony uses `@compiler_optimized` as the value of the [native_function_invocation](https://cs.symfony.com/doc/rules/function_notation/native_function_invocation.html) which means that only a small set of functions which can be optimized by PHP have to be prefixed with a backslash (see https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/blob/master/src/Fixer/FunctionNotation/NativeFunctionInvocationFixer.php#L327-L377 for a list of functions).

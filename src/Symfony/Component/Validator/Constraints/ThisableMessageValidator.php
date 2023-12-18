@@ -46,9 +46,10 @@ class ThisableMessageValidator extends ConstraintValidator
         foreach ($constraint->constraints as $subConstraint) {
             $violationList = $validator->validate($value, $subConstraint);
             foreach ($violationList as $oldViolation) {
+                $newViolation = $this->context->buildViolation($oldViolation->getMessage(), $oldViolation->getParameters());
+
                 $matches = [];
                 preg_match_all('/{{ this\.(.*?) }}/s', $oldViolation->getMessage(), $matches);
-                $newViolation = $this->context->buildViolation($oldViolation->getMessage(), $oldViolation->getParameters());
                 $keys = $matches[1] ?? [];
                 $keys = array_merge($keys, $constraint->addThisParameters);
                 foreach ($keys as $key) {
@@ -62,6 +63,8 @@ class ThisableMessageValidator extends ConstraintValidator
                 foreach ($keys as $key) {
                     $newViolation->setParameter('{{ root.'.$key.' }}', $propertyAccessor->getValue($root, $key));
                 }
+
+                $newViolation->setCode($oldViolation->getCode());
                 $newViolation->addViolation();
             }
         }

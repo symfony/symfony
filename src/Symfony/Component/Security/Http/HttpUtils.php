@@ -121,9 +121,7 @@ class HttpUtils
                 }
 
                 return isset($parameters['_route']) && $path === $parameters['_route'];
-            } catch (MethodNotAllowedException) {
-                return false;
-            } catch (ResourceNotFoundException) {
+            } catch (MethodNotAllowedException|ResourceNotFoundException) {
                 return false;
             }
         }

@@ -437,7 +437,7 @@ class ChoiceType extends AbstractType
         }
 
         // Harden against NULL values (like in EntityType and ModelType)
-        $choices = null !== $options['choices'] ? $options['choices'] : [];
+        $choices = $options['choices'] ?? [];
 
         return $this->choiceListFactory->createListFromChoices(
             $choices,

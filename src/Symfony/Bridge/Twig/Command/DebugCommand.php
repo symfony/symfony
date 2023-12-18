@@ -587,11 +587,7 @@ EOF
 
     private function getFileLink(string $absolutePath): string
     {
-        if (null === $this->fileLinkFormatter) {
-            return '';
-        }
-
-        return (string) $this->fileLinkFormatter->format($absolutePath, 1);
+        return (string) $this->fileLinkFormatter?->format($absolutePath, 1);
     }
 
     private function getAvailableFormatOptions(): array

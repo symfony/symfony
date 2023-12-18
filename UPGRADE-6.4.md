@@ -96,6 +96,7 @@ DependencyInjection
 DoctrineBridge
 --------------
 
+ * [BC Break] Add argument `$buildDir` to `ProxyCacheWarmer::warmUp()` 
  * [BC Break] Add return type-hints to `EntityFactory`
  * Deprecate `DbalLogger`, use a middleware instead
  * Deprecate not constructing `DoctrineDataCollector` with an instance of `DebugDataHolder`

@@ -29,6 +29,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\AllMySms\AllMySmsTransportFactory::class => false,
             Bridge\AmazonSns\AmazonSnsTransportFactory::class => false,
             Bridge\Bandwidth\BandwidthTransportFactory::class => false,
+            Bridge\Bluesky\BlueskyTransportFactory::class => false,
             Bridge\Brevo\BrevoTransportFactory::class => false,
             Bridge\Chatwork\ChatworkTransportFactory::class => false,
             Bridge\Clickatell\ClickatellTransportFactory::class => false,
@@ -117,6 +118,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['allmysms', 'symfony/all-my-sms-notifier'];
         yield ['sns', 'symfony/amazon-sns-notifier'];
         yield ['bandwidth', 'symfony/bandwidth-notifier'];
+        yield ['bluesky', 'symfony/bluesky-notifier'];
         yield ['brevo', 'symfony/brevo-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
         yield ['clicksend', 'symfony/click-send-notifier'];

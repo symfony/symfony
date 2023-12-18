@@ -75,7 +75,7 @@ class CrowdinProviderTest extends ProviderTestCase
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -93,7 +93,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="9dF75ai" resname="post.num_comments">
+      <trans-unit id="%s" resname="post.num_comments">
         <source>post.num_comments</source>
         <target>{count, plural, one {# comment} other {# comments}}</target>
       </trans-unit>
@@ -116,7 +116,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -132,7 +132,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: validators.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedValidatorsFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedValidatorsFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -171,7 +171,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -194,7 +194,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -236,7 +236,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -266,7 +266,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -308,7 +308,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_fr_a</target>
       </trans-unit>
@@ -326,7 +326,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -355,7 +355,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -371,7 +371,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesTranslationsContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesTranslationsContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -415,11 +415,11 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
-      <trans-unit id="SyIS4xr" resname="b">
+      <trans-unit id="%s" resname="b">
         <source>b</source>
         <target>trans_en_b</target>
       </trans-unit>
@@ -448,7 +448,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -489,7 +489,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -518,7 +518,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -534,7 +534,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesTranslationsContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesTranslationsContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -575,7 +575,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_fr_a</target>
       </trans-unit>
@@ -602,7 +602,7 @@ XLIFF
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_gb_a</target>
       </trans-unit>

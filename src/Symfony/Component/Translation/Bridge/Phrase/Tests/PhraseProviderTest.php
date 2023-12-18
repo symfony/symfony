@@ -693,7 +693,7 @@ class PhraseProviderTest extends TestCase
                     }
 
                     if (str_starts_with($part, '<?xml')) {
-                        $this->assertSame($content, $part);
+                        $this->assertStringMatchesFormat($content, $part);
                         $testedContent = true;
                     }
 
@@ -797,11 +797,11 @@ class PhraseProviderTest extends TestCase
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qdGDk9Z" resname="general.back">
+      <trans-unit id="%s" resname="general.back">
         <source>general.back</source>
         <target><![CDATA[back &!]]></target>
       </trans-unit>
-      <trans-unit id="0ESGki9" resname="general.cancel">
+      <trans-unit id="%s" resname="general.cancel">
         <source>general.cancel</source>
         <target>Cancel</target>
       </trans-unit>
@@ -837,11 +837,11 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qdGDk9Z" resname="general.back">
+      <trans-unit id="%s" resname="general.back">
         <source>general.back</source>
         <target>zurück</target>
       </trans-unit>
-      <trans-unit id="0ESGki9" resname="general.cancel">
+      <trans-unit id="%s" resname="general.cancel">
         <source>general.cancel</source>
         <target>Abbrechen</target>
       </trans-unit>

@@ -43,6 +43,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -1760,7 +1761,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                     ->replaceArgument(0, $expectedSeed)
                     ->replaceArgument(1, 12),
                 (new ChildDefinition('cache.adapter.redis'))
-                    ->replaceArgument(0, new Reference('.cache_connection.kYdiLgf'))
+                    ->replaceArgument(0, new Reference('.cache_connection.'.(\count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? 'U5HliuY' : 'kYdiLgf')))
                     ->replaceArgument(1, $expectedSeed)
                     ->replaceArgument(2, 12),
             ],

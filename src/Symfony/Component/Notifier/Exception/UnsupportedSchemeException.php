@@ -28,6 +28,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Bandwidth\BandwidthTransportFactory::class,
             'package' => 'symfony/bandwidth-notifier',
         ],
+        'bluesky' => [
+            'class' => Bridge\Bluesky\BlueskyTransportFactory::class,
+            'package' => 'symfony/bluesky-notifier',
+        ],
         'brevo' => [
             'class' => Bridge\Brevo\BrevoTransportFactory::class,
             'package' => 'symfony/brevo-notifier',

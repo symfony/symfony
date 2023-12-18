@@ -27,7 +27,9 @@ class MoFileDumper extends FileDumper
         $offsets = [];
         $size = 0;
 
-        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
+        $sort = $options['sort'] ?? null;
+
+        foreach ($messages->all($domain, $sort) as $source => $target) {
             $offsets[] = array_map('strlen', [$sources, $source, $targets, $target]);
             $sources .= "\0".$source;
             $targets .= "\0".$target;

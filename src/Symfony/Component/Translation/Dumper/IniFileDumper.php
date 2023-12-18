@@ -24,7 +24,9 @@ class IniFileDumper extends FileDumper
     {
         $output = '';
 
-        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
+        $sort = $options['sort'] ?? null;
+
+        foreach ($messages->all($domain, $sort) as $source => $target) {
             $escapeTarget = str_replace('"', '\"', $target);
             $output .= $source.'="'.$escapeTarget."\"\n";
         }

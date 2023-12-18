@@ -43,7 +43,7 @@ class XliffFileDumper extends FileDumper
             return $this->dumpXliff1($defaultLocale, $messages, $domain, $options);
         }
         if ('2.0' === $xliffVersion) {
-            return $this->dumpXliff2($defaultLocale, $messages, $domain);
+            return $this->dumpXliff2($defaultLocale, $messages, $domain, $options);
         }
 
         throw new InvalidArgumentException(sprintf('No support implemented for dumping XLIFF version "%s".', $xliffVersion));
@@ -56,6 +56,8 @@ class XliffFileDumper extends FileDumper
 
     private function dumpXliff1(string $defaultLocale, MessageCatalogue $messages, ?string $domain, array $options = []): string
     {
+        $sort = $options['sort'] ?? null;
+
         $toolInfo = ['tool-id' => 'symfony', 'tool-name' => 'Symfony'];
         if (\array_key_exists('tool_info', $options)) {
             $toolInfo = array_merge($toolInfo, $options['tool_info']);
@@ -90,7 +92,7 @@ class XliffFileDumper extends FileDumper
         }
 
         $xliffBody = $xliffFile->appendChild($dom->createElement('body'));
-        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
+        foreach ($messages->all($domain, $sort) as $source => $target) {
             $translation = $dom->createElement('trans-unit');
 
             $translation->setAttribute('id', strtr(substr(base64_encode(hash('sha256', $source, true)), 0, 7), '/+', '._'));
@@ -137,8 +139,10 @@ class XliffFileDumper extends FileDumper
         return $dom->saveXML();
     }
 
-    private function dumpXliff2(string $defaultLocale, MessageCatalogue $messages, ?string $domain): string
+    private function dumpXliff2(string $defaultLocale, MessageCatalogue $messages, ?string $domain, array $options = []): string
     {
+        $sort = $options['sort'] ?? null;
+
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
 
@@ -165,7 +169,7 @@ class XliffFileDumper extends FileDumper
             }
         }
 
-        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
+        foreach ($messages->all($domain, $sort) as $source => $target) {
             $translation = $dom->createElement('unit');
             $translation->setAttribute('id', strtr(substr(base64_encode(hash('sha256', $source, true)), 0, 7), '/+', '._'));
 

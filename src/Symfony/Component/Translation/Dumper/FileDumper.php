@@ -44,6 +44,8 @@ abstract class FileDumper implements DumperInterface
             throw new InvalidArgumentException('The file dumper needs a path option.');
         }
 
+        $sort = $options['sort'] ?? null;
+
         // save a file for each domain
         foreach ($messages->getDomains() as $domain) {
             $fullpath = $options['path'].'/'.$this->getRelativePath($domain, $messages->getLocale());
@@ -55,7 +57,7 @@ abstract class FileDumper implements DumperInterface
             }
 
             $intlDomain = $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX;
-            $intlMessages = $messages->all($intlDomain, $options['sort']);
+            $intlMessages = $messages->all($intlDomain, $sort);
 
             if ($intlMessages) {
                 $intlPath = $options['path'].'/'.$this->getRelativePath($intlDomain, $messages->getLocale());
@@ -64,7 +66,7 @@ abstract class FileDumper implements DumperInterface
                 $messages->replace([], $intlDomain);
 
                 try {
-                    if ($messages->all($domain, $options['sort'])) {
+                    if ($messages->all($domain, $sort)) {
                         file_put_contents($fullpath, $this->formatCatalogue($messages, $domain, $options));
                     }
                     continue;

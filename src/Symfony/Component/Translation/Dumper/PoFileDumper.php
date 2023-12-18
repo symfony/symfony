@@ -29,8 +29,10 @@ class PoFileDumper extends FileDumper
         $output .= '"Language: '.$messages->getLocale().'\n"'."\n";
         $output .= "\n";
 
+        $sort = $options['sort'] ?? null;
+
         $newLine = false;
-        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
+        foreach ($messages->all($domain, $sort) as $source => $target) {
             if ($newLine) {
                 $output .= "\n";
             } else {

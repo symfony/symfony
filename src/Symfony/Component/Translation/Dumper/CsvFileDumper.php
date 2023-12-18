@@ -27,7 +27,9 @@ class CsvFileDumper extends FileDumper
     {
         $handle = fopen('php://memory', 'r+');
 
-        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
+        $sort = $options['sort'] ?? null;
+
+        foreach ($messages->all($domain, $sort) as $source => $target) {
             fputcsv($handle, [$source, $target], $this->delimiter, $this->enclosure);
         }
 

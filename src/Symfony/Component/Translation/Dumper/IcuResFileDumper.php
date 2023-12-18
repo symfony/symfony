@@ -25,8 +25,9 @@ class IcuResFileDumper extends FileDumper
     public function formatCatalogue(MessageCatalogue $messages, string $domain, array $options = []): string
     {
         $data = $indexes = $resources = '';
+        $sort = $options['sort'] ?? null;
 
-        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
+        foreach ($messages->all($domain, $sort) as $source => $target) {
             $indexes .= pack('v', \strlen($data) + 28);
             $data .= $source."\0";
         }
@@ -35,7 +36,7 @@ class IcuResFileDumper extends FileDumper
 
         $keyTop = $this->getPosition($data);
 
-        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
+        foreach ($messages->all($domain, $sort) as $source => $target) {
             $resources .= pack('V', $this->getPosition($data));
 
             $data .= pack('V', \strlen($target))
@@ -46,7 +47,7 @@ class IcuResFileDumper extends FileDumper
 
         $resOffset = $this->getPosition($data);
 
-        $data .= pack('v', \count($messages->all($domain, $options['sort'])))
+        $data .= pack('v', \count($messages->all($domain, $sort)))
             .$indexes
             .$this->writePadding($data)
             .$resources

@@ -28,7 +28,9 @@ class QtFileDumper extends FileDumper
         $context = $ts->appendChild($dom->createElement('context'));
         $context->appendChild($dom->createElement('name', $domain));
 
-        foreach ($messages->all($domain, $options['sort']) as $source => $target) {
+        $sort = $options['sort'] ?? null;
+
+        foreach ($messages->all($domain, $sort) as $source => $target) {
             $message = $context->appendChild($dom->createElement('message'));
             $metadata = $messages->getMetadata($source, $domain);
             if (isset($metadata['sources'])) {

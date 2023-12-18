@@ -83,6 +83,7 @@ final class Transport
         Bridge\Sms77\Sms77TransportFactory::class,
         Bridge\Smsapi\SmsapiTransportFactory::class,
         Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
+        Bridge\Smsbox\SmsboxTransportFactory::class,
         Bridge\Smsc\SmscTransportFactory::class,
         Bridge\SmsFactor\SmsFactorTransportFactory::class,
         Bridge\Smsmode\SmsmodeTransportFactory::class,

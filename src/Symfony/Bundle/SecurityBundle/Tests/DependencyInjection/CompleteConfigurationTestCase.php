@@ -18,6 +18,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
@@ -137,7 +138,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             [
                 'simple',
                 'security.user_checker',
-                '.security.request_matcher.rud_2nr',
+                \count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? '.security.request_matcher.rud_2nr' : '.security.request_matcher.h5ibf38',
                 false,
                 false,
                 '',
@@ -187,7 +188,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             [
                 'host',
                 'security.user_checker',
-                '.security.request_matcher.ap9sh8g',
+                \count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? '.security.request_matcher.ap9sh8g' : '.security.request_matcher.bcmu4fb',
                 true,
                 false,
                 'security.user.provider.concrete.default',

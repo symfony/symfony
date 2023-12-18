@@ -463,7 +463,7 @@ final class Dotenv
                 throw $this->createFormatException(sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
             }
 
-            return preg_replace('/[\r\n]+$/', '', $process->getOutput());
+            return rtrim($process->getOutput(), "\n\r");
         }, $value);
     }
 

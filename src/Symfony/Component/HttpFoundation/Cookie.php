@@ -340,7 +340,7 @@ class Cookie
     {
         $maxAge = $this->expire - time();
 
-        return 0 >= $maxAge ? 0 : $maxAge;
+        return max(0, $maxAge);
     }
 
     /**

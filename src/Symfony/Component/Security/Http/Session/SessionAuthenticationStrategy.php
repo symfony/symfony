@@ -51,10 +51,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
 
             case self::MIGRATE:
                 $request->getSession()->migrate(true);
-
-                if ($this->csrfTokenStorage) {
-                    $this->csrfTokenStorage->clear();
-                }
+                $this->csrfTokenStorage?->clear();
 
                 return;
 

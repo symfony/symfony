@@ -98,10 +98,6 @@ class OrderedHashMapIterator implements \Iterator
 
     public function key(): mixed
     {
-        if (null === $this->key) {
-            return null;
-        }
-
         return $this->key;
     }
 

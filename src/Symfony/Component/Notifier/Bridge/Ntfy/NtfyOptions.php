@@ -67,16 +67,12 @@ final class NtfyOptions implements MessageOptionsInterface
 
     public function setStringPriority(string $priority): self
     {
-        switch ($priority) {
-            case Notification::IMPORTANCE_URGENT:
-                return $this->setPriority(self::PRIORITY_URGENT);
-            case Notification::IMPORTANCE_HIGH:
-                return $this->setPriority(self::PRIORITY_HIGH);
-            case Notification::IMPORTANCE_LOW:
-                return $this->setPriority(self::PRIORITY_LOW);
-            default:
-                return $this->setPriority(self::PRIORITY_DEFAULT);
-        }
+        return match ($priority) {
+            Notification::IMPORTANCE_URGENT => $this->setPriority(self::PRIORITY_URGENT),
+            Notification::IMPORTANCE_HIGH => $this->setPriority(self::PRIORITY_HIGH),
+            Notification::IMPORTANCE_LOW => $this->setPriority(self::PRIORITY_LOW),
+            default => $this->setPriority(self::PRIORITY_DEFAULT),
+        };
     }
 
     public function setPriority(int $priority): self

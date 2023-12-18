@@ -19,31 +19,15 @@ usort($allPackages, function($a, $b) {
 
 function getPackageType(string $packageDir): string
 {
-    if (preg_match('@Symfony/Bridge/@', $packageDir)) {
-        return 'bridge';
-    }
-
-    if (preg_match('@Symfony/Bundle/@', $packageDir)) {
-        return 'bundle';
-    }
-
-    if (preg_match('@Symfony/Component/[^/]+/Bridge/@', $packageDir)) {
-        return 'component_bridge';
-    }
-
-    if (preg_match('@Symfony/Component/@', $packageDir)) {
-        return 'component';
-    }
-
-    if (preg_match('@Symfony/Contracts/@', $packageDir)) {
-        return 'contract';
-    }
-
-    if (preg_match('@Symfony/Contracts$@', $packageDir)) {
-        return 'contracts';
-    }
-
-    throw new \LogicException();
+    return match (true) {
+        str_contains($packageDir, 'Symfony/Bridge/') => 'bridge',
+        str_contains($packageDir, 'Symfony/Bundle/') => 'bundle',
+        preg_match('@Symfony/Component/[^/]+/Bridge/@', $packageDir) => 'component_bridge',
+        str_contains($packageDir, 'Symfony/Component/') => 'component',
+        str_contains($packageDir, 'Symfony/Contracts/') => 'contract',
+        str_ends_with($packageDir, 'Symfony/Contracts') => 'contracts',
+        default => throw new \LogicException(),
+    };
 }
 
 $newPackage = [];

@@ -214,9 +214,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
             return true;
-        } catch (AccessException) {
-            return false;
-        } catch (UnexpectedTypeException) {
+        } catch (AccessException|UnexpectedTypeException) {
             return false;
         }
     }
@@ -249,9 +247,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             return true;
-        } catch (AccessException) {
-            return false;
-        } catch (UnexpectedTypeException) {
+        } catch (AccessException|UnexpectedTypeException) {
             return false;
         }
     }

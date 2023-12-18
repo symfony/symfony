@@ -283,7 +283,7 @@ class ContextListener extends AbstractListener
         $refreshedUser = $refreshedToken->getUser();
 
         if ($originalUser instanceof EquatableInterface) {
-            return !(bool) $originalUser->isEqualTo($refreshedUser);
+            return !$originalUser->isEqualTo($refreshedUser);
         }
 
         if ($originalUser instanceof PasswordAuthenticatedUserInterface || $refreshedUser instanceof PasswordAuthenticatedUserInterface) {

@@ -138,7 +138,7 @@ class MessengerPass implements CompilerPassInterface
                 }
 
                 if (null === $message) {
-                    throw new RuntimeException(sprintf('Invalid handler service "%s": the list of messages to handle is empty.', $serviceId, $r->getName()));
+                    throw new RuntimeException(sprintf('Invalid handler service "%s": the list of messages to handle is empty.', $serviceId));
                 }
             }
         }

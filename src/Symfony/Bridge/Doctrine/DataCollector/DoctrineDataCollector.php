@@ -163,8 +163,7 @@ class DoctrineDataCollector extends DataCollector
                     $query['types'][$j] = $type->getBindingType();
                     try {
                         $param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
-                    } catch (\TypeError $e) {
-                    } catch (ConversionException $e) {
+                    } catch (\TypeError|ConversionException) {
                     }
                 }
             }

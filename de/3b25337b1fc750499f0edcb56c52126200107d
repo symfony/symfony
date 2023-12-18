@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-12-18T13:43:47Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-18T14:13:35Z
+
+This won't fix the issue since the faulty combination is still allowed, so that composer can still select it, isn't it?
+
+What about making the bridge compatible with 7.0 instead? This requires a BC break, but it shouldn't affect anybody IMHO: that class/method isn't extended by anyone :crossed_fingers:
+WDYT @symfony/mergers ?
+
+---------------------------------------------------------------------------
+
+by llupa at 2023-12-18T14:45:47Z
+
+I thought about updating `Symfony\Bridge\Doctrine\CacheWarmer\ProxyCacheWarmer::warmUp` too and this would be best from my POV, but wouldn't that mean you will have anyway a conflict between doctrine-bridge 6.4.0 and htt-kernel 7.x.x ? The fix would go to doctrine-bridge 6.4.1 as I understand it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-18T15:03:12Z
+
+> have anyway a conflict between doctrine-bridge 6.4.0 and htt-kernel 7.x.x ?
+
+no need to since .0 will be replaced by .1
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-18T15:46:10Z
+
+> What about making the bridge compatible with 7.0 instead? This requires a BC break, but it shouldn't affect anybody IMHO: that class/method isn't extended by anyone
+
+works for me, we already did that in the Serializer and Translation components in #50391
+
+---------------------------------------------------------------------------
+
+by llupa at 2023-12-18T17:04:50Z
+
+I am not sure if I completely broke the process, but, I tried my best with what Nicolas and Christian said 😅
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-12-18T17:14:17Z
+
+> it shouldn't affect anybody IMHO: that class/method isn't extended by anyone 🤞 WDYT
+
+Agreed, we should make this classes final in 7.1
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-12-18T19:39:55Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot

@@ -26,8 +26,10 @@ class ThisableMessage extends Composite
 
     public $addRootParameters = [];
 
-    public function __construct(mixed $constraints = null, array $groups = null, mixed $payload = null)
+    public function __construct(mixed $constraints = null, array $addThisParameters = [],  array $addRootParameters = [], array $groups = null, mixed $payload = null)
     {
+        $this->addThisParameters = $addThisParameters;
+        $this->addRootParameters = $addRootParameters;
         parent::__construct($constraints ?? [], $groups, $payload);
     }
 

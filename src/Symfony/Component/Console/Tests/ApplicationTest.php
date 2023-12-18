@@ -67,6 +67,9 @@ class ApplicationTest extends TestCase
         putenv('SHELL_VERBOSITY');
         unset($_ENV['SHELL_VERBOSITY']);
         unset($_SERVER['SHELL_VERBOSITY']);
+        putenv('SYMFONY_CONSOLE_OUTPUT');
+        unset($_ENV['SYMFONY_CONSOLE_OUTPUT']);
+        unset($_SERVER['SYMFONY_CONSOLE_OUTPUT']);
 
         if (\function_exists('pcntl_signal')) {
             // We reset all signals to their default value to avoid side effects
@@ -1126,6 +1129,22 @@ class ApplicationTest extends TestCase
         $input = new ArgvInput(['cli.php', '--foo', 'bar']);
 
         $this->assertSame(0, $application->run($input, $output));
+    }
+
+    public function testDisableOutput()
+    {
+        $_ENV['SYMFONY_CONSOLE_OUTPUT'] = '0';
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->add($command = new \Foo1Command());
+        $_SERVER['argv'] = ['cli.php', 'foo:bar1'];
+
+        ob_start();
+        $application->run();
+        ob_end_clean();
+
+        $this->assertInstanceOf(NullOutput::class, $command->output);
     }
 
     /**

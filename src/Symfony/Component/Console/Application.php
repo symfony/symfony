@@ -48,6 +48,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -145,7 +146,7 @@ class Application implements ResetInterface
         }
 
         $input ??= new ArgvInput();
-        $output ??= new ConsoleOutput();
+        $output ??= $this->isDirectOutputDisabled() ? new NullOutput() : new ConsoleOutput();
 
         $renderException = function (\Throwable $e) use ($output) {
             if ($output instanceof ConsoleOutputInterface) {
@@ -934,7 +935,7 @@ class Application implements ResetInterface
                 break;
         }
 
-        if (true === $input->hasParameterOption(['--quiet', '-q'], true)) {
+        if (true === $input->hasParameterOption(['--quiet', '-q'], true) || $this->isDirectOutputDisabled()) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
             $shellVerbosity = -1;
         } else {
@@ -1280,5 +1281,12 @@ class Application implements ResetInterface
         foreach ($this->getDefaultCommands() as $command) {
             $this->add($command);
         }
+    }
+
+    private function isDirectOutputDisabled(): bool
+    {
+        $output = $_ENV['SYMFONY_CONSOLE_OUTPUT'] ?? $_SERVER['SYMFONY_CONSOLE_OUTPUT'] ?? getenv('SYMFONY_CONSOLE_OUTPUT');
+
+        return false === filter_var(false === $output ? '1' : $output, FILTER_VALIDATE_BOOL);
     }
 }

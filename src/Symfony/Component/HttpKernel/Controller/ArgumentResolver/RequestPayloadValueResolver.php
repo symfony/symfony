@@ -119,7 +119,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                     $payload = $e->getData();
                 }
 
-                if (null !== $payload) {
+                if (null !== $payload && !\count($violations)) {
                     $violations->addAll($this->validator->validate($payload, null, $argument->validationGroups ?? null));
                 }
 

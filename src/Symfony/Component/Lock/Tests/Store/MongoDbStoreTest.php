@@ -35,7 +35,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 
-    public static function setupBeforeClass(): void
+    public static function setUpBeforeClass(): void
     {
         $manager = self::getMongoManager();
         try {

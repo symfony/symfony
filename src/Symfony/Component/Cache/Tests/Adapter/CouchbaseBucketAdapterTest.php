@@ -31,7 +31,7 @@ class CouchbaseBucketAdapterTest extends AdapterTestCase
 
     protected static \CouchbaseBucket $client;
 
-    public static function setupBeforeClass(): void
+    public static function setUpBeforeClass(): void
     {
         if (!CouchbaseBucketAdapter::isSupported()) {
             self::markTestSkipped('Couchbase >= 2.6.0 < 3.0.0 is required.');

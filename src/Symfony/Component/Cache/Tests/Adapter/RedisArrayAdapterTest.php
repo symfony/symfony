@@ -20,7 +20,7 @@ class RedisArrayAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {
-        parent::setupBeforeClass();
+        parent::setUpBeforeClass();
         if (!class_exists(\RedisArray::class)) {
             throw new SkippedTestSuiteError('The RedisArray class is required.');
         }

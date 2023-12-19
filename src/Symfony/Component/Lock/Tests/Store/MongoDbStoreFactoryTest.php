@@ -25,7 +25,7 @@ use Symfony\Component\Lock\Store\StoreFactory;
  */
 class MongoDbStoreFactoryTest extends TestCase
 {
-    public static function setupBeforeClass(): void
+    public static function setUpBeforeClass(): void
     {
         if (!class_exists(Client::class)) {
             throw new SkippedTestSuiteError('The mongodb/mongodb package is required.');

@@ -30,7 +30,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 
-    public static function setupBeforeClass(): void
+    public static function setUpBeforeClass(): void
     {
         if (!class_exists(Client::class)) {
             throw new SkippedTestSuiteError('The mongodb/mongodb package is required.');

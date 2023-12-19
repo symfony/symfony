@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Container;
@@ -977,5 +978,27 @@ CSV;
         yield 'Empty string' => [false, fn () => ''];
         yield 'Null' => [false, fn () => null];
         yield 'Env var not defined' => [false, fn () => throw new EnvNotFoundException()];
+    }
+
+    public function testGetEnvDate(): void
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('date', 'DATE', function () {
+            return '2021-01-01 00:00:00';
+        });
+        $this->assertEquals(new DateTimeImmutable('2021-01-01 00:00:00'), $result);
+    }
+
+    public function testGetEnvDateInvalidDate(): void
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid date or datetime format in env var "DATE".');
+
+        $result = $processor->getEnv('date', 'DATE', function () {
+            return 'THIS IS NOT A DATE FORMAT';
+        });
     }
 }

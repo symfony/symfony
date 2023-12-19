@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterEnvVarProcessorsPass implements CompilerPassInterface
 {
-    private const ALLOWED_TYPES = ['array', 'bool', 'float', 'int', 'string', \BackedEnum::class];
+    private const ALLOWED_TYPES = ['array', 'bool', 'float', 'int', 'string', \BackedEnum::class, \DateTimeImmutable::class];
 
     public function process(ContainerBuilder $container): void
     {

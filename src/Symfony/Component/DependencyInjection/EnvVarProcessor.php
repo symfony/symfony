@@ -42,6 +42,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'not' => 'bool',
             'const' => 'bool|int|float|string|array',
             'csv' => 'array',
+            'date' => \DateTimeImmutable::class,
             'file' => 'string',
             'float' => 'float',
             'int' => 'int',
@@ -347,6 +348,14 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         if ('urlencode' === $prefix) {
             return rawurlencode($env);
+        }
+
+        if ('date' === $prefix) {
+            try {
+                return new \DateTimeImmutable($env);
+            } catch (\Exception $e) {
+                throw new RuntimeException(sprintf('Invalid date or datetime format in env var "%s".', $name));
+            }
         }
 
         throw new RuntimeException(sprintf('Unsupported env var prefix "%s" for env name "%s".', $prefix, $name));

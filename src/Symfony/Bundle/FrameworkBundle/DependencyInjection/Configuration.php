@@ -1988,7 +1988,7 @@ class Configuration implements ConfigurationInterface
                                         ->info('The regular expression that the request URL must match before adding the other options. When none is provided, the base URI is used instead.')
                                         ->cannotBeEmpty()
                                     ->end()
-                                        ->variableNode('base_uri')
+                                    ->variableNode('base_uri')
                                         ->info('The URI(s) to resolve relative URLs, following rules in RFC 3985, section 2.')
                                         ->cannotBeEmpty()
                                     ->end()

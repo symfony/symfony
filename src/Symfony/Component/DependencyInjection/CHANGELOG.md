@@ -4,7 +4,7 @@ CHANGELOG
 7.1
 ---
 
- * Add method `date` prefix to `EnvVarProcessor` that allows get a DateTimeImmutable from an env var
+ * Add `date` env var processor
  * Add argument `$prepend` to `ContainerConfigurator::extension()` to prepend the configuration instead of appending it
 
 7.0

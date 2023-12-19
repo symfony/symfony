@@ -754,9 +754,6 @@ class SerializerTest extends TestCase
         $this->assertSame(42, $serializer->deserialize('{"wrapper": 42}', 'int', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[wrapper]']));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testDeserializeNullableIntInXml()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);

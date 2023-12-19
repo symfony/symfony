@@ -29,7 +29,7 @@ SLACK_DSN=slack://xoxb-......@default?channel=fabien
 Adding Interactions to a Message
 --------------------------------
 
-With a Slack message, you can use the `SlackOptions` class to add some 
+With a Slack message, you can use the `SlackOptions` class to add some
 interactive options called [Block elements](https://api.slack.com/reference/block-kit/block-elements).
 
 ```php
@@ -177,7 +177,7 @@ $chatter->send($chatMessage);
 Sending a Message as a Reply
 ----------------------------
 
-To send your slack message as a reply in a thread use the `threadTs()` method.
+To send your Slack message as a reply in a thread use the `threadTs()` method.
 
 ```php
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
@@ -224,6 +224,23 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 
 $options = new UpdateMessageSlackOptions($channelId, $messageId);
 $chatter->send(new ChatMessage('Updated message', $options));
+```
+
+Scheduling a Slack Message
+--------------------------
+
+To schedule a message to be sent at a later time, use the `postAt()` method:
+
+```php
+use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$options = (new SlackOptions())->postAt(new \DateTime('+1 day'));
+
+$chatMessage = new ChatMessage('Symfony Feature');
+$chatMessage->options($options);
+
+$chatter->send($chatMessage);
 ```
 
 Resources

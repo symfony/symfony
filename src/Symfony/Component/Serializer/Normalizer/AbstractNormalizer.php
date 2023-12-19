@@ -253,7 +253,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
     {
         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
-        if (\in_array($attribute, $ignoredAttributes)) {
+        if (\in_array($attribute, $ignoredAttributes, true)) {
             return false;
         }
 
@@ -326,7 +326,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 $attributeContext = $this->getAttributeDenormalizationContext($class, $paramName, $context);
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
 
-                $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
+                $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes, true);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
                 if ($constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {

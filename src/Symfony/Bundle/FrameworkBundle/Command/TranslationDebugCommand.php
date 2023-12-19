@@ -223,8 +223,8 @@ EOF
                     }
                 }
 
-                if (!\in_array(self::MESSAGE_UNUSED, $states) && $input->getOption('only-unused')
-                    || !\in_array(self::MESSAGE_MISSING, $states) && $input->getOption('only-missing')
+                if (!\in_array(self::MESSAGE_UNUSED, $states, true) && $input->getOption('only-unused')
+                    || !\in_array(self::MESSAGE_MISSING, $states, true) && $input->getOption('only-missing')
                 ) {
                     continue;
                 }

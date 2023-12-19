@@ -45,7 +45,7 @@ final class OpenUriAction implements ActionCardCompatibleActionInterface
      */
     public function target(string $uri, string $os = 'default'): static
     {
-        if (!\in_array($os, self::OPERATING_SYSTEMS)) {
+        if (!\in_array($os, self::OPERATING_SYSTEMS, true)) {
             throw new InvalidArgumentException(sprintf('Supported operating systems for "%s" method are: "%s".', __METHOD__, implode('", "', self::OPERATING_SYSTEMS)));
         }
 

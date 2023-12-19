@@ -107,7 +107,7 @@ class Length extends Constraint
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
 
-        if (!\in_array($this->countUnit, self::VALID_COUNT_UNITS)) {
+        if (!\in_array($this->countUnit, self::VALID_COUNT_UNITS, true)) {
             throw new InvalidArgumentException(sprintf('The "countUnit" option must be one of the "%s"::COUNT_* constants ("%s" given).', __CLASS__, $this->countUnit));
         }
     }

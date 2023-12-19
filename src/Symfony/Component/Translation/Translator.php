@@ -112,7 +112,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
         $this->resources[$locale][] = [$format, $resource, $domain];
 
-        if (\in_array($locale, $this->fallbackLocales)) {
+        if (\in_array($locale, $this->fallbackLocales, true)) {
             $this->catalogues = [];
         } else {
             unset($this->catalogues[$locale]);

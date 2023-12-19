@@ -110,7 +110,7 @@ class UnusedTagsPass implements CompilerPassInterface
 
         foreach ($container->findUnusedTags() as $tag) {
             // skip known tags
-            if (\in_array($tag, self::KNOWN_TAGS)) {
+            if (\in_array($tag, self::KNOWN_TAGS, true)) {
                 continue;
             }
 

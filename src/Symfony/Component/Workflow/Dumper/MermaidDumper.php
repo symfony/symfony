@@ -72,7 +72,7 @@ class MermaidDumper implements DumperInterface
                 $placeId,
                 $place,
                 $meta->getPlaceMetadata($place),
-                \in_array($place, $definition->getInitialPlaces()),
+                \in_array($place, $definition->getInitialPlaces(), true),
                 $marking?->has($place) ?? false
             );
 

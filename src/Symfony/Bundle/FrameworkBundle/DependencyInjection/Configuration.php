@@ -435,7 +435,7 @@ class Configuration implements ConfigurationInterface
                                                     if (!\is_string($value)) {
                                                         return true;
                                                     }
-                                                    if (class_exists(WorkflowEvents::class) && !\in_array($value, WorkflowEvents::ALIASES)) {
+                                                    if (class_exists(WorkflowEvents::class) && !\in_array($value, WorkflowEvents::ALIASES, true)) {
                                                         return true;
                                                     }
                                                 }

@@ -77,7 +77,7 @@ class CssColor extends Constraint
 
             $options['value'] = $formats;
         } elseif (\is_string($formats)) {
-            if (!\in_array($formats, self::$validationModes)) {
+            if (!\in_array($formats, self::$validationModes, true)) {
                 throw new InvalidArgumentException(sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
             }
 

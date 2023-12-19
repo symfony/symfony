@@ -668,7 +668,7 @@ final class Path
             }
 
             // Only add slash if previous part didn't end with '/' or '\'
-            if (!\in_array(substr($finalPath, -1), ['/', '\\'])) {
+            if (!\in_array(substr($finalPath, -1), ['/', '\\'], true)) {
                 $finalPath .= '/';
             }
 

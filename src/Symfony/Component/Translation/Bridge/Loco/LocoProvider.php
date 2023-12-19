@@ -67,7 +67,7 @@ final class LocoProvider implements ProviderInterface
         foreach ($translatorBag->getCatalogues() as $catalogue) {
             $locale = $catalogue->getLocale();
 
-            if (!\in_array($locale, $this->getLocales())) {
+            if (!\in_array($locale, $this->getLocales(), true)) {
                 $this->createLocale($locale);
             }
 

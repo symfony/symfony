@@ -2546,8 +2546,7 @@ class FrameworkExtension extends Extension
             unset($scopeConfig['retry_failed']);
 
             if (null === $scope) {
-                $baseUri = $scopeConfig['base_uri'];
-                unset($scopeConfig['base_uri']);
+                $baseUri = \is_array($scopeConfig['base_uri']) ? $scopeConfig['base_uri'][0] : $scopeConfig['base_uri'];
 
                 $container->register($name, ScopingHttpClient::class)
                     ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
@@ -2562,7 +2561,12 @@ class FrameworkExtension extends Extension
             }
 
             if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'.retry_failed', $container, $retryOptions)) {
-                $this->registerRetryableHttpClient($retryOptions, $name, $container);
+                $baseUris = [];
+                if (isset($scopeConfig['base_uri']) && \is_array($scopeConfig['base_uri'])) {
+                    $baseUris = $scopeConfig['base_uri'];
+                    unset($scopeConfig['base_uri']);
+                }
+                $this->registerRetryableHttpClient($retryOptions, $name, $container, $baseUris);
             }
 
             $container
@@ -2598,7 +2602,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container): void
+    private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container, array $baseUris = []): void
     {
         if (null !== $options['retry_strategy']) {
             $retryStrategy = new Reference($options['retry_strategy']);
@@ -2627,7 +2631,7 @@ class FrameworkExtension extends Extension
         $container
             ->register($name.'.retryable', RetryableHttpClient::class)
             ->setDecoratedService($name, null, 10) // higher priority than TraceableHttpClient (5)
-            ->setArguments([new Reference($name.'.retryable.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
+            ->setArguments([new Reference($name.'.retryable.inner'), $retryStrategy, $options['max_retries'], new Reference('logger'), $baseUris])
             ->addTag('monolog.logger', ['channel' => 'http_client']);
     }
 

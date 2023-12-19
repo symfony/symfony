@@ -1980,7 +1980,13 @@ class Configuration implements ConfigurationInterface
                                     ->thenInvalid('"query" applies to "base_uri" but no base URI is defined.')
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(fn ($v) => (isset($v['base_uri']) && \is_array($v['base_uri'])) && !isset($v['retry_failed']))
+                                    ->ifTrue(fn ($v) => (
+                                        (isset($v['base_uri']) && \is_array($v['base_uri']))
+                                        && (
+                                            (!isset($v['retry_failed']) || $v['retry_failed']['enabled'] === false)
+                                            || \count($v['base_uri']) !== \count(\array_filter($v['base_uri'], 'is_string'))
+                                        )
+                                    ))
                                     ->thenInvalid('"base_uri" can only be an array if "retry_failed" is defined.')
                                 ->end()
                                 ->children()

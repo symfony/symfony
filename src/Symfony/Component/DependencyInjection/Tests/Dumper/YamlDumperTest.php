@@ -167,8 +167,6 @@ class YamlDumperTest extends TestCase
     }
 
     /**
-     * @requires PHP 8.1
-     *
      * @dataProvider provideDefaultClasses
      */
     public function testDumpHandlesDefaultAttribute($class, $expectedFile)

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-12-19T14:44:13Z
+
+Thank you. I think we should mention this. But maybe do it in the Symfony-docs repo instead.
+
+The readmes here are intentionally very very short and contains basic info only.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-19T14:46:05Z
+
+If I remember correctly, bridges' documentation are always contained in their own README, the doc doesn't mention available options of the different bridges. Maybe @OskarStark can confirm this as the code owner?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-12-19T14:48:22Z
+
+Yepp. You are correct. A quick look over the Notifier's Bridges show that Im wrong. Sorry about that.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-19T14:56:18Z
+
+No worries :smile: I agree about the lines order, that's updated!

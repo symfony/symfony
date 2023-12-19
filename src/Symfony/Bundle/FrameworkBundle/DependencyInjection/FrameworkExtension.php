@@ -2547,10 +2547,11 @@ class FrameworkExtension extends Extension
 
             if (null === $scope) {
                 $baseUri = \is_array($scopeConfig['base_uri']) ? $scopeConfig['base_uri'][0] : $scopeConfig['base_uri'];
+                $config = \array_filter($scopeConfig, fn($k) => $k !== 'base_uri', ARRAY_FILTER_USE_KEY);
 
                 $container->register($name, ScopingHttpClient::class)
                     ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                    ->setArguments([new Reference('http_client.transport'), $baseUri, $scopeConfig])
+                    ->setArguments([new Reference('http_client.transport'), $baseUri, $config])
                     ->addTag('http_client.client')
                 ;
             } else {

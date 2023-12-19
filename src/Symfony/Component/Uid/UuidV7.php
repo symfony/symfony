@@ -49,28 +49,6 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
         return \DateTimeImmutable::createFromFormat('U.v', substr_replace($time, '.', -3, 0));
     }
 
-    /**
-     * Sub-millisecond timestamp precision is lost since UUIDv7 don't support it.
-     */
-    public static function fromV1(UuidV1 $uuidV1): self
-    {
-        $uuidV1 = $uuidV1->toRfc4122();
-        $time = '0'.substr($uuidV1, 15, 3).substr($uuidV1, 9, 4).substr($uuidV1, 0, 8);
-        $time = BinaryUtil::hexToNumericString($time);
-        if ('-' === $time[0]) {
-            throw new \InvalidArgumentException('UUIDv1 with a timestamp before Unix epoch cannot be converted to UUIDv7');
-        }
-
-        $time = str_pad($time, 5, '0', \STR_PAD_LEFT);
-
-        return new self(substr_replace(sprintf(
-            '%012s-7%03s-%s',
-            \PHP_INT_SIZE >= 8 ? dechex(substr($time, 0, -4)) : bin2hex(BinaryUtil::fromBase(substr($time, 0, -4), BinaryUtil::BASE10)),
-            dechex((int) substr($time, -4, 3)),
-            substr($uuidV1, 19)
-        ), '-', 8, 0));
-    }
-
     public static function generate(\DateTimeInterface $time = null): string
     {
         if (null === $mtime = $time) {

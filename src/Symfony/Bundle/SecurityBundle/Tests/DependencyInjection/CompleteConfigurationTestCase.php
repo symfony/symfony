@@ -224,7 +224,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             ],
         ], $listeners);
 
-        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
+        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface'), 'No user checker alias is registered when custom user checker services are registered');
     }
 
     /**

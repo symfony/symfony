@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by maxbaldanza at 2023-12-19T15:14:13Z
+
+> Works for me. This is special case because we made flex allow recent VarExporter to be combined with 5.4 apps to make it easier to upgrade to latest versions of Doctrine.
+
+Thanks @nicolas-grekas 🙌

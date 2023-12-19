@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter;
  * @requires extension couchbase <3.0.0
  * @requires extension couchbase >=2.6.0
  *
- * @group integration legacy
+ * @group legacy integration
  *
  * @author Antonio Jose Cerezo Aranda <aj.cerezo@gmail.com>
  */

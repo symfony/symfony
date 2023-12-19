@@ -20,8 +20,7 @@ use Symfony\Component\Cache\Adapter\CouchbaseCollectionAdapter;
  * @requires extension couchbase <4.0.0
  * @requires extension couchbase >=3.0.0
  *
- * @group integration
- * @group legacy
+ * @group legacy integration
  *
  * @author Antonio Jose Cerezo Aranda <aj.cerezo@gmail.com>
  */

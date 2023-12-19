@@ -1767,7 +1767,7 @@ class Configuration implements ConfigurationInterface
                                     continue;
                                 }
                                 if (\is_array($scopedConfig['retry_failed'])) {
-                                    $scopedConfig['retry_failed'] = $scopedConfig['retry_failed'] + $config['default_options']['retry_failed'];
+                                    $scopedConfig['retry_failed'] += $config['default_options']['retry_failed'];
                                 }
                             }
 
@@ -1905,8 +1905,8 @@ class Configuration implements ConfigurationInterface
                                     ->ifTrue(fn ($v) => (
                                         (isset($v['base_uri']) && \is_array($v['base_uri']))
                                         && (
-                                            (!isset($v['retry_failed']) || $v['retry_failed']['enabled'] === false)
-                                            || \count($v['base_uri']) !== \count(\array_filter($v['base_uri'], 'is_string'))
+                                            (!isset($v['retry_failed']) || false === $v['retry_failed']['enabled'])
+                                            || \count($v['base_uri']) !== \count(array_filter($v['base_uri'], 'is_string'))
                                         )
                                     ))
                                     ->thenInvalid('"base_uri" can only be an array if "retry_failed" is defined.')

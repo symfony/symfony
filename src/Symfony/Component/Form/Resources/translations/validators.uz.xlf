@@ -3,71 +3,71 @@
     <file source-language="en" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="28">
-                <source>This form should not contain extra fields.</source>
+                <source>Ushbu shaklda qoʻshimcha maydon boʻlmasligi kerak.</source>
                 <target>Ushbu fo'rmada qo'shimcha maydonlar bo'lmasligi kerak.</target>
             </trans-unit>
             <trans-unit id="29">
-                <source>The uploaded file was too large. Please try to upload a smaller file.</source>
+                <source>Yuklangan fayl juda katta edi. Iltimos kichikroq faylni yuklashga urinib koʻring.</source>
                 <target>Yuklab olingan fayl juda katta. Iltimos, kichikroq faylni yuklashga harakat qiling.</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <source>CSRF tokeni xato. Iltimos shaklni qayta yuborishga urinib ko'ring.</source>
                 <target>CSRF qiymati yaroqsiz. Fo'rmani qayta yuborishga harakat qiling.</target>
             </trans-unit>
             <trans-unit id="99">
-                <source>This value is not a valid HTML5 color.</source>
+                <source>Bu rang haqiqiy HTML5 emas.</source>
                 <target>Qiymat noto'g'ri, HTML5 rangi emas.</target>
             </trans-unit>
             <trans-unit id="100">
-                <source>Please enter a valid birthdate.</source>
+                <source>Iltimos tugʻilgan sanani kiriting.</source>
                 <target>Iltimos, tug'ilgan kuningizni to'g'ri kiriting.</target>
             </trans-unit>
             <trans-unit id="101">
-                <source>The selected choice is invalid.</source>
+                <source>Tanlangan tanlov haqiqiy emas.</source>
                 <target>Tanlangan parametr noto'g'ri.</target>
             </trans-unit>
             <trans-unit id="102">
-                <source>The collection is invalid.</source>
+                <source>Toʻplam xato.</source>
                 <target>Kolleksiya noto'g'ri</target>
             </trans-unit>
             <trans-unit id="103">
-                <source>Please select a valid color.</source>
+                <source>Iltimos toʻgʻri rangni tanlang.</source>
                 <target>Iltimos, to'g'ri rang tanlang.</target>
             </trans-unit>
             <trans-unit id="104">
-                <source>Please select a valid country.</source>
+                <source>Iltimos toʻgʻri mamlakatni tanlang.</source>
                 <target>Iltimos, to'g'ri mamlakatni tanlang.</target>
             </trans-unit>
             <trans-unit id="105">
-                <source>Please select a valid currency.</source>
+                <source>Iltimos amaldagi valyutani tanlang.</source>
                 <target>Iltimos, to'g'ri valyutani tanlang.</target>
             </trans-unit>
             <trans-unit id="106">
-                <source>Please choose a valid date interval.</source>
+                <source>Iltimos mavjud sana oraligʻini tanlang.</source>
                 <target>Iltimos, to'g'ri sana oralig'ini tanlang.</target>
             </trans-unit>
             <trans-unit id="107">
-                <source>Please enter a valid date and time.</source>
+                <source>Iltimos sana va vaqtni kiriting.</source>
                 <target>Iltimos, to'g'ri sana va vaqtni kiriting.</target>
             </trans-unit>
             <trans-unit id="108">
-                <source>Please enter a valid date.</source>
+                <source>Iltimos toʻgʻri sana kiriting.</source>
                 <target>Iltimos, to'g'ri sanani kiriting.</target>
             </trans-unit>
             <trans-unit id="109">
-                <source>Please select a valid file.</source>
+                <source>Iltimos mavjud faylni tanlang.</source>
                 <target>Iltimos, to'g'ri faylni tanlang.</target>
             </trans-unit>
             <trans-unit id="110">
-                <source>The hidden field is invalid.</source>
+                <source>Yashirilgan maydon haqiqiy emas.</source>
                 <target>Yashirin maydon qiymati yaroqsiz.</target>
             </trans-unit>
             <trans-unit id="111">
-                <source>Please enter an integer.</source>
+                <source>Iltimos toʻgʻridan-toʻgʻri kiriting.</source>
                 <target>Iltimos, butun son kiriting.</target>
             </trans-unit>
             <trans-unit id="112">
-                <source>Please select a valid language.</source>
+                <source>Iltimos toʻgʻri tilni tanlang.</source>
                 <target>Iltimos, to'g'ri tilni tanlang.</target>
             </trans-unit>
             <trans-unit id="113">

@@ -344,7 +344,7 @@ class RedisExtIntegrationTest extends TestCase
             $connection->reject($failing['id']);
 
             // We want to make sure any pending messages are written to redis. That is why we create a new Connection.
-            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null], $redis);
+            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null]);
             $this->assertNotNull($connection->get());
         } finally {
             $redis->del('messenger-rejectthenget');

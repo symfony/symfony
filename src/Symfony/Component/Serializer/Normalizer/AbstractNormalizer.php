@@ -463,7 +463,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 sprintf('Failed to create object because the class "%s" is not instantiable.', $class),
                 $data,
                 ['unknown'],
-                $context['deserialization_path'] ?? null,
+                $context['deserialization_path'] ?? null
             );
         }
 

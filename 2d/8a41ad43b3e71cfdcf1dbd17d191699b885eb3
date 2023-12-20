@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-20T14:39:29Z
+
+Should also be fixed in 5.4, right?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2023-12-20T14:44:08Z
+
+> Should also be fixed in 5.4, right?
+
+absolutely. I thought this line was introduced in 6.x and missed it.
+
+PR rebased

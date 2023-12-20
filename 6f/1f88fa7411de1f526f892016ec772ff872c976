@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-13T07:24:19Z
+
+Let's add `associative_array` support in the same PR as this is closely related.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-14T07:10:13Z
+
+Please update the PR title + description to reflect the additional option, thanks

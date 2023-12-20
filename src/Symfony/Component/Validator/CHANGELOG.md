@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `list` and `associative_array` types to `Type` constraint
+
 7.0
 ---
 

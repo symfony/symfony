@@ -16,8 +16,8 @@ use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Contracts\Service\ServiceCollectionInterface;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -26,9 +26,9 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  *
  * @template-covariant T of mixed
  *
- * @implements ServiceProviderInterface<T>
+ * @implements ServiceCollectionInterface<T>
  */
-class ServiceLocator implements ServiceProviderInterface, \Countable
+class ServiceLocator implements ServiceCollectionInterface
 {
     use ServiceLocatorTrait {
         get as private doGet;
@@ -80,6 +80,13 @@ class ServiceLocator implements ServiceProviderInterface, \Countable
     public function count(): int
     {
         return \count($this->getProvidedServices());
+    }
+
+    public function getIterator(): \Traversable
+    {
+        foreach ($this->getProvidedServices() as $id => $config) {
+            yield $id => $this->get($id);
+        }
     }
 
     private function createNotFoundException(string $id): NotFoundExceptionInterface

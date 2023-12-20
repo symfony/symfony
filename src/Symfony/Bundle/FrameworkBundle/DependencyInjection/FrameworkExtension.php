@@ -2632,8 +2632,9 @@ class FrameworkExtension extends Extension
         $container
             ->register($name.'.retryable', RetryableHttpClient::class)
             ->setDecoratedService($name, null, 10) // higher priority than TraceableHttpClient (5)
-            ->setArguments([new Reference($name.'.retryable.inner'), $retryStrategy, $options['max_retries'], new Reference('logger'), $baseUris])
-            ->addTag('monolog.logger', ['channel' => 'http_client']);
+            ->setArguments([new Reference($name.'.retryable.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
+            ->addTag('monolog.logger', ['channel' => 'http_client'])
+            ->addMethodCall('withOptions', [['base_uri' => $baseUris]], true);
     }
 
     private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $webhookEnabled): void

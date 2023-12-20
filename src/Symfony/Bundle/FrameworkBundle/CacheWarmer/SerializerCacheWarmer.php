@@ -23,6 +23,8 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
  * Warms up XML and YAML serializer metadata.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
+ *
+ * @final since Symfony 7.1
  */
 class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
 {

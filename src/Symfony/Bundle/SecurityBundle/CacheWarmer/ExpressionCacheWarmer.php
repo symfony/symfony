@@ -15,6 +15,9 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
+/**
+ * @final since Symfony 7.1
+ */
 class ExpressionCacheWarmer implements CacheWarmerInterface
 {
     private iterable $expressions;

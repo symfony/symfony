@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Mark class `ExpressionCacheWarmer` as `final`
+
 7.0
 ---
 

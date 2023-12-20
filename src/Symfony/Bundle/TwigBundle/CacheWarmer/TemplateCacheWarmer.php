@@ -21,6 +21,8 @@ use Twig\Error\Error;
  * Generates the Twig cache for all templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 7.1
  */
 class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {

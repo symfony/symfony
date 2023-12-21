@@ -148,7 +148,8 @@ trait LazyGhostTrait
             }
             $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
 
-            return $accessor['get']($this, $name, null !== $readonlyScope);
+            $var = $accessor['get']($this, $name, null !== $readonlyScope);
+            return $var;
         } catch (\Error $e) {
             if (\Error::class !== $e::class || !str_starts_with($e->getMessage(), 'Cannot access uninitialized non-nullable property')) {
                 throw $e;
@@ -163,7 +164,8 @@ trait LazyGhostTrait
 
                 $accessor['set']($this, $name, []);
 
-                return $accessor['get']($this, $name, null !== $readonlyScope);
+                $var = $accessor['get']($this, $name, null !== $readonlyScope);
+                return $var;
             } catch (\Error) {
                 throw $e;
             }

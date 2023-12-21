@@ -565,7 +565,9 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                         /* Evaluate in global scope scripts embedded inside the toolbar */
                         var i, scripts = [].slice.call(el.querySelectorAll('script'));
                         for (i = 0; i < scripts.length; ++i) {
-                            eval.call({}, scripts[i].firstChild.nodeValue);
+                            if (scripts[i].firstChild) {
+                                eval.call({}, scripts[i].firstChild.nodeValue);
+                            }
                         }
 
                         el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';

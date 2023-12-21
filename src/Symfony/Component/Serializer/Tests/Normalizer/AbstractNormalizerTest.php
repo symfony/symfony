@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -33,6 +34,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy
 use Symfony\Component\Serializer\Tests\Fixtures\NullableOptionalConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\UnitEnumDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDummy;
 
 /**
@@ -279,5 +281,17 @@ class AbstractNormalizerTest extends TestCase
         $normalizer = new PropertyNormalizer($this->classMetadata);
 
         $this->assertSame([], $normalizer->normalize($dummy));
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testDenormalizeWhenObjectNotInstantiable()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+
+        $normalizer = new ObjectNormalizer();
+
+        $normalizer->denormalize('{}', UnitEnumDummy::class);
     }
 }

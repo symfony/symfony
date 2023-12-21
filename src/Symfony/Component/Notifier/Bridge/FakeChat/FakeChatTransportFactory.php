@@ -17,6 +17,8 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
@@ -27,9 +29,9 @@ final class FakeChatTransportFactory extends AbstractTransportFactory
     private ?MailerInterface $mailer;
     private ?LoggerInterface $logger;
 
-    public function __construct(MailerInterface $mailer = null, LoggerInterface $logger = null)
+    public function __construct(MailerInterface $mailer = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
     {
-        parent::__construct();
+        parent::__construct($dispatcher, $client);
 
         $this->mailer = $mailer;
         $this->logger = $logger;
@@ -48,7 +50,7 @@ final class FakeChatTransportFactory extends AbstractTransportFactory
             $to = $dsn->getRequiredOption('to');
             $from = $dsn->getRequiredOption('from');
 
-            return (new FakeChatEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
+            return (new FakeChatEmailTransport($this->mailer, $to, $from, $this->client, $this->dispatcher))->setHost($mailerTransport);
         }
 
         if ('fakechat+logger' === $scheme) {
@@ -56,7 +58,7 @@ final class FakeChatTransportFactory extends AbstractTransportFactory
                 $this->throwMissingDependencyException($scheme, LoggerInterface::class, 'psr/log');
             }
 
-            return new FakeChatLoggerTransport($this->logger);
+            return new FakeChatLoggerTransport($this->logger, $this->client, $this->dispatcher);
         }
 
         throw new UnsupportedSchemeException($dsn, 'fakechat', $this->getSupportedSchemes());

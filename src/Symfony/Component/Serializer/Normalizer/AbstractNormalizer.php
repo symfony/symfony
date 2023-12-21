@@ -445,6 +445,15 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
         unset($context['has_constructor']);
 
+        if (!$reflectionClass->isInstantiable()) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(
+                sprintf('Failed to create object because the class "%s" is not instantiable.', $class),
+                $data,
+                ['unknown'],
+                $context['deserialization_path'] ?? null
+            );
+        }
+
         return new $class();
     }
 

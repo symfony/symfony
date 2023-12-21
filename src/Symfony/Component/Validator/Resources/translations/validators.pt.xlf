@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Não é permitido usar caracteres de sobreposição ocultos.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>A extensão do ficheiro é inválida ({{ extension }}). As extensões permitidas são {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

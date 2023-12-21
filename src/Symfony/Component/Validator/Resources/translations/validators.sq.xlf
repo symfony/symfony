@@ -386,6 +386,50 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Kjo vlerë nuk është një numër i vlefshëm identifikues ndërkombëtar i sigurisë (ISIN).</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Kjo vlerë duhet të jetë një shprehje e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Kjo vlerë nuk është një ngjyrë e vlefshme CSS.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Kjo vlerë nuk është një shënim i vlefshëm CIDR.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Vlera e maskës së rrjetit duhet të jetë ndërmjet {{ min }} dhe {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Emri i skedarit është shumë i gjatë. Duhet të ketë maksimumi {{ filename_max_length }} karakter ose më pak.|Emri i skedarit është shumë i gjatë. Duhet të ketë maksimumi {{ filename_max_length }} karaktere ose më pak.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Fuqia e fjalëkalimit është shumë e ulët. Ju lutemi përdorni një fjalëkalim më të fortë.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Kjo vlerë përmban karaktere që nuk lejohen nga niveli aktual i kufizimit.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Përdorimi i karaktereve të padukshme nuk lejohet.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Përzierja e numrave nga skriptet e ndryshme nuk lejohet.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Përdorimi i karaktereve të mbivendosura të fshehura nuk lejohet.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Shtesa e skedarit është e pavlefshme ({{ extension }}). Shtesat e lejuara janë {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

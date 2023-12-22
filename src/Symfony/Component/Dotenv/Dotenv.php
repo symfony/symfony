@@ -80,7 +80,13 @@ final class Dotenv
      */
     public function load(string $path, string ...$extraPaths): void
     {
-        $this->doLoad(false, \func_get_args());
+        $needsAutoValueResolution = 1 === \func_num_args();
+
+        $this->doLoad(false, $needsAutoValueResolution, \func_get_args());
+
+        if (!$needsAutoValueResolution) {
+            $this->resolveAllVariables();
+        }
     }
 
     /**
@@ -100,12 +106,16 @@ final class Dotenv
      */
     public function loadEnv(string $path, string $envKey = null, string $defaultEnv = 'dev', array $testEnvs = ['test'], bool $overrideExistingVars = false): void
     {
+        // FIXME - Keep 'false' for loadEnv() or try to know if we will have multiple files to load?
+        // -> The environment is grabbed on the first doLoad() call so we cannot check conditions (except by loading the files multiple times..)
+        $needsAutoValueResolution = false;
+
         $k = $envKey ?? $this->envKey;
 
         if (is_file($path) || !is_file($p = "$path.dist")) {
-            $this->doLoad($overrideExistingVars, [$path]);
+            $this->doLoad($overrideExistingVars, $needsAutoValueResolution, [$path]);
         } else {
-            $this->doLoad($overrideExistingVars, [$p]);
+            $this->doLoad($overrideExistingVars, $needsAutoValueResolution, [$p]);
         }
 
         if (null === $env = $_SERVER[$k] ?? $_ENV[$k] ?? null) {
@@ -113,20 +123,28 @@ final class Dotenv
         }
 
         if (!\in_array($env, $testEnvs, true) && is_file($p = "$path.local")) {
-            $this->doLoad($overrideExistingVars, [$p]);
+            $this->doLoad($overrideExistingVars, $needsAutoValueResolution, [$p]);
             $env = $_SERVER[$k] ?? $_ENV[$k] ?? $env;
         }
 
         if ('local' === $env) {
+            if (!$needsAutoValueResolution) {
+                $this->resolveAllVariables();
+            }
+
             return;
         }
 
         if (is_file($p = "$path.$env")) {
-            $this->doLoad($overrideExistingVars, [$p]);
+            $this->doLoad($overrideExistingVars, $needsAutoValueResolution, [$p]);
         }
 
         if (is_file($p = "$path.$env.local")) {
-            $this->doLoad($overrideExistingVars, [$p]);
+            $this->doLoad($overrideExistingVars, $needsAutoValueResolution, [$p]);
+        }
+
+        if (!$needsAutoValueResolution) {
+            $this->resolveAllVariables();
         }
     }
 
@@ -167,7 +185,13 @@ final class Dotenv
      */
     public function overload(string $path, string ...$extraPaths): void
     {
-        $this->doLoad(true, \func_get_args());
+        $needsAutoValueResolution = 1 === \func_num_args();
+
+        $this->doLoad(true, $needsAutoValueResolution, \func_get_args());
+
+        if (!$needsAutoValueResolution) {
+            $this->resolveAllVariables();
+        }
     }
 
     /**
@@ -220,12 +244,13 @@ final class Dotenv
     /**
      * Parses the contents of an .env file.
      *
-     * @param string $data The data to be parsed
-     * @param string $path The original file name where data where stored (used for more meaningful error messages)
+     * @param string $data                 The data to be parsed
+     * @param string $path                 The original file name where data where stored (used for more meaningful error messages)
+     * @param bool   $needsValueResolution true when the value resolution needs to be done automatically
      *
      * @throws FormatException when a file has a syntax error
      */
-    public function parse(string $data, string $path = '.env'): array
+    public function parse(string $data, string $path = '.env', bool $needsValueResolution = true): array
     {
         $this->path = $path;
         $this->data = str_replace(["\r\n", "\r"], "\n", $data);
@@ -246,7 +271,7 @@ final class Dotenv
                     break;
 
                 case self::STATE_VALUE:
-                    $this->values[$name] = $this->lexValue();
+                    $this->values[$name] = $this->lexValue($needsValueResolution);
                     $state = self::STATE_VARNAME;
                     break;
             }
@@ -292,7 +317,7 @@ final class Dotenv
         return $matches[2];
     }
 
-    private function lexValue(): string
+    private function lexValue(bool $needsValueResolution): string
     {
         if (preg_match('/[ \t]*+(?:#.*)?$/Am', $this->data, $matches, 0, $this->cursor)) {
             $this->moveCursor($matches[0]);
@@ -341,7 +366,11 @@ final class Dotenv
                 ++$this->cursor;
                 $value = str_replace(['\\"', '\r', '\n'], ['"', "\r", "\n"], $value);
                 $resolvedValue = $value;
-                $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
+
+                if ($needsValueResolution) {
+                    $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
+                }
+
                 $resolvedValue = $this->resolveCommands($resolvedValue, $loadedVars);
                 $resolvedValue = str_replace('\\\\', '\\', $resolvedValue);
                 $v .= $resolvedValue;
@@ -364,7 +393,11 @@ final class Dotenv
                 }
                 $value = rtrim($value);
                 $resolvedValue = $value;
-                $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
+
+                if ($needsValueResolution) {
+                    $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
+                }
+
                 $resolvedValue = $this->resolveCommands($resolvedValue, $loadedVars);
                 $resolvedValue = str_replace('\\\\', '\\', $resolvedValue);
 
@@ -546,14 +579,35 @@ final class Dotenv
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }
 
-    private function doLoad(bool $overrideExistingVars, array $paths): void
+    private function doLoad(bool $overrideExistingVars, bool $needsValueResolution, array $paths): void
     {
         foreach ($paths as $path) {
             if (!is_readable($path) || is_dir($path)) {
                 throw new PathException($path);
             }
 
-            $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
+            $this->populate($this->parse(file_get_contents($path), $path, $needsValueResolution), $overrideExistingVars);
         }
+    }
+
+    private function resolveAllVariables(): void
+    {
+        $resolvedVars = [];
+        $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
+        unset($loadedVars['']);
+
+        foreach ($_ENV as $name => $value) {
+            if ('SYMFONY_DOTENV_VARS' === $name) {
+                continue;
+            }
+
+            $resolvedValue = $this->resolveVariables($value, $loadedVars);
+
+            if ($resolvedValue !== $value) {
+                $resolvedVars[$name] = $resolvedValue;
+            }
+        }
+
+        $this->populate($resolvedVars, true);
     }
 }

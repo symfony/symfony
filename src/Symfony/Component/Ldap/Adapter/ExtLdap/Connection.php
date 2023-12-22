@@ -70,7 +70,6 @@ class Connection extends AbstractConnection
 
         if (false === @ldap_bind($this->connection, $dn, $password)) {
             $error = ldap_error($this->connection);
-        
             throw match (ldap_errno($this->connection)) {
                 self::LDAP_INVALID_CREDENTIALS => new InvalidCredentialsException($error),
                 self::LDAP_TIMEOUT => new ConnectionTimeoutException($error),

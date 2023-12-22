@@ -90,6 +90,36 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertEquals(3, $c->getTime());
     }
 
+    public function testCollectTimeWithFloatExecutionMS()
+    {
+        $queries = [
+            ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 0.23],
+        ];
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+        $c = unserialize(serialize($c));
+        $this->assertEqualsWithDelta(0.23, $c->getTime(), .01);
+
+        $queries = [
+            ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 1.02],
+            ['sql' => 'SELECT * FROM table2', 'params' => [], 'types' => [], 'executionMS' => 0.75],
+        ];
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+        $c = unserialize(serialize($c));
+        $this->assertEqualsWithDelta(1.77, $c->getTime(), .01);
+
+        $queries = [
+            ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 0.15],
+            ['sql' => 'SELECT * FROM table2', 'params' => [], 'types' => [], 'executionMS' => 0.32],
+            ['sql' => 'SELECT * FROM table3', 'params' => [], 'types' => [], 'executionMS' => 0.07],
+        ];
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+        $c = unserialize(serialize($c));
+        $this->assertEqualsWithDelta(0.54, $c->getTime(), .01);
+    }
+
     public function testCollectQueryWithNoTypes()
     {
         $queries = [
@@ -248,7 +278,7 @@ class DoctrineDataCollectorTest extends TestCase
             $debugDataHolder->addQuery('default', $query);
 
             if (isset($queryData['executionMS'])) {
-                sleep($queryData['executionMS']);
+                usleep($queryData['executionMS'] * 1000000);
             }
             $query->stop();
         }

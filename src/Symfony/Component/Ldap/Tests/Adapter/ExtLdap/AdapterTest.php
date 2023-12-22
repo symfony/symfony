@@ -117,7 +117,8 @@ class AdapterTest extends LdapTestCase
         $ldap->getConnection()->bind('invalid_dn', 'invalid_password');
     }
 
-    public function testBindWithConnectionTimeout() {
+    public function testBindWithConnectionTimeout() 
+    {
         $ldap = new Adapter($this->getLdapConfig([\LDAP_OPT_NETWORK_TIMEOUT => 1]));
 
         $this->expectException(ConnectionTimeoutException::class);

@@ -283,9 +283,6 @@ class AbstractNormalizerTest extends TestCase
         $this->assertSame([], $normalizer->normalize($dummy));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDenormalizeWhenObjectNotInstantiable()
     {
         $this->expectException(NotNormalizableValueException::class);

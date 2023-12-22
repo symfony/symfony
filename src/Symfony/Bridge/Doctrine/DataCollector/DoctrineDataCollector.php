@@ -85,7 +85,7 @@ class DoctrineDataCollector extends DataCollector
         return $this->data['queries'];
     }
 
-    public function getTime(): int
+    public function getTime(): float
     {
         $time = 0;
         foreach ($this->data['queries'] as $queries) {

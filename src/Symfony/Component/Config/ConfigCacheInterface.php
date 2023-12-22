@@ -42,4 +42,11 @@ interface ConfigCacheInterface
      * @throws \RuntimeException When the cache file cannot be written
      */
     public function write(string $content, array $metadata = null): void;
+
+    /*
+     * Returns the metadata stored for this cache.
+     *
+     * @return false|ResourceInterface[]
+     */
+    // public function getMeta() : false | array;
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Added method `getMeta()` to ResourceCheckerConfigCache and ConfigCacheInterface
+
 7.0
 ---
 

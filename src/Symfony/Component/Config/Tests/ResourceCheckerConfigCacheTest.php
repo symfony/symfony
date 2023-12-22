@@ -148,4 +148,14 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
         $this->assertFalse($cache->isFresh());
     }
+
+    public function testGetMeta()
+    {
+        $checker = $this->createMock(ResourceCheckerInterface::class);
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
+        $cache->write('foo', [new FileResource(__FILE__)]);
+
+        $this->assertCount(1, $cache->getMeta());
+        $this->assertEquals(new FileResource(__FILE__), $cache->getMeta()[0]);
+    }
 }

@@ -70,15 +70,13 @@ class Connection extends AbstractConnection
 
         if (false === @ldap_bind($this->connection, $dn, $password)) {
             $error = ldap_error($this->connection);
-            switch (ldap_errno($this->connection)) {
-                case self::LDAP_INVALID_CREDENTIALS:
-                    throw new InvalidCredentialsException($error);
-                case self::LDAP_TIMEOUT:
-                    throw new ConnectionTimeoutException($error);
-                case self::LDAP_ALREADY_EXISTS:
-                    throw new AlreadyExistsException($error);
-            }
-            throw new ConnectionException($error);
+        
+            throw match (ldap_errno($this->connection)) {
+                self::LDAP_INVALID_CREDENTIALS => new InvalidCredentialsException($error),
+                self::LDAP_TIMEOUT => new ConnectionTimeoutException($error),
+                self::LDAP_ALREADY_EXISTS => new AlreadyExistsException($error),
+                default => new ConnectionException($error),
+            };
         }
 
         $this->bound = true;

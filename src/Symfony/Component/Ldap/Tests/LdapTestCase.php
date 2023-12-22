@@ -15,13 +15,17 @@ use PHPUnit\Framework\TestCase;
 
 class LdapTestCase extends TestCase
 {
-    protected function getLdapConfig()
+    protected function getLdapConfig($options = [])
     {
         $h = @ldap_connect(getenv('LDAP_HOST'), getenv('LDAP_PORT'));
         @ldap_set_option($h, \LDAP_OPT_PROTOCOL_VERSION, 3);
 
         if (!$h || !@ldap_bind($h)) {
             $this->markTestSkipped('No server is listening on LDAP_HOST:LDAP_PORT');
+        }
+
+        foreach ($options as $option => $value) {
+            @ldap_set_option($h, $option, $value);
         }
 
         ldap_unbind($h);

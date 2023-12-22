@@ -15,6 +15,8 @@ use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Query;
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\ConnectionTimeoutException;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\LdapInterface;
@@ -97,6 +99,29 @@ class AdapterTest extends LdapTestCase
         $entry = $result[0];
         $this->assertEquals(1, $result->count());
         $this->assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
+    }
+
+    public function testBindWithValidCredentials()
+    {
+        $ldap = new Adapter($this->getLdapConfig());
+
+        $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
+        $this->assertTrue($this->ldapConnection->isBound());
+    }
+
+    public function testBindWithInvalidCredentials()
+    {
+        $ldap = new Adapter($this->getLdapConfig());
+
+        $this->expectException(InvalidCredentialsException::class);
+        $ldap->getConnection()->bind('invalid_dn', 'invalid_password');
+    }
+
+    public function testBindWithConnectionTimeout() {
+        $ldap = new Adapter($this->getLdapConfig([\LDAP_OPT_NETWORK_TIMEOUT => 1]));
+
+        $this->expectException(ConnectionTimeoutException::class);
+        $ldap->getConnection()->bind('invalid_dn', 'invalid_password');
     }
 
     public function testLdapQueryScopeOneLevel()

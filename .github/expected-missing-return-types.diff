@@ -60,10 +60,10 @@ diff --git a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
      {
          return $this->data['queries'];
 @@ -149,5 +149,5 @@ class DoctrineDataCollector extends DataCollector
-      * @return int
+      * @return float
       */
 -    public function getTime()
-+    public function getTime(): int
++    public function getTime(): float
      {
          $time = 0;
 diff --git a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php

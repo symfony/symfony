@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Не е дозволено користење на скриени знаци за преклопување.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Зголемувања на датотеката е неважечка ({{ extension }}). Дозволени зголемувања се ({{ extensions }}).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

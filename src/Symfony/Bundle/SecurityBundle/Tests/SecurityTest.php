@@ -252,6 +252,28 @@ class SecurityTest extends TestCase
         $security->login($user);
     }
 
+    public function testLoginWithoutRequestContext()
+    {
+        $requestStack = new RequestStack();
+        $user = $this->createMock(UserInterface::class);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->atLeastOnce())
+            ->method('get')
+            ->willReturnMap([
+                ['request_stack', $requestStack],
+            ])
+        ;
+
+        $security = new Security($container, ['main' => null]);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unable to login without a request context.');
+
+        $security->login($user);
+    }
+
     public function testLogout()
     {
         $request = new Request();
@@ -456,6 +478,27 @@ class SecurityTest extends TestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals('a custom response', $response->getContent());
+    }
+
+    public function testLogoutWithoutRequestContext()
+    {
+        $requestStack = new RequestStack();
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->atLeastOnce())
+            ->method('get')
+            ->willReturnMap([
+                ['request_stack', $requestStack],
+            ])
+        ;
+
+        $security = new Security($container, ['main' => null]);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unable to logout without a request context.');
+
+        $security->logout();
     }
 
     private function createContainer(string $serviceId, object $serviceObject): ContainerInterface

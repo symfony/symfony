@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-12-23T05:17:13Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-12-23T14:54:06Z
+
+Perhaps @garak could help us to validate this one 🙏
+
+---------------------------------------------------------------------------
+
+by garak at 2023-12-23T15:06:48Z
+
+This was already implemented in PR #53113
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-12-23T15:36:48Z
+
+Ah. I see #53113 was targeting 7.1. That was a misstake. We should target lowest branch.
+To add to the confusion is that 5.4 branch does not use this translations string...
+
+Im sorry for the confusion. I still think we should merge this to be consistent with how we usually do with translations. Unless @fabpot disagrees.
+
+@garak I see that your translation is slightly different. Could you give your 50 cents on this suggestion?
+
+---------------------------------------------------------------------------
+
+by garak at 2023-12-23T15:53:11Z
+
+@Nyholm the only difference I can spot is "L'estensioni" vs "Le estensioni". As noted in my previous comment, the only correct form in Italian is the latter, since we don't use the elision for plural articles.
+
+---------------------------------------------------------------------------
+
+by marac19901990 at 2023-12-23T15:57:22Z
+
+> @Nyholm the only difference I can spot is "L'estensioni" vs "Le estensioni". As noted in my previous comment, the only correct form in Italian is the latter, since we don't use the elision for plural articles.
+
+You are right, checked with my mother also :D It seems I haven't used Italian enough recently :D
+
+---------------------------------------------------------------------------
+
+by marac19901990 at 2023-12-23T16:04:04Z
+
+@garak I've changed it and fixed the mistake. Thanks for correcting me. If you sometime have the will to speak a little Italian with me, since I have few ocasions, I would be very thankful...
+
+---------------------------------------------------------------------------
+
+by garak at 2023-12-23T16:07:09Z
+
+> @garak I've changed it and fixed the mistake. Thanks for correcting me. If you sometime have the will to speak a little Italian with me, since I have few ocasions, I would be very thankful...
+
+Sure! You can find me on the Symfony Devs slack channel

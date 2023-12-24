@@ -73,11 +73,33 @@ class DoctrineIntegrationTest extends TestCase
             $stmt = $stmt->execute();
         }
 
-        $available_at = new \DateTime($stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchOne() : $stmt->fetchColumn());
+        $availableAt = new \DateTime($stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchOne() : $stmt->fetchColumn());
 
         $now = new \DateTime();
         $now->modify('+60 seconds');
-        $this->assertGreaterThan($now, $available_at);
+        $this->assertGreaterThan($now, $availableAt);
+    }
+
+    public function testSendWithNegativeDelay()
+    {
+        $this->connection->send('{"message": "Hi I am not actually delayed"}', ['type' => DummyMessage::class], -600000);
+
+        $stmt = $this->driverConnection->createQueryBuilder()
+            ->select('m.available_at')
+            ->from('messenger_messages', 'm')
+            ->where('m.body = :body')
+            ->setParameter('body', '{"message": "Hi I am not actually delayed"}');
+        if (method_exists($stmt, 'executeQuery')) {
+            $stmt = $stmt->executeQuery();
+        } else {
+            $stmt = $stmt->execute();
+        }
+
+        $availableAt = new \DateTime($stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchOne() : $stmt->fetchColumn());
+
+        $now = new \DateTime();
+        $now->modify('-60 seconds');
+        $this->assertLessThan($now, $availableAt);
     }
 
     public function testItRetrieveTheFirstAvailableMessage()

@@ -125,7 +125,7 @@ class Connection implements ResetInterface
     public function send(string $body, array $headers, int $delay = 0): string
     {
         $now = new \DateTime();
-        $availableAt = (clone $now)->modify(sprintf('+%d seconds', $delay / 1000));
+        $availableAt = (clone $now)->modify(sprintf('%+d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
             ->insert($this->configuration['table_name'])

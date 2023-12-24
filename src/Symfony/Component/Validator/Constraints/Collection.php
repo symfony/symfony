@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Constraint;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -33,9 +35,10 @@ class Collection extends Composite
 
     public function __construct(array $fields = null, array $groups = null, mixed $payload = null, bool $allowExtraFields = null, bool $allowMissingFields = null, string $extraFieldsMessage = null, string $missingFieldsMessage = null)
     {
-        // no known options set? $fields is the fields array
         if (\is_array($fields)
-            && !array_intersect(array_keys($fields), ['groups', 'fields', 'allowExtraFields', 'allowMissingFields', 'extraFieldsMessage', 'missingFieldsMessage'])) {
+            && (($firstField = reset($fields)) instanceof Constraint
+                || ($firstField[0] ?? null) instanceof Constraint
+            )) {
             $fields = ['fields' => $fields];
         }
 

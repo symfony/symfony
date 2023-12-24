@@ -119,7 +119,7 @@ class Connection implements ResetInterface
     public function send(string $body, array $headers, int $delay = 0): string
     {
         $now = new \DateTimeImmutable('UTC');
-        $availableAt = $now->modify(sprintf('+%d seconds', $delay / 1000));
+        $availableAt = $now->modify(sprintf('%+d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
             ->insert($this->configuration['table_name'])

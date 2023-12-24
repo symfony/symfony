@@ -18,12 +18,21 @@ use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class CollectionTest extends TestCase
 {
+    public function testRejectNonConstraints()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        new Collection([
+            'foo' => 'bar',
+        ]);
+    }
+
     public function testRejectValidConstraint()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -96,5 +105,44 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Default'], $constraint->groups);
         $this->assertEquals(['Default'], $constraint->fields['foo']->groups);
         $this->assertEquals(['Default'], $constraint->fields['bar']->groups);
+    }
+
+    public function testOnlySomeKeysAreKnowOptions()
+    {
+        $constraint = new Collection([
+            'fields' => [new Required()],
+            'properties' => [new Required()],
+            'catalog' => [new Optional()],
+        ]);
+
+        $this->assertArrayHasKey('fields', $constraint->fields);
+        $this->assertInstanceOf(Required::class, $constraint->fields['fields']);
+        $this->assertArrayHasKey('properties', $constraint->fields);
+        $this->assertInstanceOf(Required::class, $constraint->fields['properties']);
+        $this->assertArrayHasKey('catalog', $constraint->fields);
+        $this->assertInstanceOf(Optional::class, $constraint->fields['catalog']);
+    }
+
+    public function testAllKeysAreKnowOptions()
+    {
+        $constraint = new Collection([
+            'fields' => [
+                'fields' => [new Required()],
+                'properties' => [new Required()],
+                'catalog' => [new Optional()],
+            ],
+            'allowExtraFields' => true,
+            'extraFieldsMessage' => 'foo bar baz',
+        ]);
+
+        $this->assertArrayHasKey('fields', $constraint->fields);
+        $this->assertInstanceOf(Required::class, $constraint->fields['fields']);
+        $this->assertArrayHasKey('properties', $constraint->fields);
+        $this->assertInstanceOf(Required::class, $constraint->fields['properties']);
+        $this->assertArrayHasKey('catalog', $constraint->fields);
+        $this->assertInstanceOf(Optional::class, $constraint->fields['catalog']);
+
+        $this->assertTrue($constraint->allowExtraFields);
+        $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 }

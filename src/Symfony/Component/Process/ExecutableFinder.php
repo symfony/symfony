@@ -69,7 +69,7 @@ class ExecutableFinder
         }
 
         $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v';
-        if (\function_exists('exec') && ($executablePath = strtok(@exec($command.' '.escapeshellarg($name)), \PHP_EOL)) && is_executable($executablePath)) {
+        if (\function_exists('exec') && ($executablePath = strtok(@exec($command.' '.escapeshellarg($name)), \PHP_EOL)) && @is_executable($executablePath)) {
             return $executablePath;
         }
 

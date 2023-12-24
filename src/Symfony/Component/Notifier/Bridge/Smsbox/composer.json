@@ -2,7 +2,7 @@
     "name": "symfony/smsbox-notifier",
     "type": "symfony-notifier-bridge",
     "description": "Symfony Smsbox Notifier Bridge",
-    "keywords": ["sms", "Smsbox", "notifier"],
+    "keywords": ["sms", "smsbox", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

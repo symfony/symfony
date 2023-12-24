@@ -82,6 +82,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Sms77\Sms77TransportFactory::class => false,
             Bridge\Smsapi\SmsapiTransportFactory::class => false,
             Bridge\SmsBiuras\SmsBiurasTransportFactory::class => false,
+            Bridge\Smsbox\SmsboxTransportFactory::class => false,
             Bridge\Smsc\SmscTransportFactory::class => false,
             Bridge\SmsFactor\SmsFactorTransportFactory::class => false,
             Bridge\Smsmode\SmsmodeTransportFactory::class => false,

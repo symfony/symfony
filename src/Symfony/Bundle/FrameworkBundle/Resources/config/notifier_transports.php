@@ -188,6 +188,10 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 
+        ->set('notifier.transport_factory.smsbox', Bridge\Smsbox\SmsboxTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
         ->set('notifier.transport_factory.smsc', Bridge\Smsc\SmscTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')

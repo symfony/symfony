@@ -2750,6 +2750,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\Sms77\Sms77TransportFactory::class => 'notifier.transport_factory.sms77',
             NotifierBridge\Smsapi\SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
             NotifierBridge\SmsBiuras\SmsBiurasTransportFactory::class => 'notifier.transport_factory.sms-biuras',
+            NotifierBridge\Smsbox\SmsboxTransportFactory::class => 'notifier.transport_factory.smsbox',
             NotifierBridge\Smsc\SmscTransportFactory::class => 'notifier.transport_factory.smsc',
             NotifierBridge\SmsFactor\SmsFactorTransportFactory::class => 'notifier.transport_factory.sms-factor',
             NotifierBridge\Smsmode\SmsmodeTransportFactory::class => 'notifier.transport_factory.smsmode',

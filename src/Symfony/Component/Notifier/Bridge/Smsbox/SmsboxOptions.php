@@ -56,10 +56,7 @@ final class SmsboxOptions implements MessageOptionsInterface
         $this->options = [];
     }
 
-    /**
-     * @return null
-     */
-    public function getRecipientId(): ?string
+    public function getRecipientId(): null
     {
         return null;
     }

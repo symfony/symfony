@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-26T11:04:24Z
+
+Comments are addressed. I'll regenerate the expected return types file in a moment 🙂
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-26T12:04:44Z
+
+Changed `self` return types to `static` in `SmsboxOptions` which resolved the return type issues. This should be ready now
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-26T14:18:00Z
+
+Great work, I would prefer to remove the SmsboxMessage prefix from the enums, we have the namespace.
+
+Agree @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T14:19:16Z
+
+`Enum` subnamespace?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-26T14:20:55Z
+
+I was skeptical to just have a `Day` or `Charset` enum for instance at the root of the component, but with an Enum subnamespace, I agree with the idea. I'm doing the change

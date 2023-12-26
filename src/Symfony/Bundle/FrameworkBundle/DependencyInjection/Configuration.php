@@ -25,7 +25,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\FeatureFlag\FeatureCheckerInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\HttpClient;
@@ -181,7 +180,6 @@ class Configuration implements ConfigurationInterface
         $this->addHtmlSanitizerSection($rootNode, $enableIfStandalone);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode, $enableIfStandalone);
-        $this->addFeatureFlagSection($rootNode, $enableIfStandalone);
 
         return $treeBuilder;
     }
@@ -2547,17 +2545,5 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
-    }
-
-    private function addFeatureFlagSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
-    {
-        $rootNode
-            ->children()
-                ->arrayNode('feature_flag')
-                    ->info('FeatureFlag configuration')
-                    ->{$enableIfStandalone('symfony/feature-flag', FeatureCheckerInterface::class)}()
-                    ->fixXmlConfig('feature_flag')
-                ->end()
-            ->end();
     }
 }

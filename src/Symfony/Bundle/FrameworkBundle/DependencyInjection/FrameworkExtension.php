@@ -145,6 +145,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Routing\Router;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
@@ -710,9 +711,9 @@ class FrameworkExtension extends Extension
                 $taskAttributeClass,
                 static function (ChildDefinition $definition, AsPeriodicTask|AsCronTask $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
                     $tagAttributes = get_object_vars($attribute) + [
-                        'trigger' => match (true) {
-                            $attribute instanceof AsPeriodicTask => 'every',
-                            $attribute instanceof AsCronTask => 'cron',
+                        'trigger' => match ($attribute::class) {
+                            AsPeriodicTask::class => 'every',
+                            AsCronTask::class => 'cron',
                         },
                     ];
                     if ($reflector instanceof \ReflectionMethod) {
@@ -1049,7 +1050,7 @@ class FrameworkExtension extends Extension
             $workflowDefinition->replaceArgument(3, $name);
             $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
 
-            $workflowDefinition->addTag('workflow', ['name' => $name, 'metadata' => $workflow['metadata']]);
+            $workflowDefinition->addTag('workflow', ['name' => $name]);
             if ('workflow' === $type) {
                 $workflowDefinition->addTag('workflow.workflow', ['name' => $name]);
             } elseif ('state_machine' === $type) {
@@ -1122,6 +1123,29 @@ class FrameworkExtension extends Extension
                 $container->setDefinition(\sprintf('.%s.listener.guard', $workflowId), $guard);
                 $container->setParameter('workflow.has_guard_listeners', true);
             }
+        }
+
+        $listenerAttributes = [
+            Workflow\Attribute\AsAnnounceListener::class,
+            Workflow\Attribute\AsCompletedListener::class,
+            Workflow\Attribute\AsEnterListener::class,
+            Workflow\Attribute\AsEnteredListener::class,
+            Workflow\Attribute\AsGuardListener::class,
+            Workflow\Attribute\AsLeaveListener::class,
+            Workflow\Attribute\AsTransitionListener::class,
+        ];
+
+        foreach ($listenerAttributes as $attribute) {
+            $container->registerAttributeForAutoconfiguration($attribute, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                if ($reflector instanceof \ReflectionMethod) {
+                    if (isset($tagAttributes['method'])) {
+                        throw new LogicException(sprintf('"%s" attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
+                    }
+                    $tagAttributes['method'] = $reflector->getName();
+                }
+                $definition->addTag('kernel.event_listener', $tagAttributes);
+            });
         }
     }
 
@@ -3261,7 +3285,7 @@ class FrameworkExtension extends Extension
         }
 
         $container->addResource(new FileResource($composerFilePath));
-        $composerConfig = json_decode((new Filesystem())->readFile($composerFilePath), true, flags: \JSON_THROW_ON_ERROR);
+        $composerConfig = json_decode(file_get_contents($composerFilePath), true);
 
         return isset($composerConfig['extra']['public-dir']) ? $projectDir.'/'.$composerConfig['extra']['public-dir'] : $defaultPublicDir;
     }

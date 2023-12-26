@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-12-24T00:51:43Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-24T00:57:54Z
+
+How can i tell fabbot to _not_ add Licence or correct typo in the generated files ?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-26T16:26:58Z
+
+> Is the reordering necessary? Can't we get rid of it? I'd prefer keeping the original order if possible.
+
+By "original" you mean the one implemented previously ?
+
+The problem i see: it was not the same between locales (as soon as parent/child where involved), and a new child addind a translatation for a given emoji would change the message.. and its position in the array.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T17:22:49Z
+
+I mean the order implemented previously yes, which is the order found in the source IIRC.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-26T17:43:48Z
+
+The previous files were not ordered like the source ones, they were ordered by mb_strlen then source order.
+
+```
+$codePointsCount = mb_strlen($emoji);
+$mapsByLocale[$locale][$codePointsCount][$emoji] = $name;
+```
+
+And that order was kept only when no parent/child locale was involved
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-26T17:45:38Z
+
+I can mimic this behaviour to build the "model map" if you want
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T17:46:13Z
+
+I like reducing diffs so if you can then yes please :)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-26T18:33:15Z
+
+> I like reducing diffs so if you can then yes please :)
+
+Much better now indeed ... only the "child locales" have been updated
+
+As they were the only one concerned by the two problems (arrows instead of messages, and missing parent messages) this is much more logical.
+
+Thanks ;)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-26T18:34:15Z
+
+Still don't know how to handle fabbot false positives ❓
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T18:37:07Z
+
+> Still don't know how to handle fabbot false positives ❓
+
+ignoring them once they are checked :brain:

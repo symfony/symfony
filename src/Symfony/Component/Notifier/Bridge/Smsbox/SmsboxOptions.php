@@ -11,49 +11,25 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsbox;
 
+use Symfony\Component\Intl\Countries;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Charset;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Day;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Encoding;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Mode;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Strategy;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Udh;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Alan Zarli <azarli@smsbox.fr>
  * @author Farid Touil <ftouil@smsbox.fr>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 final class SmsboxOptions implements MessageOptionsInterface
 {
-    public const MESSAGE_MODE_STANDARD = 'Standard';
-    public const MESSAGE_MODE_EXPERT = 'Expert';
-    public const MESSAGE_MODE_RESPONSE = 'Reponse';
-
-    public const MESSAGE_STRATEGY_PRIVATE = 1;
-    public const MESSAGE_STRATEGY_NOTIFICATION = 2;
-    public const MESSAGE_STRATEGY_NOT_MARKETING_GROUP = 3;
-    public const MESSAGE_STRATEGY_MARKETING = 4;
-
-    public const MESSAGE_CODING_DEFAULT = 'default';
-    public const MESSAGE_CODING_UNICODE = 'unicode';
-    public const MESSAGE_CODING_AUTO = 'auto';
-
-    public const MESSAGE_CHARSET_ISO_1 = 'iso-8859-1';
-    public const MESSAGE_CHARSET_ISO_15 = 'iso-8859-15';
-    public const MESSAGE_CHARSET_UTF8 = 'utf-8';
-
-    public const MESSAGE_DAYS_MONDAY = 1;
-    public const MESSAGE_DAYS_TUESDAY = 2;
-    public const MESSAGE_DAYS_WEDNESDAY = 3;
-    public const MESSAGE_DAYS_THURSDAY = 4;
-    public const MESSAGE_DAYS_FRIDAY = 5;
-    public const MESSAGE_DAYS_SATURDAY = 6;
-    public const MESSAGE_DAYS_SUNDAY = 7;
-
-    public const MESSAGE_UDH_6_OCTETS = 1;
-    public const MESSAGE_UDH_7_OCTETS = 2;
-    public const MESSAGE_UDH_DISABLED_CONCAT = 0;
-
-    private array $options;
-
-    public function __construct(array $options = [])
+    public function __construct(private array $options = [])
     {
-        $this->options = [];
     }
 
     public function getRecipientId(): null
@@ -61,89 +37,142 @@ final class SmsboxOptions implements MessageOptionsInterface
         return null;
     }
 
-    public function mode(string $mode)
+    /**
+     * @return $this
+     */
+    public function mode(Mode $mode): static
     {
-        $this->options['mode'] = self::validateMode($mode);
-
-        return $this;
-    }
-
-    public function strategy(int $strategy)
-    {
-        $this->options['strategy'] = self::validateStrategy($strategy);
-
-        return $this;
-    }
-
-    public function date(string $date)
-    {
-        $this->options['date'] = self::validateDate($date);
-
-        return $this;
-    }
-
-    public function hour(string $hour)
-    {
-        $this->options['heure'] = self::validateHour($hour);
+        $this->options['mode'] = $mode->value;
 
         return $this;
     }
 
     /**
-     * This method mustn't be set along with date and hour methods.
+     * @return $this
      */
-    public function dateTime(\DateTime $dateTime)
+    public function strategy(Strategy $strategy): static
     {
-        $this->options['dateTime'] = self::validateDateTime($dateTime);
+        $this->options['strategy'] = $strategy->value;
 
         return $this;
     }
 
     /**
-     * This method wait an ISO 3166-1 alpha.
+     * @return $this
      */
-    public function destIso(string $isoCode)
+    public function date(string $date): static
     {
-        $this->options['dest_iso'] = self::validateDestIso($isoCode);
+        if (isset($this->options['dateTime'])) {
+            throw new InvalidArgumentException(sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
+        }
+
+        if (!\DateTimeImmutable::createFromFormat('d/m/Y', $date)) {
+            throw new \DateMalformedStringException('The date must be in DD/MM/YYYY format.');
+        }
+
+        $this->options['date'] = $date;
 
         return $this;
     }
 
     /**
-     * This method will automatically set personnalise = 1 (according to SMSBOX documentation).
+     * @return $this
      */
-    public function variable(array $variable)
+    public function hour(string $hour): static
+    {
+        if (isset($this->options['dateTime'])) {
+            throw new InvalidArgumentException(sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
+        }
+
+        if (!\DateTimeImmutable::createFromFormat('H:i', $hour)) {
+            throw new \DateMalformedStringException('Hour must be in HH:MM format.');
+        }
+
+        $this->options['heure'] = $hour;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function dateTime(\DateTimeImmutable $dateTime): static
+    {
+        if (isset($this->options['date']) || isset($this->options['heure'])) {
+            throw new InvalidArgumentException(sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
+        }
+
+        if ($dateTime < new \DateTimeImmutable('now')) {
+            throw new InvalidArgumentException('The given DateTime must be greater to the current date.');
+        }
+
+        $this->options['dateTime'] = $dateTime->setTimezone(new \DateTimeZone('Europe/Paris'));
+
+        return $this;
+    }
+
+    /**
+     * An ISO 3166-1 alpha code.
+     *
+     * @return $this
+     */
+    public function destIso(string $isoCode): static
+    {
+        if (class_exists(Countries::class) && !Countries::exists($isoCode)) {
+            throw new InvalidArgumentException(sprintf('The country code "%s" is not valid.', $isoCode));
+        }
+
+        $this->options['dest_iso'] = $isoCode;
+
+        return $this;
+    }
+
+    /**
+     * Automatically sets `personnalise` option to 1.
+     *
+     * @return $this
+     */
+    public function variable(array $variable): static
     {
         $this->options['variable'] = $variable;
 
         return $this;
     }
 
-    public function coding(string $coding)
+    /**
+     * @return $this
+     */
+    public function coding(Encoding $encoding): static
     {
-        $this->options['coding'] = self::validateCoding($coding);
-
-        return $this;
-    }
-
-    public function charset(string $charset)
-    {
-        $this->options['charset'] = self::validateCharset($charset);
-
-        return $this;
-    }
-
-    public function udh(int $udh)
-    {
-        $this->options['udh'] = self::validateUdh($udh);
+        $this->options['coding'] = $encoding->value;
 
         return $this;
     }
 
     /**
-     * The true value = 1 in SMSBOX documentation.
+     * @return $this
      */
-    public function callback(bool $callback)
+    public function charset(Charset $charset): static
+    {
+        $this->options['charset'] = $charset->value;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function udh(Udh $udh): static
+    {
+        $this->options['udh'] = $udh->value;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function callback(bool $callback): static
     {
         $this->options['callback'] = $callback;
 
@@ -151,44 +180,79 @@ final class SmsboxOptions implements MessageOptionsInterface
     }
 
     /**
-     * The true value = 1 in SMSBOX documentation.
+     * @return $this
      */
-    public function allowVocal(bool $allowVocal)
+    public function allowVocal(bool $allowVocal): static
     {
         $this->options['allow_vocal'] = $allowVocal;
 
         return $this;
     }
 
-    public function maxParts(int $maxParts)
+    /**
+     * @return $this
+     */
+    public function maxParts(int $maxParts): static
     {
-        $this->options['max_parts'] = self::validateMaxParts($maxParts);
+        if ($maxParts < 1 || $maxParts > 8) {
+            throw new InvalidArgumentException(sprintf('The "max_parts" option must be an integer between 1 and 8, got "%d".', $maxParts));
+        }
+
+        $this->options['max_parts'] = $maxParts;
 
         return $this;
     }
 
-    public function validity(int $validity)
+    /**
+     * @return $this
+     */
+    public function validity(int $validity): static
     {
-        $this->options['validity'] = self::validateValidity($validity);
+        if ($validity < 5 || $validity > 1440) {
+            throw new InvalidArgumentException(sprintf('The "validity" option must be an integer between 5 and 1440, got "%d".', $validity));
+        }
+
+        $this->options['validity'] = $validity;
 
         return $this;
     }
 
-    public function daysMinMax(int $min, int $max)
+    /**
+     * @return $this
+     */
+    public function daysMinMax(Day $min, Day $max): static
     {
-        $this->options['daysMinMax'] = self::validateDays($min, $max);
+        if (!$min->isBeforeOrEqualTo($max)) {
+            throw new InvalidArgumentException('The minimum day must be before the maximum day or the same.');
+        }
+
+        $this->options['daysMinMax'] = [$min->value, $max->value];
 
         return $this;
     }
 
-    public function hoursMinMax(int $min, int $max)
+    /**
+     * @return $this
+     */
+    public function hoursMinMax(int $min, int $max): static
     {
-        $this->options['hoursMinMax'] = self::validateHours($min, $max);
+        if ($min < 0 || $min > $max) {
+            throw new InvalidArgumentException('The minimum hour must be greater than 0 and lower than the maximum hour.');
+        }
+
+        if ($max > 23) {
+            throw new InvalidArgumentException('The maximum hour must be lower or equal to 23.');
+        }
+
+        $this->options['hoursMinMax'] = [$min, $max];
 
         return $this;
     }
 
-    public function sender(string $sender)
+    /**
+     * @return $this
+     */
+    public function sender(string $sender): static
     {
         $this->options['sender'] = $sender;
 
@@ -198,188 +262,5 @@ final class SmsboxOptions implements MessageOptionsInterface
     public function toArray(): array
     {
         return $this->options;
-    }
-
-    public static function validateMode(string $mode): string
-    {
-        $supportedModes = [
-            self::MESSAGE_MODE_STANDARD,
-            self::MESSAGE_MODE_EXPERT,
-            self::MESSAGE_MODE_RESPONSE,
-        ];
-
-        if (!\in_array($mode, $supportedModes, true)) {
-            throw new InvalidArgumentException(sprintf('The message mode "%s" is not supported; supported message modes are: "%s".', $mode, implode('", "', $supportedModes)));
-        }
-
-        return $mode;
-    }
-
-    public static function validateStrategy(int $strategy): int
-    {
-        $supportedStrategies = [
-            self::MESSAGE_STRATEGY_PRIVATE,
-            self::MESSAGE_STRATEGY_NOTIFICATION,
-            self::MESSAGE_STRATEGY_NOT_MARKETING_GROUP,
-            self::MESSAGE_STRATEGY_MARKETING,
-        ];
-        if (!\in_array($strategy, $supportedStrategies, true)) {
-            throw new InvalidArgumentException(sprintf('The message strategy "%s" is not supported; supported strategies types are: "%s".', $strategy, implode('", "', $supportedStrategies)));
-        }
-
-        return $strategy;
-    }
-
-    public static function validateDate(string $date): string
-    {
-        $dateTimeObj = \DateTime::createFromFormat('d/m/Y', $date);
-        $now = new \DateTime();
-        $tz = new \DateTimeZone('Europe/Paris');
-        $dateTimeObj->setTimezone($tz);
-        $now->setTimezone($tz);
-
-        if (!$dateTimeObj || $dateTimeObj->format('Y-m-d') <= (new \DateTime())->format('Y-m-d')) {
-            throw new InvalidArgumentException('The date must be in DD/MM/YYYY format and greater than the current date.');
-        }
-
-        return $date;
-    }
-
-    public static function validateDateTime(\DateTime $dateTime)
-    {
-        \Locale::setDefault('fr');
-        $now = new \DateTime();
-        $tz = new \DateTimeZone('Europe/Paris');
-        $now->setTimezone($tz);
-        $dateTime->setTimezone($tz);
-
-        if ($now > $dateTime || $dateTime > $now->modify('+2 Year')) {
-            throw new InvalidArgumentException('dateTime must be greater to the actual date and limited to 2 years in the future.');
-        }
-
-        return $dateTime;
-    }
-
-    public static function validateDestIso(string $isoCode)
-    {
-        if (!preg_match('/^[a-z]{2}$/i', $isoCode)) {
-            throw new InvalidArgumentException('destIso must be the ISO 3166-1 alpha 2 on two uppercase characters.');
-        }
-
-        return $isoCode;
-    }
-
-    public static function validateHour(string $hour): string
-    {
-        $dateTimeObjhour = \DateTime::createFromFormat('H:i', $hour);
-
-        if (!$dateTimeObjhour || $dateTimeObjhour->format('H:i') != $hour) {
-            throw new InvalidArgumentException('Hour must be in HH:MM format and valid.');
-        }
-
-        return $hour;
-    }
-
-    public static function validateCoding(string $coding): string
-    {
-        $supportedCodings = [
-            self::MESSAGE_CODING_DEFAULT,
-            self::MESSAGE_CODING_UNICODE,
-            self::MESSAGE_CODING_AUTO,
-        ];
-
-        if (!\in_array($coding, $supportedCodings, true)) {
-            throw new InvalidArgumentException(sprintf('The message coding : "%s" is not supported; supported codings types are: "%s".', $coding, implode('", "', $supportedCodings)));
-        }
-
-        return $coding;
-    }
-
-    public static function validateCharset(string $charset): string
-    {
-        $supportedCharsets = [
-            self::MESSAGE_CHARSET_ISO_1,
-            self::MESSAGE_CHARSET_ISO_15,
-            self::MESSAGE_CHARSET_UTF8,
-        ];
-
-        if (!\in_array($charset, $supportedCharsets, true)) {
-            throw new InvalidArgumentException(sprintf('The message charset : "%s" is not supported; supported charsets types are: "%s".', $charset, implode('", "', $supportedCharsets)));
-        }
-
-        return $charset;
-    }
-
-    public static function validateUdh(int $udh): int
-    {
-        $supportedUdhs = [
-            self::MESSAGE_UDH_6_OCTETS,
-            self::MESSAGE_UDH_7_OCTETS,
-            self::MESSAGE_UDH_DISABLED_CONCAT,
-        ];
-
-        if (!\in_array($udh, $supportedUdhs, true)) {
-            throw new InvalidArgumentException(sprintf('The message charset : "%s" is not supported; supported charsets types are: "%s".', $udh, implode('", "', $supportedUdhs)));
-        }
-
-        return $udh;
-    }
-
-    public static function validateMaxParts(int $maxParts): int
-    {
-        if ($maxParts < 1 || $maxParts > 8) {
-            throw new InvalidArgumentException(sprintf('The message max_parts : "%s" is not supported; supported max_parts values are integers between 1 and 8.', $maxParts));
-        }
-
-        return $maxParts;
-    }
-
-    public static function validateValidity(int $validity): int
-    {
-        if ($validity < 5 || $validity > 1440) {
-            throw new InvalidArgumentException(sprintf('The message validity : "%s" is not supported; supported validity values are integers between 5 and 1440.', $validity));
-        }
-
-        return $validity;
-    }
-
-    public static function validateDays(int $min, int $max): array
-    {
-        $supportedDays = [
-            self::MESSAGE_DAYS_MONDAY,
-            self::MESSAGE_DAYS_TUESDAY,
-            self::MESSAGE_DAYS_WEDNESDAY,
-            self::MESSAGE_DAYS_THURSDAY,
-            self::MESSAGE_DAYS_FRIDAY,
-            self::MESSAGE_DAYS_SATURDAY,
-            self::MESSAGE_DAYS_SUNDAY,
-        ];
-
-        if (!\in_array($min, $supportedDays, true)) {
-            throw new InvalidArgumentException(sprintf('The message min : "%s" is not supported; supported charsets types are: "%s".', $min, implode('", "', $supportedDays)));
-        }
-
-        if (!\in_array($max, $supportedDays, true)) {
-            throw new InvalidArgumentException(sprintf('The message max : "%s" is not supported; supported charsets types are: "%s".', $max, implode('", "', $supportedDays)));
-        }
-
-        if ($min > $max) {
-            throw new InvalidArgumentException(sprintf('The message max must be greater than min.', $min));
-        }
-
-        return [$min, $max];
-    }
-
-    public static function validateHours(int $min, int $max): array
-    {
-        if ($min < 0 || $min > $max) {
-            throw new InvalidArgumentException(sprintf('The message min : "%s" is not supported; supported min values are integers between 0 and 23.', $min));
-        }
-
-        if ($max > 23) {
-            throw new InvalidArgumentException(sprintf('The message max : "%s" is not supported; supported min values are integers between 0 and 23.', $max));
-        }
-
-        return [$min, $max];
     }
 }

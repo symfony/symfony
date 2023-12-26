@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsbox;
 
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Mode;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Strategy;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -30,18 +32,20 @@ final class SmsboxTransportFactory extends AbstractTransportFactory
         }
 
         $apiKey = $this->getUser($dsn);
-        $mode = $dsn->getRequiredOption('mode');
-        $strategy = $dsn->getRequiredOption('strategy');
+        $mode = Mode::from($dsn->getRequiredOption('mode'));
+        $strategy = Strategy::from($dsn->getRequiredOption('strategy'));
         $sender = $dsn->getOption('sender');
 
-        if (SmsboxOptions::MESSAGE_MODE_EXPERT === $mode) {
+        if (Mode::Expert === $mode) {
             $sender = $dsn->getRequiredOption('sender');
         }
 
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new SmsboxTransport($apiKey, $mode, $strategy, $sender, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new SmsboxTransport($apiKey, $mode, $strategy, $sender, $this->client, $this->dispatcher))
+            ->setHost($host)
+            ->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

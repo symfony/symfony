@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsbox;
 
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Mode;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Strategy;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -30,31 +32,26 @@ final class SmsboxTransport extends AbstractTransport
 {
     protected const HOST = 'api.smsbox.pro';
 
-    private string $apiKey;
-    private ?string $mode;
-    private ?int $strategy;
-    private ?string $sender;
-
-    public function __construct(#[\SensitiveParameter] string $apiKey, string $mode, int $strategy, ?string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiKey = $apiKey;
-        $this->mode = $mode;
-        $this->strategy = $strategy;
-        $this->sender = $sender;
-
-        SmsboxOptions::validateMode($this->mode);
-        SmsboxOptions::validateStrategy($this->strategy);
-
+    public function __construct(
+        #[\SensitiveParameter] private string $apiKey,
+        private Mode $mode,
+        private Strategy $strategy,
+        private ?string $sender,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        if (SmsboxOptions::MESSAGE_MODE_EXPERT === $this->mode) {
-            return sprintf('smsbox://%s?mode=%s&strategy=%s&sender=%s', $this->getEndpoint(), $this->mode, $this->strategy, $this->sender);
+        $dsn = sprintf('smsbox://%s?mode=%s&strategy=%s', $this->getEndpoint(), $this->mode->value, $this->strategy->value);
+
+        if (Mode::Expert === $this->mode) {
+            $dsn .= '&sender='.$this->sender;
         }
 
-        return sprintf('smsbox://%s?mode=%s&strategy=%s', $this->getEndpoint(), $this->mode, $this->strategy);
+        return $dsn;
     }
 
     public function supports(MessageInterface $message): bool
@@ -78,49 +75,45 @@ final class SmsboxTransport extends AbstractTransport
         $options['msg'] = $message->getSubject();
         $options['id'] = 1;
         $options['usage'] = 'symfony';
-        $options['mode'] ??= $this->mode;
-        $options['strategy'] ??= $this->strategy;
+        $options['mode'] ??= $this->mode->value;
+        $options['strategy'] ??= $this->strategy->value;
 
-        if (SmsboxOptions::MESSAGE_MODE_EXPERT === $options['mode']) {
+        if (Mode::Expert === $options['mode']) {
             $options['origine'] = $options['sender'] ?? $this->sender;
         }
         unset($options['sender']);
 
         if (isset($options['daysMinMax'])) {
-            $options['day_min'] = $options['daysMinMax'][0];
-            $options['day_max'] = $options['daysMinMax'][1];
+            [$options['day_min'], $options['day_max']] = $options['daysMinMax'];
             unset($options['daysMinMax']);
         }
 
         if (isset($options['hoursMinMax'])) {
-            $options['hour_min'] = $options['hoursMinMax'][0];
-            $options['hour_max'] = $options['hoursMinMax'][1];
+            [$options['hour_min'], $options['hour_max']] = $options['hoursMinMax'];
             unset($options['hoursMinMax']);
         }
 
         if (isset($options['dateTime'])) {
-            if (isset($options['heure']) || isset($options['date'])) {
-                throw new InvalidArgumentException("You mustn't set the dateTime method along with date or hour methods.");
-            }
-
             $options['date'] = $options['dateTime']->format('d/m/Y');
             $options['heure'] = $options['dateTime']->format('H:i');
+
             unset($options['dateTime']);
         }
 
         if (isset($options['variable'])) {
             preg_match_all('%([0-9]+)%', $options['msg'], $matches);
-            $occurenceValMsg = $matches[0];
-            $occurenceValMsgMax = max($occurenceValMsg);
+            $occurrenceValMsg = $matches[0];
+            $occurrenceValMsgMax = (int) max($occurrenceValMsg);
 
-            if ($occurenceValMsgMax != \count($options['variable'])) {
-                throw new InvalidArgumentException('You must have the same amount of index in your array as you have variable.');
+            if ($occurrenceValMsgMax !== \count($options['variable'])) {
+                throw new InvalidArgumentException(sprintf('You must have the same amount of index in your array as you have variable. Expected %d variable, got %d.', $occurrenceValMsgMax, \count($options['variable'])));
             }
 
             $t = str_replace([',', ';'], ['%d44%', '%d59%'], $options['variable']);
             $variableStr = implode(';', $t);
             $options['dest'] .= ';'.$variableStr;
             $options['personnalise'] = 1;
+
             unset($options['variable']);
         }
 
@@ -135,11 +128,12 @@ final class SmsboxTransport extends AbstractTransport
         try {
             $statusCode = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {
-            throw new TransportException('Could not reach the remote Smsbox server.', $response, 0, $e);
+            throw new TransportException('Could not reach the remote Smsbox server.', $response, previous: $e);
         }
 
         if (200 !== $statusCode) {
-            $error = $response->getContent(false);
+            $error = $response->toArray(false);
+
             throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);
         }
 

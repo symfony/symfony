@@ -4,7 +4,8 @@ CHANGELOG
 7.1
 ---
 
- * Enable `#[AsTwigFilter]`, `#[AsTwigFunction]` and `#[AsTwigTest]` attributes to configure runtime extensions
+ * Enable `#[AsTwigFilter]`, `#[AsTwigFunction]` and `#[AsTwigTest]` method attributes
+   to configure extensions on classes with marked with `#[AsTwigExtension]`
 
 7.0
 ---

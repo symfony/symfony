@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-20T14:26:43Z
+
+rebase needed :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-20T16:00:25Z
+
+Rebased
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-19T09:35:01Z
+
+Rebased @nicolas-grekas any chance to get this merged?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-20T23:12:30Z
+
+> How easy would it be for you to revert all the added return types from providers?
+> They don't provide any benefit IMHO but make reviewing harder + will generate merge needless conflicts.
+
+Done, good to go @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-21T11:34:17Z
+
+the failures look related
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-21T14:33:42Z
+
+> the failures look related
+
+fixed
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-22T08:30:29Z
+
+Rebased ✅

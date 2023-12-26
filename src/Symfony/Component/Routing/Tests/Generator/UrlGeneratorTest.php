@@ -86,8 +86,10 @@ class UrlGeneratorTest extends TestCase
 
     public function testRelativeUrlWithNullParameterButNotOptional()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}/bar', ['foo' => null]));
+
+        $this->expectException(InvalidParameterException::class);
+
         // This must raise an exception because the default requirement for "foo" is "[^/]+" which is not met with these params.
         // Generating path "/testing//bar" would be wrong as matching this route would fail.
         $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_PATH);
@@ -294,18 +296,17 @@ class UrlGeneratorTest extends TestCase
 
     public function testGenerateWithoutRoutes()
     {
-        $this->expectException(RouteNotFoundException::class);
         $routes = $this->getRoutes('foo', new Route('/testing/{foo}'));
+
+        $this->expectException(RouteNotFoundException::class);
+
         $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testGenerateWithInvalidLocale()
     {
-        $this->expectException(RouteNotFoundException::class);
         $routes = new RouteCollection();
-
         $route = new Route('');
-
         $name = 'test';
 
         foreach (['hr' => '/foo', 'en' => '/bar'] as $locale => $path) {
@@ -318,28 +319,37 @@ class UrlGeneratorTest extends TestCase
         }
 
         $generator = $this->getGenerator($routes, [], null, 'fr');
+
+        $this->expectException(RouteNotFoundException::class);
+
         $generator->generate($name);
     }
 
     public function testGenerateForRouteWithoutMandatoryParameter()
     {
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
+
         $this->expectException(MissingMandatoryParametersException::class);
         $this->expectExceptionMessage('Some mandatory parameters are missing ("foo") to generate a URL for route "test".');
-        $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
+
         $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testGenerateForRouteWithInvalidOptionalParameter()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', ['foo' => '1'], ['foo' => 'd+']));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testGenerateForRouteWithInvalidParameter()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', [], ['foo' => '1|2']));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['foo' => '0'], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
@@ -372,22 +382,28 @@ class UrlGeneratorTest extends TestCase
 
     public function testGenerateForRouteWithInvalidMandatoryParameter()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', [], ['foo' => 'd+']));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testGenerateForRouteWithInvalidUtf8Parameter()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', [], ['foo' => '\pL+'], ['utf8' => true]));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['foo' => 'abc123'], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testRequiredParamAndEmptyPassed()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/{slug}', [], ['slug' => '.+']));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['slug' => '']);
     }
 
@@ -561,25 +577,30 @@ class UrlGeneratorTest extends TestCase
 
     public function testImportantVariableWithNoDefault()
     {
-        $this->expectException(MissingMandatoryParametersException::class);
-        $this->expectExceptionMessage('Some mandatory parameters are missing ("_format") to generate a URL for route "test".');
         $routes = $this->getRoutes('test', new Route('/{page}.{!_format}'));
         $generator = $this->getGenerator($routes);
+
+        $this->expectException(MissingMandatoryParametersException::class);
+        $this->expectExceptionMessage('Some mandatory parameters are missing ("_format") to generate a URL for route "test".');
 
         $generator->generate('test', ['page' => 'index']);
     }
 
     public function testDefaultRequirementOfVariableDisallowsSlash()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['page' => 'index', '_format' => 'sl/ash']);
     }
 
     public function testDefaultRequirementOfVariableDisallowsNextSeparator()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['page' => 'do.t', '_format' => 'html']);
     }
 
@@ -606,22 +627,28 @@ class UrlGeneratorTest extends TestCase
 
     public function testUrlWithInvalidParameterInHost()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/', [], ['foo' => 'bar'], [], '{foo}.example.com'));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['foo' => 'baz'], UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     public function testUrlWithInvalidParameterInHostWhenParamHasADefaultValue()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/', ['foo' => 'bar'], ['foo' => 'bar'], [], '{foo}.example.com'));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['foo' => 'baz'], UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     public function testUrlWithInvalidParameterEqualsDefaultValueInHost()
     {
-        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/', ['foo' => 'baz'], ['foo' => 'bar'], [], '{foo}.example.com'));
+
+        $this->expectException(InvalidParameterException::class);
+
         $this->getGenerator($routes)->generate('test', ['foo' => 'baz'], UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
@@ -771,10 +798,10 @@ class UrlGeneratorTest extends TestCase
 
     public function testAliasWhichTargetRouteDoesntExist()
     {
-        $this->expectException(RouteNotFoundException::class);
-
         $routes = new RouteCollection();
         $routes->addAlias('d', 'non-existent');
+
+        $this->expectException(RouteNotFoundException::class);
 
         $this->getGenerator($routes)->generate('d');
     }
@@ -827,38 +854,38 @@ class UrlGeneratorTest extends TestCase
 
     public function testCircularReferenceShouldThrowAnException()
     {
-        $this->expectException(RouteCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> a -> b".');
-
         $routes = new RouteCollection();
         $routes->addAlias('a', 'b');
         $routes->addAlias('b', 'a');
+
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> a -> b".');
 
         $this->getGenerator($routes)->generate('b');
     }
 
     public function testDeepCircularReferenceShouldThrowAnException()
     {
-        $this->expectException(RouteCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> b".');
-
         $routes = new RouteCollection();
         $routes->addAlias('a', 'b');
         $routes->addAlias('b', 'c');
         $routes->addAlias('c', 'b');
+
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> b".');
 
         $this->getGenerator($routes)->generate('b');
     }
 
     public function testIndirectCircularReferenceShouldThrowAnException()
     {
-        $this->expectException(RouteCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for route "a", path: "a -> b -> c -> a".');
-
         $routes = new RouteCollection();
         $routes->addAlias('a', 'b');
         $routes->addAlias('b', 'c');
         $routes->addAlias('c', 'a');
+
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "a", path: "a -> b -> c -> a".');
 
         $this->getGenerator($routes)->generate('a');
     }

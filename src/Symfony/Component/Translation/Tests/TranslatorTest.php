@@ -69,17 +69,19 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getInvalidLocalesTests
      */
-    public function testSetInvalidLocale($locale)
+    public function testSetInvalidLocale(string $locale)
     {
-        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('fr');
+
+        $this->expectException(InvalidArgumentException::class);
+
         $translator->setLocale($locale);
     }
 
     /**
      * @dataProvider getValidLocalesTests
      */
-    public function testSetValidLocale($locale)
+    public function testSetValidLocale(string $locale)
     {
         $translator = new Translator($locale);
         $translator->setLocale($locale);
@@ -186,15 +188,17 @@ class TranslatorTest extends TestCase
      */
     public function testAddResourceInvalidLocales($locale)
     {
-        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('fr');
+
+        $this->expectException(InvalidArgumentException::class);
+
         $translator->addResource('array', ['foo' => 'foofoo'], $locale);
     }
 
     /**
      * @dataProvider getValidLocalesTests
      */
-    public function testAddResourceValidLocales($locale)
+    public function testAddResourceValidLocales(string $locale)
     {
         $translator = new Translator('fr');
         $translator->addResource('array', ['foo' => 'foofoo'], $locale);
@@ -219,14 +223,15 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getTransFileTests
      */
-    public function testTransWithoutFallbackLocaleFile($format, $loader)
+    public function testTransWithoutFallbackLocaleFile(string $format, string $loader)
     {
-        $this->expectException(NotFoundResourceException::class);
         $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
         $translator = new Translator('en');
         $translator->addLoader($format, new $loaderClass());
         $translator->addResource($format, __DIR__.'/Fixtures/non-existing', 'en');
         $translator->addResource($format, __DIR__.'/Fixtures/resources.'.$format, 'en');
+
+        $this->expectException(NotFoundResourceException::class);
 
         // force catalogue loading
         $translator->trans('foo');
@@ -235,7 +240,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getTransFileTests
      */
-    public function testTransWithFallbackLocaleFile($format, $loader)
+    public function testTransWithFallbackLocaleFile(string $format, string $loader)
     {
         $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
         $translator = new Translator('en_GB');
@@ -343,9 +348,10 @@ class TranslatorTest extends TestCase
 
     public function testWhenAResourceHasNoRegisteredLoader()
     {
-        $this->expectException(RuntimeException::class);
         $translator = new Translator('en');
         $translator->addResource('array', ['foo' => 'foofoo'], 'en');
+
+        $this->expectException(RuntimeException::class);
 
         $translator->trans('foo');
     }
@@ -409,10 +415,11 @@ class TranslatorTest extends TestCase
      */
     public function testTransInvalidLocale($locale)
     {
-        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', ['foo' => 'foofoo'], 'en');
+
+        $this->expectException(InvalidArgumentException::class);
 
         $translator->trans('foo', [], '', $locale);
     }
@@ -420,7 +427,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getValidLocalesTests
      */
-    public function testTransValidLocale($locale)
+    public function testTransValidLocale(string $locale)
     {
         $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
@@ -433,7 +440,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getFlattenedTransTests
      */
-    public function testFlattenedTrans($expected, $messages, $id)
+    public function testFlattenedTrans(string $expected, $messages, $id)
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -470,7 +477,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public static function getTransTests(): iterable
+    public static function getTransTests(): array
     {
         $param = new TranslatableMessage('Symfony is %what%!', ['%what%' => 'awesome'], '');
 
@@ -587,11 +594,12 @@ class TranslatorTest extends TestCase
 
     public function testMissingLoaderForResourceError()
     {
+        $translator = new Translator('en');
+        $translator->addResource('twig', 'messages.en.twig', 'en');
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No loader is registered for the "twig" format when loading the "messages.en.twig" resource.');
 
-        $translator = new Translator('en');
-        $translator->addResource('twig', 'messages.en.twig', 'en');
         $translator->getCatalogue('en');
     }
 }

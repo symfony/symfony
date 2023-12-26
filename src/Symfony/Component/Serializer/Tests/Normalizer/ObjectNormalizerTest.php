@@ -307,8 +307,6 @@ class ObjectNormalizerTest extends TestCase
 
     public function testConstructorWithUnknownObjectTypeHintDenormalize()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not determine the class of the parameter "unknown".');
         $data = [
             'id' => 10,
             'unknown' => [
@@ -320,6 +318,9 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer();
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not determine the class of the parameter "unknown".');
 
         $normalizer->denormalize($data, DummyWithConstructorInexistingObject::class);
     }
@@ -623,14 +624,15 @@ class ObjectNormalizerTest extends TestCase
 
     public function testUnableToNormalizeObjectAttribute()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot normalize attribute "object" because the injected serializer is not a normalizer');
         $serializer = $this->createMock(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);
 
         $obj = new ObjectDummy();
         $object = new \stdClass();
         $obj->setObject($object);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "object" because the injected serializer is not a normalizer');
 
         $this->normalizer->normalize($obj, 'any');
     }

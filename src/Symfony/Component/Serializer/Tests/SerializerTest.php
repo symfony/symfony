@@ -97,8 +97,10 @@ class SerializerTest extends TestCase
 
     public function testNormalizeNoMatch()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->normalize(new \stdClass(), 'xml');
     }
 
@@ -118,15 +120,19 @@ class SerializerTest extends TestCase
 
     public function testNormalizeOnDenormalizer()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([new TestDenormalizer()], []);
+
+        $this->expectException(UnexpectedValueException::class);
+
         $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
     }
 
     public function testDenormalizeNoMatch()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->denormalize('foo', 'stdClass');
     }
 
@@ -140,9 +146,11 @@ class SerializerTest extends TestCase
 
     public function testDenormalizeOnNormalizer()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([new TestNormalizer()], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(UnexpectedValueException::class);
+
         $this->assertTrue($serializer->denormalize(json_encode($data), 'stdClass', 'json'));
     }
 
@@ -237,17 +245,21 @@ class SerializerTest extends TestCase
 
     public function testSerializeNoEncoder()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->serialize($data, 'json');
     }
 
     public function testSerializeNoNormalizer()
     {
-        $this->expectException(LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(LogicException::class);
+
         $serializer->serialize(Model::fromArray($data), 'json');
     }
 
@@ -271,25 +283,31 @@ class SerializerTest extends TestCase
 
     public function testDeserializeNoNormalizer()
     {
-        $this->expectException(LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(LogicException::class);
+
         $serializer->deserialize(json_encode($data), Model::class, 'json');
     }
 
     public function testDeserializeWrongNormalizer()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([new CustomNormalizer()], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->deserialize(json_encode($data), Model::class, 'json');
     }
 
     public function testDeserializeNoEncoder()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->deserialize(json_encode($data), Model::class, 'json');
     }
 
@@ -689,29 +707,37 @@ class SerializerTest extends TestCase
 
     public function testDeserializeLegacyScalarType()
     {
-        $this->expectException(LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->expectException(LogicException::class);
+
         $serializer->deserialize('42', 'integer', 'json');
     }
 
     public function testDeserializeScalarTypeToCustomType()
     {
-        $this->expectException(LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->expectException(LogicException::class);
+
         $serializer->deserialize('"something"', Foo::class, 'json');
     }
 
     public function testDeserializeNonscalarTypeToScalar()
     {
-        $this->expectException(NotNormalizableValueException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->expectException(NotNormalizableValueException::class);
+
         $serializer->deserialize('{"foo":true}', 'string', 'json');
     }
 
     public function testDeserializeInconsistentScalarType()
     {
-        $this->expectException(NotNormalizableValueException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->expectException(NotNormalizableValueException::class);
+
         $serializer->deserialize('"42"', 'int', 'json');
     }
 
@@ -727,8 +753,10 @@ class SerializerTest extends TestCase
 
     public function testDeserializeInconsistentScalarArray()
     {
-        $this->expectException(NotNormalizableValueException::class);
         $serializer = new Serializer([new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
+
+        $this->expectException(NotNormalizableValueException::class);
+
         $serializer->deserialize('["42"]', 'int[]', 'json');
     }
 

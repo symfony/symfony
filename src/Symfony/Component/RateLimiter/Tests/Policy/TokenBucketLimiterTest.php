@@ -49,23 +49,25 @@ class TokenBucketLimiterTest extends TestCase
 
     public function testReserveMoreTokensThanBucketSize()
     {
+        $limiter = $this->createLimiter();
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot reserve more tokens (15) than the burst size of the rate limiter (10).');
 
-        $limiter = $this->createLimiter();
         $limiter->reserve(15);
     }
 
     public function testReserveMaxWaitingTime()
     {
-        $this->expectException(MaxWaitDurationExceededException::class);
-
         $limiter = $this->createLimiter(10, Rate::perMinute());
 
         // enough free tokens
         $this->assertEquals(0, $limiter->reserve(10, 300)->getWaitDuration());
         // waiting time within set maximum
         $this->assertEquals(300, $limiter->reserve(5, 300)->getWaitDuration());
+
+        $this->expectException(MaxWaitDurationExceededException::class);
+
         // waiting time exceeded maximum time (as 5 tokens are already reserved)
         $limiter->reserve(5, 300);
     }

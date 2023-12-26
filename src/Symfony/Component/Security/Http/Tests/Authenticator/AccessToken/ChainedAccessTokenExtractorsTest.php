@@ -67,12 +67,12 @@ class ChainedAccessTokenExtractorsTest extends TestCase
     /**
      * @dataProvider provideInvalidAuthenticateData
      */
-    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
+    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType)
     {
+        $this->setUpAuthenticator();
+
         $this->expectException($exceptionType);
         $this->expectExceptionMessage($errorMessage);
-
-        $this->setUpAuthenticator();
 
         $this->authenticator->authenticate($request);
     }

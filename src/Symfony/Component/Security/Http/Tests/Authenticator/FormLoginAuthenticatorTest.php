@@ -72,13 +72,14 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringUsernameWithArray($postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_username" must be a string, "array" given.');
-
         $request = Request::create('/login_check', 'POST', ['_username' => []]);
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_username" must be a string, "array" given.');
+
         $this->authenticator->authenticate($request);
     }
 
@@ -87,13 +88,14 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringUsernameWithInt($postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_username" must be a string, "integer" given.');
-
         $request = Request::create('/login_check', 'POST', ['_username' => 42]);
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_username" must be a string, "integer" given.');
+
         $this->authenticator->authenticate($request);
     }
 
@@ -102,13 +104,14 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringUsernameWithObject($postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_username" must be a string, "object" given.');
-
         $request = Request::create('/login_check', 'POST', ['_username' => new \stdClass()]);
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_username" must be a string, "object" given.');
+
         $this->authenticator->authenticate($request);
     }
 
@@ -132,13 +135,14 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringPasswordWithArray(bool $postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_password" must be a string, "array" given.');
-
         $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => []]);
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_password" must be a string, "array" given.');
+
         $this->authenticator->authenticate($request);
     }
 

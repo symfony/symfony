@@ -519,10 +519,11 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
 
     public function testNegativeMaxSize()
     {
+        $file = new File();
+
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('"-1" is not a valid maximum size.');
 
-        $file = new File();
         $file->maxSize = -1;
     }
 

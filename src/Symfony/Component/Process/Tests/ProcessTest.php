@@ -328,11 +328,13 @@ class ProcessTest extends TestCase
     /**
      * @dataProvider provideInvalidInputValues
      */
-    public function testInvalidInput($value)
+    public function testInvalidInput(array|object $value)
     {
+        $process = $this->getProcess('foo');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Symfony\Component\Process\Process::setInput" only accepts strings, Traversable objects or stream resources.');
-        $process = $this->getProcess('foo');
+
         $process->setInput($value);
     }
 
@@ -347,7 +349,7 @@ class ProcessTest extends TestCase
     /**
      * @dataProvider provideInputValues
      */
-    public function testValidInput($expected, $value)
+    public function testValidInput(?string $expected, null|float|string $value)
     {
         $process = $this->getProcess('foo');
         $process->setInput($value);
@@ -593,8 +595,10 @@ class ProcessTest extends TestCase
 
     public function testMustRunThrowsException()
     {
-        $this->expectException(ProcessFailedException::class);
         $process = $this->getProcess('exit 1');
+
+        $this->expectException(ProcessFailedException::class);
+
         $process->mustRun();
     }
 
@@ -972,9 +976,11 @@ class ProcessTest extends TestCase
 
     public function testSignalProcessNotRunning()
     {
+        $process = $this->getProcess('foo');
+
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot send signal on a non running process.');
-        $process = $this->getProcess('foo');
+
         $process->signal(1); // SIGHUP
     }
 
@@ -1062,20 +1068,24 @@ class ProcessTest extends TestCase
 
     public function testDisableOutputWhileRunningThrowsException()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Disabling output while the process is running is not possible.');
         $p = $this->getProcessForCode('sleep(39);');
         $p->start();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Disabling output while the process is running is not possible.');
+
         $p->disableOutput();
     }
 
     public function testEnableOutputWhileRunningThrowsException()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Enabling output while the process is running is not possible.');
         $p = $this->getProcessForCode('sleep(40);');
         $p->disableOutput();
         $p->start();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Enabling output while the process is running is not possible.');
+
         $p->enableOutput();
     }
 
@@ -1091,19 +1101,23 @@ class ProcessTest extends TestCase
 
     public function testDisableOutputWhileIdleTimeoutIsSet()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Output cannot be disabled while an idle timeout is set.');
         $process = $this->getProcess('foo');
         $process->setIdleTimeout(1);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Output cannot be disabled while an idle timeout is set.');
+
         $process->disableOutput();
     }
 
     public function testSetIdleTimeoutWhileOutputIsDisabled()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('timeout cannot be set while the output is disabled.');
         $process = $this->getProcess('foo');
         $process->disableOutput();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('timeout cannot be set while the output is disabled.');
+
         $process->setIdleTimeout(1);
     }
 
@@ -1119,11 +1133,13 @@ class ProcessTest extends TestCase
      */
     public function testGetOutputWhileDisabled($fetchMethod)
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Output has been disabled.');
         $p = $this->getProcessForCode('sleep(41);');
         $p->disableOutput();
         $p->start();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Output has been disabled.');
+
         $p->{$fetchMethod}();
     }
 
@@ -1523,17 +1539,21 @@ class ProcessTest extends TestCase
 
     public function testPreparedCommandWithMissingValue()
     {
+        $p = Process::fromShellCommandline('echo "${:abc}"');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
-        $p = Process::fromShellCommandline('echo "${:abc}"');
+
         $p->run(null, ['bcd' => 'BCD']);
     }
 
     public function testPreparedCommandWithNoValues()
     {
+        $p = Process::fromShellCommandline('echo "${:abc}"');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
-        $p = Process::fromShellCommandline('echo "${:abc}"');
+
         $p->run(null, []);
     }
 

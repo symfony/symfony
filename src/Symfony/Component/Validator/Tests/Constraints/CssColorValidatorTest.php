@@ -369,7 +369,12 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public static function getInvalidRGBA(): array
     {
-        return [['rgba(999,999,999,999)'], ['rgba(-99,-99,-99,-99)'], ['rgba(a,b,c,d)'], ['rgba(99 99, 9 99, 99 9, . 9)']];
+        return [
+            ['rgba(999,999,999,999)'],
+            ['rgba(-99,-99,-99,-99)'],
+            ['rgba(a,b,c,d)'],
+            ['rgba(99 99, 9 99, 99 9, . 9)'],
+        ];
     }
 
     /**
@@ -415,7 +420,13 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidHSLA(): array
     {
-        return [['hsla(1000, 1000%, 20000%, 999)'], ['hsla(-100, -10%, -2%, 999)'], ['hsla(a, b, c, d)'], ['hsla(a, b%, c%, d)'], ['hsla( 9 99% , 99 9% , 9 %']];
+        return [
+            ['hsla(1000, 1000%, 20000%, 999)'],
+            ['hsla(-100, -10%, -2%, 999)'],
+            ['hsla(a, b, c, d)'],
+            ['hsla(a, b%, c%, d)'],
+            ['hsla( 9 99% , 99 9% , 9 %'],
+        ];
     }
 
     /**

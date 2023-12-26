@@ -88,15 +88,15 @@ class StopwatchTest extends TestCase
     public function testUnknownEvent()
     {
         $this->expectException(\LogicException::class);
-        $stopwatch = new Stopwatch();
-        $stopwatch->getEvent('foo');
+
+        (new Stopwatch())->getEvent('foo');
     }
 
     public function testStopWithoutStart()
     {
         $this->expectException(\LogicException::class);
-        $stopwatch = new Stopwatch();
-        $stopwatch->stop('foo');
+
+        (new Stopwatch())->stop('foo');
     }
 
     public function testMorePrecision()
@@ -159,8 +159,8 @@ class StopwatchTest extends TestCase
     public function testReopenANewSectionShouldThrowAnException()
     {
         $this->expectException(\LogicException::class);
-        $stopwatch = new Stopwatch();
-        $stopwatch->openSection('section');
+
+        (new Stopwatch())->openSection('section');
     }
 
     public function testReset()

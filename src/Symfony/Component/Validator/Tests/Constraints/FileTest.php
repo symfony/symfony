@@ -57,8 +57,10 @@ class FileTest extends TestCase
      */
     public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
     {
-        $this->expectException(ConstraintDefinitionException::class);
         $file = new File(['maxSize' => 1000]);
+
+        $this->expectException(ConstraintDefinitionException::class);
+
         $file->maxSize = $maxSize;
     }
 

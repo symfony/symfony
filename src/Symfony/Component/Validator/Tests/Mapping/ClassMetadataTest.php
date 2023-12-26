@@ -279,17 +279,21 @@ class ClassMetadataTest extends TestCase
 
     public function testGroupSequenceFailsIfGroupSequenceProviderIsSet()
     {
-        $this->expectException(GroupDefinitionException::class);
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
+
+        $this->expectException(GroupDefinitionException::class);
+
         $metadata->setGroupSequence(['GroupSequenceProviderEntity', 'Foo']);
     }
 
     public function testGroupSequenceProviderFailsIfGroupSequenceIsSet()
     {
-        $this->expectException(GroupDefinitionException::class);
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequence(['GroupSequenceProviderEntity', 'Foo']);
+
+        $this->expectException(GroupDefinitionException::class);
+
         $metadata->setGroupSequenceProvider(true);
     }
 

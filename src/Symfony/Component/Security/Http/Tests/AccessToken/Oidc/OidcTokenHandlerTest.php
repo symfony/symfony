@@ -80,11 +80,11 @@ class OidcTokenHandlerTest extends TestCase
      */
     public function testThrowsAnErrorIfTokenIsInvalid(string $token)
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
         $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock->expects($this->once())->method('error');
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
 
         (new OidcTokenHandler(
             new ES256(),
@@ -128,9 +128,6 @@ class OidcTokenHandlerTest extends TestCase
 
     public function testThrowsAnErrorIfUserPropertyIsMissing()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
         $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock->expects($this->once())->method('error');
 
@@ -144,6 +141,9 @@ class OidcTokenHandlerTest extends TestCase
             'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
         ];
         $token = $this->buildJWS(json_encode($claims));
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
 
         (new OidcTokenHandler(
             new ES256(),

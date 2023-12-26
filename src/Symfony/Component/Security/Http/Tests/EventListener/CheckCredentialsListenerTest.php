@@ -43,7 +43,7 @@ class CheckCredentialsListenerTest extends TestCase
     /**
      * @dataProvider providePasswords
      */
-    public function testPasswordAuthenticated($password, $passwordValid, $result)
+    public function testPasswordAuthenticated(string $password, bool $passwordValid, bool $result)
     {
         $hasher = $this->createMock(PasswordHasherInterface::class);
         $hasher->expects($this->any())->method('verify')->with('password-hash', $password)->willReturn($passwordValid);
@@ -71,19 +71,22 @@ class CheckCredentialsListenerTest extends TestCase
 
     public function testEmptyPassword()
     {
+        $this->hasherFactory
+            ->expects($this->never())
+            ->method('getPasswordHasher');
+
+        $event = $this->createEvent(new Passport(new UserBadge('wouter', fn () => $this->user), new PasswordCredentials('')));
+
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password cannot be empty.');
 
-        $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
-
-        $event = $this->createEvent(new Passport(new UserBadge('wouter', fn () => $this->user), new PasswordCredentials('')));
         $this->listener->checkPassport($event);
     }
 
     /**
      * @dataProvider provideCustomAuthenticatedResults
      */
-    public function testCustomAuthenticated($result)
+    public function testCustomAuthenticated(bool $result)
     {
         $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
 

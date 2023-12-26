@@ -58,9 +58,10 @@ class CacheMetadataFactoryTest extends TestCase
 
     public function testInvalidClassThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
         $decorated = $this->createMock(ClassMetadataFactoryInterface::class);
         $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
+
+        $this->expectException(InvalidArgumentException::class);
 
         $factory->getMetadataFor('Not\Exist');
     }

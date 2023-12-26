@@ -252,24 +252,27 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteCharsetMismatch()
     {
-        $this->expectException(\LogicException::class);
         $route = new Route("/\xE9/{bar}", [], ['bar' => '.'], ['utf8' => true]);
+
+        $this->expectException(\LogicException::class);
 
         $route->compile();
     }
 
     public function testRequirementCharsetMismatch()
     {
-        $this->expectException(\LogicException::class);
         $route = new Route('/foo/{bar}', [], ['bar' => "\xE9"], ['utf8' => true]);
+
+        $this->expectException(\LogicException::class);
 
         $route->compile();
     }
 
     public function testRouteWithFragmentAsPathParameter()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $route = new Route('/{_fragment}');
+
+        $this->expectException(\InvalidArgumentException::class);
 
         $route->compile();
     }
@@ -277,7 +280,7 @@ class RouteCompilerTest extends TestCase
     /**
      * @dataProvider getVariableNamesStartingWithADigit
      */
-    public function testRouteWithVariableNameStartingWithADigit($name)
+    public function testRouteWithVariableNameStartingWithADigit(string $name)
     {
         $this->expectException(\DomainException::class);
         $route = new Route('/{'.$name.'}');
@@ -296,7 +299,7 @@ class RouteCompilerTest extends TestCase
     /**
      * @dataProvider provideCompileWithHostData
      */
-    public function testCompileWithHost($name, $arguments, $prefix, $regex, $variables, $pathVariables, $tokens, $hostRegex, $hostVariables, $hostTokens)
+    public function testCompileWithHost(string $name, array $arguments, string $prefix, string $regex, array $variables, array $pathVariables, array $tokens, string $hostRegex, array $hostVariables, array $hostTokens)
     {
         $r = new \ReflectionClass(Route::class);
         $route = $r->newInstanceArgs($arguments);
@@ -366,15 +369,17 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteWithTooLongVariableName()
     {
-        $this->expectException(\DomainException::class);
         $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
+
+        $this->expectException(\DomainException::class);
+
         $route->compile();
     }
 
     /**
      * @dataProvider provideRemoveCapturingGroup
      */
-    public function testRemoveCapturingGroup($regex, $requirement)
+    public function testRemoveCapturingGroup(string $regex, string $requirement)
     {
         $route = new Route('/{foo}', [], ['foo' => $requirement]);
 

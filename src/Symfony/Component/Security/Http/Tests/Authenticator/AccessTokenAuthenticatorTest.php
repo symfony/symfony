@@ -37,9 +37,6 @@ class AccessTokenAuthenticatorTest extends TestCase
 
     public function testAuthenticateWithoutAccessToken()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
         $request = Request::create('/test');
 
         $this->accessTokenExtractor
@@ -52,6 +49,9 @@ class AccessTokenAuthenticatorTest extends TestCase
             $this->accessTokenHandler,
             $this->accessTokenExtractor,
         );
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
 
         $authenticator->authenticate($request);
     }

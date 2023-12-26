@@ -86,17 +86,19 @@ class RememberMeAuthenticatorTest extends TestCase
 
     public function testAuthenticateWithoutOldToken()
     {
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => base64_encode('foo:bar')]);
+
         $this->expectException(AuthenticationException::class);
 
-        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => base64_encode('foo:bar')]);
         $this->authenticator->authenticate($request);
     }
 
     public function testAuthenticateWithTokenWithoutDelimiter()
     {
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'invalid']);
+
         $this->expectException(AuthenticationException::class);
 
-        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'invalid']);
         $this->authenticator->authenticate($request);
     }
 }

@@ -43,8 +43,7 @@ class IniFileLoaderTest extends TestCase
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);
-        $loader = new IniFileLoader();
-        $resource = __DIR__.'/../Fixtures/non-existing.ini';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new IniFileLoader())->load(__DIR__.'/../Fixtures/non-existing.ini', 'en', 'domain1');
     }
 }

@@ -50,7 +50,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->container->set('sub1', $subscriber1 = new MySubscriber(['foo']));
         $this->container->set('sub2', $subscriber2 = new MySubscriber(['foo']));
 
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.');
         $this->assertSame([$subscriber1,  $subscriber2], array_values($this->evm->getListeners('foo')));
     }
 
@@ -92,7 +92,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
 
         $this->container->set('lazy1', $listener1 = new MyListener());
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.');
         $this->evm->addEventListener('foo', 'lazy1');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
         $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
@@ -177,7 +177,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
 
         $this->container->set('lazy1', $listener1 = new MyListener());
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.');
         $this->evm->addEventListener('foo', 'lazy1');
         $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
 
@@ -238,7 +238,7 @@ class ContainerAwareEventManagerTest extends TestCase
 
         $this->container->set('lazy', $listener1 = new MyListener());
         $this->container->set('lazy2', $subscriber1 = new MySubscriber(['foo']));
-        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.');
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 

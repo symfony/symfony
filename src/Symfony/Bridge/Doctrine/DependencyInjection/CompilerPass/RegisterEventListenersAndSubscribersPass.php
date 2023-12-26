@@ -106,7 +106,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                     $refs = $managerDef->getArguments()[1] ?? [];
                     $listenerRefs[$con][$id] = new Reference($id);
                     if ($subscriberTag === $tagName) {
-                        trigger_deprecation('symfony/doctrine-bridge', '6.3', 'Registering "%s" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.', $id);
+                        trigger_deprecation('symfony/doctrine-bridge', '6.3', 'Registering "%s" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[%s] attribute.', $id, str_starts_with($this->tagPrefix, 'doctrine_mongodb') ? 'AsDocumentListener' : 'AsDoctrineListener');
                         $refs[] = $id;
                     } else {
                         $refs[] = [[$tag['event']], $id];

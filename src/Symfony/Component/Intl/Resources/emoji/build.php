@@ -71,6 +71,8 @@ final class Builder
         foreach ($files as $file) {
             $locale = $file->getBasename('.xml');
 
+            $mapsByLocale[$locale] ??= [];
+
             $document = new DOMDocument();
             $document->loadXML(file_get_contents($file));
             $xpath = new DOMXPath($document);
@@ -79,6 +81,11 @@ final class Builder
             foreach ($results as $result) {
                 $emoji = $result->getAttribute('cp');
                 $name = $result->textContent;
+                // Ignoring the hierarchical metadata instructions
+                // (real value will be filled by the parent locale)
+                if (str_contains($name, '↑↑')) {
+                    continue;
+                }
                 $parts = preg_split('//u', $emoji, -1, \PREG_SPLIT_NO_EMPTY);
                 $emojiCodePoints = implode(' ', array_map('dechex', array_map('mb_ord', $parts)));
                 if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
@@ -99,15 +106,23 @@ final class Builder
 
         ksort($mapsByLocale);
 
-        foreach ($mapsByLocale as $locale => $maps) {
+        foreach ($mapsByLocale as $locale => $localeMaps) {
             $parentLocale = $locale;
 
             while (false !== $i = strrpos($parentLocale, '_')) {
                 $parentLocale = substr($parentLocale, 0, $i);
-                $maps += $mapsByLocale[$parentLocale] ?? [];
+                $parentMaps = $mapsByLocale[$parentLocale] ?? [];
+                foreach ($parentMaps as $codePointsCount => $parentMap) {
+                    // Ensuring the result map contains all the emojis from the parent map
+                    // if not already defined by the current locale
+                    $localeMaps[$codePointsCount] = [...$parentMap, ...$localeMaps[$codePointsCount] ?? []];
+                }
             }
 
-            yield strtolower("emoji-$locale") => self::createRules($maps);
+            // Skip locales without any emoji
+            if ($localeRules = self::createRules($localeMaps)) {
+                yield strtolower("emoji-$locale") => $localeRules;
+            }
         }
     }
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-22T16:54:31Z
+
+I think most of the users are using the ORM, so having the name in the deprecation makes sense and is very helpful, I wouldn't remove it for a more generic message, which is correct, but ends up in many research for the users.
+
+So if we are not able to get the right context, what about something like this:
+```diff
+- Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] attribute.
++ Since symfony/doctrine-bridge 6.3: Registering "Symfony\Bridge\Doctrine\Tests\MySubscriber" as a Doctrine subscriber is deprecated. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.
+```

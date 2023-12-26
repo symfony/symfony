@@ -82,6 +82,8 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testSendWithNegativeDelay()
     {
+        var_dump(__METHOD__);
+        var_dump(date_default_timezone_get());
         $this->connection->send('{"message": "Hi I am not actually delayed"}', ['type' => DummyMessage::class], -600000);
 
         $stmt = $this->driverConnection->createQueryBuilder()
@@ -96,9 +98,12 @@ class DoctrineIntegrationTest extends TestCase
         }
 
         $availableAt = new \DateTime($stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchOne() : $stmt->fetchColumn());
+        var_dump('$availableAt');
+        print_r($availableAt);
 
         $now = new \DateTime();
         $now->modify('-60 seconds');
+        print_r($now);
         $this->assertLessThan($now, $availableAt);
     }
 

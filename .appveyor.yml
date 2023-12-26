@@ -60,10 +60,7 @@ test_script:
     - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
     - copy /Y c:\php\php.ini-min c:\php\php.ini
     - IF %APPVEYOR_REPO_BRANCH:~-2% neq .x (rm -Rf src\Symfony\Bridge\PhpUnit)
-    - mv src\Symfony\Component\HttpClient\phpunit.xml.dist src\Symfony\Component\HttpClient\phpunit.xml
-    - php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || SET X=!errorlevel!
-    - php phpunit src\Symfony\Component\HttpClient || SET X=!errorlevel!
+    - php phpunit src\Symfony\Component\Messenger\Bridge\Doctrine --exclude-group tty,benchmark,intl-data,network,transient-on-windows --filter=testSendWithNegativeDelay || SET X=!errorlevel!
     - copy /Y c:\php\php.ini-max c:\php\php.ini
-    - php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || SET X=!errorlevel!
-    - php phpunit src\Symfony\Component\HttpClient || SET X=!errorlevel!
+    - php phpunit src\Symfony\Component\Messenger\Bridge\Doctrine --exclude-group tty,benchmark,intl-data,network,transient-on-windows --filter=testSendWithNegativeDelay || SET X=!errorlevel!
     - exit %X%

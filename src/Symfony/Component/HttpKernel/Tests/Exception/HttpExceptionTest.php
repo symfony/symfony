@@ -63,6 +63,38 @@ class HttpExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
+    /**
+     * @dataProvider provideStatusCode
+     */
+    public function testFromStatusCode(int $statusCode)
+    {
+        $exception = HttpException::fromStatusCode($statusCode);
+        $this->assertInstanceOf(HttpException::class, $exception);
+        $this->assertSame($statusCode, $exception->getStatusCode());
+    }
+
+    public static function provideStatusCode()
+    {
+        return [
+            [400],
+            [401],
+            [403],
+            [404],
+            [406],
+            [409],
+            [410],
+            [411],
+            [412],
+            [418],
+            [423],
+            [415],
+            [422],
+            [428],
+            [429],
+            [503],
+        ];
+    }
+
     protected function createException(string $message = '', \Throwable $previous = null, int $code = 0, array $headers = []): HttpException
     {
         return new HttpException(200, $message, $previous, $headers, $code);

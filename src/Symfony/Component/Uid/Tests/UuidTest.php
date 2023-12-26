@@ -427,4 +427,48 @@ class UuidTest extends TestCase
     {
         $this->assertInstanceOf(Uuid::class, Uuid::fromString('111111111u9QRyVM94rdmZ'));
     }
+
+    public function testV1ToV6()
+    {
+        $uuidV1 = new UuidV1('8189d3de-9670-11ee-b9d1-0242ac120002');
+        $uuidV6 = $uuidV1->toV6();
+
+        $this->assertEquals($uuidV1->getDateTime(), $uuidV6->getDateTime());
+        $this->assertSame($uuidV1->getNode(), $uuidV6->getNode());
+        $this->assertEquals($uuidV6, $uuidV1->toV6());
+    }
+
+    public function testV1ToV7BeforeUnixEpochThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot convert UUID to v7: its timestamp is before the Unix epoch.');
+
+        (new UuidV1('9aba8000-ff00-11b0-b3db-3b3fc83afdfc'))->toV7(); // Timestamp is 1969-01-01 00:00:00.0000000
+    }
+
+    public function testV1ToV7()
+    {
+        $uuidV1 = new UuidV1('eb248d80-ea4f-11ec-9d2a-839425e6fb88');
+        $sameUuidV1100NanosecondsLater = new UuidV1('eb248d81-ea4f-11ec-9d2a-839425e6fb88');
+        $uuidV7 = $uuidV1->toV7();
+        $sameUuidV7100NanosecondsLater = $sameUuidV1100NanosecondsLater->toV7();
+
+        $this->assertSame($uuidV1->getDateTime()->format('Uv'), $uuidV7->getDateTime()->format('Uv'));
+        $this->assertEquals($uuidV7, $uuidV1->toV7());
+        $this->assertNotEquals($uuidV7, $sameUuidV7100NanosecondsLater);
+        $this->assertSame(hexdec('0'.substr($uuidV7, -2)) + 1, hexdec('0'.substr($sameUuidV7100NanosecondsLater, -2)));
+    }
+
+    public function testV1ToV7WhenExtraTimeEntropyOverflows()
+    {
+        $uuidV1 = new UuidV1('10e7718f-2d4f-11be-bfed-cdd35907e584');
+        $sameUuidV1100NanosecondsLater = new UuidV1('10e77190-2d4f-11be-bfed-cdd35907e584');
+        $uuidV7 = $uuidV1->toV7();
+        $sameUuidV7100NanosecondsLater = $sameUuidV1100NanosecondsLater->toV7();
+
+        $this->assertSame($uuidV1->getDateTime()->format('Uv'), $uuidV7->getDateTime()->format('Uv'));
+        $this->assertEquals($uuidV7, $uuidV1->toV7());
+        $this->assertNotEquals($uuidV7, $sameUuidV7100NanosecondsLater);
+        $this->assertSame(hexdec('0'.substr($uuidV7, -2)) + 1, hexdec('0'.substr($sameUuidV7100NanosecondsLater, -2)));
+    }
 }

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-21T11:59:25Z
+
+> Also, what do you think of going directly from v1 to v7 to avoid the unneeded v6 step? I'm actually not even sure v6 -> v7 is needed at all since they are part of the same RFC iteration: I don't see any case where a system would be able to generate v6 but not v7 directly? 🤔
+
+It doesn't cost much to provide v6 to v7 so why skip it?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-12-21T13:00:01Z
+
+> I don't cost much to provide v6 to v7 so why skip it?
+
+Because nobody will use it :sweat_smile:
+
+I reviewed it again and it's OK for me. I can't approve it since it's my own PR. I force-pushed again to add more assertions.

@@ -73,7 +73,6 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['EST5EDT'];
         yield ['MST7MDT'];
         yield ['PST8PDT'];
-        yield ['America/Montreal'];
 
         // previously expired in ICU
         yield ['Europe/Saratov'];

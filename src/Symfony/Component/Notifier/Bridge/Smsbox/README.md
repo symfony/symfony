@@ -22,25 +22,31 @@ where:
 With a SMSBOX Message, you can use the SmsboxOptions class and use the setters to add [message options](https://www.smsbox.net/en/tools-development#developer-space)
 
 ```php
-use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Charset;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Day;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Encoding;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Mode;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Strategy;
+use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Udh;
 use Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions;
+use Symfony\Component\Notifier\Message\SmsMessage;
 
 $sms = new SmsMessage('+33123456789', 'Your %1% message %2%');
 $options = (new SmsboxOptions())
-    ->mode(SmsboxOptions::MESSAGE_MODE_EXPERT)
-    ->strategy(SmsboxOptions::MESSAGE_STRATEGY_NOT_MARKETING_GROUP)
+    ->mode(Mode::Expert)
+    ->strategy(Strategy::NotMarketingGroup)
     ->sender('Your sender')
     ->date('DD/MM/YYYY')
     ->hour('HH:MM')
-    ->coding(SmsboxOptions::MESSAGE_CODING_UNICODE)
-    ->charset(SmsboxOptions::MESSAGE_CHARSET_UTF8)
-    ->udh(SmsboxOptions::MESSAGE_UDH_DISABLED_CONCAT)
+    ->coding(Encoding::Unicode)
+    ->charset(Charset::Iso1)
+    ->udh(Udh::DisabledConcat)
     ->callback(true)
     ->allowVocal(true)
     ->maxParts(2)
     ->validity(100)
-    ->daysMinMax(min: SmsboxOptions::MESSAGE_DAYS_TUESDAY, max: SmsboxOptions::MESSAGE_DAYS_FRIDAY)
-    ->hoursMinMax(min: 8, max: 10)                                                      
+    ->daysMinMax(min: Day::Tuesday, max: Day::Friday)
+    ->hoursMinMax(min: 8, max: 10)
     ->variable(['variable1', 'variable2'])
     ->dateTime(new \DateTime())
     ->destIso('FR');

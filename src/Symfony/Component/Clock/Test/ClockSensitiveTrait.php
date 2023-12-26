@@ -42,13 +42,19 @@ trait ClockSensitiveTrait
     }
 
     /**
+     * @beforeClass
+     *
      * @before
      *
      * @internal
      */
-    protected static function saveClockBeforeTest(bool $save = true): ClockInterface
+    public static function saveClockBeforeTest(bool $save = true): ClockInterface
     {
         static $originalClock;
+
+        if ($save && $originalClock) {
+            self::restoreClockAfterTest();
+        }
 
         return $save ? $originalClock = Clock::get() : $originalClock;
     }

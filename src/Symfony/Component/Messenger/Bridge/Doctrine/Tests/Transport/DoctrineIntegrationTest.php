@@ -67,7 +67,7 @@ class DoctrineIntegrationTest extends TestCase
         // DBAL 2 compatibility
         $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
 
-        $availableAt = new \DateTimeImmutable($result->fetchOne(), , new \DateTimeZone('UTC'));
+        $availableAt = new \DateTimeImmutable($result->fetchOne(), new \DateTimeZone('UTC'));
 
         $now = new \DateTimeImmutable('now + 60 seconds', new \DateTimeZone('UTC'));
         $this->assertGreaterThan($now, $availableAt);

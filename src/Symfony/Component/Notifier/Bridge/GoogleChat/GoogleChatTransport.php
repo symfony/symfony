@@ -36,7 +36,7 @@ final class GoogleChatTransport extends AbstractTransport
     private ?string $threadKey;
 
     /**
-     * @param string      $space       The space name the the webhook url "/v1/spaces/<space>/messages"
+     * @param string      $space       The space name of the webhook url "/v1/spaces/<space>/messages"
      * @param string      $accessKey   The "key" parameter of the webhook url
      * @param string      $accessToken The "token" parameter of the webhook url
      * @param string|null $threadKey   Opaque thread identifier string that can be specified to group messages into a single thread.

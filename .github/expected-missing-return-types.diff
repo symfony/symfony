@@ -10,35 +10,35 @@ git checkout composer.json src/
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-@@ -411,5 +411,5 @@ abstract class AbstractBrowser
+@@ -407,5 +407,5 @@ abstract class AbstractBrowser
       * @throws \RuntimeException When processing returns exit code
       */
 -    protected function doRequestInProcess(object $request)
 +    protected function doRequestInProcess(object $request): object
      {
          $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
-@@ -444,5 +444,5 @@ abstract class AbstractBrowser
+@@ -440,5 +440,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    abstract protected function doRequest(object $request);
 +    abstract protected function doRequest(object $request): object;
  
      /**
-@@ -455,5 +455,5 @@ abstract class AbstractBrowser
+@@ -451,5 +451,5 @@ abstract class AbstractBrowser
       * @throws LogicException When this abstract class is not implemented
       */
 -    protected function getScript(object $request)
 +    protected function getScript(object $request): string
      {
          throw new LogicException('To insulate requests, you need to override the getScript() method.');
-@@ -465,5 +465,5 @@ abstract class AbstractBrowser
+@@ -461,5 +461,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    protected function filterRequest(Request $request)
 +    protected function filterRequest(Request $request): object
      {
          return $request;
-@@ -475,5 +475,5 @@ abstract class AbstractBrowser
+@@ -471,5 +471,5 @@ abstract class AbstractBrowser
       * @return Response
       */
 -    protected function filterResponse(object $response)
@@ -402,14 +402,14 @@ diff --git a/src/Symfony/Component/HttpKernel/KernelInterface.php b/src/Symfony/
 diff --git a/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php b/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php
 --- a/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php
-@@ -226,5 +226,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+@@ -234,5 +234,5 @@ abstract class AttributeClassLoader implements LoaderInterface
       * @return string
       */
 -    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
 +    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
      {
          $name = str_replace('\\', '_', $class->name).'_'.$method->name;
-@@ -325,5 +325,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+@@ -333,5 +333,5 @@ abstract class AttributeClassLoader implements LoaderInterface
       * @return void
       */
 -    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);

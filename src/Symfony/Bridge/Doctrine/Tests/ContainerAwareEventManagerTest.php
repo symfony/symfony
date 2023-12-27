@@ -42,7 +42,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm = new ContainerAwareEventManager($this->container, [new MySubscriber(['foo'])]);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Using Doctrine subscriber "Symfony\Bridge\Doctrine\Tests\MySubscriber" is not allowed, declare it as a listener instead.');
+        $this->expectExceptionMessage('Using Doctrine subscriber "Symfony\Bridge\Doctrine\Tests\MySubscriber" is not allowed. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.');
         $this->evm->getListeners('foo');
     }
 

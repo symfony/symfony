@@ -662,7 +662,7 @@ XLIFF
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="ypeBEso" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_pt_a</target>
       </trans-unit>

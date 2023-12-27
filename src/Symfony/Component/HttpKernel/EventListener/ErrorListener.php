@@ -63,7 +63,7 @@ class ErrorListener implements EventSubscriberInterface
             }
             if (!$throwable instanceof HttpExceptionInterface || $throwable->getStatusCode() !== $config['status_code']) {
                 $headers = $throwable instanceof HttpExceptionInterface ? $throwable->getHeaders() : [];
-                $throwable = new HttpException($config['status_code'], $throwable->getMessage(), $throwable, $headers);
+                $throwable = HttpException::fromStatusCode($config['status_code'], $throwable->getMessage(), $throwable, $headers);
                 $event->setThrowable($throwable);
             }
             break;
@@ -78,7 +78,7 @@ class ErrorListener implements EventSubscriberInterface
                     /** @var WithHttpStatus $instance */
                     $instance = $attributes[0]->newInstance();
 
-                    $throwable = new HttpException($instance->statusCode, $throwable->getMessage(), $throwable, $instance->headers);
+                    $throwable = HttpException::fromStatusCode($instance->statusCode, $throwable->getMessage(), $throwable, $instance->headers);
                     $event->setThrowable($throwable);
                     break;
                 }

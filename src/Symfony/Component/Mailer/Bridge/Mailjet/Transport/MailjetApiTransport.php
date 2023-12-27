@@ -51,16 +51,14 @@ class MailjetApiTransport extends AbstractApiTransport
         'X-Mailjet-TrackOpen' => ['TrackOpen', 'string'],
     ];
 
-    private string $privateKey;
-    private string $publicKey;
-    private bool $sandbox;
-
-    public function __construct(string $publicKey, string $privateKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, bool $sandbox = false)
-    {
-        $this->publicKey = $publicKey;
-        $this->privateKey = $privateKey;
-        $this->sandbox = $sandbox;
-
+    public function __construct(
+        private string $publicKey,
+        #[\SensitiveParameter] private string $privateKey,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+        LoggerInterface $logger = null,
+        private bool $sandbox = false,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 

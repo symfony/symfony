@@ -119,6 +119,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const REQUIRE_ALL_PROPERTIES = 'require_all_properties';
 
     /**
+     * Use class name as default expected type when throwing NotNormalizableValueException instead of unknown.
+     */
+    public const USE_CLASS_AS_DEFAULT_EXPECTED_TYPE = 'use_class_as_default_expected_type';
+
+    /**
      * @internal
      */
     protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
@@ -380,7 +385,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     $exception = NotNormalizableValueException::createForUnexpectedDataType(
                         sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name),
                         $data,
-                        ['unknown'],
+                        [isset($context[self::USE_CLASS_AS_DEFAULT_EXPECTED_TYPE]) && $context[self::USE_CLASS_AS_DEFAULT_EXPECTED_TYPE] ? $class : 'unknown'],
                         $context['deserialization_path'] ?? null,
                         true
                     );
@@ -424,12 +429,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         unset($context['has_constructor']);
 
         if (!$reflectionClass->isInstantiable()) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(
-                sprintf('Failed to create object because the class "%s" is not instantiable.', $class),
-                $data,
-                ['unknown'],
-                $context['deserialization_path'] ?? null
-            );
+            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Failed to create object because the class "%s" is not instantiable.', $class), $data, ['unknown'], $context['deserialization_path'] ?? null);
         }
 
         return new $class();

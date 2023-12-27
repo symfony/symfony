@@ -21,7 +21,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
@@ -282,6 +281,69 @@ class RequestPayloadValueResolverTest extends TestCase
             $validationFailedException = $e->getPrevious();
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
             $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
+        }
+    }
+
+    public function testNestedPayloadErrorReportingWhenPartialDenormalizationReturnsViolation()
+    {
+        $content = '{
+            "name": "john doe",
+            "address": {
+                "address": "2332 street",
+                "zipcode": "20220",
+                "city": "Paris",
+                "country": "75000",
+                "geolocalization": {
+                    "lng": 32.423
+                }
+            }
+        }';
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())
+            ->method('validate');
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: $content);
+        $kernel = $this->createMock(HttpKernelInterface::class);
+
+        // Test using use_class_as_default_expected_type = false context
+        $argument = new ArgumentMetadata('invalid-nested-payload', Employee::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(serializationContext: ['use_class_as_default_expected_type' => false]),
+        ]);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame(
+                sprintf('This value should be of type %s.', 'unknown'),
+                $validationFailedException->getViolations()[0]->getMessage()
+            );
+        }
+
+        // Test using use_class_as_default_expected_type context
+        $argument = new ArgumentMetadata('invalid-nested-payload', Employee::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(serializationContext: ['use_class_as_default_expected_type' => true]),
+        ]);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame(
+                sprintf('This value should be of type %s.', Geolocalization::class),
+                $validationFailedException->getViolations()[0]->getMessage()
+            );
         }
     }
 
@@ -729,5 +791,36 @@ class User
     public function getPassword(): string
     {
         return $this->password;
+    }
+}
+
+class Employee
+{
+    public function __construct(
+        public string $name,
+        #[Assert\Valid]
+        public ?Address $address = null,
+    ) {
+    }
+}
+
+class Address
+{
+    public function __construct(
+        public string $address,
+        public string $zipcode,
+        public string $city,
+        public string $country,
+        public Geolocalization $geolocalization,
+    ) {
+    }
+}
+
+class Geolocalization
+{
+    public function __construct(
+        public string $lat,
+        public string $lng,
+    ) {
     }
 }

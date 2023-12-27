@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-23T02:42:32Z
+
+How would that work with the exception mapping already handled ? Would there not be conflicts / priority troubles there ?
+
+---------------------------------------------------------------------------
+
+by priyadi at 2023-12-23T03:57:57Z
+
+> How would that work with the exception mapping already handled ? Would there not be conflicts / priority troubles there ?
+
+Parent classes are prioritized first, starting from the immediate parent first. Then, interfaces are processed, according to the order of `class_implements()`. There should be no BC break.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-23T11:42:55Z
+
+If i was not precise enough, i was making allusion to the framework exception map that already exists and... map classes or interfaces to HTTP status / Log level : https://symfony.com/doc/current/reference/configuration/framework.html#exceptions
+
+I just find a bit odd that those two implementations both coexists in the [ErrorListener](https://github.com/symfony/symfony/blob/7.0/src/Symfony/Component/HttpKernel/EventListener/ErrorListener.php) (one before and one after)
+
+```php
+foreach ($this->exceptionsMapping as $class => $config) {
+    if (!$throwable instanceof $class || !$config['status_code']) {
+        continue;
+    }
+    if (!$throwable instanceof HttpExceptionInterface || $throwable->getStatusCode() !== $config['status_code']) {
+        $headers = $throwable instanceof HttpExceptionInterface ? $throwable->getHeaders() : [];
+        $throwable = new HttpException($config['status_code'], $throwable->getMessage(), $throwable, $headers);
+        $event->setThrowable($throwable);
+    }
+    break;
+}
+```
+
+---------------------------------------------------------------------------
+
+by priyadi at 2023-12-23T15:26:27Z
+
+> If i was not precise enough, i was making allusion to the framework exception map that already exists and... map classes or interfaces to HTTP status / Log level : https://symfony.com/doc/current/reference/configuration/framework.html#exceptions
+
+Yes, doing it from the configuration is the traditional way to do it before 6.3, and it is still working as intended.
+
+https://symfony.com/blog/new-in-symfony-6-3-http-exception-attributes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-23T17:57:42Z
+
+Looking at the implementation, I think this might be too unusual - ie unexpected. The relationship is unnatural to me.
+
+Why don't you leverage `HttpExceptionInterface` instead?
+
+---------------------------------------------------------------------------
+
+by priyadi at 2023-12-23T21:23:45Z
+
+> Looking at the implementation, I think this might be too unusual - ie unexpected. The relationship is unnatural to me.
+>
+> Why don't you leverage `HttpExceptionInterface` instead?
+
+That would require my domain model to depend on HttpKernel.
+
+Without this change, I could still do it using `config/packages/exceptions.yaml` which works with interfaces. But I don't see why it should work using `config/packages/exceptions.yaml` but should not work with attributes.
+
+---------------------------------------------------------------------------
+
+by priyadi at 2023-12-24T07:32:36Z
+
+Added more background information in the PR description.

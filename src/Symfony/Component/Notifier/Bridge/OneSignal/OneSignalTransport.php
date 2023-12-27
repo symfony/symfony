@@ -81,7 +81,17 @@ final class OneSignalTransport extends AbstractTransport
 
         $options = $opts ? $opts->toArray() : [];
         $options['app_id'] = $this->appId;
-        $options['include_player_ids'] = [$recipientId];
+        if (isset($options['external_id'])) {
+            $options['include_aliases'] = [
+                'external_id' => [
+                    $options['external_id']
+                ]
+            ];
+            $options['target_channel'] = 'push';
+            unset($options['external_id']);
+        } else {
+            $options['include_subscription_ids'] = [$recipientId]; // include_player_ids has been deprecated
+        }
 
         if (!isset($options['headings'])) {
             $options['headings'] = ['en' => $message->getSubject()];

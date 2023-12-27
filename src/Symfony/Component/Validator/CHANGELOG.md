@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `list` and `associative_array` types to `Type` constraint
+ * Add the `Charset` constraint
 
 7.0
 ---

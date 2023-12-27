@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-12-26T14:36:53Z
+
+A test? 🥺
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T14:40:18Z
+
+This is already tested by the added code paths to me. More tests would look like testing a getter to me :)
+
+---------------------------------------------------------------------------
+
+by simondaigre at 2023-12-26T22:10:12Z
+
+Great idea. It will help to ignore some HTTP exceptions on Sentry.
+Could we also plug this with `#[WithHttpStatus]` attribute ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-27T07:17:45Z
+
+> I would also add a test, with a data provider
+
+alright, updated
+
+>  Could we also plug this with #[WithHttpStatus] attribute ?
+
+Already handled, that's what the changes on ErrorListener are about.

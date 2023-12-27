@@ -17,17 +17,13 @@ class PostmarkDeliveryEvent
 {
     public const CODE_INACTIVE_RECIPIENT = 406;
 
-    private int $errorCode;
-
     private Headers $headers;
 
-    private ?string $message;
-
-    public function __construct(string $message, int $errorCode)
+    public function __construct(
+        private string $message,
+        private int $errorCode,
+    )
     {
-        $this->message = $message;
-        $this->errorCode = $errorCode;
-
         $this->headers = new Headers();
     }
 
@@ -41,7 +37,7 @@ class PostmarkDeliveryEvent
         return $this->headers;
     }
 
-    public function getMessage(): ?string
+    public function getMessage(): string
     {
         return $this->message;
     }

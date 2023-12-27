@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-21T11:11:00Z
+
+Just bikeshadding about the name: what about Charset?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-21T12:10:48Z
+
+I like Charset very much! I find it clearer. I updated the PR. I kept the `encodings` constraint option name to match the name of the `mb_detect_encoding()` function argument.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T15:06:41Z
+
+My thoughts: On all my apps, I'd want to reject any non-UTF-8 content. It might already be the case when the DB refuses to persist invalid UTF-8. So this contraints looks both needed and not needed since I think we might want to add this check earlier when processing the input.
+Does that make sense?
+
+@alexandre-daubois can you share your use case more precisely? When can one submit non-UTF-8 in your case?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-26T15:23:31Z
+
+Thank you for the review, comments are addressed :+1:
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-27T08:07:07Z
+
+`final` suits me fine, added :+1:

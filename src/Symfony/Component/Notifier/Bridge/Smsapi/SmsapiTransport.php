@@ -29,15 +29,16 @@ final class SmsapiTransport extends AbstractTransport
 {
     protected const HOST = 'api.smsapi.pl';
 
-    private string $authToken;
-    private string $from = '';
     private bool $fast = false;
     private bool $test = false;
 
-    public function __construct(#[\SensitiveParameter] string $authToken, string $from = '', HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $from = '',
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+)
     {
-        $this->authToken = $authToken;
-        $this->from = $from;
 
         parent::__construct($client, $dispatcher);
     }

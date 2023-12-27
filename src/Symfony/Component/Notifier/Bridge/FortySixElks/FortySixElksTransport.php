@@ -28,16 +28,13 @@ final class FortySixElksTransport extends AbstractTransport
 {
     protected const HOST = 'api.46elks.com';
 
-    private string $apiUsername;
-    private string $apiPassword;
-    private string $from;
-
-    public function __construct(string $apiUsername, #[\SensitiveParameter] string $apiPassword, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiUsername = $apiUsername;
-        $this->apiPassword = $apiPassword;
-        $this->from = $from;
-
+    public function __construct(
+        private string $apiUsername,
+        #[\SensitiveParameter] private string $apiPassword,
+        private string $from,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

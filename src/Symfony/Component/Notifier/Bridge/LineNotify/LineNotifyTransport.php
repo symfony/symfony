@@ -27,11 +27,11 @@ final class LineNotifyTransport extends AbstractTransport
 {
     protected const HOST = 'notify-api.line.me';
 
-    private string $token;
-
-    public function __construct(#[\SensitiveParameter] string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

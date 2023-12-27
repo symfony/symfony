@@ -26,18 +26,14 @@ final class EsendexTransport extends AbstractTransport
 {
     protected const HOST = 'api.esendex.com';
 
-    private string $email;
-    private string $password;
-    private string $accountReference;
-    private string $from;
-
-    public function __construct(string $email, #[\SensitiveParameter] string $password, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->email = $email;
-        $this->password = $password;
-        $this->accountReference = $accountReference;
-        $this->from = $from;
-
+    public function __construct(
+        private string $email,
+        #[\SensitiveParameter] private string $password,
+        private string $accountReference,
+        private string $from,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

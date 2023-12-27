@@ -30,16 +30,14 @@ final class SmscTransport extends AbstractTransport
 {
     protected const HOST = 'smsc.ru';
 
-    private ?string $login;
-    private ?string $password;
-    private string $from;
-
-    public function __construct(string $login, #[\SensitiveParameter] string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $password,
+        private string $from,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+)
     {
-        $this->login = $login;
-        $this->password = $password;
-        $this->from = $from;
-
         parent::__construct($client, $dispatcher);
     }
 

@@ -29,8 +29,7 @@ final class UnifonicTransport extends AbstractTransport
     protected const HOST = 'el.cloud.unifonic.com';
 
     public function __construct(
-        #[\SensitiveParameter]
-        private readonly string $appSid,
+        #[\SensitiveParameter] private readonly string $appSid,
         private readonly ?string $from = null,
         HttpClientInterface $client = null,
         EventDispatcherInterface $dispatcher = null,

@@ -31,15 +31,12 @@ final class DiscordTransport extends AbstractTransport
 
     private const SUBJECT_LIMIT = 2000;
 
-    private string $token;
-    private string $webhookId;
-
-    public function __construct(#[\SensitiveParameter] string $token, string $webhookId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
-        $this->webhookId = $webhookId;
-        $this->client = $client;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        private string $webhookId,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

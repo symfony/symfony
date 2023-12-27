@@ -29,16 +29,13 @@ final class ContactEveryoneTransport extends AbstractTransport
 {
     protected const HOST = 'contact-everyone.orange-business.com';
 
-    private string $token;
-    private ?string $diffusionName;
-    private ?string $category;
-
-    public function __construct(#[\SensitiveParameter] string $token, ?string $diffusionName, ?string $category, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
-        $this->diffusionName = $diffusionName;
-        $this->category = $category;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        private ?string $diffusionName,
+        private ?string $category,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

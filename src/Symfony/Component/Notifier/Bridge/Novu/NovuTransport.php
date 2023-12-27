@@ -29,12 +29,10 @@ class NovuTransport extends AbstractTransport
     protected const HOST = 'web.novu.co';
 
     public function __construct(
-        #[\SensitiveParameter]
-        protected string $apiKey,
+        #[\SensitiveParameter] protected string $apiKey,
         HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
     ) {
-        $this->apiKey = $apiKey;
         parent::__construct($client, $dispatcher);
     }
 

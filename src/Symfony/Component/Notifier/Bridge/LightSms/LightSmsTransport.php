@@ -28,10 +28,6 @@ final class LightSmsTransport extends AbstractTransport
 {
     protected const HOST = 'www.lightsms.com';
 
-    private string $login;
-    private string $password;
-    private string $from;
-
     private const ERROR_CODES = [
         1 => 'Missing Signature',
         2 => 'Login not specified',
@@ -75,12 +71,13 @@ final class LightSmsTransport extends AbstractTransport
         999 => 'Unknown Error',
     ];
 
-    public function __construct(string $login, #[\SensitiveParameter] string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->password = $password;
-        $this->from = $from;
-
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $password,
+        private string $from,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

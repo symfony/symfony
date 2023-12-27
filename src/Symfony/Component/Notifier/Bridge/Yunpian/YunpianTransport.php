@@ -29,12 +29,12 @@ class YunpianTransport extends AbstractTransport
 {
     protected const HOST = 'sms.yunpian.com';
 
-    private string $apiKey;
-
-    public function __construct(#[\SensitiveParameter] string $apiKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        #[\SensitiveParameter] private string $apiKey,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    )
     {
-        $this->apiKey = $apiKey;
-
         parent::__construct($client, $dispatcher);
     }
 

@@ -33,10 +33,8 @@ final class BlueskyTransport extends AbstractTransport
     private array $authSession = [];
 
     public function __construct(
-        #[\SensitiveParameter]
-        private string $user,
-        #[\SensitiveParameter]
-        private string $password,
+        #[\SensitiveParameter] private string $user,
+        #[\SensitiveParameter] private string $password,
         private LoggerInterface $logger,
         HttpClientInterface $client = null,
         EventDispatcherInterface $dispatcher = null,

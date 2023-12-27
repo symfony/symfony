@@ -28,16 +28,14 @@ final class SinchTransport extends AbstractTransport
 {
     protected const HOST = 'sms.api.sinch.com';
 
-    private string $accountSid;
-    private string $authToken;
-    private string $from;
-
-    public function __construct(string $accountSid, #[\SensitiveParameter] string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        private string $accountSid,
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+)
     {
-        $this->accountSid = $accountSid;
-        $this->authToken = $authToken;
-        $this->from = $from;
-
         parent::__construct($client, $dispatcher);
     }
 

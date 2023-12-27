@@ -27,15 +27,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class ZulipTransport extends AbstractTransport
 {
-    private string $email;
-    private string $token;
-    private string $channel;
-
-    public function __construct(string $email, #[\SensitiveParameter] string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        private string $email,
+        #[\SensitiveParameter] private string $token,
+        private string $channel,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+)
     {
-        $this->email = $email;
-        $this->token = $token;
-        $this->channel = $channel;
 
         parent::__construct($client, $dispatcher);
     }

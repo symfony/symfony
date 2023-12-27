@@ -37,7 +37,7 @@ final class BandwidthTransport extends AbstractTransport
         private readonly string $applicationId,
         private readonly ?string $priority,
         HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

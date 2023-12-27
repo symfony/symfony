@@ -26,8 +26,9 @@ final class NtfyOptions implements MessageOptionsInterface
     public const PRIORITY_LOW = 2;
     public const PRIORITY_MIN = 1;
 
-    public function __construct(private array $options = [])
-    {
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public static function fromNotification(Notification $notification): self

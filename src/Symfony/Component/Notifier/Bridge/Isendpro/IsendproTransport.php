@@ -32,7 +32,7 @@ final class IsendproTransport extends AbstractTransport
         private bool $noStop = false,
         private bool $sandbox = false,
         HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

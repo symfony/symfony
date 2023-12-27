@@ -33,7 +33,7 @@ final class SimpleTextinTransport extends AbstractTransport
         #[\SensitiveParameter] private readonly string $apiKey,
         private readonly ?string $from = null,
         HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

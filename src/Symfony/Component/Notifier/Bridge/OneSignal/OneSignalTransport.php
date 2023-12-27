@@ -29,16 +29,14 @@ final class OneSignalTransport extends AbstractTransport
 {
     protected const HOST = 'onesignal.com';
 
-    private string $appId;
-    private string $apiKey;
-    private ?string $defaultRecipientId;
-
-    public function __construct(string $appId, #[\SensitiveParameter] string $apiKey, string $defaultRecipientId = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        private string $appId,
+        #[\SensitiveParameter] private string $apiKey,
+        private ?string $defaultRecipientId = null,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+)
     {
-        $this->appId = $appId;
-        $this->apiKey = $apiKey;
-        $this->defaultRecipientId = $defaultRecipientId;
-
         parent::__construct($client, $dispatcher);
     }
 

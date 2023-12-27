@@ -28,18 +28,15 @@ final class OctopushTransport extends AbstractTransport
 {
     protected const HOST = 'www.octopush-dm.com';
 
-    private string $userLogin;
-    private string $apiKey;
-    private string $from;
-    private string $type;
-
-    public function __construct(string $userLogin, #[\SensitiveParameter] string $apiKey, string $from, string $type, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        private string $userLogin,
+        #[\SensitiveParameter] private string $apiKey,
+        private string $from,
+        private string $type,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+)
     {
-        $this->userLogin = $userLogin;
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-        $this->type = $type;
-
         parent::__construct($client, $dispatcher);
     }
 

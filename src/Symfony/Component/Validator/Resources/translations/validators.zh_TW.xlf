@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>不允許使用隱藏的覆蓋字元。</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>無效的副檔名 ({{ extension }}). 允許的副檔名有 {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

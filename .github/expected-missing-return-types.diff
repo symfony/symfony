@@ -262,7 +262,7 @@ diff --git a/src/Symfony/Bridge/Doctrine/Validator/DoctrineInitializer.php b/src
 diff --git a/src/Symfony/Bridge/Monolog/Command/ServerLogCommand.php b/src/Symfony/Bridge/Monolog/Command/ServerLogCommand.php
 --- a/src/Symfony/Bridge/Monolog/Command/ServerLogCommand.php
 +++ b/src/Symfony/Bridge/Monolog/Command/ServerLogCommand.php
-@@ -54,5 +54,5 @@ class ServerLogCommand extends Command
+@@ -56,5 +56,5 @@ class ServerLogCommand extends Command
       * @return void
       */
 -    protected function configure()
@@ -482,7 +482,7 @@ diff --git a/src/Symfony/Bundle/DebugBundle/DependencyInjection/Compiler/DumpDat
 diff --git a/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php b/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php
 --- a/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php
 +++ b/src/Symfony/Bundle/DebugBundle/DependencyInjection/DebugExtension.php
-@@ -33,5 +33,5 @@ class DebugExtension extends Extension
+@@ -32,5 +32,5 @@ class DebugExtension extends Extension
       * @return void
       */
 -    public function load(array $configs, ContainerBuilder $container)
@@ -509,7 +509,7 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/Command/AbstractConfigCommand.ph
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
 --- a/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/Console/Application.php
-@@ -174,5 +174,5 @@ class Application extends BaseApplication
+@@ -180,5 +180,5 @@ class Application extends BaseApplication
       * @return void
       */
 -    protected function registerCommands()
@@ -653,7 +653,7 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2971,5 +2971,5 @@ class FrameworkExtension extends Extension
+@@ -2995,5 +2995,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -663,14 +663,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 diff --git a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 --- a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
-@@ -95,5 +95,5 @@ class FrameworkBundle extends Bundle
+@@ -96,5 +96,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
          $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
-@@ -120,5 +120,5 @@ class FrameworkBundle extends Bundle
+@@ -121,5 +121,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function build(ContainerBuilder $container)
@@ -1318,7 +1318,7 @@ diff --git a/src/Symfony/Component/Cache/Adapter/PdoAdapter.php b/src/Symfony/Co
 -    public function createTable()
 +    public function createTable(): void
      {
-         // connect if we are not yet
+         $sql = match ($driver = $this->getDriver()) {
 diff --git a/src/Symfony/Component/Cache/Adapter/PhpFilesAdapter.php b/src/Symfony/Component/Cache/Adapter/PhpFilesAdapter.php
 --- a/src/Symfony/Component/Cache/Adapter/PhpFilesAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/PhpFilesAdapter.php
@@ -3928,14 +3928,14 @@ diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfo
 +    public function set(string $id, ?object $service): void
      {
          // Runs the internal initializer; used by the dumped container to include always-needed files
-@@ -287,5 +287,5 @@ class Container implements ContainerInterface, ResetInterface
+@@ -286,5 +286,5 @@ class Container implements ContainerInterface, ResetInterface
       * @return void
       */
 -    public function reset()
 +    public function reset(): void
      {
          $services = $this->services + $this->privates;
-@@ -342,5 +342,5 @@ class Container implements ContainerInterface, ResetInterface
+@@ -341,5 +341,5 @@ class Container implements ContainerInterface, ResetInterface
       * @return mixed
       */
 -    protected function load(string $file)
@@ -8692,7 +8692,7 @@ diff --git a/src/Symfony/Component/HttpKernel/Kernel.php b/src/Symfony/Component
 +    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass): void
      {
          // cache the container
-@@ -847,5 +847,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
+@@ -849,5 +849,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
       * @return void
       */
 -    public function __wakeup()
@@ -8978,7 +8978,7 @@ diff --git a/src/Symfony/Component/Ldap/Adapter/ConnectionInterface.php b/src/Sy
 --- a/src/Symfony/Component/Ldap/Adapter/ConnectionInterface.php
 +++ b/src/Symfony/Component/Ldap/Adapter/ConnectionInterface.php
 @@ -35,4 +35,4 @@ interface ConnectionInterface
-      * @return void
+      * @throws InvalidCredentialsException When the connection can't be created because of an LDAP_INVALID_CREDENTIALS error
       */
 -    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null);
 +    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void;
@@ -9148,7 +9148,7 @@ diff --git a/src/Symfony/Component/Ldap/LdapInterface.php b/src/Symfony/Componen
 --- a/src/Symfony/Component/Ldap/LdapInterface.php
 +++ b/src/Symfony/Component/Ldap/LdapInterface.php
 @@ -33,5 +33,5 @@ interface LdapInterface
-      * @return void
+      * @throws ConnectionException if dn / password could not be bound
       */
 -    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null);
 +    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void;
@@ -9458,34 +9458,34 @@ diff --git a/src/Symfony/Component/Lock/Store/MemcachedStore.php b/src/Symfony/C
 diff --git a/src/Symfony/Component/Lock/Store/MongoDbStore.php b/src/Symfony/Component/Lock/Store/MongoDbStore.php
 --- a/src/Symfony/Component/Lock/Store/MongoDbStore.php
 +++ b/src/Symfony/Component/Lock/Store/MongoDbStore.php
-@@ -194,5 +194,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -209,5 +209,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
       */
 -    public function createTtlIndex(int $expireAfterSeconds = 0)
 +    public function createTtlIndex(int $expireAfterSeconds = 0): void
      {
-         $this->getCollection()->createIndex(
-@@ -211,5 +211,5 @@ class MongoDbStore implements PersistingStoreInterface
+         $server = $this->getManager()->selectServer();
+@@ -231,5 +231,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @throws LockExpiredException when save is called on an expired lock
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          $key->reduceLifetime($this->initialTtl);
-@@ -237,5 +237,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -257,5 +257,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @throws LockExpiredException
       */
 -    public function putOffExpiration(Key $key, float $ttl)
 +    public function putOffExpiration(Key $key, float $ttl): void
      {
          $key->reduceLifetime($ttl);
-@@ -256,5 +256,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -276,5 +276,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @return void
       */
 -    public function delete(Key $key)
 +    public function delete(Key $key): void
      {
-         $this->getCollection()->deleteOne([ // filter
+         $write = new BulkWrite();
 diff --git a/src/Symfony/Component/Lock/Store/PdoStore.php b/src/Symfony/Component/Lock/Store/PdoStore.php
 --- a/src/Symfony/Component/Lock/Store/PdoStore.php
 +++ b/src/Symfony/Component/Lock/Store/PdoStore.php
@@ -9496,14 +9496,14 @@ diff --git a/src/Symfony/Component/Lock/Store/PdoStore.php b/src/Symfony/Compone
 +    public function save(Key $key): void
      {
          $key->reduceLifetime($this->initialTtl);
-@@ -119,5 +119,5 @@ class PdoStore implements PersistingStoreInterface
+@@ -129,5 +129,5 @@ class PdoStore implements PersistingStoreInterface
       * @return void
       */
 -    public function putOffExpiration(Key $key, float $ttl)
 +    public function putOffExpiration(Key $key, float $ttl): void
      {
          if ($ttl < 1) {
-@@ -147,5 +147,5 @@ class PdoStore implements PersistingStoreInterface
+@@ -157,5 +157,5 @@ class PdoStore implements PersistingStoreInterface
       * @return void
       */
 -    public function delete(Key $key)
@@ -10103,35 +10103,35 @@ diff --git a/src/Symfony/Component/Process/PhpProcess.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Process/Process.php b/src/Symfony/Component/Process/Process.php
 --- a/src/Symfony/Component/Process/Process.php
 +++ b/src/Symfony/Component/Process/Process.php
-@@ -205,5 +205,5 @@ class Process implements \IteratorAggregate
+@@ -203,5 +203,5 @@ class Process implements \IteratorAggregate
       * @return void
       */
 -    public function __wakeup()
 +    public function __wakeup(): void
      {
          throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-@@ -296,5 +296,5 @@ class Process implements \IteratorAggregate
+@@ -294,5 +294,5 @@ class Process implements \IteratorAggregate
       * @throws LogicException   In case a callback is provided and output has been disabled
       */
 -    public function start(callable $callback = null, array $env = [])
 +    public function start(callable $callback = null, array $env = []): void
      {
          if ($this->isRunning()) {
-@@ -1151,5 +1151,5 @@ class Process implements \IteratorAggregate
+@@ -1145,5 +1145,5 @@ class Process implements \IteratorAggregate
       * @throws ProcessTimedOutException In case the timeout was reached
       */
 -    public function checkTimeout()
 +    public function checkTimeout(): void
      {
          if (self::STATUS_STARTED !== $this->status) {
-@@ -1192,5 +1192,5 @@ class Process implements \IteratorAggregate
+@@ -1186,5 +1186,5 @@ class Process implements \IteratorAggregate
       * @return void
       */
 -    public function setOptions(array $options)
 +    public function setOptions(array $options): void
      {
          if ($this->isRunning()) {
-@@ -1289,5 +1289,5 @@ class Process implements \IteratorAggregate
+@@ -1283,5 +1283,5 @@ class Process implements \IteratorAggregate
       * @return void
       */
 -    protected function updateStatus(bool $blocking)
@@ -10301,133 +10301,133 @@ diff --git a/src/Symfony/Component/PropertyInfo/PropertyTypeExtractorInterface.p
 diff --git a/src/Symfony/Component/Routing/Attribute/Route.php b/src/Symfony/Component/Routing/Attribute/Route.php
 --- a/src/Symfony/Component/Routing/Attribute/Route.php
 +++ b/src/Symfony/Component/Routing/Attribute/Route.php
-@@ -80,5 +80,5 @@ class Route
+@@ -82,5 +82,5 @@ class Route
       * @return void
       */
 -    public function setPath(string $path)
 +    public function setPath(string $path): void
      {
          $this->path = $path;
-@@ -88,5 +88,5 @@ class Route
+@@ -90,5 +90,5 @@ class Route
       * @return string|null
       */
 -    public function getPath()
 +    public function getPath(): ?string
      {
          return $this->path;
-@@ -96,5 +96,5 @@ class Route
+@@ -98,5 +98,5 @@ class Route
       * @return void
       */
 -    public function setLocalizedPaths(array $localizedPaths)
 +    public function setLocalizedPaths(array $localizedPaths): void
      {
          $this->localizedPaths = $localizedPaths;
-@@ -109,5 +109,5 @@ class Route
+@@ -111,5 +111,5 @@ class Route
       * @return void
       */
 -    public function setHost(string $pattern)
 +    public function setHost(string $pattern): void
      {
          $this->host = $pattern;
-@@ -117,5 +117,5 @@ class Route
+@@ -119,5 +119,5 @@ class Route
       * @return string|null
       */
 -    public function getHost()
 +    public function getHost(): ?string
      {
          return $this->host;
-@@ -125,5 +125,5 @@ class Route
+@@ -127,5 +127,5 @@ class Route
       * @return void
       */
 -    public function setName(string $name)
 +    public function setName(string $name): void
      {
          $this->name = $name;
-@@ -133,5 +133,5 @@ class Route
+@@ -135,5 +135,5 @@ class Route
       * @return string|null
       */
 -    public function getName()
 +    public function getName(): ?string
      {
          return $this->name;
-@@ -141,5 +141,5 @@ class Route
+@@ -143,5 +143,5 @@ class Route
       * @return void
       */
 -    public function setRequirements(array $requirements)
 +    public function setRequirements(array $requirements): void
      {
          $this->requirements = $requirements;
-@@ -149,5 +149,5 @@ class Route
+@@ -151,5 +151,5 @@ class Route
       * @return array
       */
 -    public function getRequirements()
 +    public function getRequirements(): array
      {
          return $this->requirements;
-@@ -157,5 +157,5 @@ class Route
+@@ -159,5 +159,5 @@ class Route
       * @return void
       */
 -    public function setOptions(array $options)
 +    public function setOptions(array $options): void
      {
          $this->options = $options;
-@@ -165,5 +165,5 @@ class Route
+@@ -167,5 +167,5 @@ class Route
       * @return array
       */
 -    public function getOptions()
 +    public function getOptions(): array
      {
          return $this->options;
-@@ -173,5 +173,5 @@ class Route
+@@ -175,5 +175,5 @@ class Route
       * @return void
       */
 -    public function setDefaults(array $defaults)
 +    public function setDefaults(array $defaults): void
      {
          $this->defaults = $defaults;
-@@ -181,5 +181,5 @@ class Route
+@@ -183,5 +183,5 @@ class Route
       * @return array
       */
 -    public function getDefaults()
 +    public function getDefaults(): array
      {
          return $this->defaults;
-@@ -189,5 +189,5 @@ class Route
+@@ -191,5 +191,5 @@ class Route
       * @return void
       */
 -    public function setSchemes(array|string $schemes)
 +    public function setSchemes(array|string $schemes): void
      {
          $this->schemes = (array) $schemes;
-@@ -197,5 +197,5 @@ class Route
+@@ -199,5 +199,5 @@ class Route
       * @return array
       */
 -    public function getSchemes()
 +    public function getSchemes(): array
      {
          return $this->schemes;
-@@ -205,5 +205,5 @@ class Route
+@@ -207,5 +207,5 @@ class Route
       * @return void
       */
 -    public function setMethods(array|string $methods)
 +    public function setMethods(array|string $methods): void
      {
          $this->methods = (array) $methods;
-@@ -213,5 +213,5 @@ class Route
+@@ -215,5 +215,5 @@ class Route
       * @return array
       */
 -    public function getMethods()
 +    public function getMethods(): array
      {
          return $this->methods;
-@@ -221,5 +221,5 @@ class Route
+@@ -223,5 +223,5 @@ class Route
       * @return void
       */
 -    public function setCondition(?string $condition)
 +    public function setCondition(?string $condition): void
      {
          $this->condition = $condition;
-@@ -229,5 +229,5 @@ class Route
+@@ -231,5 +231,5 @@ class Route
       * @return string|null
       */
 -    public function getCondition()
@@ -10481,35 +10481,35 @@ diff --git a/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php b/src
 +    public function setRouteAnnotationClass(string $class): void
      {
          $this->routeAnnotationClass = $class;
-@@ -175,5 +175,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+@@ -183,5 +183,5 @@ abstract class AttributeClassLoader implements LoaderInterface
       * @return void
       */
 -    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method)
 +    protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method): void
      {
          if ($annot->getEnv() && $annot->getEnv() !== $this->env) {
-@@ -282,5 +282,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+@@ -290,5 +290,5 @@ abstract class AttributeClassLoader implements LoaderInterface
       * @return string
       */
 -    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
 +    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
      {
          $name = str_replace('\\', '_', $class->name).'_'.$method->name;
-@@ -297,5 +297,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+@@ -305,5 +305,5 @@ abstract class AttributeClassLoader implements LoaderInterface
       * @return array<string, mixed>
       */
 -    protected function getGlobals(\ReflectionClass $class)
 +    protected function getGlobals(\ReflectionClass $class): array
      {
          $globals = $this->resetGlobals();
-@@ -382,5 +382,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+@@ -390,5 +390,5 @@ abstract class AttributeClassLoader implements LoaderInterface
       * @return Route
       */
 -    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition)
 +    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition): Route
      {
          return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
-@@ -390,5 +390,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+@@ -398,5 +398,5 @@ abstract class AttributeClassLoader implements LoaderInterface
       * @return void
       */
 -    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
@@ -10661,78 +10661,78 @@ diff --git a/src/Symfony/Component/Routing/RouteCollection.php b/src/Symfony/Com
 -    public function remove(string|array $name)
 +    public function remove(string|array $name): void
      {
-         foreach ((array) $name as $n) {
-@@ -159,5 +159,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+         $routes = [];
+@@ -174,5 +174,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addCollection(self $collection)
 +    public function addCollection(self $collection): void
      {
          // we need to remove all routes with the same names first because just replacing them
-@@ -188,5 +188,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -203,5 +203,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addPrefix(string $prefix, array $defaults = [], array $requirements = [])
 +    public function addPrefix(string $prefix, array $defaults = [], array $requirements = []): void
      {
          $prefix = trim(trim($prefix), '/');
-@@ -208,5 +208,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -223,5 +223,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addNamePrefix(string $prefix)
 +    public function addNamePrefix(string $prefix): void
      {
          $prefixedRoutes = [];
-@@ -238,5 +238,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -253,5 +253,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function setHost(?string $pattern, array $defaults = [], array $requirements = [])
 +    public function setHost(?string $pattern, array $defaults = [], array $requirements = []): void
      {
          foreach ($this->routes as $route) {
-@@ -254,5 +254,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -269,5 +269,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function setCondition(?string $condition)
 +    public function setCondition(?string $condition): void
      {
          foreach ($this->routes as $route) {
-@@ -268,5 +268,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -283,5 +283,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addDefaults(array $defaults)
 +    public function addDefaults(array $defaults): void
      {
          if ($defaults) {
-@@ -284,5 +284,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -299,5 +299,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addRequirements(array $requirements)
 +    public function addRequirements(array $requirements): void
      {
          if ($requirements) {
-@@ -300,5 +300,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -315,5 +315,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addOptions(array $options)
 +    public function addOptions(array $options): void
      {
          if ($options) {
-@@ -316,5 +316,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -331,5 +331,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function setSchemes(string|array $schemes)
 +    public function setSchemes(string|array $schemes): void
      {
          foreach ($this->routes as $route) {
-@@ -330,5 +330,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -345,5 +345,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function setMethods(string|array $methods)
 +    public function setMethods(string|array $methods): void
      {
          foreach ($this->routes as $route) {
-@@ -353,5 +353,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -368,5 +368,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addResource(ResourceInterface $resource)
@@ -11545,42 +11545,42 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalize
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
      {
          if (!isset($context['cache_key'])) {
-@@ -236,5 +236,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -238,5 +238,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return object
       */
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
 +    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
      {
          if ($class !== $mappedClass = $this->getMappedClass($data, $class, $context)) {
-@@ -287,5 +287,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -289,5 +289,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return string[]
       */
 -    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
 +    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
  
      /**
-@@ -294,5 +294,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -296,5 +296,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 +    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
  
      /**
-@@ -301,5 +301,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -303,5 +303,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
 -    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
 +    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
      {
          return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
-@@ -309,5 +309,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -311,5 +311,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
      {
          if (!isset($context['cache_key'])) {
-@@ -417,5 +417,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -423,5 +423,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return void
       */
 -    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
@@ -11625,7 +11625,7 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.p
 diff --git a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-@@ -147,5 +147,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+@@ -151,5 +151,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
@@ -11671,7 +11671,7 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 diff --git a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
-@@ -146,5 +146,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
+@@ -138,5 +138,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
@@ -11681,7 +11681,7 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php b/
 diff --git a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
-@@ -187,5 +187,5 @@ class PropertyNormalizer extends AbstractObjectNormalizer
+@@ -191,5 +191,5 @@ class PropertyNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
@@ -12647,7 +12647,7 @@ diff --git a/src/Symfony/Component/Validator/Constraints/ChoiceValidator.php b/s
 diff --git a/src/Symfony/Component/Validator/Constraints/Collection.php b/src/Symfony/Component/Validator/Constraints/Collection.php
 --- a/src/Symfony/Component/Validator/Constraints/Collection.php
 +++ b/src/Symfony/Component/Validator/Constraints/Collection.php
-@@ -61,5 +61,5 @@ class Collection extends Composite
+@@ -63,5 +63,5 @@ class Collection extends Composite
       * @return void
       */
 -    protected function initializeNestedConstraints()

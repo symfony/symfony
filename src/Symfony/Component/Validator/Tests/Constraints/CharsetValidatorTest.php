@@ -26,7 +26,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider provideValidValues
      */
-    public function testEncodingIsValid(string $value, array $encodings)
+    public function testEncodingIsValid(string|\Stringable $value, array $encodings)
     {
         $this->validator->validate($value, new Charset(encodings: $encodings));
 
@@ -66,6 +66,12 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
         yield ['my ûtf 8', ['ASCII', 'UTF-8']];
         yield ['my ûtf 8', ['UTF-8']];
         yield ['string', ['ISO-8859-1']];
+        yield [new class() implements \Stringable {
+            public function __toString(): string
+            {
+                return 'my ûtf 8';
+            }
+        }, ['UTF-8']];
     }
 
     public static function provideInvalidValues()

@@ -22,6 +22,8 @@ use Symfony\Component\Cache\Psr16Cache;
  */
 class Psr16AdapterTest extends AdapterTestCase
 {
+    protected static ?string $allowPsr6Keys = null;
+
     protected $skippedTests = [
         'testPrune' => 'Psr16adapter just proxies',
         'testClearPrefix' => 'SimpleCache cannot clear by prefix',

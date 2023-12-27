@@ -37,9 +37,14 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
 
     private const TAGS_PREFIX = "\1tags\1";
 
+    /**
+     * @internal
+     */
+    protected const NS_SEPARATOR = ':';
+
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
-        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).':';
+        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace, static::NS_SEPARATOR).static::NS_SEPARATOR;
         $this->defaultLifetime = $defaultLifetime;
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s").', $this->maxIdLength - 24, \strlen($namespace), $namespace));

@@ -87,7 +87,7 @@ class DebugClassLoaderTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Case mismatch between class and real file names');
         if (!file_exists(__DIR__.'/Fixtures/CaseMismatch.php')) {
-            $this->markTestSkipped('Can only be run on case insensitive filesystems');
+            $this->markTestSkipped('Can only be run on case-insensitive filesystems');
         }
 
         class_exists(Fixtures\CaseMismatch::class, true);

@@ -32,19 +32,13 @@ final class LokaliseProvider implements ProviderInterface
 {
     private const LOKALISE_GET_KEYS_LIMIT = 5000;
 
-    private HttpClientInterface $client;
-    private LoaderInterface $loader;
-    private LoggerInterface $logger;
-    private string $defaultLocale;
-    private string $endpoint;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private string $endpoint,
+    ) {
     }
 
     public function __toString(): string

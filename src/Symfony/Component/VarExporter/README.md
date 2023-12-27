@@ -7,10 +7,10 @@ of objects:
 - `VarExporter::export()` allows exporting any serializable PHP data structure to
   plain PHP code. While doing so, it preserves all the semantics associated with
   the serialization mechanism of PHP (`__wakeup`, `__sleep`, `Serializable`,
-  `__serialize`, `__unserialize`.)
+  `__serialize`, `__unserialize`);
 - `Instantiator::instantiate()` creates an object and sets its properties without
-  calling its constructor nor any other methods.
-- `Hydrator::hydrate()` can set the properties of an existing object.
+  calling its constructor nor any other methods;
+- `Hydrator::hydrate()` can set the properties of an existing object;
 - `Lazy*Trait` can make a class behave as a lazy-loading ghost or virtual proxy.
 
 VarExporter::export()
@@ -26,7 +26,7 @@ Unlike `var_export()`, this works on any serializable PHP value.
 It also provides a few improvements over `var_export()`/`serialize()`:
 
  * the output is PSR-2 compatible;
- * the output can be re-indented without messing up with `\r` or `\n` in the data
+ * the output can be re-indented without messing up with `\r` or `\n` in the data;
  * missing classes throw a `ClassNotFoundException` instead of being unserialized
    to `PHP_Incomplete_Class` objects;
  * references involving `SplObjectStorage`, `ArrayObject` or `ArrayIterator`
@@ -61,7 +61,7 @@ Hydrator::hydrate($object, [], [
 ------------
 
 The component provides two lazy-loading patterns: ghost objects and virtual
-proxies (see https://martinfowler.com/eaaCatalog/lazyLoad.html for reference.)
+proxies (see https://martinfowler.com/eaaCatalog/lazyLoad.html for reference).
 
 Ghost objects work only with concrete and non-internal classes. In the generic
 case, they are not compatible with using factories in their initializer.

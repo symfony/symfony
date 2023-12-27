@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Symfony\Component\Validator\Attribute\HasNamedArguments;
 
 /**

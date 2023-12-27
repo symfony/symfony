@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Monolog\Tests\Handler;
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Level;
-use Monolog\Logger;
 use Monolog\LogRecord;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

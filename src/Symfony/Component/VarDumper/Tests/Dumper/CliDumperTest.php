@@ -479,7 +479,7 @@ EOTXT
             ],
             [
                 'bar' => 123,
-            ]
+            ],
         ]);
 
         $dumper = new CliDumper();

@@ -56,10 +56,13 @@ final class CrowdinProvider implements ProviderInterface
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $fileList = $this->getFileList();
+        $languageMapping = $this->getLanguageMapping();
 
         $responses = [];
 
         foreach ($translatorBag->getCatalogues() as $catalogue) {
+            $locale = $catalogue->getLocale();
+
             foreach ($catalogue->getDomains() as $domain) {
                 if (0 === \count($catalogue->all($domain))) {
                     continue;
@@ -86,7 +89,7 @@ final class CrowdinProvider implements ProviderInterface
                         continue;
                     }
 
-                    $responses[] = $this->uploadTranslations($fileId, $domain, $content, $catalogue->getLocale());
+                    $responses[] = $this->uploadTranslations($fileId, $domain, $content, $languageMapping[$locale] ?? $locale);
                 }
             }
         }
@@ -105,11 +108,10 @@ final class CrowdinProvider implements ProviderInterface
     public function read(array $domains, array $locales): TranslatorBag
     {
         $fileList = $this->getFileList();
+        $languageMapping = $this->getLanguageMapping();
 
         $translatorBag = new TranslatorBag();
         $responses = [];
-
-        $localeLanguageMap = $this->mapLocalesToLanguageId($locales);
 
         foreach ($domains as $domain) {
             $fileId = $this->getFileIdByDomain($fileList, $domain);
@@ -120,7 +122,7 @@ final class CrowdinProvider implements ProviderInterface
 
             foreach ($locales as $locale) {
                 if ($locale !== $this->defaultLocale) {
-                    $response = $this->exportProjectTranslations($localeLanguageMap[$locale], $fileId);
+                    $response = $this->exportProjectTranslations($languageMapping[$locale] ?? $locale, $fileId);
                 } else {
                     $response = $this->downloadSourceFile($fileId);
                 }
@@ -406,37 +408,24 @@ final class CrowdinProvider implements ProviderInterface
         return $result;
     }
 
-    private function mapLocalesToLanguageId(array $locales): array
+    private function getLanguageMapping(): array
     {
         /**
-         * We cannot query by locales, we need to fetch all and filter out the relevant ones.
-         *
-         * @see https://developer.crowdin.com/api/v2/#operation/api.languages.getMany (Crowdin API)
-         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.languages.getMany (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.get (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.get (Crowdin Enterprise API)
          */
-        $response = $this->client->request('GET', '../../languages?limit=500');
+        $response = $this->client->request('GET', '');
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderException('Unable to list set languages.', $response);
+            throw new ProviderException('Unable to get project info.', $response);
         }
 
-        $localeLanguageMap = [];
-        foreach ($response->toArray()['data'] as $language) {
-            foreach (['locale', 'osxLocale', 'id'] as $key) {
-                if (\in_array($language['data'][$key], $locales, true)) {
-                    $localeLanguageMap[$language['data'][$key]] = $language['data']['id'];
-                }
-            }
+        $projectInfo = $response->toArray()['data'];
+        $mapping = [];
+        foreach ($projectInfo['languageMapping'] ?? [] as $key => $value) {
+            $mapping[$value['locale']] = $key;
         }
 
-        if (\count($localeLanguageMap) !== \count($locales)) {
-            $message = implode('", "', array_diff($locales, array_keys($localeLanguageMap)));
-            $message = sprintf('Unable to find all requested locales: "%s" not found.', $message);
-            $this->logger->error($message);
-
-            throw new ProviderException($message, $response);
-        }
-
-        return $localeLanguageMap;
+        return $mapping;
     }
 }

@@ -14,7 +14,7 @@ namespace Symfony\Component\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 
 /**
- * Represents an already parsed expression.
+ * Represents an already serialized parsed expression.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

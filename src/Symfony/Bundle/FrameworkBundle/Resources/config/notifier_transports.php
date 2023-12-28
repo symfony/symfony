@@ -107,6 +107,7 @@ return static function (ContainerConfigurator $container) {
         'light-sms' => Bridge\LightSms\LightSmsTransportFactory::class,
         'sms-biuras' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
         'smsbox' => Bridge\Smsbox\SmsboxTransportFactory::class,
+        'sms-sluzba' => Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
     ];
 
     foreach ($texterFactories as $name => $class) {

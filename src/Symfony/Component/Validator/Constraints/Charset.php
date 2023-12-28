@@ -27,7 +27,7 @@ final class Charset extends Constraint
     ];
 
     public array|string $encodings = [];
-    public string $message = 'The detected encoding "{{ detected }}" does not match one of the accepted encoding: "{{ encodings }}".';
+    public string $message = 'The detected character encoding "{{ detected }}" is invalid. Allowed encodings are "{{ encodings }}".';
 
     public function __construct(array|string $encodings = null, string $message = null, array $groups = null, mixed $payload = null, array $options = null)
     {

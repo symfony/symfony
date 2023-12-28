@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-12-19T15:43:03Z
+
+Thank you.
+
+CSS is tricky and I am no expert. But why does `bottom` work and not `top`? How come `middle` doesn't do the trick?
+
+What I really wonder is: Is this according to the official rules and have this been tested in more than one browser?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-12-19T15:58:56Z
+
+Intuitively, I would say that we want to align the baseline of the text here, so using `baseline`
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-19T16:01:39Z
+
+It depends on the "bounding box" of the element. The FQCN is actually two parts here: the grey and the green one.
+
+The green part of the FQCN is already centered in its section. If the bounding-box is a bit taller than the text, then the "vertical-align: top" of the grey part pushes it on top of the bounding box. Not sure I'm super clear here :sweat_smile:
+
+@stof I'm having a look at this solution
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-19T16:35:11Z
+
+Unfortunately, baseline doesn't work well:
+
+![image](https://github.com/symfony/symfony/assets/2144837/5e1db16e-9bf7-41a3-9c00-dcd9f9d2112e)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-12-28T15:20:19Z
+
+I've played a bit with this and to me, this was solved by doing this change instead:
+
+```diff
+ pre.sf-dump span {
+-    display: inline;
++    display: inline-flex;
+ }
+```
+
+Can you please try if this also solves the design issues for you? Thanks!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-28T15:37:53Z
+
+I can confirm this works well. Thanks Javier, PR updated!

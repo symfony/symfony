@@ -98,7 +98,7 @@ class ProjectServiceContainer extends Container
             'utf-8 valid string' => 'ָ›ב­–	test',
             'binary' => 'ננננ',
             'binary-control-char' => 'This is a Bell char ',
-            'console banner' => '[37;44m#StandWith[30;43mUkraine[0m',
+            'console banner' => '[37;44mHello[30;43mWorld[0m',
             'null string' => 'null',
             'string of digits' => '123',
             'string of digits prefixed with minus character' => '-123',

@@ -664,7 +664,7 @@ pre.sf-dump:after {
    clear: both;
 }
 pre.sf-dump span {
-    display: inline;
+    display: inline-flex;
 }
 pre.sf-dump a {
     text-decoration: none;

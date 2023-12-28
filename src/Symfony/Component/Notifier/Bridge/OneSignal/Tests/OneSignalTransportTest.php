@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\OneSignal\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalOptions;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
@@ -84,15 +85,7 @@ final class OneSignalTransportTest extends TransportTestCase
 
     public function testSendWithErrorResponseThrows()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(400);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['errors' => ['Message Notifications must have English language content']]));
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new JsonMockResponse(['errors' => ['Message Notifications must have English language content']], ['http_code' => 400]));
 
         $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 
@@ -104,15 +97,7 @@ final class OneSignalTransportTest extends TransportTestCase
 
     public function testSendWithErrorResponseThrowsWhenAllUnsubscribed()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['id' => '', 'recipients' => 0, 'errors' => ['All included players are not subscribed']]));
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new JsonMockResponse(['id' => '', 'recipients' => 0, 'errors' => ['All included players are not subscribed']]));
 
         $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 
@@ -124,25 +109,37 @@ final class OneSignalTransportTest extends TransportTestCase
 
     public function testSend()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['id' => 'b98881cc-1e94-4366-bbd9-db8f3429292b', 'recipients' => 1, 'external_id' => null]));
+        $expectedBody = json_encode(['app_id' => '9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'headings' => ['en' => 'Hello'], 'contents' => ['en' => 'World'], 'include_subscription_ids' => ['ea345989-d273-4f21-a33b-0c006efc5edb']]);
 
-        $expectedBody = json_encode(['app_id' => '9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'headings' => ['en' => 'Hello'], 'contents' => ['en' => 'World'], 'include_player_ids' => ['ea345989-d273-4f21-a33b-0c006efc5edb']]);
-
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
-            return $response;
+            return new JsonMockResponse(['id' => 'b98881cc-1e94-4366-bbd9-db8f3429292b', 'recipients' => 1, 'external_id' => null]);
         });
 
         $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
 
         $sentMessage = $transport->send(new PushMessage('Hello', 'World'));
+
+        $this->assertSame('b98881cc-1e94-4366-bbd9-db8f3429292b', $sentMessage->getMessageId());
+    }
+
+    public function testSendExternalIds()
+    {
+        $expectedBody = json_encode(['app_id' => '9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'headings' => ['en' => 'Hello'], 'contents' => ['en' => 'World'], 'include_aliases' => ['external_id' => ['ea345989-d273-4f21-a33b-0c006efc5edb']], 'target_channel' => 'push']);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+
+            return new JsonMockResponse(['id' => 'b98881cc-1e94-4366-bbd9-db8f3429292b', 'recipients' => 1, 'external_id' => null]);
+        });
+
+        $transport = self::createTransport($client, 'ea345989-d273-4f21-a33b-0c006efc5edb');
+
+        $options = new OneSignalOptions();
+        $options->isExternalUserId();
+
+        $sentMessage = $transport->send(new PushMessage('Hello', 'World', $options));
 
         $this->assertSame('b98881cc-1e94-4366-bbd9-db8f3429292b', $sentMessage->getMessageId());
     }

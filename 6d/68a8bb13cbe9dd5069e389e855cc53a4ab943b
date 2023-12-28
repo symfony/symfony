@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-28T08:55:56Z
+
+For 7.1.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-28T08:56:24Z
+
+It does not merge cleanly on 7.1.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-28T08:58:21Z
+
+I thought it would avoid merge conflicts in the long run if merging up from 5.4 but I can rebase
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-28T09:00:20Z
+
+> I thought it would avoid merge conflicts in the long run if merging up from 5.4 but I can rebase
+
+I want us to be very strict on the "only bug fixes go to lower branches" policy (like for CS changes).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-28T09:08:59Z
+
+> I want us to be very strict on the "only bug fixes go to lower branches" policy (like for CS changes).
+
+Allright 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-28T09:20:42Z
+
+Rebased on `7.1` ✅

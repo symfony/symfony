@@ -7,7 +7,7 @@ parameters:
     utf-8 valid string: "ț᭖\ttest"
     binary: !!binary 8PDw8A==
     binary-control-char: !!binary VGhpcyBpcyBhIEJlbGwgY2hhciAH
-    console banner: "\e[37;44m#StandWith\e[30;43mUkraine\e[0m"
+    console banner: "\e[37;44mHello\e[30;43mWorld\e[0m"
     null string: 'null'
     string of digits: '123'
     string of digits prefixed with minus character: '-123'

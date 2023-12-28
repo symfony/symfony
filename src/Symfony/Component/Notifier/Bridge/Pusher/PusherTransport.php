@@ -28,7 +28,7 @@ use Throwable;
 final class PusherTransport extends AbstractTransport
 {
     public function __construct(
-        private Pusher $pusher,
+        private readonly Pusher $pusher,
         HttpClientInterface $client = null,
         EventDispatcherInterface $dispatcher = null,
     ) {

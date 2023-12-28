@@ -17,8 +17,6 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
  * @author Yasmany Cubela Medina <yasmanycm@gmail.com>
- *
- * @coversNothing
  */
 final class PusherTransportFactoryTest extends TransportFactoryTestCase
 {
@@ -30,7 +28,7 @@ final class PusherTransportFactoryTest extends TransportFactoryTestCase
         return new PusherTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'pusher://key:secret@id?server=mt1',
@@ -38,23 +36,23 @@ final class PusherTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'pusher://key:secret@id?server=mt1'];
         yield [false, 'somethingElse://xoxb-TestToken@host?server=testChannel'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing secret' => ['pusher://key@id?server=mt1'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://something@else'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield ['pusher://key:secret@id'];
     }

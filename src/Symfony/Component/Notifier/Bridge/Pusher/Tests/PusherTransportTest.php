@@ -12,12 +12,12 @@
 namespace Symfony\Component\Notifier\Bridge\Pusher\Tests;
 
 use Pusher\Pusher;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Pusher\PusherTransport;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyHttpClient;
-use Symfony\Component\Notifier\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -28,17 +28,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class PusherTransportTest extends TransportTestCase
 {
-    public function toStringProvider(): iterable
-    {
-        yield ['pusher://key:secret@app?server=mt1', $this->createTransport()];
-    }
-
     /**
      * @return PusherTransport
      */
     public static function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new PusherTransport(new Pusher('key', 'secret', 'app'), $client ?? new DummyHttpClient());
+        return new PusherTransport(new Pusher('key', 'secret', 'app'), $client ?? new MockHttpClient());
+    }
+
+    public static function toStringProvider(): iterable
+    {
+        yield ['pusher://key:secret@app?server=mt1', self::createTransport()];
     }
 
     public static function supportedMessagesProvider(): iterable

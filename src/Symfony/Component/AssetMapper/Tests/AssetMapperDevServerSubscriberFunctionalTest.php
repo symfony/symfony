@@ -32,6 +32,20 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $this->assertSame('immutable, max-age=604800, public', $response->headers->get('Cache-Control'));
     }
 
+    public function testGettingAssetWithNonAsciiFilenameWorks()
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/assets/voilà-6344422da690fcc471f23f7a8966cd1c.css');
+        $response = $client->getResponse();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(<<<EOF
+        /* voilà.css */
+        body {}
+
+        EOF, $response->getContent());
+    }
+
     public function test404OnUnknownAsset()
     {
         $client = static::createClient();

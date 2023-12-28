@@ -63,7 +63,7 @@ class AssetsMapperCompileCommandTest extends TestCase
 
         $finder = new Finder();
         $finder->in($targetBuildDir)->files();
-        $this->assertCount(10, $finder);
+        $this->assertCount(11, $finder);
         $this->assertFileExists($targetBuildDir.'/manifest.json');
 
         $this->assertSame([
@@ -74,6 +74,7 @@ class AssetsMapperCompileCommandTest extends TestCase
             'file4.js',
             'subdir/file5.js',
             'subdir/file6.js',
+            'voilà.css',
         ], array_keys(json_decode(file_get_contents($targetBuildDir.'/manifest.json'), true)));
 
         $this->assertFileExists($targetBuildDir.'/importmap.json');

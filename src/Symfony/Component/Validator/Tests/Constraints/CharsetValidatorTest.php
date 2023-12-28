@@ -65,7 +65,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
         yield ['my ascii string', ['ASCII', 'UTF-8']];
         yield ['my ûtf 8', ['ASCII', 'UTF-8']];
         yield ['my ûtf 8', ['UTF-8']];
-        yield ['ώ', ['UTF-16']];
+        yield ['string', ['ISO-8859-1']];
     }
 
     public static function provideInvalidValues()

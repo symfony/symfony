@@ -18,11 +18,10 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class PusherOptions implements MessageOptionsInterface
 {
-    private array $channels;
-
-    public function __construct(array $channels)
+    public function __construct(
+        private readonly array $channels,
+    )
     {
-        $this->channels = $channels;
     }
 
     public function toArray(): array

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-26T21:07:58Z
+
+> Please add your bridge to UnsupportedSchemeExceptionTest, thanks
+
+I pushed to your branch
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-26T21:11:00Z
+
+I fixed CS errors mentioned by fabbot.io and rebased on top of `7.1`
+
+Good to merge from my side @fabpot 👍

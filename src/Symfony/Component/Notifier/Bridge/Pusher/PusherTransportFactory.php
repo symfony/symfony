@@ -30,17 +30,15 @@ final class PusherTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'pusher', $this->getSupportedSchemes());
         }
 
-        if (null === $dsn->getUser() || null === $dsn->getPassword() || null === $dsn->getOption('server')) {
-            throw new MissingRequiredOptionException('Pusher needs a APP_KEY, APP_SECRET AND SERVER specified.');
+        if (null === $dsn->getUser() || null === $dsn->getPassword()) {
+            throw new MissingRequiredOptionException('Pusher needs APP_KEY and APP_SECRET specified.');
         }
 
-        $options = [
-            'cluster' => $dsn->getOption('server', 'mt1'),
-        ];
-
-        $pusherClient = new Pusher($dsn->getUser(), $dsn->getPassword(), $dsn->getHost(), $options);
-
-        return new PusherTransport($pusherClient, $this->client, $this->dispatcher);
+        return new PusherTransport(
+            new Pusher($dsn->getUser(), $dsn->getPassword(), $dsn->getHost(), ['cluster' => $dsn->getRequiredOption('server'),]),
+            $this->client,
+            $this->dispatcher
+        );
     }
 
     protected function getSupportedSchemes(): array

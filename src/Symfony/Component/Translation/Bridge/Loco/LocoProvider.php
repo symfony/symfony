@@ -31,21 +31,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LocoProvider implements ProviderInterface
 {
-    private HttpClientInterface $client;
-    private LoaderInterface $loader;
-    private LoggerInterface $logger;
-    private string $defaultLocale;
-    private string $endpoint;
-    private ?TranslatorBagInterface $translatorBag = null;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, TranslatorBagInterface $translatorBag = null)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
-        $this->translatorBag = $translatorBag;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private string $endpoint,
+        private ?TranslatorBagInterface $translatorBag = null,
+    ) {
     }
 
     public function __toString(): string

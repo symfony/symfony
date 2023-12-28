@@ -41,7 +41,7 @@ class PhraseProviderFactory extends AbstractProviderFactory
     ];
 
     public function __construct(
-        private readonly HttpClientInterface $httpClient,
+        private readonly HttpClientInterface $client,
         private readonly LoggerInterface $logger,
         private readonly LoaderInterface $loader,
         private readonly XliffFileDumper $xliffFileDumper,
@@ -62,7 +62,7 @@ class PhraseProviderFactory extends AbstractProviderFactory
             $endpoint .= ':'.$port;
         }
 
-        $client = $this->httpClient->withOptions([
+        $client = $this->client->withOptions([
             'base_uri' => 'https://'.$endpoint.'/v2/projects/'.$this->getUser($dsn).'/',
             'headers' => [
                 'Authorization' => 'token '.$this->getPassword($dsn),

@@ -27,18 +27,18 @@ use Throwable;
  */
 final class PusherTransport extends AbstractTransport
 {
-    private $pusherClient;
-
-    public function __construct(Pusher $pusherClient, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->pusherClient = $pusherClient;
+    public function __construct(
+        private Pusher $pusher,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
 
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        $settings = $this->pusherClient->getSettings();
+        $settings = $this->pusher->getSettings();
         preg_match('/api-([\w]+)\.pusher\.com$/m', $settings['host'], $server);
 
         return sprintf('pusher://%s?server=%s', $settings['app_id'], $server[1]);
@@ -62,7 +62,7 @@ final class PusherTransport extends AbstractTransport
         }
 
         try {
-            $this->pusherClient->trigger($options->getChannels(), $message->getSubject(), $message->getContent(), [], true);
+            $this->pusher->trigger($options->getChannels(), $message->getSubject(), $message->getContent(), [], true);
         } catch (Throwable) {
             throw new \RuntimeException('An error occurred at Pusher Notifier Transport.');
         }

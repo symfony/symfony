@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\Pusher;
 
 use Pusher\Pusher;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;

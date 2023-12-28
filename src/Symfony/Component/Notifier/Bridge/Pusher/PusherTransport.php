@@ -20,7 +20,6 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Throwable;
 
 /**
  * @author Yasmany Cubela Medina <yasmanycm@gmail.com>
@@ -32,7 +31,6 @@ final class PusherTransport extends AbstractTransport
         HttpClientInterface $client = null,
         EventDispatcherInterface $dispatcher = null,
     ) {
-
         parent::__construct($client, $dispatcher);
     }
 
@@ -63,7 +61,7 @@ final class PusherTransport extends AbstractTransport
 
         try {
             $this->pusher->trigger($options->getChannels(), $message->getSubject(), $message->getContent(), [], true);
-        } catch (Throwable) {
+        } catch (\Throwable) {
             throw new \RuntimeException('An error occurred at Pusher Notifier Transport.');
         }
 

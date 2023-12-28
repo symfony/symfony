@@ -20,8 +20,7 @@ final class PusherOptions implements MessageOptionsInterface
 {
     public function __construct(
         private readonly array $channels,
-    )
-    {
+    ) {
     }
 
     public function toArray(): array

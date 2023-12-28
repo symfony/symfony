@@ -53,6 +53,7 @@ class DotenvTest extends TestCase
             ["FOO=\nBAR=\${FOO:-\'a{a}a}", "Unsupported character \"'\" found in the default value of variable \"\$FOO\". in \".env\" at line 2.\n...\\nBAR=\${FOO:-\'a{a}a}...\n                       ^ line 2 offset 24"],
             ["FOO=\nBAR=\${FOO:-a\$a}", "Unsupported character \"\$\" found in the default value of variable \"\$FOO\". in \".env\" at line 2.\n...FOO=\\nBAR=\${FOO:-a\$a}...\n                       ^ line 2 offset 20"],
             ["FOO=\nBAR=\${FOO:-a\"a}", "Unclosed braces on variable expansion in \".env\" at line 2.\n...FOO=\\nBAR=\${FOO:-a\"a}...\n                    ^ line 2 offset 17"],
+            ['_=FOO', "Invalid character in variable name in \".env\" at line 1.\n..._=FOO...\n  ^ line 1 offset 0"],
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {
@@ -175,6 +176,10 @@ class DotenvTest extends TestCase
             ["FOO=\nBAR=\${FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\$FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST}']],
             ["FOO=foo\nFOOBAR=\${FOO}\${BAR}", ['FOO' => 'foo', 'FOOBAR' => 'foo']],
+
+            // underscores
+            ['_FOO=BAR', ['_FOO' => 'BAR']],
+            ['_FOO_BAR=FOOBAR', ['_FOO_BAR' => 'FOOBAR']],
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {

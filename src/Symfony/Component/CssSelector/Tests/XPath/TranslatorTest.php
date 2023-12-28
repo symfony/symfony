@@ -277,7 +277,7 @@ HTML
             ['div[foobar~="cd"]', []],
             ['*[lang|="En"]', ['second-li']],
             ['[lang|="En-us"]', ['second-li']],
-            // Attribute values are case sensitive
+            // Attribute values are case-sensitive
             ['*[lang|="en"]', []],
             ['[lang|="en-US"]', []],
             ['*[lang|="e"]', []],
@@ -334,7 +334,7 @@ HTML
             ['* :root', []],
             ['*:contains("link")', ['html', 'nil', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
             [':CONtains("link")', ['html', 'nil', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
-            ['*:contains("LInk")', []],  // case sensitive
+            ['*:contains("LInk")', []],  // case-sensitive
             ['*:contains("e")', ['html', 'nil', 'outer-div', 'first-ol', 'first-li', 'paragraph', 'p-em']],
             ['*:contains("E")', []],  // case-sensitive
             ['.a', ['first-ol']],

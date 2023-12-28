@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-27T22:54:24Z
+
+Tests are still failing on AppVeyor. Shouldn't they become green with these changes?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-28T08:27:04Z
+
+Seems I chose the exact wrong encoding that always return false on some implementation :facepalm: I updated to use a more "classical" one. All green :+1:

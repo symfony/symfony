@@ -26,27 +26,27 @@ return static function (ContainerConfigurator $container) {
             ]);
 
     $chatterFactories = [
-        'google-chat' => Bridge\GoogleChat\GoogleChatTransportFactory::class,
-        'telegram' => Bridge\Telegram\TelegramTransportFactory::class,
         'bluesky' => Bridge\Bluesky\BlueskyTransportFactory::class,
+        'brevo' => Bridge\Brevo\BrevoTransportFactory::class,
+        'chatwork' => Bridge\Chatwork\ChatworkTransportFactory::class,
+        'discord' => Bridge\Discord\DiscordTransportFactory::class,
         'fake-chat' => Bridge\FakeChat\FakeChatTransportFactory::class,
         'firebase' => Bridge\Firebase\FirebaseTransportFactory::class,
         'gitter' => Bridge\Gitter\GitterTransportFactory::class,
+        'google-chat' => Bridge\GoogleChat\GoogleChatTransportFactory::class,
         'line-notify' => Bridge\LineNotify\LineNotifyTransportFactory::class,
         'linked-in' => Bridge\LinkedIn\LinkedInTransportFactory::class,
         'mastodon' => Bridge\Mastodon\MastodonTransportFactory::class,
+        'mattermost' => Bridge\Mattermost\MattermostTransportFactory::class,
         'mercure' => Bridge\Mercure\MercureTransportFactory::class,
         'microsoft-teams' => Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,
         'pager-duty' => Bridge\PagerDuty\PagerDutyTransportFactory::class,
         'rocket-chat' => Bridge\RocketChat\RocketChatTransportFactory::class,
-        'twitter' => Bridge\Twitter\TwitterTransportFactory::class,
-        'zulip' => Bridge\Zulip\ZulipTransportFactory::class,
-        'brevo' => Bridge\Brevo\BrevoTransportFactory::class,
-        'chatwork' => Bridge\Chatwork\ChatworkTransportFactory::class,
-        'discord' => Bridge\Discord\DiscordTransportFactory::class,
-        'mattermost' => Bridge\Mattermost\MattermostTransportFactory::class,
         'slack' => Bridge\Slack\SlackTransportFactory::class,
+        'telegram' => Bridge\Telegram\TelegramTransportFactory::class,
+        'twitter' => Bridge\Twitter\TwitterTransportFactory::class,
         'zendesk' => Bridge\Zendesk\ZendeskTransportFactory::class,
+        'zulip' => Bridge\Zulip\ZulipTransportFactory::class,
     ];
 
     foreach ($chatterFactories as $name => $class) {
@@ -74,6 +74,7 @@ return static function (ContainerConfigurator $container) {
         'iqsms' => Bridge\Iqsms\IqsmsTransportFactory::class,
         'isendpro' => Bridge\Isendpro\IsendproTransportFactory::class,
         'kaz-info-teh' => Bridge\KazInfoTeh\KazInfoTehTransportFactory::class,
+        'light-sms' => Bridge\LightSms\LightSmsTransportFactory::class,
         'mailjet' => Bridge\Mailjet\MailjetTransportFactory::class,
         'message-bird' => Bridge\MessageBird\MessageBirdTransportFactory::class,
         'message-media' => Bridge\MessageMedia\MessageMediaTransportFactory::class,
@@ -91,9 +92,12 @@ return static function (ContainerConfigurator $container) {
         'sendberry' => Bridge\Sendberry\SendberryTransportFactory::class,
         'simple-textin' => Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
         'sinch' => Bridge\Sinch\SinchTransportFactory::class,
+        'sms-biuras' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
         'sms-factor' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
+        'sms-sluzba' => Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
         'sms77' => Bridge\Sms77\Sms77TransportFactory::class,
         'smsapi' => Bridge\Smsapi\SmsapiTransportFactory::class,
+        'smsbox' => Bridge\Smsbox\SmsboxTransportFactory::class,
         'smsc' => Bridge\Smsc\SmscTransportFactory::class,
         'smsmode' => Bridge\Smsmode\SmsmodeTransportFactory::class,
         'spot-hit' => Bridge\SpotHit\SpotHitTransportFactory::class,
@@ -104,10 +108,6 @@ return static function (ContainerConfigurator $container) {
         'unifonic' => Bridge\Unifonic\UnifonicTransportFactory::class,
         'vonage' => Bridge\Vonage\VonageTransportFactory::class,
         'yunpian' => Bridge\Yunpian\YunpianTransportFactory::class,
-        'light-sms' => Bridge\LightSms\LightSmsTransportFactory::class,
-        'sms-biuras' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
-        'smsbox' => Bridge\Smsbox\SmsboxTransportFactory::class,
-        'sms-sluzba' => Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
     ];
 
     foreach ($texterFactories as $name => $class) {

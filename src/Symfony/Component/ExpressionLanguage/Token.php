@@ -12,7 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage;
 
 /**
- * Represents a Token.
+ * Represents a token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

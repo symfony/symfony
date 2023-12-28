@@ -12,7 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage;
 
 /**
- * Parsers a token stream.
+ * Parses a token stream.
  *
  * This parser implements a "Precedence climbing" algorithm.
  *

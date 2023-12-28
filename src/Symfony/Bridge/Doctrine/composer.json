@@ -21,7 +21,8 @@
         "doctrine/persistence": "^3.1",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/service-contracts": "^2.5|^3"
+        "symfony/service-contracts": "^2.5|^3",
+        "symfony/uid": "^6.4|^7.0"
     },
     "require-dev": {
         "symfony/cache": "^6.4|^7.0",
@@ -38,7 +39,6 @@
         "symfony/security-core": "^6.4|^7.0",
         "symfony/stopwatch": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",
-        "symfony/uid": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
         "symfony/var-dumper": "^6.4|^7.0",
         "doctrine/collections": "^1.0|^2.0",

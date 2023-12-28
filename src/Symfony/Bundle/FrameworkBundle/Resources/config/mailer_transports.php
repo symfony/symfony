@@ -39,73 +39,32 @@ return static function (ContainerConfigurator $container) {
                 service('http_client')->ignoreOnInvalid(),
                 service('logger')->ignoreOnInvalid(),
             ])
-            ->tag('monolog.logger', ['channel' => 'mailer'])
+            ->tag('monolog.logger', ['channel' => 'mailer']);
 
-        ->set('mailer.transport_factory.amazon', SesTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
+    $factories = [
+        'amazon' => SesTransportFactory::class,
+        'azure' => AzureTransportFactory::class,
+        'brevo' => BrevoTransportFactory::class,
+        'gmail' => GmailTransportFactory::class,
+        'infobip' => InfobipTransportFactory::class,
+        'mailchimp' => MandrillTransportFactory::class,
+        'mailersend' => MailerSendTransportFactory::class,
+        'mailgun' => MailgunTransportFactory::class,
+        'mailjet' => MailjetTransportFactory::class,
+        'mailpace' => MailPaceTransportFactory::class,
+        'native' => NativeTransportFactory::class,
+        'null' => NullTransportFactory::class,
+        'postmark' => PostmarkTransportFactory::class,
+        'scaleway' => ScalewayTransportFactory::class,
+        'sendgrid' => SendgridTransportFactory::class,
+        'sendmail' => SendmailTransportFactory::class,
+        'smtp' => EsmtpTransportFactory::class,
+    ];
 
-        ->set('mailer.transport_factory.azure', AzureTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.brevo', BrevoTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.gmail', GmailTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.infobip', InfobipTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.mailersend', MailerSendTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.mailchimp', MandrillTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.mailjet', MailjetTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.mailgun', MailgunTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.mailpace', MailPaceTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.postmark', PostmarkTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.sendgrid', SendgridTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.null', NullTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.scaleway', ScalewayTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.sendmail', SendmailTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory')
-
-        ->set('mailer.transport_factory.smtp', EsmtpTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory', ['priority' => -100])
-
-        ->set('mailer.transport_factory.native', NativeTransportFactory::class)
-            ->parent('mailer.transport_factory.abstract')
-            ->tag('mailer.transport_factory');
+    foreach ($factories as $name => $class) {
+        $container->services()
+            ->set('mailer.transport_factory.'.$name, $class)
+                ->parent('mailer.transport_factory.abstract')
+                ->tag('mailer.transport_factory');
+    }
 };

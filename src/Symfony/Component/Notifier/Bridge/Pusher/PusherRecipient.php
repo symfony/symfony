@@ -16,11 +16,9 @@ namespace Symfony\Component\Notifier\Bridge\Pusher;
  */
 class PusherRecipient implements PusherRecipientInterface
 {
-    private array $channels;
-
-    public function __construct(array $channels)
-    {
-        $this->channels = $channels;
+    public function __construct(
+        private readonly array $channels,
+    ) {
     }
 
     public function getChannels(): array

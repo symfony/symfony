@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-26T22:09:25Z
+
+Are you ok with this PR @nicolas-grekas ?
+If yes I will check `mailer_transports.php` too
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-27T07:03:22Z
+
+Looks fine to me (but don't miss running tests)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-27T08:51:45Z
+
+> but don't miss running tests
+
+Done ✅

@@ -121,6 +121,7 @@ class ImportMapRendererTest extends TestCase
         );
         $html = $renderer->render(['app']);
         $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims@', $html);
+        $this->assertStringContainsString('es-module-shims.js" crossorigin="anonymous" integrity="sha384-', $html);
     }
 
     public function testCustomScriptAttributes()

@@ -426,6 +426,10 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Uporaba skritih prekrivnih znakov ni dovoljena.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Končnica datoteke ni veljavna ({{ extension }}). Dovoljene so naslednje končnice: {{ extensions }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

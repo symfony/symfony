@@ -493,7 +493,7 @@ class GetSetMethodNormalizerTest extends TestCase
         return new GetSetMethodNormalizer();
     }
 
-    protected function getNormalizerForSkipUninitializedValues(): NormalizerInterface
+    protected function getNormalizerForSkipUninitializedValues(): GetSetMethodNormalizer
     {
         return new GetSetMethodNormalizer(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
     }

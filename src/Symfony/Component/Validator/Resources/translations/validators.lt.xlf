@@ -36,11 +36,11 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Nebuvo tikimasi Šis laukas.</target>
+                <target>Nebuvo tikimasi šio laukelio.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>Šiame lauke yra dingęs.</target>
+                <target>Trūkstamas laukelis.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -425,6 +425,10 @@
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Draudžiama naudoti paslėptus perdangos simbolius.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Failo plėtinys netinkamas ({{ extension }}). Leidžiami plėtiniai yra {{ extensions }}.</target>
             </trans-unit>
         </body>
     </file>

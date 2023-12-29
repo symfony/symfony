@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by garak at 2023-10-29T09:22:19Z
+
+@xabbuh could you review, please?
+
+---------------------------------------------------------------------------
+
+by garak at 2023-11-25T11:12:55Z
+
+> Please add a line in the chagelog of the component in section 7.1
+
+I see no changelog for 7.1, should I create a new file?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-25T11:14:09Z
+
+I mean this file: https://github.com/symfony/symfony/blob/7.1/src/Symfony/Component/Form/CHANGELOG.md

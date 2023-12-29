@@ -36,11 +36,11 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Nebuvo tikimasi Šis laukas.</target>
+                <target>Nebuvo tikimasi šio laukelio.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>Šiame lauke yra dingęs.</target>
+                <target>Trūkstamas laukelis.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

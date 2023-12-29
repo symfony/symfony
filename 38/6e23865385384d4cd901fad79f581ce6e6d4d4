@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-23T01:24:03Z
+
+I'm having just a doubt about the second line of the "if"
+
+```
+  $request->attributes->set('_vary_by_language', true);
+```
+
+It is later used by the ResponseListener to send a Vary header.. so i guess we want to send this header regardless of whether the client send its preferences or not (or that coud generate big cache problems)
+
+(sorry, did not think about that when I wrote the example)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-12-23T13:18:53Z
+
+Indeed. Nice catch @smnandre
+
+---------------------------------------------------------------------------
+
+by jkobus at 2023-12-27T09:34:08Z
+
+Thanks, I added a test case for that @smnandre
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-28T18:10:12Z
+
+Isn't something we need to merge in 5.4?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-12-29T11:29:51Z
+
+@fabpot yes, good catch.

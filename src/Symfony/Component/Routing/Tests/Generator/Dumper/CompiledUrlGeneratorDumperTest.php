@@ -104,14 +104,16 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testDumpWithRouteNotFoundLocalizedRoutes()
     {
-        $this->expectException(RouteNotFoundException::class);
-        $this->expectExceptionMessage('Unable to generate a URL for the named route "test" as such route does not exist.');
         $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test')->setRequirement('_locale', 'en'));
 
         $code = $this->generatorDumper->dump();
         file_put_contents($this->testTmpFilepath, $code);
 
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php'), null, 'pl_PL');
+
+        $this->expectException(RouteNotFoundException::class);
+        $this->expectExceptionMessage('Unable to generate a URL for the named route "test" as such route does not exist.');
+
         $projectUrlGenerator->generate('test');
     }
 
@@ -163,22 +165,25 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testDumpWithoutRoutes()
     {
-        $this->expectException(\InvalidArgumentException::class);
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php'));
+
+        $this->expectException(\InvalidArgumentException::class);
 
         $projectUrlGenerator->generate('Test', []);
     }
 
     public function testGenerateNonExistingRoute()
     {
-        $this->expectException(RouteNotFoundException::class);
         $this->routeCollection->add('Test', new Route('/test'));
 
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
+
+        $this->expectException(RouteNotFoundException::class);
+
         $projectUrlGenerator->generate('NonExisting', []);
     }
 
@@ -267,65 +272,71 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testTargetAliasNotExisting()
     {
-        $this->expectException(RouteNotFoundException::class);
-
-        $this->routeCollection->addAlias('a', 'not-existing');
+        $this->routeCollection->add('not-existing', new Route('/not-existing'));
+        $this->routeCollection->addAlias('alias', 'not-existing');
 
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
-        $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
+        $compiledRoutes = require $this->testTmpFilepath;
+        unset($compiledRoutes['alias']);
 
+        $this->expectException(RouteNotFoundException::class);
+
+        $compiledUrlGenerator = new CompiledUrlGenerator($compiledRoutes, new RequestContext());
         $compiledUrlGenerator->generate('a');
     }
 
     public function testTargetAliasWithNamePrefixNotExisting()
     {
-        $this->expectException(RouteNotFoundException::class);
-
         $subCollection = new RouteCollection();
-        $subCollection->addAlias('a', 'not-existing');
+        $subCollection->add('not-existing', new Route('/not-existing'));
+        $subCollection->addAlias('alias', 'not-existing');
         $subCollection->addNamePrefix('sub_');
 
         $this->routeCollection->addCollection($subCollection);
 
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
-        $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
+        $compiledRoutes = require $this->testTmpFilepath;
+        unset($compiledRoutes['sub_alias']);
 
-        $compiledUrlGenerator->generate('sub_a');
+        $this->expectException(RouteNotFoundException::class);
+
+        $compiledUrlGenerator = new CompiledUrlGenerator($compiledRoutes, new RequestContext());
+        $compiledUrlGenerator->generate('sub_alias');
     }
 
     public function testCircularReferenceShouldThrowAnException()
     {
-        $this->expectException(RouteCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> a -> b".');
-
         $this->routeCollection->addAlias('a', 'b');
         $this->routeCollection->addAlias('b', 'a');
+
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> a -> b".');
 
         $this->generatorDumper->dump();
     }
 
     public function testDeepCircularReferenceShouldThrowAnException()
     {
-        $this->expectException(RouteCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> b".');
-
         $this->routeCollection->addAlias('a', 'b');
         $this->routeCollection->addAlias('b', 'c');
         $this->routeCollection->addAlias('c', 'b');
+
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> b".');
 
         $this->generatorDumper->dump();
     }
 
     public function testIndirectCircularReferenceShouldThrowAnException()
     {
-        $this->expectException(RouteCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> a -> b".');
-
         $this->routeCollection->addAlias('a', 'b');
         $this->routeCollection->addAlias('b', 'c');
         $this->routeCollection->addAlias('c', 'a');
+
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> a -> b".');
 
         $this->generatorDumper->dump();
     }

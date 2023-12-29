@@ -67,11 +67,20 @@ final class TokenBucketLimiter implements LimiterInterface
             $now = microtime(true);
             $availableTokens = $bucket->getAvailableTokens($now);
 
-            if ($availableTokens >= max(1, $tokens)) {
+            if ($availableTokens >= $tokens) {
                 // tokens are now available, update bucket
                 $bucket->setTokens($availableTokens - $tokens);
 
-                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->maxBurst));
+                if (0 === $availableTokens) {
+                    // This means 0 tokens where consumed (discouraged in most cases).
+                    // Return the first time a new token is available
+                    $waitDuration = $this->rate->calculateTimeForTokens(1);
+                    $waitTime = \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration));
+                } else {
+                    $waitTime = \DateTimeImmutable::createFromFormat('U', floor($now));
+                }
+
+                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), $waitTime, true, $this->maxBurst));
             } else {
                 $remainingTokens = $tokens - $availableTokens;
                 $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);

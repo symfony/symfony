@@ -430,6 +430,10 @@
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>Die Dateiendung ist ungültig ({{ extension }}). Gültige Dateiendungen sind {{ extensions }}.</target>
             </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Der erkannte Zeichensatz ist nicht gültig ({{ detected }}). Gültige Zeichensätze sind "{{ encodings }}".</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

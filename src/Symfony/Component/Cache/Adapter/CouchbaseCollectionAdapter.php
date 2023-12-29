@@ -35,7 +35,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
     public function __construct(Collection $connection, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
         if (!static::isSupported()) {
-            throw new CacheException('Couchbase >= 3.0.0 < 4.0.0 is required.');
+            throw new CacheException('Couchbase >= 3.0.5 < 4.0.0 is required.');
         }
 
         $this->maxIdLength = static::MAX_KEY_LENGTH;
@@ -54,7 +54,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         }
 
         if (!static::isSupported()) {
-            throw new CacheException('Couchbase >= 3.0.0 < 4.0.0 is required.');
+            throw new CacheException('Couchbase >= 3.0.5 < 4.0.0 is required.');
         }
 
         set_error_handler(static fn ($type, $msg, $file, $line) => throw new \ErrorException($msg, 0, $type, $file, $line));
@@ -183,7 +183,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         }
 
         $upsertOptions = new UpsertOptions();
-        $upsertOptions->expiry($lifetime);
+        $upsertOptions->expiry(\DateTimeImmutable::createFromFormat('U', time() + $lifetime));
 
         $ko = [];
         foreach ($values as $key => $value) {

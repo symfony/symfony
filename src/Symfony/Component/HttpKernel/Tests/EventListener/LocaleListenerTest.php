@@ -131,6 +131,28 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('fr', $request->getLocale());
     }
 
+    public function testRequestDefaultLocaleIfNoAcceptLanguageHeaderIsPresent()
+    {
+        $request = new Request();
+        $listener = new LocaleListener($this->requestStack, 'de', null, true, ['lt', 'de']);
+        $event = $this->getEvent($request);
+
+        $listener->setDefaultLocale($event);
+        $listener->onKernelRequest($event);
+        $this->assertEquals('de', $request->getLocale());
+    }
+
+    public function testRequestVaryByLanguageAttributeIsSetIfUsingAcceptLanguageHeader()
+    {
+        $request = new Request();
+        $listener = new LocaleListener($this->requestStack, 'de', null, true, ['lt', 'de']);
+        $event = $this->getEvent($request);
+
+        $listener->setDefaultLocale($event);
+        $listener->onKernelRequest($event);
+        $this->assertTrue($request->attributes->get('_vary_by_language'));
+    }
+
     public function testRequestSecondPreferredLocaleFromAcceptLanguageHeader()
     {
         $request = Request::create('/');

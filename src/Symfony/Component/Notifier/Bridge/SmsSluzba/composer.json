@@ -2,7 +2,7 @@
     "name": "symfony/sms-sluzba-notifier",
     "type": "symfony-notifier-bridge",
     "description": "Symfony sms-sluzba.cz Notifier Bridge",
-    "keywords": ["sms", "sms-sluzba.cz", "notifier"],
+    "keywords": ["sms", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

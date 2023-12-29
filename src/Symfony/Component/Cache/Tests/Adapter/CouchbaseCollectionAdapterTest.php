@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Adapter\CouchbaseCollectionAdapter;
 
 /**
  * @requires extension couchbase <4.0.0
- * @requires extension couchbase >=3.0.0
+ * @requires extension couchbase >=3.0.5
  *
  * @group integration
  *
@@ -36,7 +36,7 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
     public static function setUpBeforeClass(): void
     {
         if (!CouchbaseCollectionAdapter::isSupported()) {
-            self::markTestSkipped('Couchbase >= 3.0.0 < 4.0.0 is required.');
+            self::markTestSkipped('Couchbase >= 3.0.5 < 4.0.0 is required.');
         }
 
         self::$client = AbstractAdapter::createConnection('couchbase://'.getenv('COUCHBASE_HOST').'/cache',
@@ -47,7 +47,7 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
     public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         if (!CouchbaseCollectionAdapter::isSupported()) {
-            self::markTestSkipped('Couchbase >= 3.0.0 < 4.0.0 is required.');
+            self::markTestSkipped('Couchbase >= 3.0.5 < 4.0.0 is required.');
         }
 
         $client = $defaultLifetime

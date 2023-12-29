@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-27T10:06:55Z
+
+What about:
+
+```diff
+diff --git a/src/Symfony/Component/Routing/Tests/Generator/Dumper/CompiledUrlGeneratorDumperTest.php b/src/Symfony/Component/Routing/Tests/Generator/Dumper/CompiledUrlGeneratorDumperTest.php
+index 8603ab6d98..572f524a05 100644
+--- a/src/Symfony/Component/Routing/Tests/Generator/Dumper/CompiledUrlGeneratorDumperTest.php
++++ b/src/Symfony/Component/Routing/Tests/Generator/Dumper/CompiledUrlGeneratorDumperTest.php
+@@ -267,66 +272,72 @@ class CompiledUrlGeneratorDumperTest extends TestCase
+
+     public function testTargetAliasNotExisting()
+     {
+-        $this->expectException(RouteNotFoundException::class);
+-
+-        $this->routeCollection->addAlias('a', 'not-existing');
++        $this->routeCollection->add('not-existing', new Route('/not-existing'));
++        $this->routeCollection->addAlias('alias', 'not-existing');
+
+         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
+
+-        $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
++        $compiledRoutes = require $this->testTmpFilepath;
++        unset($compiledRoutes['alias']);
+
++        $this->expectException(RouteNotFoundException::class);
++
++        $compiledUrlGenerator = new CompiledUrlGenerator($compiledRoutes, new RequestContext());
+         $compiledUrlGenerator->generate('a');
+     }
+
+     public function testTargetAliasWithNamePrefixNotExisting()
+     {
+-        $this->expectException(RouteNotFoundException::class);
+-
+         $subCollection = new RouteCollection();
+-        $subCollection->addAlias('a', 'not-existing');
++        $subCollection->add('not-existing', new Route('/not-existing'));
++        $subCollection->addAlias('alias', 'not-existing');
+         $subCollection->addNamePrefix('sub_');
+
+         $this->routeCollection->addCollection($subCollection);
+
+         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
+
+-        $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
++        $compiledRoutes = require $this->testTmpFilepath;
++        unset($compiledRoutes['sub_alias']);
+
+-        $compiledUrlGenerator->generate('sub_a');
++        $this->expectException(RouteNotFoundException::class);
++
++        $compiledUrlGenerator = new CompiledUrlGenerator($compiledRoutes, new RequestContext());
++        $compiledUrlGenerator->generate('sub_alias');
+     }
+```
+
+We generate the file with the existing route then we remove it from compiled ones. This way, we ensure that we test the exception coming from route generation. Works on my computer :smile:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-27T11:32:40Z
+
+Thanks, lets see
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-27T12:00:31Z
+
+Seems to do the job!
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-27T12:06:26Z
+
+@nicolas-grekas I think this should be merged into `5.4`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-27T12:08:04Z
+
+Works for me, please rebase.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-27T12:51:55Z
+
+Rebased ✅

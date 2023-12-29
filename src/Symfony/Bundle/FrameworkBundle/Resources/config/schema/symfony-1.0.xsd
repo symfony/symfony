@@ -231,6 +231,7 @@
             <xsd:element name="path" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="pseudo-localization" type="pseudo_localization" minOccurs="0" maxOccurs="1" />
             <xsd:element name="provider" type="translation_provider" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="global" type="translation_global" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="fallback" type="xsd:string" />
@@ -238,6 +239,7 @@
         <xsd:attribute name="formatter" type="xsd:string" />
         <xsd:attribute name="cache-dir" type="xsd:string" />
         <xsd:attribute name="default-path" type="xsd:string" />
+        <xsd:attribute name="global" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="pseudo_localization">
@@ -258,6 +260,11 @@
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="translation_global" mixed="true">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="value" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="validation">

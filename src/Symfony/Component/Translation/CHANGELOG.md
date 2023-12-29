@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Mark class `DataCollectorTranslator` as `final`
+ * Add `GlobalsTranslator` to allow defining global parameters
 
 7.0
 ---

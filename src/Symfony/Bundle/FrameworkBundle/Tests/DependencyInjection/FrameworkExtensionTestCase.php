@@ -1198,6 +1198,22 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNull($options['cache_dir']);
     }
 
+    public function testTranslatorGlobals()
+    {
+        $container = $this->createContainerFromFile('translator_globals');
+        $calls = $container->getDefinition('translator.globals')->getMethodCalls();
+        $this->assertSame([
+            ['addGlobal', ['%%app_name%%', 'My application']],
+            ['addGlobal', ['{app_version}', '1.2.3']],
+        ], $calls);
+    }
+
+    public function testTranslatorWithoutGlobals()
+    {
+        $container = $this->createContainerFromFile('translator_without_globals');
+        $this->assertFalse($container->hasDefinition('translator.globals'));
+    }
+
     public function testValidation()
     {
         $container = $this->createContainerFromFile('full');

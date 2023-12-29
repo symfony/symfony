@@ -180,12 +180,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $attributeValue = $attribute === $this->classDiscriminatorResolver?->getMappingForMappedObject($object)?->getTypeProperty()
                     ? $this->classDiscriminatorResolver?->getTypeForMappedObject($object)
                     : $this->getAttributeValue($object, $attribute, $format, $attributeContext);
-            } catch (UninitializedPropertyException $e) {
-                if ($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true) {
-                    continue;
-                }
-                throw $e;
-            } catch (\Error $e) {
+            } catch (UninitializedPropertyException|\Error $e) {
                 if (($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true) && $this->isUninitializedValueError($e)) {
                     continue;
                 }
@@ -350,6 +345,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         ? $discriminatorMapping
                         : $this->getAttributeValue($object, $attribute, $format, $attributeContext);
                 } catch (NoSuchPropertyException) {
+                } catch (UninitializedPropertyException|\Error $e) {
+                    if (!(($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true) && $this->isUninitializedValueError($e))) {
+                        throw $e;
+                    }
                 }
             }
 
@@ -743,9 +742,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * This error may occur when specific object normalizer implementation gets attribute value
      * by accessing a public uninitialized property or by calling a method accessing such property.
      */
-    private function isUninitializedValueError(\Error $e): bool
+    private function isUninitializedValueError(\Error|UninitializedPropertyException $e): bool
     {
-        return str_starts_with($e->getMessage(), 'Typed property')
+        return $e instanceof UninitializedPropertyException
+            || str_starts_with($e->getMessage(), 'Typed property')
             && str_ends_with($e->getMessage(), 'must not be accessed before initialization');
     }
 

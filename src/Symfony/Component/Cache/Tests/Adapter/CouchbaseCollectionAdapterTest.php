@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Adapter\CouchbaseCollectionAdapter;
 
 /**
  * @requires extension couchbase <4.0.0
- * @requires extension couchbase >=3.0.0
+ * @requires extension couchbase >=3.0.5
  *
  * @group legacy integration
  *
@@ -31,13 +31,6 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
     protected $skippedTests = [
         'testClearPrefix' => 'Couchbase cannot clear by prefix',
     ];
-
-    public static function setUpBeforeClass(): void
-    {
-        if (!CouchbaseCollectionAdapter::isSupported()) {
-            self::markTestSkipped('Couchbase >= 3.0.0 < 4.0.0 is required.');
-        }
-    }
 
     public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {

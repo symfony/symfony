@@ -136,11 +136,26 @@ class TokenBucketLimiterTest extends TestCase
 
         $limiter->consume(9);
 
+        // peek by consuming 0 tokens twice (making sure peeking doesn't claim a token)
         for ($i = 0; $i < 2; ++$i) {
             $rateLimit = $limiter->consume(0);
             $this->assertTrue($rateLimit->isAccepted());
             $this->assertSame(10, $rateLimit->getLimit());
+            $this->assertEquals(
+                \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true))),
+                $rateLimit->getRetryAfter()
+            );
         }
+
+        $limiter->consume();
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertEquals(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 1)),
+            $rateLimit->getRetryAfter()
+        );
     }
 
     public function testBucketRefilledWithStrictFrequency()

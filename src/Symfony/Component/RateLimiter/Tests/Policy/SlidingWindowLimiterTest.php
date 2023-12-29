@@ -78,6 +78,34 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertEqualsWithDelta(12 / 5, $limiter->reserve(4)->getWaitDuration(), 1);
     }
 
+    public function testPeekConsume()
+    {
+        $limiter = $this->createLimiter();
+
+        $limiter->consume(9);
+
+        // peek by consuming 0 tokens twice (making sure peeking doesn't claim a token)
+        for ($i = 0; $i < 2; ++$i) {
+            $rateLimit = $limiter->consume(0);
+            $this->assertTrue($rateLimit->isAccepted());
+            $this->assertSame(10, $rateLimit->getLimit());
+            $this->assertEquals(
+                \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true))),
+                $rateLimit->getRetryAfter()
+            );
+        }
+
+        $limiter->consume();
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertEquals(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true) + 12)),
+            $rateLimit->getRetryAfter()
+        );
+    }
+
     private function createLimiter(): SlidingWindowLimiter
     {
         return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);

@@ -22,11 +22,9 @@ class NormalizationBuilder
     public array $declaredTypes = [];
     public array $remappings = [];
 
-    protected NodeDefinition $node;
-
-    public function __construct(NodeDefinition $node)
-    {
-        $this->node = $node;
+    public function __construct(
+        protected NodeDefinition $node,
+    ) {
     }
 
     /**

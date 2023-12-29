@@ -23,7 +23,6 @@ namespace Symfony\Component\Config\Resource;
  */
 class ClassExistenceResource implements SelfCheckingResourceInterface
 {
-    private string $resource;
     private ?array $exists = null;
 
     private static int $autoloadLevel = 0;
@@ -34,9 +33,10 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      * @param string    $resource The fully-qualified class name
      * @param bool|null $exists   Boolean when the existence check has already been done
      */
-    public function __construct(string $resource, bool $exists = null)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        private string $resource,
+        bool $exists = null,
+    ) {
         if (null !== $exists) {
             $this->exists = [$exists, null];
         }

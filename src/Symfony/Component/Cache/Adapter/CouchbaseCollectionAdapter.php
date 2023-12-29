@@ -183,7 +183,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         }
 
         $upsertOptions = new UpsertOptions();
-        $upsertOptions->expiry(time() + $lifetime);
+        $upsertOptions->expiry(\DateTimeImmutable::createFromFormat('U', time() + $lifetime));
 
         $ko = [];
         foreach ($values as $key => $value) {

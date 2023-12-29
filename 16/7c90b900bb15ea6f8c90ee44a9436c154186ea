@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-12-07T23:14:21Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-08T08:40:30Z
+
+Hi 👋
+
+Please target 7.1 branch, as this is a new feature.
+
+1. Your new bridge need to require `symfony/notifier` `^7.1`
+2. Does the old bridge including the old URL still work or did the revoke the old endpoint from SMS77? If this is the case we would need a bugfix PR against the lowest maintained branch for the SMS77 bridge to keep it compatible.
+3. Lets rename it to SevenIo bridge and `sevenio` for scheme and package name
+4. Please remove everything related to the deprecation of the old bridge for now, thanks
+
+---------------------------------------------------------------------------
+
+by NeoBlack at 2023-12-08T08:54:07Z
+
+Thanks for your quick feedback, I will take care of your feedback tomorrow.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-09T11:55:17Z
+
+Small note: this is a new feature, so it's going to be merged in 7.1, not 6.4.
+
+---------------------------------------------------------------------------
+
+by NeoBlack at 2023-12-09T12:03:03Z
+
+@OskarStark @fabpot, I am having trouble running the tests locally on my machine. I am trying to understand why the tests are failing in CI. how to enable the new package for the test?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-09T12:31:43Z
+
+Like the other day, your rebase looks wrong.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-28T20:42:10Z
+
+@fabpot I squashed and rebased the branch, created a docs and re recipe PR ✅

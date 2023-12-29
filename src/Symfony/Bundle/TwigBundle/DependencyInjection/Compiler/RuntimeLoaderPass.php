@@ -33,7 +33,17 @@ class RuntimeLoaderPass implements CompilerPassInterface
             $def = $container->getDefinition($id);
             $mapping[$def->getClass()] = new Reference($id);
         }
+        $attributesMapping = [];
+        foreach ($container->findTaggedServiceIds('twig.attribute_extension', true) as $id => $attributes) {
+            $def = $container->getDefinition($id);
+            $attributesMapping[$def->getClass()] = new Reference($id);
+        }
 
-        $definition->replaceArgument(0, ServiceLocatorTagPass::register($container, $mapping));
+        $definition->replaceArgument(0, ServiceLocatorTagPass::register($container, $mapping + $attributesMapping));
+
+        // Scan all Twig runtimes for attributes
+        if ($container->hasDefinition('twig.extension.attributes')) {
+            $container->getDefinition('twig.extension.attributes')->replaceArgument(0, array_keys($attributesMapping));
+        }
     }
 }

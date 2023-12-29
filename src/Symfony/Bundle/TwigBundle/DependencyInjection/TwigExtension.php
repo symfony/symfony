@@ -15,6 +15,7 @@ use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -22,9 +23,11 @@ use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Service\ResetInterface;
+use Twig\Attribute\AsTwigExtension;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
@@ -176,6 +179,15 @@ class TwigExtension extends Extension
 
         if (false === $config['cache']) {
             $container->removeDefinition('twig.template_cache_warmer');
+        }
+
+        // Attributes declaration requires Twig 3.9+
+        if (class_exists(AsTwigExtension::class)) {
+            $container->registerAttributeForAutoconfiguration(AsTwigExtension::class, static function (ChildDefinition $definition): void {
+                $definition->addTag('twig.attribute_extension');
+            });
+        } else {
+            $container->removeDefinition('twig.extension.attributes');
         }
     }
 

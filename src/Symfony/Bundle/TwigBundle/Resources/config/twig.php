@@ -37,6 +37,7 @@ use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfig
 use Symfony\Bundle\TwigBundle\TemplateIterator;
 use Twig\Cache\FilesystemCache;
 use Twig\Environment;
+use Twig\Extension\AttributeExtension;
 use Twig\Extension\CoreExtension;
 use Twig\Extension\DebugExtension;
 use Twig\Extension\EscaperExtension;
@@ -150,6 +151,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('twig.runtime_loader', ContainerRuntimeLoader::class)
             ->args([abstract_arg('runtime locator')])
+
+        ->set('twig.extension.attributes', AttributeExtension::class)
+            ->args([abstract_arg('runtime classes')])
+            ->tag('twig.extension')
 
         ->set('twig.error_renderer.html', TwigErrorRenderer::class)
             ->decorate('error_renderer.html')

@@ -216,6 +216,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Sendberry\SendberryTransportFactory::class,
             'package' => 'symfony/sendberry-notifier',
         ],
+        'sevenio' => [
+            'class' => Bridge\Sevenio\SevenIoTransportFactory::class,
+            'package' => 'symfony/sevenio-notifier',
+        ],
         'simpletextin' => [
             'class' => Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
             'package' => 'symfony/simple-textin-notifier',

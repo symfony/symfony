@@ -69,11 +69,12 @@ final class SlidingWindowLimiter implements LimiterInterface
                 return new RateLimit($availableTokens, $window->getRetryAfter(), false, $this->limit);
             }
 
-            $window->add($tokens);
-
-            if (0 < $tokens) {
-                $this->storage->save($window);
+            if (0 === $tokens) {
+                return new RateLimit($availableTokens, $availableTokens ? \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true))) : $window->getRetryAfter(), true, $this->limit);
             }
+
+            $window->add($tokens);
+            $this->storage->save($window);
 
             return new RateLimit($this->getAvailableTokens($window->getHitCount()), $window->getRetryAfter(), true, $this->limit);
         } finally {

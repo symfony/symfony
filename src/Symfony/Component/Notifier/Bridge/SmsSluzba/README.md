@@ -3,6 +3,9 @@ sms-sluzba.cz Notifier
 
 Provides [sms-sluzba.cz](https://www.sms-sluzba.cz/) integration for Symfony Notifier.
 
+> [!CAUTION]
+> This bridge uses query parameters to provide credentials to the sms-sluzba.cz API!
+
 DSN example
 -----------
 

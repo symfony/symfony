@@ -16,7 +16,7 @@ interface FeatureRegistryInterface
     public function get(string $featureName): callable;
 
     /**
-     * @return array<string>
+     * @return array<string> An array of all registered feature names.
      */
     public function getNames(): array;
 }

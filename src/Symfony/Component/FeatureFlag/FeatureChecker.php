@@ -16,8 +16,8 @@ final class FeatureChecker implements FeatureCheckerInterface
     private array $cache = [];
 
     public function __construct(
-        private readonly FeatureRegistry $featureRegistry,
-        private readonly mixed $default,
+        private readonly FeatureRegistryInterface $featureRegistry,
+        private readonly mixed $default = false,
     ) {
     }
 

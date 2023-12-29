@@ -55,7 +55,6 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         'zh' => 'Han-Latin',
     ];
 
-    private ?string $defaultLocale;
     private \Closure|array $symbolsMap = [
         'en' => ['@' => 'at', '&' => 'and'],
     ];
@@ -68,9 +67,10 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
      */
     private array $transliterators = [];
 
-    public function __construct(string $defaultLocale = null, array|\Closure $symbolsMap = null)
-    {
-        $this->defaultLocale = $defaultLocale;
+    public function __construct(
+        private ?string $defaultLocale = null,
+        array|\Closure $symbolsMap = null,
+    ) {
         $this->symbolsMap = $symbolsMap ?? $this->symbolsMap;
     }
 

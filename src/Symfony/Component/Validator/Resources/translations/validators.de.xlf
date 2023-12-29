@@ -432,7 +432,7 @@
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target>Der erkannte Zeichensatz ist nicht gültig ({{ detected }}). Gültige Zeichensätze sind "{{ encodings }}".</target>
+                <target>Der erkannte Zeichensatz ist nicht gültig ({{ detected }}). Gültige Zeichensätze sind {{ encodings }}.</target>
             </trans-unit>
         </body>
     </file>

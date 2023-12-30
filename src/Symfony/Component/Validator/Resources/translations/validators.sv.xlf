@@ -430,6 +430,10 @@
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>Filtillägget är ogiltigt ({{ extension }}). Tillåtna filtillägg är {{ extensions }}.</target>
             </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Den upptäckta teckenkodningen är ogiltig ({{ detected }}). Tillåtna kodningar är {{ encodings }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -98,7 +98,7 @@ final class ControllerEvent extends KernelEvent
         } elseif (\is_string($this->controller) && false !== $i = strpos($this->controller, '::')) {
             $class = new \ReflectionClass(substr($this->controller, 0, $i));
         } else {
-            $class = str_contains($this->controllerReflector->name, '{closure}') ? null : $this->controllerReflector->getClosureCalledClass();
+            $class = $this->controllerReflector instanceof \ReflectionFunction && $this->controllerReflector->isAnonymous() ? null : $this->controllerReflector->getClosureCalledClass();
         }
         $this->attributes = [];
 

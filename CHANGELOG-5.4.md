@@ -7,6 +7,34 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.34 (2023-12-30)
+
+ * bug #52406 [Validator] Fix `Constraints\Email::ERROR_NAMES` (mathroc)
+ * bug #53140 [Serializer] Skip uninitialized properties with deep_object_to_populate (mtarld)
+ * bug #53195 [HttpKernel] Fix default locale is ignored when `set_locale_from_accept_language` is used (jkobus)
+ * bug #52928 [Dotenv] Allow environment variables starting with an underscore (xabbuh)
+ * bug #53232 [Notifier] [Smsc] Require login and password (OskarStark)
+ * bug #53187 [Messenger] Fix using negative delay (J-roen)
+ * bug #53133 [Validator] Fix using known option names as field names (HypeMC)
+ * bug #53153 [WebProfilerBundle] Fix JS error when evaluating scripts (jderusse)
+ * bug #52998 [Notifier] [Bridges] Provide EventDispatcher and HttpClient to the transport (rdavaillaud)
+ * bug #52817 [Serializer] Do not instantiate object if it is not instantiable (maxbaldanza)
+ * bug #53079 [DoctrineBridge] Add check for lazy object interface (maxbaldanza)
+ * bug #53115 [Serializer] Fix partial denormalization with missing constructor arguments (HypeMC)
+ * bug #53081 [Serializer] Keep stack trace for enum value denormalizer error (kylekatarnls)
+ * bug #53057 [HttpKernel] Move ``@internal`` from `AbstractSessionListener` class to its methods and properties (Florian-Merle)
+ * bug #52990 [TwigBridge] don't use deprecated and internal Twig functions (xabbuh)
+ * bug #52996 [Validator] add missing translation (xabbuh)
+ * bug #52940 [Console] Fix color support check on non-Windows platforms (theofidry)
+ * bug #52896 [Messenger] Avoid reconnecting active Redis connections. (BusterNeece)
+ * bug #52923 Avoid incompatibility with symfony/console 7 (jdecool)
+ * bug #52927 [Dotenv] Properly handle `SYMFONY_DOTENV_VARS` being the empty string (xabbuh)
+ * bug #52935 [Validator] Missing translations for Slovak (sk) #51954 (Jan Vernarsky)
+ * bug #52941 [Console] Fix xterm detection (theofidry)
+ * bug #52795 [FrameworkBundle]  do not overwrite an application's default serialization context (xabbuh)
+ * bug #52885 [Serializer] fix nullable int cannot be serialized (nikophil)
+ * bug #52864 [HttpClient][Mailer][Process] always pass microseconds to usleep as integers (xabbuh)
+
 * 5.4.33 (2023-12-01)
 
  * bug #52804 [Serializer] Fix support of plain object types denormalization (andersonamuller)

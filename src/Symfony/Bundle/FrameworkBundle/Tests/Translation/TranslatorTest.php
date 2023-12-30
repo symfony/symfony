@@ -100,16 +100,6 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
-    public function testTransWithCachingWithInvalidLocale()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "invalid locale" locale.');
-        $loader = $this->createMock(LoaderInterface::class);
-        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', TranslatorWithInvalidLocale::class);
-
-        $translator->trans('foo');
-    }
-
     public function testLoadResourcesWithoutCaching()
     {
         $loader = new YamlFileLoader();
@@ -416,13 +406,5 @@ class TranslatorTest extends TestCase
             $options,
             $enabledLocales
         );
-    }
-}
-
-class TranslatorWithInvalidLocale extends Translator
-{
-    public function getLocale(): string
-    {
-        return 'invalid locale';
     }
 }

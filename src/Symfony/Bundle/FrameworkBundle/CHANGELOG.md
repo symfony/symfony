@@ -4,6 +4,7 @@ CHANGELOG
 7.1
 ---
 
+ * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
  * Move the Router `cache_dir` to `kernel.build_dir`
  * Deprecate the `router.cache_dir` config option
  * Add `rate_limiter` tags to rate limiter services

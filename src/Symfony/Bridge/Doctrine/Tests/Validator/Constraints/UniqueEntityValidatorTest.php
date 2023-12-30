@@ -292,7 +292,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     {
         $entity1 = new SingleIntIdEntity(1, null);
 
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->validator->validate($entity1, $constraint);
     }
 

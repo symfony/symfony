@@ -116,7 +116,6 @@ class YamlFileLoader extends FileLoader
     private int $anonymousServicesCount;
     private string $anonymousServicesSuffix;
 
-
     public function load(mixed $resource, string $type = null): mixed
     {
         $path = $this->locator->locate($resource);
@@ -760,7 +759,7 @@ class YamlFileLoader extends FileLoader
      */
     protected function loadFile(string $file): ?array
     {
-        if (!class_exists(\Symfony\Component\Yaml\Parser::class)) {
+        if (!class_exists(YamlParser::class)) {
             throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed. Try running "composer require symfony/yaml".');
         }
 

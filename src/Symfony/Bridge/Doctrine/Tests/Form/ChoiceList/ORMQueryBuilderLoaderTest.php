@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\GuidType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\AbstractQuery;

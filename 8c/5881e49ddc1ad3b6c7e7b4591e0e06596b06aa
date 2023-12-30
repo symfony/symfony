@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-08T13:51:44Z
+
+What about deprecating the Couchbase Bucket adapter in another PR? It is only compatible with Couchbase 2, which conflicts with this adapter compatible with Couchbase 3
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-09T10:19:36Z
+
+After discussing with @nicolas-grekas, the following changes have been made:
+
+- Replaced `$parsed` by `$params` to match other DSN parsing
+- Target 7.1 instead of 5.4
+
+Note: `rawurldecode()` is still needed even after `parse_url`, which doesn't decode HTML chars. I'll send another PR to deprecate the `CouchbaseBucketAdapter`, only compatible with Couchbase 2 (which conflicts with this adapter requiring Couchbase 3 and making the other one not possible to test on the CI).
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-29T16:02:17Z
+
+Rebased and conflicts fixed. All green 🙂
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-29T16:14:17Z
+
+It seems 😕 https://3v4l.org/eshPt
+
+I'll have a look at it. Is this something that also should target 7.1? I'd say yes.

@@ -171,7 +171,7 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure}')) {
+            if ($r->isAnonymous()) {
                 $title = (string) $r;
             } elseif ($class = $r->getClosureCalledClass()) {
                 $title = $class->name.'::'.$r->name.'()';

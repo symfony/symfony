@@ -649,7 +649,7 @@ class TextDescriptor extends Descriptor
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure}')) {
+            if ($r->isAnonymous()) {
                 return 'Closure()';
             }
             if ($class = $r->getClosureCalledClass()) {

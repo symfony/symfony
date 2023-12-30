@@ -32,7 +32,7 @@ final class HandlerDescriptor
 
         $r = new \ReflectionFunction($handler);
 
-        if (str_contains($r->name, '{closure}')) {
+        if ($r->isAnonymous()) {
             $this->name = 'Closure';
         } elseif (!$handler = $r->getClosureThis()) {
             $class = $r->getClosureCalledClass();

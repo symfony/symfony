@@ -403,7 +403,7 @@ class MarkdownDescriptor extends Descriptor
             $string .= "\n- Type: `closure`";
 
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure}')) {
+            if ($r->isAnonymous()) {
                 $this->write($string."\n");
 
                 return;

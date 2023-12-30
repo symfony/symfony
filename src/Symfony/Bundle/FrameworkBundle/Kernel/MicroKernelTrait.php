@@ -214,7 +214,7 @@ trait MicroKernelTrait
 
             if (\is_array($controller) && [0, 1] === array_keys($controller) && $this === $controller[0]) {
                 $route->setDefault('_controller', ['kernel', $controller[1]]);
-            } elseif ($controller instanceof \Closure && $this === ($r = new \ReflectionFunction($controller))->getClosureThis() && !str_contains($r->name, '{closure}')) {
+            } elseif ($controller instanceof \Closure && $this === ($r = new \ReflectionFunction($controller))->getClosureThis() && !$r->isAnonymous()) {
                 $route->setDefault('_controller', ['kernel', $r->name]);
             }
         }

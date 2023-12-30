@@ -430,6 +430,10 @@
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>Rozszerzenie pliku jest nieprawidłowe ({{ extension }}). Dozwolone rozszerzenia to {{ extensions }}.</target>
             </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Wykryte kodowanie znaków ({{ detected }}) jest nieprawidłowe. Dozwolone kodowania to {{ encodings }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

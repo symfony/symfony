@@ -177,24 +177,24 @@ class Connection
      */
     public static function fromDsn(string $dsn, array $options = [], AmqpFactory $amqpFactory = null): self
     {
-        if (false === $parsedUrl = parse_url($dsn)) {
+        if (false === $params = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
             if (!\in_array($dsn, ['amqp://', 'amqps://'])) {
                 throw new InvalidArgumentException('The given AMQP DSN is invalid.');
             }
 
-            $parsedUrl = [];
+            $params = [];
         }
 
         $useAmqps = 0 === strpos($dsn, 'amqps://');
-        $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
+        $pathParts = isset($params['path']) ? explode('/', trim($params['path'], '/')) : [];
         $exchangeName = $pathParts[1] ?? 'messages';
-        parse_str($parsedUrl['query'] ?? '', $parsedQuery);
+        parse_str($params['query'] ?? '', $parsedQuery);
         $port = $useAmqps ? 5671 : 5672;
 
         $amqpOptions = array_replace_recursive([
-            'host' => $parsedUrl['host'] ?? 'localhost',
-            'port' => $parsedUrl['port'] ?? $port,
+            'host' => $params['host'] ?? 'localhost',
+            'port' => $params['port'] ?? $port,
             'vhost' => isset($pathParts[0]) ? urldecode($pathParts[0]) : '/',
             'exchange' => [
                 'name' => $exchangeName,
@@ -203,12 +203,12 @@ class Connection
 
         self::validateOptions($amqpOptions);
 
-        if (isset($parsedUrl['user'])) {
-            $amqpOptions['login'] = urldecode($parsedUrl['user']);
+        if (isset($params['user'])) {
+            $amqpOptions['login'] = rawurldecode($params['user']);
         }
 
-        if (isset($parsedUrl['pass'])) {
-            $amqpOptions['password'] = urldecode($parsedUrl['pass']);
+        if (isset($params['pass'])) {
+            $amqpOptions['password'] = rawurldecode($params['pass']);
         }
 
         if (!isset($amqpOptions['queues'])) {

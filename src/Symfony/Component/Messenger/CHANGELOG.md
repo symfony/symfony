@@ -7,6 +7,7 @@ CHANGELOG
  * Add option `redis_sentinel` as an alias for `sentinel_master`
  * Add `--all` option to the `messenger:consume` command
  * Make `#[AsMessageHandler]` final
+ * Add parameter `$jitter` to `MultiplierRetryStrategy` in order to randomize delay and prevent the thundering herd effect
 
 7.0
 ---

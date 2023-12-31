@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Symfony\Component\HttpFoundation\UrlParser\UrlParser;
+use Symfony\Component\HttpFoundation\Exception\Parser\MissingHostException;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 
 /**
@@ -37,24 +39,22 @@ final class Dsn
 
     public static function fromString(#[\SensitiveParameter] string $dsn): self
     {
-        if (false === $parsedDsn = parse_url($dsn)) {
-            throw new InvalidArgumentException('The mailer DSN is invalid.');
+        try {
+            $params = UrlParser::parse($dsn, true);
+        } catch (MissingHostException) {
+            throw new InvalidArgumentException('The URL must contain a host (use "default" by default).');
+        } catch (\InvalidArgumentException $e) {
+            throw new InvalidArgumentException($e->getMessage());
         }
 
-        if (!isset($parsedDsn['scheme'])) {
-            throw new InvalidArgumentException('The mailer DSN must contain a scheme.');
-        }
-
-        if (!isset($parsedDsn['host'])) {
-            throw new InvalidArgumentException('The mailer DSN must contain a host (use "default" by default).');
-        }
-
-        $user = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
-        $password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
-        $port = $parsedDsn['port'] ?? null;
-        parse_str($parsedDsn['query'] ?? '', $query);
-
-        return new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $query);
+        return new self(
+            $params->scheme,
+            $params->host,
+            $params->user,
+            $params->password,
+            $params->port,
+            $params->parsedQuery()
+        );
     }
 
     public function getScheme(): string

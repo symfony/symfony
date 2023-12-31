@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\HttpFoundation\UrlParser\UrlParser;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -287,27 +288,20 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('url' === $prefix) {
-            $parsedEnv = parse_url($env);
-
-            if (false === $parsedEnv) {
+            try {
+                $params = UrlParser::parse($env);
+            } catch (\InvalidArgumentException) {
                 throw new RuntimeException(sprintf('Invalid URL in env var "%s".', $name));
             }
-            if (!isset($parsedEnv['scheme'], $parsedEnv['host'])) {
+
+            if (null === $params->host) {
                 throw new RuntimeException(sprintf('Invalid URL env var "%s": schema and host expected, "%s" given.', $name, $env));
             }
-            $parsedEnv += [
-                'port' => null,
-                'user' => null,
-                'pass' => null,
-                'path' => null,
-                'query' => null,
-                'fragment' => null,
-            ];
 
             // remove the '/' separator
-            $parsedEnv['path'] = '/' === ($parsedEnv['path'] ?? '/') ? '' : substr($parsedEnv['path'], 1);
+            $params->path = '/' === ($params->path ?? '/') ? '' : substr($params->path, 1);
 
-            return $parsedEnv;
+            return (array) $params;
         }
 
         if ('query_string' === $prefix) {

@@ -155,17 +155,17 @@ final class DsnTest extends TestCase
     {
         yield [
             'some://',
-            'The notifier DSN is invalid.',
+            'The URL is invalid.',
         ];
 
         yield [
             '//slack',
-            'The notifier DSN must contain a scheme.',
+            'The URL must contain a scheme.',
         ];
 
         yield [
             'file:///some/path',
-            'The notifier DSN must contain a host (use "default" by default).',
+            'The URL must contain a host (use "default" by default).',
         ];
     }
 

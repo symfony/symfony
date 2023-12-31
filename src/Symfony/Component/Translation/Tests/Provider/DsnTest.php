@@ -155,17 +155,17 @@ final class DsnTest extends TestCase
     {
         yield [
             'some://',
-            'The translation provider DSN is invalid.',
+            'The URL is invalid.',
         ];
 
         yield [
             '//loco',
-            'The translation provider DSN must contain a scheme.',
+            'The URL must contain a scheme.',
         ];
 
         yield [
             'file:///some/path',
-            'The translation provider DSN must contain a host (use "default" by default).',
+            'The URL must contain a host (use "default" by default).',
         ];
     }
 

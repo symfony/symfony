@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `UploadedFile::getClientOriginalPath()`
+ * Add `UrlParser` and `Url`
 
 7.0
 ---

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation\Provider;
 
+use Symfony\Component\HttpFoundation\UrlParser\UrlParser;
+use Symfony\Component\HttpFoundation\Exception\Parser\MissingHostException;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\MissingRequiredOptionException;
 
@@ -31,27 +33,23 @@ final class Dsn
 
     public function __construct(#[\SensitiveParameter] string $dsn)
     {
+        try {
+            $params = UrlParser::parse($dsn, true);
+        } catch (MissingHostException) {
+            throw new InvalidArgumentException('The URL must contain a host (use "default" by default).');
+        } catch (\InvalidArgumentException $e) {
+            throw new InvalidArgumentException($e->getMessage());
+        }
+
         $this->originalDsn = $dsn;
 
-        if (false === $parsedDsn = parse_url($dsn)) {
-            throw new InvalidArgumentException('The translation provider DSN is invalid.');
-        }
-
-        if (!isset($parsedDsn['scheme'])) {
-            throw new InvalidArgumentException('The translation provider DSN must contain a scheme.');
-        }
-        $this->scheme = $parsedDsn['scheme'];
-
-        if (!isset($parsedDsn['host'])) {
-            throw new InvalidArgumentException('The translation provider DSN must contain a host (use "default" by default).');
-        }
-        $this->host = $parsedDsn['host'];
-
-        $this->user = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
-        $this->password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
-        $this->port = $parsedDsn['port'] ?? null;
-        $this->path = $parsedDsn['path'] ?? null;
-        parse_str($parsedDsn['query'] ?? '', $this->options);
+        $this->scheme = $params->scheme;
+        $this->host = $params->host;
+        $this->user = $params->user;
+        $this->password = $params->password;
+        $this->port = $params->port;
+        $this->path = $params->path;
+        $this->options = $params->parsedQuery();
     }
 
     public function getScheme(): string

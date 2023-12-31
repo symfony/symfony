@@ -624,12 +624,12 @@ class PhpDumperTest extends TestCase
         $container = new \Symfony_DI_PhpDumper_Test_UrlParameters();
         $this->assertSame([
             'scheme' => 'postgres',
+            'user' => 'user',
+            'pass' => null,
             'host' => 'localhost',
             'port' => 5432,
-            'user' => 'user',
             'path' => 'database',
             'query' => 'sslmode=disable',
-            'pass' => null,
             'fragment' => null,
         ], $container->getParameter('hello'));
     }

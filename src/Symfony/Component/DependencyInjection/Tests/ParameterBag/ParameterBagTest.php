@@ -348,8 +348,8 @@ class ParameterBagTest extends TestCase
     public static function stringsWithSpacesProvider()
     {
         return [
-            ['bar', '%foo%', 'Parameters must be wrapped by %.'],
-            ['% foo %', '% foo %', 'Parameters should not have spaces.'],
+            ['bar', '%foo%', 'Url must be wrapped by %.'],
+            ['% foo %', '% foo %', 'Url should not have spaces.'],
             ['{% set my_template = "foo" %}', '{% set my_template = "foo" %}', 'Twig-like strings are not parameters.'],
             ['50% is less than 100%', '50% is less than 100%', 'Text between % signs is allowed, if there are spaces.'],
         ];

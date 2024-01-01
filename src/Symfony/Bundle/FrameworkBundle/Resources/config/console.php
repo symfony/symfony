@@ -198,6 +198,7 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
                 service('messenger.transport.native_php_serializer')->nullOnInvalid(),
                 null,
+                service('messenger.transport.igbinary_serializer')->nullOnInvalid(),
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])
@@ -207,6 +208,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Default failure receiver name'),
                 abstract_arg('Receivers'),
                 service('messenger.transport.native_php_serializer')->nullOnInvalid(),
+                service('messenger.transport.igbinary_serializer')->nullOnInvalid(),
             ])
             ->tag('console.command')
 
@@ -215,6 +217,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Default failure receiver name'),
                 abstract_arg('Receivers'),
                 service('messenger.transport.native_php_serializer')->nullOnInvalid(),
+                service('messenger.transport.igbinary_serializer')->nullOnInvalid(),
             ])
             ->tag('console.command')
 

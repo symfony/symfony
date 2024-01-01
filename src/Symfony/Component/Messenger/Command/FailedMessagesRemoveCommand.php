@@ -94,10 +94,12 @@ EOF
     {
         foreach ($ids as $id) {
             $this->phpSerializer?->acceptPhpIncompleteClass();
+            $this->igbinarySerializer?->acceptPhpIncompleteClass();
             try {
                 $envelope = $receiver->find($id);
             } finally {
                 $this->phpSerializer?->rejectPhpIncompleteClass();
+                $this->igbinarySerializer?->rejectPhpIncompleteClass();
             }
 
             if (null === $envelope) {

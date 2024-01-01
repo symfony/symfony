@@ -29,6 +29,7 @@ use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
+use Symfony\Component\Messenger\Transport\Serialization\IgbinarySerializer;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -47,14 +48,14 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
     private bool $forceExit = false;
     private ?Worker $worker = null;
 
-    public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, PhpSerializer $phpSerializer = null, array $signals = null)
+    public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, PhpSerializer $phpSerializer = null, array $signals = null, IgbinarySerializer $igbinarySerializer = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;
         $this->logger = $logger;
         $this->signals = $signals;
 
-        parent::__construct($globalReceiverName, $failureTransports, $phpSerializer);
+        parent::__construct($globalReceiverName, $failureTransports, $phpSerializer, $igbinarySerializer);
     }
 
     protected function configure(): void
@@ -164,6 +165,7 @@ EOF
             while (!$this->shouldStop) {
                 $envelopes = [];
                 $this->phpSerializer?->acceptPhpIncompleteClass();
+                $this->igbinarySerializer?->acceptPhpIncompleteClass();
                 try {
                     foreach ($receiver->all(1) as $envelope) {
                         ++$count;
@@ -171,6 +173,7 @@ EOF
                     }
                 } finally {
                     $this->phpSerializer?->rejectPhpIncompleteClass();
+                    $this->igbinarySerializer?->rejectPhpIncompleteClass();
                 }
 
                 // break the loop if all messages are consumed
@@ -247,10 +250,12 @@ EOF
 
         foreach ($ids as $id) {
             $this->phpSerializer?->acceptPhpIncompleteClass();
+            $this->igbinarySerializer?->acceptPhpIncompleteClass();
             try {
                 $envelope = $receiver->find($id);
             } finally {
                 $this->phpSerializer?->rejectPhpIncompleteClass();
+                $this->igbinarySerializer?->rejectPhpIncompleteClass();
             }
             if (null === $envelope) {
                 throw new RuntimeException(sprintf('The message "%s" was not found.', $id));

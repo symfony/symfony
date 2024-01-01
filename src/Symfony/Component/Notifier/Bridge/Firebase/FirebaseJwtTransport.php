@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Firebase;
 
-use Ahc\Jwt\JWT;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -114,11 +113,23 @@ final class FirebaseJwtTransport extends AbstractTransport
             'aud' => 'https://fcm.googleapis.com/',
             'iat' => $time,
             'exp' => $time + 3600,
-            'kid' => $this->credentials['private_key_id']
+            'kid' => $this->credentials['private_key_id'],
         ];
 
-        $jwt = new JWT(openssl_pkey_get_private($this->credentials['private_key']), 'RS256');
+        $header = $this->urlSafeEncode(['alg' => 'RS256', 'typ' => 'JWT']);
+        $payload = $this->urlSafeEncode($payload);
+        openssl_sign($header . '.' . $payload, $signature, openssl_pkey_get_private($this->credentials['private_key']), OPENSSL_ALGO_SHA256);
+        $signature = $this->urlSafeEncode($signature);
 
-        return $jwt->encode($payload);
+        return $header . '.' . $payload . '.' . $signature;
+    }
+
+    protected function urlSafeEncode($data): string
+    {
+        if (is_array($data)) {
+            $data = json_encode($data, JSON_UNESCAPED_SLASHES);
+        }
+
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }

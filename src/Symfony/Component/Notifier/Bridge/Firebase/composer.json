@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=8.2",
+        "ext-openssl": "*",
         "symfony/http-client": "^6.4|^7.0",
-        "symfony/notifier": "^6.4|^7.0",
-        "adhocore/jwt": "^1.1"
+        "symfony/notifier": "^6.4|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Firebase\\": "" },

@@ -2594,27 +2594,27 @@ class FrameworkExtension extends Extension
 
         if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages, true) && ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, $parentPackages, true) && \in_array(MercureBundle::class, $container->getParameter('kernel.bundles'), true)) {
             $container->getDefinition($classToServices[MercureTransportFactory::class])
-                ->replaceArgument('$registry', new Reference(HubRegistry::class))
-                ->replaceArgument('$client', new Reference('http_client', ContainerBuilder::NULL_ON_INVALID_REFERENCE))
-                ->replaceArgument('$dispatcher', new Reference('event_dispatcher', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
+                ->replaceArgument(0, new Reference(HubRegistry::class))
+                ->replaceArgument(1, new Reference('event_dispatcher', ContainerBuilder::NULL_ON_INVALID_REFERENCE))
+                ->addArgument(new Reference('http_client', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
         } elseif (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages, true)) {
             $container->removeDefinition($classToServices[MercureTransportFactory::class]);
         }
 
         if (ContainerBuilder::willBeAvailable('symfony/fake-chat-notifier', FakeChatTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier', 'symfony/mailer'], true)) {
             $container->getDefinition($classToServices[FakeChatTransportFactory::class])
-                ->replaceArgument('$mailer', new Reference('mailer'))
-                ->replaceArgument('$logger', new Reference('logger'))
-                ->replaceArgument('$client', new Reference('http_client', ContainerBuilder::NULL_ON_INVALID_REFERENCE))
-                ->replaceArgument('$dispatcher', new Reference('event_dispatcher', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
+                ->replaceArgument(0, new Reference('mailer'))
+                ->replaceArgument(1, new Reference('logger'))
+                ->addArgument(new Reference('event_dispatcher', ContainerBuilder::NULL_ON_INVALID_REFERENCE))
+                ->addArgument(new Reference('http_client', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
         }
 
         if (ContainerBuilder::willBeAvailable('symfony/fake-sms-notifier', FakeSmsTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier', 'symfony/mailer'], true)) {
             $container->getDefinition($classToServices[FakeSmsTransportFactory::class])
-                ->replaceArgument('$mailer', new Reference('mailer'))
-                ->replaceArgument('$logger', new Reference('logger'))
-                ->replaceArgument('$client', new Reference('http_client', ContainerBuilder::NULL_ON_INVALID_REFERENCE))
-                ->replaceArgument('$dispatcher', new Reference('event_dispatcher', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
+                ->replaceArgument(0, new Reference('mailer'))
+                ->replaceArgument(1, new Reference('logger'))
+                ->addArgument(new Reference('event_dispatcher', ContainerBuilder::NULL_ON_INVALID_REFERENCE))
+                ->addArgument(new Reference('http_client', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
         }
 
         if (isset($config['admin_recipients'])) {

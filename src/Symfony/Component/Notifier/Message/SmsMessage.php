@@ -21,22 +21,17 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 class SmsMessage implements MessageInterface, FromNotificationInterface
 {
     private ?string $transport = null;
-    private string $subject;
-    private string $phone;
-    private string $from;
-    private ?MessageOptionsInterface $options;
     private ?Notification $notification = null;
 
-    public function __construct(string $phone, string $subject, string $from = '', MessageOptionsInterface $options = null)
-    {
+    public function __construct(
+        private string $phone,
+        private string $subject,
+        private string $from = '',
+        private ?MessageOptionsInterface $options = null,
+    ) {
         if ('' === $phone) {
             throw new InvalidArgumentException(sprintf('"%s" needs a phone number, it cannot be empty.', __CLASS__));
         }
-
-        $this->subject = $subject;
-        $this->phone = $phone;
-        $this->from = $from;
-        $this->options = $options;
     }
 
     public static function fromNotification(Notification $notification, SmsRecipientInterface $recipient): self

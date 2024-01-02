@@ -25,14 +25,12 @@ use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
  */
 class EmailMessage implements MessageInterface, FromNotificationInterface
 {
-    private RawMessage $message;
-    private ?Envelope $envelope;
     private ?Notification $notification = null;
 
-    public function __construct(RawMessage $message, Envelope $envelope = null)
-    {
-        $this->message = $message;
-        $this->envelope = $envelope;
+    public function __construct(
+        private RawMessage $message,
+        private ?Envelope $envelope = null,
+    ) {
     }
 
     public static function fromNotification(Notification $notification, EmailRecipientInterface $recipient): self

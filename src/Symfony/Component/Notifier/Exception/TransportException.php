@@ -18,12 +18,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class TransportException extends RuntimeException implements TransportExceptionInterface
 {
-    private ResponseInterface $response;
     private string $debug = '';
 
-    public function __construct(string $message, ResponseInterface $response, int $code = 0, \Throwable $previous = null)
-    {
-        $this->response = $response;
+    public function __construct(
+        string $message,
+        private ResponseInterface $response,
+        int $code = 0,
+        \Throwable $previous = null,
+    ) {
         $this->debug .= $response->getInfo('debug') ?? '';
 
         parent::__construct($message, $code, $previous);

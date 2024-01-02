@@ -22,14 +22,10 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 final class BrowserChannel implements ChannelInterface
 {
-    private RequestStack $stack;
-
-    private FlashMessageImportanceMapperInterface $mapper;
-
-    public function __construct(RequestStack $stack, FlashMessageImportanceMapperInterface $mapper = new DefaultFlashMessageImportanceMapper())
-    {
-        $this->stack = $stack;
-        $this->mapper = $mapper;
+    public function __construct(
+        private RequestStack $stack,
+        private FlashMessageImportanceMapperInterface $mapper = new DefaultFlashMessageImportanceMapper(),
+    ) {
     }
 
     public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void

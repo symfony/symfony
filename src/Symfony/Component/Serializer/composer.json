@@ -33,7 +33,7 @@
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4|^6.0",
         "symfony/mime": "^5.4|^6.0",
-        "symfony/property-access": "^5.4|^6.0",
+        "symfony/property-access": "^5.4.26|^6.3",
         "symfony/property-info": "^5.4.24|^6.2.11",
         "symfony/uid": "^5.4|^6.0",
         "symfony/validator": "^5.4|^6.0",

@@ -434,6 +434,10 @@
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
                 <target>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
             </trans-unit>
+            <trans-unit id="112">
+                <source>This is not a valid MAC address.</source>
+                <target>This is not a valid MAC address.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

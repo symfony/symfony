@@ -83,7 +83,7 @@ final class RecurringMessage implements MessageProviderInterface
             }
         }
 
-        return new self($trigger, new StaticMessageProvider([$message], strtr(substr(base64_encode(hash('xxh128', serialize($message), true)), 0, 7), '/+', '._'), -7), $description));
+        return new self($trigger, new StaticMessageProvider([$message], strtr(substr(base64_encode(hash('xxh128', serialize($message), true)), 0, 7), '/+', '._'), $description));
     }
 
     public function withJitter(int $maxSeconds = 60): self

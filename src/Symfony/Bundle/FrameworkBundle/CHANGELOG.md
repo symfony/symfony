@@ -4,6 +4,7 @@ CHANGELOG
 7.1
 ---
 
+ * Add `private_ranges` as a shortcut for private IP address ranges to the `trusted_proxies` option
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
  * Move the Router `cache_dir` to `kernel.build_dir`
  * Deprecate the `router.cache_dir` config option

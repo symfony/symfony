@@ -37,9 +37,9 @@ class AttributeDirectoryLoader extends AttributeFileLoader
         $files = iterator_to_array(new \RecursiveIteratorIterator(
             new \RecursiveCallbackFilterIterator(
                 new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
-                fn (\SplFileInfo $current) => !str_starts_with($current->getBasename(), '.'),
+                fn (\SplFileInfo $current) => !str_starts_with($current->getBasename(), '.')
             ),
-            \RecursiveIteratorIterator::LEAVES_ONLY,
+            \RecursiveIteratorIterator::LEAVES_ONLY
         ));
         usort($files, fn (\SplFileInfo $a, \SplFileInfo $b) => (string) $a > (string) $b ? 1 : -1);
 

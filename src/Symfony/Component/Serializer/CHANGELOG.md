@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+7.1
+---
+ * Add `AbstractNormalizer::USE_CLASS_AS_DEFAULT_EXPECTED_TYPE` in order to use the FQCN as the default value for NotNormalizableValueException's expectedTypes instead of unknown
+
 7.0
 ---
 

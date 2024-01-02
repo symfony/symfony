@@ -28,12 +28,11 @@ use Symfony\Component\Mime\Message;
  */
 class SesHttpAsyncAwsTransport extends AbstractTransport
 {
-    protected SesClient $sesClient;
-
-    public function __construct(SesClient $sesClient, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->sesClient = $sesClient;
-
+    public function __construct(
+        protected SesClient $sesClient,
+        EventDispatcherInterface $dispatcher = null,
+        LoggerInterface $logger = null,
+    ) {
         parent::__construct($dispatcher, $logger);
     }
 

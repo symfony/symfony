@@ -37,16 +37,27 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     private ?EventDispatcherInterface $dispatcher;
 
-    private string $key;
-
     private ?string $messageStream = null;
 
-    public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->key = $key;
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+        LoggerInterface $logger = null,
+    ) {
         $this->dispatcher = $dispatcher;
 
         parent::__construct($client, $dispatcher, $logger);
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMessageStream(string $messageStream): static
+    {
+        $this->messageStream = $messageStream;
+
+        return $this;
     }
 
     public function __toString(): string
@@ -176,15 +187,5 @@ class PostmarkApiTransport extends AbstractApiTransport
     private function getEndpoint(): ?string
     {
         return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
-    }
-
-    /**
-     * @return $this
-     */
-    public function setMessageStream(string $messageStream): static
-    {
-        $this->messageStream = $messageStream;
-
-        return $this;
     }
 }

@@ -29,36 +29,24 @@ final class AzureApiTransport extends AbstractApiTransport
     private const HOST = '%s.communication.azure.com';
 
     /**
-     * User Access Key from Azure Communication Service (Primary or Secondary key).
+     * @param string $key             User Access Key from Azure Communication Service (Primary or Secondary key)
+     * @param string $resourceName    The endpoint API URL to which to POST emails to Azure https://{acsResourceName}.communication.azure.com/
+     * @param bool   $disableTracking Indicates whether user engagement tracking should be disabled
+     * @param string $apiVersion      The version of API to invoke
      */
-    private string $key;
-
-    /**
-     * The endpoint API URL to which to POST emails to Azure
-     * https://{acsResourceName}.communication.azure.com/.
-     */
-    private string $resourceName;
-
-    /**
-     * The version of API to invoke.
-     */
-    private string $apiVersion;
-
-    /**
-     * Indicates whether user engagement tracking should be disabled.
-     */
-    private bool $disableTracking;
-
-    public function __construct(string $key, string $resourceName, bool $disableTracking = false, string $apiVersion = '2023-03-31', HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        private string $resourceName,
+        private bool $disableTracking = false,
+        private string $apiVersion = '2023-03-31',
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+        LoggerInterface $logger = null,
+    ) {
         if (str_contains($resourceName, '.') || str_ends_with($resourceName, '.')) {
             throw new \Exception('Resource name cannot contain or end with a dot.');
         }
 
-        $this->resourceName = $resourceName;
-        $this->key = $key;
-        $this->apiVersion = $apiVersion;
-        $this->disableTracking = $disableTracking;
         parent::__construct($client, $dispatcher, $logger);
     }
 

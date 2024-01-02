@@ -9,6 +9,9 @@ use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 #[AsCronTask(expression: '0 * * * *', timezone: 'Europe/Berlin', arguments: ['2'], schedule: 'dummy_task', method: 'method2')]
 #[AsPeriodicTask(frequency: 5, arguments: [3], schedule: 'dummy_task')]
 #[AsPeriodicTask(frequency: '1 day', from: '2023-10-25 09:59:00Z', jitter: 60, arguments: ['4'], schedule: 'dummy_task', method: 'method4')]
+#[AsPeriodicTask(frequency: '1 day', from: '2023-10-25 09:59:00Z', arguments: ['9'], schedule: 'dummy_task', method: 'method5')]
+#[AsPeriodicTask(frequency: '1 day', from: '2023-10-25 09:59:00Z', arguments: ['9b'], schedule: 'dummy_task', method: 'method5')]
+#[AsPeriodicTask(frequency: '1 day', from: '2023-10-25 09:59:00Z', arguments: ['named' => '9'], schedule: 'dummy_task', method: 'method5')]
 class DummyTask
 {
     public static array $calls = [];

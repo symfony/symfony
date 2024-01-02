@@ -1531,9 +1531,11 @@ class Request
     /**
      * Returns the request body content.
      *
-     * @param bool $asResource If true, a resource will be returned
+     * @param bool $asResource If true, a resource|false will be returned, otherwise string|false
      *
-     * @return string|resource
+     * @return string|resource|false
+     *
+     * @psalm-return ($asResource is true ? resource|false : string|false)
      */
     public function getContent(bool $asResource = false)
     {

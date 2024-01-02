@@ -18,7 +18,9 @@ final class FeatureRegistry implements FeatureRegistryInterface
     /**
      * @param array<string, (\Closure(): mixed)> $features
      */
-    public function __construct(private readonly array $features) {}
+    public function __construct(private readonly array $features)
+    {
+    }
 
     public function get(string $featureName): callable
     {

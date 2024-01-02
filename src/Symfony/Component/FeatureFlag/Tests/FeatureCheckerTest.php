@@ -38,7 +38,7 @@ class FeatureCheckerTest extends TestCase
         $this->assertSame(1, (new FeatureChecker($featureRegistry))->getValue('existing_feature'));
         $this->assertSame(1, (new FeatureChecker($featureRegistry, 42))->getValue('existing_feature'));
 
-        $this->assertSame(false, (new FeatureChecker($featureRegistry))->getValue('unknown_feature'));
+        $this->assertFalse((new FeatureChecker($featureRegistry))->getValue('unknown_feature'));
         $this->assertSame(42, (new FeatureChecker($featureRegistry, 42))->getValue('unknown_feature'));
     }
 

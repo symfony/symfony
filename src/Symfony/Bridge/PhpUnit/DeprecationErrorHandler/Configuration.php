@@ -349,7 +349,7 @@ class Configuration
             $normalizedConfiguration['ignoreFile'],
             filter_var($normalizedConfiguration['generateBaseline'], \FILTER_VALIDATE_BOOLEAN),
             $normalizedConfiguration['baselineFile'],
-            $normalizedConfiguration['logFile'],
+            $normalizedConfiguration['logFile']
         );
     }
 

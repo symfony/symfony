@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by kbond at 2023-12-20T19:24:08Z
+
+> Could you provide examples where you need the service locator to be iterable.
+
+Here's a good example: https://github.com/symfony/ux/pull/1347/files#diff-6487ef7c39e106956904930b49958df26d90de6e025cd0c69a1a9a84e31ed064 (the entire class could be replaced with a `ServiceLocator`). He needs to iterate over a _collection of component services_ for the _index_ page, then, on each _component_ page, he needs to _get_ a specific one.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-12-20T21:37:31Z
+
+Ok, I've removed the interface and just made `ServiceLocator` iterable.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-12-21T08:55:27Z
+
+> There are currently two ways to achieve:
+
+3. Inject a tagged iterator in addition to your locator.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-21T09:47:11Z
+
+> [symfony/ux#1347 (files)](https://github.com/symfony/ux/pull/1347/files#diff-6487ef7c39e106956904930b49958df26d90de6e025cd0c69a1a9a84e31ed064) (the entire class could be replaced with a ServiceLocator)
+
+that's quite common needless overhead - we already simplified many components by using a container
+this PR is not needed to kill that class :)
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-12-22T01:41:58Z
+
+> that's quite common needless overhead - we already simplified many components by using a container
+this PR is not needed to kill that class :)
+
+I guess you mean, inject a tagged iterator into the index action and the tagged locator into the show method? Indeed that would work.
+
+> The added method is just a helper: userland can do this iteration with any ServiceProviderInterface.
+
+This is true, and in fact what I've been doing, but in userland, `ServiceProviderInterface::getProvidedServices()` is weird. It's keyed by the service id which, imo, is 95% of the reason to call by end users (the array values aren't important at this stage). It's a bit of a papercut imo as I don't think it's entirely clear this is possible (iterating over all the services).
+
+What about a `ServiceProviderInterface::getProvidedServiceIds(): string[]` method?
+
+> Still worth it?
+
+I do still feel this improves the DX as the need for a service locator/iterator is a common pattern I'm seeing (but let's close if there isn't agreement).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T15:02:56Z
+
+To make this full "IoC", one can type hint `ServiceProviderInteface&Traversable`, isn't it? Then LGTM.
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-12-26T16:19:57Z
+
+As discussed with Nicolas on Slack, I've switched back to a `ServiceCollectionInterface` (in `symfony/service-contracts`).
+
+---------------------------------------------------------------------------
+
+by kbond at 2023-12-28T16:10:03Z
+
+> Please update the root composer.json for 3.5 also.
+
+Done, but please confirm it's updated correctly.

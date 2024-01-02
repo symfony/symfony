@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-11-20T09:13:08Z
+
+> The `SYMFONY_DOTENV_PATH` env var is a nice feature in itself, let's tell about in in the changelog and in the title of the PR
+
+Do you want the Dotenv class to read `SYMFONY_DOTENV_PATH` for the default `.env`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-20T09:19:15Z
+
+Nope, I want the env var you're proposing to be documented in the changelog

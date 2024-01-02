@@ -40,7 +40,7 @@ class ExpressionSyntaxValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_string($expression)) {
+        if (!\is_string($expression) && !$expression instanceof \Stringable) {
             throw new UnexpectedValueException($expression, 'string');
         }
 

@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints\CssColor;
 use Symfony\Component\Validator\Constraints\CssColorValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\StringableValue;
 
 final class CssColorValidatorTest extends ConstraintValidatorTestCase
 {
@@ -67,6 +68,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
             ['rgba(255, 255, 255, 0.3)'],
             ['hsl(0, 0%, 20%)'],
             ['hsla(0, 0%, 20%, 0.4)'],
+            [new StringableValue('hsla(0, 0%, 20%, 0.4)')],
         ];
     }
 
@@ -323,7 +325,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public static function getInvalidNamedColors(): array
     {
-        return [['fabpot'], ['ngrekas'], ['symfony'], ['FABPOT'], ['NGREKAS'], ['SYMFONY']];
+        return [['fabpot'], ['ngrekas'], ['symfony'], ['FABPOT'], ['NGREKAS'], ['SYMFONY'], [new StringableValue('SYMFONY')]];
     }
 
     /**

@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\StringableValue;
 
 class CidrValidatorTest extends ConstraintValidatorTestCase
 {
@@ -83,7 +84,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValid
      */
-    public function testValidCidr(string $cidr, string $version)
+    public function testValidCidr(string|\Stringable $cidr, string $version)
     {
         $this->validator->validate($cidr, new Cidr(['version' => $version]));
 
@@ -93,7 +94,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getWithInvalidMasksAndIps
      */
-    public function testInvalidIpAddressAndNetmask(string $cidr)
+    public function testInvalidIpAddressAndNetmask(string|\Stringable $cidr)
     {
         $this->validator->validate($cidr, new Cidr());
         $this
@@ -195,6 +196,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ['::255.255.255.255/32', Ip::V6],
             ['::123.45.67.178/120', Ip::V6],
             ['::123.45.67.178/120', Ip::ALL],
+            [new StringableValue('::123.45.67.178/120'), Ip::ALL],
         ];
     }
 
@@ -233,6 +235,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ['::0.0.0/a/'],
             ['::256.0.0.0/-1aa'],
             ['::0.256.0.0/1b'],
+            [new StringableValue('::0.256.0.0/1b')],
         ];
     }
 

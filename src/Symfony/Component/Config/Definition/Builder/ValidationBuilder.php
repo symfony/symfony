@@ -20,11 +20,9 @@ class ValidationBuilder
 {
     public array $rules = [];
 
-    protected NodeDefinition $node;
-
-    public function __construct(NodeDefinition $node)
-    {
-        $this->node = $node;
+    public function __construct(
+        protected NodeDefinition $node,
+    ) {
     }
 
     /**

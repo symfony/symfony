@@ -30,11 +30,9 @@ class ExprBuilder
     public ?\Closure $ifPart = null;
     public ?\Closure $thenPart = null;
 
-    protected NodeDefinition $node;
-
-    public function __construct(NodeDefinition $node)
-    {
-        $this->node = $node;
+    public function __construct(
+        protected NodeDefinition $node,
+    ) {
     }
 
     /**

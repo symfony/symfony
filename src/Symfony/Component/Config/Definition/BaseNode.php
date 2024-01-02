@@ -30,7 +30,6 @@ abstract class BaseNode implements NodeInterface
     private static array $placeholders = [];
 
     protected string $name;
-    protected ?NodeInterface $parent;
     protected array $normalizationClosures = [];
     protected array $normalizedTypes = [];
     protected array $finalValidationClosures = [];
@@ -39,22 +38,22 @@ abstract class BaseNode implements NodeInterface
     protected array $deprecation = [];
     protected array $equivalentValues = [];
     protected array $attributes = [];
-    protected string $pathSeparator;
 
     private mixed $handlingPlaceholder = null;
 
     /**
      * @throws \InvalidArgumentException if the name contains a period
      */
-    public function __construct(?string $name, NodeInterface $parent = null, string $pathSeparator = self::DEFAULT_PATH_SEPARATOR)
-    {
+    public function __construct(
+        ?string $name,
+        protected ?NodeInterface $parent = null,
+        protected string $pathSeparator = self::DEFAULT_PATH_SEPARATOR,
+    ) {
         if (str_contains($name = (string) $name, $pathSeparator)) {
             throw new \InvalidArgumentException('The name must not contain ".'.$pathSeparator.'".');
         }
 
         $this->name = $name;
-        $this->parent = $parent;
-        $this->pathSeparator = $pathSeparator;
     }
 
     /**

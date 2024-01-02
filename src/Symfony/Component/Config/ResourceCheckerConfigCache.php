@@ -23,21 +23,14 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class ResourceCheckerConfigCache implements ConfigCacheInterface
 {
-    private string $file;
-
-    /**
-     * @var iterable<mixed, ResourceCheckerInterface>
-     */
-    private iterable $resourceCheckers;
-
     /**
      * @param string                                    $file             The absolute cache path
      * @param iterable<mixed, ResourceCheckerInterface> $resourceCheckers The ResourceCheckers to use for the freshness check
      */
-    public function __construct(string $file, iterable $resourceCheckers = [])
-    {
-        $this->file = $file;
-        $this->resourceCheckers = $resourceCheckers;
+    public function __construct(
+        private string $file,
+        private iterable $resourceCheckers = [],
+    ) {
     }
 
     public function getPath(): string

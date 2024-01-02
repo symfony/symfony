@@ -7,6 +7,7 @@ CHANGELOG
  * Add `MacAddress` constraint
  * Add `list` and `associative_array` types to `Type` constraint
  * Add the `Charset` constraint
+ * Add the `Base64` constraint
 
 7.0
 ---

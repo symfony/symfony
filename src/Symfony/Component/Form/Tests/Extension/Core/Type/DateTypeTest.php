@@ -1043,6 +1043,7 @@ class DateTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => $widget,
             'empty_data' => $emptyData,
+            'years' => range(2018, (int) date('Y')),
         ]);
         $form->submit(null);
 

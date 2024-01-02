@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-02T10:29:11Z
+
+> Can't we stop using named args at all?
+> So those args are already wired in the default config files?
+
+That's what we do now. Or do I misunderstand what you are asking for?
+
+---------------------------------------------------------------------------
+
+by rdavaillaud at 2024-01-02T10:30:10Z
+
+The problem is that the bridges are wired via a factory that is declared via an abstract factory.
+
+see https://github.com/symfony/symfony/blob/317c67bed8f4ede15828438b46d4e96313b2442e/src/Symfony/Bundle/FrameworkBundle/Resources/config/notifier_transports.php#L151
+
+As far as I have tested, if we remove the HttpClient and Dispatcher from the definition, they will not be injected in the constructor.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-02T10:30:34Z
+
+I mean we revert the framework extension changes made in #52998 which were not necessary because of the `notifier.transport_factory.abstract` definition: https://github.com/symfony/symfony/blob/5.4/src/Symfony/Bundle/FrameworkBundle/Resources/config/notifier_transports.php#L90-L92
+
+---------------------------------------------------------------------------
+
+by rdavaillaud at 2024-01-02T10:33:00Z
+
+If we revert the changes, the DI will generate this code (at least in 6.3):
+
+```php
+class getNotifier_TransportFactory_FakesmsService extends App_KernelDevDebugContainer
+{
+    /**
+     * Gets the private 'notifier.transport_factory.fake-sms' shared service.
+     *
+     * @return \Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory
+     */
+    public static function do($container, $lazyLoad = true)
+    {
+        include_once \dirname(__DIR__, 4).'/vendor/symfony/notifier/Transport/TransportFactoryInterface.php';
+        include_once \dirname(__DIR__, 4).'/vendor/symfony/notifier/Transport/AbstractTransportFactory.php';
+        include_once \dirname(__DIR__, 4).'/vendor/symfony/fake-sms-notifier/FakeSmsTransportFactory.php';
+
+        return new \Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory(($container->privates['mailer.mailer'] ?? self::getMailer_MailerService($container)), ($container->privates['monolog.logger'] ?? self::getMonolog_LoggerService($container)));
+    }
+}
+```
+
+The HttpClient and EventDispatcher are replaced, not injected.
+
+---------------------------------------------------------------------------
+
+by rdavaillaud at 2024-01-02T10:41:57Z
+
+If we revert the FrameworkBundle, we must also change the signatures of the bridges Fake* constructor to put Mailer and Logger at the end.
+
+---------------------------------------------------------------------------
+
+by rdavaillaud at 2024-01-02T10:54:45Z
+
+@xabbuh your last change seems to work with the old bridge, and the modified one. :+1:

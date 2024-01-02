@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class RedlinkOptions implements MessageOptionsInterface
 {
-    public function __construct(protected array $options = [])
+    public function __construct(private array $options = [])
     {
     }
 

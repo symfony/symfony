@@ -686,7 +686,7 @@ hello,"hey ho"
 CSV;
         $this->assertEquals(
             ['foo' => 'hello', 'bar' => 'hey ho'],
-            $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false])
+            $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]),
         );
     }
 

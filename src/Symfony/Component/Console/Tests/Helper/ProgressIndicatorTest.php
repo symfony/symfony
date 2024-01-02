@@ -60,7 +60,7 @@ class ProgressIndicatorTest extends TestCase
             $this->generateOutput(' \\ Starting Again...').
             $this->generateOutput(' \\ Done Again...').
             \PHP_EOL,
-            stream_get_contents($output->getStream())
+            stream_get_contents($output->getStream()),
         );
     }
 
@@ -82,7 +82,7 @@ class ProgressIndicatorTest extends TestCase
             ' Starting...'.\PHP_EOL.
             ' Midway...'.\PHP_EOL.
             ' Done...'.\PHP_EOL.\PHP_EOL,
-            stream_get_contents($output->getStream())
+            stream_get_contents($output->getStream()),
         );
     }
 
@@ -105,7 +105,7 @@ class ProgressIndicatorTest extends TestCase
             $this->generateOutput(' b Starting...').
             $this->generateOutput(' c Starting...').
             $this->generateOutput(' a Starting...'),
-            stream_get_contents($output->getStream())
+            stream_get_contents($output->getStream()),
         );
     }
 

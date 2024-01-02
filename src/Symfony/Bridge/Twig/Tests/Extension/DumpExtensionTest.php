@@ -122,7 +122,7 @@ class DumpExtensionTest extends TestCase
         $dumper->setDumpHeader('');
         $dumper->setDumpBoundaries(
             '<pre class=sf-dump-test id=%s data-indent-pad="%s">',
-            '</pre><script>Sfdump("%s")</script>'
+            '</pre><script>Sfdump("%s")</script>',
         );
         $extension = new DumpExtension(new VarCloner(), $dumper);
         $twig = new Environment($this->createMock(LoaderInterface::class), [
@@ -139,7 +139,7 @@ class DumpExtensionTest extends TestCase
             "<span class=sf-dump-str title=\"3 characters\">foo</span>\"\n".
             "</pre><script>Sfdump(\"sf-dump\")</script>\n",
             $dump,
-            'Custom dumper should be used to dump data.'
+            'Custom dumper should be used to dump data.',
         );
 
         $this->assertEmpty($output, 'Dumper output should be ignored.');

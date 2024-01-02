@@ -106,7 +106,7 @@ class GetSetMethodNormalizerTest extends TestCase
                 'camelCase' => 'camelcase',
                 'object' => 'string_object',
             ],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any'),
         );
     }
 
@@ -115,7 +115,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'],
             GetSetDummy::class,
-            'any'
+            'any',
         );
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
@@ -134,7 +134,7 @@ class GetSetMethodNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => true,
             ],
-            $this->normalizer->normalize($obj, 'any', [AbstractNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes])
+            $this->normalizer->normalize($obj, 'any', [AbstractNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes]),
         );
     }
 
@@ -295,7 +295,7 @@ class GetSetMethodNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
             ],
-            $this->normalizer->normalize($obj, null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
+            $this->normalizer->normalize($obj, null, [GetSetMethodNormalizer::GROUPS => ['name_converter']]),
         );
     }
 
@@ -316,7 +316,7 @@ class GetSetMethodNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
                 'coop_tilleuls' => 'les-tilleuls.coop',
-            ], GroupDummy::class, null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
+            ], GroupDummy::class, null, [GetSetMethodNormalizer::GROUPS => ['name_converter']]),
         );
     }
 
@@ -404,7 +404,7 @@ class GetSetMethodNormalizerTest extends TestCase
     {
         $this->assertEquals(
             new GetSetDummy(),
-            $this->normalizer->denormalize(['non_existing' => true], GetSetDummy::class)
+            $this->normalizer->denormalize(['non_existing' => true], GetSetDummy::class),
         );
     }
 
@@ -450,7 +450,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
         $this->assertEquals(
             ['foo' => true],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any'),
         );
     }
 
@@ -466,7 +466,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
         $this->assertSame(
             ['active' => true],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any'),
         );
     }
 

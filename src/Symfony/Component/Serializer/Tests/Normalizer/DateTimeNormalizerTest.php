@@ -91,8 +91,8 @@ class DateTimeNormalizerTest extends TestCase
                 [
                     DateTimeNormalizer::TIMEZONE_KEY => $timezone,
                     DateTimeNormalizer::FORMAT_KEY => $expectedFormat,
-                ]
-            )
+                ],
+            ),
         );
     }
 
@@ -104,7 +104,7 @@ class DateTimeNormalizerTest extends TestCase
             \DateTime::createFromFormat(
                 'Y-m-d\TH:i:s.u',
                 '2018-12-01T18:03:06.067634',
-                new \DateTimeZone('UTC')
+                new \DateTimeZone('UTC'),
             ),
             null,
         ];
@@ -115,7 +115,7 @@ class DateTimeNormalizerTest extends TestCase
             \DateTime::createFromFormat(
                 'Y-m-d\TH:i:s.u',
                 '2018-12-01T18:03:06.067634',
-                new \DateTimeZone('UTC')
+                new \DateTimeZone('UTC'),
             ),
             new \DateTimeZone('UTC'),
         ];
@@ -126,7 +126,7 @@ class DateTimeNormalizerTest extends TestCase
             \DateTimeImmutable::createFromFormat(
                 'Y-m-d\TH:i:s.u',
                 '2018-12-01T18:03:06.067634',
-                new \DateTimeZone('UTC')
+                new \DateTimeZone('UTC'),
             ),
             new \DateTimeZone('Europe/Rome'),
         ];
@@ -137,7 +137,7 @@ class DateTimeNormalizerTest extends TestCase
             \DateTime::createFromFormat(
                 'Y-m-d\TH:i:s.u',
                 '2018-12-01T18:03:06.067634',
-                new \DateTimeZone('UTC')
+                new \DateTimeZone('UTC'),
             ),
             new \DateTimeZone('Europe/Kiev'),
         ];
@@ -148,7 +148,7 @@ class DateTimeNormalizerTest extends TestCase
             \DateTime::createFromFormat(
                 'Y-m-d\TH:i:s.u',
                 '2018-12-01T18:03:06.067634',
-                new \DateTimeZone('UTC')
+                new \DateTimeZone('UTC'),
             ),
             new \DateTimeZone('Europe/Berlin'),
         ];

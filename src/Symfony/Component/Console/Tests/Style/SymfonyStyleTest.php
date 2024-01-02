@@ -216,7 +216,7 @@ class SymfonyStyleTest extends TestCase
             'foo2'.\PHP_EOL. // write foo2
             'bar2'.\PHP_EOL. // write bar
             "\033[9A\033[0J"), // clear 9 lines (8 output lines and one from the answer input return)
-            escapeshellcmd(stream_get_contents($output->getStream()))
+            escapeshellcmd(stream_get_contents($output->getStream())),
         );
     }
 }

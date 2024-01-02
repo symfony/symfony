@@ -311,7 +311,7 @@ class DeprecationErrorHandler
                 $deprecationGroupMessage = sprintf(
                     '%s deprecation notices (%d)',
                     \in_array($group, ['direct', 'indirect', 'self'], true) ? "Remaining $group" : ucfirst($group),
-                    $this->deprecationGroups[$group]->count()
+                    $this->deprecationGroups[$group]->count(),
                 );
                 if ($configuration->shouldWriteToLogFile()) {
                     fwrite($handle, "\n$deprecationGroupMessage\n");
@@ -375,7 +375,7 @@ class DeprecationErrorHandler
                     $frame['object']->getConvertDeprecationsToExceptions(),
                     $frame['object']->getConvertErrorsToExceptions(),
                     $frame['object']->getConvertNoticesToExceptions(),
-                    $frame['object']->getConvertWarningsToExceptions()
+                    $frame['object']->getConvertWarningsToExceptions(),
                 );
             }
         }

@@ -162,9 +162,9 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
                 empty($value['day']) ? $this->referenceDate->format('d') : $value['day'],
                 $value['hour'] ?? $this->referenceDate->format('H'),
                 $value['minute'] ?? $this->referenceDate->format('i'),
-                $value['second'] ?? $this->referenceDate->format('s')
+                $value['second'] ?? $this->referenceDate->format('s'),
             ),
-                new \DateTimeZone($this->outputTimezone)
+                new \DateTimeZone($this->outputTimezone),
             );
 
             if ($this->inputTimezone !== $this->outputTimezone) {

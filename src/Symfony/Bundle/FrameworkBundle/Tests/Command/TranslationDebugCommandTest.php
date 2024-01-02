@@ -181,7 +181,7 @@ class TranslationDebugCommandTest extends TestCase
                 ->willReturnCallback(
                     function ($path, $catalogue) use ($extractedMessages) {
                         $catalogue->add($extractedMessages);
-                    }
+                    },
                 );
         }
 
@@ -192,7 +192,7 @@ class TranslationDebugCommandTest extends TestCase
             ->willReturnCallback(
                 function ($path, $catalogue) use ($loadedMessages) {
                     $catalogue->add($loadedMessages);
-                }
+                },
             );
 
         if (null === $kernel) {
@@ -263,7 +263,7 @@ class TranslationDebugCommandTest extends TestCase
                     foreach ($extractedMessagesWithDomains as $domain => $message) {
                         $catalogue->add($message, $domain);
                     }
-                }
+                },
             );
 
         $tester = new CommandCompletionTester($this->createCommand([], [], null, [], [], $extractor, [new ExtensionWithoutConfigTestBundle()], ['fr', 'nl']));

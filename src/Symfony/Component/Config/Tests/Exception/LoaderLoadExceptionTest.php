@@ -53,7 +53,7 @@ class LoaderLoadExceptionTest extends TestCase
             'Cannot import resource "@resource" from "sourceResource". '.
             'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
             'If the bundle is registered, make sure the bundle path "@resource" is not empty.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -63,11 +63,11 @@ class LoaderLoadExceptionTest extends TestCase
             'resource',
             null,
             0,
-            new \Exception('There was a previous error with an ending dot.')
+            new \Exception('There was a previous error with an ending dot.'),
         );
         $this->assertEquals(
             'There was a previous error with an ending dot in resource (which is loaded in resource "resource").',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -77,11 +77,11 @@ class LoaderLoadExceptionTest extends TestCase
             'resource',
             null,
             0,
-            new \Exception('There was a previous error with no ending dot')
+            new \Exception('There was a previous error with no ending dot'),
         );
         $this->assertEquals(
             'There was a previous error with no ending dot in resource (which is loaded in resource "resource").',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -91,14 +91,14 @@ class LoaderLoadExceptionTest extends TestCase
             '@resource',
             null,
             0,
-            new \Exception('There was a previous error with an ending dot.')
+            new \Exception('There was a previous error with an ending dot.'),
         );
         $this->assertEquals(
             'There was a previous error with an ending dot in @resource '.
             '(which is loaded in resource "@resource"). '.
             'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
             'If the bundle is registered, make sure the bundle path "@resource" is not empty.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 }

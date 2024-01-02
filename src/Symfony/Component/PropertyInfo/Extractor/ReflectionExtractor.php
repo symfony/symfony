@@ -396,7 +396,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 'the new value must be an array or an instance of \Traversable',
                 $property,
                 $reflClass->getName(),
-                implode('()", "', [$adderAccessName, $removerAccessName])
+                implode('()", "', [$adderAccessName, $removerAccessName]),
             )];
         }
 

@@ -70,7 +70,7 @@ class FailureIntegrationTest extends TestCase
             ->willReturnCallback(fn ($transportName) => $transports[$transportName]);
         $senderLocator = new SendersLocator(
             [DummyMessage::class => ['transport1', 'transport2']],
-            $locator
+            $locator,
         );
 
         $retryStrategyLocator = $this->createMock(ContainerInterface::class);
@@ -256,7 +256,7 @@ class FailureIntegrationTest extends TestCase
             ->willReturnCallback(fn ($transportName) => $transports[$transportName]);
         $senderLocator = new SendersLocator(
             [DummyMessage::class => ['transport1', 'transport2']],
-            $locator
+            $locator,
         );
 
         // retry strategy with zero retries so it goes to the failed transport after failure
@@ -292,7 +292,7 @@ class FailureIntegrationTest extends TestCase
         $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
         $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(
             $sendersLocatorFailureTransport,
-            new NullLogger()
+            new NullLogger(),
         ));
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 

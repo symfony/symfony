@@ -99,7 +99,7 @@ class ApplicationTesterTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(
             ['command' => 'foo', 'foo' => 'bar'],
-            ['capture_stderr_separately' => true]
+            ['capture_stderr_separately' => true],
         );
 
         $this->assertSame('foo', $tester->getErrorOutput());

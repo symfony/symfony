@@ -192,7 +192,7 @@ class Connection implements ResetInterface
                     $sql = str_replace(
                         sprintf('FROM %s WHERE', $fromClause),
                         sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
-                        $sql
+                        $sql,
                     );
                 }
 
@@ -203,7 +203,7 @@ class Connection implements ResetInterface
             $doctrineEnvelope = $this->executeQuery(
                 $sql,
                 $query->getParameters(),
-                $query->getParameterTypes()
+                $query->getParameterTypes(),
             )->fetchAssociative();
 
             if (false === $doctrineEnvelope) {
@@ -300,7 +300,7 @@ class Connection implements ResetInterface
 
         return array_map(
             $this->decodeEnvelopeHeaders(...),
-            $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes())->fetchAllAssociative()
+            $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes())->fetchAllAssociative(),
         );
     }
 
@@ -375,7 +375,7 @@ class Connection implements ResetInterface
         return $queryBuilder->select(str_replace(', ', ', '.$alias,
             $alias.'id AS "id", body AS "body", headers AS "headers", queue_name AS "queue_name", '.
             'created_at AS "created_at", available_at AS "available_at", '.
-            'delivered_at AS "delivered_at"'
+            'delivered_at AS "delivered_at"',
         ));
     }
 

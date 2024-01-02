@@ -85,7 +85,7 @@ class PhpFileLoaderTest extends TestCase
         $fileResource = reset($resources);
         $this->assertSame(
             realpath($locator->locate('with_define_path_variable.php')),
-            (string) $fileResource
+            (string) $fileResource,
         );
     }
 
@@ -201,23 +201,23 @@ class PhpFileLoaderTest extends TestCase
 
         $expectedCollection->add('foo', (new Route('/foo'))
             ->setOptions(['utf8' => true])
-            ->setCondition('abc')
+            ->setCondition('abc'),
         );
         $expectedCollection->add('buz', (new Route('/zub'))
-            ->setDefaults(['_controller' => 'foo:act', '_stateless' => true])
+            ->setDefaults(['_controller' => 'foo:act', '_stateless' => true]),
         );
         $expectedCollection->add('controller_class', (new Route('/controller'))
-            ->setDefaults(['_controller' => ['Acme\MyApp\MyController', 'myAction']])
+            ->setDefaults(['_controller' => ['Acme\MyApp\MyController', 'myAction']]),
         );
         $expectedCollection->add('c_root', (new Route('/sub/pub/'))
-            ->setRequirements(['id' => '\d+'])
+            ->setRequirements(['id' => '\d+']),
         );
         $expectedCollection->add('c_bar', (new Route('/sub/pub/bar'))
-            ->setRequirements(['id' => '\d+'])
+            ->setRequirements(['id' => '\d+']),
         );
         $expectedCollection->add('c_pub_buz', (new Route('/sub/pub/buz'))
             ->setHost('host')
-            ->setRequirements(['id' => '\d+'])
+            ->setRequirements(['id' => '\d+']),
         );
         $expectedCollection->add('z_c_root', new Route('/zub/pub/'));
         $expectedCollection->add('z_c_bar', new Route('/zub/pub/bar'));
@@ -227,7 +227,7 @@ class PhpFileLoaderTest extends TestCase
         $expectedCollection->add('ouf', (new Route('/ouf'))
             ->setSchemes(['https'])
             ->setMethods(['GET'])
-            ->setDefaults(['id' => 0])
+            ->setDefaults(['id' => 0]),
         );
 
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub.php')));

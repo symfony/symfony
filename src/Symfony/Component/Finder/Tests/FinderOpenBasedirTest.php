@@ -32,7 +32,7 @@ class FinderOpenBasedirTest extends Iterator\RealIteratorTestCase
             $finder
                 ->ignoreVCS(true)
                 ->ignoreDotFiles(true)
-                ->ignoreVCSIgnored(true)
+                ->ignoreVCSIgnored(true),
         );
 
         $this->iniSet('open_basedir', \dirname(__DIR__, 5).\PATH_SEPARATOR.self::toAbsolute('gitignore/search_root'));

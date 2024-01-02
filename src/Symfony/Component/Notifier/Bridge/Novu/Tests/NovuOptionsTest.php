@@ -50,7 +50,7 @@ class NovuOptionsTest extends TestCase
                     ],
                 ],
             ],
-            $options->toArray()
+            $options->toArray(),
         );
     }
 }

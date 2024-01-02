@@ -38,7 +38,7 @@ final class EventAliasTest extends AbstractWebTestCase
                 'onInteractiveLogin' => 1,
                 'onSwitchUser' => 1,
             ],
-            $container->get('test_subscriber')->calledMethods
+            $container->get('test_subscriber')->calledMethods,
         );
     }
 }

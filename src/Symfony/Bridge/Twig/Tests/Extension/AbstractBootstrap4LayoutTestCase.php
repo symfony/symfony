@@ -51,7 +51,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
         ]
         /following-sibling::input[@id="name"]
     ]
-'
+',
         );
     }
 
@@ -66,7 +66,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             '/legend
     [@class="col-form-label required"]
     [.="[trans]Name[/trans]"]
-'
+',
         );
     }
 
@@ -83,7 +83,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             '/label
     [@for="name"]
     [@class="required"]
-'
+',
         );
     }
 
@@ -100,7 +100,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             '/label
     [@for="name"]
     [@class="my&class required"]
-'
+',
         );
     }
 
@@ -118,7 +118,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@for="name"]
     [@class="my&class required"]
     [.="[trans]Custom label[/trans]"]
-'
+',
         );
     }
 
@@ -138,7 +138,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@for="name"]
     [@class="my&class required"]
     [.="[trans]Custom label[/trans]"]
-'
+',
         );
     }
 
@@ -190,7 +190,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             '/legend
     [@class="col-form-label required"]
     [.="[trans]Custom label[/trans]"]
-'
+',
         );
     }
 
@@ -207,7 +207,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@id="name_help"]
     [@class="form-text text-muted"]
     [.="[trans]Help text test![/trans]"]
-'
+',
         );
     }
 
@@ -227,7 +227,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@id="name_help"]
     [@class="class-test form-text text-muted"]
     [.="[trans]Help text test![/trans]"]
-'
+',
         );
     }
 
@@ -245,7 +245,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@id="name_help"]
     [@class="form-text text-muted"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-'
+',
         );
 
         $this->assertMatchesXpath($html,
@@ -254,7 +254,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@class="form-text text-muted"]
     /b
     [.="text"]
-', 0
+', 0,
         );
     }
 
@@ -273,7 +273,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@id="name_help"]
     [@class="form-text text-muted"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-'
+',
         );
 
         $this->assertMatchesXpath($html,
@@ -282,7 +282,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@class="form-text text-muted"]
     /b
     [.="text"]
-', 0
+', 0,
         );
     }
 
@@ -301,7 +301,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@id="name_help"]
     [@class="form-text text-muted"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-', 0
+', 0,
         );
 
         $this->assertMatchesXpath($html,
@@ -310,7 +310,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@class="form-text text-muted"]
     /b
     [.="text"]
-'
+',
         );
     }
 
@@ -335,7 +335,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             [./span[.="[trans]Error 2[/trans]"]]
     ]
     [count(./span)=2]
-'
+',
         );
     }
 
@@ -362,7 +362,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             [.="[trans]Name[/trans]"]
             [@class="form-check-label required"]
     ]
-'
+',
         );
     }
 
@@ -385,7 +385,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-'
+',
         );
     }
 
@@ -418,7 +418,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -434,7 +434,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
         /following-sibling::label
             [.="[trans]Name[/trans]"]
     ]
-'
+',
         );
     }
 
@@ -452,7 +452,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
         /following-sibling::label
             [.="[trans]Name[/trans]"]
     ]
-'
+',
         );
     }
 
@@ -467,7 +467,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [
         ./small[text() = "[trans]really helpful text[/trans]"]
     ]
-'
+',
         );
     }
 
@@ -498,7 +498,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -528,7 +528,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -572,7 +572,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -602,7 +602,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -634,7 +634,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -666,7 +666,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -706,7 +706,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -747,7 +747,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -778,7 +778,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -817,7 +817,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -847,7 +847,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -891,7 +891,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -921,7 +921,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -961,7 +961,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -1001,7 +1001,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-'
+',
         );
     }
 
@@ -1023,7 +1023,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
         /following-sibling::label
             [@class="form-check-label required"]
     ]
-'
+',
         );
     }
 
@@ -1044,7 +1044,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
         /following-sibling::label
             [@class="form-check-label required"]
     ]
-'
+',
         );
     }
 
@@ -1068,7 +1068,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             [@class="form-check-label required"]
             [@for="my&id"]
     ]
-'
+',
         );
     }
 
@@ -1083,7 +1083,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [
         ./small[text() = "[trans]really helpful text[/trans]"]
     ]
-'
+',
         );
     }
 
@@ -1113,7 +1113,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
         /following-sibling::label
             [@for="name"]
     ]
-'
+',
         );
     }
 
@@ -1131,7 +1131,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
         /following-sibling::label
             [@for="name"][not(@id)]
     ]
-'
+',
         );
     }
 
@@ -1149,7 +1149,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
         /following-sibling::label
             [@for="name" and text() = "[trans]Custom Placeholder[/trans]"]
     ]
-'
+',
         );
     }
 
@@ -1177,7 +1177,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             [@class="my&class form-control"]
             [@value="1234.56"]
     ]
-'
+',
         );
     }
 
@@ -1203,7 +1203,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
                     [contains(.., "%")]
                 ]
     ]
-'
+',
         );
     }
 
@@ -1217,7 +1217,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@name="name"]
     [@class="my&class form-control"]
     [@value="10"]
-'
+',
         );
     }
 
@@ -1242,7 +1242,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
                     [contains(.., "‱")]
                 ]
     ]
-'
+',
         );
     }
 
@@ -1259,7 +1259,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@value="42"]
     [@min="5"]
     [@class="my&class form-control-range"]
-'
+',
         );
     }
 
@@ -1277,7 +1277,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@min="5"]
     [@max="57"]
     [@class="my&class form-control-range"]
-'
+',
         );
     }
 }

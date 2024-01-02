@@ -39,7 +39,7 @@ class OutputFormatterTest extends TestCase
 
         $this->assertEquals(
             "\033[33mSymfony\\Component\\Console does work very well!\033[39m",
-            $formatter->format('<comment>Symfony\Component\Console does work very well!</comment>')
+            $formatter->format('<comment>Symfony\Component\Console does work very well!</comment>'),
         );
     }
 
@@ -54,19 +54,19 @@ class OutputFormatterTest extends TestCase
 
         $this->assertEquals(
             "\033[37;41msome error\033[39;49m",
-            $formatter->format('<error>some error</error>')
+            $formatter->format('<error>some error</error>'),
         );
         $this->assertEquals(
             "\033[32msome info\033[39m",
-            $formatter->format('<info>some info</info>')
+            $formatter->format('<info>some info</info>'),
         );
         $this->assertEquals(
             "\033[33msome comment\033[39m",
-            $formatter->format('<comment>some comment</comment>')
+            $formatter->format('<comment>some comment</comment>'),
         );
         $this->assertEquals(
             "\033[30;46msome question\033[39;49m",
-            $formatter->format('<question>some question</question>')
+            $formatter->format('<question>some question</question>'),
         );
     }
 
@@ -76,7 +76,7 @@ class OutputFormatterTest extends TestCase
 
         $this->assertEquals(
             "\033[37;41msome \033[39;49m\033[32msome info\033[39m\033[37;41m error\033[39;49m",
-            $formatter->format('<error>some <info>some info</info> error</error>')
+            $formatter->format('<error>some <info>some info</info> error</error>'),
         );
     }
 
@@ -86,7 +86,7 @@ class OutputFormatterTest extends TestCase
 
         $this->assertEquals(
             "\033[37;41msome error\033[39;49m\033[32msome info\033[39m",
-            $formatter->format('<error>some error</error><info>some info</info>')
+            $formatter->format('<error>some error</error><info>some info</info>'),
         );
     }
 
@@ -96,7 +96,7 @@ class OutputFormatterTest extends TestCase
 
         $this->assertEquals(
             "(\033[32m>=2.0,<2.3\033[39m)",
-            $formatter->format('(<info>>=2.0,<2.3</info>)')
+            $formatter->format('(<info>>=2.0,<2.3</info>)'),
         );
     }
 
@@ -106,12 +106,12 @@ class OutputFormatterTest extends TestCase
 
         $this->assertEquals(
             "(\033[32mz>=2.0,<<<a2.3\\\033[39m)",
-            $formatter->format('(<info>'.$formatter->escape('z>=2.0,<\\<<a2.3\\').'</info>)')
+            $formatter->format('(<info>'.$formatter->escape('z>=2.0,<\\<<a2.3\\').'</info>)'),
         );
 
         $this->assertEquals(
             "\033[32m<error>some error</error>\033[39m",
-            $formatter->format('<info>'.$formatter->escape('<error>some error</error>').'</info>')
+            $formatter->format('<info>'.$formatter->escape('<error>some error</error>').'</info>'),
         );
     }
 
@@ -121,7 +121,7 @@ class OutputFormatterTest extends TestCase
 
         $this->assertEquals(
             "\033[37;41merror\033[39;49m\033[32minfo\033[39m\033[33mcomment\033[39m\033[37;41merror\033[39;49m",
-            $formatter->format('<error>error<info>info<comment>comment</info>error</error>')
+            $formatter->format('<error>error<info>info<comment>comment</info>error</error>'),
         );
     }
 
@@ -227,7 +227,7 @@ class OutputFormatterTest extends TestCase
     {
         $formatter = new OutputFormatter(false);
         $this->assertEquals(
-            'some info', $formatter->format(new TableCell())
+            'some info', $formatter->format(new TableCell()),
         );
     }
 

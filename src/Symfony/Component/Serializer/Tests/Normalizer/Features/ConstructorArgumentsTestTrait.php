@@ -50,8 +50,8 @@ trait ConstructorArgumentsTestTrait
                 null,
                 ['default_constructor_arguments' => [
                     NotSerializedConstructorArgumentDummy::class => ['foo' => 'buz'],
-                ]]
-            )
+                ]],
+            ),
         );
     }
 

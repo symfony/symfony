@@ -57,7 +57,7 @@ trait ContextMappingTestTrait
         ], $attributes['foo']->getNormalizationContexts());
         Assert::assertSame(
             $attributes['foo']->getNormalizationContexts(),
-            $attributes['foo']->getDenormalizationContexts()
+            $attributes['foo']->getDenormalizationContexts(),
         );
 
         Assert::assertEquals([
@@ -72,7 +72,7 @@ trait ContextMappingTestTrait
         Assert::assertEquals(['*' => ['method' => 'method_with_context']], $attributes['methodWithContext']->getNormalizationContexts());
         Assert::assertEquals(
             $attributes['methodWithContext']->getNormalizationContexts(),
-            $attributes['methodWithContext']->getDenormalizationContexts()
+            $attributes['methodWithContext']->getDenormalizationContexts(),
         );
     }
 }

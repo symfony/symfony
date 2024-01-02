@@ -47,7 +47,7 @@ class MemcachedSessionHandlerTest extends TestCase
 
         $this->storage = new MemcachedSessionHandler(
             $this->memcached,
-            ['prefix' => self::PREFIX, 'expiretime' => self::TTL]
+            ['prefix' => self::PREFIX, 'expiretime' => self::TTL],
         );
     }
 
@@ -101,7 +101,7 @@ class MemcachedSessionHandlerTest extends TestCase
 
         $storage = new MemcachedSessionHandler(
             $this->memcached,
-            ['prefix' => self::PREFIX, 'expiretime' => self::TTL + 60 * 60 * 24 * 30]
+            ['prefix' => self::PREFIX, 'expiretime' => self::TTL + 60 * 60 * 24 * 30],
         );
 
         $this->assertTrue($storage->write('id', 'data'));

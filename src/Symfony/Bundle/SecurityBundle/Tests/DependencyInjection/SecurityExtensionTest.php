@@ -238,7 +238,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.cache_warmer.expression'));
         $this->assertEquals(
             new IteratorArgument([new Reference($expressionId)]),
-            $container->getDefinition('security.cache_warmer.expression')->getArgument(0)
+            $container->getDefinition('security.cache_warmer.expression')->getArgument(0),
         );
     }
 

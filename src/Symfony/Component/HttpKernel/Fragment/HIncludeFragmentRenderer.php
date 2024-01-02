@@ -82,7 +82,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
                 $renderedAttributes .= sprintf(
                     ' %s="%s"',
                     htmlspecialchars($attribute, $flags, $this->charset, false),
-                    htmlspecialchars($value, $flags, $this->charset, false)
+                    htmlspecialchars($value, $flags, $this->charset, false),
                 );
             }
         }

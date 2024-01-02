@@ -41,7 +41,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
         ]
         /following-sibling::div[./input[@id="name"]]
     ]
-'
+',
         );
     }
 
@@ -56,7 +56,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
             '/legend
     [@class="col-form-label col-sm-2 col-form-label required"]
     [.="[trans]Name[/trans]"]
-'
+',
         );
     }
 
@@ -73,7 +73,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
             '/label
     [@for="name"]
     [@class="col-form-label col-sm-2 required"]
-'
+',
         );
     }
 
@@ -90,7 +90,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
             '/label
     [@for="name"]
     [@class="my&class col-form-label col-sm-2 required"]
-'
+',
         );
     }
 
@@ -108,7 +108,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
     [@for="name"]
     [@class="my&class col-form-label col-sm-2 required"]
     [.="[trans]Custom label[/trans]"]
-'
+',
         );
     }
 
@@ -128,7 +128,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
     [@for="name"]
     [@class="my&class col-form-label col-sm-2 required"]
     [.="[trans]Custom label[/trans]"]
-'
+',
         );
     }
 
@@ -180,7 +180,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
             '/legend
     [@class="col-sm-2 col-form-label required"]
     [.="[trans]Custom label[/trans]"]
-'
+',
         );
     }
 
@@ -264,7 +264,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
             ./small[text() = "[trans]really helpful text[/trans]"]
         ]
     ]
-'
+',
         );
     }
 
@@ -283,7 +283,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
             ./small[text() = "[trans]really helpful text[/trans]"]
         ]
     ]
-'
+',
         );
     }
 }

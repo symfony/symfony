@@ -73,7 +73,7 @@ class ManagerRegistryTest extends TestCase
             ['defaultManager' => 'foo'],
             'irrelevant',
             'defaultManager',
-            'irrelevant'
+            'irrelevant',
         );
         $registry->setTestContainer($container);
 
@@ -127,7 +127,7 @@ class ManagerRegistryTest extends TestCase
             $containerFiles,
             static function (string $containerSources, string $fileName) use ($temporaryPath): void {
                 (new Filesystem())->dumpFile($temporaryPath.'/'.$fileName, $containerSources);
-            }
+            },
         );
 
         require $temporaryPath.'/LazyServiceDoctrineBridgeContainerAsFiles.php';

@@ -45,8 +45,8 @@ class FirePHPHandlerTest extends TestCase
             array_filter(
                 $response->headers->all(),
                 static fn (string $key): bool => str_starts_with($key, 'x-wf-1-1-1'),
-                \ARRAY_FILTER_USE_KEY
-            )
+                \ARRAY_FILTER_USE_KEY,
+            ),
         );
     }
 
@@ -67,8 +67,8 @@ class FirePHPHandlerTest extends TestCase
             array_filter(
                 $response->headers->all(),
                 static fn (string $key): bool => str_starts_with($key, 'x-wf-1-1-1'),
-                \ARRAY_FILTER_USE_KEY
-            )
+                \ARRAY_FILTER_USE_KEY,
+            ),
         );
     }
 
@@ -91,8 +91,8 @@ class FirePHPHandlerTest extends TestCase
             array_filter(
                 $response->headers->all(),
                 static fn (string $key): bool => str_starts_with($key, 'x-wf-1-1-1'),
-                \ARRAY_FILTER_USE_KEY
-            )
+                \ARRAY_FILTER_USE_KEY,
+            ),
         );
     }
 
@@ -134,9 +134,9 @@ class FirePHPHandlerTest extends TestCase
                     $this->createStub(HttpKernelInterface::class),
                     $request,
                     HttpKernelInterface::MAIN_REQUEST,
-                    new Response()
+                    new Response(),
                 ),
-                KernelEvents::RESPONSE
+                KernelEvents::RESPONSE,
             )
             ->getResponse();
     }

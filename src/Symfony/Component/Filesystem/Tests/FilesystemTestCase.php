@@ -86,7 +86,7 @@ class FilesystemTestCase extends TestCase
         $this->assertEquals(
             $expectedFilePerms,
             $actualFilePerms,
-            sprintf('File permissions for %s must be %s. Actual %s', $filePath, $expectedFilePerms, $actualFilePerms)
+            sprintf('File permissions for %s must be %s. Actual %s', $filePath, $expectedFilePerms, $actualFilePerms),
         );
     }
 

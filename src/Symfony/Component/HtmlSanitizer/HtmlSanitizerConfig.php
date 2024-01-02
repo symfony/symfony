@@ -109,7 +109,7 @@ class HtmlSanitizerConfig
     {
         $elements = array_merge(
             array_keys(W3CReference::HEAD_ELEMENTS),
-            array_keys(W3CReference::BODY_ELEMENTS)
+            array_keys(W3CReference::BODY_ELEMENTS),
         );
 
         $clone = clone $this;
@@ -399,7 +399,7 @@ class HtmlSanitizerConfig
         $clone = clone $this;
         $clone->attributeSanitizers = array_values(array_filter(
             $this->attributeSanitizers,
-            static fn ($current) => $current !== $sanitizer
+            static fn ($current) => $current !== $sanitizer,
         ));
 
         return $clone;

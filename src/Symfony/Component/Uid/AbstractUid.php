@@ -113,7 +113,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
             base_convert(substr($uid, 12, 5), 16, 32),
             base_convert(substr($uid, 17, 5), 16, 32),
             base_convert(substr($uid, 22, 5), 16, 32),
-            base_convert(substr($uid, 27, 5), 16, 32)
+            base_convert(substr($uid, 27, 5), 16, 32),
         );
 
         return strtr($uid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');

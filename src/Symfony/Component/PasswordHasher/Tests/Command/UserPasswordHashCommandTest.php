@@ -162,7 +162,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->passwordHasherCommandTester->execute(
             [
                 'password' => 'p@ssw0rd',
-            ], ['interactive' => false]
+            ], ['interactive' => false],
         );
 
         $this->assertStringContainsString('Password hashing succeeded', $this->passwordHasherCommandTester->getDisplay());
@@ -325,7 +325,7 @@ EOTXT
 
         $this->passwordHasherCommandTester = new CommandTester(new UserPasswordHashCommand(
             $hasherFactory,
-            [InMemoryUser::class, 'Custom\Class\Native\User', 'Custom\Class\Pbkdf2\User', 'Custom\Class\Test\User']
+            [InMemoryUser::class, 'Custom\Class\Native\User', 'Custom\Class\Pbkdf2\User', 'Custom\Class\Test\User'],
         ));
     }
 
@@ -342,7 +342,7 @@ EOTXT
         ]);
 
         $this->passwordHasherCommandTester = new CommandTester(
-            new UserPasswordHashCommand($hasherFactory, ['Custom\Class\Argon2i\User'])
+            new UserPasswordHashCommand($hasherFactory, ['Custom\Class\Argon2i\User']),
         );
     }
 
@@ -353,7 +353,7 @@ EOTXT
         ]);
 
         $this->passwordHasherCommandTester = new CommandTester(
-            new UserPasswordHashCommand($hasherFactory, ['Custom\Class\Argon2id\User'])
+            new UserPasswordHashCommand($hasherFactory, ['Custom\Class\Argon2id\User']),
         );
     }
 
@@ -365,7 +365,7 @@ EOTXT
 
         $this->passwordHasherCommandTester = new CommandTester(new UserPasswordHashCommand(
             $hasherFactory,
-            [InMemoryUser::class, 'Custom\Class\Pbkdf2\User', 'Custom\Class\Test\User']
+            [InMemoryUser::class, 'Custom\Class\Pbkdf2\User', 'Custom\Class\Test\User'],
         ));
     }
 
@@ -376,7 +376,7 @@ EOTXT
         ]);
 
         $this->passwordHasherCommandTester = new CommandTester(
-            new UserPasswordHashCommand($hasherFactory, ['Custom\Class\Sodium\User'])
+            new UserPasswordHashCommand($hasherFactory, ['Custom\Class\Sodium\User']),
         );
     }
 }

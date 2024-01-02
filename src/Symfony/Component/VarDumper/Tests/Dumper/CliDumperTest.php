@@ -111,7 +111,7 @@ array:25 [
 
 EOTXT
             ,
-            $out
+            $out,
         );
     }
 
@@ -225,7 +225,7 @@ array:4 [
 ]
 EOTXT
             ,
-            $var
+            $var,
         );
     }
 
@@ -241,7 +241,7 @@ EOTXT
 }
 EOTXT
             ,
-            $var
+            $var,
         );
     }
 
@@ -266,7 +266,7 @@ Closed resource @{$res}
 
 EOTXT
             ,
-            $out
+            $out,
         );
     }
 
@@ -295,7 +295,7 @@ EOTXT
 ]
 EOTXT
             ,
-            $var
+            $var,
         );
 
         putenv('DUMP_LIGHT_ARRAY=');
@@ -363,7 +363,7 @@ stream resource {@{$ref}
 
 EOTXT
             ,
-            $out
+            $out,
         );
     }
 
@@ -388,7 +388,7 @@ EOTXT
 
 EOTXT
             ,
-            $out
+            $out,
         );
     }
 
@@ -403,7 +403,7 @@ EOTXT
 __PHP_Incomplete_Class(Foo\Buzz) {}
 EOTXT
             ,
-            $var
+            $var,
         );
     }
 
@@ -496,7 +496,7 @@ EOTXT
 
 EOTXT
             ,
-            $dump
+            $dump,
         );
     }
 }

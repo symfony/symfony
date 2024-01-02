@@ -213,7 +213,7 @@ class UrlGeneratorTest extends TestCase
 
         $this->assertSame(
             'http://localhost/app.php/foo',
-            $generator->generate($name, [], UrlGeneratorInterface::ABSOLUTE_URL)
+            $generator->generate($name, [], UrlGeneratorInterface::ABSOLUTE_URL),
         );
     }
 
@@ -238,7 +238,7 @@ class UrlGeneratorTest extends TestCase
 
         $this->assertSame(
             'http://localhost/app.php/bar',
-            $generator->generate($name, ['_locale' => 'en'], UrlGeneratorInterface::ABSOLUTE_URL)
+            $generator->generate($name, ['_locale' => 'en'], UrlGeneratorInterface::ABSOLUTE_URL),
         );
     }
 
@@ -267,7 +267,7 @@ class UrlGeneratorTest extends TestCase
 
         $this->assertSame(
             'http://localhost/app.php/bar',
-            $generator->generate($name, [], UrlGeneratorInterface::ABSOLUTE_URL)
+            $generator->generate($name, [], UrlGeneratorInterface::ABSOLUTE_URL),
         );
     }
 
@@ -736,16 +736,16 @@ class UrlGeneratorTest extends TestCase
         $routes = $this->getRoutes('test', new Route('/{name}', [], [], [], '{locale}.example.com', ['http']));
 
         $this->assertSame('//fr.example.com/app.php/Fabien', $this->getGenerator($routes)->generate('test',
-            ['name' => 'Fabien', 'locale' => 'fr'], UrlGeneratorInterface::NETWORK_PATH), 'network path with different host'
+            ['name' => 'Fabien', 'locale' => 'fr'], UrlGeneratorInterface::NETWORK_PATH), 'network path with different host',
         );
         $this->assertSame('//fr.example.com/app.php/Fabien?query=string', $this->getGenerator($routes, ['host' => 'fr.example.com'])->generate('test',
-            ['name' => 'Fabien', 'locale' => 'fr', 'query' => 'string'], UrlGeneratorInterface::NETWORK_PATH), 'network path although host same as context'
+            ['name' => 'Fabien', 'locale' => 'fr', 'query' => 'string'], UrlGeneratorInterface::NETWORK_PATH), 'network path although host same as context',
         );
         $this->assertSame('http://fr.example.com/app.php/Fabien', $this->getGenerator($routes, ['scheme' => 'https'])->generate('test',
-            ['name' => 'Fabien', 'locale' => 'fr'], UrlGeneratorInterface::NETWORK_PATH), 'absolute URL because scheme requirement does not match context'
+            ['name' => 'Fabien', 'locale' => 'fr'], UrlGeneratorInterface::NETWORK_PATH), 'absolute URL because scheme requirement does not match context',
         );
         $this->assertSame('http://fr.example.com/app.php/Fabien', $this->getGenerator($routes)->generate('test',
-            ['name' => 'Fabien', 'locale' => 'fr'], UrlGeneratorInterface::ABSOLUTE_URL), 'absolute URL with same scheme because it is requested'
+            ['name' => 'Fabien', 'locale' => 'fr'], UrlGeneratorInterface::ABSOLUTE_URL), 'absolute URL with same scheme because it is requested',
         );
     }
 
@@ -761,25 +761,25 @@ class UrlGeneratorTest extends TestCase
         $generator = $this->getGenerator($routes, ['host' => 'example.com', 'pathInfo' => '/fabien/symfony-is-great/']);
 
         $this->assertSame('comments', $generator->generate('comments',
-            ['author' => 'fabien', 'article' => 'symfony-is-great'], UrlGeneratorInterface::RELATIVE_PATH)
+            ['author' => 'fabien', 'article' => 'symfony-is-great'], UrlGeneratorInterface::RELATIVE_PATH),
         );
         $this->assertSame('comments?page=2', $generator->generate('comments',
-            ['author' => 'fabien', 'article' => 'symfony-is-great', 'page' => 2], UrlGeneratorInterface::RELATIVE_PATH)
+            ['author' => 'fabien', 'article' => 'symfony-is-great', 'page' => 2], UrlGeneratorInterface::RELATIVE_PATH),
         );
         $this->assertSame('../twig-is-great/', $generator->generate('article',
-            ['author' => 'fabien', 'article' => 'twig-is-great'], UrlGeneratorInterface::RELATIVE_PATH)
+            ['author' => 'fabien', 'article' => 'twig-is-great'], UrlGeneratorInterface::RELATIVE_PATH),
         );
         $this->assertSame('../../bernhard/forms-are-great/', $generator->generate('article',
-            ['author' => 'bernhard', 'article' => 'forms-are-great'], UrlGeneratorInterface::RELATIVE_PATH)
+            ['author' => 'bernhard', 'article' => 'forms-are-great'], UrlGeneratorInterface::RELATIVE_PATH),
         );
         $this->assertSame('//bernhard.example.com/app.php/forms-are-great', $generator->generate('host',
-            ['author' => 'bernhard', 'article' => 'forms-are-great'], UrlGeneratorInterface::RELATIVE_PATH)
+            ['author' => 'bernhard', 'article' => 'forms-are-great'], UrlGeneratorInterface::RELATIVE_PATH),
         );
         $this->assertSame('https://example.com/app.php/bernhard/blog', $generator->generate('scheme',
-            ['author' => 'bernhard'], UrlGeneratorInterface::RELATIVE_PATH)
+            ['author' => 'bernhard'], UrlGeneratorInterface::RELATIVE_PATH),
         );
         $this->assertSame('../../about', $generator->generate('unrelated',
-            [], UrlGeneratorInterface::RELATIVE_PATH)
+            [], UrlGeneratorInterface::RELATIVE_PATH),
         );
     }
 

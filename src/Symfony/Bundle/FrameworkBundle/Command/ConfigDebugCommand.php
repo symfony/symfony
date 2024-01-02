@@ -106,7 +106,7 @@ EOF
         if (null === $path = $input->getArgument('path')) {
             if ('txt' === $input->getOption('format')) {
                 $io->title(
-                    sprintf('Current configuration for %s', $name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name))
+                    sprintf('Current configuration for %s', $name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name)),
                 );
             }
 
@@ -249,8 +249,8 @@ EOF
     {
         return $container->resolveEnvPlaceholders(
             $container->getParameterBag()->resolveValue(
-                $this->getConfigForExtension($extension, $container)
-            ), $resolveEnvs ?: null
+                $this->getConfigForExtension($extension, $container),
+            ), $resolveEnvs ?: null,
         );
     }
 

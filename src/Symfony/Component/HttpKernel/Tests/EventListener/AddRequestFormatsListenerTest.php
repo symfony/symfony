@@ -40,7 +40,7 @@ class AddRequestFormatsListenerTest extends TestCase
     {
         $this->assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest', 100]],
-            AddRequestFormatsListener::getSubscribedEvents()
+            AddRequestFormatsListener::getSubscribedEvents(),
         );
     }
 

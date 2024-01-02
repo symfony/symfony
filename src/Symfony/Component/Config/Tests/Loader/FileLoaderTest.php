@@ -30,7 +30,7 @@ class FileLoaderTest extends TestCase
             ['path/to/file1', 'path/to/file2'],   // First is imported
             ['path/to/file1', 'path/to/file2'],   // Second is imported
             ['path/to/file1'],                    // Exception
-            ['path/to/file1', 'path/to/file2']    // Exception
+            ['path/to/file1', 'path/to/file2'],    // Exception
         ));
 
         $fileLoader = new TestFileLoader($locatorMock);

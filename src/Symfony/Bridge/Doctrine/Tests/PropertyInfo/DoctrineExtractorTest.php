@@ -90,7 +90,7 @@ class DoctrineExtractorTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $this->createExtractor()->getProperties(DoctrineDummy::class)
+            $this->createExtractor()->getProperties(DoctrineDummy::class),
         );
     }
 
@@ -101,7 +101,7 @@ class DoctrineExtractorTest extends TestCase
                 'id',
                 'embedded',
             ],
-            $this->createExtractor()->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded')
+            $this->createExtractor()->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded'),
         );
     }
 
@@ -118,13 +118,13 @@ class DoctrineExtractorTest extends TestCase
         $expectedTypes = [new Type(
             Type::BUILTIN_TYPE_OBJECT,
             false,
-            DoctrineEmbeddable::class
+            DoctrineEmbeddable::class,
         )];
 
         $actualTypes = $this->createExtractor()->getTypes(
             DoctrineWithEmbedded::class,
             'embedded',
-            []
+            [],
         );
 
         $this->assertEquals($expectedTypes, $actualTypes);
@@ -160,7 +160,7 @@ class DoctrineExtractorTest extends TestCase
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type(Type::BUILTIN_TYPE_INT),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation'),
             )]],
             ['indexedRguid', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
@@ -168,7 +168,7 @@ class DoctrineExtractorTest extends TestCase
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type(Type::BUILTIN_TYPE_STRING),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation'),
             )]],
             ['indexedBar', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
@@ -176,7 +176,7 @@ class DoctrineExtractorTest extends TestCase
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type(Type::BUILTIN_TYPE_STRING),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation'),
             )]],
             ['indexedFoo', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
@@ -184,7 +184,7 @@ class DoctrineExtractorTest extends TestCase
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type(Type::BUILTIN_TYPE_STRING),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation'),
             )]],
             ['indexedBaz', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
@@ -192,7 +192,7 @@ class DoctrineExtractorTest extends TestCase
                 Collection::class,
                 true,
                 new Type(Type::BUILTIN_TYPE_INT),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class),
             )]],
             ['simpleArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))]],
             ['customFoo', null],
@@ -203,7 +203,7 @@ class DoctrineExtractorTest extends TestCase
                 Collection::class,
                 true,
                 new Type(Type::BUILTIN_TYPE_OBJECT),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class),
             )]],
             ['indexedByCustomType', null],
             ['indexedBuz', [new Type(
@@ -212,7 +212,7 @@ class DoctrineExtractorTest extends TestCase
                 Collection::class,
                 true,
                 new Type(Type::BUILTIN_TYPE_STRING),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class),
             )]],
             ['dummyGeneratedValueList', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
@@ -220,7 +220,7 @@ class DoctrineExtractorTest extends TestCase
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type(Type::BUILTIN_TYPE_INT),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class),
             )]],
             ['json', null],
         ];

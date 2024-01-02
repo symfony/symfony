@@ -246,7 +246,7 @@ EOF
                 '%s %-6s %s',
                 $lineNumber === $line ? '<error> >> </error>' : '    ',
                 $lineNumber,
-                $code
+                $code,
             ));
             if ($lineNumber === $line) {
                 $output->text(sprintf('<error> >> %s</error> ', $exception->getRawMessage()));

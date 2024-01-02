@@ -68,7 +68,7 @@ final class RingCentralTransportTest extends TransportTestCase
             self::assertSame('https://platform.ringcentral.com/restapi/v1.0/account/~/extension/~/sms', $url);
 
             return $response;
-        }
+        },
         );
         $transport = $this->createTransport($client, $from);
         $sentMessage = $transport->send($message);

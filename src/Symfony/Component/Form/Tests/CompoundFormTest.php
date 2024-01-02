@@ -813,7 +813,7 @@ class CompoundFormTest extends TestCase
         $this->assertSame(
             "ERROR: Error 1\n".
             "ERROR: Error 2\n",
-            (string) $errors
+            (string) $errors,
         );
 
         $this->assertSame([$error1, $error2], iterator_to_array($errors));
@@ -834,12 +834,12 @@ class CompoundFormTest extends TestCase
             "ERROR: Error 1\n".
             "ERROR: Error 2\n".
             "ERROR: Nested Error\n",
-            (string) $errors
+            (string) $errors,
         );
 
         $this->assertSame(
             [$error1, $error2, $nestedError],
-            iterator_to_array($errors)
+            iterator_to_array($errors),
         );
     }
 
@@ -859,7 +859,7 @@ class CompoundFormTest extends TestCase
             "ERROR: Error 2\n".
             "Child:\n".
             "    ERROR: Nested Error\n",
-            (string) $errors
+            (string) $errors,
         );
 
         $errorsAsArray = iterator_to_array($errors);

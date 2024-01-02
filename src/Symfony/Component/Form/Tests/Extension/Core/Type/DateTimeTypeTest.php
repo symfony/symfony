@@ -694,7 +694,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         // view transformer writes back empty strings in the view data
         $this->assertSame(
             ['date' => ['year' => '', 'month' => '', 'day' => ''], 'time' => ['hour' => '', 'minute' => '']],
-            $form->getViewData()
+            $form->getViewData(),
         );
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());

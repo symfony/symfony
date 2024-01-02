@@ -28,7 +28,7 @@ class AutoconfigureTag extends Autoconfigure
         parent::__construct(
             tags: [
                 [$name ?? 0 => $attributes],
-            ]
+            ],
         );
     }
 }

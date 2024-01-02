@@ -136,7 +136,7 @@ class FunctionExtension extends AbstractExtension
 
         return $xpath->addCondition(sprintf(
             'contains(string(.), %s)',
-            Translator::getXpathLiteral($arguments[0]->getValue())
+            Translator::getXpathLiteral($arguments[0]->getValue()),
         ));
     }
 
@@ -154,7 +154,7 @@ class FunctionExtension extends AbstractExtension
 
         return $xpath->addCondition(sprintf(
             'lang(%s)',
-            Translator::getXpathLiteral($arguments[0]->getValue())
+            Translator::getXpathLiteral($arguments[0]->getValue()),
         ));
     }
 

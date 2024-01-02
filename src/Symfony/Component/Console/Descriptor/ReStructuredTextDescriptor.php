@@ -62,7 +62,7 @@ class ReStructuredTextDescriptor extends Descriptor
                 .($argument->getDescription() ? preg_replace('/\s*[\r\n]\s*/', "\n", $argument->getDescription())."\n\n" : '')
                 .'- **Is required**: '.($argument->isRequired() ? 'yes' : 'no')."\n"
                 .'- **Is array**: '.($argument->isArray() ? 'yes' : 'no')."\n"
-                .'- **Default**: ``'.str_replace("\n", '', var_export($argument->getDefault(), true)).'``'
+                .'- **Default**: ``'.str_replace("\n", '', var_export($argument->getDefault(), true)).'``',
         );
     }
 
@@ -85,7 +85,7 @@ class ReStructuredTextDescriptor extends Descriptor
             .'- **Is value required**: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
             .'- **Is multiple**: '.($option->isArray() ? 'yes' : 'no')."\n"
             .'- **Is negatable**: '.($option->isNegatable() ? 'yes' : 'no')."\n"
-            .'- **Default**: ``'.str_replace("\n", '', var_export($option->getDefault(), true)).'``'."\n"
+            .'- **Default**: ``'.str_replace("\n", '', var_export($option->getDefault(), true)).'``'."\n",
         );
     }
 
@@ -120,7 +120,7 @@ class ReStructuredTextDescriptor extends Descriptor
                 .str_repeat($this->subsectionChar, Helper::width($command->getName()))."\n\n"
                 .($command->getDescription() ? $command->getDescription()."\n\n" : '')
                 ."Usage\n".str_repeat($this->paragraphsChar, 5)."\n\n"
-                .array_reduce($command->getAliases(), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n")
+                .array_reduce($command->getAliases(), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n"),
             );
 
             return;
@@ -136,7 +136,7 @@ class ReStructuredTextDescriptor extends Descriptor
             .str_repeat($this->subsectionChar, Helper::width($command->getName()))."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             ."Usage\n".str_repeat($this->subsubsectionChar, 5)."\n\n"
-            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n")
+            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n"),
         );
 
         if ($help = $command->getProcessedHelp()) {

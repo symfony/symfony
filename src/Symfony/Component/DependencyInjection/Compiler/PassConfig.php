@@ -114,7 +114,7 @@ class PassConfig
             $this->getOptimizationPasses(),
             $this->getBeforeRemovingPasses(),
             $this->getRemovingPasses(),
-            $this->getAfterRemovingPasses()
+            $this->getAfterRemovingPasses(),
         );
     }
 

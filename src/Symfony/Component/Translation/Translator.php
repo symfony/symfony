@@ -255,7 +255,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         $cache = $this->getConfigCacheFactory()->cache($this->getCatalogueCachePath($locale),
             function (ConfigCacheInterface $cache) use ($locale) {
                 $this->dumpCatalogue($locale, $cache);
-            }
+            },
         );
 
         if (isset($this->catalogues[$locale])) {
@@ -286,7 +286,7 @@ EOF
             ,
             $locale,
             var_export($this->getAllMessages($this->catalogues[$locale]), true),
-            $fallbackContent
+            $fallbackContent,
         );
 
         $cache->write($content, $this->catalogues[$locale]->getResources());
@@ -313,7 +313,7 @@ EOF
                 $fallback,
                 var_export($this->getAllMessages($fallbackCatalogue), true),
                 $currentSuffix,
-                $fallbackSuffix
+                $fallbackSuffix,
             );
             $current = $fallbackCatalogue->getLocale();
             $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();

@@ -23,7 +23,7 @@ class FormatterHelperTest extends TestCase
         $this->assertEquals(
             '<info>[cli]</info> Some text to display',
             $formatter->formatSection('cli', 'Some text to display'),
-            '::formatSection() formats a message in a section'
+            '::formatSection() formats a message in a section',
         );
     }
 
@@ -34,14 +34,14 @@ class FormatterHelperTest extends TestCase
         $this->assertEquals(
             '<error> Some text to display </error>',
             $formatter->formatBlock('Some text to display', 'error'),
-            '::formatBlock() formats a message in a block'
+            '::formatBlock() formats a message in a block',
         );
 
         $this->assertEquals(
             '<error> Some text to display </error>'."\n".
             '<error> foo bar              </error>',
             $formatter->formatBlock(['Some text to display', 'foo bar'], 'error'),
-            '::formatBlock() formats a message in a block'
+            '::formatBlock() formats a message in a block',
         );
 
         $this->assertEquals(
@@ -49,7 +49,7 @@ class FormatterHelperTest extends TestCase
             '<error>  Some text to display  </error>'."\n".
             '<error>                        </error>',
             $formatter->formatBlock('Some text to display', 'error', true),
-            '::formatBlock() formats a message in a block'
+            '::formatBlock() formats a message in a block',
         );
     }
 
@@ -62,7 +62,7 @@ class FormatterHelperTest extends TestCase
             '<error>  Du texte à afficher  </error>'."\n".
             '<error>                       </error>',
             $formatter->formatBlock('Du texte à afficher', 'error', true),
-            '::formatBlock() formats a message in a block'
+            '::formatBlock() formats a message in a block',
         );
     }
 
@@ -74,7 +74,7 @@ class FormatterHelperTest extends TestCase
             '<error>  表示するテキスト  </error>'."\n".
             '<error>                    </error>',
             $formatter->formatBlock('表示するテキスト', 'error', true),
-            '::formatBlock() formats a message in a block'
+            '::formatBlock() formats a message in a block',
         );
     }
 
@@ -87,7 +87,7 @@ class FormatterHelperTest extends TestCase
             '<error>  \<info\>some info\</info\>  </error>'."\n".
             '<error>                              </error>',
             $formatter->formatBlock('<info>some info</info>', 'error', true),
-            '::formatBlock() escapes \'<\' chars'
+            '::formatBlock() escapes \'<\' chars',
         );
     }
 

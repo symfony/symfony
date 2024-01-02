@@ -372,7 +372,7 @@ class AccessTokenTest extends AbstractWebTestCase
                 'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
                 'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
             ]), ['alg' => 'ES256'])
-            ->build()
+            ->build(),
         );
 
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc.yml']);

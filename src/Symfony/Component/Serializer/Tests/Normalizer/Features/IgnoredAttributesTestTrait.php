@@ -44,7 +44,7 @@ trait IgnoredAttributesTestTrait
                 'date' => null,
                 'inners' => null,
             ],
-            $normalizer->normalize($objectOuter, null, $context)
+            $normalizer->normalize($objectOuter, null, $context),
         );
 
         $context = ['ignored_attributes' => ['foo', 'inner']];
@@ -54,7 +54,7 @@ trait IgnoredAttributesTestTrait
                 'date' => null,
                 'inners' => null,
             ],
-            $normalizer->normalize($objectOuter, null, $context)
+            $normalizer->normalize($objectOuter, null, $context),
         );
     }
 

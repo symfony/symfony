@@ -53,7 +53,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                 return $item;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
         self::$mergeByLifetime ??= \Closure::bind(
             static function ($deferred, $namespace, &$expiredIds, $getId, $defaultLifetime) {
@@ -77,7 +77,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                 return $byLifetime;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
     }
 

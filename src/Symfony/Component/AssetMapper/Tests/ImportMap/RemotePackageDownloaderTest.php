@@ -60,7 +60,7 @@ class RemotePackageDownloaderTest extends TestCase
             ->method('downloadPackages')
             ->with(
                 ['foo' => $entry1, 'bar.js/file' => $entry2, 'baz' => $entry3, 'different_specifier' => $entry4],
-                $progressCallback
+                $progressCallback,
             )
             ->willReturn([
                 'foo' => ['content' => 'foo content', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff' => 'extra file contents']],
@@ -94,7 +94,7 @@ class RemotePackageDownloaderTest extends TestCase
                 'baz' => ['version' => '1.0.0', 'dependencies' => ['foo'], 'extraFiles' => []],
                 'different_specifier' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
             ],
-            $installed
+            $installed,
         );
     }
 
@@ -108,7 +108,7 @@ class RemotePackageDownloaderTest extends TestCase
         ];
         file_put_contents(
             self::$writableRoot.'/assets/vendor/installed.php',
-            '<?php return '.var_export($installed, true).';'
+            '<?php return '.var_export($installed, true).';',
         );
 
         $configReader = $this->createMock(ImportMapConfigReader::class);
@@ -163,7 +163,7 @@ class RemotePackageDownloaderTest extends TestCase
                 'baz' => ['version' => '1.1.0', 'dependencies' => [], 'extraFiles' => []],
                 'has-missing-extra' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff']],
             ],
-            $installed
+            $installed,
         );
     }
 

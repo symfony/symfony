@@ -88,7 +88,7 @@ class ErrorListenerTest extends TestCase
                 'console.error' => ['onConsoleError', -128],
                 'console.terminate' => ['onConsoleTerminate', -128],
             ],
-            ErrorListener::getSubscribedEvents()
+            ErrorListener::getSubscribedEvents(),
         );
     }
 

@@ -68,13 +68,13 @@ class GraphvizDumper extends Dumper
         foreach ($this->container->getDefinitions() as $id => $definition) {
             $this->edges[$id] = array_merge(
                 $this->findEdges($id, $definition->getArguments(), true, ''),
-                $this->findEdges($id, $definition->getProperties(), false, '')
+                $this->findEdges($id, $definition->getProperties(), false, ''),
             );
 
             foreach ($definition->getMethodCalls() as $call) {
                 $this->edges[$id] = array_merge(
                     $this->edges[$id],
-                    $this->findEdges($id, $call[1], false, $call[0].'()')
+                    $this->findEdges($id, $call[1], false, $call[0].'()'),
                 );
             }
         }
@@ -201,7 +201,7 @@ class GraphvizDumper extends Dumper
         return sprintf("digraph sc {\n  %s\n  node [%s];\n  edge [%s];\n\n",
             $this->addOptions($this->options['graph']),
             $this->addOptions($this->options['node']),
-            $this->addOptions($this->options['edge'])
+            $this->addOptions($this->options['edge']),
         );
     }
 

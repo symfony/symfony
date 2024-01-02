@@ -44,7 +44,7 @@ class UploadedFile extends BaseUploadedFile
             (string) $psrUploadedFile->getClientFilename(),
             $psrUploadedFile->getClientMediaType(),
             $psrUploadedFile->getError(),
-            $this->test
+            $this->test,
         );
     }
 

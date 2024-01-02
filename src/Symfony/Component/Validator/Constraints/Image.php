@@ -154,7 +154,7 @@ class Image extends File
             $uploadExtensionErrorMessage,
             $uploadErrorMessage,
             $groups,
-            $payload
+            $payload,
         );
 
         $this->minWidth = $minWidth ?? $this->minWidth;

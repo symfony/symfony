@@ -121,7 +121,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->authenticator = new AccessTokenAuthenticator(
             $this->accessTokenHandler,
             new FormEncodedBodyExtractor($parameter),
-            $this->userProvider
+            $this->userProvider,
         );
     }
 }

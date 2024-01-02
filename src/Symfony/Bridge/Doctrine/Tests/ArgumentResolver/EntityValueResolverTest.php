@@ -228,7 +228,7 @@ class EntityValueResolverTest extends TestCase
 
         $argument = $this->createArgument(
             'stdClass',
-            new MapEntity(mapping: ['foo' => 'Foo'], exclude: ['bar'])
+            new MapEntity(mapping: ['foo' => 'Foo'], exclude: ['bar']),
         );
 
         $metadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
@@ -266,7 +266,7 @@ class EntityValueResolverTest extends TestCase
         $argument = $this->createArgument(
             'stdClass',
             new MapEntity(expr: 'repository.find(id)'),
-            'arg1'
+            'arg1',
         );
 
         $this->expectException(\LogicException::class);
@@ -287,7 +287,7 @@ class EntityValueResolverTest extends TestCase
         $argument = $this->createArgument(
             'stdClass',
             new MapEntity(expr: 'repository.someMethod()'),
-            'arg1'
+            'arg1',
         );
 
         $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
@@ -318,7 +318,7 @@ class EntityValueResolverTest extends TestCase
         $argument = $this->createArgument(
             'stdClass',
             new MapEntity(expr: 'repository.findOneByCustomMethod(id)'),
-            'arg1'
+            'arg1',
         );
 
         $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
@@ -353,7 +353,7 @@ class EntityValueResolverTest extends TestCase
         $argument = $this->createArgument(
             'stdClass',
             new MapEntity(expr: 'repository.findOneByCustomMethod(id)'),
-            'arg1'
+            'arg1',
         );
 
         $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();

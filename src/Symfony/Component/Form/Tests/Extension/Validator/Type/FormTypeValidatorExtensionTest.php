@@ -42,7 +42,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
             null,
             [
                 'validation_groups' => 'group',
-            ]
+            ],
         );
         $builder->add('firstName', FormTypeTest::TESTED_TYPE);
         $form = $builder->getForm();

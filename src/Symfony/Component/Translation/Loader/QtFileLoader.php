@@ -61,7 +61,7 @@ class QtFileLoader implements LoaderInterface
                     $catalogue->set(
                         (string) $translation->getElementsByTagName('source')->item(0)->nodeValue,
                         $translationValue,
-                        $domain
+                        $domain,
                     );
                 }
             }

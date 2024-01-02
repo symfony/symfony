@@ -556,7 +556,7 @@ class FormDataCollectorTest extends TestCase
                 'forms_by_hash' => [],
                 'nb_errors' => 0,
             ],
-            $this->dataCollector->getData()
+            $this->dataCollector->getData(),
         );
     }
 

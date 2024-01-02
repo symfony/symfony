@@ -55,7 +55,7 @@ final class GoogleChatTransport extends AbstractTransport
         return sprintf('googlechat://%s/%s%s',
             $this->getEndpoint(),
             $this->space,
-            $this->threadKey ? '?thread_key='.urlencode($this->threadKey) : ''
+            $this->threadKey ? '?thread_key='.urlencode($this->threadKey) : '',
         );
     }
 
@@ -92,7 +92,7 @@ final class GoogleChatTransport extends AbstractTransport
             $this->space,
             urlencode($this->accessKey),
             urlencode($this->accessToken),
-            $threadKey ? '&threadKey='.urlencode($threadKey) : ''
+            $threadKey ? '&threadKey='.urlencode($threadKey) : '',
         );
         $response = $this->client->request('POST', $url, [
             'json' => array_filter($options->toArray()),

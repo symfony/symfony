@@ -29,7 +29,7 @@ class ProcessStartFailedException extends ProcessFailedException
         $error = sprintf('The command "%s" failed.'."\n\nWorking directory: %s\n\nError: %s",
             $process->getCommandLine(),
             $process->getWorkingDirectory(),
-            $message ?? 'unknown'
+            $message ?? 'unknown',
         );
 
         // Skip parent constructor

@@ -46,7 +46,7 @@ class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
                 return $item;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
 
         $cache = $this->createCachePool(1);

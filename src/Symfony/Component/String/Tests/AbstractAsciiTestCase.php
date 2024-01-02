@@ -573,7 +573,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     {
         $this->assertEquals(
             static::createFromString($expected),
-            static::createFromString($origin)->title($allWords)
+            static::createFromString($origin)->title($allWords),
         );
     }
 
@@ -599,7 +599,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     {
         $this->assertEquals(
             static::createFromString($expected),
-            static::createFromString($origin)->slice($start, $length)
+            static::createFromString($origin)->slice($start, $length),
         );
     }
 
@@ -627,7 +627,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     {
         $this->assertEquals(
             static::createFromString($expected),
-            static::createFromString('Symfony is awesome')->splice('X', $start, $length)
+            static::createFromString('Symfony is awesome')->splice('X', $start, $length),
         );
     }
 
@@ -941,7 +941,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     {
         $this->assertEquals(
             static::createFromString($expected),
-            static::createFromString($origin)->folded()
+            static::createFromString($origin)->folded(),
         );
     }
 

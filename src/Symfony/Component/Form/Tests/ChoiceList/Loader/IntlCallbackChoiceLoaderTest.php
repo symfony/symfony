@@ -64,7 +64,7 @@ class IntlCallbackChoiceLoaderTest extends TestCase
         $this->assertSame(
             self::$loader->loadChoicesForValues(self::$choiceValues, self::$value),
             self::$lazyChoiceList->getChoicesForValues(self::$choiceValues),
-            'Choice list should not be reloaded.'
+            'Choice list should not be reloaded.',
         );
     }
 
@@ -78,7 +78,7 @@ class IntlCallbackChoiceLoaderTest extends TestCase
         $this->assertSame(
             self::$loader->loadValuesForChoices(self::$choices, self::$value),
             self::$lazyChoiceList->getValuesForChoices(self::$choices),
-            'Choice list should not be reloaded.'
+            'Choice list should not be reloaded.',
         );
     }
 }

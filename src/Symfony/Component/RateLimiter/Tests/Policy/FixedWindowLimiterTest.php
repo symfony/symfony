@@ -125,7 +125,7 @@ class FixedWindowLimiterTest extends TestCase
             $this->assertTrue($rateLimit->isAccepted());
             $this->assertEquals(
                 \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true))),
-                $rateLimit->getRetryAfter()
+                $rateLimit->getRetryAfter(),
             );
         }
 
@@ -136,7 +136,7 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertEquals(
             \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 60)),
-            $rateLimit->getRetryAfter()
+            $rateLimit->getRetryAfter(),
         );
     }
 

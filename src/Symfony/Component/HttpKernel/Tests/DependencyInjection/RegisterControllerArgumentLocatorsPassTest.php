@@ -363,7 +363,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $container->setDefinition('child', (new ChildDefinition('parent'))
             ->setBindings(['$someArg' => new Reference('parent')])
-            ->addTag('controller.service_arguments')
+            ->addTag('controller.service_arguments'),
         );
 
         $pass = new RegisterControllerArgumentLocatorsPass();

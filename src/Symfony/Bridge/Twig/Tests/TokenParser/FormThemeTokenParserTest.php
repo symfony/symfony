@@ -52,7 +52,7 @@ class FormThemeTokenParserTest extends TestCase
                         new ConstantExpression('tpl1', 1),
                     ], 1),
                     1,
-                    'form_theme'
+                    'form_theme',
                 ),
             ],
             [
@@ -66,7 +66,7 @@ class FormThemeTokenParserTest extends TestCase
                         new ConstantExpression('tpl2', 1),
                     ], 1),
                     1,
-                    'form_theme'
+                    'form_theme',
                 ),
             ],
             [
@@ -75,7 +75,7 @@ class FormThemeTokenParserTest extends TestCase
                     new NameExpression('form', 1),
                     new ConstantExpression('tpl1', 1),
                     1,
-                    'form_theme'
+                    'form_theme',
                 ),
             ],
             [
@@ -87,7 +87,7 @@ class FormThemeTokenParserTest extends TestCase
                         new ConstantExpression('tpl1', 1),
                     ], 1),
                     1,
-                    'form_theme'
+                    'form_theme',
                 ),
             ],
             [
@@ -101,7 +101,7 @@ class FormThemeTokenParserTest extends TestCase
                         new ConstantExpression('tpl2', 1),
                     ], 1),
                     1,
-                    'form_theme'
+                    'form_theme',
                 ),
             ],
             [
@@ -116,7 +116,7 @@ class FormThemeTokenParserTest extends TestCase
                     ], 1),
                     1,
                     'form_theme',
-                    true
+                    true,
                 ),
             ],
         ];

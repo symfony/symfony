@@ -58,7 +58,7 @@ final class SmsSluzbaTransport extends AbstractTransport
             'https://%s/apixml30/receiver?login=%s&password=%s',
             $this->getEndpoint(),
             $this->username,
-            $this->password
+            $this->password,
         );
 
         $options = $message->getOptions()?->toArray() ?? [];

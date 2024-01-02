@@ -167,7 +167,7 @@ class PeriodicalTriggerTest extends TestCase
         $trigger = new PeriodicalTrigger(
             600,
             new \DateTimeImmutable('2020-02-20T02:00:00+02:00'),
-            new \DateTimeImmutable('2020-02-20T03:00:00+02:00')
+            new \DateTimeImmutable('2020-02-20T03:00:00+02:00'),
         );
 
         yield [
@@ -214,7 +214,7 @@ class PeriodicalTriggerTest extends TestCase
         $trigger = new PeriodicalTrigger(
             600,
             new \DateTimeImmutable('2020-02-20T02:00:00Z'),
-            new \DateTimeImmutable('2020-02-20T03:01:00Z')
+            new \DateTimeImmutable('2020-02-20T03:01:00Z'),
         );
 
         yield [

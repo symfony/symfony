@@ -149,7 +149,7 @@ class YamlFileLoader extends FileLoader
                 $metadata->setGroupProvider($classDescription['group_sequence_provider']);
             }
             $metadata->setGroupSequenceProvider(
-                (bool) $classDescription['group_sequence_provider']
+                (bool) $classDescription['group_sequence_provider'],
             );
         }
 

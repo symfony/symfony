@@ -35,7 +35,7 @@ class ConsoleCommandProcessorTest extends TestCase
         $this->assertArrayHasKey('command', $record['extra']);
         $this->assertEquals(
             ['name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS],
-            $record['extra']['command']
+            $record['extra']['command'],
         );
     }
 
@@ -49,7 +49,7 @@ class ConsoleCommandProcessorTest extends TestCase
         $this->assertArrayHasKey('command', $record['extra']);
         $this->assertEquals(
             ['name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS, 'options' => self::TEST_OPTIONS],
-            $record['extra']['command']
+            $record['extra']['command'],
         );
     }
 

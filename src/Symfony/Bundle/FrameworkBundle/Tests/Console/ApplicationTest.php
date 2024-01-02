@@ -135,7 +135,7 @@ class ApplicationTest extends TestCase
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
-                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })]
+                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })],
             )]);
         $kernel
             ->method('getContainer')
@@ -163,7 +163,7 @@ class ApplicationTest extends TestCase
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
-                [(new Command(null))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })]
+                [(new Command(null))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })],
             )]);
         $kernel
             ->method('getContainer')
@@ -193,7 +193,7 @@ class ApplicationTest extends TestCase
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
-                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })]
+                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })],
             )]);
         $kernel
             ->method('getContainer')

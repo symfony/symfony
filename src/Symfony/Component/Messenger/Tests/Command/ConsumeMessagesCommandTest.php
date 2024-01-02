@@ -243,7 +243,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand(
             new RoutableMessageBus($busLocator),
             $receiverLocator, new EventDispatcher(),
-            receiverNames: ['dummy-receiver1', 'dummy-receiver2']
+            receiverNames: ['dummy-receiver1', 'dummy-receiver2'],
         );
 
         $application = new Application();

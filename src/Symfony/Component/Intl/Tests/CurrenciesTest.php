@@ -678,7 +678,7 @@ class CurrenciesTest extends ResourceBundleTestCase
     {
         return array_map(
             fn ($currency) => [$currency],
-            self::CURRENCIES
+            self::CURRENCIES,
         );
     }
 
@@ -705,7 +705,7 @@ class CurrenciesTest extends ResourceBundleTestCase
     {
         return array_map(
             fn ($value) => [$value],
-            array_keys(self::ALPHA3_TO_NUMERIC)
+            array_keys(self::ALPHA3_TO_NUMERIC),
         );
     }
 
@@ -721,7 +721,7 @@ class CurrenciesTest extends ResourceBundleTestCase
     {
         return array_map(
             fn ($value) => [$value],
-            array_diff(self::CURRENCIES, array_keys(self::ALPHA3_TO_NUMERIC))
+            array_diff(self::CURRENCIES, array_keys(self::ALPHA3_TO_NUMERIC)),
         );
     }
 
@@ -741,7 +741,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         return array_map(
             fn ($numeric, $alpha3) => [$numeric, $alpha3],
             array_keys($numericToAlpha3),
-            $numericToAlpha3
+            $numericToAlpha3,
         );
     }
 
@@ -766,7 +766,7 @@ class CurrenciesTest extends ResourceBundleTestCase
 
         return array_map(
             fn ($value) => [$value],
-            $invalidNumericCodes
+            $invalidNumericCodes,
         );
     }
 

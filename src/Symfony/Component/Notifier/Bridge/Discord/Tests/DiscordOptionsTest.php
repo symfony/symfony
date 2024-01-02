@@ -42,14 +42,14 @@ final class DiscordOptionsTest extends TestCase
                 ->url('http://ava.tar/pic.png')
                 ->timestamp(new \DateTimeImmutable('2020-10-12 9:14:15+0000'))
                 ->color(2021216)
-                ->title('New song added!')
+                ->title('New song added!'),
             )
             ->addEmbed((new DiscordEmbed())
                 ->description('descript.io 2')
                 ->url('http://ava.tar/pic.png')
                 ->timestamp(new \DateTimeImmutable('2020-10-12 9:14:15+0000'))
                 ->color(2021216)
-                ->title('New song added!')
+                ->title('New song added!'),
             );
 
         $this->assertSame($discordOptions->toArray(), [
@@ -82,29 +82,29 @@ final class DiscordOptionsTest extends TestCase
                     (new DiscordFooterEmbedObject())
                         ->text('text')
                         ->iconUrl('icon url')
-                        ->proxyIconUrl('proxy icon url')
+                        ->proxyIconUrl('proxy icon url'),
                 )
                 ->thumbnail(
                     (new DiscordMediaEmbedObject())
                         ->url('https://thumb.ur.l/')
                         ->proxyUrl('https://proxy.ur.l/')
                         ->height(900)
-                        ->width(600)
+                        ->width(600),
                 )
                 ->image(
                     (new DiscordMediaEmbedObject())
                         ->url('https://image.ur.l/')
                         ->proxyUrl('https://proxy.ur.l/')
                         ->height(900)
-                        ->width(600)
+                        ->width(600),
                 )
                 ->author(
                     (new DiscordAuthorEmbedObject())
                         ->name('name field')
                         ->url('https://ur.l/')
                         ->iconUrl('https://icon.ur.l/')
-                        ->proxyIconUrl('https://proxy.ic.on/url')
-                )
+                        ->proxyIconUrl('https://proxy.ic.on/url'),
+                ),
             );
 
         $this->assertSame($discordOptions->toArray(), [

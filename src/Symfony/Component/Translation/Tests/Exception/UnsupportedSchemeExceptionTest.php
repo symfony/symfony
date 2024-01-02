@@ -45,7 +45,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
 
         $this->assertSame(
             sprintf('Unable to synchronize translations via "%s" as the provider is not installed. Try running "composer require %s".', $scheme, $package),
-            (new UnsupportedSchemeException($dsn))->getMessage()
+            (new UnsupportedSchemeException($dsn))->getMessage(),
         );
     }
 
@@ -64,7 +64,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     {
         $this->assertSame(
             $expected,
-            (new UnsupportedSchemeException($dsn, $name, $supported))->getMessage()
+            (new UnsupportedSchemeException($dsn, $name, $supported))->getMessage(),
         );
     }
 

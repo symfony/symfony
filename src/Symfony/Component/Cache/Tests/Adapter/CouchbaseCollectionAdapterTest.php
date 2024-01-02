@@ -37,7 +37,7 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
         $this->expectDeprecation('Since symfony/cache 7.1: The "Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter" class is deprecated, use "Symfony\Component\Cache\Adapter\CouchbaseCollectionAdapter" instead.');
 
         $client = AbstractAdapter::createConnection('couchbase://'.getenv('COUCHBASE_HOST').'/cache',
-            ['username' => getenv('COUCHBASE_USER'), 'password' => getenv('COUCHBASE_PASS')]
+            ['username' => getenv('COUCHBASE_USER'), 'password' => getenv('COUCHBASE_PASS')],
         );
 
         return new CouchbaseCollectionAdapter($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);

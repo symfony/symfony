@@ -104,7 +104,7 @@ class InlineFragmentRendererTest extends TestCase
     {
         $strategy = new InlineFragmentRenderer($this->getKernel($this->onConsecutiveCalls(
             $this->throwException(new \RuntimeException('foo')),
-            $this->returnValue(new Response('bar'))
+            $this->returnValue(new Response('bar')),
         )));
 
         $this->assertEquals('bar', $strategy->render('/', Request::create('/'), ['ignore_errors' => true, 'alt' => '/foo'])->getContent());

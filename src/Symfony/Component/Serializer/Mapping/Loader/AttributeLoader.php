@@ -61,7 +61,7 @@ class AttributeLoader implements LoaderInterface
             if ($annotation instanceof DiscriminatorMap) {
                 $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
                     $annotation->getTypeProperty(),
-                    $annotation->getMapping()
+                    $annotation->getMapping(),
                 ));
                 continue;
             }

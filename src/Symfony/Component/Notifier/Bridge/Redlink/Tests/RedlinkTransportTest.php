@@ -30,7 +30,7 @@ final class RedlinkTransportTest extends TransportTestCase
             'testAppToken',
             'TEST',
             'v2.1',
-            $client ?? new MockHttpClient()
+            $client ?? new MockHttpClient(),
         ))->setHost('api.redlink.pl');
     }
 

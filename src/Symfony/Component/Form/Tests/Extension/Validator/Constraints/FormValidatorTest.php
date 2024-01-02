@@ -265,7 +265,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 static fn ($data) => $data,
-                static fn () => throw new TransformationFailedException()
+                static fn () => throw new TransformationFailedException(),
             ))
             ->getForm();
 
@@ -302,7 +302,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 static fn ($data) => $data,
-                static fn () => throw new TransformationFailedException()
+                static fn () => throw new TransformationFailedException(),
             ))
             ->getForm();
 
@@ -337,7 +337,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 static fn ($data) => $data,
-                static fn () => throw new TransformationFailedException()
+                static fn () => throw new TransformationFailedException(),
             ))
             ->getForm();
 
@@ -373,7 +373,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
                     $failure->setInvalidMessage('safe message to be used', ['{{ bar }}' => 'bar']);
 
                     throw $failure;
-                }
+                },
             ))
             ->getForm()
         ;

@@ -41,7 +41,7 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
 
         $this->middleware = new DoctrineCloseConnectionMiddleware(
             $this->managerRegistry,
-            $this->entityManagerName
+            $this->entityManagerName,
         );
     }
 

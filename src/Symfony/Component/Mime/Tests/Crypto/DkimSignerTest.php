@@ -101,7 +101,7 @@ EOF;
         ]);
 
         $this->expectExceptionObject(
-            new \LogicException('Invalid DKIM signing algorithm "unsupported-value".')
+            new \LogicException('Invalid DKIM signing algorithm "unsupported-value".'),
         );
 
         $signer->sign($message, []);

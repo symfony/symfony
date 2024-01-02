@@ -79,7 +79,7 @@ class DateTimeType extends AbstractType
                 $builder->addViewTransformer(new DateTimeToHtml5LocalDateTimeTransformer(
                     $options['model_timezone'],
                     $options['view_timezone'],
-                    $options['with_seconds']
+                    $options['with_seconds'],
                 ));
             } else {
                 $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
@@ -88,7 +88,7 @@ class DateTimeType extends AbstractType
                     $dateFormat,
                     $timeFormat,
                     $calendar,
-                    $pattern
+                    $pattern,
                 ));
             }
         } else {
@@ -182,15 +182,15 @@ class DateTimeType extends AbstractType
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format'])
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format']),
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone']),
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
+                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts),
             ));
         }
 

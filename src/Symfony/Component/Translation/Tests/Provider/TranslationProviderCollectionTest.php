@@ -29,7 +29,7 @@ class TranslationProviderCollectionTest extends TestCase
                 yield 'foo' => $this->createMock(ProviderInterface::class);
 
                 yield 'baz' => $this->createMock(ProviderInterface::class);
-            })()
+            })(),
         ))->keys());
     }
 

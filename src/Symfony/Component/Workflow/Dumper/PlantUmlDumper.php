@@ -233,7 +233,7 @@ class PlantUmlDumper implements DumperInterface
             $to = sprintf(
                 '<font color=%1$s>%2$s</font>',
                 $color,
-                $to
+                $to,
             );
         }
 

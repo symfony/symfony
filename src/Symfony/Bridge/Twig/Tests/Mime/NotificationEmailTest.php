@@ -47,7 +47,7 @@ class NotificationEmailTest extends TestCase
             ->importance(NotificationEmail::IMPORTANCE_HIGH)
             ->action('Bar', 'http://example.com/')
             ->context(['a' => 'b'])
-            ->theme('example')
+            ->theme('example'),
         ));
         $this->assertEquals([
             'importance' => NotificationEmail::IMPORTANCE_HIGH,

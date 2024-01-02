@@ -68,7 +68,7 @@ class PropertyInfoLoaderTest extends TestCase
                 [new Type(Type::BUILTIN_TYPE_STRING, true)],
                 [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_FLOAT))],
                 [new Type(Type::BUILTIN_TYPE_STRING)],
-                [new Type(Type::BUILTIN_TYPE_STRING)]
+                [new Type(Type::BUILTIN_TYPE_STRING)],
             ))
         ;
         $propertyInfoStub
@@ -85,7 +85,7 @@ class PropertyInfoLoaderTest extends TestCase
                 true,
                 true,
                 false,
-                true
+                true,
             ))
         ;
 
@@ -225,7 +225,7 @@ class PropertyInfoLoaderTest extends TestCase
             ->method('getTypes')
             ->willReturnOnConsecutiveCalls(
                 [new Type(Type::BUILTIN_TYPE_STRING)],
-                [new Type(Type::BUILTIN_TYPE_BOOL)]
+                [new Type(Type::BUILTIN_TYPE_BOOL)],
             );
 
         $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');

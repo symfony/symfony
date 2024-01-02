@@ -56,7 +56,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
                 return $item;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
         $this->createCacheItem = function ($key, $value, $allowInt = false) use ($createCacheItem) {
             if (null === $this->cacheItemPrototype) {
@@ -73,7 +73,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
                 return $item->pack();
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
     }
 

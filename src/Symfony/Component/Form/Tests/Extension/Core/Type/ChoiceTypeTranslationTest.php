@@ -31,7 +31,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')
-            ->willReturnCallback(fn ($key, $params) => strtr(sprintf('Translation of: %s', $key), $params)
+            ->willReturnCallback(fn ($key, $params) => strtr(sprintf('Translation of: %s', $key), $params),
             );
 
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);
@@ -49,7 +49,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
         $form->submit(['My invalid choice']);
         $this->assertEquals(
             "ERROR: Translation of: You are not able to use value \"My invalid choice\"\n",
-            (string) $form->getErrors(true)
+            (string) $form->getErrors(true),
         );
     }
 
@@ -65,7 +65,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
         $form->submit(new \stdClass());
         $this->assertEquals(
             "ERROR: Translation of: You are not able to use value \"stdClass\"\n",
-            (string) $form->getErrors(true)
+            (string) $form->getErrors(true),
         );
     }
 }

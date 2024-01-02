@@ -234,7 +234,7 @@ class PhpDumper extends Dumper
                 "/\r?\n\r?\n    public function __construct.+?\\{\r?\n/s",
                 "\n    protected \Closure \$getService;$0",
                 $code,
-                1
+                1,
             );
         }
 
@@ -1027,7 +1027,7 @@ EOF;
 EOTXT
             ,
             $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates',
-            $this->doExport($id)
+            $this->doExport($id),
         );
 
         return $code;
@@ -1176,7 +1176,7 @@ EOTXT
             if (\is_string($callable) && str_starts_with($callable, '@=')) {
                 return $return.sprintf('(($args = %s) ? (%s) : null)',
                     $this->dumpValue(new ServiceLocatorArgument($definition->getArguments())),
-                    $this->getExpressionLanguage()->compile(substr($callable, 2), ['container' => 'container', 'args' => 'args'])
+                    $this->getExpressionLanguage()->compile(substr($callable, 2), ['container' => 'container', 'args' => 'args']),
                 ).$tail;
             }
 
@@ -1889,7 +1889,7 @@ EOF;
                             $this->export($definition->isShared() ? ($definition->isPublic() ? 'services' : 'privates') : false),
                             $this->doExport($id),
                             $this->export(ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE !== $v->getInvalidBehavior() && !\is_string($load) ? $this->generateMethodName($id) : null),
-                            $this->export($load)
+                            $this->export($load),
                         );
                         $serviceTypes .= sprintf("\n            %s => %s,", $this->export($k), $this->export($v instanceof TypedReference ? $v->getType() : '?'));
                         $this->locatedIds[$id] = true;

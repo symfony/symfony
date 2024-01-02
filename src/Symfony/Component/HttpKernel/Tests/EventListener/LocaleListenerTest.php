@@ -45,7 +45,7 @@ class LocaleListenerTest extends TestCase
                 KernelEvents::REQUEST => [['setDefaultLocale', 100], ['onKernelRequest', 16]],
                 KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', 0]],
             ],
-            LocaleListener::getSubscribedEvents()
+            LocaleListener::getSubscribedEvents(),
         );
     }
 

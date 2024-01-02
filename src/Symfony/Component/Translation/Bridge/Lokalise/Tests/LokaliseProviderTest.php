@@ -717,7 +717,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->getLoader(),
             $this->getLogger(),
             $this->getDefaultLocale(),
-            'api.lokalise.com'
+            'api.lokalise.com',
         );
 
         $provider->delete($translatorBag);

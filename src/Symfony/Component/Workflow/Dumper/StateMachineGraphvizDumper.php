@@ -95,7 +95,7 @@ class StateMachineGraphvizDumper extends GraphvizDumper
                     $this->dotize($edge['to']),
                     $this->escape($edge['name']),
                     'solid',
-                    $this->addAttributes($edge['attributes'])
+                    $this->addAttributes($edge['attributes']),
                 );
             }
         }

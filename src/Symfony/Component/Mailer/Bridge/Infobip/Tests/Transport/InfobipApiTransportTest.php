@@ -120,7 +120,7 @@ class InfobipApiTransportTest extends TestCase
             Some text
             --%s--
             TXT,
-            $options['body']
+            $options['body'],
         );
     }
 
@@ -199,7 +199,7 @@ class InfobipApiTransportTest extends TestCase
             <html><p>Hello!</p></html>
             --%s--
             TXT,
-            $options['body']
+            $options['body'],
         );
     }
 
@@ -237,7 +237,7 @@ class InfobipApiTransportTest extends TestCase
             some inline attachment
             --%s--
             TXT,
-            $options['body']
+            $options['body'],
         );
     }
 
@@ -282,7 +282,7 @@ class InfobipApiTransportTest extends TestCase
             RANDOM-CUSTOM-ID
             --%s--
             TXT,
-            $options['body']
+            $options['body'],
         );
     }
 
@@ -311,7 +311,7 @@ class InfobipApiTransportTest extends TestCase
 
             Some text
             TXT,
-            $sentMessage->toString()
+            $sentMessage->toString(),
         );
     }
 
@@ -356,7 +356,7 @@ class InfobipApiTransportTest extends TestCase
             <html><p>Hello!</p></html>
             --%s--
             TXT,
-            $sentMessage->toString()
+            $sentMessage->toString(),
         );
         $this->assertInstanceOf(Email::class, $sentMessage->getOriginalMessage());
         $this->assertEquals([new Address('bcc@example.com')], $sentMessage->getOriginalMessage()->getBcc());
@@ -398,7 +398,7 @@ class InfobipApiTransportTest extends TestCase
             c29tZSBpbmxpbmUgYXR0YWNobWVudA==
             --%s--
             TXT,
-            $sentMessage->toString()
+            $sentMessage->toString(),
         );
     }
 
@@ -425,7 +425,7 @@ class InfobipApiTransportTest extends TestCase
             X-Infobip-Track: false
             %a
             TXT,
-            $sentMessage->toString()
+            $sentMessage->toString(),
         );
     }
 

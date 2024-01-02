@@ -31,7 +31,7 @@ class UnexpectedTypeException extends RuntimeException
             'but it found type "%s" while trying to traverse path "%s" at property "%s".',
             \gettype($value),
             (string) $path,
-            $path->getElement($pathIndex)
+            $path->getElement($pathIndex),
         );
 
         parent::__construct($message);

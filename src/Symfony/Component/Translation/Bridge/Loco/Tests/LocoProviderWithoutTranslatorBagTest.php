@@ -77,7 +77,7 @@ class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
             $this->getLoader(),
             $this->getLogger(),
             $this->getDefaultLocale(),
-            'localise.biz/api/'
+            'localise.biz/api/',
         );
 
         $translatorBag = $provider->read($domains, $locales);
@@ -109,7 +109,7 @@ class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
             $this->getLoader(),
             $this->getLogger(),
             $this->getDefaultLocale(),
-            'localise.biz/api/'
+            'localise.biz/api/',
         );
 
         $translatorBag = $provider->read($domains, $locales);

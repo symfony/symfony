@@ -84,7 +84,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 return $item;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
     }
 

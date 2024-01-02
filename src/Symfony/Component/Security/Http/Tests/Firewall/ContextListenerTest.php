@@ -47,7 +47,7 @@ class ContextListenerTest extends TestCase
         new ContextListener(
             $this->createMock(TokenStorageInterface::class),
             [],
-            ''
+            '',
         );
     }
 
@@ -62,7 +62,7 @@ class ContextListenerTest extends TestCase
     {
         $session = $this->runSessionOnKernelResponse(
             new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']),
-            null
+            null,
         );
 
         $token = unserialize($session->get('_security_session'));
@@ -74,7 +74,7 @@ class ContextListenerTest extends TestCase
     {
         $session = $this->runSessionOnKernelResponse(
             new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']),
-            'C:10:"serialized"'
+            'C:10:"serialized"',
         );
 
         $token = unserialize($session->get('_security_session'));
@@ -86,7 +86,7 @@ class ContextListenerTest extends TestCase
     {
         $session = $this->runSessionOnKernelResponse(
             null,
-            'C:10:"serialized"'
+            'C:10:"serialized"',
         );
 
         $this->assertFalse($session->has('_security_session'));
@@ -105,7 +105,7 @@ class ContextListenerTest extends TestCase
             $this->createMock(HttpKernelInterface::class),
             $request,
             HttpKernelInterface::MAIN_REQUEST,
-            new Response()
+            new Response(),
         );
 
         $listener = new ContextListener($tokenStorage, [], 'session', null, new EventDispatcher());
@@ -124,7 +124,7 @@ class ContextListenerTest extends TestCase
             $this->createMock(HttpKernelInterface::class),
             $request,
             HttpKernelInterface::MAIN_REQUEST,
-            new Response()
+            new Response(),
         );
 
         $listener = new ContextListener(new TokenStorage(), [], 'session', null, new EventDispatcher());
@@ -375,7 +375,7 @@ class ContextListenerTest extends TestCase
             $this->createMock(HttpKernelInterface::class),
             $request,
             HttpKernelInterface::MAIN_REQUEST,
-            new Response()
+            new Response(),
         );
 
         $listener = new ContextListener($tokenStorage, [], 'session', null, new EventDispatcher(), null, $tokenStorage->enableUsageTracking(...));

@@ -48,7 +48,7 @@ abstract class ResourceBundle
         if (!isset(self::$entryReader)) {
             self::$entryReader = new BundleEntryReader(new BufferedBundleReader(
                 new PhpBundleReader(),
-                Intl::BUFFER_SIZE
+                Intl::BUFFER_SIZE,
             ));
 
             $localeAliases = self::$entryReader->readEntry(Intl::getDataDirectory().'/'.Intl::LOCALE_DIR, 'meta', ['Aliases']);

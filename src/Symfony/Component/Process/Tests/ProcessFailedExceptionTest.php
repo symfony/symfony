@@ -82,7 +82,7 @@ class ProcessFailedExceptionTest extends TestCase
 
         $this->assertEquals(
             "The command \"$cmd\" failed.\n\nExit Code: $exitCode($exitText)\n\nWorking directory: {$workingDirectory}\n\nOutput:\n================\n{$output}\n\nError Output:\n================\n{$errorOutput}",
-            str_replace("'php'", 'php', $exception->getMessage())
+            str_replace("'php'", 'php', $exception->getMessage()),
         );
     }
 
@@ -128,7 +128,7 @@ class ProcessFailedExceptionTest extends TestCase
 
         $this->assertEquals(
             "The command \"$cmd\" failed.\n\nExit Code: $exitCode($exitText)\n\nWorking directory: {$workingDirectory}",
-            str_replace("'php'", 'php', $exception->getMessage())
+            str_replace("'php'", 'php', $exception->getMessage()),
         );
     }
 }

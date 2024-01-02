@@ -320,7 +320,7 @@ class DoctrineExtensionTest extends TestCase
                 'mapping' => true,
                 'is_bundle' => true,
             ],
-            $method->invoke($this->extension, $mappingConfig, new \ReflectionClass($bundleClass), $container, $bundleClass->getPath())
+            $method->invoke($this->extension, $mappingConfig, new \ReflectionClass($bundleClass), $container, $bundleClass->getPath()),
         );
     }
 

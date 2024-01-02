@@ -200,7 +200,7 @@ class LogoutListenerTest extends TestCase
                 'logout_path' => '/logout',
                 'target_url' => '/',
             ],
-            $tokenManager
+            $tokenManager,
         );
 
         return [$listener, $tokenStorage, $httpUtils, $options];

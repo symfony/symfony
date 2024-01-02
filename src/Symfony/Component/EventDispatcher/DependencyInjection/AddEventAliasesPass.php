@@ -34,7 +34,7 @@ class AddEventAliasesPass implements CompilerPassInterface
 
         $container->setParameter(
             'event_dispatcher.event_aliases',
-            array_merge($eventAliases, $this->eventAliases)
+            array_merge($eventAliases, $this->eventAliases),
         );
     }
 }

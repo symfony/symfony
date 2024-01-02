@@ -34,7 +34,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                     ['a' => 1, 'ä' => ['ö' => 2, 'ü' => 3]],
                     ['a' => 1, "a\u{0308}" => ["o\u{0308}" => 2, 'ü' => 3]],
                 ],
-            ]
+            ],
         );
     }
 
@@ -45,7 +45,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 // 5 letters + 3 combining marks
                 [5, 'अनुच्छेद'],
-            ]
+            ],
         );
     }
 
@@ -66,7 +66,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                     ],
                     null,
                 ],
-            ]
+            ],
         );
     }
 
@@ -86,7 +86,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                     ],
                     1,
                 ],
-            ]
+            ],
         );
     }
 
@@ -98,7 +98,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                 [[0xC3, 0xA4], "Spa\u{0308}ßchen", 2],
                 [[0x61, 0xCC, 0x88], "Spa\u{0308}ßchen", 2, UnicodeString::NFD],
                 [[0xE0, 0xA4, 0xB8, 0xE0, 0xA5, 0x8D], 'नमस्ते', 2],
-            ]
+            ],
         );
     }
 
@@ -110,7 +110,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                 [[0xE4], "Spa\u{0308}ßchen", 2],
                 [[0x61, 0x0308], "Spa\u{0308}ßchen", 2, UnicodeString::NFD],
                 [[0x0938, 0x094D], 'नमस्ते', 2],
-            ]
+            ],
         );
     }
 
@@ -121,7 +121,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 // Hindi
                 ['अनुच्छेद', 'अनुच्छेद'],
-            ]
+            ],
         );
     }
 
@@ -132,7 +132,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 // Hindi
                 ['अनुच्छेद', 'अनुच्छेद'],
-            ]
+            ],
         );
     }
 
@@ -149,7 +149,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                     'तद्भव देशज विदेशी',
                     ['तद्भव', ' देशज', ' विदेशी'],
                 ],
-            ]
+            ],
         );
     }
 
@@ -166,7 +166,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                     'विदेशी देशज तद्भव',
                     ['तद्भव', 'देशज ', 'विदेशी '],
                 ],
-            ]
+            ],
         );
     }
 
@@ -177,7 +177,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 ['द foo अनुच्छेद', 'द', 'अनुच्छेद foo अनुच्छेद', 0, false],
                 ['अनुच्छे', 'द', 'अनुच्छेद foo अनुच्छेद', 0, true],
-            ]
+            ],
         );
     }
 
@@ -190,7 +190,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                 ['दछेच्नुअ', 'छेछे', 'दछेच्नुअ', 0, true],
                 ['छेच्नुअ', 'छे', 'दछेच्नुअ', 0, false],
                 ['द', 'छे', 'दछेच्नुअ', 0, true],
-            ]
+            ],
         );
     }
 
@@ -203,7 +203,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                 ['दछेच्नुअ-दछेच्नु-अदछेच्नु', 'छेछे', 'दछेच्नुअ-दछेच्नु-अदछेच्नु', 0, true],
                 ['-दछेच्नु', '-द', 'दछेच्नुअ-दछेच्नु-अद-दछेच्नु', 0, false],
                 ['दछेच्नुअ-दछेच्नु-अद', '-द', 'दछेच्नुअ-दछेच्नु-अद-दछेच्नु', 0, true],
-            ]
+            ],
         );
     }
 
@@ -216,7 +216,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                 ['दछेच्नुअ-दछेच्नु-अदछेच्नु', 'छेछे', 'दछेच्नुअ-दछेच्नु-अदछेच्नु', 0, true],
                 ['-दछेच्नु', '-द', 'दछेच्नुअ-दछेच्नु-अद-दछेच्नु', 0, false],
                 ['दछेच्नुअ-दछेच्नु-अद', '-द', 'दछेच्नुअ-दछेच्नु-अद-दछेच्नु', 0, true],
-            ]
+            ],
         );
     }
 
@@ -227,7 +227,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 ['Das Innenministerium', 1, 'Das Außenministerium', 'Auß', 'Inn'],
                 ['दछेच्नुद-दछेच्नु-ददछेच्नु', 2, 'दछेच्नुअ-दछेच्नु-अदछेच्नु', 'अ', 'द'],
-            ]
+            ],
         );
     }
 
@@ -238,7 +238,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 ['Das Aussenministerium', 1, 'Das Außenministerium', 'auß', 'Auss'],
                 ['दछेच्नुद-दछेच्नु-ददछेच्नु', 2, 'दछेच्नुअ-दछेच्नु-अदछेच्नु', 'अ', 'द'],
-            ]
+            ],
         );
     }
 
@@ -249,7 +249,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 [false, "cle\u{0301} prive\u{0301}e", 'cle', UnicodeString::NFD],
                 [true, "cle\u{0301} prive\u{0301}e", 'clé', UnicodeString::NFD],
-            ]
+            ],
         );
     }
 
@@ -260,7 +260,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 [false, "cle\u{0301} prive\u{0301}e", 'ee', UnicodeString::NFD],
                 [true, "cle\u{0301} prive\u{0301}e", 'ée', UnicodeString::NFD],
-            ]
+            ],
         );
     }
 }

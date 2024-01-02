@@ -106,7 +106,7 @@ class ChainedAccessTokenExtractorsTest extends TestCase
                 new QueryAccessTokenExtractor(),
                 new HeaderAccessTokenExtractor(),
             ]),
-            $this->userProvider
+            $this->userProvider,
         );
     }
 }

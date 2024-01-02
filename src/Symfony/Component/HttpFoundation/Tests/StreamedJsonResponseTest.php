@@ -122,7 +122,7 @@ class StreamedJsonResponseTest extends TestCase
                         yield 3 => 'three';
                     })(),
                 ],
-            ]
+            ],
         );
 
         $this->assertSame('{"_embedded":{"list":["test","value"],"map":{"key":"value","0":"test"},"integer":{"1":"one","3":"three"}}}', $content);

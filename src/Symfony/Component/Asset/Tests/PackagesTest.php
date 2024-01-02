@@ -40,7 +40,7 @@ class PackagesTest extends TestCase
     {
         $packages = new Packages(
             new Package(new StaticVersionStrategy('default')),
-            ['a' => new Package(new StaticVersionStrategy('a'))]
+            ['a' => new Package(new StaticVersionStrategy('a'))],
         );
 
         $this->assertSame('default', $packages->getVersion('/foo'));
@@ -51,7 +51,7 @@ class PackagesTest extends TestCase
     {
         $packages = new Packages(
             new Package(new StaticVersionStrategy('default')),
-            new \ArrayIterator(['a' => new Package(new StaticVersionStrategy('a'))])
+            new \ArrayIterator(['a' => new Package(new StaticVersionStrategy('a'))]),
         );
 
         $this->assertSame('/foo?default', $packages->getUrl('/foo'));

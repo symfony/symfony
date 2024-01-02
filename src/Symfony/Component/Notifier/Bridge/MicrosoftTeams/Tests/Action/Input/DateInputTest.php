@@ -43,7 +43,7 @@ final class DateInputTest extends AbstractInputTestCase
             [
                 '@type' => 'DateInput',
             ],
-            $this->createInput()->toArray()
+            $this->createInput()->toArray(),
         );
     }
 }

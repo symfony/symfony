@@ -937,7 +937,7 @@ class RecursiveValidatorTest extends TestCase
             $entity,
             'firstName',
             'Bernhard',
-            'Group'
+            'Group',
         );
 
         /* @var ConstraintViolationInterface[] $violations */
@@ -986,7 +986,7 @@ class RecursiveValidatorTest extends TestCase
             self::ENTITY_CLASS,
             'firstName',
             'Bernhard',
-            'Group'
+            'Group',
         );
 
         /* @var ConstraintViolationInterface[] $violations */
@@ -2231,7 +2231,7 @@ class RecursiveValidatorTest extends TestCase
     {
         $this->metadataFactory->addMetadata(new ClassMetadata(CascadingEntity::class));
         $this->metadataFactory->addMetadata((new ClassMetadata(CascadedChild::class))
-            ->addPropertyConstraint('name', new NotNull())
+            ->addPropertyConstraint('name', new NotNull()),
         );
 
         $entity = new CascadingEntity();
@@ -2252,10 +2252,10 @@ class RecursiveValidatorTest extends TestCase
         $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
             ->addPropertyConstraint('children', new All([
                 new Type(CascadedChild::class),
-            ]))
+            ])),
         );
         $this->metadataFactory->addMetadata((new ClassMetadata(CascadedChild::class))
-            ->addPropertyConstraint('name', new NotNull())
+            ->addPropertyConstraint('name', new NotNull()),
         );
 
         $entity = new CascadingEntity();
@@ -2274,10 +2274,10 @@ class RecursiveValidatorTest extends TestCase
             ->addPropertyConstraint('requiredChild', new Valid())
             ->addPropertyConstraint('optionalChild', new Valid())
             ->addPropertyConstraint('staticChild', new Valid())
-            ->addPropertyConstraint('children', new Valid())
+            ->addPropertyConstraint('children', new Valid()),
         );
         $this->metadataFactory->addMetadata((new ClassMetadata(CascadedChild::class))
-            ->addPropertyConstraint('name', new NotNull())
+            ->addPropertyConstraint('name', new NotNull()),
         );
 
         $entity = new CascadingEntity();
@@ -2302,10 +2302,10 @@ class RecursiveValidatorTest extends TestCase
     public function testValidateWithExplicitCascade()
     {
         $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
-            ->addConstraint(new Cascade())
+            ->addConstraint(new Cascade()),
         );
         $this->metadataFactory->addMetadata((new ClassMetadata(CascadedChild::class))
-            ->addPropertyConstraint('name', new NotNull())
+            ->addPropertyConstraint('name', new NotNull()),
         );
 
         $entity = new CascadingEntity();

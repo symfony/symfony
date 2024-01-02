@@ -98,7 +98,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
             $dateFormat,
             $timeFormat,
             \IntlDateFormatter::GREGORIAN,
-            $pattern
+            $pattern,
         );
 
         $input = new \DateTime($input);
@@ -155,7 +155,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         $this->assertDateTimeEquals(
             $dateTime->format('c'),
-            $transformer->reverseTransform('03.02.2010, 04:05')->format('c')
+            $transformer->reverseTransform('03.02.2010, 04:05')->format('c'),
         );
 
         date_default_timezone_set($tz);
@@ -211,7 +211,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
             $dateFormat,
             $timeFormat,
             \IntlDateFormatter::GREGORIAN,
-            $pattern
+            $pattern,
         );
 
         $output = new \DateTime($output);
@@ -267,7 +267,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         $this->assertDateTimeEquals(
             new \DateTime('1978-05-28', new \DateTimeZone('Europe/Rome')),
-            $transformer->reverseTransform('28/05/1978')
+            $transformer->reverseTransform('28/05/1978'),
         );
     }
 
@@ -277,7 +277,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         $this->assertDateTimeEquals(
             new \DateTime('1978-05-28', new \DateTimeZone('Europe/Rome')),
-            $transformer->reverseTransform('day: 28 month: 05 year: 1978')
+            $transformer->reverseTransform('day: 28 month: 05 year: 1978'),
         );
     }
 

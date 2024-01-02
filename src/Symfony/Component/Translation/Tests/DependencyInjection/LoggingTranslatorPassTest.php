@@ -42,7 +42,7 @@ class LoggingTranslatorPassTest extends TestCase
                 ['id' => 'foo'],
                 ['key' => 'translator', 'id' => 'translator.logging.inner'],
             ]],
-            $translationWarmerDefinition->getTags()
+            $translationWarmerDefinition->getTags(),
         );
     }
 

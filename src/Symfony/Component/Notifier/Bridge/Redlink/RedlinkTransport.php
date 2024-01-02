@@ -50,7 +50,7 @@ final class RedlinkTransport extends AbstractTransport
             'redlink://%s?from=%s&version=%s',
             $this->getEndpoint(),
             $this->from,
-            $this->version
+            $this->version,
         );
     }
 

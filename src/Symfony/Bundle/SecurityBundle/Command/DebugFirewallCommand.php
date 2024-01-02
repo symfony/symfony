@@ -148,7 +148,7 @@ EOF
 
         $io->table(
             ['Option', 'Value'],
-            $rows
+            $rows,
         );
     }
 
@@ -196,7 +196,7 @@ EOF
 
             $io->table(
                 ['Order', 'Callable', 'Priority'],
-                $rows
+                $rows,
             );
         }
     }
@@ -217,8 +217,8 @@ EOF
             ['Classname'],
             array_map(
                 fn ($authenticator) => [$authenticator::class],
-                $authenticators
-            )
+                $authenticators,
+            ),
         );
     }
 

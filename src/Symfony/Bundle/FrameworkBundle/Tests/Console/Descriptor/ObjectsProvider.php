@@ -47,7 +47,7 @@ class ObjectsProvider
                 ['opt1' => 'val1', 'opt2' => 'val2'],
                 'localhost',
                 ['http', 'https'],
-                ['get', 'head']
+                ['get', 'head'],
             ),
             'route_2' => new RouteStub(
                 '/name/add',
@@ -57,7 +57,7 @@ class ObjectsProvider
                 'localhost',
                 ['http', 'https'],
                 ['put', 'post'],
-                "context.getMethod() in ['GET', 'HEAD', 'POST']"
+                "context.getMethod() in ['GET', 'HEAD', 'POST']",
             ),
         ];
     }

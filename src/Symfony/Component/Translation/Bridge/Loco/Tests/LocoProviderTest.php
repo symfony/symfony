@@ -814,7 +814,7 @@ class LocoProviderTest extends ProviderTestCase
             $this->getLoader(),
             $this->getLogger(),
             $this->getDefaultLocale(),
-            'localise.biz/api/'
+            'localise.biz/api/',
         );
 
         $this->translatorBag = $provider->read($domains, $locales);
@@ -845,7 +845,7 @@ class LocoProviderTest extends ProviderTestCase
             $this->getLogger(),
             $this->getDefaultLocale(),
             'localise.biz/api/',
-            $this->getTranslatorBag()
+            $this->getTranslatorBag(),
         );
 
         $translatorBag = $provider->read($domains, $locales);
@@ -897,7 +897,7 @@ class LocoProviderTest extends ProviderTestCase
             $this->getLoader(),
             $this->getLogger(),
             $this->getDefaultLocale(),
-            'localise.biz/api/'
+            'localise.biz/api/',
         );
 
         $provider->delete($translatorBag);
@@ -929,7 +929,7 @@ class LocoProviderTest extends ProviderTestCase
             $this->getLoader(),
             $this->getLogger(),
             $this->getDefaultLocale(),
-            'localise.biz/api/'
+            'localise.biz/api/',
         );
 
         $this->expectException(ProviderException::class);

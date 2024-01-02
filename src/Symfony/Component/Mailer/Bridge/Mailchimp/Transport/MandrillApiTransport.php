@@ -126,7 +126,7 @@ class MandrillApiTransport extends AbstractApiTransport
             if ($header instanceof TagHeader) {
                 $payload['message']['tags'] = array_merge(
                     $payload['message']['tags'] ?? [],
-                    explode(',', $header->getValue())
+                    explode(',', $header->getValue()),
                 );
 
                 continue;

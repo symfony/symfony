@@ -152,7 +152,7 @@ class ExpressionLanguage
                 }
 
                 return $value;
-            }
+            },
         ));
     }
 

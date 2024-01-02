@@ -109,7 +109,7 @@ class ParameterizedHeaderTest extends TestCase
             'filename*0*=utf-8\'\''.str_repeat('a', 60).";\r\n ".
             'filename*1*='.str_repeat('a', 60).";\r\n ".
             'filename*2*='.str_repeat('a', 60),
-            $header->getBodyAsString()
+            $header->getBodyAsString(),
         );
     }
 
@@ -147,7 +147,7 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals(
             'attachment; filename*='.$header->getCharset()."'".$this->lang."'".
             str_repeat('a', 20).'%8F'.str_repeat('a', 10),
-            $header->getBodyAsString()
+            $header->getBodyAsString(),
         );
     }
 
@@ -192,7 +192,7 @@ class ParameterizedHeaderTest extends TestCase
             'attachment; filename*0*='.$header->getCharset()."'".$this->lang."'".
             str_repeat('a', 20).'%8F'.str_repeat('a', 23).";\r\n ".
             'filename*1*='.str_repeat('a', 37),
-            $header->getBodyAsString()
+            $header->getBodyAsString(),
         );
     }
 

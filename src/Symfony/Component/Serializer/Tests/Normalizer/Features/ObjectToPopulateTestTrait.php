@@ -32,7 +32,7 @@ trait ObjectToPopulateTestTrait
             ['foo' => 'foo'],
             ObjectDummy::class,
             null,
-            ['object_to_populate' => $dummy]
+            ['object_to_populate' => $dummy],
         );
 
         $this->assertEquals($dummy, $obj);

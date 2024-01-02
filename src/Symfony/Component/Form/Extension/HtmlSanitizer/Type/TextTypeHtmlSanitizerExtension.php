@@ -60,7 +60,7 @@ class TextTypeHtmlSanitizerExtension extends AbstractTypeExtension
                     $event->setData($sanitizers->get($sanitizer)->sanitize($data));
                 }
             },
-            10000 /* as soon as possible */
+            10000, /* as soon as possible */
         );
     }
 }

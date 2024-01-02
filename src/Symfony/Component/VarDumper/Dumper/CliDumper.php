@@ -624,7 +624,7 @@ class CliDumper extends AbstractDumper
                 '%s.%s.%s',
                 PHP_WINDOWS_VERSION_MAJOR,
                 PHP_WINDOWS_VERSION_MINOR,
-                PHP_WINDOWS_VERSION_BUILD
+                PHP_WINDOWS_VERSION_BUILD,
             );
             $result = $version >= '10.0.15063';
         }

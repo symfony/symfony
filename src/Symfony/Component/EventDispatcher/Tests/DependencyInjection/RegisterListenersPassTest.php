@@ -308,7 +308,7 @@ class RegisterListenersPassTest extends TestCase
                     $tagAttributes['method'] = $reflector->getName();
                 }
                 $definition->addTag('kernel.event_listener', $tagAttributes);
-            }
+            },
         );
 
         $container->register('foo', TaggedMultiListener::class)->setAutoconfigured(true);

@@ -126,7 +126,7 @@ class FailoverTransportTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 new SentMessage($message, 't2'),
                 new SentMessage($message, 't2'),
-                $this->throwException($this->createMock(TransportExceptionInterface::class))
+                $this->throwException($this->createMock(TransportExceptionInterface::class)),
             );
         $t = new FailoverTransport([$t1, $t2], 40);
         $t->send($message);
@@ -148,13 +148,13 @@ class FailoverTransportTest extends TestCase
         $t1->method('supports')->with($message)->willReturn(true);
         $t1->expects($this->exactly(2))->method('send')->willReturnOnConsecutiveCalls(
             $this->throwException($this->createMock(TransportExceptionInterface::class)),
-            new SentMessage($message, 't1')
+            new SentMessage($message, 't1'),
         );
         $t2 = $this->createMock(TransportInterface::class);
         $t2->method('supports')->with($message)->willReturn(true);
         $t2->expects($this->exactly(2))->method('send')->willReturnOnConsecutiveCalls(
             new SentMessage($message, 't2'),
-            $this->throwException($this->createMock(TransportExceptionInterface::class))
+            $this->throwException($this->createMock(TransportExceptionInterface::class)),
         );
 
         $t = new FailoverTransport([$t1, $t2], 1);

@@ -63,7 +63,7 @@ return static function (ContainerConfigurator $container) {
         class_exists(ConsoleEvents::class) ? ConsoleEvents::ALIASES : [],
         class_exists(FormEvents::class) ? FormEvents::ALIASES : [],
         KernelEvents::ALIASES,
-        class_exists(WorkflowEvents::class) ? WorkflowEvents::ALIASES : []
+        class_exists(WorkflowEvents::class) ? WorkflowEvents::ALIASES : [],
     ));
 
     $container->services()

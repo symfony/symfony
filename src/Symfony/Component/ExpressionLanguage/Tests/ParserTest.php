@@ -94,7 +94,7 @@ class ParserTest extends TestCase
             [
                 new Node\BinaryNode('*',
                     new Node\BinaryNode('-', new Node\ConstantNode(3), new Node\ConstantNode(3)),
-                    new Node\ConstantNode(2)
+                    new Node\ConstantNode(2),
                 ),
                 '(3 - 3) * 2',
             ],
@@ -118,7 +118,7 @@ class ParserTest extends TestCase
                     new Node\NameNode('foo'),
                     new Node\ConstantNode('bar', true),
                     $arguments,
-                    Node\GetAttrNode::METHOD_CALL
+                    Node\GetAttrNode::METHOD_CALL,
                 ),
                 'foo.bar("arg1", 2, true)',
                 ['foo'],
@@ -201,9 +201,9 @@ class ParserTest extends TestCase
                         new Node\NameNode('foo'),
                         new Node\ConstantNode('not', true),
                         new Node\ArgumentsNode(),
-                        Node\GetAttrNode::PROPERTY_CALL
+                        Node\GetAttrNode::PROPERTY_CALL,
                     ),
-                    $arrayNode
+                    $arrayNode,
                 ),
                 'foo.not in [bar]',
                 ['foo', 'bar'],
@@ -216,8 +216,8 @@ class ParserTest extends TestCase
                         new Node\NameNode('foo'),
                         new Node\ConstantNode('not', true),
                         new Node\ArgumentsNode(),
-                        Node\GetAttrNode::PROPERTY_CALL
-                    )
+                        Node\GetAttrNode::PROPERTY_CALL,
+                    ),
                 ),
                 'not foo or foo.not',
                 ['foo'],

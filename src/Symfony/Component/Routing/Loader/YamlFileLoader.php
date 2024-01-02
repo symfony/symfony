@@ -122,7 +122,7 @@ class YamlFileLoader extends FileLoader
                 $alias->setDeprecated(
                     $deprecation['package'],
                     $deprecation['version'],
-                    $deprecation['message'] ?? ''
+                    $deprecation['message'] ?? '',
                 );
             }
 

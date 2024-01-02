@@ -38,9 +38,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'widget\')',
-                $this->getVariableGetter('form')
+                $this->getVariableGetter('form'),
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 
@@ -61,9 +61,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'widget\', ["foo" => "bar"])',
-                $this->getVariableGetter('form')
+                $this->getVariableGetter('form'),
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 
@@ -81,9 +81,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["label" => "my label"])',
-                $this->getVariableGetter('form')
+                $this->getVariableGetter('form'),
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 
@@ -103,9 +103,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\')',
-                $this->getVariableGetter('form')
+                $this->getVariableGetter('form'),
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 
@@ -125,9 +125,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\')',
-                $this->getVariableGetter('form')
+                $this->getVariableGetter('form'),
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 
@@ -144,9 +144,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\')',
-                $this->getVariableGetter('form')
+                $this->getVariableGetter('form'),
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 
@@ -171,9 +171,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar"])',
-                $this->getVariableGetter('form')
+                $this->getVariableGetter('form'),
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 
@@ -197,9 +197,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in argument"])',
-                $this->getVariableGetter('form')
+                $this->getVariableGetter('form'),
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 
@@ -214,7 +214,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
                 new ConstantExpression(null, 0),
                 // else
                 new ConstantExpression(null, 0),
-                0
+                0,
             ),
         ]);
 
@@ -229,9 +229,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', (%s($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
                 $this->getVariableGetter('form'),
-                method_exists(CoreExtension::class, 'testEmpty') ? 'CoreExtension::testEmpty' : 'twig_test_empty'
+                method_exists(CoreExtension::class, 'testEmpty') ? 'CoreExtension::testEmpty' : 'twig_test_empty',
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 
@@ -246,7 +246,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
                 new ConstantExpression(null, 0),
                 // else
                 new ConstantExpression(null, 0),
-                0
+                0,
             ),
             new ArrayExpression([
                 new ConstantExpression('foo', 0),
@@ -267,9 +267,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in attributes"] + (%s($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
                 $this->getVariableGetter('form'),
-                method_exists(CoreExtension::class, 'testEmpty') ? 'CoreExtension::testEmpty' : 'twig_test_empty'
+                method_exists(CoreExtension::class, 'testEmpty') ? 'CoreExtension::testEmpty' : 'twig_test_empty',
             ),
-            trim($compiler->compile($node)->getSource())
+            trim($compiler->compile($node)->getSource()),
         );
     }
 

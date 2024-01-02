@@ -47,7 +47,7 @@ final class HttpPostActionTest extends TestCase
             [
                 ['name' => $name, 'value' => $value],
             ],
-            $action->toArray()['headers']
+            $action->toArray()['headers'],
         );
     }
 
@@ -73,7 +73,7 @@ final class HttpPostActionTest extends TestCase
             [
                 '@type' => 'HttpPOST',
             ],
-            (new HttpPostAction())->toArray()
+            (new HttpPostAction())->toArray(),
         );
     }
 }

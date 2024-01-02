@@ -123,7 +123,7 @@ class ImportMapAuditCommand extends Command
         if (0 < $packagesWithoutVersionCount) {
             $this->io->warning(sprintf('Unable to retrieve versions for package%s: %s',
                 1 === $packagesWithoutVersionCount ? '' : 's',
-                implode(', ', $packagesWithoutVersion)
+                implode(', ', $packagesWithoutVersion),
             ));
         }
 

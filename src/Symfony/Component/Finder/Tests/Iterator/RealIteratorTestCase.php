@@ -101,7 +101,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         try {
             $paths = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator(self::$tmpDir, \RecursiveDirectoryIterator::SKIP_DOTS),
-                \RecursiveIteratorIterator::CHILD_FIRST
+                \RecursiveIteratorIterator::CHILD_FIRST,
             );
         } catch (\UnexpectedValueException $exception) {
             // open_basedir restriction in effect

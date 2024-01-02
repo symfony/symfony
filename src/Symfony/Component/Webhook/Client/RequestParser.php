@@ -61,7 +61,7 @@ class RequestParser extends AbstractRequestParser
         return new RemoteEvent(
             $request->headers->get($this->eventHeaderName),
             $request->headers->get($this->idHeaderName),
-            $body
+            $body,
         );
     }
 

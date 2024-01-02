@@ -74,7 +74,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
                 return $items;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
         self::$setTagVersions ??= \Closure::bind(
             static function (array $items, array $tagVersions) {
@@ -83,7 +83,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
                 }
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
         self::$getTagsByKey ??= \Closure::bind(
             static function ($deferred) {
@@ -96,7 +96,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
                 return $tagsByKey;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
         self::$saveTags ??= \Closure::bind(
             static function (AdapterInterface $tagsAdapter, array $tags) {
@@ -110,7 +110,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
                 return $tagsAdapter->commit();
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
     }
 

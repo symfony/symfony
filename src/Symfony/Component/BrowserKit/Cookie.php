@@ -193,7 +193,7 @@ class Cookie
             $values['secure'],
             $values['httponly'],
             $values['passedRawValue'],
-            $values['samesite']
+            $values['samesite'],
         );
     }
 

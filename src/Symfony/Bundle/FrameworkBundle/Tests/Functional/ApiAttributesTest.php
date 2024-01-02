@@ -106,7 +106,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             $parameters,
             [],
             ['HTTP_ACCEPT' => $acceptHeader, 'CONTENT_TYPE' => $acceptHeader],
-            $content
+            $content,
         );
 
         $response = $client->getResponse();

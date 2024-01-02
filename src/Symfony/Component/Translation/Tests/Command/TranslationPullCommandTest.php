@@ -628,7 +628,7 @@ XLIFF
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
             'new.foo' => 'newFoo',
         ], 'en',
-            'domain'
+            'domain',
         ));
 
         $provider = $this->createMock(ProviderInterface::class);
@@ -745,7 +745,7 @@ XLIFF
             $reader,
             $defaultLocale,
             [$this->translationAppDir.'/translations'],
-            $locales
+            $locales,
         );
     }
 }

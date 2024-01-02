@@ -94,7 +94,7 @@ class Psr4DirectoryLoaderTest extends TestCase
     {
         return $this->getLoader()->load(
             ['path' => 'Psr4Controllers', 'namespace' => 'Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers'],
-            'attribute'
+            'attribute',
         );
     }
 
@@ -111,7 +111,7 @@ class Psr4DirectoryLoaderTest extends TestCase
                         $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                     }
                 },
-            ])
+            ]),
         );
     }
 }

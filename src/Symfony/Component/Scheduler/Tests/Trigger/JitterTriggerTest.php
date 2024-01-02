@@ -27,7 +27,7 @@ class JitterTriggerTest extends TestCase
 
         $values = array_map(
             fn () => (int) $trigger->getNextRunDate($time)?->getTimestamp(),
-            array_fill(0, 100, null)
+            array_fill(0, 100, null),
         );
 
         foreach ($values as $value) {

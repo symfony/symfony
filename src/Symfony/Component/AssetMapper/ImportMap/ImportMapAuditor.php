@@ -91,7 +91,7 @@ class ImportMapAuditor
                             $advisory['severity'],
                             $vulnerability['vulnerable_version_range'],
                             $vulnerability['first_patched_version'],
-                        )
+                        ),
                     );
                 }
             }

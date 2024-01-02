@@ -48,7 +48,7 @@ class UriSignerTest extends TestCase
 
         $this->assertSame(
             'http://example.com/foo?_hash=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D&baz=bay&foo=bar',
-            $signer->sign('http://example.com/foo?foo=bar&baz=bay')
+            $signer->sign('http://example.com/foo?foo=bar&baz=bay'),
         );
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
     }
@@ -68,7 +68,7 @@ class UriSignerTest extends TestCase
 
         $this->assertSame(
             'http://example.com/foo?baz=bay&foo=bar&qux=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D',
-            $signer->sign('http://example.com/foo?foo=bar&baz=bay')
+            $signer->sign('http://example.com/foo?foo=bar&baz=bay'),
         );
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
     }
@@ -79,7 +79,7 @@ class UriSignerTest extends TestCase
 
         $this->assertSame(
             'http://example.com/foo?_hash=EhpAUyEobiM3QTrKxoLOtQq5IsWyWedoXDPqIjzNj5o%3D&bar=foo&foo=bar#foobar',
-            $signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar')
+            $signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar'),
         );
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar')));
     }

@@ -355,6 +355,53 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertNotNull($itemsForm->get('0')->get('file'));
     }
 
+    public function testMergePartialDataFromCollection()
+    {
+        $form = $this->createForm('root', 'POST', true);
+        $form->add('items', CollectionType::class, [
+            'entry_type' => ItemFileType::class,
+            'allow_add' => true,
+        ]);
+
+        $file = $this->getUploadedFile();
+        $file2 = $this->getUploadedFile();
+
+        $this->setRequestData('POST', [
+            'root' => [
+                'items' => [
+                    1 => [
+                        'item' => 'test',
+                    ],
+                ],
+            ],
+        ], [
+            'root' => [
+                'items' => [
+                    0 => [
+                        'file' => $file,
+                    ],
+                    1 => [
+                        'file' => $file2,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $itemsForm = $form->get('items');
+        $data = $itemsForm->getData();
+        $this->assertTrue($form->isSubmitted());
+        $this->assertTrue($form->isValid());
+
+        $this->assertCount(2, $data);
+        $this->assertArrayHasKey(0, $data);
+        $this->assertArrayHasKey(1, $data);
+
+        $this->assertEquals('test', $itemsForm->get('1')->get('item')->getData());
+        $this->assertNotNull($itemsForm->get('0')->get('file'));
+    }
+
     /**
      * @dataProvider methodExceptGetProvider
      */

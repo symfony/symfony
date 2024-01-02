@@ -93,8 +93,8 @@ class DateTypeTest extends BaseTypeTestCase
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
 
-        if ('71.1' === Intl::getIcuVersion()) {
-            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
         }
 
         \Locale::setDefault('de_DE');
@@ -119,8 +119,8 @@ class DateTypeTest extends BaseTypeTestCase
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
 
-        if ('71.1' === Intl::getIcuVersion()) {
-            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
         }
 
         \Locale::setDefault('de_DE');
@@ -146,8 +146,8 @@ class DateTypeTest extends BaseTypeTestCase
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
 
-        if ('71.1' === Intl::getIcuVersion()) {
-            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
         }
 
         \Locale::setDefault('de_DE');
@@ -172,8 +172,8 @@ class DateTypeTest extends BaseTypeTestCase
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
 
-        if ('71.1' === Intl::getIcuVersion()) {
-            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
         }
 
         \Locale::setDefault('de_DE');
@@ -200,8 +200,8 @@ class DateTypeTest extends BaseTypeTestCase
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
 
-        if ('71.1' === Intl::getIcuVersion()) {
-            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1.');
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
         }
 
         \Locale::setDefault('de_DE');
@@ -1093,6 +1093,7 @@ class DateTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => $widget,
             'empty_data' => $emptyData,
+            'years' => range(2018, (int) date('Y')),
         ]);
         $form->submit(null);
 

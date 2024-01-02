@@ -66,6 +66,7 @@ class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertSame($value, $this->cache->getItem('baz')->get());
 
         sleep(1);
+        usleep(100000);
         $this->assertSame($value, $this->cache->getItem('foo')->get());
         $this->assertSame($value, $this->cache->getItem('bar')->get());
         $this->assertFalse($this->cache->getItem('baz')->isHit());

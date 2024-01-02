@@ -52,7 +52,7 @@ class Isbn extends Constraint
         string $bothIsbnMessage = null,
         array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
     ) {
         if (\is_array($type)) {
             $options = array_merge($type, $options);

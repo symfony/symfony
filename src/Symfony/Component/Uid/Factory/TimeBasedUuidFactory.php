@@ -21,7 +21,7 @@ class TimeBasedUuidFactory
      */
     public function __construct(
         private string $class,
-        private ?Uuid $node = null
+        private ?Uuid $node = null,
     ) {
     }
 

@@ -33,7 +33,7 @@ class Hostname extends Constraint
         string $message = null,
         bool $requireTld = null,
         array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

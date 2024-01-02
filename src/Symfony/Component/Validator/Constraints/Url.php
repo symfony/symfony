@@ -39,7 +39,7 @@ class Url extends Constraint
         bool $relativeProtocol = null,
         callable $normalizer = null,
         array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

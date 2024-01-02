@@ -41,7 +41,7 @@ class Regex extends Constraint
         callable $normalizer = null,
         array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
     ) {
         if (\is_array($pattern)) {
             $options = array_merge($pattern, $options);

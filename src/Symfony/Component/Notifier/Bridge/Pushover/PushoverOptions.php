@@ -64,7 +64,7 @@ final class PushoverOptions implements MessageOptionsInterface
             Notification::IMPORTANCE_URGENT => 2,
             Notification::IMPORTANCE_HIGH => 1,
             Notification::IMPORTANCE_MEDIUM => 0,
-            Notification::IMPORTANCE_LOW => -1
+            Notification::IMPORTANCE_LOW => -1,
         };
         $options->priority($priority);
 

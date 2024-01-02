@@ -131,7 +131,7 @@ class Image extends File
         string $allowPortraitMessage = null,
         string $corruptedMessage = null,
         array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         parent::__construct(
             $options,

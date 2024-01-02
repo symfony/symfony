@@ -34,7 +34,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
      * @param array<EncoderInterface> $encoders
      */
     public function __construct(
-        private readonly array $encoders = []
+        private readonly array $encoders = [],
     ) {
     }
 

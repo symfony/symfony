@@ -30,7 +30,7 @@ final class NotFoundActivationStrategy implements ActivationStrategyInterface
     public function __construct(
         private RequestStack $requestStack,
         array $excludedUrls,
-        private ActivationStrategyInterface $inner
+        private ActivationStrategyInterface $inner,
     ) {
         $this->exclude = '{('.implode('|', $excludedUrls).')}i';
     }

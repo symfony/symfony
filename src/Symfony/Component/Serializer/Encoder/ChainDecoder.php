@@ -33,7 +33,7 @@ class ChainDecoder implements ContextAwareDecoderInterface
      * @param array<DecoderInterface> $decoders
      */
     public function __construct(
-        private readonly array $decoders = []
+        private readonly array $decoders = [],
     ) {
     }
 

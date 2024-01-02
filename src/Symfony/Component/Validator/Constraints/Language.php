@@ -35,7 +35,7 @@ class Language extends Constraint
         string $message = null,
         bool $alpha3 = null,
         array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         if (!class_exists(Languages::class)) {
             throw new LogicException('The Intl component is required to use the Language constraint. Try running "composer require symfony/intl".');

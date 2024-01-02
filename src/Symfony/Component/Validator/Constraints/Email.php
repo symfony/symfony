@@ -49,7 +49,7 @@ class Email extends Constraint
         string $mode = null,
         callable $normalizer = null,
         array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::VALIDATION_MODES, true)) {
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');

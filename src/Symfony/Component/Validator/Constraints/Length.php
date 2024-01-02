@@ -71,7 +71,7 @@ class Length extends Constraint
         string $charsetMessage = null,
         array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
     ) {
         if (\is_array($exactly)) {
             $options = array_merge($exactly, $options);

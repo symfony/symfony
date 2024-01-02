@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-29T14:31:45Z
+
+Any opinion on this @dunglas @lyrixx @mtarld or anyone else?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-29T15:59:21Z
+
+> Actually, before that PR, paths related to constructor weren't taken into account. And it does look good to me to be more precise in that case
+
+Should we interpret this as an improvement then? For 7.1?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-12-29T16:27:44Z
+
+> > Actually, before that PR, paths related to constructor weren't taken into account. And it does look good to me to be more precise in that case
+>
+> Should we interpret this as an improvement then? For 7.1?
+
+@nicolas-grekas To me, this seems like a bug. As far as I can tell, the `$attributeContext` variable was introduced in #39399 for version 5.3, whereas support for collecting type errors was introduced in version 5.4 with #42502. It appears that the wrong variable might have been used by accident :shrug:
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-12-29T16:34:59Z
+
+There's also the fact that the messages actually have the correct paths in them:
+
+```diff
+            [
+...
+-                'path' => null,
++                'path' => 'string',
+                 'message' => 'Failed to create object because the class misses the "string" property.',
+            ],
+```
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-12-30T11:19:10Z
+
+I agree with @HypeMC, it can be considered as a bugfix in my opinion

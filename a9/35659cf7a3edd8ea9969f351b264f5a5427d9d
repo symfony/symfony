@@ -1,0 +1,109 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-06T06:25:16Z
+
+What about renaming it to `MacAddress`?
+
+---------------------------------------------------------------------------
+
+by Ninos at 2023-10-06T06:35:01Z
+
+> What about renaming it to `MacAddress`?
+
+For me `Mac` was cleaner, because the `Ip` constraint is not called `IpAddress` (consistency) & there are no different meanings of the word `mac`, so no conflicts
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-07T05:54:29Z
+
+> there are no different meanings of the word `mac`
+
+I see what you did there. 🍏
+
+---------------------------------------------------------------------------
+
+by geekabel at 2023-10-13T09:45:46Z
+
+> What about renaming it to `MacAddress`?
+
+I actually find this name more relevant than simply putting `Mac`
+
+---------------------------------------------------------------------------
+
+by Ninos at 2023-10-17T14:53:12Z
+
+> I see what you did there. 🍏
+
+Hahah, seems I'm so "anti Apple", that I forgot one of the most known names in world... :D
+
+I don't think there will be any constraint used in real scenario to check mac devices (mac device names?) - but if, the constraint should be a prefixed with the name of the company, e.g. `AppleMac`. But I can change it to `MacAddress`, if preferred, just let me know :-)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-18T10:17:57Z
+
+As I said in https://github.com/symfony/symfony/pull/51777#issuecomment-1742578118 I am not convinced that this is a common enough use case to be part of the Symfony core.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-18T10:31:59Z
+
+> I am not convinced that this is a common enough use case to be part of the Symfony core.
+
+Yeah, maybe we should encourage releasing niche-y validators as standalone packages more.
+
+Then again, we have other network-related constraints, like the already mentioned IP and CIDR. What makes this one different?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-18T11:19:32Z
+
+To me a `MacAddress` is general enough to be part of the core.
+
+I vote for naming it `MacAddress`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-10-18T11:23:08Z
+
+> Then again, we have other network-related constraints, like the already mentioned IP and CIDR. What makes this one different?
+
+I can work with a client's IP address. But for MAC addresses I do only get the one from the latest hop.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-18T11:30:28Z
+
+@Ninos can you please elaborate on your use-case? Thanks
+
+---------------------------------------------------------------------------
+
+by geekabel at 2023-10-18T16:03:57Z
+
+> To me a `MacAddress` is general enough to be part of the core.
+>
+> I vote for naming it `MacAddress`.
+
+I vote `MacAddress` too
+
+---------------------------------------------------------------------------
+
+by Ninos at 2023-10-23T21:49:10Z
+
+Renamed to `MacAddress`, hope it's fine now :-)
+
+> can you please elaborate on your use-case?
+
+Application e.g. for storing device specific mac addresses
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-29T20:22:23Z
+
+PR rebased ✅
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-30T21:50:11Z
+
+I still don’t see this as a common enough use case, but I won’t insist if others agree with adding this constraint.

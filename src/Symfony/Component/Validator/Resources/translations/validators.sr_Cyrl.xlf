@@ -430,6 +430,10 @@
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>Екстензија фајла није валидна ({{ extension }}). Дозвољене екстензије су {{ extensions }}.</target>
             </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Детектовани енкодинг карактера није валидан ({{ detected }}). Дозвољене вредности за енкодинг су: {{ encodings }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-12-01T18:15:17Z
+
+As Symfony ensures that the `FormEvents::PRE_SUBMIT` event is triggered using a PreSubmitEvent object (and as this is inside the Form component, we don't have to care about older versions where this PreSubmitEvent was not there and FormEvent was instantiated), I would suggest changing the typehint instead.
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2023-12-01T18:28:18Z
+
+That's what I suggested too, but others said it's not worth the BC break, see https://github.com/symfony/symfony/issues/52829#issuecomment-1834625465
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-12-01T19:34:55Z
+
+@stof technically you can dispatch any FormEvent subtype (different from PreSubmitEvent) through the form event dispatcher accessible through the `$form->getConfig()->getEventDispatcher()` instance for a `ChoiceType` field. Why someone would want to do that, I don't know, but it's not only the Form class that is able to do it.
+
+I'm not against changing it directly without deprecation, though, as it's really a special use case.

@@ -158,6 +158,22 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             return $node->getAttribute('value');
         }
 
+        if (
+            $node instanceof FunctionExpression
+            && 'constant' === $node->getAttribute('name')
+        ) {
+            $nodeArguments = $node->getNode('arguments');
+            if ($nodeArguments->getIterator()->current() instanceof ConstantExpression) {
+                $constantName = $nodeArguments->getIterator()->current()->getAttribute('value');
+                if (\defined($constantName)) {
+                    $value = \constant($constantName);
+                    if (\is_string($value)) {
+                        return $value;
+                    }
+                }
+            }
+        }
+
         return self::UNDEFINED_DOMAIN;
     }
 

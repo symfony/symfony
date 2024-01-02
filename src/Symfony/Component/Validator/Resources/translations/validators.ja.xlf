@@ -430,6 +430,10 @@
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>ファイルの拡張子が無効です({{ extension }})。有効な拡張子は{{ extensions }}です。</target>
             </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>検出された文字コードは無効です({{ detected }})。有効な文字コードは{{ encodings }}です。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

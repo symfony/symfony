@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-30T20:22:03Z
+
+And again a DSN component would help us across the whole codebase
+
+I know this was discussed quite often in the past. Anything changed your mind @nicolas-grekas ?
+
+cc @Nyholm
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-30T20:26:11Z
+
+All this makes me think we need a working url parser... (a dsn component is another story.)
+(and I don't know where I'd put this parser...)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-30T21:36:31Z
+
+To be reusable in a dedicated component ofc, but as this is util and no "domain", I don't know either 🤷‍♂️ but it sounds good 👍
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-30T21:50:22Z
+
+Maybe this UrlParser could belong to HttpFoundation?
+
+If this is something that could happen, I'll gladly implement this and leverage it in the numerous DSN parsing processes the codebase counts.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-31T09:36:41Z
+
+Rebased to 5.4 to make it a bug fix. I'll have a look at what can be done with some UrlParser/DsnParser to have a global logic over every DSN parsing

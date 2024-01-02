@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2023-12-07T19:11:47Z
+
+There are some scenarios where additional private IPs are used for reverse proxies. For example I know of multiple setups where the forwarded proxy is 127.0.0.1 (mainly Nginx -> Apache on the same machine without containerization).
+
+There is also the case of azure load balancer. I don't know if they still actively deploy this or not but at least they used to use a little known feature called IPv6 "IPv4 mapped addresses" `::ffff:0:0/96`.
+
+Wouldn't it make sense to add this to the shortcut as well? And if yes, why not just use the `IpUtils::PRIVATE_SUBNETS` constant? symfony/framework-bundle has a dependency on http-foundation anyways.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-12-08T09:28:06Z
+
+> Wouldn't it make sense to add this to the shortcut as well? And if yes, why not just use the `IpUtils::PRIVATE_SUBNETS` constant? symfony/framework-bundle has a dependency on http-foundation anyways.
+
+sounds reasonable to me, I have changed the code accordingly

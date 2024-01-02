@@ -29,7 +29,6 @@ CHANGELOG
  * Added factory methods `DelayStamp::delayFor(\DateInterval)` and `DelayStamp::delayUntil(\DateTimeInterface)`.
  * Removed the exception when dispatching a message with a `DispatchAfterCurrentBusStamp` and not in a context of another dispatch call
  * Added `WorkerMessageRetriedEvent`
- * Added `WorkerMessageReceivedEvent::setEnvelope()` and made event mutable
 
 5.1.0
 -----

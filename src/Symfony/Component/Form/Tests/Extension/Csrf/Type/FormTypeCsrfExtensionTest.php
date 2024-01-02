@@ -69,7 +69,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 ->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
                     'csrf_field_name' => 'csrf',
                     'compound' => true,
-                ])
+                ]),
             )
             ->getForm()
             ->get('form')
@@ -300,7 +300,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                     'csrf_token_manager' => $this->tokenManager,
                     'csrf_token_id' => 'TOKEN_ID',
                     'compound' => true,
-                ])
+                ]),
             )
             ->getForm()
             ->get('form');

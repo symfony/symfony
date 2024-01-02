@@ -152,7 +152,7 @@ class PhraseProviderFactoryTest extends TestCase
             $this->getLoader(),
             $this->getXliffFileDumper(),
             $this->getCache(),
-            $this->getDefaultLocale()
+            $this->getDefaultLocale(),
         );
     }
 

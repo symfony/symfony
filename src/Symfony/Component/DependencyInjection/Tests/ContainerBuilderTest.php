@@ -359,7 +359,7 @@ class ContainerBuilderTest extends TestCase
                 'bar',
             ],
             $builder->getServiceIds(),
-            '->getServiceIds() returns all defined service ids'
+            '->getServiceIds() returns all defined service ids',
         );
     }
 
@@ -1175,7 +1175,7 @@ class ContainerBuilderTest extends TestCase
 
         $matchingResources = array_filter(
             $container->getResources(),
-            fn (ResourceInterface $resource) => 'reflection.BarClass' === (string) $resource
+            fn (ResourceInterface $resource) => 'reflection.BarClass' === (string) $resource,
         );
 
         $this->assertNotEmpty($matchingResources);

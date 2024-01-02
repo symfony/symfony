@@ -221,7 +221,7 @@ class AppVariableTest extends TestCase
         $this->setFlashMessages();
         $this->assertEquals(
             ['this-does-not-exist' => []],
-            $this->appVariable->getFlashes(['this-does-not-exist'])
+            $this->appVariable->getFlashes(['this-does-not-exist']),
         );
 
         $flashMessages = $this->setFlashMessages();
@@ -230,30 +230,30 @@ class AppVariableTest extends TestCase
         $flashMessages = $this->setFlashMessages();
         $this->assertEquals(
             ['notice' => $flashMessages['notice']],
-            $this->appVariable->getFlashes(['notice'])
+            $this->appVariable->getFlashes(['notice']),
         );
 
         $flashMessages = $this->setFlashMessages();
         $this->assertEquals(
             ['notice' => $flashMessages['notice'], 'this-does-not-exist' => []],
-            $this->appVariable->getFlashes(['notice', 'this-does-not-exist'])
+            $this->appVariable->getFlashes(['notice', 'this-does-not-exist']),
         );
 
         $flashMessages = $this->setFlashMessages();
         $this->assertEquals(
             ['notice' => $flashMessages['notice'], 'error' => $flashMessages['error']],
-            $this->appVariable->getFlashes(['notice', 'error'])
+            $this->appVariable->getFlashes(['notice', 'error']),
         );
 
         $this->assertEquals(
             ['warning' => $flashMessages['warning']],
             $this->appVariable->getFlashes(['warning']),
-            'After getting some flash types (e.g. "notice" and "error"), the rest of flash messages must remain (e.g. "warning").'
+            'After getting some flash types (e.g. "notice" and "error"), the rest of flash messages must remain (e.g. "warning").',
         );
 
         $this->assertEquals(
             ['this-does-not-exist' => []],
-            $this->appVariable->getFlashes(['this-does-not-exist'])
+            $this->appVariable->getFlashes(['this-does-not-exist']),
         );
     }
 

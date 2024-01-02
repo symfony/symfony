@@ -170,7 +170,7 @@ class OidcUserTest extends TestCase
             [
                 'username' => 'jane.doe@example.com',
             ],
-            12345
+            12345,
         ));
     }
 }

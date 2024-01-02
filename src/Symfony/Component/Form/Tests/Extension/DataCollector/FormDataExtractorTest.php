@@ -330,7 +330,7 @@ array:3 [
 ]
 EODUMP
             ,
-            $this->dataExtractor->extractSubmittedData($form)
+            $this->dataExtractor->extractSubmittedData($form),
         );
     }
 
@@ -341,7 +341,7 @@ EODUMP
                 function () {},
                 function () {
                     throw new TransformationFailedException('Fail!');
-                }
+                },
             ))
             ->getForm();
 

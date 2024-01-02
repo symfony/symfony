@@ -76,7 +76,7 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 +---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
 
 TXT
-            , $tester->getDisplay(true)
+            , $tester->getDisplay(true),
         );
     }
 
@@ -174,7 +174,7 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassTwo
 +---------------+----------------------------------------------------+------------------------+------------------------------------------------------------+
 
 TXT
-            , $tester->getDisplay(true)
+            , $tester->getDisplay(true),
         );
     }
 
@@ -190,7 +190,7 @@ TXT
         $this->assertStringContainsString(<<<TXT
 Neither class nor path were found with "App\NotFoundResource" argument.
 TXT
-            , $tester->getDisplay(true)
+            , $tester->getDisplay(true),
         );
     }
 }

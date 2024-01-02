@@ -61,7 +61,7 @@ class AmazonSqsSender implements SenderInterface
                 $delay,
                 $messageGroupId,
                 $messageDeduplicationId,
-                $xrayTraceId
+                $xrayTraceId,
             );
         } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);

@@ -145,7 +145,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         $this->authenticator = new AccessTokenAuthenticator(
             $this->accessTokenHandler,
             new HeaderAccessTokenExtractor($headerParameter, $tokenType),
-            $this->userProvider
+            $this->userProvider,
         );
     }
 }

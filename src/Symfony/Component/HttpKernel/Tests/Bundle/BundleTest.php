@@ -23,7 +23,7 @@ class BundleTest extends TestCase
 
         $this->assertInstanceOf(
             'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\DependencyInjection\ExtensionPresentExtension',
-            $bundle->getContainerExtension()
+            $bundle->getContainerExtension(),
         );
     }
 

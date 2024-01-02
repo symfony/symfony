@@ -50,7 +50,7 @@ class ArrayDenormalizerTest extends TestCase
                 ['foo' => 'one', 'bar' => 'two'],
                 ['foo' => 'three', 'bar' => 'four'],
             ],
-            __NAMESPACE__.'\ArrayDummy[]'
+            __NAMESPACE__.'\ArrayDummy[]',
         );
 
         $this->assertEquals(
@@ -58,7 +58,7 @@ class ArrayDenormalizerTest extends TestCase
                 new ArrayDummy('one', 'two'),
                 new ArrayDummy('three', 'four'),
             ],
-            $result
+            $result,
         );
     }
 
@@ -77,8 +77,8 @@ class ArrayDenormalizerTest extends TestCase
                 ],
                 __NAMESPACE__.'\ArrayDummy[]',
                 'json',
-                ['con' => 'text']
-            )
+                ['con' => 'text'],
+            ),
         );
     }
 
@@ -94,8 +94,8 @@ class ArrayDenormalizerTest extends TestCase
                     ['foo' => 'one', 'bar' => 'two'],
                     ['foo' => 'three', 'bar' => 'four'],
                 ],
-                __NAMESPACE__.'\InvalidClass[]'
-            )
+                __NAMESPACE__.'\InvalidClass[]',
+            ),
         );
     }
 
@@ -104,8 +104,8 @@ class ArrayDenormalizerTest extends TestCase
         $this->assertFalse(
             $this->denormalizer->supportsDenormalization(
                 ['foo' => 'one', 'bar' => 'two'],
-                ArrayDummy::class
-            )
+                ArrayDummy::class,
+            ),
         );
     }
 }

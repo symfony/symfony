@@ -36,7 +36,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             // filter the choice list lazily
             return $this->createListFromLoader(new FilterChoiceLoaderDecorator(
                 new CallbackChoiceLoader(static fn () => $choices),
-                $filter
+                $filter,
             ), $value);
         }
 
@@ -175,7 +175,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             \is_callable($attr) ? $attr($choice, $key, $value) : ($attr[$key] ?? []),
             // The label translation parameters may be a callable or a mapping from choice indices
             // to nested arrays
-            \is_callable($labelTranslationParameters) ? $labelTranslationParameters($choice, $key, $value) : ($labelTranslationParameters[$key] ?? [])
+            \is_callable($labelTranslationParameters) ? $labelTranslationParameters($choice, $key, $value) : ($labelTranslationParameters[$key] ?? []),
         );
 
         // $isPreferred may be null if no choices are preferred

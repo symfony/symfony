@@ -68,7 +68,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 return $item;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
         self::$setInnerItem ??= \Closure::bind(
             static function (CacheItemInterface $innerItem, CacheItem $item, $expiry = null) {
@@ -76,7 +76,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $innerItem->expiresAt(($expiry ?? $item->expiry) ? \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $expiry ?? $item->expiry)) : null);
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
     }
 

@@ -27,7 +27,7 @@ class DoctrineTransportFactoryTest extends TestCase
     public function testSupports()
     {
         $factory = new DoctrineTransportFactory(
-            $this->createMock(ConnectionRegistry::class)
+            $this->createMock(ConnectionRegistry::class),
         );
 
         $this->assertTrue($factory->supports('doctrine://default', []));
@@ -50,7 +50,7 @@ class DoctrineTransportFactoryTest extends TestCase
 
         $this->assertEquals(
             new DoctrineTransport(new Connection(PostgreSqlConnection::buildConfiguration('doctrine://default'), $driverConnection), $serializer),
-            $factory->createTransport('doctrine://default', [], $serializer)
+            $factory->createTransport('doctrine://default', [], $serializer),
         );
     }
 
@@ -71,7 +71,7 @@ class DoctrineTransportFactoryTest extends TestCase
 
         $this->assertEquals(
             new DoctrineTransport(new PostgreSqlConnection(PostgreSqlConnection::buildConfiguration('doctrine://default'), $driverConnection), $serializer),
-            $factory->createTransport('doctrine://default', [], $serializer)
+            $factory->createTransport('doctrine://default', [], $serializer),
         );
     }
 

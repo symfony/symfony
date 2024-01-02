@@ -29,39 +29,39 @@ class MessageConverterTest extends TestCase
         $this->assertConversion((clone $email)->html('HTML content <img src="cid:test.jpg" />'));
         $this->assertConversion((clone $email)
             ->text('text content')
+            ->html('HTML content <img src="cid:test.jpg" />'),
+        );
+        $this->assertConversion((clone $email)
+            ->text('text content')
             ->html('HTML content <img src="cid:test.jpg" />')
+            ->addPart((new DataPart($file, 'test.jpg', 'image/gif'))->asInline()),
+        );
+        $this->assertConversion((clone $email)
+            ->text('text content')
+            ->html('HTML content <img src="cid:test.jpg" />')
+            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif')),
         );
         $this->assertConversion((clone $email)
             ->text('text content')
             ->html('HTML content <img src="cid:test.jpg" />')
             ->addPart((new DataPart($file, 'test.jpg', 'image/gif'))->asInline())
+            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif')),
         );
         $this->assertConversion((clone $email)
             ->text('text content')
+            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif')),
+        );
+        $this->assertConversion((clone $email)
             ->html('HTML content <img src="cid:test.jpg" />')
-            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif'))
+            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif')),
+        );
+        $this->assertConversion((clone $email)
+            ->html('HTML content <img src="cid:test.jpg" />')
+            ->addPart((new DataPart($file, 'test.jpg', 'image/gif'))->asInline()),
         );
         $this->assertConversion((clone $email)
             ->text('text content')
-            ->html('HTML content <img src="cid:test.jpg" />')
-            ->addPart((new DataPart($file, 'test.jpg', 'image/gif'))->asInline())
-            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif'))
-        );
-        $this->assertConversion((clone $email)
-            ->text('text content')
-            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif'))
-        );
-        $this->assertConversion((clone $email)
-            ->html('HTML content <img src="cid:test.jpg" />')
-            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif'))
-        );
-        $this->assertConversion((clone $email)
-            ->html('HTML content <img src="cid:test.jpg" />')
-            ->addPart((new DataPart($file, 'test.jpg', 'image/gif'))->asInline())
-        );
-        $this->assertConversion((clone $email)
-            ->text('text content')
-            ->addPart((new DataPart($file, 'test_attached.jpg', 'image/gif'))->asInline())
+            ->addPart((new DataPart($file, 'test_attached.jpg', 'image/gif'))->asInline()),
         );
     }
 

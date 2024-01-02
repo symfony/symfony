@@ -31,7 +31,7 @@ class ObjectPropertyListExtractorTest extends TestCase
 
         $this->assertSame(
             $properties,
-            (new ObjectPropertyListExtractor($propertyListExtractor))->getProperties($object, $context)
+            (new ObjectPropertyListExtractor($propertyListExtractor))->getProperties($object, $context),
         );
     }
 
@@ -55,7 +55,7 @@ class ObjectPropertyListExtractorTest extends TestCase
 
         $this->assertSame(
             $properties,
-            (new ObjectPropertyListExtractor($propertyListExtractor, $classResolver))->getProperties($object, $context)
+            (new ObjectPropertyListExtractor($propertyListExtractor, $classResolver))->getProperties($object, $context),
         );
     }
 }

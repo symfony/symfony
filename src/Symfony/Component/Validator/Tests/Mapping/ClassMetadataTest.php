@@ -185,7 +185,7 @@ class ClassMetadataTest extends TestCase
                 'Default' => [$constraintA2],
                 'Entity' => [$constraintA2],
             ],
-            $members[0]->constraintsByGroup
+            $members[0]->constraintsByGroup,
         );
         $this->assertEquals(self::PARENTCLASS, $members[1]->getClassName());
         $this->assertEquals([$constraintA1, $constraintB], $members[1]->getConstraints());
@@ -196,7 +196,7 @@ class ClassMetadataTest extends TestCase
                 'EntityParent' => [$constraintA1],
                 'foo' => [$constraintB],
             ],
-            $members[1]->constraintsByGroup
+            $members[1]->constraintsByGroup,
         );
     }
 

@@ -67,7 +67,7 @@ class IntlCaster
                     'MIN_SIGNIFICANT_DIGITS' => $c->getAttribute(\NumberFormatter::MIN_SIGNIFICANT_DIGITS),
                     'MAX_SIGNIFICANT_DIGITS' => $c->getAttribute(\NumberFormatter::MAX_SIGNIFICANT_DIGITS),
                     'LENIENT_PARSE' => $c->getAttribute(\NumberFormatter::LENIENT_PARSE),
-                ]
+                ],
             ),
             Caster::PREFIX_VIRTUAL.'text_attributes' => new EnumStub(
                 [
@@ -79,7 +79,7 @@ class IntlCaster
                     'CURRENCY_CODE' => $c->getTextAttribute(\NumberFormatter::CURRENCY_CODE),
                     'DEFAULT_RULESET' => $c->getTextAttribute(\NumberFormatter::DEFAULT_RULESET),
                     'PUBLIC_RULESETS' => $c->getTextAttribute(\NumberFormatter::PUBLIC_RULESETS),
-                ]
+                ],
             ),
             Caster::PREFIX_VIRTUAL.'symbols' => new EnumStub(
                 [
@@ -101,7 +101,7 @@ class IntlCaster
                     'NAN_SYMBOL' => $c->getSymbol(\NumberFormatter::NAN_SYMBOL),
                     'SIGNIFICANT_DIGIT_SYMBOL' => $c->getSymbol(\NumberFormatter::SIGNIFICANT_DIGIT_SYMBOL),
                     'MONETARY_GROUPING_SEPARATOR_SYMBOL' => $c->getSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL),
-                ]
+                ],
             ),
         ];
 

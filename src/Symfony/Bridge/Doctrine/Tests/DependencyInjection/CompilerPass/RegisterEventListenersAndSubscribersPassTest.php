@@ -80,7 +80,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
                 [['foo'], 'b'],
                 [['foo'], 'a'],
             ],
-            $eventManagerDef->getArgument(1)
+            $eventManagerDef->getArgument(1),
         );
         $this->assertEquals([], $eventManagerDef->getMethodCalls());
 
@@ -92,7 +92,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
                 'a' => new ServiceClosureArgument(new Reference('a')),
                 'b' => new ServiceClosureArgument(new Reference('b')),
             ],
-            $serviceLocatorDef->getArgument(0)
+            $serviceLocatorDef->getArgument(0),
         );
     }
 
@@ -143,7 +143,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
                 [['onFlush'], 'a'],
                 [['onFlush'], 'b'],
             ],
-            $eventManagerDef->getArgument(1)
+            $eventManagerDef->getArgument(1),
         );
         $this->assertEquals([], $eventManagerDef->getMethodCalls());
 
@@ -154,7 +154,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
                 'a' => new ServiceClosureArgument(new Reference('a')),
                 'b' => new ServiceClosureArgument(new Reference('b')),
             ],
-            $serviceLocatorDef->getArgument(0)
+            $serviceLocatorDef->getArgument(0),
         );
 
         // second connection
@@ -165,7 +165,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
                 [['onFlush'], 'c'],
                 [['onFlush'], 'd'],
             ],
-            $secondEventManagerDef->getArgument(1)
+            $secondEventManagerDef->getArgument(1),
         );
         $this->assertEquals([], $secondEventManagerDef->getMethodCalls());
 
@@ -177,7 +177,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
                 'c' => new ServiceClosureArgument(new Reference('c')),
                 'd' => new ServiceClosureArgument(new Reference('d')),
             ],
-            $serviceLocatorDef->getArgument(0)
+            $serviceLocatorDef->getArgument(0),
         );
     }
 
@@ -213,7 +213,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
                 [['bar'], 'b'],
                 [['foo'], 'b'],
             ],
-            $eventManagerDef->getArgument(1)
+            $eventManagerDef->getArgument(1),
         );
     }
 

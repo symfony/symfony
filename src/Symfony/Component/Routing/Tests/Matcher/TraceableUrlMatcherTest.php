@@ -67,7 +67,7 @@ class TraceableUrlMatcherTest extends UrlMatcherTest
             ['_controller' => 'MainBundle:Info:first'],
             [],
             [],
-            'some.example.com'
+            'some.example.com',
         ));
 
         $routes->add('second', new Route(
@@ -75,7 +75,7 @@ class TraceableUrlMatcherTest extends UrlMatcherTest
             ['_controller' => 'MainBundle:Info:second'],
             [],
             [],
-            'another.example.com'
+            'another.example.com',
         ));
 
         $context = new RequestContext();
@@ -86,7 +86,7 @@ class TraceableUrlMatcherTest extends UrlMatcherTest
         $traces = $matcher->getTraces('/mypath/');
         $this->assertSame(
             [TraceableUrlMatcher::ROUTE_ALMOST_MATCHES, TraceableUrlMatcher::ROUTE_ALMOST_MATCHES],
-            $this->getLevels($traces)
+            $this->getLevels($traces),
         );
     }
 

@@ -314,7 +314,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $constraints = [new NotNull(), new Range(['min' => 2])];
 
         $constraint = new Expression(
-            ['expression' => 'is_valid(this.data, a)', 'values' => ['a' => $constraints]]
+            ['expression' => 'is_valid(this.data, a)', 'values' => ['a' => $constraints]],
         );
 
         $object = new Entity();
@@ -334,7 +334,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $constraints = [new Range(['min' => 2, 'max' => 5])];
 
         $constraint = new Expression(
-            ['expression' => 'is_valid(this.data, a)', 'values' => ['a' => $constraints]]
+            ['expression' => 'is_valid(this.data, a)', 'values' => ['a' => $constraints]],
         );
 
         $object = new Entity();
@@ -347,7 +347,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             7,
             $constraints,
             null,
-            new ConstraintViolation('error_range', '', [], '', '', 7, null, 'range')
+            new ConstraintViolation('error_range', '', [], '', '', 7, null, 'range'),
         );
 
         $this->validator->validate($object, $constraint);

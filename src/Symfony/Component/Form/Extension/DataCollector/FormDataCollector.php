@@ -104,7 +104,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
         $this->dataByForm[$hash] = array_replace(
             $this->dataByForm[$hash],
-            $this->dataExtractor->extractConfiguration($form)
+            $this->dataExtractor->extractConfiguration($form),
         );
 
         foreach ($form as $child) {
@@ -123,7 +123,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
         $this->dataByForm[$hash] = array_replace(
             $this->dataByForm[$hash],
-            $this->dataExtractor->extractDefaultData($form)
+            $this->dataExtractor->extractDefaultData($form),
         );
 
         foreach ($form as $child) {
@@ -143,7 +143,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
         $this->dataByForm[$hash] = array_replace(
             $this->dataByForm[$hash],
-            $this->dataExtractor->extractSubmittedData($form)
+            $this->dataExtractor->extractSubmittedData($form),
         );
 
         // Count errors
@@ -172,7 +172,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
         $this->dataByView[$hash] = array_replace(
             $this->dataByView[$hash],
-            $this->dataExtractor->extractViewVariables($view)
+            $this->dataExtractor->extractViewVariables($view),
         );
 
         foreach ($view->children as $child) {
@@ -283,7 +283,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             $output = array_replace(
                 $output,
                 $this->dataByForm[$formHash]
-                    ?? []
+                    ?? [],
             );
         }
 

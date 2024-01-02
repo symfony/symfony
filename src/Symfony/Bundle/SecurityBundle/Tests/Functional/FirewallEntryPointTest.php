@@ -24,7 +24,7 @@ class FirewallEntryPointTest extends AbstractWebTestCase
         $this->assertEquals(
             EntryPointStub::RESPONSE_TEXT,
             $client->getResponse()->getContent(),
-            "Custom entry point wasn't started"
+            "Custom entry point wasn't started",
         );
     }
 }

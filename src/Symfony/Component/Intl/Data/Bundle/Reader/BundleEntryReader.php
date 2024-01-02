@@ -152,7 +152,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
             'Couldn\'t read the indices [%s] for the locale "%s" in "%s".',
             implode('][', $indices),
             $locale,
-            $path
+            $path,
         );
 
         // Append fallback locales, if any
@@ -162,7 +162,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
 
             $errorMessage .= sprintf(
                 ' The indices also couldn\'t be found for the fallback locale(s) "%s".',
-                implode('", "', $testedLocales)
+                implode('", "', $testedLocales),
             );
         }
 

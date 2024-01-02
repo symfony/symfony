@@ -92,7 +92,7 @@ class AbstractObjectNormalizerTest extends TestCase
             ['fooFoo' => 'foo'],
             Dummy::class,
             'any',
-            ['allow_extra_attributes' => false]
+            ['allow_extra_attributes' => false],
         );
     }
 
@@ -108,7 +108,7 @@ class AbstractObjectNormalizerTest extends TestCase
             ['fooFoo' => 'foo', 'fooBar' => 'bar'],
             Dummy::class,
             'any',
-            ['allow_extra_attributes' => false]
+            ['allow_extra_attributes' => false],
         );
     }
 
@@ -123,7 +123,7 @@ class AbstractObjectNormalizerTest extends TestCase
             ['fooFoo' => 'foo', 'fooBar' => 'bar', 'bar' => 'bar'],
             Dummy::class,
             'any',
-            ['allow_extra_attributes' => false]
+            ['allow_extra_attributes' => false],
         );
     }
 
@@ -399,7 +399,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 ],
             ],
             DummyCollection::class,
-            'xml'
+            'xml',
         );
 
         $this->assertInstanceOf(DummyCollection::class, $dummyCollection);
@@ -420,7 +420,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 ],
             ],
             DummyCollection::class,
-            'xml'
+            'xml',
         );
 
         $this->assertInstanceOf(DummyCollection::class, $dummyCollection);
@@ -436,7 +436,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $extractor->method('getTypes')
             ->will($this->onConsecutiveCalls(
                 [new Type('array', false, null, true, new Type('int'), new Type('object', false, DummyChild::class))],
-                null
+                null,
             ));
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
@@ -491,7 +491,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $extractor->method('getTypes')
             ->will($this->onConsecutiveCalls(
                 [new Type('array', false, null, true, new Type('int'), new Type('string'))],
-                null
+                null,
             ));
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
@@ -516,7 +516,7 @@ class AbstractObjectNormalizerTest extends TestCase
                         new ClassDiscriminatorMapping('type', [
                             'first' => AbstractDummyFirstChild::class,
                             'second' => AbstractDummySecondChild::class,
-                        ])
+                        ]),
                     );
                 }
 
@@ -551,7 +551,7 @@ class AbstractObjectNormalizerTest extends TestCase
                         new ClassDiscriminatorMapping('type', [
                             'first' => AbstractDummyFirstChild::class,
                             'second' => AbstractDummySecondChild::class,
-                        ])
+                        ]),
                     );
                 }
 
@@ -648,7 +648,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 'floatNegInf' => '-INF',
             ],
             ObjectWithBasicProperties::class,
-            'xml'
+            'xml',
         );
 
         $this->assertInstanceOf(ObjectWithBasicProperties::class, $objectWithBooleanProperties);
@@ -688,7 +688,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 [new Type('float')],
                 [new Type('float')],
                 [new Type('float')],
-                [new Type('float')]
+                [new Type('float')],
             ));
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);

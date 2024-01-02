@@ -31,7 +31,7 @@ class UnaryNode extends Node
     {
         parent::__construct(
             ['node' => $node],
-            ['operator' => $operator]
+            ['operator' => $operator],
         );
     }
 

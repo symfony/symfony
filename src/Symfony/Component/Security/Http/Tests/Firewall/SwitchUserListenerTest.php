@@ -128,7 +128,7 @@ class SwitchUserListenerTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(fn (SwitchUserEvent $event) => $event->getTargetUser() === $refreshedUser),
-                SecurityEvents::SWITCH_USER
+                SecurityEvents::SWITCH_USER,
             )
         ;
 
@@ -300,7 +300,7 @@ class SwitchUserListenerTest extends TestCase
 
                     return true;
                 }),
-                SecurityEvents::SWITCH_USER
+                SecurityEvents::SWITCH_USER,
             );
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
@@ -362,7 +362,7 @@ class SwitchUserListenerTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(fn (SwitchUserEvent $event) => $event->getToken()->getUser() === $refreshedOriginalUser),
-                SecurityEvents::SWITCH_USER
+                SecurityEvents::SWITCH_USER,
             )
         ;
 

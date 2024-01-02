@@ -54,7 +54,7 @@ class UidValueResolverTest extends TestCase
     {
         $this->assertEquals([$expected], (new UidValueResolver())->resolve(
             new Request([], [], ['id' => $requestUid]),
-            new ArgumentMetadata('id', $expected::class, false, false, null)
+            new ArgumentMetadata('id', $expected::class, false, false, null),
         ));
     }
 
@@ -83,7 +83,7 @@ class UidValueResolverTest extends TestCase
 
         (new UidValueResolver())->resolve(
             new Request([], [], ['id' => $requestUid]),
-            new ArgumentMetadata('id', $argumentType, false, false, null)
+            new ArgumentMetadata('id', $argumentType, false, false, null),
         );
     }
 
@@ -104,7 +104,7 @@ class UidValueResolverTest extends TestCase
 
         (new UidValueResolver())->resolve(
             new Request([], [], ['id' => (string) new UuidV1()]),
-            new ArgumentMetadata('id', TestAbstractCustomUid::class, false, false, null)
+            new ArgumentMetadata('id', TestAbstractCustomUid::class, false, false, null),
         );
     }
 }

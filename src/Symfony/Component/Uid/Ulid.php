@@ -80,7 +80,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             base_convert(substr($ulid, 12, 5), 16, 32),
             base_convert(substr($ulid, 17, 5), 16, 32),
             base_convert(substr($ulid, 22, 5), 16, 32),
-            base_convert(substr($ulid, 27, 5), 16, 32)
+            base_convert(substr($ulid, 27, 5), 16, 32),
         );
 
         if (self::NIL === $ulid) {
@@ -108,7 +108,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             base_convert(substr($ulid, 10, 4), 32, 16),
             base_convert(substr($ulid, 14, 4), 32, 16),
             base_convert(substr($ulid, 18, 4), 32, 16),
-            base_convert(substr($ulid, 22, 4), 32, 16)
+            base_convert(substr($ulid, 22, 4), 32, 16),
         );
 
         return hex2bin($ulid);
@@ -136,7 +136,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             $time = sprintf('%02s%05s%05s',
                 base_convert(substr($time, 0, 2), 32, 16),
                 base_convert(substr($time, 2, 4), 32, 16),
-                base_convert(substr($time, 6, 4), 32, 16)
+                base_convert(substr($time, 6, 4), 32, 16),
             );
             $time = BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10);
         }
@@ -193,7 +193,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             $time = sprintf('%s%04s%04s',
                 base_convert(substr($time, 0, 2), 16, 32),
                 base_convert(substr($time, 2, 5), 16, 32),
-                base_convert(substr($time, 7, 5), 16, 32)
+                base_convert(substr($time, 7, 5), 16, 32),
             );
         }
 
@@ -202,7 +202,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             base_convert(self::$rand[1], 10, 32),
             base_convert(self::$rand[2], 10, 32),
             base_convert(self::$rand[3], 10, 32),
-            base_convert(self::$rand[4], 10, 32)
+            base_convert(self::$rand[4], 10, 32),
         ), 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
     }
 }

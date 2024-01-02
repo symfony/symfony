@@ -93,7 +93,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         $allowedBytes = array_merge(
             range(\ord('a'), \ord('z')), range(\ord('A'), \ord('Z')),
             range(\ord('0'), \ord('9')),
-            [\ord('!'), \ord('*'), \ord('+'), \ord('-'), \ord('/')]
+            [\ord('!'), \ord('*'), \ord('+'), \ord('-'), \ord('/')],
         );
         $encoder = new QpMimeHeaderEncoder();
         foreach (range(0x00, 0xFF) as $byte) {

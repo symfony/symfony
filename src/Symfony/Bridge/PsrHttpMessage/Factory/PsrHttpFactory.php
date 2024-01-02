@@ -73,7 +73,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
         $request = $this->serverRequestFactory->createServerRequest(
             $symfonyRequest->getMethod(),
             $uri,
-            $symfonyRequest->server->all()
+            $symfonyRequest->server->all(),
         );
 
         foreach ($symfonyRequest->headers->all() as $name => $value) {
@@ -141,12 +141,12 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
     {
         return $this->uploadedFileFactory->createUploadedFile(
             $this->streamFactory->createStreamFromFile(
-                $symfonyUploadedFile->getRealPath()
+                $symfonyUploadedFile->getRealPath(),
             ),
             (int) $symfonyUploadedFile->getSize(),
             $symfonyUploadedFile->getError(),
             $symfonyUploadedFile->getClientOriginalName(),
-            $symfonyUploadedFile->getClientMimeType()
+            $symfonyUploadedFile->getClientMimeType(),
         );
     }
 
@@ -156,7 +156,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
         if ($symfonyResponse instanceof BinaryFileResponse && !$symfonyResponse->headers->has('Content-Range')) {
             $stream = $this->streamFactory->createStreamFromFile(
-                $symfonyResponse->getFile()->getPathname()
+                $symfonyResponse->getFile()->getPathname(),
             );
         } else {
             $stream = $this->streamFactory->createStreamFromFile('php://temp', 'wb+');

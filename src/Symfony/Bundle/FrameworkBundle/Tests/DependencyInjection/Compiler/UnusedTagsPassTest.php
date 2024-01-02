@@ -46,7 +46,7 @@ class UnusedTagsPassTest extends TestCase
         $tags = \Closure::bind(
             fn () => UnusedTagsPass::KNOWN_TAGS,
             null,
-            UnusedTagsPass::class
+            UnusedTagsPass::class,
         )();
         sort($tags);
 

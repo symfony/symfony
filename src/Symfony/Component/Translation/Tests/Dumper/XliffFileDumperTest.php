@@ -32,7 +32,7 @@ class XliffFileDumperTest extends TestCase
 
         $this->assertStringEqualsFile(
             __DIR__.'/../Fixtures/resources-clean.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR'])
+            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR']),
         );
     }
 
@@ -51,7 +51,7 @@ class XliffFileDumperTest extends TestCase
 
         $this->assertStringEqualsFile(
             __DIR__.'/../Fixtures/resources-2.0-clean.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
+            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0']),
         );
     }
 
@@ -66,7 +66,7 @@ class XliffFileDumperTest extends TestCase
 
         $this->assertStringEqualsFile(
             __DIR__.'/../Fixtures/resources-2.0+intl-icu.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages'.MessageCatalogue::INTL_DOMAIN_SUFFIX, ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
+            $dumper->formatCatalogue($catalogue, 'messages'.MessageCatalogue::INTL_DOMAIN_SUFFIX, ['default_locale' => 'fr_FR', 'xliff_version' => '2.0']),
         );
     }
 
@@ -84,7 +84,7 @@ class XliffFileDumperTest extends TestCase
 
         $this->assertStringEqualsFile(
             __DIR__.'/../Fixtures/resources-tool-info.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', $options)
+            $dumper->formatCatalogue($catalogue, 'messages', $options),
         );
     }
 
@@ -100,7 +100,7 @@ class XliffFileDumperTest extends TestCase
 
         $this->assertStringEqualsFile(
             __DIR__.'/../Fixtures/resources-target-attributes.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR'])
+            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR']),
         );
     }
 
@@ -125,7 +125,7 @@ class XliffFileDumperTest extends TestCase
 
         $this->assertStringEqualsFile(
             __DIR__.'/../Fixtures/resources-notes-meta.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
+            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0']),
         );
     }
 
@@ -144,7 +144,7 @@ class XliffFileDumperTest extends TestCase
 
         $this->assertStringEqualsFile(
             __DIR__.'/../Fixtures/resources-clean.xliff',
-            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR'])
+            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR']),
         );
     }
 }

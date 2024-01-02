@@ -114,7 +114,7 @@ final class FormExtension extends AbstractExtension
         return $this->createFieldTranslation(
             $label,
             $view->vars['label_translation_parameters'] ?: [],
-            $view->vars['translation_domain']
+            $view->vars['translation_domain'],
         );
     }
 
@@ -123,7 +123,7 @@ final class FormExtension extends AbstractExtension
         return $this->createFieldTranslation(
             $view->vars['help'],
             $view->vars['help_translation_parameters'] ?: [],
-            $view->vars['translation_domain']
+            $view->vars['translation_domain'],
         );
     }
 

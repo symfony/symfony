@@ -66,7 +66,7 @@ class AccessListenerTest extends TestCase
         $listener = new AccessListener(
             $tokenStorage,
             $accessDecisionManager,
-            $accessMap
+            $accessMap,
         );
 
         $this->expectException(AccessDeniedException::class);
@@ -95,7 +95,7 @@ class AccessListenerTest extends TestCase
         $listener = new AccessListener(
             $tokenStorage,
             $this->createMock(AccessDecisionManagerInterface::class),
-            $accessMap
+            $accessMap,
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
@@ -122,7 +122,7 @@ class AccessListenerTest extends TestCase
         $listener = new AccessListener(
             $tokenStorage,
             $this->createMock(AccessDecisionManagerInterface::class),
-            $accessMap
+            $accessMap,
         );
 
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
@@ -152,7 +152,7 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            false
+            false,
         );
 
         $this->expectException(AccessDeniedException::class);
@@ -182,7 +182,7 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            false
+            false,
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
@@ -212,7 +212,7 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            false
+            false,
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
@@ -246,7 +246,7 @@ class AccessListenerTest extends TestCase
         $listener = new AccessListener(
             $tokenStorage,
             $accessDecisionManager,
-            $accessMap
+            $accessMap,
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
@@ -277,7 +277,7 @@ class AccessListenerTest extends TestCase
         $accessMap = $this->createMock(AccessMapInterface::class);
 
         $this->expectExceptionObject(
-            new \LogicException('Argument $exceptionOnNoToken of "Symfony\Component\Security\Http\Firewall\AccessListener::__construct()" must be set to "false".')
+            new \LogicException('Argument $exceptionOnNoToken of "Symfony\Component\Security\Http\Firewall\AccessListener::__construct()" must be set to "false".'),
         );
 
         new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, true);

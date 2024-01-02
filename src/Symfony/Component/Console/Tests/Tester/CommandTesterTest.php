@@ -240,7 +240,7 @@ class CommandTesterTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(
             ['foo' => 'bar'],
-            ['capture_stderr_separately' => true]
+            ['capture_stderr_separately' => true],
         );
 
         $this->assertSame('foo', $tester->getErrorOutput());

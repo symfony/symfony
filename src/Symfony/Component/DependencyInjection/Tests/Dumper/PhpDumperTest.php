@@ -769,7 +769,7 @@ class PhpDumperTest extends TestCase
         ]);
         $this->assertStringEqualsFile(
             self::$fixturesPath.'/php/services_non_shared_lazy_public.php',
-            '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump) : $dump
+            '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump) : $dump,
         );
         eval('?>'.$dump);
 
@@ -807,7 +807,7 @@ class PhpDumperTest extends TestCase
         $stringDump = print_r($dumps, true);
         $this->assertStringMatchesFormatFile(
             self::$fixturesPath.'/php/services_non_shared_lazy_as_files.txt',
-            '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $stringDump) : $stringDump
+            '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $stringDump) : $stringDump,
         );
 
         $lastDump = array_pop($dumps);
@@ -1401,7 +1401,7 @@ class PhpDumperTest extends TestCase
         };
 %A
 PHP
-            , $dumpedContainer
+            , $dumpedContainer,
         );
     }
 

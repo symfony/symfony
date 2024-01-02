@@ -42,7 +42,7 @@ class IdReader
         // single field association are resolved, since the schema column could be an int
         if ($singleId && $classMetadata->hasAssociation($this->idField)) {
             $this->associationIdReader = new self($om, $om->getClassMetadata(
-                $classMetadata->getAssociationTargetClass($this->idField)
+                $classMetadata->getAssociationTargetClass($this->idField),
             ));
 
             $singleId = $this->associationIdReader->isSingleId();

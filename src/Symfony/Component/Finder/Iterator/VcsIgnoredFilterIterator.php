@@ -123,7 +123,7 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
     {
         return array_filter(
             $this->parentDirectoriesUpwards($from),
-            static fn (string $directory): bool => str_starts_with($directory, $upTo)
+            static fn (string $directory): bool => str_starts_with($directory, $upTo),
         );
     }
 
@@ -133,7 +133,7 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
     private function parentDirectoriesDownwards(string $fileRealPath): array
     {
         return array_reverse(
-            $this->parentDirectoriesUpTo($fileRealPath, $this->baseDir)
+            $this->parentDirectoriesUpTo($fileRealPath, $this->baseDir),
         );
     }
 

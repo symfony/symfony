@@ -24,7 +24,7 @@ class NameNode extends Node
     {
         parent::__construct(
             [],
-            ['name' => $name]
+            ['name' => $name],
         );
     }
 

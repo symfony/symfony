@@ -354,7 +354,7 @@ abstract class Descriptor implements DescriptorInterface
         try {
             return array_values(array_unique(array_map(
                 fn (ServiceReferenceGraphEdge $edge) => $edge->getSourceNode()->getId(),
-                $container->getCompiler()->getServiceReferenceGraph()->getNode($serviceId)->getInEdges()
+                $container->getCompiler()->getServiceReferenceGraph()->getNode($serviceId)->getInEdges(),
             )));
         } catch (InvalidArgumentException $exception) {
             return [];

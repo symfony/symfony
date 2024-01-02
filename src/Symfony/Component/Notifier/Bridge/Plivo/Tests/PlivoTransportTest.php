@@ -70,7 +70,7 @@ final class PlivoTransportTest extends TransportTestCase
             self::assertSame('https://api.plivo.com/v1/Account/authId/Message/', $url);
 
             return $response;
-        }
+        },
         );
         $transport = $this->createTransport($client, $from);
         $sentMessage = $transport->send($message);

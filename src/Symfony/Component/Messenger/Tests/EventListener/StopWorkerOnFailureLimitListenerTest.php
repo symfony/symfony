@@ -58,7 +58,7 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
         $logger->expects($this->once())->method('info')
             ->with(
                 $this->equalTo('Worker stopped due to limit of {count} failed message(s) is reached'),
-                $this->equalTo(['count' => 1])
+                $this->equalTo(['count' => 1]),
             );
 
         $worker = $this->createMock(Worker::class);

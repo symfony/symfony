@@ -32,7 +32,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500], 0),
-            1
+            1,
         );
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
@@ -49,7 +49,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500], 0),
-            1
+            1,
         );
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
@@ -71,7 +71,7 @@ class RetryableHttpClientTest extends TestCase
                     return 500 === $context->getStatusCode() && null === $responseContent ? null : 200 !== $context->getStatusCode();
                 }
             },
-            2
+            2,
         );
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
@@ -96,7 +96,7 @@ class RetryableHttpClientTest extends TestCase
                     return 'my bad' !== $responseContent;
                 }
             },
-            1
+            1,
         );
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
@@ -118,7 +118,7 @@ class RetryableHttpClientTest extends TestCase
                     return null;
                 }
             },
-            1
+            1,
         );
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
@@ -134,7 +134,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 500]),
             ]),
             new GenericRetryStrategy([500], 0),
-            0
+            0,
         );
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
@@ -157,7 +157,7 @@ class RetryableHttpClientTest extends TestCase
                 }
             },
             2,
-            $logger = new TestLogger()
+            $logger = new TestLogger(),
         );
 
         $response = $client->request('GET', 'http://does.not.exists/foo-bar');
@@ -215,7 +215,7 @@ class RetryableHttpClientTest extends TestCase
                     $this->context = $context;
                     parent::log($level, $message, $context);
                 }
-            }
+            },
         );
 
         $client->request('GET', 'http://example.com/foo-bar')->getContent();
@@ -235,7 +235,7 @@ class RetryableHttpClientTest extends TestCase
                new MockResponse('Test out content', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500], 0),
-            1
+            1,
         );
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
@@ -253,7 +253,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('Hit on second uri', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500], 0),
-            1
+            1,
         );
 
         $response = $client->request('GET', 'foo-bar', [
@@ -275,7 +275,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('Hit on second uri', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500], 0),
-            1
+            1,
         );
 
         $client = $client->withOptions([
@@ -299,7 +299,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('Hit on second uri', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500], 0),
-            1
+            1,
         );
 
         $response = $client->request('GET', 'foo-bar', [
@@ -327,7 +327,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('Hit on second uri', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500], 0),
-            3
+            3,
         );
 
         $response = $client->request('GET', 'foo-bar', [
@@ -354,7 +354,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500, 502], 0),
-            3
+            3,
         );
 
         $response = $client->request('GET', 'http://example.com/foo-bar', [
@@ -374,7 +374,7 @@ class RetryableHttpClientTest extends TestCase
                 new MockResponse('', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500, 502, 504], 0),
-            3
+            3,
         );
 
         $client = $client->withOptions([

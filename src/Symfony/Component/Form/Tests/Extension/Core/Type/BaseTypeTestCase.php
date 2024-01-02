@@ -238,7 +238,7 @@ abstract class BaseTypeTestCase extends TypeTestCase
     {
         $view = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array_merge(
             $this->getTestOptions(),
-            ['label' => 'My label']
+            ['label' => 'My label'],
         ))
             ->createView();
 

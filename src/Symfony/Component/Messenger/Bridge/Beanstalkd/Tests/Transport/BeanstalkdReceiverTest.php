@@ -92,7 +92,7 @@ final class BeanstalkdReceiverTest extends TestCase
     private function createSerializer(): Serializer
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]),
         );
 
         return $serializer;

@@ -75,7 +75,7 @@ class RedisReceiverTest extends TestCase
             ],
             new DummyMessage('Hi'),
             new Serializer(
-                new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+                new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]),
             ),
         ];
 

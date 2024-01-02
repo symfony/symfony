@@ -59,7 +59,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
                 return $item;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
     }
 

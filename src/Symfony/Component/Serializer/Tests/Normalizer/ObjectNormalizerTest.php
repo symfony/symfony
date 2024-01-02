@@ -123,7 +123,7 @@ class ObjectNormalizerTest extends TestCase
                 'object' => 'string_object',
                 'go' => true,
             ],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any'),
         );
     }
 
@@ -132,7 +132,7 @@ class ObjectNormalizerTest extends TestCase
         $obj = new Php74Dummy();
         $this->assertEquals(
             ['initializedProperty' => 'defaultValue'],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any'),
         );
     }
 
@@ -142,7 +142,7 @@ class ObjectNormalizerTest extends TestCase
         unset($obj->foo);
         $this->assertEquals(
             ['bar' => null],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any'),
         );
     }
 
@@ -152,7 +152,7 @@ class ObjectNormalizerTest extends TestCase
         unset($obj->foo);
         $this->assertEquals(
             ['foo' => 123, 'bar' => null],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any'),
         );
     }
 
@@ -161,7 +161,7 @@ class ObjectNormalizerTest extends TestCase
         $obj = new Php74DummyPrivate();
         $this->assertEquals(
             ['initializedProperty' => 'defaultValue'],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any'),
         );
     }
 
@@ -170,7 +170,7 @@ class ObjectNormalizerTest extends TestCase
         $obj = new DummyPrivatePropertyWithoutGetter();
         $this->assertEquals(
             ['bar' => 'bar'],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any'),
         );
     }
 
@@ -179,7 +179,7 @@ class ObjectNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'],
             ObjectDummy::class,
-            'any'
+            'any',
         );
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->bar);
@@ -192,7 +192,7 @@ class ObjectNormalizerTest extends TestCase
         $obj = $normalizer->denormalize(
             ['bar' => ''],
             ObjectDummy::class,
-            'xml'
+            'xml',
         );
 
         $this->assertIsArray($obj->bar);
@@ -483,7 +483,7 @@ class ObjectNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
             ],
-            $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => ['name_converter']])
+            $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => ['name_converter']]),
         );
     }
 
@@ -504,7 +504,7 @@ class ObjectNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
                 'coop_tilleuls' => 'les-tilleuls.coop',
-            ], GroupDummy::class, null, [ObjectNormalizer::GROUPS => ['name_converter']])
+            ], GroupDummy::class, null, [ObjectNormalizer::GROUPS => ['name_converter']]),
         );
     }
 
@@ -521,7 +521,7 @@ class ObjectNormalizerTest extends TestCase
             $obj,
             $this->normalizer->denormalize([
                 'buz' => 'Aldrin',
-            ], 'Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy', null, [ObjectNormalizer::GROUPS => ['a']])
+            ], 'Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy', null, [ObjectNormalizer::GROUPS => ['a']]),
         );
     }
 
@@ -641,7 +641,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $this->assertEquals(
             new ObjectDummy(),
-            $this->normalizer->denormalize(['non_existing' => true], ObjectDummy::class)
+            $this->normalizer->denormalize(['non_existing' => true], ObjectDummy::class),
         );
     }
 
@@ -795,7 +795,7 @@ class ObjectNormalizerTest extends TestCase
                 'object' => null,
                 'go' => false,
             ],
-            $normalizer->normalize($obj, 'any')
+            $normalizer->normalize($obj, 'any'),
         );
     }
 
@@ -822,7 +822,7 @@ class ObjectNormalizerTest extends TestCase
                 'object' => null,
                 'go' => null,
             ],
-            $normalizer->normalize($obj, 'any')
+            $normalizer->normalize($obj, 'any'),
         );
     }
 

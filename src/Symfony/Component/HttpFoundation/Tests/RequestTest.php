@@ -609,7 +609,7 @@ class RequestTest extends TestCase
 
         $this->assertEquals(
             'http://host:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string',
-            $request->getUri()
+            $request->getUri(),
         );
 
         // with user info

@@ -43,7 +43,7 @@ trait DomCrawlerAssertionsTrait
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
-            new DomCrawlerConstraint\CrawlerSelectorTextContains($selector, $text)
+            new DomCrawlerConstraint\CrawlerSelectorTextContains($selector, $text),
         ), $message);
     }
 
@@ -51,7 +51,7 @@ trait DomCrawlerAssertionsTrait
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
-            new DomCrawlerConstraint\CrawlerAnySelectorTextContains($selector, $text)
+            new DomCrawlerConstraint\CrawlerAnySelectorTextContains($selector, $text),
         ), $message);
     }
 
@@ -59,7 +59,7 @@ trait DomCrawlerAssertionsTrait
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
-            new DomCrawlerConstraint\CrawlerSelectorTextSame($selector, $text)
+            new DomCrawlerConstraint\CrawlerSelectorTextSame($selector, $text),
         ), $message);
     }
 
@@ -67,7 +67,7 @@ trait DomCrawlerAssertionsTrait
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
-            new DomCrawlerConstraint\CrawlerAnySelectorTextSame($selector, $text)
+            new DomCrawlerConstraint\CrawlerAnySelectorTextSame($selector, $text),
         ), $message);
     }
 
@@ -75,7 +75,7 @@ trait DomCrawlerAssertionsTrait
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
-            new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorTextContains($selector, $text))
+            new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorTextContains($selector, $text)),
         ), $message);
     }
 
@@ -83,7 +83,7 @@ trait DomCrawlerAssertionsTrait
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
-            new LogicalNot(new DomCrawlerConstraint\CrawlerAnySelectorTextContains($selector, $text))
+            new LogicalNot(new DomCrawlerConstraint\CrawlerAnySelectorTextContains($selector, $text)),
         ), $message);
     }
 
@@ -101,7 +101,7 @@ trait DomCrawlerAssertionsTrait
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists("input[name=\"$fieldName\"]"),
-            new DomCrawlerConstraint\CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'value', $expectedValue)
+            new DomCrawlerConstraint\CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'value', $expectedValue),
         ), $message);
     }
 
@@ -109,7 +109,7 @@ trait DomCrawlerAssertionsTrait
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists("input[name=\"$fieldName\"]"),
-            new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'value', $expectedValue))
+            new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'value', $expectedValue)),
         ), $message);
     }
 

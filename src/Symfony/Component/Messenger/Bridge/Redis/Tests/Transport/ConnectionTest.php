@@ -36,7 +36,7 @@ class ConnectionTest extends TestCase
                 'host' => 'localhost',
                 'port' => 6379,
             ], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue?', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/queue?', [], $this->createMock(\Redis::class)),
         );
     }
 
@@ -48,7 +48,7 @@ class ConnectionTest extends TestCase
                 'host' => '/var/run/redis/redis.sock',
                 'port' => 0,
             ], $redis = $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis:///var/run/redis/redis.sock', ['stream' => 'queue'], $redis)
+            Connection::fromDsn('redis:///var/run/redis/redis.sock', ['stream' => 'queue'], $redis),
         );
     }
 
@@ -56,7 +56,7 @@ class ConnectionTest extends TestCase
     {
         $this->assertEquals(
             Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createMock(\Redis::class)),
         );
     }
 
@@ -64,7 +64,7 @@ class ConnectionTest extends TestCase
     {
         $this->assertEquals(
             Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createMock(\Redis::class)),
         );
     }
 
@@ -90,7 +90,7 @@ class ConnectionTest extends TestCase
                 'port' => 6379,
                 'serializer' => 2,
             ], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2', [], $this->createMock(\Redis::class)),
         );
     }
 
@@ -98,12 +98,12 @@ class ConnectionTest extends TestCase
     {
         $this->assertEquals(
             Connection::fromDsn('redis://localhost/queue/group1?serializer=2', ['consumer' => 'specific-consumer'], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2', [], $this->createMock(\Redis::class)),
         );
 
         $this->assertEquals(
             Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['consumer' => 'specific-consumer'], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1', [], $this->createMock(\Redis::class)),
         );
     }
 
@@ -439,7 +439,7 @@ class ConnectionTest extends TestCase
                 'user' => 'user',
                 'pass' => 'password',
             ], $redis),
-            Connection::fromDsn('redis://user:password@/var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis)
+            Connection::fromDsn('redis://user:password@/var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis),
         );
     }
 
@@ -459,7 +459,7 @@ class ConnectionTest extends TestCase
                 'port' => 0,
                 'pass' => 'password',
             ], $redis),
-            Connection::fromDsn('redis://password@/var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis)
+            Connection::fromDsn('redis://password@/var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis),
         );
     }
 
@@ -479,7 +479,7 @@ class ConnectionTest extends TestCase
                 'port' => 0,
                 'user' => 'user',
             ], $redis),
-            Connection::fromDsn('redis://user:@/var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis)
+            Connection::fromDsn('redis://user:@/var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis),
         );
     }
 }

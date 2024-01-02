@@ -73,7 +73,7 @@ class FrozenParameterBagTest extends TestCase
     {
         $bag = new FrozenParameterBag(
             ['foo' => 'bar'],
-            ['foo' => ['symfony/test', '6.3', 'The parameter "%s" is deprecated.', 'foo']]
+            ['foo' => ['symfony/test', '6.3', 'The parameter "%s" is deprecated.', 'foo']],
         );
 
         $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated.');

@@ -36,7 +36,7 @@ trait SkipUninitializedValuesTestTrait
             ['unInitialized' => 'value'],
             TypedPropertiesObjectWithGetters::class,
             null,
-            ['object_to_populate' => $objectToPopulate = new TypedPropertiesObjectWithGetters(), 'deep_object_to_populate' => true] + $context
+            ['object_to_populate' => $objectToPopulate = new TypedPropertiesObjectWithGetters(), 'deep_object_to_populate' => true] + $context,
         );
 
         $this->assertSame('value', $objectToPopulate->getUninitialized());

@@ -33,7 +33,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
                 return $item;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
     }
 

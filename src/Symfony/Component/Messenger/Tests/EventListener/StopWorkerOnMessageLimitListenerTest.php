@@ -49,7 +49,7 @@ class StopWorkerOnMessageLimitListenerTest extends TestCase
         $logger->expects($this->once())->method('info')
             ->with(
                 $this->equalTo('Worker stopped due to maximum count of {count} messages processed'),
-                $this->equalTo(['count' => 1])
+                $this->equalTo(['count' => 1]),
             );
 
         $worker = $this->createMock(Worker::class);

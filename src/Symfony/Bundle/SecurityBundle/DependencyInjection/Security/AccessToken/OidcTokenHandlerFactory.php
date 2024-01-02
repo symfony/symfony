@@ -28,7 +28,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
         $tokenHandlerDefinition = $container->setDefinition($id, (new ChildDefinition('security.access_token_handler.oidc'))
             ->replaceArgument(2, $config['audience'])
             ->replaceArgument(3, $config['issuers'])
-            ->replaceArgument(4, $config['claim'])
+            ->replaceArgument(4, $config['claim']),
         );
 
         if (!ContainerBuilder::willBeAvailable('web-token/jwt-core', Algorithm::class, ['symfony/security-bundle'])) {
@@ -41,12 +41,12 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
             $tokenHandlerDefinition->replaceArgument(0, new Reference('security.access_token_handler.oidc.signature.'.$config['algorithm']));
         } else {
             $tokenHandlerDefinition->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature'))
-                ->replaceArgument(0, $config['algorithm'])
+                ->replaceArgument(0, $config['algorithm']),
             );
         }
 
         $tokenHandlerDefinition->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwk'))
-            ->replaceArgument(0, $config['key'])
+            ->replaceArgument(0, $config['key']),
         );
     }
 

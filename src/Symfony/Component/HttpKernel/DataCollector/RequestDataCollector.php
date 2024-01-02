@@ -162,7 +162,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     'status_code' => $statusCode,
                     'status_text' => Response::$statusTexts[$statusCode],
                 ]),
-                0, '/', null, $request->isSecure(), true, false, 'lax'
+                0, '/', null, $request->isSecure(), true, false, 'lax',
             ));
         }
 

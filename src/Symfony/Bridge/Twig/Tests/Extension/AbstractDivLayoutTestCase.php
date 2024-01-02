@@ -32,7 +32,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
             [count(./li)=1]
         /following-sibling::input[@id="name"]
     ]
-'
+',
         );
     }
 
@@ -51,7 +51,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         ./label[@for="name"][@class="my&label&class required"][.="[trans]foo&bar[/trans]"]
         /following-sibling::input[@id="name"][@class="my&class"]
     ]
-'
+',
         );
     }
 
@@ -78,7 +78,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         ./label[@for="name_second"]
         /following-sibling::input[@id="name_second"]
     ]
-'
+',
         );
     }
 
@@ -94,7 +94,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         ./button[@type="button"][@name="name"]
     ]
     [count(//label)=0]
-'
+',
         );
     }
 
@@ -135,7 +135,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
 /following-sibling::input
     [@type="hidden"]
     [@id="name__token"]
-'
+',
         );
     }
 
@@ -193,7 +193,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     [count(//label)=4]
     [count(//input[@type="text"])=2]
 /following-sibling::input[@type="hidden"][@id="parent__token"]
-'
+',
         );
     }
 
@@ -219,7 +219,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
 /following-sibling::input
     [@type="hidden"]
     [@id="name__token"]
-'
+',
         );
     }
 
@@ -247,7 +247,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
 /following-sibling::input
     [@type="hidden"]
     [@id="name__token"]
-'
+',
         );
     }
 
@@ -277,7 +277,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
 /following-sibling::input
     [@type="hidden"]
     [@id="name__token"]
-'
+',
         );
     }
 
@@ -294,7 +294,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::div[./input[@type="text"][@value="b"]]
     ]
     [count(./div[./input])=2]
-'
+',
         );
     }
 
@@ -317,7 +317,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
     [count(./div[./div/div/input])=1]
     [count(./div[./div/div/textarea])=1]
-'
+',
         );
     }
 
@@ -331,7 +331,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
             '/div
     [./input[@type="hidden"][@id="names__token"]]
     [count(./div)=0]
-'
+',
         );
     }
 
@@ -341,7 +341,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
             'collection',
             'Symfony\Component\Form\Extension\Core\Type\CollectionType',
             ['a', 'b'],
-            ['entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType']
+            ['entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType'],
         );
 
         $form = $this->factory->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType')
@@ -371,7 +371,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="form__token"]
     ]
     [count(.//input)=3]
-'
+',
         );
     }
 
@@ -415,7 +415,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     [@method="post"]
     [@action="http://example.com"]
     [@class="my&class"]
-'
+',
         );
     }
 
@@ -442,7 +442,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(.//input)=3]
-'
+',
         );
     }
 
@@ -452,7 +452,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add($this->factory
                 ->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, ['error_bubbling' => false])
-                ->add('grandChild', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+                ->add('grandChild', 'Symfony\Component\Form\Extension\Core\Type\FormType'),
             )
             ->getForm();
 
@@ -465,7 +465,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::ul[./li[.="[trans]Error![/trans]"]]
     ]
     [count(.//li[.="[trans]Error![/trans]"])=1]
-'
+',
         );
     }
 
@@ -479,7 +479,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
             ->add($this->factory
                 // No CSRF protection on nested forms
                 ->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-                ->add($this->factory->createNamedBuilder('grandchild', 'Symfony\Component\Form\Extension\Core\Type\TextType'))
+                ->add($this->factory->createNamedBuilder('grandchild', 'Symfony\Component\Form\Extension\Core\Type\TextType')),
             )
             ->getForm();
 
@@ -490,7 +490,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"][@value="foo&bar"]
     ]
     [count(.//input[@type="hidden"])=1]
-'
+',
         );
     }
 
@@ -516,7 +516,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(.//input)=3]
-'
+',
         );
     }
 
@@ -544,7 +544,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(.//input)=3]
-'
+',
         );
     }
 
@@ -565,7 +565,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="full__token"]
     ]
     [count(//input)=2]
-'
+',
         );
     }
 
@@ -580,7 +580,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         ./label[@for="name"][not(@id)]
         /following-sibling::input[@id="name"]
     ]
-'
+',
         );
     }
 
@@ -597,7 +597,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         ./input[@id="name"]
     ]
     [count(//label)=0]
-'
+',
         );
     }
 
@@ -615,7 +615,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
 
         $this->assertMatchesXpath(
             $this->renderWidget($view),
-            '/input[@type="email"][@rel="theme"]'
+            '/input[@type="email"][@rel="theme"]',
         );
     }
 
@@ -659,7 +659,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"]
     ]
-'
+',
         );
     }
 
@@ -680,7 +680,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::div[./label[.="Custom label: [trans]1[/trans]"]]
         /following-sibling::div[./label[.="Custom label: [trans]2[/trans]"]]
     ]
-'
+',
         );
     }
 
@@ -702,7 +702,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         ./label[.="Custom name label: [trans]ChoiceA[/trans]"]
         /following-sibling::label[.="Custom name label: [trans]ChoiceB[/trans]"]
     ]
-'
+',
         );
     }
 
@@ -724,7 +724,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
     [count(./input)=3]
     [count(./label)=1]
-'
+',
         );
     }
 
@@ -755,7 +755,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
     [count(./input)=4]
     [count(./label)=3]
-'
+',
         );
     }
 
@@ -777,7 +777,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
     [count(./input)=3]
     [count(./label)=1]
-'
+',
         );
     }
 
@@ -799,7 +799,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
     [count(./input)=3]
     [count(./label)=1]
-'
+',
         );
     }
 
@@ -830,7 +830,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
     [count(./input)=4]
     [count(./label)=3]
-'
+',
         );
     }
 
@@ -852,7 +852,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
     [count(./input)=3]
     [count(./label)=1]
-'
+',
         );
     }
 
@@ -882,7 +882,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
             [@type="hidden"]
             [@id="name__token"]
     ]
-'
+',
         );
     }
 

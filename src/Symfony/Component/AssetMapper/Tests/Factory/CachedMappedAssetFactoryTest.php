@@ -44,7 +44,7 @@ class CachedMappedAssetFactoryTest extends TestCase
         $cachedFactory = new CachedMappedAssetFactory(
             $factory,
             $this->cacheDir,
-            true
+            true,
         );
 
         $mappedAsset = new MappedAsset('file1.css', __DIR__.'/../Fixtures/dir1/file1.css');
@@ -74,7 +74,7 @@ class CachedMappedAssetFactoryTest extends TestCase
         $cachedFactory = new CachedMappedAssetFactory(
             $factory,
             $this->cacheDir,
-            true
+            true,
         );
 
         $factory->expects($this->never())
@@ -111,7 +111,7 @@ class CachedMappedAssetFactoryTest extends TestCase
         $cachedFactory = new CachedMappedAssetFactory(
             $factory,
             $this->cacheDir,
-            true
+            true,
         );
         $cachedFactory->createMappedAsset('file1.css', $sourcePath);
 

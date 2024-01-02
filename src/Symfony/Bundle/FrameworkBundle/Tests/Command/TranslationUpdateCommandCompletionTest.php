@@ -84,7 +84,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
                     foreach ($extractedMessages as $domain => $messages) {
                         $catalogue->add($messages, $domain);
                     }
-                }
+                },
             );
 
         $loader = $this->createMock(TranslationReader::class);
@@ -94,7 +94,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
             ->willReturnCallback(
                 function ($path, $catalogue) use ($loadedMessages) {
                     $catalogue->add($loadedMessages);
-                }
+                },
             );
 
         $writer = $this->createMock(TranslationWriter::class);
@@ -102,7 +102,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
             ->expects($this->any())
             ->method('getFormats')
             ->willReturn(
-                ['php', 'xlf', 'po', 'mo', 'yml', 'yaml', 'ts', 'csv', 'ini', 'json', 'res']
+                ['php', 'xlf', 'po', 'mo', 'yml', 'yaml', 'ts', 'csv', 'ini', 'json', 'res'],
             );
 
         if (null === $kernel) {

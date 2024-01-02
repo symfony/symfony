@@ -229,7 +229,7 @@ EOF
                 $list = array_merge(
                     array_diff($allKeys, $newKeys),
                     array_map(fn ($id) => sprintf('<fg=green>%s</>', $id), $newKeys),
-                    array_map(fn ($id) => sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
+                    array_map(fn ($id) => sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain))),
                 );
 
                 $domainMessagesCount = \count($list);
@@ -317,7 +317,7 @@ EOF
         if ($input->mustSuggestOptionValuesFor('format')) {
             $suggestions->suggestValues(array_merge(
                 $this->writer->getFormats(),
-                array_keys(self::FORMATS)
+                array_keys(self::FORMATS),
             ));
 
             return;

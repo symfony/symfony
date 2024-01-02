@@ -53,28 +53,28 @@ class FilecontentFilterIteratorTest extends IteratorTestCase
             'name' => 'a.txt',
             'contents' => 'Lorem ipsum...',
             'type' => 'file',
-            'mode' => 'r+', ]
+            'mode' => 'r+', ],
         );
 
         $inner[] = new MockSplFileInfo([
             'name' => 'b.yml',
             'contents' => 'dolor sit...',
             'type' => 'file',
-            'mode' => 'r+', ]
+            'mode' => 'r+', ],
         );
 
         $inner[] = new MockSplFileInfo([
             'name' => 'some/other/dir/third.php',
             'contents' => 'amet...',
             'type' => 'file',
-            'mode' => 'r+', ]
+            'mode' => 'r+', ],
         );
 
         $inner[] = new MockSplFileInfo([
             'name' => 'unreadable-file.txt',
             'contents' => false,
             'type' => 'file',
-            'mode' => 'r+', ]
+            'mode' => 'r+', ],
         );
 
         return [

@@ -133,7 +133,7 @@ class YamlFileLoader extends FileLoader
 
             $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
                 $yaml['discriminator_map']['type_property'],
-                $yaml['discriminator_map']['mapping']
+                $yaml['discriminator_map']['mapping'],
             ));
         }
 

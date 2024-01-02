@@ -48,7 +48,7 @@ class RegisterLocaleAwareServicesPassTest extends TestCase
                 ]),
                 null,
             ],
-            $container->getDefinition('locale_aware_listener')->getArguments()
+            $container->getDefinition('locale_aware_listener')->getArguments(),
         );
     }
 

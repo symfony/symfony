@@ -142,7 +142,7 @@ class UrlHelperTest extends TestCase
 
         $this->assertEquals(
             'http://localhost/app/web/bundles/framework/css/structure.css',
-            $helper->getAbsoluteUrl('/app/web/bundles/framework/css/structure.css')
+            $helper->getAbsoluteUrl('/app/web/bundles/framework/css/structure.css'),
         );
     }
 

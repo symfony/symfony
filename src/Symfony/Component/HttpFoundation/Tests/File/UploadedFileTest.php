@@ -39,7 +39,7 @@ class UploadedFileTest extends TestCase
         new UploadedFile(
             __DIR__.'/Fixtures/not_here',
             'original.gif',
-            null
+            null,
         );
     }
 
@@ -49,7 +49,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            \UPLOAD_ERR_OK
+            \UPLOAD_ERR_OK,
         );
 
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
@@ -65,7 +65,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/.unknownextension',
             'original.gif',
             null,
-            \UPLOAD_ERR_OK
+            \UPLOAD_ERR_OK,
         );
 
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
@@ -77,7 +77,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            null
+            null,
         );
 
         $this->assertEquals('gif', $file->guessClientExtension());
@@ -89,7 +89,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/png',
-            null
+            null,
         );
 
         $this->assertEquals('png', $file->guessClientExtension());
@@ -101,7 +101,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/case-sensitive-mime-type.xlsm',
             'test.xlsm',
             'application/vnd.ms-excel.sheet.macroEnabled.12',
-            null
+            null,
         );
 
         $this->assertEquals('xlsm', $file->guessClientExtension());
@@ -113,7 +113,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            null
+            null,
         );
 
         $this->assertEquals(\UPLOAD_ERR_OK, $file->getError());
@@ -125,7 +125,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            null
+            null,
         );
 
         $this->assertEquals('original.gif', $file->getClientOriginalName());
@@ -137,7 +137,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            null
+            null,
         );
 
         $this->assertEquals('gif', $file->getClientOriginalExtension());
@@ -150,7 +150,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            \UPLOAD_ERR_OK
+            \UPLOAD_ERR_OK,
         );
 
         $file->move(__DIR__.'/Fixtures/directory');
@@ -163,7 +163,7 @@ class UploadedFileTest extends TestCase
                 __DIR__.'/Fixtures/test.gif',
                 'original.gif',
                 'image/gif',
-                $error
+                $error,
             )];
         }
     }
@@ -203,7 +203,7 @@ class UploadedFileTest extends TestCase
             'original.gif',
             'image/gif',
             \UPLOAD_ERR_OK,
-            true
+            true,
         );
 
         $movedFile = $file->move(__DIR__.'/Fixtures/directory');
@@ -220,7 +220,7 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             '../../original.gif',
-            'image/gif'
+            'image/gif',
         );
 
         $this->assertEquals('original.gif', $file->getClientOriginalName());
@@ -231,7 +231,7 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
-            'image/gif'
+            'image/gif',
         );
 
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
@@ -239,7 +239,7 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test',
             'original.gif',
-            'image/gif'
+            'image/gif',
         );
 
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
@@ -249,7 +249,7 @@ class UploadedFileTest extends TestCase
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
-            'original.gif'
+            'original.gif',
         );
 
         $this->assertEquals('gif', $file->getExtension());
@@ -262,7 +262,7 @@ class UploadedFileTest extends TestCase
             'original.gif',
             null,
             \UPLOAD_ERR_OK,
-            true
+            true,
         );
 
         $this->assertTrue($file->isValid());
@@ -277,7 +277,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            $error
+            $error,
         );
 
         $this->assertFalse($file->isValid());
@@ -300,7 +300,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            \UPLOAD_ERR_OK
+            \UPLOAD_ERR_OK,
         );
 
         $this->assertFalse($file->isValid());
@@ -328,7 +328,7 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'test.gif',
-            'image/gif'
+            'image/gif',
         );
 
         $this->assertEquals('test.gif', $file->getClientOriginalPath());

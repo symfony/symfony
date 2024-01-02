@@ -36,7 +36,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            $serviceLocator,
         );
 
         $tester = new CommandTester($command);
@@ -57,7 +57,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            $serviceLocator,
         );
 
         $tester = new CommandTester($command);
@@ -78,7 +78,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $command = new FailedMessagesRemoveCommand(
             $failureReveiverName,
-            $serviceLocator
+            $serviceLocator,
         );
 
         $tester = new CommandTester($command);
@@ -98,7 +98,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $command = new FailedMessagesRemoveCommand(
             $failureReceiverName,
-            $serviceLocator
+            $serviceLocator,
         );
 
         $tester = new CommandTester($command);
@@ -134,7 +134,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            $serviceLocator,
         );
 
         $tester = new CommandTester($command);
@@ -171,7 +171,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            $serviceLocator,
         );
 
         $tester = new CommandTester($command);
@@ -196,7 +196,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            $serviceLocator,
         );
         $tester = new CommandCompletionTester($command);
 
@@ -220,7 +220,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            $serviceLocator,
         );
         $tester = new CommandCompletionTester($command);
 
@@ -246,7 +246,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            $serviceLocator,
         );
 
         $tester = new CommandCompletionTester($command);

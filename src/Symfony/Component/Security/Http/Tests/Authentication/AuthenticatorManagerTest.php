@@ -83,7 +83,7 @@ class AuthenticatorManagerTest extends TestCase
         $manager = $this->createManager([new \stdClass()]);
 
         $this->expectExceptionObject(
-            new \InvalidArgumentException('Authenticator "stdClass" must implement "Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface".')
+            new \InvalidArgumentException('Authenticator "stdClass" must implement "Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface".'),
         );
 
         $manager->supports($this->request);

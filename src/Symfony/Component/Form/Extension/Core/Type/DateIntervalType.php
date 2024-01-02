@@ -113,8 +113,8 @@ class DateIntervalType extends AbstractType
                     if ('integer' === $options['widget']) {
                         $childForm->addModelTransformer(
                             new ReversedTransformer(
-                                new IntegerToLocalizedStringTransformer()
-                            )
+                                new IntegerToLocalizedStringTransformer(),
+                            ),
                         );
                     }
                     $builder->add($childForm);
@@ -133,14 +133,14 @@ class DateIntervalType extends AbstractType
         if ('string' === $options['input']) {
             $builder->addModelTransformer(
                 new ReversedTransformer(
-                    new DateIntervalToStringTransformer($format)
-                )
+                    new DateIntervalToStringTransformer($format),
+                ),
             );
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(
                 new ReversedTransformer(
-                    new DateIntervalToArrayTransformer($parts)
-                )
+                    new DateIntervalToArrayTransformer($parts),
+                ),
             );
         }
     }
@@ -225,7 +225,7 @@ class DateIntervalType extends AbstractType
                 'dateinterval',
                 'string',
                 'array',
-            ]
+            ],
         );
         $resolver->setAllowedValues(
             'widget',
@@ -234,7 +234,7 @@ class DateIntervalType extends AbstractType
                 'text',
                 'integer',
                 'choice',
-            ]
+            ],
         );
         // Don't clone \DateInterval classes, as i.e. format()
         // does not work after that

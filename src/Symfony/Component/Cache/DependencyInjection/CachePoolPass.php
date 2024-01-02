@@ -147,7 +147,7 @@ class CachePoolPass implements CompilerPassInterface
                         ->addArgument(new Reference('reverse_container'))
                         ->addArgument((new Definition('callable'))
                             ->setFactory([new Reference($id), 'setCallbackWrapper'])
-                            ->addArgument(null)
+                            ->addArgument(null),
                         ),
                     ]);
                     $pool->addTag('container.reversible');

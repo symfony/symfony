@@ -196,7 +196,7 @@ class MapDenormalizationTest extends TestCase
                         new ClassDiscriminatorMapping('type', [
                             'dummy' => DummyValue::class,
                             'another-dummy' => AnotherDummyValue::class,
-                        ])
+                        ]),
                     );
                 }
 

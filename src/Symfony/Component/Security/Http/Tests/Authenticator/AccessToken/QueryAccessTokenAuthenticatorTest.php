@@ -113,7 +113,7 @@ class QueryAccessTokenAuthenticatorTest extends TestCase
         $this->authenticator = new AccessTokenAuthenticator(
             $this->accessTokenHandler,
             new QueryAccessTokenExtractor($parameter),
-            $this->userProvider
+            $this->userProvider,
         );
     }
 }

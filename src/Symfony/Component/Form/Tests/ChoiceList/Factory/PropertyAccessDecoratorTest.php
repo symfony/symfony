@@ -69,7 +69,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->assertSame(
             ['value 2' => $object2],
-            $this->factory->createListFromChoices($choices, new PropertyPath('property'), new PropertyPath('filter'))->getChoices()
+            $this->factory->createListFromChoices($choices, new PropertyPath('property'), new PropertyPath('filter'))->getChoices(),
         );
     }
 

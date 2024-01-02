@@ -378,7 +378,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     $attributeContext['deserialization_path'] ?? null,
                     false,
                     $e->getCode(),
-                    $e
+                    $e,
                 );
                 if (isset($context['not_normalizable_value_exceptions'])) {
                     $context['not_normalizable_value_exceptions'][] = $exception;

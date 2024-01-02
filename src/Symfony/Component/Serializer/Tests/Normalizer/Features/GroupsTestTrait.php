@@ -63,7 +63,7 @@ trait GroupsTestTrait
             $data,
             GroupDummy::class,
             null,
-            ['groups' => ['a']]
+            ['groups' => ['a']],
         );
         $this->assertEquals($obj, $normalized);
 
@@ -73,7 +73,7 @@ trait GroupsTestTrait
             $data,
             GroupDummy::class,
             null,
-            ['groups' => ['a', 'b']]
+            ['groups' => ['a', 'b']],
         );
         $this->assertEquals($obj, $normalized);
     }

@@ -30,7 +30,7 @@ class NullTransportFactoryTest extends TestCase
     {
         $this->nullTransportFactory = new NullTransportFactory(
             $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(HttpClientInterface::class)
+            $this->createMock(HttpClientInterface::class),
         );
     }
 
@@ -45,7 +45,7 @@ class NullTransportFactoryTest extends TestCase
     {
         $this->assertInstanceOf(
             NullTransport::class,
-            $this->nullTransportFactory->create(new Dsn('null://null'))
+            $this->nullTransportFactory->create(new Dsn('null://null')),
         );
     }
 }

@@ -333,7 +333,7 @@ class MessengerPass implements CompilerPassInterface
     {
         $container->setDefinition(
             $tracedBusId = 'debug.traced.'.$busId,
-            (new Definition(TraceableMessageBus::class, [new Reference($tracedBusId.'.inner')]))->setDecoratedService($busId)
+            (new Definition(TraceableMessageBus::class, [new Reference($tracedBusId.'.inner')]))->setDecoratedService($busId),
         );
 
         $container->getDefinition('data_collector.messenger')->addMethodCall('registerBus', [$busId, new Reference($tracedBusId)]);

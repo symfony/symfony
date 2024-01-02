@@ -62,7 +62,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
                 $options['csrf_message'],
                 $this->translator,
                 $this->translationDomain,
-                $this->serverParams
+                $this->serverParams,
             ))
         ;
     }

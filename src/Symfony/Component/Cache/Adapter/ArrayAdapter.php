@@ -70,7 +70,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
                 return $item;
             },
             null,
-            CacheItem::class
+            CacheItem::class,
         );
     }
 

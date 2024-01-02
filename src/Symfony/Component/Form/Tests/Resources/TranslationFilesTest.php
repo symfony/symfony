@@ -46,7 +46,7 @@ class TranslationFilesTest extends TestCase
     {
         return array_map(
             fn ($filePath) => (array) $filePath,
-            glob(\dirname(__DIR__, 2).'/Resources/translations/*.xlf')
+            glob(\dirname(__DIR__, 2).'/Resources/translations/*.xlf'),
         );
     }
 
@@ -55,7 +55,7 @@ class TranslationFilesTest extends TestCase
         $this->assertFileEquals(
             \dirname(__DIR__, 2).'/Resources/translations/validators.nb.xlf',
             \dirname(__DIR__, 2).'/Resources/translations/validators.no.xlf',
-            'The NO locale should be an alias for the NB variant of the Norwegian language.'
+            'The NO locale should be an alias for the NB variant of the Norwegian language.',
         );
     }
 }

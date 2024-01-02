@@ -42,7 +42,7 @@ class TargetPathTraitTest extends TestCase
         $actualUri = $obj->doGetTargetPath($session, 'cool_firewall');
         $this->assertEquals(
             '/bar',
-            $actualUri
+            $actualUri,
         );
     }
 

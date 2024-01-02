@@ -57,7 +57,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
 
         $this->assertEquals(
             ['notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured', 'setChildMethodWithoutDocBlock'],
-            array_column($methodCalls, 0)
+            array_column($methodCalls, 0),
         );
         $this->assertEquals([], $methodCalls[0][1]);
     }

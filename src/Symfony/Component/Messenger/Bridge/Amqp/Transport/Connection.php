@@ -297,7 +297,7 @@ class Connection
             $body,
             $this->getRoutingKeyForMessage($amqpStamp),
             $headers,
-            $amqpStamp
+            $amqpStamp,
         );
     }
 
@@ -324,7 +324,7 @@ class Connection
             $body,
             $this->getRoutingKeyForDelay($delay, $routingKey, $isRetryAttempt),
             $headers,
-            $amqpStamp
+            $amqpStamp,
         );
     }
 
@@ -341,7 +341,7 @@ class Connection
             $body,
             $routingKey,
             $amqpStamp ? $amqpStamp->getFlags() : \AMQP_NOPARAM,
-            $attributes
+            $attributes,
         );
 
         if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
@@ -409,7 +409,7 @@ class Connection
         return str_replace(
             ['%delay%', '%exchange_name%', '%routing_key%'],
             [$delay, $this->exchangeOptions['name'], $finalRoutingKey ?? ''],
-            $this->connectionOptions['delay']['queue_name_pattern']
+            $this->connectionOptions['delay']['queue_name_pattern'],
         ).$action;
     }
 
@@ -493,7 +493,7 @@ class Connection
                 $this->amqpChannel->confirmSelect();
                 $this->amqpChannel->setConfirmCallback(
                     static fn (): bool => false,
-                    static fn (): bool => false
+                    static fn (): bool => false,
                 );
             }
 

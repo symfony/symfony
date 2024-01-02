@@ -90,7 +90,7 @@ final class TranslatorBag implements TranslatorBagInterface
             foreach ($operation->getDomains() as $domain) {
                 $obsoleteCatalogue->add(
                     array_diff($operation->getMessages($domain), $operation->getNewMessages($domain)),
-                    $domain
+                    $domain,
                 );
             }
 

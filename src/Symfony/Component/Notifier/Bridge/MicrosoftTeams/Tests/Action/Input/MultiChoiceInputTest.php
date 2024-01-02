@@ -31,7 +31,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
             [
                 ['display' => $display, 'value' => $value],
             ],
-            $input->toArray()['choices']
+            $input->toArray()['choices'],
         );
     }
 
@@ -87,7 +87,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
             [
                 '@type' => 'MultichoiceInput',
             ],
-            $this->createInput()->toArray()
+            $this->createInput()->toArray(),
         );
     }
 }

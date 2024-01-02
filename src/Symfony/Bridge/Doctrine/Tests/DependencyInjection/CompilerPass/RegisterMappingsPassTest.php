@@ -37,7 +37,7 @@ class RegisterMappingsPassTest extends TestCase
             new Definition('\stdClass'),
             [],
             $managerParamNames,
-            'some.%s.metadata_driver'
+            'some.%s.metadata_driver',
         );
 
         $pass->process($container);

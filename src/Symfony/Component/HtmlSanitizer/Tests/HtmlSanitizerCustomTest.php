@@ -26,7 +26,7 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             ' world',
-            (new HtmlSanitizer($config))->sanitizeFor('head', '<div style="width: 100px">Hello</div> world')
+            (new HtmlSanitizer($config))->sanitizeFor('head', '<div style="width: 100px">Hello</div> world'),
         );
     }
 
@@ -38,7 +38,7 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '&lt;div style&#61;&#34;width: 100px&#34;&gt;Hello&lt;/div&gt; world',
-            (new HtmlSanitizer($config))->sanitizeFor('textarea', '<div style="width: 100px">Hello</div> world')
+            (new HtmlSanitizer($config))->sanitizeFor('textarea', '<div style="width: 100px">Hello</div> world'),
         );
     }
 
@@ -50,7 +50,7 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '&lt;div style&#61;&#34;width: 100px&#34;&gt;Hello&lt;/div&gt; world',
-            (new HtmlSanitizer($config))->sanitizeFor('title', '<div style="width: 100px">Hello</div> world')
+            (new HtmlSanitizer($config))->sanitizeFor('title', '<div style="width: 100px">Hello</div> world'),
         );
     }
 
@@ -77,7 +77,7 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<div>Hello</div> world',
-            (new HtmlSanitizer($config))->sanitize('<div style="width: 100px">Hello</div> world')
+            (new HtmlSanitizer($config))->sanitize('<div style="width: 100px">Hello</div> world'),
         );
     }
 
@@ -89,12 +89,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<div>Hello</div> world',
-            $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+            $this->sanitize($config, '<div style="width: 100px">Hello</div> world'),
         );
 
         $this->assertSame(
             ' world',
-            $this->sanitize($config, '<span style="width: 100px">Hello</span> world')
+            $this->sanitize($config, '<span style="width: 100px">Hello</span> world'),
         );
     }
 
@@ -106,12 +106,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<div style="width: 100px">Hello</div> world',
-            $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+            $this->sanitize($config, '<div style="width: 100px">Hello</div> world'),
         );
 
         $this->assertSame(
             ' world',
-            $this->sanitize($config, '<span style="width: 100px">Hello</span> world')
+            $this->sanitize($config, '<span style="width: 100px">Hello</span> world'),
         );
     }
 
@@ -123,12 +123,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             'Hello world',
-            $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+            $this->sanitize($config, '<div style="width: 100px">Hello</div> world'),
         );
 
         $this->assertSame(
             ' world',
-            $this->sanitize($config, '<span style="width: 100px">Hello</span> world')
+            $this->sanitize($config, '<span style="width: 100px">Hello</span> world'),
         );
     }
 
@@ -141,12 +141,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             ' world',
-            $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+            $this->sanitize($config, '<div style="width: 100px">Hello</div> world'),
         );
 
         $this->assertSame(
             ' world',
-            $this->sanitize($config, '<span style="width: 100px">Hello</span> world')
+            $this->sanitize($config, '<span style="width: 100px">Hello</span> world'),
         );
     }
 
@@ -160,12 +160,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<div style="width: 100px">Hello</div> world',
-            $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+            $this->sanitize($config, '<div style="width: 100px">Hello</div> world'),
         );
 
         $this->assertSame(
             '<span>Hello</span> world',
-            $this->sanitize($config, '<span style="width: 100px">Hello</span> world')
+            $this->sanitize($config, '<span style="width: 100px">Hello</span> world'),
         );
     }
 
@@ -179,12 +179,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<div style="width: 100px">Hello</div> world',
-            $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+            $this->sanitize($config, '<div style="width: 100px">Hello</div> world'),
         );
 
         $this->assertSame(
             '<span style="width: 100px">Hello</span> world',
-            $this->sanitize($config, '<span style="width: 100px">Hello</span> world')
+            $this->sanitize($config, '<span style="width: 100px">Hello</span> world'),
         );
     }
 
@@ -199,12 +199,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<div style="width: 100px">Hello</div> world',
-            $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+            $this->sanitize($config, '<div style="width: 100px">Hello</div> world'),
         );
 
         $this->assertSame(
             '<span>Hello</span> world',
-            $this->sanitize($config, '<span style="width: 100px">Hello</span> world')
+            $this->sanitize($config, '<span style="width: 100px">Hello</span> world'),
         );
     }
 
@@ -219,12 +219,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<div>Hello</div> world',
-            $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+            $this->sanitize($config, '<div style="width: 100px">Hello</div> world'),
         );
 
         $this->assertSame(
             '<span>Hello</span> world',
-            $this->sanitize($config, '<span style="width: 100px">Hello</span> world')
+            $this->sanitize($config, '<span style="width: 100px">Hello</span> world'),
         );
     }
 
@@ -238,17 +238,17 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<a rel="noopener noreferrer">Hello</a> world',
-            $this->sanitize($config, '<a>Hello</a> world')
+            $this->sanitize($config, '<a>Hello</a> world'),
         );
 
         $this->assertSame(
             '<a href="https://symfony.com" rel="noopener noreferrer">Hello</a> world',
-            $this->sanitize($config, '<a href="https://symfony.com">Hello</a> world')
+            $this->sanitize($config, '<a href="https://symfony.com">Hello</a> world'),
         );
 
         $this->assertSame(
             '<div>Hello</div> world',
-            $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+            $this->sanitize($config, '<div style="width: 100px">Hello</div> world'),
         );
     }
 
@@ -261,17 +261,17 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<a href="https://symfony.com">Hello world</a>',
-            $this->sanitize($config, '<a href="http://symfony.com">Hello world</a>')
+            $this->sanitize($config, '<a href="http://symfony.com">Hello world</a>'),
         );
 
         $this->assertSame(
             '<a href="https://symfony.com">Hello world</a>',
-            $this->sanitize($config, '<a href="https://symfony.com">Hello world</a>')
+            $this->sanitize($config, '<a href="https://symfony.com">Hello world</a>'),
         );
 
         $this->assertSame(
             '<a>Hello world</a>',
-            $this->sanitize($config, '<a href="/index.php">Hello world</a>')
+            $this->sanitize($config, '<a href="/index.php">Hello world</a>'),
         );
     }
 
@@ -284,12 +284,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<a href="https://trusted.com">Hello world</a>',
-            $this->sanitize($config, '<a href="https://trusted.com">Hello world</a>')
+            $this->sanitize($config, '<a href="https://trusted.com">Hello world</a>'),
         );
 
         $this->assertSame(
             '<a>Hello world</a>',
-            $this->sanitize($config, '<a href="mailto:galopintitouan@gmail.com">Hello world</a>')
+            $this->sanitize($config, '<a href="mailto:galopintitouan@gmail.com">Hello world</a>'),
         );
     }
 
@@ -302,12 +302,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<a href="https://trusted.com">Hello world</a>',
-            $this->sanitize($config, '<a href="https://trusted.com">Hello world</a>')
+            $this->sanitize($config, '<a href="https://trusted.com">Hello world</a>'),
         );
 
         $this->assertSame(
             '<a>Hello world</a>',
-            $this->sanitize($config, '<a href="https://untrusted.com">Hello world</a>')
+            $this->sanitize($config, '<a href="https://untrusted.com">Hello world</a>'),
         );
     }
 
@@ -320,12 +320,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<a href="/index.php">Hello world</a>',
-            $this->sanitize($config, '<a href="/index.php">Hello world</a>')
+            $this->sanitize($config, '<a href="/index.php">Hello world</a>'),
         );
 
         $this->assertSame(
             '<a href="https://symfony.com">Hello world</a>',
-            $this->sanitize($config, '<a href="https://symfony.com">Hello world</a>')
+            $this->sanitize($config, '<a href="https://symfony.com">Hello world</a>'),
         );
     }
 
@@ -338,17 +338,17 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<img src="https://trusted.com" />',
-            $this->sanitize($config, '<img src="https://trusted.com" />')
+            $this->sanitize($config, '<img src="https://trusted.com" />'),
         );
 
         $this->assertSame(
             '<img />',
-            $this->sanitize($config, '<img src="http://trusted.com" />')
+            $this->sanitize($config, '<img src="http://trusted.com" />'),
         );
 
         $this->assertSame(
             '<img />',
-            $this->sanitize($config, '<img src="/image.png" />')
+            $this->sanitize($config, '<img src="/image.png" />'),
         );
     }
 
@@ -361,17 +361,17 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<img src="https://trusted.com" />',
-            $this->sanitize($config, '<img src="https://trusted.com" />')
+            $this->sanitize($config, '<img src="https://trusted.com" />'),
         );
 
         $this->assertSame(
             '<img />',
-            $this->sanitize($config, '<img src="https://untrusted.com" />')
+            $this->sanitize($config, '<img src="https://untrusted.com" />'),
         );
 
         $this->assertSame(
             '<img />',
-            $this->sanitize($config, '<img src="/image.png" />')
+            $this->sanitize($config, '<img src="/image.png" />'),
         );
     }
 
@@ -384,12 +384,12 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<img src="/image.png" />',
-            $this->sanitize($config, '<img src="/image.png" />')
+            $this->sanitize($config, '<img src="/image.png" />'),
         );
 
         $this->assertSame(
             '<img src="https://trusted.com" />',
-            $this->sanitize($config, '<img src="https://trusted.com" />')
+            $this->sanitize($config, '<img src="https://trusted.com" />'),
         );
     }
 
@@ -417,7 +417,7 @@ class HtmlSanitizerCustomTest extends TestCase
 
         $this->assertSame(
             '<div data-attr="new value">Hello world</div>',
-            $this->sanitize($config, '<div data-attr="old value">Hello world</div>')
+            $this->sanitize($config, '<div data-attr="old value">Hello world</div>'),
         );
     }
 

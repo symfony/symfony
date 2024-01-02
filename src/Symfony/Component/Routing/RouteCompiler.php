@@ -92,7 +92,7 @@ class RouteCompiler implements RouteCompilerInterface
             $hostRegex,
             $hostTokens,
             $hostVariables,
-            array_unique($variables)
+            array_unique($variables),
         );
     }
 
@@ -166,7 +166,7 @@ class RouteCompiler implements RouteCompilerInterface
                 $regexp = sprintf(
                     '[^%s%s]+',
                     preg_quote($defaultSeparator),
-                    $defaultSeparator !== $nextSeparator && '' !== $nextSeparator ? preg_quote($nextSeparator) : ''
+                    $defaultSeparator !== $nextSeparator && '' !== $nextSeparator ? preg_quote($nextSeparator) : '',
                 );
                 if (('' !== $nextSeparator && !preg_match('#^\{[\w\x80-\xFF]+\}#', $followingPattern)) || '' === $followingPattern) {
                     // When we have a separator, which is disallowed for the variable, we can optimize the regex with a possessive

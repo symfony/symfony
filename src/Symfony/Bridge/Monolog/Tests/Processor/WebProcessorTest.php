@@ -84,7 +84,7 @@ class WebProcessorTest extends TestCase
                 'SERVER_NAME' => 'D',
                 'HTTP_REFERER' => 'E',
             ],
-            $additionalServerParameters
+            $additionalServerParameters,
         );
 
         $request = new Request();

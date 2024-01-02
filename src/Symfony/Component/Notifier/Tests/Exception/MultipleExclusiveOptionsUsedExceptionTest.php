@@ -22,7 +22,7 @@ class MultipleExclusiveOptionsUsedExceptionTest extends TestCase
 
         $this->assertSame(
             'Multiple exclusive options have been used "foo", "bar". Only one of "foo", "bar", "baz" can be used.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 }

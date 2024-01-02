@@ -231,12 +231,12 @@ class GraphvizDumper implements DumperInterface
             if ('from' === $edge['direction']) {
                 $code .= sprintf("  place_%s -> transition_%s [style=\"solid\"];\n",
                     $this->dotize($edge['from']),
-                    $this->dotize($edge['transition_number'])
+                    $this->dotize($edge['transition_number']),
                 );
             } else {
                 $code .= sprintf("  transition_%s -> place_%s [style=\"solid\"];\n",
                     $this->dotize($edge['transition_number']),
-                    $this->dotize($edge['to'])
+                    $this->dotize($edge['to']),
                 );
             }
         }
@@ -253,7 +253,7 @@ class GraphvizDumper implements DumperInterface
             $this->addOptions($options['graph']),
             '""' !== $label && '<>' !== $label ? sprintf(' label=%s', $label) : '',
             $this->addOptions($options['node']),
-            $this->addOptions($options['edge'])
+            $this->addOptions($options['edge']),
         );
     }
 

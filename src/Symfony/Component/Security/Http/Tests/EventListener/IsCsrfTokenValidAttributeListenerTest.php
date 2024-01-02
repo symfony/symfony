@@ -39,7 +39,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
             new IsCsrfTokenValidAttributeController(),
             [],
             $request,
-            null
+            null,
         );
 
         $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);
@@ -57,7 +57,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
             [new IsCsrfTokenValidAttributeMethodsController(), 'noAttribute'],
             [],
             new Request(),
-            null
+            null,
         );
 
         $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);
@@ -79,7 +79,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
             [new IsCsrfTokenValidAttributeMethodsController(), 'withDefaultTokenKey'],
             [],
             $request,
-            null
+            null,
         );
 
         $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);
@@ -101,7 +101,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
             [new IsCsrfTokenValidAttributeMethodsController(), 'withCustomTokenKey'],
             [],
             $request,
-            null
+            null,
         );
 
         $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);
@@ -123,7 +123,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
             [new IsCsrfTokenValidAttributeMethodsController(), 'withInvalidTokenKey'],
             [],
             $request,
-            null
+            null,
         );
 
         $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);
@@ -145,7 +145,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
             [new IsCsrfTokenValidAttributeMethodsController(), 'withDefaultTokenKey'],
             [],
             new Request(),
-            null
+            null,
         );
 
         $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);

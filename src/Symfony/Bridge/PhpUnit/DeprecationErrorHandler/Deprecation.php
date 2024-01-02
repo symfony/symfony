@@ -336,7 +336,7 @@ class Deprecation
                         $loader = require $v.'/autoload.php';
                         $paths = self::addSourcePathsFromPrefixes(
                             array_merge($loader->getPrefixes(), $loader->getPrefixesPsr4()),
-                            $paths
+                            $paths,
                         );
                     }
                 }

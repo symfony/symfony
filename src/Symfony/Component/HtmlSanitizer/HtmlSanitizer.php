@@ -45,7 +45,7 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
     {
         return $this->sanitizeWithContext(
             W3CReference::CONTEXTS_MAP[StringSanitizer::htmlLower($element)] ?? W3CReference::CONTEXT_BODY,
-            $input
+            $input,
         );
     }
 

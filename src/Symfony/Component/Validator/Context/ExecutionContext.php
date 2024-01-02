@@ -150,7 +150,7 @@ class ExecutionContext implements ExecutionContextInterface
             $this->getValue(),
             null,
             null,
-            $this->constraint
+            $this->constraint,
         ));
     }
 
@@ -165,7 +165,7 @@ class ExecutionContext implements ExecutionContextInterface
             $this->propertyPath,
             $this->getValue(),
             $this->translator,
-            $this->translationDomain
+            $this->translationDomain,
         );
     }
 

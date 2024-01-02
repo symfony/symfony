@@ -84,7 +84,7 @@ final class AmqpStamp implements NonSendableStampInterface
         return new self(
             $previousStamp->routingKey ?? null,
             $previousStamp->flags ?? \AMQP_NOPARAM,
-            array_merge($previousStamp->attributes ?? [], $attributes)
+            array_merge($previousStamp->attributes ?? [], $attributes),
         );
     }
 }

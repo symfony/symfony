@@ -105,7 +105,7 @@ class YamlDumperTest extends TestCase
         $container->register('foo', 'Class1')
             ->setPublic(true)
             ->addArgument((new Definition('Class2'))
-                ->addArgument(new Definition('Class2'))
+                ->addArgument(new Definition('Class2')),
             )
         ;
 

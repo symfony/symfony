@@ -26,7 +26,7 @@ class ConstraintViolationTest extends TestCase
             ['{{ value }}' => [1, 2, 3]],
             'Root',
             'property.path',
-            null
+            null,
         );
 
         $expected = <<<'EOF'
@@ -45,7 +45,7 @@ EOF;
             [],
             ['some_value' => 42],
             'some_value',
-            null
+            null,
         );
 
         $expected = <<<'EOF'
@@ -66,7 +66,7 @@ EOF;
             'some_value',
             null,
             null,
-            '0'
+            '0',
         );
 
         $expected = <<<'EOF'
@@ -92,7 +92,7 @@ EOF;
             'some_value',
             null,
             null,
-            null
+            null,
         );
 
         $this->assertSame($expected, (string) $violation);
@@ -105,7 +105,7 @@ EOF;
             'some_value',
             null,
             null,
-            ''
+            '',
         );
 
         $this->assertSame($expected, (string) $violation);
@@ -120,7 +120,7 @@ EOF;
             [],
             'Root',
             'property.path',
-            null
+            null,
         );
 
         $expected = <<<'EOF'
@@ -140,7 +140,7 @@ EOF;
             [],
             'Root',
             'property.path',
-            null
+            null,
         );
     }
 
@@ -153,7 +153,7 @@ EOF;
             [],
             'Root',
             'property.path',
-            null
+            null,
         );
     }
 
@@ -167,8 +167,8 @@ EOF;
                 [],
                 'irrelevant',
                 null,
-                null
-            ))->getPropertyPath()
+                null,
+            ))->getPropertyPath(),
         );
     }
 
@@ -182,8 +182,8 @@ EOF;
                 [],
                 'irrelevant',
                 'irrelevant',
-                null
-            ))->getMessageTemplate()
+                null,
+            ))->getMessageTemplate(),
         );
     }
 }

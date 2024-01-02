@@ -151,7 +151,7 @@ class MailjetApiTransportTest extends TestCase
             ->text('foobar');
 
         $this->expectExceptionObject(
-            new HttpTransportException('Unable to send an email: "cannot-be-decoded" (code 200).', $response)
+            new HttpTransportException('Unable to send an email: "cannot-be-decoded" (code 200).', $response),
         );
 
         $transport->send($email);
@@ -172,7 +172,7 @@ class MailjetApiTransportTest extends TestCase
             ->text('foobar');
 
         $this->expectExceptionObject(
-            new HttpTransportException('Could not reach the remote Mailjet server.', $response)
+            new HttpTransportException('Could not reach the remote Mailjet server.', $response),
         );
 
         $transport->send($email);
@@ -210,7 +210,7 @@ class MailjetApiTransportTest extends TestCase
             ->text('foobar');
 
         $this->expectExceptionObject(
-            new HttpTransportException('Unable to send an email: "The To is mandatory but missing from the input" (code 400).', $response)
+            new HttpTransportException('Unable to send an email: "The To is mandatory but missing from the input" (code 400).', $response),
         );
 
         $transport->send($email);
@@ -231,7 +231,7 @@ class MailjetApiTransportTest extends TestCase
             ->text('foobar');
 
         $this->expectExceptionObject(
-            new HttpTransportException('Unable to send an email: "response-content" (code 400).', $response)
+            new HttpTransportException('Unable to send an email: "response-content" (code 400).', $response),
         );
 
         $transport->send($email);
@@ -257,7 +257,7 @@ class MailjetApiTransportTest extends TestCase
             ->text('foobar');
 
         $this->expectExceptionObject(
-            new HttpTransportException(sprintf('Unable to send an email: "%s" malformed api response.', $json), $response)
+            new HttpTransportException(sprintf('Unable to send an email: "%s" malformed api response.', $json), $response),
         );
 
         $transport->send($email);
@@ -375,7 +375,7 @@ class MailjetApiTransportTest extends TestCase
                 ],
                 'SandBoxMode' => false,
             ],
-            $method->invoke($transport, $email, $envelope)
+            $method->invoke($transport, $email, $envelope),
         );
 
         $transport = new MailjetApiTransport(self::USER, self::PASSWORD, sandbox: true);
@@ -427,7 +427,7 @@ class MailjetApiTransportTest extends TestCase
                 ],
                 'SandBoxMode' => true,
             ],
-            $method->invoke($transport, $email, $envelope)
+            $method->invoke($transport, $email, $envelope),
         );
     }
 }

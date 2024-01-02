@@ -107,7 +107,7 @@ class FileLoaderTest extends TestCase
 
         $this->assertEquals(
             ['service_container', Bar::class],
-            array_keys($container->getDefinitions())
+            array_keys($container->getDefinitions()),
         );
         $this->assertEquals([BarInterface::class], array_keys($container->getAliases()));
     }
@@ -123,7 +123,7 @@ class FileLoaderTest extends TestCase
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
             'Prototype/*',
             // load everything, except OtherDir/AnotherSub & Foo.php
-            'Prototype/{%other_dir%/AnotherSub,Foo.php,StaticConstructor}'
+            'Prototype/{%other_dir%/AnotherSub,Foo.php,StaticConstructor}',
         );
 
         $this->assertFalse($container->getDefinition(Bar::class)->isAbstract());
@@ -142,7 +142,7 @@ class FileLoaderTest extends TestCase
             new Definition(),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
             'Prototype/*',
-            'Prototype/NotExistingDir'
+            'Prototype/NotExistingDir',
         );
     }
 
@@ -175,7 +175,7 @@ class FileLoaderTest extends TestCase
             'Prototype/*', [
                 'Prototype/%sub_dir%',
                 'Prototype/OtherDir/AnotherSub/DeeperBaz.php',
-            ]
+            ],
         );
 
         $this->assertTrue($container->has(Foo::class));
@@ -216,14 +216,14 @@ class FileLoaderTest extends TestCase
         $loader->registerClasses(
             (new Definition())->setAutoconfigured(true),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\\',
-            'Prototype/%bad_classes_dir%/*'
+            'Prototype/%bad_classes_dir%/*',
         );
 
         $this->assertTrue($container->has(MissingParent::class));
 
         $this->assertMatchesRegularExpression(
             '{Class "?Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Fixtures\\\\Prototype\\\\BadClasses\\\\MissingClass"? not found}',
-            $container->getDefinition(MissingParent::class)->getErrors()[0]
+            $container->getDefinition(MissingParent::class)->getErrors()[0],
         );
     }
 
@@ -249,7 +249,7 @@ class FileLoaderTest extends TestCase
             new Definition(),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
             'Prototype/*',
-            'yaml/*'
+            'yaml/*',
         );
     }
 
@@ -264,7 +264,7 @@ class FileLoaderTest extends TestCase
             new Definition(),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
             'Prototype/*',
-            $exclude
+            $exclude,
         );
 
         $this->assertTrue($container->has(Foo::class));
@@ -296,7 +296,7 @@ class FileLoaderTest extends TestCase
         $loader->registerClasses(
             (new Definition())->setAutoconfigured(true),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
-            'Prototype/{Foo.php}'
+            'Prototype/{Foo.php}',
         );
 
         $this->assertSame($expected, $container->getDefinition(Foo::class)->hasTag('container.excluded'));
@@ -312,7 +312,7 @@ class FileLoaderTest extends TestCase
         $loader->registerClasses(
             (new Definition())->setAutoconfigured(true),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
-            $resource
+            $resource,
         );
 
         $this->assertEquals($expectedAliases, $container->getAliases());
@@ -345,7 +345,7 @@ class FileLoaderTest extends TestCase
         $loader->registerClasses(
             (new Definition())->setAutoconfigured(true),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
-            $resource
+            $resource,
         );
     }
 
@@ -365,7 +365,7 @@ class FileLoaderTest extends TestCase
         $loader->registerClasses(
             (new Definition())->setAutoconfigured(true),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
-            'PrototypeAsAlias/{WithAsAliasMultipleInterface,AliasBarInterface,AliasFooInterface}.php'
+            'PrototypeAsAlias/{WithAsAliasMultipleInterface,AliasBarInterface,AliasFooInterface}.php',
         );
     }
 }

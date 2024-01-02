@@ -56,7 +56,7 @@ class TemplateAttributeListener implements EventSubscriberInterface
 
         $event->setResponse($attribute->stream
             ? new StreamedResponse(fn () => $this->twig->display($attribute->template, $parameters), $status)
-            : new Response($this->twig->render($attribute->template, $parameters), $status)
+            : new Response($this->twig->render($attribute->template, $parameters), $status),
         );
     }
 

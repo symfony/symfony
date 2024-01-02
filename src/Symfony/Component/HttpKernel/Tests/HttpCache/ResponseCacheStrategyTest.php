@@ -320,7 +320,7 @@ class ResponseCacheStrategyTest extends TestCase
             } elseif (false === $value) {
                 $this->assertFalse(
                     $response->headers->hasCacheControlDirective($key),
-                    sprintf('Cache-Control header must NOT have "%s" flag', $key)
+                    sprintf('Cache-Control header must NOT have "%s" flag', $key),
                 );
             } else {
                 $this->assertSame($value, $response->headers->getCacheControlDirective($key), sprintf('Cache-Control flag "%s" should be "%s"', $key, $value));

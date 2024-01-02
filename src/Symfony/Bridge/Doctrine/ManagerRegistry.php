@@ -67,7 +67,7 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
                 return true;
             },
             $this->container,
-            Container::class
+            Container::class,
         ));
     }
 }

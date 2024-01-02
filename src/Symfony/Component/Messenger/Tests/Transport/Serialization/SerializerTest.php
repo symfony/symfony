@@ -55,7 +55,7 @@ class SerializerTest extends TestCase
         $serializer = new Serializer();
 
         $encoded = $serializer->encode(
-            new Envelope(new DummyMessage(''), [new SerializedMessageStamp('{"message":"Hello"}')])
+            new Envelope(new DummyMessage(''), [new SerializedMessageStamp('{"message":"Hello"}')]),
         );
 
         $this->assertSame('{"message":"Hello"}', $encoded['body'] ?? null);
@@ -94,7 +94,7 @@ class SerializerTest extends TestCase
     public function testEncodedWithSymfonySerializerForStamps()
     {
         $serializer = new Serializer(
-            $symfonySerializer = $this->createMock(SerializerComponentInterface::class)
+            $symfonySerializer = $this->createMock(SerializerComponentInterface::class),
         );
 
         $envelope = (new Envelope($message = new DummyMessage('test')))
@@ -138,7 +138,7 @@ class SerializerTest extends TestCase
     public function testDecodeWithSymfonySerializerStamp()
     {
         $serializer = new Serializer(
-            $symfonySerializer = $this->createMock(SerializerComponentInterface::class)
+            $symfonySerializer = $this->createMock(SerializerComponentInterface::class),
         );
 
         $series = [

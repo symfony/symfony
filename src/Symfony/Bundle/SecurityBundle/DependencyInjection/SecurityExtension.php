@@ -146,7 +146,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->addArgument($this->createStrategyDefinition(
                     $config['access_decision_manager']['strategy'] ?? MainConfiguration::STRATEGY_AFFIRMATIVE,
                     $config['access_decision_manager']['allow_if_all_abstain'],
-                    $config['access_decision_manager']['allow_if_equal_granted_denied']
+                    $config['access_decision_manager']['allow_if_equal_granted_denied'],
                 ));
         }
 
@@ -229,7 +229,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     $access['port'],
                     $access['methods'],
                     $access['ips'],
-                    $attributes
+                    $attributes,
                 );
             }
 
@@ -675,7 +675,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $userProvider = sprintf('security.user.provider.missing.%s', $factoryKey);
         $container->setDefinition(
             $userProvider,
-            (new ChildDefinition('security.user.provider.missing'))->replaceArgument(0, $id)
+            (new ChildDefinition('security.user.provider.missing'))->replaceArgument(0, $id),
         );
 
         return $userProvider;

@@ -31,7 +31,7 @@ class ValidatorBuilderTest extends TestCase
     public function testAddObjectInitializer()
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(
-            $this->createMock(ObjectInitializerInterface::class)
+            $this->createMock(ObjectInitializerInterface::class),
         ));
     }
 
@@ -83,14 +83,14 @@ class ValidatorBuilderTest extends TestCase
     public function testSetConstraintValidatorFactory()
     {
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
-            $this->createMock(ConstraintValidatorFactoryInterface::class))
+            $this->createMock(ConstraintValidatorFactoryInterface::class)),
         );
     }
 
     public function testSetTranslator()
     {
         $this->assertSame($this->builder, $this->builder->setTranslator(
-            $this->createMock(TranslatorInterface::class))
+            $this->createMock(TranslatorInterface::class)),
         );
     }
 

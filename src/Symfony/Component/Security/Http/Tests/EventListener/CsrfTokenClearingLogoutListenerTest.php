@@ -25,7 +25,7 @@ class CsrfTokenClearingLogoutListenerTest extends TestCase
     {
         try {
             (new CsrfTokenClearingLogoutListener(
-                new SessionTokenStorage(new RequestStack())
+                new SessionTokenStorage(new RequestStack()),
             ))->onLogout(new LogoutEvent(new Request(), null));
         } catch (SessionNotFoundException) {
             $this->fail('clear() must not be called if the request is not associated with a session instance');

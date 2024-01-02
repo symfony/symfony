@@ -46,7 +46,7 @@ class WorkflowDataCollectorTest extends TestCase
             $this->createMock(AuthorizationCheckerInterface::class),
             $this->createMock(AuthenticationTrustResolverInterface::class),
             $this->createMock(RoleHierarchyInterface::class),
-            $this->createMock(ValidatorInterface::class)
+            $this->createMock(ValidatorInterface::class),
         );
         $dispatcher->addListener('workflow.workflow2.guard.t1', [$guardListener, 'onTransition']);
 

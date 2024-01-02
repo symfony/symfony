@@ -26,7 +26,7 @@ class PercentType extends AbstractType
             $options['scale'],
             $options['type'],
             $options['rounding_mode'],
-            $options['html5']
+            $options['html5'],
         ));
     }
 

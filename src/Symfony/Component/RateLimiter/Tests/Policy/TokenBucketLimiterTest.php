@@ -143,7 +143,7 @@ class TokenBucketLimiterTest extends TestCase
             $this->assertSame(10, $rateLimit->getLimit());
             $this->assertEquals(
                 \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true))),
-                $rateLimit->getRetryAfter()
+                $rateLimit->getRetryAfter(),
             );
         }
 
@@ -154,7 +154,7 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertEquals(
             \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 1)),
-            $rateLimit->getRetryAfter()
+            $rateLimit->getRetryAfter(),
         );
     }
 

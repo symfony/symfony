@@ -21,22 +21,22 @@ class MergeOperationTest extends AbstractOperationTestCase
     {
         $operation = $this->createOperation(
             new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]),
-            new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']])
+            new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']]),
         );
 
         $this->assertEquals(
             ['a' => 'old_a', 'b' => 'old_b', 'c' => 'new_c'],
-            $operation->getMessages('messages')
+            $operation->getMessages('messages'),
         );
 
         $this->assertEquals(
             ['c' => 'new_c'],
-            $operation->getNewMessages('messages')
+            $operation->getNewMessages('messages'),
         );
 
         $this->assertEquals(
             [],
-            $operation->getObsoleteMessages('messages')
+            $operation->getObsoleteMessages('messages'),
         );
     }
 
@@ -48,8 +48,8 @@ class MergeOperationTest extends AbstractOperationTestCase
             ]),
             $this->createOperation(
                 new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]),
-                new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']])
-            )->getResult()
+                new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']]),
+            )->getResult(),
         );
     }
 
@@ -62,8 +62,8 @@ class MergeOperationTest extends AbstractOperationTestCase
             ]),
             $this->createOperation(
                 new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b'], 'messages+intl-icu' => ['d' => 'old_d']]),
-                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a', 'c' => 'new_c']])
-            )->getResult()
+                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a', 'c' => 'new_c']]),
+            )->getResult(),
         );
     }
 
@@ -85,8 +85,8 @@ class MergeOperationTest extends AbstractOperationTestCase
             $mergedCatalogue,
             $this->createOperation(
                 $leftCatalogue,
-                $rightCatalogue
-            )->getResult()
+                $rightCatalogue,
+            )->getResult(),
         );
     }
 
@@ -108,8 +108,8 @@ class MergeOperationTest extends AbstractOperationTestCase
             $mergedCatalogue,
             $this->createOperation(
                 $leftCatalogue,
-                $rightCatalogue
-            )->getResult()
+                $rightCatalogue,
+            )->getResult(),
         );
     }
 

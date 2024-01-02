@@ -29,7 +29,7 @@ class NumberType extends AbstractType
             $options['scale'],
             $options['grouping'],
             $options['rounding_mode'],
-            $options['html5'] ? 'en' : null
+            $options['html5'] ? 'en' : null,
         ));
 
         if ('string' === $options['input']) {

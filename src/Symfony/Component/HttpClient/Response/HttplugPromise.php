@@ -34,7 +34,7 @@ final class HttplugPromise implements HttplugPromiseInterface
     {
         return new self($this->promise->then(
             $this->wrapThenCallback($onFulfilled),
-            $this->wrapThenCallback($onRejected)
+            $this->wrapThenCallback($onRejected),
         ));
     }
 

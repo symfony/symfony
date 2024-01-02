@@ -137,7 +137,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
                     $this->assertIsCallable($onProgress);
 
                     return true;
-                })
+                }),
             )
             ->willReturnCallback(function ($method, $url, $options) use ($ipAddr, $content): ResponseInterface {
                 $info = [

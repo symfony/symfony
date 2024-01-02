@@ -454,7 +454,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $finder
                 ->ignoreVCS(true)
                 ->ignoreDotFiles(true)
-                ->ignoreVCSIgnored(true)
+                ->ignoreVCSIgnored(true),
         );
 
         $this->assertIterator(self::toAbsolute([
@@ -472,7 +472,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $finder
                 ->ignoreVCS(true)
                 ->ignoreDotFiles(true)
-                ->ignoreVCSIgnored(true)
+                ->ignoreVCSIgnored(true),
         );
 
         $this->assertIterator(self::toAbsolute([
@@ -1647,7 +1647,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 'qux_10_2.php',
                 'qux_12_0.php',
                 'qux_2_0.php',
-                ]
+                ],
             ), $finder->getIterator());
         }
 

@@ -39,7 +39,7 @@ final class ConnectionTest extends TestCase
     {
         $this->assertEquals(
             $connection = new Connection([], Pheanstalk::create('127.0.0.1', 11300)),
-            Connection::fromDsn('beanstalkd://127.0.0.1')
+            Connection::fromDsn('beanstalkd://127.0.0.1'),
         );
 
         $configuration = $connection->getConfiguration();
@@ -50,7 +50,7 @@ final class ConnectionTest extends TestCase
 
         $this->assertEquals(
             $connection = new Connection([], Pheanstalk::create('foobar', 15555)),
-            Connection::fromDsn('beanstalkd://foobar:15555')
+            Connection::fromDsn('beanstalkd://foobar:15555'),
         );
 
         $configuration = $connection->getConfiguration();
@@ -65,7 +65,7 @@ final class ConnectionTest extends TestCase
     {
         $this->assertEquals(
             $connection = Connection::fromDsn('beanstalkd://localhost', ['tube_name' => 'foo', 'timeout' => 10, 'ttr' => 5000]),
-            Connection::fromDsn('beanstalkd://localhost?tube_name=foo&timeout=10&ttr=5000')
+            Connection::fromDsn('beanstalkd://localhost?tube_name=foo&timeout=10&ttr=5000'),
         );
 
         $configuration = $connection->getConfiguration();
@@ -86,7 +86,7 @@ final class ConnectionTest extends TestCase
 
         $this->assertEquals(
             $connection = new Connection($options, Pheanstalk::create('localhost', 11333)),
-            Connection::fromDsn('beanstalkd://localhost:11333?tube_name=foo&timeout=10&ttr=5000', $options)
+            Connection::fromDsn('beanstalkd://localhost:11333?tube_name=foo&timeout=10&ttr=5000', $options),
         );
 
         $configuration = $connection->getConfiguration();
@@ -287,7 +287,7 @@ final class ConnectionTest extends TestCase
             }),
             1024,
             $expectedDelay,
-            90
+            90,
         )->willReturn(new Job($id, 'foobar'));
 
         $connection = new Connection(['tube_name' => $tube], $client);
@@ -321,7 +321,7 @@ final class ConnectionTest extends TestCase
             }),
             1024,
             $expectedDelay,
-            90
+            90,
         )->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);

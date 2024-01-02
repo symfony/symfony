@@ -96,7 +96,7 @@ EOT
         if ($variables || null === $nameFilter) {
             $io->table(
                 array_merge(['Variable', 'Value'], array_map($this->getRelativeName(...), $availableFiles)),
-                $this->getVariables($availableFiles, $nameFilter)
+                $this->getVariables($availableFiles, $nameFilter),
             );
 
             $io->comment('Note that values might be different between web and CLI.');

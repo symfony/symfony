@@ -201,7 +201,7 @@ class TranslationUpdateCommandTest extends TestCase
                     foreach ($extractedMessages as $domain => $messages) {
                         $catalogue->add($messages, $domain);
                     }
-                }
+                },
             );
 
         $loader = $this->createMock(TranslationReader::class);
@@ -211,7 +211,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->willReturnCallback(
                 function ($path, $catalogue) use ($loadedMessages) {
                     $catalogue->add($loadedMessages);
-                }
+                },
             );
 
         $writer = $this->createMock(TranslationWriter::class);
@@ -219,7 +219,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->expects($this->any())
             ->method('getFormats')
             ->willReturn(
-                ['xlf', 'yml', 'yaml']
+                ['xlf', 'yml', 'yaml'],
             );
 
         if (null === $kernel) {

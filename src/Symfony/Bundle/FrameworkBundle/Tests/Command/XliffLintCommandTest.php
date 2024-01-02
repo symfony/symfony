@@ -48,7 +48,7 @@ EOF;
         $tester = $this->createCommandTester($this->getKernelAwareApplicationMock());
         $tester->execute(
             ['filename' => '@AppBundle/Resources'],
-            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false],
         );
 
         $tester->assertCommandIsSuccessful('Returns 0 in case of success');

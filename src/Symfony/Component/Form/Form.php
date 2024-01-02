@@ -545,7 +545,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                     // for $this->config->getInheritData() above)
                     $this->config->getDataMapper()->mapFormsToData(
                         new \RecursiveIteratorIterator(new InheritDataAwareIterator($this->children)),
-                        $viewData
+                        $viewData,
                     );
                 }
 
@@ -766,7 +766,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $viewData = $this->getViewData();
             $this->config->getDataMapper()->mapDataToForms(
                 $viewData,
-                new \RecursiveIteratorIterator(new InheritDataAwareIterator(new \ArrayIterator([$child->getName() => $child])))
+                new \RecursiveIteratorIterator(new InheritDataAwareIterator(new \ArrayIterator([$child->getName() => $child]))),
             );
         }
 

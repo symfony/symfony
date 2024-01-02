@@ -162,7 +162,7 @@ class OidcTokenHandlerTest extends TestCase
         ])))->create()
             ->withPayload($payload)
             ->addSignature(self::getJWK(), ['alg' => 'ES256'])
-            ->build()
+            ->build(),
         );
     }
 

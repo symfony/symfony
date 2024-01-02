@@ -34,7 +34,7 @@ class RememberMeTokenTest extends TestCase
         new RememberMeToken(
             $this->getUser(),
             '',
-            ''
+            '',
         );
     }
 

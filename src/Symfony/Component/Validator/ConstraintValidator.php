@@ -78,7 +78,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
 
                 return $formatter->format(new \DateTimeImmutable(
                     $value->format('Y-m-d H:i:s.u'),
-                    new \DateTimeZone('UTC')
+                    new \DateTimeZone('UTC'),
                 ));
             }
 

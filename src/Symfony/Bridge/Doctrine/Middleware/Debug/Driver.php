@@ -41,7 +41,7 @@ final class Driver extends AbstractDriverMiddleware
                 $connection,
                 $this->debugDataHolder,
                 $this->stopwatch,
-                $this->connectionName
+                $this->connectionName,
             );
         }
 
@@ -49,7 +49,7 @@ final class Driver extends AbstractDriverMiddleware
             $connection,
             $this->debugDataHolder,
             $this->stopwatch,
-            $this->connectionName
+            $this->connectionName,
         );
     }
 }

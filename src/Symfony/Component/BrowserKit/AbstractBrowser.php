@@ -614,7 +614,7 @@ abstract class AbstractBrowser
         } else {
             $currentUri = sprintf('http%s://%s/',
                 isset($this->server['HTTPS']) ? 's' : '',
-                $this->server['HTTP_HOST'] ?? 'localhost'
+                $this->server['HTTP_HOST'] ?? 'localhost',
             );
         }
 

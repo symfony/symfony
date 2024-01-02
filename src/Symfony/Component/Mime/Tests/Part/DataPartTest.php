@@ -61,14 +61,14 @@ class DataPartTest extends TestCase
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'application/octet-stream'),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
-            new ParameterizedHeader('Content-Disposition', 'attachment')
+            new ParameterizedHeader('Content-Disposition', 'attachment'),
         ), $p->getPreparedHeaders());
 
         $p = new DataPart('content', 'photo.jpg', 'text/html');
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'text/html', ['name' => 'photo.jpg']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
-            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'photo.jpg', 'filename' => 'photo.jpg'])
+            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'photo.jpg', 'filename' => 'photo.jpg']),
         ), $p->getPreparedHeaders());
     }
 
@@ -79,7 +79,7 @@ class DataPartTest extends TestCase
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'text/html', ['name' => 'photo.jpg']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
-            new ParameterizedHeader('Content-Disposition', 'inline', ['name' => 'photo.jpg', 'filename' => 'photo.jpg'])
+            new ParameterizedHeader('Content-Disposition', 'inline', ['name' => 'photo.jpg', 'filename' => 'photo.jpg']),
         ), $p->getPreparedHeaders());
     }
 
@@ -92,7 +92,7 @@ class DataPartTest extends TestCase
             new ParameterizedHeader('Content-Type', 'text/html', ['name' => 'photo.jpg']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
             new ParameterizedHeader('Content-Disposition', 'inline', ['name' => 'photo.jpg', 'filename' => 'photo.jpg']),
-            new IdentificationHeader('Content-ID', $cid)
+            new IdentificationHeader('Content-ID', $cid),
         ), $p->getPreparedHeaders());
     }
 
@@ -108,7 +108,7 @@ class DataPartTest extends TestCase
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'image/gif', ['name' => 'test.gif']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
-            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'test.gif', 'filename' => 'test.gif'])
+            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'test.gif', 'filename' => 'test.gif']),
         ), $p->getPreparedHeaders());
     }
 
@@ -124,7 +124,7 @@ class DataPartTest extends TestCase
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'image/jpeg', ['name' => 'photo.gif']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
-            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'photo.gif', 'filename' => 'photo.gif'])
+            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'photo.gif', 'filename' => 'photo.gif']),
         ), $p->getPreparedHeaders());
     }
 
@@ -154,7 +154,7 @@ class DataPartTest extends TestCase
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'image/png', ['name' => 'logo_symfony_header.png']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
-            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'logo_symfony_header.png', 'filename' => 'logo_symfony_header.png'])
+            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'logo_symfony_header.png', 'filename' => 'logo_symfony_header.png']),
         ), $p->getPreparedHeaders());
     }
 

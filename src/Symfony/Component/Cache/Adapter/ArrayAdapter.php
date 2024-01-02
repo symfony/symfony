@@ -30,21 +30,21 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 {
     use LoggerAwareTrait;
 
-    private bool $storeSerialized;
     private array $values = [];
     private array $tags = [];
     private array $expiries = [];
-    private int $defaultLifetime;
-    private float $maxLifetime;
-    private int $maxItems;
 
     private static \Closure $createCacheItem;
 
     /**
      * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
      */
-    public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true, float $maxLifetime = 0, int $maxItems = 0)
-    {
+    public function __construct(
+        private int $defaultLifetime = 0,
+        private bool $storeSerialized = true,
+        private float $maxLifetime = 0,
+        private int $maxItems = 0,
+    ) {
         if (0 > $maxLifetime) {
             throw new InvalidArgumentException(sprintf('Argument $maxLifetime must be positive, %F passed.', $maxLifetime));
         }
@@ -53,10 +53,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             throw new InvalidArgumentException(sprintf('Argument $maxItems must be a positive integer, %d passed.', $maxItems));
         }
 
-        $this->defaultLifetime = $defaultLifetime;
-        $this->storeSerialized = $storeSerialized;
-        $this->maxLifetime = $maxLifetime;
-        $this->maxItems = $maxItems;
         self::$createCacheItem ??= \Closure::bind(
             static function ($key, $value, $isHit, $tags) {
                 $item = new CacheItem();

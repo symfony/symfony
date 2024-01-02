@@ -21,13 +21,11 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class Question
 {
-    private string $question;
     private ?int $attempts = null;
     private bool $hidden = false;
     private bool $hiddenFallback = true;
     private ?\Closure $autocompleterCallback = null;
     private ?\Closure $validator = null;
-    private string|int|bool|null|float $default;
     private ?\Closure $normalizer = null;
     private bool $trimmable = true;
     private bool $multiline = false;
@@ -36,10 +34,10 @@ class Question
      * @param string                     $question The question to ask to the user
      * @param string|bool|int|float|null $default  The default answer to return if the user enters nothing
      */
-    public function __construct(string $question, string|bool|int|float $default = null)
-    {
-        $this->question = $question;
-        $this->default = $default;
+    public function __construct(
+        private string $question,
+        private null|string|bool|int|float $default = null,
+    ) {
     }
 
     /**

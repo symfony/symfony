@@ -31,21 +31,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class JsonManifestVersionStrategy implements VersionStrategyInterface
 {
-    private string $manifestPath;
     private array $manifestData;
-    private ?HttpClientInterface $httpClient;
-    private bool $strictMode;
 
     /**
      * @param string $manifestPath Absolute path to the manifest file
      * @param bool   $strictMode   Throws an exception for unknown paths
      */
-    public function __construct(string $manifestPath, HttpClientInterface $httpClient = null, bool $strictMode = false)
-    {
-        $this->manifestPath = $manifestPath;
-        $this->httpClient = $httpClient;
-        $this->strictMode = $strictMode;
-
+    public function __construct(
+        private string $manifestPath,
+        private ?HttpClientInterface $httpClient = null,
+        private bool $strictMode = false,
+    ) {
         if (null === $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && str_starts_with($scheme, 'http')) {
             throw new LogicException(sprintf('The "%s" class needs an HTTP client to use a remote manifest. Try running "composer require symfony/http-client".', self::class));
         }

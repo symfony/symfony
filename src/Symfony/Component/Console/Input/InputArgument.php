@@ -29,11 +29,8 @@ class InputArgument
     public const OPTIONAL = 2;
     public const IS_ARRAY = 4;
 
-    private string $name;
     private int $mode;
     private string|int|bool|array|null|float $default;
-    private array|\Closure $suggestedValues;
-    private string $description;
 
     /**
      * @param string                                                                        $name            The argument name
@@ -44,18 +41,20 @@ class InputArgument
      *
      * @throws InvalidArgumentException When argument mode is not valid
      */
-    public function __construct(string $name, int $mode = null, string $description = '', string|bool|int|float|array $default = null, \Closure|array $suggestedValues = [])
-    {
+    public function __construct(
+        private string $name,
+        int $mode = null,
+        private string $description = '',
+        string|bool|int|float|array $default = null,
+        private \Closure|array $suggestedValues = [],
+    ) {
         if (null === $mode) {
             $mode = self::OPTIONAL;
         } elseif ($mode > 7 || $mode < 1) {
             throw new InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
         }
 
-        $this->name = $name;
         $this->mode = $mode;
-        $this->description = $description;
-        $this->suggestedValues = $suggestedValues;
 
         $this->setDefault($default);
     }

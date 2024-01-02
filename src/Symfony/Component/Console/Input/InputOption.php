@@ -54,8 +54,6 @@ class InputOption
     private string|array|null $shortcut;
     private int $mode;
     private string|int|bool|array|null|float $default;
-    private array|\Closure $suggestedValues;
-    private string $description;
 
     /**
      * @param string|array|null                                                             $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
@@ -65,8 +63,14 @@ class InputOption
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function __construct(string $name, string|array $shortcut = null, int $mode = null, string $description = '', string|bool|int|float|array $default = null, array|\Closure $suggestedValues = [])
-    {
+    public function __construct(
+        string $name,
+        string|array $shortcut = null,
+        int $mode = null,
+        private string $description = '',
+        string|bool|int|float|array $default = null,
+        private array|\Closure $suggestedValues = [],
+    ) {
         if (str_starts_with($name, '--')) {
             $name = substr($name, 2);
         }
@@ -101,8 +105,6 @@ class InputOption
         $this->name = $name;
         $this->shortcut = $shortcut;
         $this->mode = $mode;
-        $this->description = $description;
-        $this->suggestedValues = $suggestedValues;
 
         if ($suggestedValues && !$this->acceptValue()) {
             throw new LogicException('Cannot set suggested values if the option does not accept a value.');

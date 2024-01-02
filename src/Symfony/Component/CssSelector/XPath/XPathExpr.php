@@ -23,16 +23,12 @@ namespace Symfony\Component\CssSelector\XPath;
  */
 class XPathExpr
 {
-    private string $path;
-    private string $element;
-    private string $condition;
-
-    public function __construct(string $path = '', string $element = '*', string $condition = '', bool $starPrefix = false)
-    {
-        $this->path = $path;
-        $this->element = $element;
-        $this->condition = $condition;
-
+    public function __construct(
+        private string $path = '',
+        private string $element = '*',
+        private string $condition = '',
+        bool $starPrefix = false,
+    ) {
         if ($starPrefix) {
             $this->addStarPrefix();
         }

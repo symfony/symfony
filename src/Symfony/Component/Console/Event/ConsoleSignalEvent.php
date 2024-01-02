@@ -20,14 +20,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class ConsoleSignalEvent extends ConsoleEvent
 {
-    private int $handlingSignal;
-    private int|false $exitCode;
-
-    public function __construct(Command $command, InputInterface $input, OutputInterface $output, int $handlingSignal, int|false $exitCode = 0)
-    {
+    public function __construct(
+        Command $command,
+        InputInterface $input,
+        OutputInterface $output,
+        private int $handlingSignal,
+        private int|false $exitCode = 0,
+    ) {
         parent::__construct($command, $input, $output);
-        $this->handlingSignal = $handlingSignal;
-        $this->exitCode = $exitCode;
     }
 
     public function getHandlingSignal(): int

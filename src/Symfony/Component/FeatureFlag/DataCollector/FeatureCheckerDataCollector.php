@@ -24,11 +24,7 @@ final class FeatureCheckerDataCollector extends DataCollector implements LateDat
 
     public function __construct(
         private readonly FeatureRegistry $featureRegistry,
-    )
-    {
-        $this->data = [
-            'features' => [],
-        ];
+    ) {
     }
 
     public function collect(Request $request, Response $response, \Throwable $exception = null): void
@@ -52,9 +48,10 @@ final class FeatureCheckerDataCollector extends DataCollector implements LateDat
 
     public function reset(): void
     {
-        $this->data = [
-            'features' => [],
-        ];
+        parent::reset();
+
+        $this->isEnabledLogs = [];
+        $this->valueLogs = [];
     }
 
     public function lateCollect(): void

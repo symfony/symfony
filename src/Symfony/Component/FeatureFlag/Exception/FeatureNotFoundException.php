@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\FeatureFlag;
+namespace Symfony\Component\FeatureFlag\Exception;
 
 class FeatureNotFoundException extends \RuntimeException
 {

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\FeatureFlag;
 
+use Symfony\Component\FeatureFlag\Exception\FeatureNotFoundException;
+
 final class FeatureRegistry implements FeatureRegistryInterface
 {
     /**

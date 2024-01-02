@@ -430,6 +430,10 @@
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>A fájl kiterjesztése érvénytelen ({{ extension }}). Engedélyezett kiterjesztések: {{ extensions }}.</target>
             </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Az érzékelt karakterkódolás érvénytelen ({{ detected }}). Engedélyezett karakterkódolások: {{ encodings }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

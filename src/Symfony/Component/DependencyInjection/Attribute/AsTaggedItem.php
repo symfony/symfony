@@ -19,6 +19,10 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsTaggedItem
 {
+    /**
+     * @param string|null $index    The property or method to use to index the item in the locator
+     * @param int|null    $priority The priority of the item; the higher the number, the earlier the tagged service will be located in the locator
+     */
     public function __construct(
         public ?string $index = null,
         public ?int $priority = null,

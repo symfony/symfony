@@ -426,6 +426,14 @@
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Peidetud tähemärkide kasutamine pole lubatud.</target>
             </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Faili laiend on vigane ({{ extension }}). Lubatud laiendid on {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Tuvastatud teksti kodeering on vigane ({{ detected }}). Lubatud kodeeringud on {{ encodings }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

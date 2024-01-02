@@ -37,7 +37,7 @@ final class ClickSendTransport extends AbstractTransport
         private readonly ?string $listId = null,
         private readonly ?string $fromEmail = null,
         HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

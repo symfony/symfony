@@ -30,17 +30,18 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransport extends AbstractTransport
 {
-    private HubInterface $hub;
-    private string $hubId;
     private string|array $topics;
 
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(HubInterface $hub, string $hubId, string|array $topics = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->hub = $hub;
-        $this->hubId = $hubId;
+    public function __construct(
+        private HubInterface $hub,
+        private string $hubId,
+        string|array $topics = null,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         $this->topics = $topics ?? 'https://symfony.com/notifier';
 
         parent::__construct($client, $dispatcher);

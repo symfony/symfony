@@ -27,12 +27,11 @@ final class FakeChatLoggerTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->logger = $logger;
-
+    public function __construct(
+        private LoggerInterface $logger,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

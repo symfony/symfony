@@ -32,11 +32,10 @@ final class GoIpTransport extends AbstractTransport
 {
     public function __construct(
         private readonly string $username,
-        #[\SensitiveParameter]
-        private readonly string $password,
+        #[\SensitiveParameter] private readonly string $password,
         private readonly int $simSlot,
         HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

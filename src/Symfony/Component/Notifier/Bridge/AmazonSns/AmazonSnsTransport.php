@@ -28,11 +28,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class AmazonSnsTransport extends AbstractTransport
 {
-    private SnsClient $snsClient;
-
-    public function __construct(SnsClient $snsClient, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->snsClient = $snsClient;
+    public function __construct(
+        private SnsClient $snsClient,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

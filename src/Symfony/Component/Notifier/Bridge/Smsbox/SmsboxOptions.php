@@ -28,8 +28,9 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class SmsboxOptions implements MessageOptionsInterface
 {
-    public function __construct(private array $options = [])
-    {
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public function getRecipientId(): null

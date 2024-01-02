@@ -32,7 +32,7 @@ final class BrevoTransport extends AbstractTransport
         #[\SensitiveParameter] private readonly string $apiKey,
         private readonly string $sender,
         HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

@@ -24,18 +24,15 @@ final class OrangeSmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.orange.com';
 
-    private string $clientID;
-    private string $clientSecret;
-    private string $from;
-    private ?string $senderName;
-
-    public function __construct(string $clientID, #[\SensitiveParameter] string $clientSecret, string $from, string $senderName = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        private string $clientID,
+        #[\SensitiveParameter] private string $clientSecret,
+        private string $from,
+        private ?string $senderName = null,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    )
     {
-        $this->clientID = $clientID;
-        $this->clientSecret = $clientSecret;
-        $this->from = $from;
-        $this->senderName = $senderName;
-
         parent::__construct($client, $dispatcher);
     }
 

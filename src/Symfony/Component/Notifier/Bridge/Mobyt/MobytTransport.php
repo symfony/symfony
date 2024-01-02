@@ -28,17 +28,16 @@ final class MobytTransport extends AbstractTransport
 {
     protected const HOST = 'app.mobyt.fr';
 
-    private string $accountSid;
-    private string $authToken;
-    private string $from;
     private string $typeQuality;
 
-    public function __construct(string $accountSid, #[\SensitiveParameter] string $authToken, string $from, string $typeQuality = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->accountSid = $accountSid;
-        $this->authToken = $authToken;
-        $this->from = $from;
-
+    public function __construct(
+        private string $accountSid,
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        string $typeQuality = null,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         $typeQuality ??= MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
         MobytOptions::validateMessageType($typeQuality);
 

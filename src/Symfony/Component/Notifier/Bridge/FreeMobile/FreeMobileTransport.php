@@ -29,14 +29,13 @@ final class FreeMobileTransport extends AbstractTransport
 {
     protected const HOST = 'smsapi.free-mobile.fr/sendmsg';
 
-    private string $login;
-    private string $password;
-    private string $phone;
-
-    public function __construct(string $login, #[\SensitiveParameter] string $password, string $phone, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->password = $password;
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $password,
+        private string $phone,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         $this->phone = str_replace('+33', '0', $phone);
 
         parent::__construct($client, $dispatcher);

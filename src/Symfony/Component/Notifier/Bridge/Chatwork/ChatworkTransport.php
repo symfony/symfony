@@ -28,13 +28,12 @@ class ChatworkTransport extends AbstractTransport
 {
     protected const HOST = 'api.chatwork.com';
 
-    private string $apiToken;
-    private string $roomId;
-
-    public function __construct(#[\SensitiveParameter] string $apiToken, string $roomId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiToken = $apiToken;
-        $this->roomId = $roomId;
+    public function __construct(
+        #[\SensitiveParameter] private string $apiToken,
+        private string $roomId,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

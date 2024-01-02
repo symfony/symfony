@@ -33,16 +33,16 @@ final class SpotHitTransport extends AbstractTransport
 {
     protected const HOST = 'spot-hit.fr';
 
-    private string $token;
-    private ?string $from;
     private ?bool $smsLong = null;
     private ?int $smsLongNBr = null;
 
-    public function __construct(#[\SensitiveParameter] string $token, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        private ?string $from = null,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+)
     {
-        $this->token = $token;
-        $this->from = $from;
-
         parent::__construct($client, $dispatcher);
     }
 

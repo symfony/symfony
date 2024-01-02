@@ -35,7 +35,7 @@ final class TermiiTransport extends AbstractTransport
         private readonly string $from,
         private readonly string $channel,
         HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

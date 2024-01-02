@@ -29,8 +29,7 @@ final class SevenIoTransport extends AbstractTransport
     protected const HOST = 'gateway.seven.io';
 
     public function __construct(
-        #[\SensitiveParameter]
-        private string $apiKey,
+        #[\SensitiveParameter] private string $apiKey,
         private ?string $from = null,
         HttpClientInterface $client = null,
         EventDispatcherInterface $dispatcher = null,

@@ -36,19 +36,16 @@ final class TwitterTransport extends AbstractTransport
 
     private static string $nonce;
 
-    private string $apiKey;
-    private string $apiSecret;
-    private string $accessToken;
-    private string $accessSecret;
-
-    public function __construct(#[\SensitiveParameter] string $apiKey, #[\SensitiveParameter] string $apiSecret, #[\SensitiveParameter] string $accessToken, #[\SensitiveParameter] string $accessSecret, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        #[\SensitiveParameter] private string $apiKey,
+        #[\SensitiveParameter] private string $apiSecret,
+        #[\SensitiveParameter] private string $accessToken,
+        #[\SensitiveParameter] private string $accessSecret,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+)
     {
         parent::__construct($client, $dispatcher);
-
-        $this->apiKey = $apiKey;
-        $this->apiSecret = $apiSecret;
-        $this->accessToken = $accessToken;
-        $this->accessSecret = $accessSecret;
     }
 
     public function __toString(): string

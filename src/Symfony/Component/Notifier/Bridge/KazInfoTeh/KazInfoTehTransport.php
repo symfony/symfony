@@ -28,16 +28,13 @@ class KazInfoTehTransport extends AbstractTransport
 {
     protected const HOST = 'kazinfoteh.org';
 
-    private string $username;
-    private string $password;
-    private string $sender;
-
-    public function __construct(string $username, #[\SensitiveParameter] string $password, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->username = $username;
-        $this->password = $password;
-        $this->sender = $sender;
-
+    public function __construct(
+        private string $username,
+        #[\SensitiveParameter] private string $password,
+        private string $sender,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

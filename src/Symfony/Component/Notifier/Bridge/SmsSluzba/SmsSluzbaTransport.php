@@ -30,12 +30,10 @@ final class SmsSluzbaTransport extends AbstractTransport
     protected const HOST = 'smsgateapi.sms-sluzba.cz';
 
     public function __construct(
-        #[\SensitiveParameter]
-        private string $username,
-        #[\SensitiveParameter]
-        private string $password,
+        #[\SensitiveParameter] private string $username,
+        #[\SensitiveParameter] private string $password,
         HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

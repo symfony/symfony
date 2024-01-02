@@ -32,14 +32,12 @@ final class LinkedInTransport extends AbstractTransport
 {
     protected const HOST = 'api.linkedin.com';
 
-    private string $authToken;
-    private string $accountId;
-
-    public function __construct(#[\SensitiveParameter] string $authToken, string $accountId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->accountId = $accountId;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $accountId,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

@@ -29,18 +29,15 @@ final class SendberryTransport extends AbstractTransport
 {
     protected const HOST = 'api.sendberry.com';
 
-    private string $username;
-    private string $password;
-    private string $authKey;
-    private string $from;
-
-    public function __construct(string $username, #[\SensitiveParameter] string $password, string $authKey, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(
+        private string $username,
+        #[\SensitiveParameter] private string $password,
+        private string $authKey,
+        private string $from,
+        HttpClientInterface $client = null,
+        EventDispatcherInterface $dispatcher = null,
+)
     {
-        $this->username = $username;
-        $this->password = $password;
-        $this->authKey = $authKey;
-        $this->from = $from;
-
         parent::__construct($client, $dispatcher);
     }
 

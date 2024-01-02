@@ -29,10 +29,8 @@ final class RedlinkTransport extends AbstractTransport
     protected const HOST = 'api.redlink.pl';
 
     public function __construct(
-        #[\SensitiveParameter]
-        private readonly string $apiToken,
-        #[\SensitiveParameter]
-        private readonly string $appToken,
+        #[\SensitiveParameter] private readonly string $apiToken,
+        #[\SensitiveParameter] private readonly string $appToken,
         private readonly ?string $from,
         private readonly ?string $version,
         HttpClientInterface $client = null,

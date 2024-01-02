@@ -165,9 +165,9 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
                         new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
                         fn (\SplFileInfo $file, $path) => !isset($this->excludedPrefixes[$path = str_replace('\\', '/', $path)])
                             && (null === $regex || preg_match($regex, substr($path, $prefixLen)) || $file->isDir())
-                            && '.' !== $file->getBasename()[0],
+                            && '.' !== $file->getBasename()[0]
                     ),
-                    \RecursiveIteratorIterator::LEAVES_ONLY,
+                    \RecursiveIteratorIterator::LEAVES_ONLY
                 ));
                 uksort($files, 'strnatcmp');
 

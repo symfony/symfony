@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-10-11T07:25:43Z
+
+@GromNaN I revamped the PR with the feedback that was given in the other one and by taking into account your review on this one :slightly_smiling_face:
+
+@javiereguiluz Thanks, I agree with every point! I updated the PR accordingly. I understand how challenging this kind of PR it is, we don't have that much "space" to explain things like in the doc :smile:
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-10-15T09:19:51Z
+
+Thanks, I addressed your comments :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-29T21:43:32Z
+
+Rebase please
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-30T16:47:41Z
+
+Rebased and updated with `@param` 🙂

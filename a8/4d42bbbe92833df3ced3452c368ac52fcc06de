@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-12-03T11:46:23Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by valtzu at 2023-12-03T12:02:25Z
+
+Not sure what to do with the tests since `FrameworkBundle` tests now depend on the unreleased/unmerged Scheduler version (this PR).
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2023-12-06T14:22:55Z
+
+While you're addressing this, could you check other `__toString` scheduled messages? `RedispatchMessage` is also affected.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2023-12-06T14:36:16Z
+
+> While you're addressing this, could you check other `__toString` scheduled messages? `RedispatchMessage` is also affected.
+
+@alex-dev but `RedispatchMessage` uses the wrapped message's `__toString()` and it does include the transport names in __toString so I don't think it's affected itself directly?
+
+---
+
+Or yeah if you don't implement `__toString` in your message, then it is affected indeed. But since right now `__toString` is how you define uniqueness, I would consider that a feature and not a bug.
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2023-12-06T16:48:22Z
+
+You don't define uniqueness only by `__toString`. If a message doesn't implement a `__toString`, `Schedule` use `serialize`. So, if a message wrapped by a `RedispatchMessage` is not `Stringable`, they should be serialized to determine uniqueness. `RedispatchMessage` should be transparent for identifying uniqueness.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2023-12-06T19:33:58Z
+
+Ok then, I separated id & description and used hashed serialized message for uniqueness with `StaticMessageProvider`.
+
+I would've rather added explicit `getDescription()` on `MessageProviderInterface` but with optional `__toString` we should be able to avoid dealing with BC.
+
+What do you think?
+
+We could also consider adding `id` parameter to `#[AsPeriodicTask]` & `#[AsCronTask]` attributes in case someone would rather have static ids which don't depend on message content.
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2023-12-06T22:01:43Z
+
+Seems good!

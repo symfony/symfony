@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.5
+---
+
+ * Add `ServiceCollectionInterface`
+
 3.4
 ---
 

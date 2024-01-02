@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add argument `$prepend` to `ContainerConfigurator::extension()` to prepend the configuration instead of appending it
+ * Have `ServiceLocator` implement `ServiceCollectionInterface`
 
 7.0
 ---

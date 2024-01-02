@@ -107,6 +107,7 @@ EOF;
         try {
             $dotenv->loadEnv($dotenvPath, null, 'dev', $testEnvs);
             unset($_ENV['SYMFONY_DOTENV_VARS']);
+            unset($_ENV['SYMFONY_DOTENV_PATH']);
 
             return $_ENV;
         } finally {

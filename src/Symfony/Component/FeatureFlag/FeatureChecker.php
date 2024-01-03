@@ -33,7 +33,7 @@ final class FeatureChecker implements FeatureCheckerInterface
         try {
             return $this->cache[$featureName] ??= $this->featureRegistry->get($featureName)();
         } catch (FeatureNotFoundException) {
-            return $this->default;
+            return $this->cache[$featureName] ??= $this->default;
         }
     }
 }

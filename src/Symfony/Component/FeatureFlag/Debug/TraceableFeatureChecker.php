@@ -11,33 +11,48 @@
 
 namespace Symfony\Component\FeatureFlag\Debug;
 
-use Symfony\Component\FeatureFlag\DataCollector\FeatureCheckerDataCollector;
 use Symfony\Component\FeatureFlag\FeatureCheckerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-final class TraceableFeatureChecker implements FeatureCheckerInterface
+final class TraceableFeatureChecker implements FeatureCheckerInterface, ResetInterface
 {
+    /** @var array<string, bool> */
+    private array $checks = [];
+    /** @var array<string, mixed> */
+    private array $values = [];
+
     public function __construct(
         private readonly FeatureCheckerInterface $decorated,
-        private readonly FeatureCheckerDataCollector $dataCollector,
     ) {
     }
 
     public function isEnabled(string $featureName, mixed $expectedValue = true): bool
     {
-        $isEnabled = $this->decorated->isEnabled($featureName, $expectedValue);
-
-        $this->dataCollector->collectIsEnabled($featureName, $isEnabled);
-        $this->dataCollector->collectValue($featureName, $this->decorated->getValue($featureName));
+        $isEnabled = $this->checks[$featureName] = $this->decorated->isEnabled($featureName, $expectedValue);
+        // Force logging value. It has no cost since value is cached by decorated FeatureChecker.
+        $this->getValue($featureName);
 
         return $isEnabled;
     }
 
     public function getValue(string $featureName): mixed
     {
-        $value = $this->decorated->getValue($featureName);
+        return $this->values[$featureName] = $this->decorated->getValue($featureName);
+    }
 
-        $this->dataCollector->collectValue($featureName, $value);
+    public function getChecks(): array
+    {
+        return $this->checks;
+    }
 
-        return $value;
+    public function getValues(): array
+    {
+        return $this->values;
+    }
+
+    public function reset(): void
+    {
+        $this->checks = [];
+        $this->values = [];
     }
 }

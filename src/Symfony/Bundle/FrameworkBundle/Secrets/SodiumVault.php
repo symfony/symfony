@@ -27,7 +27,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
     private ?string $secretsDir;
 
     /**
-     * @param $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault
+     * @param null|string|\Stringable $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault
      *                       or null to store generated keys in the provided $secretsDir
      */
     public function __construct(string $secretsDir, #[\SensitiveParameter] string|\Stringable $decryptionKey = null)

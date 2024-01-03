@@ -32,8 +32,8 @@ class HttpUtils
     private ?string $secureDomainRegexp;
 
     /**
-     * @param $domainRegexp       A regexp the target of HTTP redirections must match, scheme included
-     * @param $secureDomainRegexp A regexp the target of HTTP redirections must match when the scheme is "https"
+     * @param string|null $domainRegexp       A regexp the target of HTTP redirections must match, scheme included
+     * @param string|null $secureDomainRegexp A regexp the target of HTTP redirections must match when the scheme is "https"
      *
      * @throws \InvalidArgumentException
      */

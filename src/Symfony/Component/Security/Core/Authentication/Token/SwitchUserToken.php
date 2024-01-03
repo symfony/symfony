@@ -24,8 +24,8 @@ class SwitchUserToken extends UsernamePasswordToken
     private ?string $originatedFromUri = null;
 
     /**
-     * @param $user              The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
-     * @param $originatedFromUri The URI where was the user at the switch
+     * @param UserInterface $user              The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
+     * @param string|null $originatedFromUri The URI where was the user at the switch
      *
      * @throws \InvalidArgumentException
      */

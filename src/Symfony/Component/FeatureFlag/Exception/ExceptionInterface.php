@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\FeatureFlag\Exception;
 
-class FeatureNotFoundException extends RuntimeException
+interface ExceptionInterface extends \Throwable
 {
 }

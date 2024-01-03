@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\FeatureFlag\Exception;
 
-class FeatureNotFoundException extends RuntimeException
+use Symfony\Component\Workflow\Exception\ExceptionInterface;
+
+class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

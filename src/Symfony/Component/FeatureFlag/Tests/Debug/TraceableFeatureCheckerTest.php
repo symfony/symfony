@@ -36,7 +36,6 @@ class TraceableFeatureCheckerTest extends TestCase
                 'feature_true' => true,
                 'feature_integer' => false,
                 'unknown_feature' => false,
-
             ],
             $traceableFeatureChecker->getChecks(),
         );

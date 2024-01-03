@@ -28,6 +28,11 @@ final class FeatureChecker implements FeatureCheckerInterface
         return $this->getValue($featureName) === $expectedValue;
     }
 
+    public function isDisabled(string $featureName, mixed $expectedValue = true): bool
+    {
+        return !$this->isEnabled($featureName, $expectedValue);
+    }
+
     public function getValue(string $featureName): mixed
     {
         try {

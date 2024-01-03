@@ -54,6 +54,11 @@ class FeatureCheckerTest extends TestCase
         $this->assertFalse($featureChecker->isEnabled('feature_false'));
         $this->assertFalse($featureChecker->isEnabled('feature_integer'));
         $this->assertFalse($featureChecker->isEnabled('unknown_feature'));
+
+        $this->assertFalse($featureChecker->isDisabled('feature_true'));
+        $this->assertTrue($featureChecker->isDisabled('feature_false'));
+        $this->assertTrue($featureChecker->isDisabled('feature_integer'));
+        $this->assertTrue($featureChecker->isDisabled('unknown_feature'));
     }
 
     /**

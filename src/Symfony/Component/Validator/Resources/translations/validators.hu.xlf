@@ -434,6 +434,10 @@
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
                 <target>Az érzékelt karakterkódolás érvénytelen ({{ detected }}). Engedélyezett karakterkódolások: {{ encodings }}.</target>
             </trans-unit>
+            <trans-unit id="112">
+                <source>This is not a valid MAC address.</source>
+                <target>Ez egy érvénytelen MAC cím.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

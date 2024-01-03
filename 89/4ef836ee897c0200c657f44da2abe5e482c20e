@@ -1,0 +1,285 @@
+---------------------------------------------------------------------------
+
+by kbond at 2024-01-02T15:17:44Z
+
+In general, I'm in favor of this (and adding to `@Symfony` ruleset).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-01-02T15:19:32Z
+
+I'm supportive as well (including it in @Symfony by default makes sense to me as well).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-02T16:43:35Z
+
+Great idea 😍
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-02T18:59:45Z
+
+If i understand it correctly, any multiline argument given to a method will get a trailing coma, even if there is only one argument allowed in the method ?
+
+Imaginary code, but i feel some similar are in the changed files
+
+```diff
+$foobar = 'foobar';
+$foobar = ucfirst(
+    str_replace(
+        ['foo', 'bar'],
+        ['Foo', 'Bar'],
+        $foobar,
++    ),
+);
+```
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-02T19:56:45Z
+
+> In general, I'm in favor of this (and adding to @Symfony ruleset).
+
+overall, as code-change is big, i want to see the impact on codebase first, ensure the config we want to go with, and when this will be aligned, adjust the ruleset. otherwise we adjust the ruleset and then potentially see not all changes are welcome only afterwards 😅
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-02T20:00:16Z
+
+> If i understand it correctly, any multiline argument given to a method will get a trailing coma, even if there is only one argument allowed in the method ?
+
+yes, if opening `(` and closing `)` are in different lines, arguments will get trailing `,`.
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-02T20:11:15Z
+
+had to do some partial revert, looks like we found bug on Pslam
+[551c5f3](https://github.com/symfony/symfony/pull/53352/commits/551c5f3802359e926f2b308707bdbb80151f49a7)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-02T20:12:39Z
+
+I'm not convinced this is an improvement in term of readability.. but that's very personal :)
+
+```diff
+$foo = my_method([
+    'foo' => 'foo',
+    'bar' => 'Bar',
+-]);
++],);
+```
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-01-02T20:15:36Z
+
+> I'm not convinced this is an improvement in term of readability
+
+You're example wouldn't be adjusted this way (from what I can see in my app).
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-02T20:25:33Z
+
+> > I'm not convinced this is an improvement in term of readability
+>
+> You're example wouldn't be adjusted this way (from what I can see in my app).
+
+Indeed, thanks.
+
+I over-generalized.. the "problematic" one for me would be the one i  just quoted : method with a single argument.
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-02T20:27:04Z
+
+not sure if failing related anyhow? happy to get guidance
+
+https://github.com/symfony/symfony/actions/runs/7390078815/job/20104252552?pr=53352#step:8:8085
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-02T21:20:00Z
+
+Is there a way to tweak the rule to require the comma on the declaration side, but not on the call side?
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-02T22:33:20Z
+
+If I understood right, you want [elements => parameters](https://github.com/symfony/symfony/pull/53352/commits/f47bb67723e2002f73fa37cdc7c62a76e94ddd1b) to be enabled, but [elements => arguments](https://github.com/symfony/symfony/pull/53352/commits/469d9d795496308d7f7d6ac55e9cf6f789c27fbd) to be disabled.
+
+We have this tech possibility and I would encourage to have both enabled, to make the rule simpler ("trailing commas everywhere" rather than "trailing commas here and here, but not there"). Would you mind to share your reasoning for idea to not enable everywhere, so I can understand better?
+
+Yet, if you are concluding that you want to disable trailing commas on arguments, I can do it - it's already better for me to enable it in some places that in none of them.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-01-03T01:42:12Z
+
+> Is there a way to tweak the rule to require the comma on the declaration side, but not on the call side?
+
+I would want them on both sides, tbh.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-03T07:25:38Z
+
+I want trailing commas on constructor declarations (and on arrays) because it's quite common to add a new argument there and having to add a comma after the last existing argument creates noisy diffs that complicate reviews, blurs the git history, etc.
+
+But I'd prefer no trailing comma on function calls because a trailing comma tells my brain something can come next, while it's usually not the case (`str_replace($a, $b, $c,)`) => "what could be after "$c"??? :brain: )
+
+This breaks my brain as @chalasr wrote somewhere on another CS topic :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-01-03T08:54:09Z
+
+You can train your brain to accept this. Trust me. ✌️
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-03T10:07:22Z
+
+I use it myself and it hurts me to not have have trailing comma 😅 all is a matter of habit.
+Consider having function like `foo($a, $b=2, $c=3, $d=4, ...$args=[])`. Then you see trailing commas for function calls make sense too ;)
+
+Happy to go with any direction.
+Also, we can split PR and merge everything *except* method calls and have method calls as separated discussion.
+
+tell me and I will follow.
+
+still, no clue on CI error :(
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-01-03T10:19:54Z
+
+I'm all in favor of commas at the end of a line as it minimizes the diff when adding a new line.
+But I'm against adding visual clutter (unneeded characters) like in Nicolas example: `str_replace($a, $b, $c,)`. I don't see any benefit. So, it's not that it "hurts my brain", but more like there is no benefit in having this additional character.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-03T10:21:02Z
+
+I agree with Nicolas and Fabien. Having the trailing comma at the end of a line is great because of the reduced diffs, but having it at the end of arguments on on-liners is not so nice.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-03T10:22:14Z
+
+> having it at the end of arguments on on-liners is not so nice
+
+on one-liners *and* multi-liners ;)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-03T10:29:09Z
+
+Exactly, only on multiline
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-03T10:33:12Z
+
+@keradus can you please update the PR to add the trailing commas on declaration sites only? At least we have an agreement on that so let's move on. Then if one wants the comma on call sites let's make it another discussion (and I will object like I'm doing here :) )
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-03T18:04:48Z
+
+> But I'm against adding visual clutter (unneeded characters) like in Nicolas example: str_replace($a, $b, $c,).
+
+not sure if we talk about same thing. To highlight... with this PR
+
+this *will NOT* be modified
+```diff
+ str_replace($a, $b, $c);
+```
+
+this *will* be modified
+```diff
+ str_replace(
+    $a,
+    $b,
+-   $c
++   $c,
+  );
+```
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-03T18:14:28Z
+
+@nicolas-grekas , i think all but you are to enable everything.
+I am OK to merge some by now and continue discussion about other part of it after this partial merge already,
+
+but please clarify what you want to have, https://github.com/symfony/symfony/pull/53352#issuecomment-1874645561
+
+"declaration site" is blurry for me and I'm guessing which you want or want not to have - eg, I understood you would like to have trailing comma in arrays, but I struggle to call array a "declaration site".
+Please consider to mark for revert one of commits I mentioned in linked msg or state configuration you are happy with - values in PR , but also overview here: https://cs.symfony.com/doc/rules/control_structure/trailing_comma_in_multiline.html#elements
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-03T18:21:20Z
+
+I guess I mean to enable "arguments" but not "parameters"?
+
+eg this is fine:
+```diff
+ function __construct(
+    $a,
+    $b,
+-   $c
++   $c,
+  );
+```
+
+and this isn't to me:
+```diff
+ str_replace(
+    $a,
+    $b,
+-   $c
++   $c,
+  );
+```
+
+The reason being the visual cluttering of the latter with no justification. It's super rare to add parameters to a call, while it's quite common on a function/method signature (esp for constructors, which is how all this discussion started)
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-03T19:37:54Z
+
+I believe it's as common to add input to function declaration as to function call, as whenever we change one, we change another ;) yeah - maybe constructor of service being good exception here.
+
+I reverted `arguments` [ref](https://cs.symfony.com/doc/rules/control_structure/trailing_comma_in_multiline.html#example-3) and will trigger it as separated PR, after this PR gets merged.
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-03T19:41:55Z
+
+I will (in background), but curious - with all new greatest possibility of github and old features of git itself, why not squash during merge? :)
+
+--
+rebased
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-03T20:08:13Z
+
+> I will (in background), but curious - with all new greatest possibility of github and old features of git itself, why not squash during merge? :)
+
+We are using a dedicated tool to merge PRs on `symfony/*`, while squashing is no problem, we cannot do it if the PR contains a merge commit 🤷‍♂️
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-01-03T20:14:37Z
+
+@OskarStark I am aware ;) I was mentioning this in context of PRs I did open for that tool (133, 140) in 2018 to solve exactly this problem ;)
+
+unfortunately they did not got enough attention to get merged 😅
+I'm not proposing myself for that again, but maybe it's worth to consider having built-in support of merge-commits so we do not need to ask contributors for this anymore. We switched to a custom fork for Fixer and used it over months (now we actually use github button :) ), it helped with experience for contributors to avoid "get rid of merge commit" requests and even eased with the PR reviews (no longer destructive pushes to PRs).

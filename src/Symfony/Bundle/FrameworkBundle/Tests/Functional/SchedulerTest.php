@@ -84,6 +84,7 @@ class SchedulerTest extends AbstractWebTestCase
         $this->assertCount(779, $calls['__invoke']);
         $this->assertSame([['2']], $calls['method2']);
         $this->assertSame([['4']], $calls['method4']);
+        $this->assertSame([['9'], ['9b'], ['named' => '9']], $calls['method5']);
         $this->assertSame([['5', 6], ['7', 8]], $calls['attributesOnMethod']);
     }
 

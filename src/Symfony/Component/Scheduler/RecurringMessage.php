@@ -75,14 +75,15 @@ final class RecurringMessage implements MessageProviderInterface
             return new self($trigger, $message);
         }
 
-        $description = '';
-        try {
-            $description = $message instanceof \Stringable ? (string) $message : serialize($message);
-        } catch (\Exception) {
+        $description = $message::class;
+        if ($message instanceof \Stringable) {
+            try {
+                $description .= " ($message)";
+            } catch (\Exception) {
+            }
         }
-        $description = sprintf('%s(%s)', $message::class, $description);
 
-        return new self($trigger, new StaticMessageProvider([$message], $description));
+        return new self($trigger, new StaticMessageProvider([$message], strtr(substr(base64_encode(hash('xxh128', serialize($message), true)), 0, 7), '/+', '._'), $description));
     }
 
     public function withJitter(int $maxSeconds = 60): self

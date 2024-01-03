@@ -111,6 +111,8 @@ class MemcachedAdapter extends AbstractAdapter
                 $params = preg_replace_callback('#^memcached:(//)?(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {
                     if (!empty($m[2])) {
                         [$username, $password] = explode(':', $m[2], 2) + [1 => null];
+                        $username = rawurldecode($username);
+                        $password = null !== $password ? rawurldecode($password) : null;
                     }
 
                     return 'file:'.($m[1] ?? '');

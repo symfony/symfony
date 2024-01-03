@@ -20,7 +20,7 @@ use Symfony\Component\Uid\Ulid;
 final class UlidGenerator extends AbstractIdGenerator
 {
     public function __construct(
-        private readonly ?UlidFactory $factory = null
+        private readonly ?UlidFactory $factory = null,
     ) {
     }
 

@@ -17,7 +17,7 @@ final class PackageVersionProblem
         public readonly string $packageName,
         public readonly string $dependencyPackageName,
         public readonly string $requiredVersionConstraint,
-        public readonly ?string $installedVersion
+        public readonly ?string $installedVersion,
     ) {
     }
 }

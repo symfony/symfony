@@ -45,7 +45,7 @@ class Timezone extends Constraint
         bool $intlCompatible = null,
         array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
     ) {
         if (\is_array($zone)) {
             $options = array_merge($zone, $options);

@@ -22,7 +22,7 @@ use PhpParser\NodeVisitor;
 final class ConstraintVisitor extends AbstractVisitor implements NodeVisitor
 {
     public function __construct(
-        private readonly array $constraintClassNames = []
+        private readonly array $constraintClassNames = [],
     ) {
     }
 

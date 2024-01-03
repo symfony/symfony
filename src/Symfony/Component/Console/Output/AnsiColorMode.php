@@ -63,7 +63,7 @@ enum AnsiColorMode
         return match ($this) {
             self::Ansi4 => (string) $this->convertFromRGB($r, $g, $b),
             self::Ansi8 => '8;5;'.((string) $this->convertFromRGB($r, $g, $b)),
-            self::Ansi24 => sprintf('8;2;%d;%d;%d', $r, $g, $b)
+            self::Ansi24 => sprintf('8;2;%d;%d;%d', $r, $g, $b),
         };
     }
 
@@ -72,7 +72,7 @@ enum AnsiColorMode
         return match ($this) {
             self::Ansi4 => $this->degradeHexColorToAnsi4($r, $g, $b),
             self::Ansi8 => $this->degradeHexColorToAnsi8($r, $g, $b),
-            default => throw new InvalidArgumentException("RGB cannot be converted to {$this->name}.")
+            default => throw new InvalidArgumentException("RGB cannot be converted to {$this->name}."),
         };
     }
 

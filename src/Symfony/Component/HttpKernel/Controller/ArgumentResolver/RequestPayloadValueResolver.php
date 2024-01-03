@@ -139,7 +139,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 $payload = match (true) {
                     $argument->metadata->hasDefaultValue() => $argument->metadata->getDefaultValue(),
                     $argument->metadata->isNullable() => null,
-                    default => throw HttpException::fromStatusCode($validationFailedCode)
+                    default => throw HttpException::fromStatusCode($validationFailedCode),
                 };
             }
 

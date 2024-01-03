@@ -35,7 +35,7 @@ class BrowserChannelTest extends TestCase
     public function testImportanceLevelIsReflectedInFlashMessageType(
         FlashMessageImportanceMapperInterface $mapper,
         string $importance,
-        string $expectedFlashMessageType
+        string $expectedFlashMessageType,
     ) {
         $session = $this->createMock(Session::class);
         $session->method('getFlashBag')->willReturn(new FlashBag());

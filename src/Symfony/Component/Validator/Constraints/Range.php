@@ -57,7 +57,7 @@ class Range extends Constraint
         mixed $max = null,
         string $maxPropertyPath = null,
         array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

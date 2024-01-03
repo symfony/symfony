@@ -86,7 +86,7 @@ final class FFICaster
             CType::ABI_MS => '[ms]',
             CType::ABI_SYSV => '[sysv]',
             CType::ABI_VECTORCALL => '[vectorcall]',
-            default => '[unknown abi]'
+            default => '[unknown abi]',
         };
 
         $returnType = $type->getFuncReturnType();

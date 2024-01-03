@@ -50,7 +50,7 @@ class Cidr extends Constraint
         int $netmaskMax = null,
         string $message = null,
         array $groups = null,
-        $payload = null
+        $payload = null,
     ) {
         $this->version = $version ?? $options['version'] ?? $this->version;
 

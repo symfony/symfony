@@ -32,7 +32,7 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
         private LoggerInterface $logger,
         private string $defaultLocale,
         private LoaderInterface $loader,
-        private XliffFileDumper $xliffFileDumper
+        private XliffFileDumper $xliffFileDumper,
     ) {
     }
 

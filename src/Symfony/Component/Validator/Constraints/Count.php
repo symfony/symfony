@@ -51,7 +51,7 @@ class Count extends Constraint
         string $divisibleByMessage = null,
         array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
     ) {
         if (\is_array($exactly)) {
             $options = array_merge($exactly, $options);

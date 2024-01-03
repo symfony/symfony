@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -1253,7 +1254,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'array',
                 'expectedTypes' => [
-                    'string',
+                    class_exists(InvalidTypeException::class) ? 'string' : 'unknown',
                 ],
                 'path' => 'string',
                 'useMessageForUser' => false,
@@ -1262,7 +1263,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'array',
                 'expectedTypes' => [
-                    'int',
+                    class_exists(InvalidTypeException::class) ? 'int' : 'unknown',
                 ],
                 'path' => 'int',
                 'useMessageForUser' => false,
@@ -1271,7 +1272,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'array',
                 'expectedTypes' => [
-                    'float',
+                    class_exists(InvalidTypeException::class) ? 'float' : 'unknown',
                 ],
                 'path' => 'float',
                 'useMessageForUser' => false,

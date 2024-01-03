@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate the `DoctrineExtractor::getTypes()` method, use `DoctrineExtractor::getType()` instead
+ * Allow `EntityValueResolver` to return a list of entities
 
 7.0
 ---

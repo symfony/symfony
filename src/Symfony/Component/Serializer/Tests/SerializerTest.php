@@ -1253,7 +1253,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'array',
                 'expectedTypes' => [
-                    'unknown',
+                    'string',
                 ],
                 'path' => 'string',
                 'useMessageForUser' => false,
@@ -1262,7 +1262,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'array',
                 'expectedTypes' => [
-                    'unknown',
+                    'int',
                 ],
                 'path' => 'int',
                 'useMessageForUser' => false,
@@ -1271,7 +1271,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'array',
                 'expectedTypes' => [
-                    'unknown',
+                    'float',
                 ],
                 'path' => 'float',
                 'useMessageForUser' => false,

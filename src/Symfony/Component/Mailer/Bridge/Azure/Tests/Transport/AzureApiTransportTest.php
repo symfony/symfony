@@ -121,7 +121,7 @@ class AzureApiTransportTest extends TestCase
     public function testItDoesNotAllowToAddResourceNameWithDot()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Resource name cannot contain or end with a dot');
+        $this->expectExceptionMessage('Resource name must not end with a dot "."');
 
         new AzureApiTransport('KEY', 'ACS_RESOURCE_NAME.');
     }

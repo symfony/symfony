@@ -43,8 +43,8 @@ final class AzureApiTransport extends AbstractApiTransport
         EventDispatcherInterface $dispatcher = null,
         LoggerInterface $logger = null,
     ) {
-        if (str_contains($resourceName, '.') || str_ends_with($resourceName, '.')) {
-            throw new \Exception('Resource name cannot contain or end with a dot.');
+        if (str_ends_with($resourceName, '.')) {
+            throw new \Exception('Resource name must not end with a dot ".".');
         }
 
         parent::__construct($client, $dispatcher, $logger);

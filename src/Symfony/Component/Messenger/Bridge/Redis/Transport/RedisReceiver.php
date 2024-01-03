@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class RedisReceiver implements ReceiverInterface, MessageCountAwareInterface
 {
+    private \WeakMap $receivedMessages;
     private Connection $connection;
     private SerializerInterface $serializer;
 
@@ -37,7 +38,7 @@ class RedisReceiver implements ReceiverInterface, MessageCountAwareInterface
 
     public function get(): iterable
     {
-        $message = $this->connection->get();
+        $message = $this->connection->get($this->receivedMessages->count() === 0);
 
         if (null === $message) {
             return [];
@@ -76,17 +77,23 @@ class RedisReceiver implements ReceiverInterface, MessageCountAwareInterface
             throw $exception;
         }
 
+        $this->receivedMessages[$envelope->getMessage()] = true;
+
         return [$envelope->with(new RedisReceivedStamp($message['id']))];
     }
 
     public function ack(Envelope $envelope): void
     {
         $this->connection->ack($this->findRedisReceivedStamp($envelope)->getId());
+
+        unset($this->receivedMessages[$envelope->getMessage()]);
     }
 
     public function reject(Envelope $envelope): void
     {
         $this->connection->reject($this->findRedisReceivedStamp($envelope)->getId());
+
+        unset($this->receivedMessages[$envelope->getMessage()]);
     }
 
     public function getMessageCount(): int

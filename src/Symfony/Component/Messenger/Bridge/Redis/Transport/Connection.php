@@ -64,10 +64,13 @@ class Connection
     private int $maxEntries;
     private int $redeliverTimeout;
     private float $nextClaim = 0.0;
+    private float $nextPending = 0.0;
     private float $claimInterval;
+    private float $pendingInterval;
     private bool $deleteAfterAck;
     private bool $deleteAfterReject;
-    private bool $couldHavePendingMessages = true;
+    private ?string $lastPendingMessageId = null;
+    private ?string $lastClaimMessageId   = null;
 
     public function __construct(array $options, \Redis|Relay|\RedisCluster $redis = null)
     {
@@ -165,6 +168,7 @@ class Connection
         $this->deleteAfterReject = $options['delete_after_reject'];
         $this->redeliverTimeout = $options['redeliver_timeout'] * 1000;
         $this->claimInterval = $options['claim_interval'] / 1000;
+        $this->pendingInterval   = $options['pending_interval'] / 1000;
     }
 
     /**
@@ -331,54 +335,8 @@ class Connection
         return $params;
     }
 
-    private function claimOldPendingMessages(): void
+    private function handleDelayedMessages(): void
     {
-        try {
-            // This could soon be optimized with https://github.com/antirez/redis/issues/5212 or
-            // https://github.com/antirez/redis/issues/6256
-            $pendingMessages = $this->getRedis()->xpending($this->stream, $this->group, '-', '+', 1);
-        } catch (\RedisException|\Relay\Exception $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
-        }
-
-        $claimableIds = [];
-        foreach ($pendingMessages as $pendingMessage) {
-            if ($pendingMessage[1] === $this->consumer) {
-                $this->couldHavePendingMessages = true;
-
-                return;
-            }
-
-            if ($pendingMessage[2] >= $this->redeliverTimeout) {
-                $claimableIds[] = $pendingMessage[0];
-            }
-        }
-
-        if (\count($claimableIds) > 0) {
-            try {
-                $this->getRedis()->xclaim(
-                    $this->stream,
-                    $this->group,
-                    $this->consumer,
-                    $this->redeliverTimeout,
-                    $claimableIds,
-                    ['JUSTID']
-                );
-
-                $this->couldHavePendingMessages = true;
-            } catch (\RedisException|\Relay\Exception $e) {
-                throw new TransportException($e->getMessage(), 0, $e);
-            }
-        }
-
-        $this->nextClaim = microtime(true) + $this->claimInterval;
-    }
-
-    public function get(): ?array
-    {
-        if ($this->autoSetup) {
-            $this->setup();
-        }
         $now = microtime();
         $now = substr($now, 11).substr($now, 2, 3);
 
@@ -405,49 +363,86 @@ class Connection
             $decodedQueuedMessage = json_decode($queuedMessage, true);
             $this->add(\array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage, $decodedQueuedMessage['headers'] ?? [], 0);
         }
+    }
 
-        if (!$this->couldHavePendingMessages && $this->nextClaim <= microtime(true)) {
-            $this->claimOldPendingMessages();
+    private function getPendingMessage(bool $canStartPendingMode): array|null
+    {
+        if (
+            $this->lastPendingMessageId === null
+            && ($this->nextPending > microtime(true) || !$canStartPendingMode)
+        ) {
+            return null;
         }
 
-        $messageId = '>'; // will receive new messages
+        $messages = $this->xReadGroup($this->lastPendingMessageId ?? '0');
 
-        if ($this->couldHavePendingMessages) {
-            $messageId = '0'; // will receive consumers pending messages
-        }
-        $redis = $this->getRedis();
-
-        try {
-            $messages = $redis->xreadgroup(
-                $this->group,
-                $this->consumer,
-                [$this->stream => $messageId],
-                1,
-                1
-            );
-        } catch (\RedisException|\Relay\Exception $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
-        }
-
-        if (false === $messages) {
-            if ($error = $redis->getLastError() ?: null) {
-                $redis->clearLastError();
-            }
-
-            throw new TransportException($error ?? 'Could not read messages from the redis stream.');
-        }
-
-        if ($this->couldHavePendingMessages && empty($messages[$this->stream])) {
-            $this->couldHavePendingMessages = false;
-
-            // No pending messages so get a new one
-            return $this->get();
-        }
-
-        foreach ($messages[$this->stream] ?? [] as $key => $message) {
+        if ($messages[$this->stream] !== []) {
             return [
-                'id' => $key,
-                'data' => $message,
+                'id' => $this->lastPendingMessageId = array_key_first($messages[$this->stream]),
+                'data' => reset($messages[$this->stream])
+            ];
+        }
+
+        $this->lastPendingMessageId = null;
+        $this->nextPending          = microtime(true) + $this->pendingInterval;
+
+        return null;
+    }
+
+    private function getClaimMessage(): array|null
+    {
+        if ($this->lastClaimMessageId === null && $this->nextClaim > microtime(true)) {
+            return null;
+        }
+
+        $messages = $this->rawCommand(
+            $this->stream,
+            'XAUTOCLAIM',
+            $this->group,
+            $this->consumer,
+            $this->redeliverTimeout,
+            $this->lastClaimMessageId ?? '0',
+            'COUNT',
+            '1'
+        );
+
+        if ($messages[1] !== []) {
+            $message = reset($messages[1]);
+
+            return [
+                'id' => $this->lastClaimMessageId = $message[0],
+                'data' => [$message[1][0] => $message[1][1]]
+            ];
+        }
+
+        $this->lastClaimMessageId = null;
+        $this->nextClaim          = microtime(true) + $this->claimInterval;
+
+        return null;
+    }
+
+    public function get(bool $canStartPendingMode): ?array
+    {
+        if ($this->autoSetup) {
+            $this->setup();
+        }
+
+        $this->handleDelayedMessages();
+
+        if (null !== $message = $this->getPendingMessage($canStartPendingMode)) {
+            return $message;
+        }
+
+        if (null !== $message = $this->getClaimMessage()) {
+            return $message;
+        }
+
+        $messages = $this->xReadGroup('>');
+
+        if (isset($messages[$this->stream]) && $messages[$this->stream] !== []) {
+            return [
+                'id' => array_key_first($messages[$this->stream]),
+                'data' => reset($messages[$this->stream])
             ];
         }
 
@@ -592,6 +587,32 @@ class Connection
         }
 
         $this->autoSetup = false;
+    }
+
+    private function xReadGroup(string $id, int $count = 1): array
+    {
+        $redis = $this->getRedis();
+
+        try {
+            $messages = $redis->xreadgroup(
+                $this->group,
+                $this->consumer,
+                [$this->stream => $id],
+                $count
+            );
+        } catch (\RedisException|\Relay\Exception $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (false === $messages) {
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
+            }
+
+            throw new TransportException($error ?? 'Could not read messages from the redis stream.');
+        }
+
+        return $messages;
     }
 
     public function cleanup(): void

@@ -430,6 +430,14 @@
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>Ekstensi file tidak valid ({{ extension }}). Ekstensi yang diperbolehkan adalah {{ extensions }}.</target>
             </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Pengkodean karakter yang terdeteksi tidak valid ({{ detected }}). Pengkodean yang diperbolehkan adalah {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This is not a valid MAC address.</source>
+                <target>Ini bukan alamat MAC yang valid.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

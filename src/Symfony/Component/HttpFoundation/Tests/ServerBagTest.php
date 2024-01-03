@@ -177,4 +177,20 @@ class ServerBagTest extends TestCase
             'PHP_AUTH_PW' => '',
         ], $bag->getHeaders());
     }
+
+    /**
+     * An HTTP request without content-type and content-length will result in
+     * the variables $_SERVER['CONTENT_TYPE'] and $_SERVER['CONTENT_LENGTH']
+     * containing an empty string in PHP.
+     */
+    public function testRequestWithoutContentTypeAndContentLength()
+    {
+        $bag = new ServerBag([
+            'CONTENT_TYPE' => '',
+            'CONTENT_LENGTH' => '',
+            'HTTP_USER_AGENT' => 'foo',
+        ]);
+
+        $this->assertSame(['USER_AGENT' => 'foo'], $bag->getHeaders());
+    }
 }

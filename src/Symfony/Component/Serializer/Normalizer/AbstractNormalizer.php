@@ -382,7 +382,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         $data,
                         ['unknown'],
                         $attributeContext['deserialization_path'] ?? null,
-                        true
+                        true,
                     );
                     $context['not_normalizable_value_exceptions'][] = $exception;
                 }
@@ -428,7 +428,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 sprintf('Failed to create object because the class "%s" is not instantiable.', $class),
                 $data,
                 ['unknown'],
-                $context['deserialization_path'] ?? null
+                $context['deserialization_path'] ?? null,
             );
         }
 

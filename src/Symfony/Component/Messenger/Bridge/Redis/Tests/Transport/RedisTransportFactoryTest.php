@@ -47,7 +47,7 @@ class RedisTransportFactoryTest extends TestCase
 
         $this->assertEquals(
             new RedisTransport(Connection::fromDsn($dsn, $options), $serializer),
-            $factory->createTransport($dsn, $options, $serializer)
+            $factory->createTransport($dsn, $options, $serializer),
         );
     }
 

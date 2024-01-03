@@ -188,7 +188,7 @@ class ServerBagTest extends TestCase
         $bag = new ServerBag([
             'CONTENT_TYPE' => '',
             'CONTENT_LENGTH' => '',
-            'HTTP_USER_AGENT' => 'foo'
+            'HTTP_USER_AGENT' => 'foo',
         ]);
 
         $this->assertEquals(['USER_AGENT' => 'foo'], $bag->getHeaders());

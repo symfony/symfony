@@ -102,13 +102,13 @@ class Connection
      */
     public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], HttpClientInterface $client = null, LoggerInterface $logger = null): self
     {
-        if (false === $parsedUrl = parse_url($dsn)) {
+        if (false === $params = parse_url($dsn)) {
             throw new InvalidArgumentException('The given Amazon SQS DSN is invalid.');
         }
 
         $query = [];
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $query);
+        if (isset($params['query'])) {
+            parse_str($params['query'], $query);
         }
 
         // check for extra keys in options
@@ -135,8 +135,8 @@ class Connection
 
         $clientConfiguration = [
             'region' => $options['region'],
-            'accessKeyId' => urldecode($parsedUrl['user'] ?? '') ?: $options['access_key'] ?? self::DEFAULT_OPTIONS['access_key'],
-            'accessKeySecret' => urldecode($parsedUrl['pass'] ?? '') ?: $options['secret_key'] ?? self::DEFAULT_OPTIONS['secret_key'],
+            'accessKeyId' => rawurldecode($params['user'] ?? '') ?: $options['access_key'] ?? self::DEFAULT_OPTIONS['access_key'],
+            'accessKeySecret' => rawurldecode($params['pass'] ?? '') ?: $options['secret_key'] ?? self::DEFAULT_OPTIONS['secret_key'],
         ];
         if (null !== $options['session_token']) {
             $clientConfiguration['sessionToken'] = $options['session_token'];
@@ -146,16 +146,16 @@ class Connection
         }
         unset($query['region']);
 
-        if ('default' !== ($parsedUrl['host'] ?? 'default')) {
-            $clientConfiguration['endpoint'] = sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $parsedUrl['host'], ($parsedUrl['port'] ?? null) ? ':'.$parsedUrl['port'] : '');
-            if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $parsedUrl['host'], $matches)) {
+        if ('default' !== ($params['host'] ?? 'default')) {
+            $clientConfiguration['endpoint'] = sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
+            if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $params['host'], $matches)) {
                 $clientConfiguration['region'] = $matches[1];
             }
         } elseif (self::DEFAULT_OPTIONS['endpoint'] !== $options['endpoint'] ?? self::DEFAULT_OPTIONS['endpoint']) {
             $clientConfiguration['endpoint'] = $options['endpoint'];
         }
 
-        $parsedPath = explode('/', ltrim($parsedUrl['path'] ?? '/', '/'));
+        $parsedPath = explode('/', ltrim($params['path'] ?? '/', '/'));
         if (\count($parsedPath) > 0 && !empty($queueName = end($parsedPath))) {
             $configuration['queue_name'] = $queueName;
         }
@@ -165,11 +165,11 @@ class Connection
         // https://sqs.REGION.amazonaws.com/ACCOUNT/QUEUE
         $queueUrl = null;
         if (
-            'https' === $parsedUrl['scheme']
-            && ($parsedUrl['host'] ?? 'default') === "sqs.{$clientConfiguration['region']}.amazonaws.com"
-            && ($parsedUrl['path'] ?? '/') === "/{$configuration['account']}/{$configuration['queue_name']}"
+            'https' === $params['scheme']
+            && ($params['host'] ?? 'default') === "sqs.{$clientConfiguration['region']}.amazonaws.com"
+            && ($params['path'] ?? '/') === "/{$configuration['account']}/{$configuration['queue_name']}"
         ) {
-            $queueUrl = 'https://'.$parsedUrl['host'].$parsedUrl['path'];
+            $queueUrl = 'https://'.$params['host'].$params['path'];
         }
 
         return new self($configuration, new SqsClient($clientConfiguration, null, $client, $logger), $queueUrl);

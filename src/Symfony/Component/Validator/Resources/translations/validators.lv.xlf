@@ -434,6 +434,10 @@
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
                 <target>Noteiktais rakstzīmju kodējums nav derīgs ({{ detected }}). Atļautie kodējumi ir {{ encodings }}.</target>
             </trans-unit>
+            <trans-unit id="112">
+                <source>This is not a valid MAC address.</source>
+                <target>Šī nav derīga MAC adrese.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

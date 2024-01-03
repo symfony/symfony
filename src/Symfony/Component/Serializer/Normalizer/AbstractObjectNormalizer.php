@@ -374,7 +374,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type),
                     $data,
                     ['unknown'],
-                    $context['deserialization_path'] ?? null,
+                    $attributeContext['deserialization_path'] ?? null,
                     false,
                     $e->getCode(),
                     $e

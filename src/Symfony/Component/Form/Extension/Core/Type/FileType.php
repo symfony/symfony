@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\FileUploadError;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -45,6 +46,7 @@ class FileType extends AbstractType
     {
         // Ensure that submitted data is always an uploaded file or an array of some
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($options) {
+            /** @var PreSubmitEvent $event */
             $form = $event->getForm();
             $requestHandler = $form->getConfig()->getRequestHandler();
 

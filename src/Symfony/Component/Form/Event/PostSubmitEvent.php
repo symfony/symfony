@@ -28,5 +28,6 @@ final class PostSubmitEvent extends FormEvent
     {
         trigger_deprecation('symfony/form', '6.4', 'Calling "%s()" will throw an exception as of 7.0, listen to "form.pre_submit" or "form.submit" instead.', __METHOD__);
         // throw new BadMethodCallException('Form data cannot be changed during "form.post_submit", you should use "form.pre_submit" or "form.submit" instead.');
+        parent::setData($data);
     }
 }

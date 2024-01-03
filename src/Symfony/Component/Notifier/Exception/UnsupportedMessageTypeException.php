@@ -24,7 +24,7 @@ class UnsupportedMessageTypeException extends LogicException
             'The "%s" transport only supports instances of "%s" (instance of "%s" given).',
             $transport,
             $supported,
-            get_debug_type($given),
+            get_debug_type($given)
         );
 
         parent::__construct($message);

@@ -127,7 +127,7 @@ XLIFF;
                     'original' => 'file.ext',
                 ],
             ],
-            $catalogue->getMetadata('foo', 'domain1'),
+            $catalogue->getMetadata('foo', 'domain1')
         );
     }
 
@@ -200,7 +200,7 @@ XLIFF;
                     'original' => 'file.ext',
                 ],
             ],
-            $catalogue->getMetadata('foo', 'domain1'),
+            $catalogue->getMetadata('foo', 'domain1')
         );
         // message without target
         $this->assertEquals(
@@ -212,7 +212,7 @@ XLIFF;
                     'original' => 'file.ext',
                 ],
             ],
-            $catalogue->getMetadata('extra', 'domain1'),
+            $catalogue->getMetadata('extra', 'domain1')
         );
         // message with empty target
         $this->assertEquals(
@@ -227,7 +227,7 @@ XLIFF;
                     'original' => 'file.ext',
                 ],
             ],
-            $catalogue->getMetadata('key', 'domain1'),
+            $catalogue->getMetadata('key', 'domain1')
         );
     }
 
@@ -331,7 +331,7 @@ XLIFF;
                     'original' => 'file.ext',
                 ],
             ],
-            $catalogue->getMetadata('foo', 'domain1'),
+            $catalogue->getMetadata('foo', 'domain1')
         );
         $this->assertEquals(
             [
@@ -342,7 +342,7 @@ XLIFF;
                     'original' => 'otherfile.ext',
                 ],
             ],
-            $catalogue->getMetadata('test', 'domain1'),
+            $catalogue->getMetadata('test', 'domain1')
         );
     }
 

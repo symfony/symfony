@@ -30,7 +30,7 @@ final class HeaderAccessTokenExtractor implements AccessTokenExtractorInterface
     ) {
         $this->regex = sprintf(
             '/^%s([a-zA-Z0-9\-_\+~\/\.]+)$/',
-            '' === $this->tokenType ? '' : preg_quote($this->tokenType).'\s+',
+            '' === $this->tokenType ? '' : preg_quote($this->tokenType).'\s+'
         );
     }
 

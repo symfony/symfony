@@ -236,7 +236,7 @@ EOF
     {
         $default = fn ($directory) => new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
-            \RecursiveIteratorIterator::LEAVES_ONLY,
+            \RecursiveIteratorIterator::LEAVES_ONLY
         );
 
         if (null !== $this->directoryIteratorProvider) {

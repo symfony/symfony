@@ -59,7 +59,7 @@ class ConsoleHandlerTest extends TestCase
         ;
         $handler = new ConsoleHandler($output, true, $map);
         $this->assertSame($isHandling, $handler->isHandling(RecordFactory::create($level)),
-            '->isHandling returns correct value depending on console verbosity and log level',
+            '->isHandling returns correct value depending on console verbosity and log level'
         );
 
         // check that the handler actually outputs the record if it handles it
@@ -113,15 +113,15 @@ class ConsoleHandlerTest extends TestCase
             ->method('getVerbosity')
             ->willReturnOnConsecutiveCalls(
                 OutputInterface::VERBOSITY_QUIET,
-                OutputInterface::VERBOSITY_DEBUG,
+                OutputInterface::VERBOSITY_DEBUG
             )
         ;
         $handler = new ConsoleHandler($output);
         $this->assertFalse($handler->isHandling(RecordFactory::create(Level::Notice)),
-            'when verbosity is set to quiet, the handler does not handle the log',
+            'when verbosity is set to quiet, the handler does not handle the log'
         );
         $this->assertTrue($handler->isHandling(RecordFactory::create(Level::Notice)),
-            'since the verbosity of the output increased externally, the handler is now handling the log',
+            'since the verbosity of the output increased externally, the handler is now handling the log'
         );
     }
 
@@ -130,7 +130,7 @@ class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler();
         $this->assertInstanceOf(
             ConsoleFormatter::class, $handler->getFormatter(),
-            '->getFormatter returns ConsoleFormatter by default',
+            '->getFormatter returns ConsoleFormatter by default'
         );
     }
 

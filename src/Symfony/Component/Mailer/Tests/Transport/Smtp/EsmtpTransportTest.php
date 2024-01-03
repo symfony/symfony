@@ -109,7 +109,7 @@ class EsmtpTransportTest extends TestCase
                 "RSET\r\n",
                 // S: 250 2.0.0 Resetting
             ],
-            $stream->getCommands(),
+            $stream->getCommands()
         );
     }
 
@@ -118,7 +118,7 @@ class EsmtpTransportTest extends TestCase
         $stream = new DummyStream();
         $transport = new EsmtpTransport(
             stream: $stream,
-            authenticators: [new CramMd5Authenticator(), new LoginAuthenticator()],
+            authenticators: [new CramMd5Authenticator(), new LoginAuthenticator()]
         );
         $transport->setUsername('testuser');
         $transport->setPassword('p4ssw0rd');
@@ -155,7 +155,7 @@ class EsmtpTransportTest extends TestCase
                 "RSET\r\n",
                 // S: 250 2.0.0 Resetting
             ],
-            $stream->getCommands(),
+            $stream->getCommands()
         );
     }
 
@@ -189,7 +189,7 @@ class EsmtpTransportTest extends TestCase
                 "RSET\r\n",
                 // S: 250 2.0.0 Resetting
             ],
-            $stream->getCommands(),
+            $stream->getCommands()
         );
     }
 

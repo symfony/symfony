@@ -57,7 +57,7 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         return $this->strategy->decide(
-            $this->collectResults($token, $attributes, $object),
+            $this->collectResults($token, $attributes, $object)
         );
     }
 

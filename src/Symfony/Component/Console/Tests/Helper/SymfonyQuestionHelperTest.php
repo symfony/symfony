@@ -151,7 +151,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTestCase
         (new SymfonyQuestionHelper())->ask(
             $this->createStreamableInputInterfaceMock($this->getInputStream("foo\n")),
             $output = $this->createOutputInterface(),
-            $choiceQuestion,
+            $choiceQuestion
         );
 
         $this->assertOutputContains(<<<EOT
@@ -172,7 +172,7 @@ EOT
         (new SymfonyQuestionHelper())->ask(
             $this->createStreamableInputInterfaceMock($this->getInputStream("foo\n")),
             $output = $this->createOutputInterface(),
-            $choiceQuestion,
+            $choiceQuestion
         );
 
         $this->assertOutputContains(<<<EOT

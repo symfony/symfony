@@ -58,7 +58,7 @@ class FailedMessagesRetryCommandTest extends TestCase
             $failureTransportName,
             $serviceLocator,
             $bus,
-            $dispatcher,
+            $dispatcher
         );
 
         $tester = new CommandTester($command);
@@ -90,7 +90,7 @@ class FailedMessagesRetryCommandTest extends TestCase
             $failureTransportName,
             $serviceLocator,
             $bus,
-            $dispatcher,
+            $dispatcher
         );
         $tester = new CommandTester($command);
         $tester->setInputs([0]);
@@ -136,7 +136,7 @@ EOF;
             $failureTransportName,
             $serviceLocator,
             $bus,
-            $dispatcher,
+            $dispatcher
         );
 
         $tester = new CommandTester($command);
@@ -161,7 +161,7 @@ EOF;
             $globalFailureReceiverName,
             $serviceLocator,
             $this->createMock(MessageBusInterface::class),
-            new EventDispatcher(),
+            new EventDispatcher()
         );
         $tester = new CommandCompletionTester($command);
 
@@ -187,7 +187,7 @@ EOF;
             $globalFailureReceiverName,
             $serviceLocator,
             $this->createMock(MessageBusInterface::class),
-            new EventDispatcher(),
+            new EventDispatcher()
         );
         $tester = new CommandCompletionTester($command);
 
@@ -215,7 +215,7 @@ EOF;
             $globalFailureReceiverName,
             $serviceLocator,
             $this->createMock(MessageBusInterface::class),
-            new EventDispatcher(),
+            new EventDispatcher()
         );
         $tester = new CommandCompletionTester($command);
 

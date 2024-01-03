@@ -179,7 +179,7 @@ class FormValidator extends ConstraintValidator
                     ->setParameters(array_replace(
                         ['{{ value }}' => $clientDataAsString],
                         $config->getOption('invalid_message_parameters'),
-                        $failure->getInvalidMessageParameters(),
+                        $failure->getInvalidMessageParameters()
                     ))
                     ->setInvalidValue($form->getViewData())
                     ->setCode(Form::NOT_SYNCHRONIZED_ERROR)

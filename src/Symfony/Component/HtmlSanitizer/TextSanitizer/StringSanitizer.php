@@ -76,7 +76,7 @@ final class StringSanitizer
         return str_replace(
             self::REPLACEMENTS[0],
             self::REPLACEMENTS[1],
-            htmlspecialchars($string, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8'),
+            htmlspecialchars($string, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8')
         );
     }
 }

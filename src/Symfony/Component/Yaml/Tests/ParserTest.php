@@ -1426,7 +1426,7 @@ EOT;
 EOT
                 ,
             ],
-            $this->parser->parse($yaml),
+            $this->parser->parse($yaml)
         );
     }
 
@@ -1453,7 +1453,7 @@ EOT;
 EOT
                 ,
             ],
-            $this->parser->parse($yaml),
+            $this->parser->parse($yaml)
         );
     }
 
@@ -2849,7 +2849,7 @@ YAML;
                     'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
                 ],
             ],
-            $this->parser->parse($yaml),
+            $this->parser->parse($yaml)
         );
     }
 
@@ -2870,7 +2870,7 @@ YAML;
                     'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
                 ],
             ],
-            $this->parser->parse($yaml),
+            $this->parser->parse($yaml)
         );
     }
 
@@ -2902,7 +2902,7 @@ YAML;
                     'arguments' => ['@bar'],
                 ],
             ],
-            $this->parser->parse($yaml),
+            $this->parser->parse($yaml)
         );
 
         $yaml = "\nfoo:\n    bar: {} \n";
@@ -2912,7 +2912,7 @@ YAML;
                     'bar' => [],
                 ],
             ],
-            $this->parser->parse($yaml),
+            $this->parser->parse($yaml)
         );
 
         $this->assertSame(
@@ -2920,7 +2920,7 @@ YAML;
                 'foo' => 'bar',
                 'foobar' => 'baz',
             ],
-            $this->parser->parse("foo: 'bar' \nfoobar: baz"),
+            $this->parser->parse("foo: 'bar' \nfoobar: baz")
         );
     }
 
@@ -2972,7 +2972,7 @@ YAML;
         $this->assertEquals($expected, $actual);
         $this->assertSame(
             var_export($expected, true),
-            var_export($actual, true),
+            var_export($actual, true)
         );
     }
 }

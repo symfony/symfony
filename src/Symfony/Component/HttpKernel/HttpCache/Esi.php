@@ -44,7 +44,7 @@ class Esi extends AbstractSurrogate
         $html = sprintf('<esi:include src="%s"%s%s />',
             $uri,
             $ignoreErrors ? ' onerror="continue"' : '',
-            $alt ? sprintf(' alt="%s"', $alt) : '',
+            $alt ? sprintf(' alt="%s"', $alt) : ''
         );
 
         if (!empty($comment)) {

@@ -174,7 +174,7 @@ class FormTest extends TestCase
 
         $this->assertEquals(
             ['foo[2]', 'foo[3]', 'bar[foo][0]', 'bar[foo][foobar]'],
-            array_keys($form->all()),
+            array_keys($form->all())
         );
 
         $this->assertEquals('foo', $form->get('foo[2]')->getValue());
@@ -193,7 +193,7 @@ class FormTest extends TestCase
         $this->assertEquals('bar', $form->get('bar[foo][0]')->getValue());
         $this->assertEquals(
             'foobar',
-            $form->get('bar[foo][foobar]')->getValue(),
+            $form->get('bar[foo][foobar]')->getValue()
         );
     }
 
@@ -211,9 +211,9 @@ class FormTest extends TestCase
 
                     return [substr($class, strrpos($class, '\\') + 1), $field->getValue()];
                 },
-                $form->all(),
+                $form->all()
             ),
-            '->getDefaultValues() '.$message,
+            '->getDefaultValues() '.$message
         );
     }
 
@@ -786,7 +786,7 @@ class FormTest extends TestCase
 
         $this->assertEquals(
             ['foo[0]', 'foo[1]', 'bar[5]', 'bar[6]', 'bar[baz]'],
-            array_keys($registry->all()),
+            array_keys($registry->all())
         );
     }
 
@@ -978,7 +978,7 @@ class FormTest extends TestCase
                 <form>
                     <textarea name="example"></textarea>
                 </form>
-            </html>',
+            </html>'
         );
 
         $nodes = $dom->getElementsByTagName('form');
@@ -994,7 +994,7 @@ class FormTest extends TestCase
                 <form>
                     <textarea name="foo[collection][0][bar]">item 0</textarea>
                 </form>
-            </html>',
+            </html>'
         );
 
         $nodes = $dom->getElementsByTagName('form');

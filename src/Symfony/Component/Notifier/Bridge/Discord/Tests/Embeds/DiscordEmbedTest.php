@@ -25,7 +25,7 @@ final class DiscordEmbedTest extends TestCase
             ->description('bar')
             ->addField((new DiscordFieldEmbedObject())
                 ->name('baz')
-                ->value('qux'),
+                ->value('qux')
             );
 
         $this->assertSame([
@@ -62,7 +62,7 @@ final class DiscordEmbedTest extends TestCase
         for ($i = 0; $i < 25; ++$i) {
             $embed->addField((new DiscordFieldEmbedObject())
                 ->name('baz')
-                ->value('qux'),
+                ->value('qux')
             );
         }
 
@@ -71,7 +71,7 @@ final class DiscordEmbedTest extends TestCase
 
         $embed->addField((new DiscordFieldEmbedObject())
             ->name('fail')
-            ->value('fail'),
+            ->value('fail')
         );
     }
 }

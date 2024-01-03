@@ -36,7 +36,7 @@ class MessagePartTest extends TestCase
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'message/rfc822', ['name' => 'Subject.eml']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
-            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'Subject.eml', 'filename' => 'Subject.eml']),
+            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'Subject.eml', 'filename' => 'Subject.eml'])
         ), $p->getPreparedHeaders());
     }
 

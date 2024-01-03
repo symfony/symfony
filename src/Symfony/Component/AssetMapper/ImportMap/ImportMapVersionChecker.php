@@ -54,7 +54,7 @@ class ImportMapVersionChecker
             $url = str_replace(
                 ['%package%', '%version%'],
                 [$packageName, $entry->version],
-                self::PACKAGE_METADATA_PATTERN,
+                self::PACKAGE_METADATA_PATTERN
             );
             $packages[$packageName] = [
                 $this->httpClient->request('GET', $url),
@@ -74,7 +74,7 @@ class ImportMapVersionChecker
             // dependencies seem to be found in both places
             $packageDependencies = array_merge(
                 $data['dependencies'] ?? [],
-                $data['peerDependencies'] ?? [],
+                $data['peerDependencies'] ?? []
             );
 
             foreach ($dependencies as $dependencyName) {

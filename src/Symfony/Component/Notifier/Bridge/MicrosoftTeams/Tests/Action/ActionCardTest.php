@@ -74,7 +74,7 @@ final class ActionCardTest extends TestCase
             [
                 '@type' => 'ActionCard',
             ],
-            (new ActionCard())->toArray(),
+            (new ActionCard())->toArray()
         );
     }
 }

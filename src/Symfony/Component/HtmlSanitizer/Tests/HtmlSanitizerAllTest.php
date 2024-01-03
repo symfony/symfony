@@ -26,7 +26,7 @@ class HtmlSanitizerAllTest extends TestCase
                 ->allowMediaHosts(['trusted.com', 'external.com'])
                 ->allowRelativeLinks()
                 ->allowRelativeMedias()
-                ->forceHttpsUrls(),
+                ->forceHttpsUrls()
         );
     }
 

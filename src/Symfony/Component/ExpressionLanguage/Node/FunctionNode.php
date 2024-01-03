@@ -24,7 +24,7 @@ class FunctionNode extends Node
     {
         parent::__construct(
             ['arguments' => $arguments],
-            ['name' => $name],
+            ['name' => $name]
         );
     }
 

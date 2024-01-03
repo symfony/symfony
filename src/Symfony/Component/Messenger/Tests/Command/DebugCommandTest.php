@@ -101,7 +101,7 @@ query_bus
 
 
 TXT
-            , $tester->getDisplay(true),
+            , $tester->getDisplay(true)
         );
 
         $tester->execute(['bus' => 'query_bus'], ['decorated' => false]);
@@ -127,7 +127,7 @@ query_bus
 
 
 TXT
-            , $tester->getDisplay(true),
+            , $tester->getDisplay(true)
         );
     }
 
@@ -155,7 +155,7 @@ query_bus
 
 
 TXT
-            , $tester->getDisplay(true),
+            , $tester->getDisplay(true)
         );
     }
 

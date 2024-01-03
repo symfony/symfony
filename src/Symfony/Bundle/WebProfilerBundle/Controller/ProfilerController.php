@@ -199,7 +199,7 @@ class ProfilerController
                 'profile_type' => $request->query->get('type', $session?->get('_profiler_search_type', 'request')),
             ]),
             200,
-            ['Content-Type' => 'text/html'],
+            ['Content-Type' => 'text/html']
         );
     }
 

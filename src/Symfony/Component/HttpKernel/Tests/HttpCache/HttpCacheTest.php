@@ -76,7 +76,7 @@ class HttpCacheTest extends HttpCacheTestCase
             ],
             'Hello World',
             null,
-            $eventDispatcher,
+            $eventDispatcher
         );
 
         $this->request('GET', '/');
@@ -239,7 +239,7 @@ class HttpCacheTest extends HttpCacheTestCase
             [
                 'ETag' => '1234',
                 'Cache-Control' => 'public, s-maxage=60',
-            ],
+            ]
         );
 
         $this->request('GET', '/');
@@ -1548,7 +1548,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $cache = new HttpCache($kernel,
             $store,
-            new Esi(),
+            new Esi()
         );
 
         $request = Request::create('/');
@@ -1700,7 +1700,7 @@ class HttpCacheTest extends HttpCacheTestCase
                     $this->assertTrue($response->headers->has('Another-One-To-Keep'));
 
                     return true;
-                }),
+                })
             );
 
         $this->setNextResponse(200, [

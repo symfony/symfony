@@ -30,7 +30,7 @@ class SMimeSignerTest extends SMimeTestCase
             (new Headers())
                 ->addDateHeader('Date', new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
                 ->addMailboxListHeader('From', ['fabien@symfony.com']),
-            new TextPart('content'),
+            new TextPart('content')
         );
 
         $signer = new SMimeSigner($this->samplesDir.'sign.crt', $this->samplesDir.'sign.key');
@@ -65,7 +65,7 @@ class SMimeSignerTest extends SMimeTestCase
             (new Headers())
                 ->addDateHeader('Date', new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
                 ->addMailboxListHeader('From', ['fabien@symfony.com']),
-            new TextPart('content'),
+            new TextPart('content')
         );
 
         $signer = new SMimeSigner($this->samplesDir.'sign3.crt', $this->samplesDir.'sign3.key', 'symfony-rocks');
@@ -117,7 +117,7 @@ class SMimeSignerTest extends SMimeTestCase
         $message = new Email((new Headers())
             ->addDateHeader('Date', new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->addMailboxListHeader('From', ['fabien@symfony.com'])
-            ->addMailboxListHeader('To', ['fabien@symfony.com']),
+            ->addMailboxListHeader('To', ['fabien@symfony.com'])
         );
         $message->html('html content <img src="cid:test.gif">');
         $message->text('text content');
@@ -136,7 +136,7 @@ class SMimeSignerTest extends SMimeTestCase
             (new Headers())
                 ->addDateHeader('Date', new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
                 ->addMailboxListHeader('From', ['fabien@symfony.com']),
-            new TextPart('content'),
+            new TextPart('content')
         );
 
         $signer = new SMimeSigner(
@@ -144,7 +144,7 @@ class SMimeSignerTest extends SMimeTestCase
             $this->samplesDir.'sign.key',
             null,
             $this->samplesDir.'intermediate.crt',
-            \PKCS7_DETACHED,
+            \PKCS7_DETACHED
         );
         $signedMessage = $signer->sign($message);
 

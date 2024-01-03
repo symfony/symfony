@@ -34,7 +34,7 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
         self::assertEquals(
             'Foo',
             $crawler->filterXPath('//h1')->text(),
-            '->addHtmlContent() parses valid HTML with comment before doctype',
+            '->addHtmlContent() parses valid HTML with comment before doctype'
         );
     }
 

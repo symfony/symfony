@@ -67,7 +67,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                 return $item;
             },
             null,
-            CacheItem::class,
+            CacheItem::class
         );
         self::$mergeByLifetime ??= \Closure::bind(
             static function ($deferred, &$expiredIds, $getId, $tagPrefix, $defaultLifetime) {
@@ -116,7 +116,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                 return $byLifetime;
             },
             null,
-            CacheItem::class,
+            CacheItem::class
         );
     }
 

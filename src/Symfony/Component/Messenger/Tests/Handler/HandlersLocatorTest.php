@@ -53,7 +53,7 @@ class HandlersLocatorTest extends TestCase
             $first,
             $second,
         ], iterator_to_array($locator->getHandlers(
-            new Envelope(new DummyMessage('Body'), [new ReceivedStamp('transportName')]),
+            new Envelope(new DummyMessage('Body'), [new ReceivedStamp('transportName')])
         )));
     }
 

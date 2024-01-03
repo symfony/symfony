@@ -39,7 +39,7 @@ class HandleTraitTest extends TestCase
 
         $query = new DummyMessage('Hello');
         $bus->expects($this->once())->method('dispatch')->willReturn(
-            new Envelope($query, [new HandledStamp('result', 'DummyHandler::__invoke')]),
+            new Envelope($query, [new HandledStamp('result', 'DummyHandler::__invoke')])
         );
 
         $this->assertSame('result', $queryBus->query($query));
@@ -78,7 +78,7 @@ class HandleTraitTest extends TestCase
 
         $query = new DummyMessage('Hello');
         $bus->expects($this->once())->method('dispatch')->willReturn(
-            new Envelope($query, [new HandledStamp('first_result', 'FirstDummyHandler::__invoke'), new HandledStamp('second_result', 'SecondDummyHandler::__invoke')]),
+            new Envelope($query, [new HandledStamp('first_result', 'FirstDummyHandler::__invoke'), new HandledStamp('second_result', 'SecondDummyHandler::__invoke')])
         );
 
         $queryBus->query($query);

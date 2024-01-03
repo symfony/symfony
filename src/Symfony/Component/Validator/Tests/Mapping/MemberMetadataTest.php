@@ -33,7 +33,7 @@ class MemberMetadataTest extends TestCase
         $this->metadata = new TestMemberMetadata(
             Entity::class,
             'getLastName',
-            'lastName',
+            'lastName'
         );
     }
 

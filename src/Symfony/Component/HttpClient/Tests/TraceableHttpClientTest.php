@@ -44,7 +44,7 @@ class TraceableHttpClientTest extends TestCase
                     $this->assertEquals(['options1' => 'foo'], $subject);
 
                     return true;
-                }),
+                })
             )
             ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse('hello')))
         ;

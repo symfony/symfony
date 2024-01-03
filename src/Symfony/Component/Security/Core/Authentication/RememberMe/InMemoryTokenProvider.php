@@ -42,7 +42,7 @@ final class InMemoryTokenProvider implements TokenProviderInterface
             $this->tokens[$series]->getUserIdentifier(),
             $series,
             $tokenValue,
-            $lastUsed,
+            $lastUsed
         );
         $this->tokens[$series] = $token;
     }

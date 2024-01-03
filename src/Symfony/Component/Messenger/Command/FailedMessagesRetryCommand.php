@@ -224,7 +224,7 @@ EOF
             [$failureTransportName => $receiver],
             $this->messageBus,
             $this->eventDispatcher,
-            $this->logger,
+            $this->logger
         );
 
         try {

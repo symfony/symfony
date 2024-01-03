@@ -38,8 +38,8 @@ class GitignoreTest extends TestCase
                 sprintf(
                     "Failed asserting path:\n%s\nmatches gitignore patterns:\n%s",
                     preg_replace('~^~m', '    ', $matchingCase),
-                    preg_replace('~^~m', '    ', $patterns),
-                ),
+                    preg_replace('~^~m', '    ', $patterns)
+                )
             );
         }
 
@@ -49,8 +49,8 @@ class GitignoreTest extends TestCase
                 $nonMatchingCase,
                 sprintf("Failed asserting path:\n%s\nNOT matching gitignore patterns:\n%s",
                     preg_replace('~^~m', '    ', $nonMatchingCase),
-                    preg_replace('~^~m', '    ', $patterns),
-                ),
+                    preg_replace('~^~m', '    ', $patterns)
+                )
             );
         }
     }
@@ -462,8 +462,8 @@ class GitignoreTest extends TestCase
                 sprintf(
                     "Failed asserting path:\n%s\nmatches gitignore negated patterns:\n%s",
                     preg_replace('~^~m', '    ', $matchingCase),
-                    preg_replace('~^~m', '    ', $patterns),
-                ),
+                    preg_replace('~^~m', '    ', $patterns)
+                )
             );
         }
 
@@ -473,8 +473,8 @@ class GitignoreTest extends TestCase
                 $nonMatchingCase,
                 sprintf("Failed asserting path:\n%s\nNOT matching gitignore negated patterns:\n%s",
                     preg_replace('~^~m', '    ', $nonMatchingCase),
-                    preg_replace('~^~m', '    ', $patterns),
-                ),
+                    preg_replace('~^~m', '    ', $patterns)
+                )
             );
         }
     }

@@ -231,7 +231,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
     public function testReverseTransformWithWeek()
     {
         $transformer = new DateIntervalToArrayTransformer(
-            ['years', 'months', 'weeks', 'hours', 'minutes', 'seconds'],
+            ['years', 'months', 'weeks', 'hours', 'minutes', 'seconds']
         );
         $input = [
             'years' => '1',
@@ -260,7 +260,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
     public function testBothTransformsWithWeek()
     {
         $transformer = new DateIntervalToArrayTransformer(
-            ['years', 'months', 'weeks', 'hours', 'minutes', 'seconds'],
+            ['years', 'months', 'weeks', 'hours', 'minutes', 'seconds']
         );
         $interval = new \DateInterval('P1Y2M21DT4H5M6S');
         $array = [

@@ -365,7 +365,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sAccept: */*%1$s \\
   --header %1$sAuthorization: Basic Zm9vOmJhcg==%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand,
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand
         );
     }
 

@@ -218,7 +218,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
                 2 => new Reference('bar'),
                 3 => new Reference('baz'),
             ],
-            $definition->getArguments(),
+            $definition->getArguments()
         );
     }
 }

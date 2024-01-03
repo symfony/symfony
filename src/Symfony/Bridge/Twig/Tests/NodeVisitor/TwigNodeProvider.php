@@ -32,7 +32,7 @@ class TwigNodeProvider
             new ArrayExpression([], 0),
             new ArrayExpression([], 0),
             null,
-            new Source('', ''),
+            new Source('', '')
         );
     }
 
@@ -49,7 +49,7 @@ class TwigNodeProvider
             new ConstantExpression($message, 0),
             new ConstantExpression('trans', 0),
             new Node($arguments),
-            0,
+            0
         );
     }
 
@@ -57,14 +57,14 @@ class TwigNodeProvider
     {
         return new TransNode(
             new BodyNode([], ['data' => $message]),
-            $domain ? new ConstantExpression($domain, 0) : null,
+            $domain ? new ConstantExpression($domain, 0) : null
         );
     }
 
     public static function getTransDefaultDomainTag($domain)
     {
         return new TransDefaultDomainNode(
-            new ConstantExpression($domain, 0),
+            new ConstantExpression($domain, 0)
         );
     }
 }

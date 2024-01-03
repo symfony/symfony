@@ -87,7 +87,7 @@ final class PhpStanTypeHelper
                 $firstType->getClassName(),
                 $firstType->isCollection(),
                 $firstType->getCollectionKeyTypes(),
-                $firstType->getCollectionValueTypes(),
+                $firstType->getCollectionValueTypes()
             );
             unset($types[$nullableTypeIndex]);
         }

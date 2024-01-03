@@ -34,7 +34,7 @@ class TraceableWorkflowTest extends TestCase
 
         $this->traceableWorkflow = new TraceableWorkflow(
             $this->innerWorkflow,
-            $this->stopwatch,
+            $this->stopwatch
         );
     }
 

@@ -317,7 +317,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'published',
             ],
             $workflowDefinition->getArgument(0),
-            'Places are passed to the workflow definition',
+            'Places are passed to the workflow definition'
         );
         $this->assertCount(4, $workflowDefinition->getArgument(1));
         $this->assertSame(['draft'], $workflowDefinition->getArgument(2));
@@ -346,7 +346,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'closed',
             ],
             $stateMachineDefinition->getArgument(0),
-            'Places are passed to the state machine definition',
+            'Places are passed to the state machine definition'
         );
         $this->assertCount(9, $stateMachineDefinition->getArgument(1));
         $this->assertSame(['start'], $stateMachineDefinition->getArgument(2));
@@ -776,7 +776,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $messengerDefinitions = array_filter(
             $container->getDefinitions(),
             fn ($name) => str_starts_with($name, 'messenger.'),
-            \ARRAY_FILTER_USE_KEY,
+            \ARRAY_FILTER_USE_KEY
         );
 
         $this->assertEmpty($messengerDefinitions);
@@ -1111,34 +1111,34 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
-            '->registerTranslatorConfiguration() finds Validator translation resources',
+            '->registerTranslatorConfiguration() finds Validator translation resources'
         );
         $ref = new \ReflectionClass(Form::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
-            '->registerTranslatorConfiguration() finds Form translation resources',
+            '->registerTranslatorConfiguration() finds Form translation resources'
         );
         $ref = new \ReflectionClass(AuthenticationEvents::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
-            '->registerTranslatorConfiguration() finds Security translation resources',
+            '->registerTranslatorConfiguration() finds Security translation resources'
         );
         $this->assertContains(
             strtr(__DIR__.'/Fixtures/translations/test_paths.en.yml', '/', \DIRECTORY_SEPARATOR),
             $files,
-            '->registerTranslatorConfiguration() finds translation resources in custom paths',
+            '->registerTranslatorConfiguration() finds translation resources in custom paths'
         );
         $this->assertContains(
             strtr(__DIR__.'/translations/test_default.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
-            '->registerTranslatorConfiguration() finds translation resources in default path',
+            '->registerTranslatorConfiguration() finds translation resources in default path'
         );
         $this->assertContains(
             strtr(__DIR__.'/Fixtures/translations/domain.with.dots.en.yml', '/', \DIRECTORY_SEPARATOR),
             $files,
-            '->registerTranslatorConfiguration() finds translation resources with dots in domain',
+            '->registerTranslatorConfiguration() finds translation resources with dots in domain'
         );
         $this->assertContains(strtr(__DIR__.'/translations/security.en.yaml', '/', \DIRECTORY_SEPARATOR), $files);
 
@@ -1159,7 +1159,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $nonExistingDirectories = array_filter(
             $options['scanned_directories'],
-            fn ($directory) => !file_exists($directory),
+            fn ($directory) => !file_exists($directory)
         );
 
         $this->assertNotEmpty($nonExistingDirectories, 'FrameworkBundle should pass non existing directories to Translator');
@@ -1874,7 +1874,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true], 'disallow_search_engine_index' => false]], $container);
         $this->assertFalse(
             $container->has('disallow_search_engine_index_response_listener'),
-            'DisallowRobotsIndexingListener should not be registered when explicitly disabled',
+            'DisallowRobotsIndexingListener should not be registered when explicitly disabled'
         );
 
         $container = $this->createContainer(['kernel.debug' => false]);
@@ -2197,8 +2197,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
                     return $call;
                 },
-                $calls,
-            ),
+                $calls
+            )
         );
 
         // Named alias
@@ -2234,7 +2234,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertCount(1, $calls = $container->getDefinition('html_sanitizer.config.default')->getMethodCalls());
         $this->assertSame(
             ['allowSafeElements', [], true],
-            $calls[0],
+            $calls[0]
         );
 
         // Named alias
@@ -2301,7 +2301,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->getDefinition('webhook.body_configurator.json')->hasErrors());
         $this->assertSame(
             ['You cannot use the "webhook transport" service since the Serializer component is not enabled. Try setting "framework.serializer.enabled" to true.'],
-            $container->getDefinition('webhook.body_configurator.json')->getErrors(),
+            $container->getDefinition('webhook.body_configurator.json')->getErrors()
         );
     }
 

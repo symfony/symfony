@@ -101,7 +101,7 @@ class HttpFoundationExtensionTest extends TestCase
 
         $this->assertEquals(
             'http://localhost/app/web/bundles/framework/css/structure.css',
-            $extension->generateAbsoluteUrl('/app/web/bundles/framework/css/structure.css'),
+            $extension->generateAbsoluteUrl('/app/web/bundles/framework/css/structure.css')
         );
     }
 

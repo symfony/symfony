@@ -128,7 +128,7 @@ class CovertTest extends TestCase
                 'REQUEST_URI' => '/testCreateRequest?foo=1&bar%5Bbaz%5D=42',
                 'QUERY_STRING' => 'foo=1&bar%5Bbaz%5D=42',
             ],
-            'Content',
+            'Content'
         );
 
         $psr7Requests = [
@@ -192,7 +192,7 @@ class CovertTest extends TestCase
         $sfResponse = new Response(
             'Response content.',
             202,
-            ['x-symfony' => ['3.4']],
+            ['x-symfony' => ['3.4']]
         );
 
         $cookie = Cookie::create('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'));

@@ -49,7 +49,7 @@ trait TypeEnforcementTestTrait
             ['number' => 'foo'],
             TypeEnforcementNumberObject::class,
             null,
-            [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true],
+            [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]
         )->number);
     }
 }

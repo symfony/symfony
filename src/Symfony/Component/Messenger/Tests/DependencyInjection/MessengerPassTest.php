@@ -89,7 +89,7 @@ class MessengerPassTest extends TestCase
 
         $this->assertEquals(
             [DummyReceiver::class => new Reference(DummyReceiver::class)],
-            $container->getDefinition('messenger.receiver_locator')->getArgument(0),
+            $container->getDefinition('messenger.receiver_locator')->getArgument(0)
         );
     }
 
@@ -133,7 +133,7 @@ class MessengerPassTest extends TestCase
             $container,
             $handlersMapping,
             DummyMessage::class,
-            [[DummyHandlerWithCustomMethods::class, 'handleDummyMessage']],
+            [[DummyHandlerWithCustomMethods::class, 'handleDummyMessage']]
         );
 
         $this->assertArrayHasKey(SecondMessage::class, $handlersMapping);
@@ -141,7 +141,7 @@ class MessengerPassTest extends TestCase
             $container,
             $handlersMapping,
             SecondMessage::class,
-            [[DummyHandlerWithCustomMethods::class, 'handleSecondMessage']],
+            [[DummyHandlerWithCustomMethods::class, 'handleSecondMessage']]
         );
     }
 
@@ -168,7 +168,7 @@ class MessengerPassTest extends TestCase
             $container,
             $handlerDescriptionMapping,
             SecondMessage::class,
-            [[TaggedDummyHandler::class, 'handleSecondMessage']],
+            [[TaggedDummyHandler::class, 'handleSecondMessage']]
         );
         $this->assertHandlerDescriptor(
             $container,
@@ -210,13 +210,13 @@ class MessengerPassTest extends TestCase
             $container,
             $handlerDescriptionMapping,
             UnionTypeOneMessage::class,
-            [[TaggedDummyHandlerWithUnionTypes::class, 'handleUnionTypeMessage']],
+            [[TaggedDummyHandlerWithUnionTypes::class, 'handleUnionTypeMessage']]
         );
         $this->assertHandlerDescriptor(
             $container,
             $handlerDescriptionMapping,
             UnionTypeTwoMessage::class,
-            [[TaggedDummyHandlerWithUnionTypes::class, 'handleUnionTypeMessage']],
+            [[TaggedDummyHandlerWithUnionTypes::class, 'handleUnionTypeMessage']]
         );
     }
 
@@ -252,14 +252,14 @@ class MessengerPassTest extends TestCase
             $commandBusHandlersLocatorDefinition->getArgument(0),
             MultipleBusesMessage::class,
             [MultipleBusesMessageHandler::class],
-            [['bus' => $commandBusId]],
+            [['bus' => $commandBusId]]
         );
         $this->assertHandlerDescriptor(
             $container,
             $commandBusHandlersLocatorDefinition->getArgument(0),
             DummyCommand::class,
             [DummyCommandHandler::class],
-            [['bus' => $commandBusId]],
+            [['bus' => $commandBusId]]
         );
 
         $queryBusHandlersLocatorDefinition = $container->getDefinition($queryBusId.'.messenger.handlers_locator');
@@ -269,14 +269,14 @@ class MessengerPassTest extends TestCase
             $queryBusHandlersLocatorDefinition->getArgument(0),
             DummyQuery::class,
             [DummyQueryHandler::class],
-            [['bus' => $queryBusId]],
+            [['bus' => $queryBusId]]
         );
         $this->assertHandlerDescriptor(
             $container,
             $queryBusHandlersLocatorDefinition->getArgument(0),
             MultipleBusesMessage::class,
             [MultipleBusesMessageHandler::class],
-            [['bus' => $queryBusId]],
+            [['bus' => $queryBusId]]
         );
     }
 
@@ -380,7 +380,7 @@ class MessengerPassTest extends TestCase
             $container,
             $messageHandlerMapping,
             DummyMessage::class,
-            [$abstractHandlerId],
+            [$abstractHandlerId]
         );
     }
 
@@ -492,7 +492,7 @@ class MessengerPassTest extends TestCase
             $eventsHandlerMapping,
             DummyMessage::class,
             [[HandlerOnSpecificBuses::class, 'dummyMethodForEvents']],
-            [['bus' => 'event_bus']],
+            [['bus' => 'event_bus']]
         );
 
         $commandsHandlerMapping = $container->getDefinition($commandsBusId.'.messenger.handlers_locator')->getArgument(0);
@@ -502,7 +502,7 @@ class MessengerPassTest extends TestCase
             $commandsHandlerMapping,
             DummyMessage::class,
             [[HandlerOnSpecificBuses::class, 'dummyMethodForCommands']],
-            [['bus' => 'command_bus']],
+            [['bus' => 'command_bus']]
         );
     }
 
@@ -680,30 +680,30 @@ class MessengerPassTest extends TestCase
         (new ResolveChildDefinitionsPass())->process($container);
 
         $this->assertTrue($container->hasDefinition(
-            $factoryChildMiddlewareArgs1Id = $fooBusId.'.middleware.middleware_with_factory',
+            $factoryChildMiddlewareArgs1Id = $fooBusId.'.middleware.middleware_with_factory'
         ));
         $this->assertEquals(
             ['foo', 'bar'],
             $container->getDefinition($factoryChildMiddlewareArgs1Id)->getArguments(),
-            'parent default argument is overridden, and next ones appended',
+            'parent default argument is overridden, and next ones appended'
         );
 
         $this->assertTrue($container->hasDefinition(
-            $factoryChildMiddlewareArgs2Id = $fooBusId.'.middleware.middleware_with_factory.'.ContainerBuilder::hash($factoryChildMiddlewareArgs2),
+            $factoryChildMiddlewareArgs2Id = $fooBusId.'.middleware.middleware_with_factory.'.ContainerBuilder::hash($factoryChildMiddlewareArgs2)
         ));
         $this->assertEquals(
             ['baz'],
             $container->getDefinition($factoryChildMiddlewareArgs2Id)->getArguments(),
-            'parent default argument is overridden, and next ones appended',
+            'parent default argument is overridden, and next ones appended'
         );
 
         $this->assertTrue($container->hasDefinition(
-            $factoryWithDefaultChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_default',
+            $factoryWithDefaultChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_default'
         ));
         $this->assertEquals(
             ['some_default'],
             $container->getDefinition($factoryWithDefaultChildMiddlewareId)->getArguments(),
-            'parent default argument is used',
+            'parent default argument is used'
         );
 
         $this->assertEquals([

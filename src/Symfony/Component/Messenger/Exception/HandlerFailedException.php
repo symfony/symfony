@@ -34,7 +34,7 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
                 : sprintf('%d handlers failed. First failure is: %s', \count($exceptions), $firstFailure->getMessage())
             ),
             (int) $firstFailure->getCode(),
-            $firstFailure,
+            $firstFailure
         );
 
         $this->envelope = $envelope;

@@ -267,7 +267,7 @@ class MongoDbStore implements PersistingStoreInterface
                 '_id' => (string) $key,
                 'token' => $this->getUniqueToken($key),
             ],
-            ['limit' => 1],
+            ['limit' => 1]
         );
 
         $this->getManager()->executeBulkWrite($this->namespace, $write);
@@ -286,7 +286,7 @@ class MongoDbStore implements PersistingStoreInterface
             [
                 'limit' => 1,
                 'projection' => ['_id' => 1],
-            ],
+            ]
         ));
 
         return [] !== $cursor->toArray();
@@ -326,7 +326,7 @@ class MongoDbStore implements PersistingStoreInterface
             ],
             [
                 'upsert' => true,
-            ],
+            ]
         );
 
         $this->getManager()->executeBulkWrite($this->namespace, $write);

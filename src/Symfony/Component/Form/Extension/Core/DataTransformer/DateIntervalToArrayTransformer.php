@@ -75,7 +75,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
                     'seconds' => '',
                     'invert' => false,
                 ],
-                array_flip($this->fields),
+                array_flip($this->fields)
             );
         }
         if (!$dateInterval instanceof \DateInterval) {
@@ -143,7 +143,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
                     empty($value['weeks']) ? '0' : $value['weeks'],
                     empty($value['hours']) ? '0' : $value['hours'],
                     empty($value['minutes']) ? '0' : $value['minutes'],
-                    empty($value['seconds']) ? '0' : $value['seconds'],
+                    empty($value['seconds']) ? '0' : $value['seconds']
                 );
             } else {
                 $interval = sprintf(
@@ -153,7 +153,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
                     empty($value['days']) ? '0' : $value['days'],
                     empty($value['hours']) ? '0' : $value['hours'],
                     empty($value['minutes']) ? '0' : $value['minutes'],
-                    empty($value['seconds']) ? '0' : $value['seconds'],
+                    empty($value['seconds']) ? '0' : $value['seconds']
                 );
             }
             $dateInterval = new \DateInterval($interval);

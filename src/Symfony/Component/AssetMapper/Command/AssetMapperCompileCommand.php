@@ -90,7 +90,7 @@ EOT
         if ($this->isDebug) {
             $io->warning(sprintf(
                 'You are compiling assets in development. Symfony will not serve any changed assets until you delete the files in the "%s" directory.',
-                $this->shortenPath(\dirname($manifestPath)),
+                $this->shortenPath(\dirname($manifestPath))
             ));
         }
 

@@ -1065,13 +1065,13 @@ class OptionsResolver implements Options
                 $message = sprintf(
                     'The option "%s" with value %s is invalid.',
                     $this->formatOptions([$option]),
-                    $this->formatValue($value),
+                    $this->formatValue($value)
                 );
 
                 if (\count($printableAllowedValues) > 0) {
                     $message .= sprintf(
                         ' Accepted values are: %s.',
-                        $this->formatValues($printableAllowedValues),
+                        $this->formatValues($printableAllowedValues)
                     );
                 }
 

@@ -62,7 +62,7 @@ class HtmlExtension extends AbstractExtension
         return $xpath->addCondition(
             '(@checked '
             ."and (name(.) = 'input' or name(.) = 'command')"
-            ."and (@type = 'checkbox' or @type = 'radio'))",
+            ."and (@type = 'checkbox' or @type = 'radio'))"
         );
     }
 
@@ -92,7 +92,7 @@ class HtmlExtension extends AbstractExtension
                 ." or name(.) = 'select'"
                 ." or name(.) = 'textarea'"
             .')'
-            .' and ancestor::fieldset[@disabled]',
+            .' and ancestor::fieldset[@disabled]'
         );
         // todo: in the second half, add "and is not a descendant of that fieldset element's first legend element child, if any."
     }
@@ -126,7 +126,7 @@ class HtmlExtension extends AbstractExtension
                 ."name(.) = 'option' and not("
                     .'@disabled or ancestor::optgroup[@disabled]'
                 .')'
-            .')',
+            .')'
         );
     }
 
@@ -147,7 +147,7 @@ class HtmlExtension extends AbstractExtension
             ."translate(@%s, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '-')"
             .', %s)]',
             'lang',
-            Translator::getXpathLiteral(strtolower($arguments[0]->getValue()).'-'),
+            Translator::getXpathLiteral(strtolower($arguments[0]->getValue()).'-')
         ));
     }
 

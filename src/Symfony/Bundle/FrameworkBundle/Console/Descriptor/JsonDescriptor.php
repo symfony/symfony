@@ -136,7 +136,7 @@ class JsonDescriptor extends Descriptor
 
         $this->writeData(
             [$this->getContainerAliasData($alias), $this->getContainerDefinitionData($container->getDefinition((string) $alias), isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, (string) $alias)],
-            array_merge($options, ['id' => (string) $alias]),
+            array_merge($options, ['id' => (string) $alias])
         );
     }
 

@@ -63,7 +63,7 @@ class CacheClearCommandTest extends TestCase
                 substr($file, 0, -5),
                 function () use ($file) {
                     $this->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
-                },
+                }
             );
         }
 
@@ -89,12 +89,12 @@ class CacheClearCommandTest extends TestCase
         $containerFile = str_replace(
             'tes_'.\DIRECTORY_SEPARATOR,
             'test'.\DIRECTORY_SEPARATOR,
-            $containerRef->getFileName(),
+            $containerRef->getFileName()
         );
         $this->assertMatchesRegularExpression(
             sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass),
             file_get_contents($containerFile),
-            'kernel.container_class is properly set on the dumped container',
+            'kernel.container_class is properly set on the dumped container'
         );
     }
 

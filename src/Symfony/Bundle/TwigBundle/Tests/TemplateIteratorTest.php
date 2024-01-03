@@ -31,7 +31,7 @@ class TemplateIteratorTest extends TestCase
                 '@Foo/not-twig.js',
                 'layout.html.twig',
             ],
-            $sorted,
+            $sorted
         );
     }
 
@@ -48,7 +48,7 @@ class TemplateIteratorTest extends TestCase
                 '@Foo/index.html.twig',
                 'layout.html.twig',
             ],
-            $sorted,
+            $sorted
         );
     }
 

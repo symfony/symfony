@@ -82,7 +82,7 @@ class ErrorControllerTest extends TestCase
 
                     return true;
                 }),
-                $this->equalTo(HttpKernelInterface::SUB_REQUEST),
+                $this->equalTo(HttpKernelInterface::SUB_REQUEST)
             )
             ->willReturn($response = new Response());
 

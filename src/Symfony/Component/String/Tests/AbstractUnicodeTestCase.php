@@ -24,7 +24,7 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
 This is a
 multiline text
 END'],
-            ],
+            ]
         );
     }
 
@@ -113,7 +113,7 @@ END'],
             [
                 [[0xC3, 0xA4], 'Späßchen', 2],
                 [[0xC3, 0x9F], 'Späßchen', -5],
-            ],
+            ]
         );
     }
 
@@ -175,7 +175,7 @@ END'],
                 [1, '한국어', '국', 1],
                 [null, '한국어', '국', 2],
                 [8, 'der Straße nach Paris', 'ß', 4],
-            ],
+            ]
         );
     }
 
@@ -191,7 +191,7 @@ END'],
                 [1, 'aςσb', 'ΣΣ', 0],
                 [16, 'der Straße nach Paris', 'Paris', 0],
                 [8, 'der Straße nach Paris', 'ß', 4],
-            ],
+            ]
         );
     }
 
@@ -206,7 +206,7 @@ END'],
                 // see https://bugs.php.net/bug.php?id=74264
                 [15, 'abcdéf12é45abcdéf', 'é', 0],
                 [8, 'abcdéf12é45abcdéf', 'é', -4],
-            ],
+            ]
         );
     }
 
@@ -229,7 +229,7 @@ END'],
                 [15, 'abcdéf12é45abcdéf', 'é', 0],
                 [8, 'abcdéf12é45abcdéf', 'é', -4],
                 [1, 'aςσb', 'ΣΣ', 0],
-            ],
+            ]
         );
     }
 
@@ -266,7 +266,7 @@ END'],
                     ],
                     5,
                 ],
-            ],
+            ]
         );
     }
 
@@ -293,7 +293,7 @@ END'],
                     ],
                     2,
                 ],
-            ],
+            ]
         );
     }
 
@@ -336,7 +336,7 @@ END'],
 
                 // Random symbols
                 ['déjà σσς i̇iıi', 'DÉJÀ Σσς İIıi'],
-            ],
+            ]
         );
     }
 
@@ -433,7 +433,7 @@ END'],
 
                 // Random symbols
                 ['DÉJÀ ΣΣΣ İIII', 'Déjà Σσς İIıi'],
-            ],
+            ]
         );
     }
 
@@ -460,7 +460,7 @@ END'],
 
                 ['Última Prueba', 'última prueba', true],
                 ['ÚLTIMA PRUEBA', 'úLTIMA pRUEBA', true],
-            ],
+            ]
         );
     }
 
@@ -479,7 +479,7 @@ END'],
                 ['', 'déjà', -2, -2],
                 ['', 'déjà', 5, 0],
                 ['', 'déjà', -5, 0],
-            ],
+            ]
         );
     }
 
@@ -496,7 +496,7 @@ END'],
                     'Déjà Σσς İIıi',
                     ['Déjà', ' Σσς', ' İIıi'],
                 ],
-            ],
+            ]
         );
     }
 
@@ -520,7 +520,7 @@ END'],
                     'İIıi Σσς Déjà',
                     ['Déjà', 'Σσς ', 'İIıi '],
                 ],
-            ],
+            ]
         );
     }
 
@@ -538,7 +538,7 @@ END'],
             [
                 ['jàdéjà', 'jà', 'déjàdéjà', 0, false],
                 ['dé', 'jà', 'déjàdéjà', 0, true],
-            ],
+            ]
         );
     }
 
@@ -553,7 +553,7 @@ END'],
                 ['d', 'é', 'déjàdéjà', 0, true],
                 ['déjàdéjà', 'Ç', 'déjàdéjà', 0, false],
                 ['déjàdéjà', 'Ç', 'déjàdéjà', 0, true],
-            ],
+            ]
         );
     }
 
@@ -566,7 +566,7 @@ END'],
                 ['déjàdéjà', 'Ç', 'déjàdéjà', 0, true],
                 ['éjà', 'é', 'déjàdéjà', 0, false],
                 ['déjàd', 'é', 'déjàdéjà', 0, true],
-            ],
+            ]
         );
     }
 
@@ -578,7 +578,7 @@ END'],
                 ['déjàdéjà', 'Ç', 'déjàdéjà', 0, false],
                 ['éjà', 'é', 'déjàdéjà', 0, false],
                 ['éjà', 'É', 'déjàdéjà', 0, false],
-            ],
+            ]
         );
     }
 
@@ -590,7 +590,7 @@ END'],
                 ['déjà', 'DéjÀ'],
                 ['σσσ', 'Σσς'],
                 ['iıi̇i', 'Iıİi'],
-            ],
+            ]
         );
     }
 
@@ -603,7 +603,7 @@ END'],
                 ['漢字はユニコード', 0, '漢字はユニコード', 'foo', 'bar'],
                 ['漢字ーユニコード', 1, '漢字はユニコード', 'は', 'ー'],
                 ['This is a jamais-vu situation!', 1, 'This is a déjà-vu situation!', 'déjà', 'jamais'],
-            ],
+            ]
         );
     }
 
@@ -613,7 +613,7 @@ END'],
             parent::provideReplaceMatches(),
             [
                 ['This is a dj-vu situation!', 'This is a déjà-vu situation!', '/([à-ú])/', ''],
-            ],
+            ]
         );
     }
 
@@ -629,7 +629,7 @@ END'],
                 ['漢字はユニコード', 0, '漢字はユニコード', 'foo', 'bar'],
                 ['漢字ーユニコード', 1, '漢字はユニコード', 'は', 'ー'],
                 ['This is a jamais-vu situation!', 1, 'This is a déjà-vu situation!', 'DÉjÀ', 'jamais'],
-            ],
+            ]
         );
     }
 
@@ -651,7 +651,7 @@ END'],
             parent::provideCamel(),
             [
                 ['symfonyIstÄußerstCool', 'symfony_ist_äußerst_cool'],
-            ],
+            ]
         );
     }
 
@@ -661,7 +661,7 @@ END'],
             parent::provideSnake(),
             [
                 ['symfony_ist_äußerst_cool', 'symfonyIstÄußerstCool'],
-            ],
+            ]
         );
     }
 
@@ -673,7 +673,7 @@ END'],
                 [true, 'äußerst', 'äußerst'],
                 [false, 'BÄR', 'bär'],
                 [false, 'Bär', 'Bar'],
-            ],
+            ]
         );
     }
 
@@ -684,7 +684,7 @@ END'],
             [
                 [true, 'Äußerst', 'äußerst'],
                 [false, 'Bär', 'Bar'],
-            ],
+            ]
         );
     }
 
@@ -696,7 +696,7 @@ END'],
                 ['äußerst', 'äußerst', 7, '+'],
                 ['+äußerst+', 'äußerst', 9, '+'],
                 ['äö.äöä', '.', 6, 'äö'],
-            ],
+            ]
         );
     }
 
@@ -708,7 +708,7 @@ END'],
                 ['äußerst', 'äußerst', 7, '+'],
                 ['äußerst+', 'äußerst', 8, '+'],
                 ['.äöä', '.', 4, 'äö'],
-            ],
+            ]
         );
     }
 
@@ -720,7 +720,7 @@ END'],
                 ['äußerst', 'äußerst', 7, '+'],
                 ['+äußerst', 'äußerst', 8, '+'],
                 ['äöä.', '.', 4, 'äö'],
-            ],
+            ]
         );
     }
 
@@ -732,7 +732,7 @@ END'],
                 ['äuß⭐erst', 'tsre⭐ßuä'],
                 ['漢字ーユニコードéèΣσς', 'ςσΣèéドーコニユー字漢'],
                 ['नमस्ते', 'तेस्मन'],
-            ],
+            ]
         );
     }
 }

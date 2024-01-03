@@ -129,7 +129,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         if (preg_match('~[\x00-\x08\x10-\x19\x7F-\xFF\r\n]~', $name = $a->getName())) {
             return sprintf('=?UTF-8?B?%s?= <%s>',
                 base64_encode($name),
-                $a->getEncodedAddress(),
+                $a->getEncodedAddress()
             );
         }
 

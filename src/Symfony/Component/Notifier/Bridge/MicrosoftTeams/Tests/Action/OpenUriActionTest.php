@@ -34,7 +34,7 @@ final class OpenUriActionTest extends TestCase
             [
                 ['os' => 'default', 'uri' => $uri],
             ],
-            $action->toArray()['targets'],
+            $action->toArray()['targets']
         );
     }
 
@@ -50,7 +50,7 @@ final class OpenUriActionTest extends TestCase
             [
                 ['os' => $os, 'uri' => $uri],
             ],
-            $action->toArray()['targets'],
+            $action->toArray()['targets']
         );
     }
 
@@ -78,7 +78,7 @@ final class OpenUriActionTest extends TestCase
             [
                 '@type' => 'OpenUri',
             ],
-            (new OpenUriAction())->toArray(),
+            (new OpenUriAction())->toArray()
         );
     }
 }

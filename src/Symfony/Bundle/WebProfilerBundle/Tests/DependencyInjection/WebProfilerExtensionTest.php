@@ -163,7 +163,7 @@ class WebProfilerExtensionTest extends TestCase
         $extension = new WebProfilerExtension();
         $extension->load(
             [['toolbar' => $toolbarEnabled, 'intercept_redirects' => $interceptRedirects]],
-            $this->container,
+            $this->container
         );
         $this->container->removeDefinition('web_profiler.controller.exception');
 

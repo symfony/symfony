@@ -284,7 +284,7 @@ EOF
 
             $mergeOperation = new MergeOperation(
                 $this->extractMessages($locale, $this->getRootCodePaths($kernel)),
-                $this->loadCurrentMessages($locale, $this->getRootTransPaths()),
+                $this->loadCurrentMessages($locale, $this->getRootTransPaths())
             );
 
             $suggestions->suggestValues($mergeOperation->getDomains());

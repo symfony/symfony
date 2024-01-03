@@ -248,7 +248,7 @@ class XmlUtils
                 trim($error->message),
                 $error->file ?: 'n/a',
                 $error->line,
-                $error->column,
+                $error->column
             );
         }
 

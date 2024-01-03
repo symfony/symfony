@@ -218,12 +218,12 @@ class FlattenExceptionTest extends TestCase
     {
         $exception = new NotFoundHttpException(
             'test',
-            new \RuntimeException('previous', 123),
+            new \RuntimeException('previous', 123)
         );
 
         $this->assertSame(
             FlattenException::createFromThrowable($exception)->toArray(),
-            FlattenException::createFromThrowable($exception)->toArray(),
+            FlattenException::createFromThrowable($exception)->toArray()
         );
     }
 

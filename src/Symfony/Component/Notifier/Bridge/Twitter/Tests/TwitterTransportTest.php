@@ -116,7 +116,7 @@ class TwitterTransportTest extends TransportTestCase
         })()));
 
         $result = $transport->send(new ChatMessage('Hello World!', (new TwitterOptions())
-            ->attachImage(new File(__DIR__.'/fixtures.gif'), 'A fixture')),
+            ->attachImage(new File(__DIR__.'/fixtures.gif'), 'A fixture'))
         );
 
         $this->assertSame('abc123', $result->getMessageId());
@@ -193,7 +193,7 @@ class TwitterTransportTest extends TransportTestCase
         })()));
 
         $result = $transport->send(new ChatMessage('Hello World!', (new TwitterOptions())
-            ->attachVideo(new File(__DIR__.'/fixtures.gif'), '', new File(__DIR__.'/fixtures.gif', 'English.en.srt'))),
+            ->attachVideo(new File(__DIR__.'/fixtures.gif'), '', new File(__DIR__.'/fixtures.gif', 'English.en.srt')))
         );
 
         $this->assertSame('abc123', $result->getMessageId());

@@ -33,7 +33,7 @@ class FormErrorIteratorTest extends TestCase
             null,
             new EventDispatcher(),
             new FormFactory(new FormRegistry([], new ResolvedFormTypeFactory())),
-            [],
+            []
         );
 
         $form = $formBuilder->getForm();

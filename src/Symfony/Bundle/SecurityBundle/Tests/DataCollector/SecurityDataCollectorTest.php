@@ -290,7 +290,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame(
             $actualVoterClasses,
             $expectedVoterClasses,
-            'Wrong value returned by getVoters',
+            'Wrong value returned by getVoters'
         );
 
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
@@ -391,7 +391,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame(
             $actualVoterClasses,
             $expectedVoterClasses,
-            'Wrong value returned by getVoters',
+            'Wrong value returned by getVoters'
         );
 
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');

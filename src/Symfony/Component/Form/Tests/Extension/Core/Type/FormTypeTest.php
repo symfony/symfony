@@ -440,7 +440,7 @@ class FormTypeTest extends BaseTypeTestCase
         $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
             fn ($value) => // reverseTransform
-'foobar',
+'foobar'
         ));
         $form = $builder->getForm();
 
@@ -464,7 +464,7 @@ class FormTypeTest extends BaseTypeTestCase
         $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
             fn ($value) => // reverseTransform
-$ref2,
+$ref2
         ));
         $form = $builder->getForm();
 
@@ -762,7 +762,7 @@ $ref2,
                 ->add('child', self::TESTED_TYPE, [
                     'compound' => false,
                     'error_bubbling' => true,
-                ]),
+                ])
             )
             ->getForm();
         $error = new FormError('error message');
@@ -904,7 +904,7 @@ class MoneyDataMapper implements DataMapperInterface
 
         $viewData = new Money(
             $forms['amount']->getData(),
-            $forms['currency']->getData(),
+            $forms['currency']->getData()
         );
     }
 }

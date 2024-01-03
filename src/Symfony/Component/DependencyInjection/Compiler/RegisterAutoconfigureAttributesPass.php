@@ -77,7 +77,7 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
                     ],
                 ],
                 $class->getFileName(),
-                false,
+                false
             );
         };
 

@@ -74,7 +74,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
 
         $this->assertEquals(
             ['invokable::__invoke', 'invokable:__invoke', 'invokable'],
-            array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0)),
+            array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0))
         );
     }
 }

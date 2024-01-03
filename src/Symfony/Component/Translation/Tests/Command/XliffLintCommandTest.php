@@ -35,7 +35,7 @@ class XliffLintCommandTest extends TestCase
 
         $tester->execute(
             ['filename' => $filename],
-            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
         $tester->assertCommandIsSuccessful('Returns 0 in case of success');
@@ -50,7 +50,7 @@ class XliffLintCommandTest extends TestCase
 
         $tester->execute(
             ['filename' => [$filename1, $filename2]],
-            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
         $tester->assertCommandIsSuccessful('Returns 0 in case of success');
@@ -67,7 +67,7 @@ class XliffLintCommandTest extends TestCase
 
         $tester->execute(
             ['filename' => $filename],
-            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
         $this->assertEquals($mustFail ? 1 : 0, $tester->getStatusCode());
@@ -174,7 +174,7 @@ EOF;
     {
         $command = new XliffLintCommand('translation:xliff:lint',
             $this->testPassingClosureAndCallableToConstructor(...),
-            [$this, 'testPassingClosureAndCallableToConstructor'],
+            [$this, 'testPassingClosureAndCallableToConstructor']
         );
 
         self::assertInstanceOf(XliffLintCommand::class, $command);

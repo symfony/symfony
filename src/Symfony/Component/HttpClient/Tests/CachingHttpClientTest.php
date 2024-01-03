@@ -59,7 +59,7 @@ class CachingHttpClientTest extends TestCase
             'test', ['response_headers' => [
                 'X-Body-Eval' => true,
                 'X-Body-File' => $file,
-            ]],
+            ]]
         ));
         $headers = $response->getHeaders();
 
@@ -75,7 +75,7 @@ class CachingHttpClientTest extends TestCase
         $response = $this->runRequest(new MockResponse(
             'test', ['response_headers' => [
                 'X-Body-File' => $file,
-            ]],
+            ]]
         ));
         $headers = $response->getHeaders();
 

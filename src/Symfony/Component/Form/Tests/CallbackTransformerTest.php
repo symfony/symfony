@@ -20,7 +20,7 @@ class CallbackTransformerTest extends TestCase
     {
         $transformer = new CallbackTransformer(
             fn ($value) => $value.' has been transformed',
-            fn ($value) => $value.' has reversely been transformed',
+            fn ($value) => $value.' has reversely been transformed'
         );
 
         $this->assertEquals('foo has been transformed', $transformer->transform('foo'));

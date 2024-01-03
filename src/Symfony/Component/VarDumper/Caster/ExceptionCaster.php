@@ -145,7 +145,7 @@ class ExceptionCaster
                     'function' => $f['function'] ?? null,
                 ] + $frames[$i - 1],
                 false,
-                true,
+                true
             );
             $f = self::castFrameStub($frame, [], $frame, true);
             if (isset($f[$prefix.'src'])) {

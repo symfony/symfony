@@ -72,7 +72,7 @@ class ConfigurationTest extends TestCase
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => true],
                 'session' => ['name' => $sessionName, 'cookie_secure' => 'auto', 'cookie_samesite' => 'lax'],
-            ]],
+            ]]
         );
     }
 
@@ -325,7 +325,7 @@ class ConfigurationTest extends TestCase
                     'payload' => ['semaphore'],
                 ],
             ],
-            $config['lock'],
+            $config['lock']
         );
     }
 
@@ -467,7 +467,7 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
             ],
-            $config['messenger']['buses'],
+            $config['messenger']['buses']
         );
     }
 

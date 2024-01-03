@@ -59,7 +59,7 @@ class AmqpSender implements SenderInterface
             $amqpStamp = AmqpStamp::createFromAmqpEnvelope(
                 $amqpReceivedStamp->getAmqpEnvelope(),
                 $amqpStamp,
-                $envelope->last(RedeliveryStamp::class) ? $amqpReceivedStamp->getQueueName() : null,
+                $envelope->last(RedeliveryStamp::class) ? $amqpReceivedStamp->getQueueName() : null
             );
         }
 
@@ -68,7 +68,7 @@ class AmqpSender implements SenderInterface
                 $encodedMessage['body'],
                 $encodedMessage['headers'] ?? [],
                 $delay,
-                $amqpStamp,
+                $amqpStamp
             );
         } catch (\AMQPException $e) {
             throw new TransportException($e->getMessage(), 0, $e);

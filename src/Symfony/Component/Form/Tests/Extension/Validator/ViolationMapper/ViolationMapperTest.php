@@ -72,7 +72,7 @@ class ViolationMapperTest extends TestCase
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(
                 static fn ($normData) => $normData,
-                static fn () => throw new TransformationFailedException(),
+                static fn () => throw new TransformationFailedException()
             ));
         }
 
@@ -1810,7 +1810,7 @@ class ViolationMapperTest extends TestCase
             [
                 '{{ limit }}' => '2',
                 '{{ suffix }}' => 'MB',
-            ],
+            ]
         ));
 
         $this->mapper->mapViolation($this->getConstraintViolation('data'), $form);
@@ -1827,7 +1827,7 @@ class ViolationMapperTest extends TestCase
             [
                 '{{ limit }}' => '2',
                 '{{ suffix }}' => 'MB',
-            ],
+            ]
         ));
 
         $violation = new ConstraintViolation(
@@ -1843,7 +1843,7 @@ class ViolationMapperTest extends TestCase
             null,
             null,
             (string) \UPLOAD_ERR_INI_SIZE,
-            new File(),
+            new File()
         );
         $this->mapper->mapViolation($this->getConstraintViolation('data'), $form);
         $this->mapper->mapViolation($violation, $form);
@@ -1864,7 +1864,7 @@ class ViolationMapperTest extends TestCase
             [
                 '{{ limit }}' => '2',
                 '{{ suffix }}' => 'MB',
-            ],
+            ]
         ));
 
         $violation = new ConstraintViolation(
@@ -1880,7 +1880,7 @@ class ViolationMapperTest extends TestCase
             null,
             null,
             (string) \UPLOAD_ERR_INI_SIZE,
-            new File(),
+            new File()
         );
         $this->mapper->mapViolation($this->getConstraintViolation('data'), $parent);
         $this->mapper->mapViolation($this->getConstraintViolation('data.file'), $parent);

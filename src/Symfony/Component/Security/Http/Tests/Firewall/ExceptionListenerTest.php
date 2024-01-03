@@ -212,7 +212,7 @@ class ExceptionListenerTest extends TestCase
             'key',
             $authenticationEntryPoint,
             $errorPage,
-            $accessDeniedHandler,
+            $accessDeniedHandler
         );
     }
 }

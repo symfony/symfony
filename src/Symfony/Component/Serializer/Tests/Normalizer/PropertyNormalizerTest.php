@@ -82,7 +82,7 @@ class PropertyNormalizerTest extends TestCase
         $obj->setCamelCase('camelcase');
         $this->assertEquals(
             ['foo' => 'foo', 'bar' => 'bar', 'camelCase' => 'camelcase'],
-            $this->normalizer->normalize($obj, 'any'),
+            $this->normalizer->normalize($obj, 'any')
         );
     }
 
@@ -91,7 +91,7 @@ class PropertyNormalizerTest extends TestCase
         $obj = new Php74Dummy();
         $this->assertEquals(
             ['initializedProperty' => 'defaultValue'],
-            $this->normalizer->normalize($obj, 'any'),
+            $this->normalizer->normalize($obj, 'any')
         );
     }
 
@@ -101,7 +101,7 @@ class PropertyNormalizerTest extends TestCase
         unset($obj->foo);
         $this->assertEquals(
             ['bar' => null, 'camelCase' => null],
-            $this->normalizer->normalize($obj, 'any'),
+            $this->normalizer->normalize($obj, 'any')
         );
     }
 
@@ -111,7 +111,7 @@ class PropertyNormalizerTest extends TestCase
         unset($obj->foo);
         $this->assertEquals(
             ['foo' => 123, 'bar' => null, 'camelCase' => null],
-            $this->normalizer->normalize($obj, 'any'),
+            $this->normalizer->normalize($obj, 'any')
         );
     }
 
@@ -123,7 +123,7 @@ class PropertyNormalizerTest extends TestCase
         $obj->setCamelCase('camelcase');
         $this->assertEquals(
             ['foo' => 'foo'],
-            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PUBLIC]),
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PUBLIC])
         );
     }
 
@@ -135,7 +135,7 @@ class PropertyNormalizerTest extends TestCase
         $obj->setCamelCase('camelcase');
         $this->assertEquals(
             ['camelCase' => 'camelcase'],
-            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PROTECTED]),
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PROTECTED])
         );
     }
 
@@ -147,7 +147,7 @@ class PropertyNormalizerTest extends TestCase
         $obj->setCamelCase('camelcase');
         $this->assertEquals(
             ['bar' => 'bar'],
-            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PRIVATE]),
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PRIVATE])
         );
     }
 
@@ -159,7 +159,7 @@ class PropertyNormalizerTest extends TestCase
         $obj->setCamelCase('camelcase');
         $this->assertEquals(
             ['foo' => 'foo', 'camelCase' => 'camelcase'],
-            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PUBLIC | PropertyNormalizer::NORMALIZE_PROTECTED]),
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PUBLIC | PropertyNormalizer::NORMALIZE_PROTECTED])
         );
     }
 
@@ -168,7 +168,7 @@ class PropertyNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar'],
             PropertyDummy::class,
-            'any',
+            'any'
         );
         $this->assertEquals('foo', $obj->foo);
         $this->assertEquals('bar', $obj->getBar());
@@ -185,7 +185,7 @@ class PropertyNormalizerTest extends TestCase
         $group->setCoopTilleuls('coop');
         $this->assertEquals(
             ['foo' => 'foo', 'bar' => 'bar', 'quux' => 'quux', 'kevin' => 'Kevin', 'coopTilleuls' => 'coop', 'fooBar' => null, 'symfony' => null, 'baz' => 'baz'],
-            $this->normalizer->normalize($group, 'any'),
+            $this->normalizer->normalize($group, 'any')
         );
     }
 
@@ -194,7 +194,7 @@ class PropertyNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar', 'kevin' => 'Kevin', 'baz' => 'baz'],
             GroupDummyChild::class,
-            'any',
+            'any'
         );
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
@@ -208,7 +208,7 @@ class PropertyNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar'],
             PropertyConstructorDummy::class,
-            'any',
+            'any'
         );
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
@@ -219,7 +219,7 @@ class PropertyNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => null, 'bar' => 'bar'],
             PropertyConstructorDummy::class, '
-            any',
+            any'
         );
         $this->assertNull($obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
@@ -304,7 +304,7 @@ class PropertyNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
             ],
-            $this->normalizer->normalize($obj, null, [PropertyNormalizer::GROUPS => ['name_converter']]),
+            $this->normalizer->normalize($obj, null, [PropertyNormalizer::GROUPS => ['name_converter']])
         );
     }
 
@@ -325,7 +325,7 @@ class PropertyNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
                 'coop_tilleuls' => 'les-tilleuls.coop',
-            ], GroupDummy::class, null, [PropertyNormalizer::GROUPS => ['name_converter']]),
+            ], GroupDummy::class, null, [PropertyNormalizer::GROUPS => ['name_converter']])
         );
     }
 
@@ -385,7 +385,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $this->assertEquals(
             new PropertyDummy(),
-            $this->normalizer->denormalize(['non_existing' => true], PropertyDummy::class),
+            $this->normalizer->denormalize(['non_existing' => true], PropertyDummy::class)
         );
     }
 
@@ -445,7 +445,7 @@ class PropertyNormalizerTest extends TestCase
                 ],
             ],
             RootDummy::class,
-            'any',
+            'any'
         );
         $this->assertEquals($root::class, RootDummy::class);
 

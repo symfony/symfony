@@ -46,7 +46,7 @@ class CollectionType extends AbstractType
             $options['allow_delete'],
             $options['delete_empty'],
             $resizePrototypeOptions,
-            $options['keep_as_list'],
+            $options['keep_as_list']
         );
 
         $builder->addEventSubscriber($resizeListener);

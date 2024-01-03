@@ -93,7 +93,7 @@ class FailoverTransportTest extends TestCase
                 null,
                 null,
                 null,
-                $this->throwException(new TransportException()),
+                $this->throwException(new TransportException())
             );
         $t = new FailoverTransport([$t1, $t2], 6);
         $t->send(new RawMessage('')); // t1>fail - t2>sent
@@ -123,7 +123,7 @@ class FailoverTransportTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 null,
                 null,
-                $this->throwException(new TransportException()),
+                $this->throwException(new TransportException())
             );
         $t = new FailoverTransport([$t1, $t2], 40);
         $t->send(new RawMessage(''));
@@ -144,7 +144,7 @@ class FailoverTransportTest extends TestCase
             ->method('send')->willReturnOnConsecutiveCalls(
                 null,
                 null,
-                $this->throwException(new TransportException()),
+                $this->throwException(new TransportException())
             );
         $t = new FailoverTransport([$t1, $t2], 1);
         $t->send(new RawMessage(''));

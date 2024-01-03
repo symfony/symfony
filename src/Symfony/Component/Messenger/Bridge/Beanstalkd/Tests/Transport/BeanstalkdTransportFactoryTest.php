@@ -34,7 +34,7 @@ final class BeanstalkdTransportFactoryTest extends TestCase
 
         $this->assertEquals(
             new BeanstalkdTransport(Connection::fromDsn('beanstalkd://127.0.0.1'), $serializer),
-            $factory->createTransport('beanstalkd://127.0.0.1', [], $serializer),
+            $factory->createTransport('beanstalkd://127.0.0.1', [], $serializer)
         );
     }
 }

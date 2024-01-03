@@ -196,15 +196,15 @@ class TimeType extends AbstractType
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format']),
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone']),
+                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts, 'text' === $options['widget'], $options['reference_date']),
+                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts, 'text' === $options['widget'], $options['reference_date'])
             ));
         }
 
@@ -263,7 +263,7 @@ class TimeType extends AbstractType
 
                 return array_merge(
                     ['hour' => $default, 'minute' => $default, 'second' => $default],
-                    $placeholder,
+                    $placeholder
                 );
             }
 
@@ -280,7 +280,7 @@ class TimeType extends AbstractType
 
                 return array_replace(
                     ['hour' => $default, 'minute' => $default, 'second' => $default],
-                    $choiceTranslationDomain,
+                    $choiceTranslationDomain
                 );
             }
 

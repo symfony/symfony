@@ -35,7 +35,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
         $this->assertMatchesXpath(
             $this->renderWidget($view),
-            '/input[@type="email"][@rel="theme"]',
+            '/input[@type="email"][@rel="theme"]'
         );
     }
 
@@ -50,7 +50,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
         $this->assertMatchesXpath(
             $this->renderWidget($view),
-            '/input[@type="email"][@rel="theme"]',
+            '/input[@type="email"][@rel="theme"]'
         );
     }
 
@@ -64,7 +64,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->renderer->setTheme($view, ['page_dynamic_extends.html.twig']);
         $this->assertMatchesXpath(
             $this->renderer->searchAndRenderBlock($view, 'row'),
-            '/div/label[text()="child"]',
+            '/div/label[text()="child"]'
         );
     }
 
@@ -175,7 +175,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
     [@id="name_help"]
     [@class="class-test help-text"]
     [.="[trans]Help text test![/trans]"]
-',
+'
         );
     }
 
@@ -193,7 +193,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-',
+'
         );
 
         $this->assertMatchesXpath($html,
@@ -202,7 +202,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
     [@class="help-text"]
     /b
     [.="text"]
-', 0,
+', 0
         );
     }
 
@@ -221,7 +221,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-',
+'
         );
 
         $this->assertMatchesXpath($html,
@@ -230,7 +230,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
     [@class="help-text"]
     /b
     [.="text"]
-', 0,
+', 0
         );
     }
 
@@ -249,7 +249,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-', 0,
+', 0
         );
 
         $this->assertMatchesXpath($html,
@@ -258,7 +258,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
     [@class="help-text"]
     /b
     [.="text"]
-',
+'
         );
     }
 

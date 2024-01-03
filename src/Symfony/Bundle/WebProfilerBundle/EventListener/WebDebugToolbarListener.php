@@ -82,7 +82,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             try {
                 $response->headers->set(
                     'X-Debug-Token-Link',
-                    $this->urlGenerator->generate('_profiler', ['token' => $response->headers->get('X-Debug-Token')], UrlGeneratorInterface::ABSOLUTE_URL),
+                    $this->urlGenerator->generate('_profiler', ['token' => $response->headers->get('X-Debug-Token')], UrlGeneratorInterface::ABSOLUTE_URL)
                 );
             } catch (\Exception $e) {
                 $response->headers->set('X-Debug-Error', $e::class.': '.preg_replace('/\s+/', ' ', $e->getMessage()));
@@ -149,7 +149,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     'request' => $request,
                     'csp_script_nonce' => $nonces['csp_script_nonce'] ?? null,
                     'csp_style_nonce' => $nonces['csp_style_nonce'] ?? null,
-                ],
+                ]
             ))."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
             $response->setContent($content);

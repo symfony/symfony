@@ -167,7 +167,7 @@ class ViolationMapper implements ViolationMapperInterface
                             $scope->getName(),
                             (string) $scope->getPropertyPath(),
                         ],
-                        $labelFormat,
+                        $labelFormat
                     );
                 } else {
                     $label = $scope->getConfig()->getOption('label');
@@ -188,7 +188,7 @@ class ViolationMapper implements ViolationMapperInterface
                             $translationDomain = $form->getConfig()->getOption('translation_domain');
                             array_unshift(
                                 $translationParameters,
-                                $form->getConfig()->getOption('label_translation_parameters', []),
+                                $form->getConfig()->getOption('label_translation_parameters', [])
                             );
                         } while (null === $translationDomain && null !== $form = $form->getParent());
 
@@ -197,7 +197,7 @@ class ViolationMapper implements ViolationMapperInterface
                         $label = $this->translator->trans(
                             $label,
                             $translationParameters,
-                            $translationDomain,
+                            $translationDomain
                         );
                     }
 
@@ -211,7 +211,7 @@ class ViolationMapper implements ViolationMapperInterface
                 $messageTemplate,
                 $violation->getParameters(),
                 $violation->getPlural(),
-                $violation,
+                $violation
             ));
         }
     }

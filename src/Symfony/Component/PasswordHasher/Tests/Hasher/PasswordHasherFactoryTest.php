@@ -179,12 +179,12 @@ class PasswordHasherFactoryTest extends TestCase
     {
         $this->assertInstanceOf(
             MigratingPasswordHasher::class,
-            (new PasswordHasherFactory([SomeUser::class => ['class' => NativePasswordHasher::class, 'arguments' => []]]))->getPasswordHasher(SomeUser::class),
+            (new PasswordHasherFactory([SomeUser::class => ['class' => NativePasswordHasher::class, 'arguments' => []]]))->getPasswordHasher(SomeUser::class)
         );
 
         $this->assertInstanceOf(
             MigratingPasswordHasher::class,
-            (new PasswordHasherFactory([SomeUser::class => ['algorithm' => 'bcrypt', 'cost' => 11]]))->getPasswordHasher(SomeUser::class),
+            (new PasswordHasherFactory([SomeUser::class => ['algorithm' => 'bcrypt', 'cost' => 11]]))->getPasswordHasher(SomeUser::class)
         );
 
         if (!SodiumPasswordHasher::isSupported()) {
@@ -193,7 +193,7 @@ class PasswordHasherFactoryTest extends TestCase
 
         $this->assertInstanceOf(
             MigratingPasswordHasher::class,
-            (new PasswordHasherFactory([SomeUser::class => ['class' => SodiumPasswordHasher::class, 'arguments' => []]]))->getPasswordHasher(SomeUser::class),
+            (new PasswordHasherFactory([SomeUser::class => ['class' => SodiumPasswordHasher::class, 'arguments' => []]]))->getPasswordHasher(SomeUser::class)
         );
     }
 

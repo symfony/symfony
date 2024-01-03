@@ -230,7 +230,7 @@ class AbstractNormalizerTest extends TestCase
         $normalizer->setSerializer($serializer);
         $this->assertEquals(
             '{"foo":{"d1":{"foo":"Foo","bar":"Bar","baz":"Baz","qux":"Quz"},"d2":{"foo":"FOO","bar":"BAR","baz":"BAZ","qux":"QUZ"}}}',
-            $data = $serializer->serialize($obj, 'json'),
+            $data = $serializer->serialize($obj, 'json')
         );
 
         $dummy = $normalizer->denormalize(json_decode($data, true), VariadicConstructorTypedArgsDummy::class);

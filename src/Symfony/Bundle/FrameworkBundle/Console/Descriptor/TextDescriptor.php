@@ -134,7 +134,7 @@ class TextDescriptor extends Descriptor
             if (isset($deprecatedParameters[$parameter])) {
                 $tableRows[] = [new TableCell(
                     sprintf('<comment>(Since %s %s: %s)</comment>', $deprecatedParameters[$parameter][0], $deprecatedParameters[$parameter][1], sprintf(...\array_slice($deprecatedParameters[$parameter], 2))),
-                    ['colspan' => 2],
+                    ['colspan' => 2]
                 )];
             }
         }
@@ -175,7 +175,7 @@ class TextDescriptor extends Descriptor
                 ['Service ID', 'Class'],
                 [
                     [$options['id'] ?? '-', $service::class],
-                ],
+                ]
             );
         }
     }
@@ -445,7 +445,7 @@ class TextDescriptor extends Descriptor
         if ($deprecation) {
             $rows[] = [new TableCell(
                 sprintf('<comment>(Since %s %s: %s)</comment>', $deprecation[0], $deprecation[1], sprintf(...\array_slice($deprecation, 2))),
-                ['colspan' => 2],
+                ['colspan' => 2]
             )];
         }
 
@@ -670,7 +670,7 @@ class TextDescriptor extends Descriptor
     {
         $this->write(
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,
-            isset($options['raw_output']) ? !$options['raw_output'] : true,
+            isset($options['raw_output']) ? !$options['raw_output'] : true
         );
     }
 }

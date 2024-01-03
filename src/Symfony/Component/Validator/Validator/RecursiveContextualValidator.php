@@ -112,7 +112,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $groups,
                 null,
                 TraversalStrategy::IMPLICIT,
-                $this->context,
+                $this->context
             );
 
             $this->context->setNode($previousValue, $previousObject, $previousMetadata, $previousPath);
@@ -133,7 +133,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $this->defaultPropertyPath,
                 $groups,
                 TraversalStrategy::IMPLICIT,
-                $this->context,
+                $this->context
             );
 
             $this->context->setNode($previousValue, $previousObject, $previousMetadata, $previousPath);
@@ -149,7 +149,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $value,
                 $this->defaultPropertyPath,
                 $groups,
-                $this->context,
+                $this->context
             );
 
             $this->context->setNode($previousValue, $previousObject, $previousMetadata, $previousPath);
@@ -192,7 +192,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $groups,
                 null,
                 TraversalStrategy::IMPLICIT,
-                $this->context,
+                $this->context
             );
         }
 
@@ -242,7 +242,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $groups,
                 null,
                 TraversalStrategy::IMPLICIT,
-                $this->context,
+                $this->context
             );
         }
 
@@ -306,7 +306,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $groups,
                 null,
                 $traversalStrategy,
-                $context,
+                $context
             );
         } catch (NoSuchMetadataException $e) {
             // Rethrow if not Traversable
@@ -323,7 +323,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $object,
                 $propertyPath,
                 $groups,
-                $context,
+                $context
             );
         }
     }
@@ -343,7 +343,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $value,
                     $propertyPath.'['.$key.']',
                     $groups,
-                    $context,
+                    $context
                 );
 
                 continue;
@@ -356,7 +356,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $propertyPath.'['.$key.']',
                     $groups,
                     TraversalStrategy::IMPLICIT,
-                    $context,
+                    $context
                 );
             }
         }
@@ -472,7 +472,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $traversalStrategy,
                     $group,
                     $defaultOverridden ? Constraint::DEFAULT_GROUP : null,
-                    $context,
+                    $context
                 );
 
                 // Skip the group sequence when validating properties, because
@@ -516,7 +516,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $groups,
                     $cascadedGroups,
                     TraversalStrategy::IMPLICIT,
-                    $context,
+                    $context
                 );
             }
         }
@@ -546,7 +546,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $object,
             $propertyPath,
             $groups,
-            $context,
+            $context
         );
     }
 
@@ -584,7 +584,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $traversalStrategy,
                     $group,
                     null,
-                    $context,
+                    $context
                 );
 
                 // Skip the group sequence when cascading, as the cascading
@@ -638,7 +638,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $value,
                 $propertyPath,
                 $cascadedGroups,
-                $context,
+                $context
             );
 
             return;
@@ -653,7 +653,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $propertyPath,
             $cascadedGroups,
             $traversalStrategy,
-            $context,
+            $context
         );
 
         // Currently, the traversal strategy can only be TRAVERSE for a
@@ -687,7 +687,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $groups,
                     $cascadedGroups,
                     $traversalStrategy,
-                    $context,
+                    $context
                 );
             } else {
                 $this->validateGenericNode(
@@ -699,7 +699,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $groups,
                     $cascadedGroups,
                     $traversalStrategy,
-                    $context,
+                    $context
                 );
             }
 

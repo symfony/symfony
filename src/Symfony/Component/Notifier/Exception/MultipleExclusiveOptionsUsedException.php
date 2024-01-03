@@ -25,7 +25,7 @@ class MultipleExclusiveOptionsUsedException extends InvalidArgumentException
         $message = sprintf(
             'Multiple exclusive options have been used "%s". Only one of "%s" can be used.',
             implode('", "', $usedExclusiveOptions),
-            implode('", "', $exclusiveOptions),
+            implode('", "', $exclusiveOptions)
         );
 
         parent::__construct($message, 0, $previous);

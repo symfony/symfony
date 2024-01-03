@@ -483,7 +483,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $compiler = new JavaScriptImportPathCompiler(
             $this->createMock(ImportMapConfigReader::class),
             AssetCompilerInterface::MISSING_IMPORT_STRICT,
-            $logger,
+            $logger
         );
         $assetMapper = $this->createMock(AssetMapperInterface::class);
         $assetMapper->expects($this->any())
@@ -493,7 +493,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     '/path/to/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
                     default => null,
                 };
-            },
+            }
             );
 
         $this->assertSame($input, $compiler->compile($input, $asset, $assetMapper));

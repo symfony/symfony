@@ -32,7 +32,7 @@ class ObjectLoaderTest extends TestCase
 
         $actualRoutes = $loader->load(
             'my_route_provider_service::loadRoutes',
-            'service',
+            'service'
         );
 
         $this->assertSame($collection, $actualRoutes);

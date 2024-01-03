@@ -163,9 +163,9 @@ class DoctrineLoaderTest extends TestCase
             ->addLoader(
                 new DoctrineLoader(
                     DoctrineTestHelper::createTestEntityManager(
-                        DoctrineTestHelper::createTestConfigurationWithXmlLoader(),
-                    ), '{}',
-                ),
+                        DoctrineTestHelper::createTestConfigurationWithXmlLoader()
+                    ), '{}'
+                )
             )
             ->getValidator();
 

@@ -72,7 +72,7 @@ class PsrHttpFactoryTest extends TestCase
                 'REQUEST_URI' => '/testCreateRequest?bar[baz]=42&foo=1',
                 'QUERY_STRING' => 'bar[baz]=42&foo=1',
             ],
-            'Content',
+            'Content'
         );
         $request->headers->set(' X-Broken', 'abc');
 
@@ -148,7 +148,7 @@ class PsrHttpFactoryTest extends TestCase
             [
                 'X-Symfony' => ['3.4'],
                 ' X-Broken-Header' => 'abc',
-            ],
+            ]
         );
         $response->headers->setCookie(new Cookie('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'), '/', null, false, true, false, 'lax'));
 
@@ -227,7 +227,7 @@ class PsrHttpFactoryTest extends TestCase
             'HTTP_HOST' => 'dunglas.fr',
             'HTTP_X_SYMFONY' => '2.8',
           ],
-            'Content',
+            'Content'
         );
 
         $psrRequest = self::buildHttpMessageFactory()->createRequest($request);

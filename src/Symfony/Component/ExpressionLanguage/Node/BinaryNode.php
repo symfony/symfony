@@ -41,7 +41,7 @@ class BinaryNode extends Node
     {
         parent::__construct(
             ['left' => $left, 'right' => $right],
-            ['operator' => $operator],
+            ['operator' => $operator]
         );
     }
 

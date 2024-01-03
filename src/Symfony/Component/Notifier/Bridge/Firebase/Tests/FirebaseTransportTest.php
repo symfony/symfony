@@ -68,12 +68,12 @@ final class FirebaseTransportTest extends TransportTestCase
     {
         yield [new MockResponse(
             json_encode(['results' => [['error' => 'testErrorCode']]]),
-            ['response_headers' => ['content-type' => ['application/json']], 'http_code' => 200],
+            ['response_headers' => ['content-type' => ['application/json']], 'http_code' => 200]
         )];
 
         yield [new MockResponse(
             json_encode(['results' => [['error' => 'testErrorCode']]]),
-            ['response_headers' => ['content-type' => ['application/json']], 'http_code' => 400],
+            ['response_headers' => ['content-type' => ['application/json']], 'http_code' => 400]
         )];
     }
 }

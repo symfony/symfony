@@ -38,7 +38,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeController(), 'foo'],
             [],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -54,7 +54,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeController(), 'bar'],
             [],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -72,7 +72,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'noAttribute'],
             [],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -92,7 +92,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'admin'],
             [],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -113,7 +113,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'withSubject'],
             ['arg1Value', 'arg2Value'],
             new Request(),
-            null,
+            null
         );
 
         // create metadata for 2 named args for the controller
@@ -138,7 +138,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'withSubjectArray'],
             ['arg1Value', 'arg2Value'],
             new Request(),
-            null,
+            null
         );
 
         // create metadata for 2 named args for the controller
@@ -159,7 +159,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'withSubject'],
             ['arg1Value', null],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -182,7 +182,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'withSubjectArray'],
             ['arg1Value', null],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -198,7 +198,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'withMissingSubject'],
             [],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -233,7 +233,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), $method],
             $arguments,
             new Request(),
-            null,
+            null
         );
 
         try {
@@ -272,7 +272,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'notFound'],
             [],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -296,7 +296,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'withExpressionInAttribute'],
             ['postVal'],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -327,7 +327,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'withExpressionInSubject'],
             ['postVal'],
             $request,
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker, $expressionLanguage);
@@ -358,7 +358,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'withNestedExpressionInSubject'],
             ['postVal', 'arg2Val'],
             $request,
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker, $expressionLanguage);
@@ -380,7 +380,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'withRequestAsSubject'],
             [],
             $request,
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker, new ExpressionLanguage());
@@ -399,7 +399,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'exceptionCodeInHttpException'],
             [],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
@@ -423,7 +423,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             [new IsGrantedAttributeMethodsController(), 'exceptionCodeInAccessDeniedException'],
             [],
             new Request(),
-            null,
+            null
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);

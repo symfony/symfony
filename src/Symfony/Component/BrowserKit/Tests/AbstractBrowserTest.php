@@ -390,7 +390,7 @@ class AbstractBrowserTest extends TestCase
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
         $this->expectExceptionObject(
-            new InvalidArgumentException('There is no button with "Register" as its content, id, value or name.'),
+            new InvalidArgumentException('There is no button with "Register" as its content, id, value or name.')
         );
 
         $client->submitForm('Register', [

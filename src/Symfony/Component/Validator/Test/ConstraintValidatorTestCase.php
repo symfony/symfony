@@ -439,7 +439,7 @@ final class ConstraintViolationAssertion
             $this->plural,
             $this->code,
             $this->constraint,
-            $this->cause,
+            $this->cause
         );
     }
 }

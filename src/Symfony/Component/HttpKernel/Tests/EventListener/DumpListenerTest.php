@@ -30,7 +30,7 @@ class DumpListenerTest extends TestCase
     {
         $this->assertSame(
             [ConsoleEvents::COMMAND => ['configure', 1024]],
-            DumpListener::getSubscribedEvents(),
+            DumpListener::getSubscribedEvents()
         );
     }
 

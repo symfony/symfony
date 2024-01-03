@@ -368,13 +368,13 @@ class Table
                                 $rows[] = [sprintf(
                                     '<comment>%s</>: %s',
                                     str_pad($headers[$i] ?? '', $maxHeaderLength, ' ', \STR_PAD_LEFT),
-                                    $part,
+                                    $part
                                 )];
                             } else {
                                 $rows[] = [sprintf(
                                     '%s  %s',
                                     str_pad('', $maxHeaderLength, ' ', \STR_PAD_LEFT),
-                                    $part,
+                                    $part
                                 )];
                             }
                         } elseif ('' !== $cell) {
@@ -421,7 +421,7 @@ class Table
                     $this->renderRowSeparator(
                         self::SEPARATOR_TOP,
                         $hasTitle ? $this->headerTitle : null,
-                        $hasTitle ? $this->style->getHeaderTitleFormat() : null,
+                        $hasTitle ? $this->style->getHeaderTitleFormat() : null
                     );
                     $hasTitle = false;
                     $isHeaderSeparatorRendered = true;
@@ -431,7 +431,7 @@ class Table
                     $this->renderRowSeparator(
                         $horizontal ? self::SEPARATOR_TOP : self::SEPARATOR_TOP_BOTTOM,
                         $hasTitle ? $this->headerTitle : null,
-                        $hasTitle ? $this->style->getHeaderTitleFormat() : null,
+                        $hasTitle ? $this->style->getHeaderTitleFormat() : null
                     );
                     $isFirstRow = false;
                     $hasTitle = false;

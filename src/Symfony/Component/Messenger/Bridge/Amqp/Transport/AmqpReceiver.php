@@ -84,7 +84,7 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 
             $this->connection->ack(
                 $stamp->getAmqpEnvelope(),
-                $stamp->getQueueName(),
+                $stamp->getQueueName()
             );
         } catch (\AMQPException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -97,7 +97,7 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 
         $this->rejectAmqpEnvelope(
             $stamp->getAmqpEnvelope(),
-            $stamp->getQueueName(),
+            $stamp->getQueueName()
         );
     }
 

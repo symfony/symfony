@@ -73,7 +73,7 @@ class Rfc2231EncoderTest extends TestCase
             str_repeat('a', 72)."\r\n".
             str_repeat('a', 56),
             $encoded,
-            'Lines should be wrapped at each 72 characters',
+            'Lines should be wrapped at each 72 characters'
         );
     }
 
@@ -93,7 +93,7 @@ class Rfc2231EncoderTest extends TestCase
             str_repeat('a', 72)."\r\n".
             str_repeat('a', 8),
             $encoded,
-            'First line should be 24 bytes shorter than the others.',
+            'First line should be 24 bytes shorter than the others.'
         );
     }
 
@@ -118,7 +118,7 @@ class Rfc2231EncoderTest extends TestCase
                     $encodedText = $encoder->encodeString($text, $encoding);
                     $this->assertEquals(
                         urldecode(implode('', explode("\r\n", $encodedText))), $text,
-                        'Encoded string should decode back to original string for sample '.$dir.'/'.$encoding.'/'.$sampleFile,
+                        'Encoded string should decode back to original string for sample '.$dir.'/'.$encoding.'/'.$sampleFile
                     );
                 }
                 closedir($fileFp);

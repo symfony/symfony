@@ -163,7 +163,7 @@ class RedisExtIntegrationTest extends TestCase
             $this->getConnectionGroup($connection),
             'other-consumer2',
             [$this->getConnectionStream($connection) => '>'],
-            1,
+            1
         );
 
         // Queue will not have any messages yet
@@ -177,7 +177,7 @@ class RedisExtIntegrationTest extends TestCase
             getenv('MESSENGER_REDIS_DSN'),
             ['redeliver_timeout' => 0, 'claim_interval' => 500, 'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null],
 
-            $this->redis,
+            $this->redis
         );
 
         $connection->cleanup();
@@ -196,7 +196,7 @@ class RedisExtIntegrationTest extends TestCase
             $this->getConnectionGroup($connection),
             'other-consumer2',
             [$this->getConnectionStream($connection) => '>'],
-            1,
+            1
         );
 
         // Queue will return the pending message first because redeliver_timeout = 0

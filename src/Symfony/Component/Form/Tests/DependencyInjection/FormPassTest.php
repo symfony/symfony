@@ -65,7 +65,7 @@ class FormPassTest extends TestCase
                 __CLASS__.'_Type1' => new ServiceClosureArgument(new Reference('my.type1')),
                 __CLASS__.'_Type2' => new ServiceClosureArgument(new Reference('my.type2')),
             ]]))->addTag('container.service_locator'),
-            $locator,
+            $locator
         );
     }
 
@@ -91,7 +91,7 @@ class FormPassTest extends TestCase
                 'Symfony\Component\Form\Extension\Core\Type',
                 __NAMESPACE__,
             ],
-            $cmdDefinition->getArgument(1),
+            $cmdDefinition->getArgument(1)
         );
     }
 
@@ -256,7 +256,7 @@ class FormPassTest extends TestCase
                 new Reference('my.guesser1'),
                 new Reference('my.guesser2'),
             ]),
-            $extDefinition->getArgument(2),
+            $extDefinition->getArgument(2)
         );
     }
 
@@ -303,7 +303,7 @@ class FormPassTest extends TestCase
                 function (ContainerBuilder $container) {
                     self::assertEquals(
                         ['Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument([new Reference('my.type_extension')])],
-                        $container->getDefinition('form.extension')->getArgument(1),
+                        $container->getDefinition('form.extension')->getArgument(1)
                     );
                 },
                 ['extended_type' => 'Symfony\Component\Form\Extension\Core\Type\FormType'],

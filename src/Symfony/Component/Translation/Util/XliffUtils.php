@@ -119,7 +119,7 @@ class XliffUtils
                 $error['message'],
                 $error['file'],
                 $error['line'],
-                $error['column'],
+                $error['column']
             );
         }
 

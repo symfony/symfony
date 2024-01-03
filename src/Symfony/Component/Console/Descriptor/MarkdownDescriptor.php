@@ -50,7 +50,7 @@ class MarkdownDescriptor extends Descriptor
             .($argument->getDescription() ? preg_replace('/\s*[\r\n]\s*/', "\n", $argument->getDescription())."\n\n" : '')
             .'* Is required: '.($argument->isRequired() ? 'yes' : 'no')."\n"
             .'* Is array: '.($argument->isArray() ? 'yes' : 'no')."\n"
-            .'* Default: `'.str_replace("\n", '', var_export($argument->getDefault(), true)).'`',
+            .'* Default: `'.str_replace("\n", '', var_export($argument->getDefault(), true)).'`'
         );
     }
 
@@ -71,7 +71,7 @@ class MarkdownDescriptor extends Descriptor
             .'* Is value required: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
             .'* Is multiple: '.($option->isArray() ? 'yes' : 'no')."\n"
             .'* Is negatable: '.($option->isNegatable() ? 'yes' : 'no')."\n"
-            .'* Default: `'.str_replace("\n", '', var_export($option->getDefault(), true)).'`',
+            .'* Default: `'.str_replace("\n", '', var_export($option->getDefault(), true)).'`'
         );
     }
 
@@ -106,7 +106,7 @@ class MarkdownDescriptor extends Descriptor
                 .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
                 .($command->getDescription() ? $command->getDescription()."\n\n" : '')
                 .'### Usage'."\n\n"
-                .array_reduce($command->getAliases(), fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n"),
+                .array_reduce($command->getAliases(), fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n")
             );
 
             return;
@@ -119,7 +119,7 @@ class MarkdownDescriptor extends Descriptor
             .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             .'### Usage'."\n\n"
-            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n"),
+            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n")
         );
 
         if ($help = $command->getProcessedHelp()) {

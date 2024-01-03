@@ -79,7 +79,7 @@ class MarkdownDescriptor extends Descriptor
                 "\n- `%s`: `%s`%s",
                 $key,
                 $this->formatParameter($value),
-                isset($deprecatedParameters[$key]) ? sprintf(' *Since %s %s: %s*', $deprecatedParameters[$key][0], $deprecatedParameters[$key][1], sprintf(...\array_slice($deprecatedParameters[$key], 2))) : '',
+                isset($deprecatedParameters[$key]) ? sprintf(' *Since %s %s: %s*', $deprecatedParameters[$key][0], $deprecatedParameters[$key][1], sprintf(...\array_slice($deprecatedParameters[$key], 2))) : ''
             ));
         }
     }

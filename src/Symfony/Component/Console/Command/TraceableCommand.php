@@ -115,7 +115,7 @@ final class TraceableCommand extends Command implements SignalableCommandInterfa
         $this->handledSignals[$signal]['duration'] += $event->getDuration();
         $this->handledSignals[$signal]['memory'] = max(
             $this->handledSignals[$signal]['memory'],
-            $event->getMemory() >> 20,
+            $event->getMemory() >> 20
         );
 
         return $exit;

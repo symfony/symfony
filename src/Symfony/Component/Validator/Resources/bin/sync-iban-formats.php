@@ -31,7 +31,7 @@ echo "Collecting IBAN formats...\n";
 
 $formats = array_merge(
     (new WikipediaIbanProvider())->getIbanFormats(),
-    (new SwiftRegistryIbanProvider())->getIbanFormats(),
+    (new SwiftRegistryIbanProvider())->getIbanFormats()
 );
 
 printf("Collected %d IBAN formats\n", count($formats));
@@ -62,7 +62,7 @@ function updateValidatorFormats(string $validatorPath, array $formats): void
     $validatorContent = preg_replace(
         '/FORMATS = \[.*?\];/s',
         "FORMATS = {$formatsContent};",
-        $validatorContent,
+        $validatorContent
     );
 
     file_put_contents($validatorPath, $validatorContent);

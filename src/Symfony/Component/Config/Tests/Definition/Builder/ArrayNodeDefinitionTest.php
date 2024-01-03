@@ -186,7 +186,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertEquals(
             $expected,
             $processor->process($node->getNode(), $config),
-            $message,
+            $message
         );
     }
 
@@ -391,7 +391,7 @@ class ArrayNodeDefinitionTest extends TestCase
                         ->children()
                             ->booleanNode('enable')->end()
                             ->arrayNode('transports')->end()
-                        ->end(),
+                        ->end()
                 )
             ->end()
         ;

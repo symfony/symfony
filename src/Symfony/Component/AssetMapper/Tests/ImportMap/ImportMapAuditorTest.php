@@ -153,7 +153,7 @@ class ImportMapAuditorTest extends TestCase
             '/any/path',
             $version,
             $packageSpecifier,
-            false,
+            false
         );
     }
 }

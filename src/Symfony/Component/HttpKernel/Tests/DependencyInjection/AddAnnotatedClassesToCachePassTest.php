@@ -69,27 +69,27 @@ class AddAnnotatedClassesToCachePassTest extends TestCase
 
         $this->assertSame(
             'Acme\\FooBundle\\Controller\\DefaultController',
-            $expand(['**Bundle\\Controller\\'], ['\\Acme\\FooBundle\\Controller\\DefaultController'])[0],
+            $expand(['**Bundle\\Controller\\'], ['\\Acme\\FooBundle\\Controller\\DefaultController'])[0]
         );
 
         $this->assertSame(
             'FooBundle\\Controller\\DefaultController',
-            $expand(['**Bundle\\Controller\\'], ['\\FooBundle\\Controller\\DefaultController'])[0],
+            $expand(['**Bundle\\Controller\\'], ['\\FooBundle\\Controller\\DefaultController'])[0]
         );
 
         $this->assertSame(
             'Acme\\FooBundle\\Controller\\Bar\\DefaultController',
-            $expand(['**Bundle\\Controller\\'], ['\\Acme\\FooBundle\\Controller\\Bar\\DefaultController'])[0],
+            $expand(['**Bundle\\Controller\\'], ['\\Acme\\FooBundle\\Controller\\Bar\\DefaultController'])[0]
         );
 
         $this->assertSame(
             'Bundle\\Controller\\Bar\\DefaultController',
-            $expand(['**Bundle\\Controller\\'], ['\\Bundle\\Controller\\Bar\\DefaultController'])[0],
+            $expand(['**Bundle\\Controller\\'], ['\\Bundle\\Controller\\Bar\\DefaultController'])[0]
         );
 
         $this->assertSame(
             'Acme\\Bundle\\Controller\\Bar\\DefaultController',
-            $expand(['**Bundle\\Controller\\'], ['\\Acme\\Bundle\\Controller\\Bar\\DefaultController'])[0],
+            $expand(['**Bundle\\Controller\\'], ['\\Acme\\Bundle\\Controller\\Bar\\DefaultController'])[0]
         );
 
         $this->assertSame('Foo\\Bar', $expand(['Foo\\Bar'], [])[0]);

@@ -50,7 +50,7 @@ class HttpCodeActivationStrategyTest extends TestCase
                 ['code' => 405, 'urls' => []],
                 ['code' => 400, 'urls' => ['^/400/a', '^/400/b']],
             ],
-            new ErrorLevelActivationStrategy(Level::Warning),
+            new ErrorLevelActivationStrategy(Level::Warning)
         );
 
         self::assertEquals($expected, $strategy->isHandlerActivated($record));

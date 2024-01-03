@@ -31,7 +31,7 @@ class MailerTest extends AbstractWebTestCase
 
             $this->assertEquals(
                 [new Address('redirected@example.org')],
-                $envelope->getRecipients(),
+                $envelope->getRecipients()
             );
 
             $this->assertEquals('sender@example.org', $envelope->getSender()->getAddress());

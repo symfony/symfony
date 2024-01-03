@@ -29,7 +29,7 @@ class ConstantNode extends Node
         $this->isNullSafe = $isNullSafe;
         parent::__construct(
             [],
-            ['value' => $value],
+            ['value' => $value]
         );
     }
 

@@ -910,7 +910,7 @@ XLIFF;
         return $this->getExceptionResponses(
             exceptionMessage: 'Unable to delete key in phrase.',
             loggerMessage: 'Unable to delete key "key.to.delete" in phrase: "provider error".',
-            statusCode: 500,
+            statusCode: 500
         );
     }
 
@@ -918,7 +918,7 @@ XLIFF;
     {
         return $this->getExceptionResponses(
             exceptionMessage: 'Unable to upload translations to phrase.',
-            loggerMessage: 'Unable to upload translations for domain "messages" to phrase: "provider error".',
+            loggerMessage: 'Unable to upload translations for domain "messages" to phrase: "provider error".'
         );
     }
 
@@ -926,7 +926,7 @@ XLIFF;
     {
         return $this->getExceptionResponses(
             exceptionMessage: 'Unable to create locale phrase.',
-            loggerMessage: 'Unable to create locale "nl-NL" in phrase: "provider error".',
+            loggerMessage: 'Unable to create locale "nl-NL" in phrase: "provider error".'
         );
     }
 
@@ -934,7 +934,7 @@ XLIFF;
     {
         return $this->getExceptionResponses(
             exceptionMessage: 'Unable to get locales from phrase.',
-            loggerMessage: 'Unable to get locales from phrase: "provider error".',
+            loggerMessage: 'Unable to get locales from phrase: "provider error".'
         );
     }
 
@@ -942,7 +942,7 @@ XLIFF;
     {
         return $this->getExceptionResponses(
             exceptionMessage: 'Unable to get translations from phrase.',
-            loggerMessage: 'Unable to get translations for locale "en_GB" from phrase: "provider error".',
+            loggerMessage: 'Unable to get translations for locale "en_GB" from phrase: "provider error".'
         );
     }
 

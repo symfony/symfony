@@ -89,7 +89,7 @@ class FirewallTest extends TestCase
         $event = new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->createMock(Request::class),
-            HttpKernelInterface::SUB_REQUEST,
+            HttpKernelInterface::SUB_REQUEST
         );
 
         $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));

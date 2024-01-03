@@ -44,7 +44,7 @@ trait AttributesTestTrait
                 'baz' => true,
                 'object' => ['foo' => 'innerFoo'],
             ],
-            $normalizer->normalize($objectDummy, null, $context),
+            $normalizer->normalize($objectDummy, null, $context)
         );
 
         $context = ['attributes' => ['foo', 'baz', 'object']];
@@ -54,7 +54,7 @@ trait AttributesTestTrait
                 'baz' => true,
                 'object' => ['foo' => 'innerFoo', 'bar' => 'innerBar'],
             ],
-            $normalizer->normalize($objectDummy, null, $context),
+            $normalizer->normalize($objectDummy, null, $context)
         );
     }
 

@@ -160,12 +160,12 @@ class EntityUserProviderTest extends TestCase
             ->method('loadUserByIdentifier')
             ->with('name')
             ->willReturn(
-                $this->createMock(UserInterface::class),
+                $this->createMock(UserInterface::class)
             );
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),
-            'Symfony\Bridge\Doctrine\Tests\Fixtures\User',
+            'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
         );
 
         $provider->loadUserByIdentifier('name');
@@ -177,7 +177,7 @@ class EntityUserProviderTest extends TestCase
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),
-            'Symfony\Bridge\Doctrine\Tests\Fixtures\User',
+            'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
         );
 
         $this->expectException(\InvalidArgumentException::class);
@@ -196,7 +196,7 @@ class EntityUserProviderTest extends TestCase
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),
-            'Symfony\Bridge\Doctrine\Tests\Fixtures\User',
+            'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
         );
 
         $provider->upgradePassword($user, 'foobar');

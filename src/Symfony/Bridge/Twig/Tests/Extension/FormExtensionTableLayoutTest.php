@@ -57,7 +57,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
     [@id="name_help"]
     [@class="class-test help-text"]
     [.="[trans]Help text test![/trans]"]
-',
+'
         );
     }
 
@@ -75,7 +75,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-',
+'
         );
 
         $this->assertMatchesXpath($html,
@@ -84,7 +84,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
     [@class="help-text"]
     /b
     [.="text"]
-', 0,
+', 0
         );
     }
 
@@ -103,7 +103,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-',
+'
         );
 
         $this->assertMatchesXpath($html,
@@ -112,7 +112,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
     [@class="help-text"]
     /b
     [.="text"]
-', 0,
+', 0
         );
     }
 
@@ -131,7 +131,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-', 0,
+', 0
         );
 
         $this->assertMatchesXpath($html,
@@ -140,7 +140,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
     [@class="help-text"]
     /b
     [.="text"]
-',
+'
         );
     }
 

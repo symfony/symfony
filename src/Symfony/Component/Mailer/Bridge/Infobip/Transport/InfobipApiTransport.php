@@ -69,7 +69,7 @@ final class InfobipApiTransport extends AbstractApiTransport
             [
                 'headers' => $headers,
                 'body' => $formData->bodyToIterable(),
-            ],
+            ]
         );
 
         try {

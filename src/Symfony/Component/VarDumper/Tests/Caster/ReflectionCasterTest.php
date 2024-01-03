@@ -78,7 +78,7 @@ ReflectionClass {
 %A
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -98,7 +98,7 @@ Closure($x) {
   line: "88 to 88"
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -124,7 +124,7 @@ array:2 [
   }
 ]
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -148,7 +148,7 @@ ReflectionParameter {
   typeHint: "Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass"
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -165,7 +165,7 @@ ReflectionParameter {
   typeHint: "int"
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -183,7 +183,7 @@ ReflectionParameter {
   typeHint: "mixed"
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -200,7 +200,7 @@ ReflectionParameter {
   typeHint: "int|float"
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -218,7 +218,7 @@ ReflectionParameter {
   typeHint: "int|float|null"
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -235,7 +235,7 @@ ReflectionParameter {
   typeHint: "Traversable&Countable"
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -250,7 +250,7 @@ ReflectionProperty {
   modifiers: "public"
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -265,7 +265,7 @@ ReflectionNamedType {
   isBuiltin: true
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -290,7 +290,7 @@ ReflectionUnionType {
   ]
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -315,7 +315,7 @@ ReflectionIntersectionType {
   ]
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -350,7 +350,7 @@ ReflectionUnionType {
   ]
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -363,7 +363,7 @@ Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture {
   allowsNull: false
 }
 EOTXT
-            , $var,
+            , $var
         );
     }
 
@@ -381,7 +381,7 @@ Closure(): int {
   line: "%s"
 }
 EOTXT
-            , $f,
+            , $f
         );
     }
 
@@ -399,7 +399,7 @@ Closure(): mixed {
   line: "%s"
 }
 EOTXT
-            , $f,
+            , $f
         );
     }
 
@@ -417,7 +417,7 @@ Closure(): int|float {
   line: "%s"
 }
 EOTXT
-            , $f,
+            , $f
         );
     }
 
@@ -435,7 +435,7 @@ Closure(): int|float|null {
   line: "%s"
 }
 EOTXT
-            , $f,
+            , $f
         );
     }
 
@@ -524,7 +524,7 @@ Closure(\$a = new stdClass) {
   line: "%s"
 }
 EOTXT
-            , $f,
+            , $f
         );
     }
 

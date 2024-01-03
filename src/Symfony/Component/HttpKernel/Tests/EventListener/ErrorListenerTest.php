@@ -353,7 +353,7 @@ class UserProvidedHttpStatusCodeAttribute extends WithHttpStatus
     {
         parent::__construct(
             Response::HTTP_ALREADY_REPORTED,
-            $headers,
+            $headers
         );
     }
 }
@@ -369,7 +369,7 @@ class WithCustomUserProvidedAttribute extends \Exception
     statusCode: Response::HTTP_PRECONDITION_FAILED,
     headers: [
         'some' => 'thing',
-    ],
+    ]
 )]
 class WithGeneralAttribute extends \Exception
 {
@@ -379,7 +379,7 @@ class WithGeneralAttribute extends \Exception
     statusCode: Response::HTTP_PRECONDITION_FAILED,
     headers: [
         'some' => 'thing',
-    ],
+    ]
 )]
 interface InterfaceWithGeneralAttribute
 {

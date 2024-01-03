@@ -762,7 +762,7 @@ abstract class ResourceBundleTestCase extends TestCase
     {
         return array_map(
             fn ($locale) => [$locale],
-            self::getLocales(),
+            self::getLocales()
         );
     }
 
@@ -771,7 +771,7 @@ abstract class ResourceBundleTestCase extends TestCase
         return array_map(
             fn ($alias, $ofLocale) => [$alias, $ofLocale],
             array_keys(self::getLocaleAliases()),
-            self::getLocaleAliases(),
+            self::getLocaleAliases()
         );
     }
 
@@ -779,7 +779,7 @@ abstract class ResourceBundleTestCase extends TestCase
     {
         return array_map(
             fn ($locale) => [$locale],
-            self::getRootLocales(),
+            self::getRootLocales()
         );
     }
 

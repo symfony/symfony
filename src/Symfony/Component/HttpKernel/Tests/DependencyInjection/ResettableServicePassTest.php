@@ -61,7 +61,7 @@ class ResettableServicePassTest extends TestCase
                     'three' => ['resetFirst', 'resetSecond'],
                 ],
             ],
-            $definition->getArguments(),
+            $definition->getArguments()
         );
     }
 

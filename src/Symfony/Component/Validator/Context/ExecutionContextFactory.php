@@ -38,7 +38,7 @@ class ExecutionContextFactory implements ExecutionContextFactoryInterface
             $validator,
             $root,
             $this->translator,
-            $this->translationDomain,
+            $this->translationDomain
         );
     }
 }

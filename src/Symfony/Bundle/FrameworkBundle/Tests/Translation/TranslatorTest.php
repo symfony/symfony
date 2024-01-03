@@ -285,7 +285,7 @@ class TranslatorTest extends TestCase
                 ]),
                 $this->getCatalogue('sr@latin', [
                     'foobarbax' => 'foobarbax (sr@latin)',
-                ]),
+                ])
             )
         ;
 
@@ -394,7 +394,7 @@ class TranslatorTest extends TestCase
                 new MessageFormatter(),
                 [$loaderFomat => [$loaderFomat]],
                 $options,
-                $enabledLocales,
+                $enabledLocales
             );
         }
 
@@ -404,7 +404,7 @@ class TranslatorTest extends TestCase
             $defaultLocale,
             [$loaderFomat => [$loaderFomat]],
             $options,
-            $enabledLocales,
+            $enabledLocales
         );
     }
 }

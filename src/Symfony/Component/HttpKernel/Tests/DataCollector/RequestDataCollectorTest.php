@@ -348,7 +348,7 @@ class RequestDataCollectorTest extends TestCase
             [],
             [],
             [],
-            '_password=%20_password%40123',
+            '_password=%20_password%40123'
         );
 
         $c->collect($request, $this->createResponse());

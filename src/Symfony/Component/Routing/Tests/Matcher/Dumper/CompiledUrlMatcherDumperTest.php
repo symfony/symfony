@@ -74,7 +74,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
         $collection->add('foo', new Route(
             '/foo/{bar}',
             ['def' => 'test'],
-            ['bar' => 'baz|symfony'],
+            ['bar' => 'baz|symfony']
         ));
         // method requirement
         $collection->add('bar', new Route(
@@ -84,7 +84,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['GET', 'head'],
+            ['GET', 'head']
         ));
         // GET method requirement automatically adds HEAD as valid
         $collection->add('barhead', new Route(
@@ -94,23 +94,23 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['GET'],
+            ['GET']
         ));
         // simple
         $collection->add('baz', new Route(
-            '/test/baz',
+            '/test/baz'
         ));
         // simple with extension
         $collection->add('baz2', new Route(
-            '/test/baz.html',
+            '/test/baz.html'
         ));
         // trailing slash
         $collection->add('baz3', new Route(
-            '/test/baz3/',
+            '/test/baz3/'
         ));
         // trailing slash with variable
         $collection->add('baz4', new Route(
-            '/test/{foo}/',
+            '/test/{foo}/'
         ));
         // trailing slash and method
         $collection->add('baz5', new Route(
@@ -120,7 +120,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['post'],
+            ['post']
         ));
         // complex name
         $collection->add('baz.baz6', new Route(
@@ -130,22 +130,22 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['put'],
+            ['put']
         ));
         // defaults without variable
         $collection->add('foofoo', new Route(
             '/foofoo',
-            ['def' => 'test'],
+            ['def' => 'test']
         ));
         // pattern with quotes
         $collection->add('quoter', new Route(
             '/{quoter}',
             [],
-            ['quoter' => '[\']+'],
+            ['quoter' => '[\']+']
         ));
         // space in pattern
         $collection->add('space', new Route(
-            '/spa ce',
+            '/spa ce'
         ));
 
         // prefixes
@@ -271,7 +271,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             [],
             '',
-            ['https'],
+            ['https']
         ));
 
         // force HTTP redirection
@@ -281,7 +281,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             [],
             '',
-            ['http'],
+            ['http']
         ));
 
         /* test case 3 */
@@ -307,7 +307,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['HEAD'],
+            ['HEAD']
         ));
         $headMatchCasesCollection->add('head_and_get', new Route(
             '/head_and_get',
@@ -316,7 +316,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['HEAD', 'GET'],
+            ['HEAD', 'GET']
         ));
         $headMatchCasesCollection->add('get_and_head', new Route(
             '/get_and_head',
@@ -325,7 +325,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['GET', 'HEAD'],
+            ['GET', 'HEAD']
         ));
         $headMatchCasesCollection->add('post_and_head', new Route(
             '/post_and_head',
@@ -334,7 +334,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['POST', 'HEAD'],
+            ['POST', 'HEAD']
         ));
         $headMatchCasesCollection->add('put_and_post', new Route(
             '/put_and_post',
@@ -343,7 +343,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['PUT', 'POST'],
+            ['PUT', 'POST']
         ));
         $headMatchCasesCollection->add('put_and_get_and_head', new Route(
             '/put_and_post',
@@ -352,7 +352,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [],
             '',
             [],
-            ['PUT', 'GET', 'HEAD'],
+            ['PUT', 'GET', 'HEAD']
         ));
 
         /* test case 5 */

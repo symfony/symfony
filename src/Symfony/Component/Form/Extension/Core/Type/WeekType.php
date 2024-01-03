@@ -101,7 +101,7 @@ class WeekType extends AbstractType
 
                 return array_merge(
                     ['year' => $default, 'week' => $default],
-                    $placeholder,
+                    $placeholder
                 );
             }
 
@@ -117,7 +117,7 @@ class WeekType extends AbstractType
 
                 return array_replace(
                     ['year' => $default, 'week' => $default],
-                    $choiceTranslationDomain,
+                    $choiceTranslationDomain
                 );
             }
 

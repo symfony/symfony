@@ -51,7 +51,7 @@ final class TextInputTest extends AbstractInputTestCase
             [
                 '@type' => 'TextInput',
             ],
-            $this->createInput()->toArray(),
+            $this->createInput()->toArray()
         );
     }
 }

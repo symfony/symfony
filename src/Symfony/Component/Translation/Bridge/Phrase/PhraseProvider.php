@@ -250,7 +250,7 @@ class PhraseProvider implements ProviderInterface
         throw match (true) {
             429 === $statusCode => new ProviderException(sprintf('Rate limit exceeded (%s). please wait %s seconds.',
                 $headers['x-rate-limit-limit'][0],
-                $headers['x-rate-limit-reset'][0],
+                $headers['x-rate-limit-reset'][0]
             ), $response),
             $statusCode <= 500 => new ProviderException($message, $response),
             default => new ProviderException('Provider server error.', $response),

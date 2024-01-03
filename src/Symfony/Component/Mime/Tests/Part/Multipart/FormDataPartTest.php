@@ -240,7 +240,7 @@ class FormDataPartTest extends TestCase
         $headers = $f->getPreparedHeaders()->toArray();
         $this->assertMatchesRegularExpression(
             '/^Content-Type: multipart\/form-data; boundary=[a-zA-Z0-9\-_]{8}$/',
-            $headers[0],
+            $headers[0]
         );
     }
 }

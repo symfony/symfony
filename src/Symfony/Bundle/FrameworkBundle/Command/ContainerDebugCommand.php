@@ -226,7 +226,7 @@ EOF
             $suggestions->suggestValues($this->findServiceIdsContaining(
                 $object,
                 $input->getCompletionValue(),
-                (bool) $input->getOption('show-hidden'),
+                (bool) $input->getOption('show-hidden')
             ));
 
             return;

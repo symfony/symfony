@@ -118,7 +118,7 @@ class RouteCollectionTest extends TestCase
         $collection->add('foo', new Route('/{placeholder}'));
         $collection1 = new RouteCollection();
         $collection1->add('bar', new Route('/{placeholder}',
-            ['_controller' => 'fixed', 'placeholder' => 'default'], ['placeholder' => '.+'], ['option' => 'value']),
+            ['_controller' => 'fixed', 'placeholder' => 'default'], ['placeholder' => '.+'], ['option' => 'value'])
         );
         $collection->addCollection($collection1);
 
@@ -135,7 +135,7 @@ class RouteCollectionTest extends TestCase
         $collection->addOptions(['option' => 'new-value']);
         $this->assertEquals(
             ['option' => 'new-value', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'],
-            $collection->get('bar')->getOptions(), '->addOptions() adds options to all routes and overwrites existing ones',
+            $collection->get('bar')->getOptions(), '->addOptions() adds options to all routes and overwrites existing ones'
         );
     }
 

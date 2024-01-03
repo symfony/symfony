@@ -44,7 +44,7 @@ class FirewallConfigTest extends TestCase
             $options['access_denied_handler'],
             $options['access_denied_url'],
             $authenticators,
-            $options['switch_user'],
+            $options['switch_user']
         );
 
         $this->assertSame('foo_firewall', $config->getName());

@@ -27,7 +27,7 @@ class RequestContextTest extends TestCase
             8080,
             444,
             '/baz',
-            'bar=foobar',
+            'bar=foobar'
         );
 
         $this->assertEquals('foo', $requestContext->getBaseUrl());

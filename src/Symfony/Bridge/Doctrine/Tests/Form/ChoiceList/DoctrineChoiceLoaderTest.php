@@ -72,7 +72,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader,
+            $this->idReader
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -96,7 +96,7 @@ class DoctrineChoiceLoaderTest extends TestCase
             $this->om,
             $this->class,
             $this->idReader,
-            $this->objectLoader,
+            $this->objectLoader
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -120,7 +120,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            null,
+            null
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -141,7 +141,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader,
+            $this->idReader
         );
 
         $this->repository->expects($this->never())
@@ -155,7 +155,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader,
+            $this->idReader
         );
 
         $this->repository->expects($this->never())
@@ -177,7 +177,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader,
+            $this->idReader
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -189,7 +189,7 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->assertSame(['B'], $loader->loadValuesForChoices(
             [$this->obj2],
-            $value,
+            $value
         ));
     }
 
@@ -198,7 +198,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader,
+            $this->idReader
         );
 
         $value = [$this->idReader, 'getIdValue'];
@@ -213,7 +213,7 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->assertSame(['2'], $loader->loadValuesForChoices(
             [$this->obj2],
-            $value,
+            $value
         ));
     }
 
@@ -221,7 +221,7 @@ class DoctrineChoiceLoaderTest extends TestCase
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
-            $this->class,
+            $this->class
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -242,7 +242,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader,
+            $this->idReader
         );
 
         $this->repository->expects($this->never())
@@ -257,7 +257,7 @@ class DoctrineChoiceLoaderTest extends TestCase
             $this->om,
             $this->class,
             $this->idReader,
-            $this->objectLoader,
+            $this->objectLoader
         );
 
         $this->idReader->expects($this->any())
@@ -282,7 +282,7 @@ class DoctrineChoiceLoaderTest extends TestCase
             $this->om,
             $this->class,
             $this->idReader,
-            $this->objectLoader,
+            $this->objectLoader
         );
 
         $choices = [$this->obj2, $this->obj3];
@@ -308,7 +308,7 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->assertSame(
             [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue']),
+            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue'])
         );
     }
 
@@ -317,7 +317,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader,
+            $this->idReader
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -329,7 +329,7 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->assertSame([$this->obj2], $loader->loadChoicesForValues(
             ['B'],
-            $value,
+            $value
         ));
     }
 
@@ -339,7 +339,7 @@ class DoctrineChoiceLoaderTest extends TestCase
             $this->om,
             $this->class,
             $this->idReader,
-            $this->objectLoader,
+            $this->objectLoader
         );
 
         $choices = [$this->obj2, $this->obj3];

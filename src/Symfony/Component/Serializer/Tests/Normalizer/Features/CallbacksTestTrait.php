@@ -298,7 +298,7 @@ trait CallbacksTestTrait
             [$reflectionExtractor, $phpDocExtractor],
             [$reflectionExtractor, $phpDocExtractor],
             [$reflectionExtractor, $phpDocExtractor],
-            [$reflectionExtractor, $phpDocExtractor],
+            [$reflectionExtractor, $phpDocExtractor]
         );
     }
 }

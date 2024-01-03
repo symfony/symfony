@@ -130,7 +130,7 @@ class Dumper
                     $prefix,
                     $dumpAsMap ? Inline::dump($key, $flags).':' : '-',
                     $willBeInlined ? ' ' : "\n",
-                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $flags),
+                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $flags)
                 ).($willBeInlined ? "\n" : '');
             }
         }

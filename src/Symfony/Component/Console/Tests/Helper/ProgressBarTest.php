@@ -48,7 +48,7 @@ class ProgressBarTest extends TestCase
             '    0 [>---------------------------]'.
             $this->generateOutput('    1 [->--------------------------]').
             $this->generateOutput('    0 [>---------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -62,7 +62,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             '    0 [>---------------------------]'.
             $this->generateOutput('    1 [->--------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -77,7 +77,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             '   15 [--------------->------------]'.
             $this->generateOutput('   16 [---------------->-----------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -90,7 +90,7 @@ class ProgressBarTest extends TestCase
 
         $this->assertEquals(
             ' 1000/5000 [=====>----------------------]  20%',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -106,7 +106,7 @@ class ProgressBarTest extends TestCase
 
         $this->assertEquals(
             600.0,
-            $bar->getEstimated(),
+            $bar->getEstimated()
         );
     }
 
@@ -120,12 +120,12 @@ class ProgressBarTest extends TestCase
 
         $this->assertEquals(
             1_200.0,
-            $bar->getEstimated(),
+            $bar->getEstimated()
         );
 
         $this->assertEquals(
             600.0,
-            $bar->getRemaining(),
+            $bar->getRemaining()
         );
     }
 
@@ -139,7 +139,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             '    0 [>---------------------------]'.
             $this->generateOutput('    5 [----->----------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -155,7 +155,7 @@ class ProgressBarTest extends TestCase
             '    0 [>---------------------------]'.
             $this->generateOutput('    3 [--->------------------------]').
             $this->generateOutput('    5 [----->----------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -171,7 +171,7 @@ class ProgressBarTest extends TestCase
             '  9/10 [=========================>--]  90%'.
             $this->generateOutput(' 10/10 [============================] 100%').
             $this->generateOutput(' 11/11 [============================] 100%'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -189,7 +189,7 @@ class ProgressBarTest extends TestCase
             $this->generateOutput('    1 [->--------------------------]').
             $this->generateOutput('    2 [-->-------------------------]').
             $this->generateOutput('    1 [->--------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -207,7 +207,7 @@ class ProgressBarTest extends TestCase
             $this->generateOutput('    4 [---->-----------------------]').
             $this->generateOutput('    8 [-------->-------------------]').
             $this->generateOutput('    6 [------>---------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -227,7 +227,7 @@ class ProgressBarTest extends TestCase
             $this->generateOutput('    6 [------>---------------------]').
             $this->generateOutput('    5 [----->----------------------]').
             $this->generateOutput('    3 [--->------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -242,7 +242,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             '  1/10 [==>-------------------------]  10%'.
             $this->generateOutput('  0/10 [>---------------------------]   0%'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -307,7 +307,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             '  0/10 [/         ]   0%'.
             $this->generateOutput('  1/10 [_/        ]  10%'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -319,7 +319,7 @@ class ProgressBarTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals(
             '  0/50 [>---------------------------]   0%',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -331,7 +331,7 @@ class ProgressBarTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals(
             '',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -343,7 +343,7 @@ class ProgressBarTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals(
             ' 50/50 [============================] 100%',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -360,7 +360,7 @@ class ProgressBarTest extends TestCase
             '  0/50 [>---------------------------]   0%'.
             $this->generateOutput('  1/50 [>---------------------------]   2%').
             $this->generateOutput('  2/50 [=>--------------------------]   4%'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -381,7 +381,7 @@ class ProgressBarTest extends TestCase
             '  0/50 [>---------------------------]   0%'.
             $this->generateOutput('  1/50 [>---------------------------]   2%').
             $this->generateOutput('  2/50 [=>--------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -402,7 +402,7 @@ class ProgressBarTest extends TestCase
             '  0/50 [>---------------------------]   0%'.\PHP_EOL.
             "\x1b[1A\x1b[0J".'  1/50 [>---------------------------]   2%'.\PHP_EOL.
             "\x1b[1A\x1b[0J".'  2/50 [=>--------------------------]   4%'.\PHP_EOL,
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -426,7 +426,7 @@ class ProgressBarTest extends TestCase
             " \033[44;37m 0/50\033[0m [>---------------------------]   0%".\PHP_EOL.
             "\x1b[1A\x1b[0J \033[44;37m 1/50\033[0m [>---------------------------]   2%".\PHP_EOL.
             "\x1b[1A\x1b[0J \033[44;37m 2/50\033[0m [=>--------------------------]   4%".\PHP_EOL,
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
         putenv('COLUMNS=120');
     }
@@ -456,7 +456,7 @@ class ProgressBarTest extends TestCase
             "\x1b[2A\x1b[0J".'  1/50 [>---------------------------]   2%'.\PHP_EOL.
             "\x1b[1A\x1b[0J".'  1/50 [>---------------------------]   2%'.\PHP_EOL.
             '  1/50 [>---------------------------]   2%'.\PHP_EOL,
-            stream_get_contents($stream->getStream()),
+            stream_get_contents($stream->getStream())
         );
     }
 
@@ -478,7 +478,7 @@ class ProgressBarTest extends TestCase
             " 0/50 [>]   0% %message% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.\x1b[1G\x1b[2K 1/50 [>]   2% Twas brillig, and the slithy toves. Did gyre and gimble in the wabe: All mimsy were the borogoves, And the mome raths outgrabe.
 Beware the Jabberwock, my son! The jaws that bite, the claws that catch! Beware the Jubjub bird, and shun The frumious Bandersnatch! Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.\x1b[1G\x1b[2K\x1b[1A\x1b[1G\x1b[2K 2/50 [>]   4% He took his vorpal sword in hand; Long time the manxome foe he sought— So rested he by the Tumtum tree And stood awhile in thought.
 And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whiffling through the tulgey wood, And burbled as it came! Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.",
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -506,7 +506,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
 Beware the Jabberwock, my son! The jaws that bite, the claws that catch! Beware the Jubjub bird, and shun The frumious Bandersnatch! Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.".\PHP_EOL.
             "\x1b[6A\x1b[0J 2/50 [>]   4% He took his vorpal sword in hand; Long time the manxome foe he sought— So rested he by the Tumtum tree And stood awhile in thought.
 And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whiffling through the tulgey wood, And burbled as it came! Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.".\PHP_EOL,
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -537,7 +537,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             "\x1b[3A\x1b[0J".'  1/50 [>---------------------------]   2%'.\PHP_EOL.
             ' 0/50 [>]   0% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.\PHP_EOL.
             "\x1b[3A\x1b[0J".' 1/50 [>]   2% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.'.\PHP_EOL,
-            stream_get_contents($stream->getStream()),
+            stream_get_contents($stream->getStream())
         );
     }
 
@@ -552,7 +552,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             ' 0/50 [>---------------------------]'.
             $this->generateOutput(' 1/50 [>---------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -571,7 +571,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput('  1/50 [>---------------------------]   2%').
             $this->generateOutput(' 15/50 [========>-------------------]  30%').
             $this->generateOutput(' 25/50 [==============>-------------]  50%'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -598,7 +598,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput(' 3/6 [==============>-------------]  50%').
             $this->generateOutput(' 5/6 [=======================>----]  83%').
             $this->generateOutput(' 6/6 [============================] 100%'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -613,7 +613,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             '    0 [>---------------------------]'.
             $this->generateOutput('    1 [->--------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -628,7 +628,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             '    0 [>---------------------------]'.
             $this->generateOutput('    1 [->--------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -643,7 +643,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             '    0 [>---------------------------]'.
             $this->generateOutput('    3 [■■■>------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -659,7 +659,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             '  0/50 [>---------------------------]   0%'.
             $this->generateOutput(' 25/50 [==============>-------------]  50%').
             $this->generateOutput(''),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -676,7 +676,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             '   0/200 [>---------------------------]   0%'.
             $this->generateOutput(' 199/200 [===========================>]  99%').
             $this->generateOutput(' 200/200 [============================] 100%'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -704,7 +704,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             ' 160/200 [======================>-----]  80%'.\PHP_EOL.
             ' 180/200 [=========================>--]  90%'.\PHP_EOL.
             ' 200/200 [============================] 100%',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -722,7 +722,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             '  0/50 [>---------------------------]   0%'.\PHP_EOL.
             ' 25/50 [==============>-------------]  50%'.\PHP_EOL.
             ' 50/50 [============================] 100%',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -736,7 +736,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             '    0 [>---------------------------]'.\PHP_EOL.
             '    1 [->--------------------------]',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -795,7 +795,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             "\n".
             "\n".
             rtrim($this->generateOutput('    3 [============================]')),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -817,7 +817,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             rtrim($this->generateOutput('    2 [-->-------------------------]')).
             rtrim($this->generateOutput('    3 [--->------------------------]')).
             rtrim($this->generateOutput('    3 [============================]')),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -840,7 +840,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             rtrim($this->generateOutput('  5/10 [==============>-------------]  50%')).
             rtrim($this->generateOutput('  10/100 [==>-------------------------]  10%')).
             rtrim($this->generateOutput(' 100/100 [============================] 100%')),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -858,7 +858,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             '    0 [>---]'.
             $this->generateOutput('    1 [->--]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -877,7 +877,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             ' 3 [>---------------------------]'.
             $this->generateOutput(' 2 [=========>------------------]').
             $this->generateOutput(' 0 [============================]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -898,7 +898,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             ' 3 [>---------------------------]'.
             $this->generateOutput(' 2 [=========>------------------]').
             $this->generateOutput(' 0 [============================]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -920,7 +920,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput('').
             $this->generateOutput('============================').
             "\nfoobar",
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -949,7 +949,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             " \033[44;37m Starting the demo... fingers crossed  \033[0m\n".
             '  0/15 '.$progress.str_repeat($empty, 26)."   0%\n".
             " \xf0\x9f\x8f\x81  < 1 sec                        \033[44;37m 0 B \033[0m",
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
         ftruncate($output->getStream(), 0);
         rewind($output->getStream());
@@ -962,9 +962,9 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput(
                 " \033[44;37m Looks good to me...                   \033[0m\n".
                 '  4/15 '.str_repeat($done, 7).$progress.str_repeat($empty, 19)."  26%\n".
-                " \xf0\x9f\x8f\x81  < 1 sec                     \033[41;37m 97 KiB \033[0m",
+                " \xf0\x9f\x8f\x81  < 1 sec                     \033[41;37m 97 KiB \033[0m"
             ),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
         ftruncate($output->getStream(), 0);
         rewind($output->getStream());
@@ -977,9 +977,9 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput(
                 " \033[44;37m Thanks, bye                           \033[0m\n".
                 ' 15/15 '.str_repeat($done, 28)." 100%\n".
-                " \xf0\x9f\x8f\x81  < 1 sec                    \033[41;37m 195 KiB \033[0m",
+                " \xf0\x9f\x8f\x81  < 1 sec                    \033[41;37m 195 KiB \033[0m"
             ),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
         putenv('COLUMNS=120');
     }
@@ -992,7 +992,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         rewind($output->getStream());
         $this->assertEquals(
             '    0 [>---------------------------]',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
 
         $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
@@ -1001,7 +1001,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         rewind($output->getStream());
         $this->assertEquals(
             '  0/10 [>---------------------------]   0%',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1013,7 +1013,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         rewind($output->getStream());
         $this->assertEquals(
             ' 0/15 [>---------------------------]   0% < 1 sec/< 1 sec/< 1 sec',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1027,7 +1027,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         rewind($output->getStream());
         $this->assertStringContainsString(
             ' 0/10 [💧]   0%',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
         $bar->finish();
     }
@@ -1069,7 +1069,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             ' 0/2 [>---------------------------]   0%'.
             $this->generateOutput(' 1/2 [==============>-------------]  50%').
             $this->generateOutput(' 2/2 [============================] 100%'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1088,7 +1088,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput('    1 [->--------------------------]').
             $this->generateOutput('    2 [-->-------------------------]').
             $this->generateOutput('    2 [============================]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1102,7 +1102,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         rewind($output->getStream());
         $this->assertEquals(
             ' 0/0 [============================] 100% < 1 sec/< 1 sec',
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1155,7 +1155,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             '    0 [>---------------------------]'.
             $this->generateOutput('    2 [-->-------------------------]').
             $this->generateOutput('    3 [--->------------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1185,7 +1185,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput('    3 [--->------------------------]').
             $this->generateOutput('    4 [---->-----------------------]').
             $this->generateOutput('    7 [------->--------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1210,7 +1210,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             '    0 [>---------------------------]'.
             $this->generateOutput('    2 [-->-------------------------]').
             $this->generateOutput('    4 [---->-----------------------]'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1224,7 +1224,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             ' 0/2 [>---------------------------]   0%'.
             $this->generateOutput(' 1/2 [==============>-------------]  50%'),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1253,7 +1253,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput("1/3\nABC\nFoo").
             $this->generateOutput("2/3\nA\nFoo").
             $this->generateOutput("3/3\nA\nFoo"),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 
@@ -1278,7 +1278,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput('[--->------------------------]').
             "\nProcessing \"foobar\"...".
             $this->generateOutput("[============================]\nProcessing \"foobar\"..."),
-            stream_get_contents($output->getStream()),
+            stream_get_contents($output->getStream())
         );
     }
 }

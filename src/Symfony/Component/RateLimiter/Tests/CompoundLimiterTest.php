@@ -64,7 +64,7 @@ class CompoundLimiterTest extends TestCase
         $this->assertEquals(
             0,
             $rateLimit->getRemainingTokens(),
-            'Limiter 1 consumed the remaining tokens (accept), Limiter 2 did not have any remaining (not accept)',
+            'Limiter 1 consumed the remaining tokens (accept), Limiter 2 did not have any remaining (not accept)'
         );
         $this->assertFalse($rateLimit->isAccepted(), 'Limiter 2 reached the limit already');
 

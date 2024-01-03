@@ -287,7 +287,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
 
             return array_map(
                 fn ($word) => $suggestionBase.$word.' ',
-                $knownWords,
+                $knownWords
             );
         };
 
@@ -892,7 +892,7 @@ EOD;
         $question = new ChoiceQuestion(
             'Please select a bundle (defaults to AcmeDemoBundle and AsseticBundle)',
             ['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle'],
-            '0,1',
+            '0,1'
         );
 
         // This tests that autocomplete works for all multiselect choices entered by the user

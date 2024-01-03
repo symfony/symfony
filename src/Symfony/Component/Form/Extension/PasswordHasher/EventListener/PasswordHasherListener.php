@@ -65,7 +65,7 @@ class PasswordHasherListener
                 $this->propertyAccessor->setValue(
                     $user,
                     $password['property_path'],
-                    $this->passwordHasher->hashPassword($user, $password['password']),
+                    $this->passwordHasher->hashPassword($user, $password['password'])
                 );
             }
         }

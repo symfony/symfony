@@ -304,11 +304,11 @@ class KernelTest extends TestCase
 
         $this->assertEquals(
             __DIR__.'/Fixtures/Bundle1Bundle/Resources/',
-            $kernel->locateResource('@Bundle1Bundle/Resources/'),
+            $kernel->locateResource('@Bundle1Bundle/Resources/')
         );
         $this->assertEquals(
             __DIR__.'/Fixtures/Bundle1Bundle/Resources',
-            $kernel->locateResource('@Bundle1Bundle/Resources'),
+            $kernel->locateResource('@Bundle1Bundle/Resources')
         );
     }
 

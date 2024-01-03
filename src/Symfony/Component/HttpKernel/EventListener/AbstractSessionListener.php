@@ -177,7 +177,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
                         $sessionCookieDomain,
                         $sessionCookieSecure,
                         $sessionCookieHttpOnly,
-                        $sessionCookieSameSite,
+                        $sessionCookieSameSite
                     );
                 } elseif ($sessionId !== $requestSessionCookieId && !$isSessionEmpty) {
                     $expire = 0;
@@ -196,8 +196,8 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
                             $sessionCookieSecure,
                             $sessionCookieHttpOnly,
                             false,
-                            $sessionCookieSameSite,
-                        ),
+                            $sessionCookieSameSite
+                        )
                     );
                 }
             }

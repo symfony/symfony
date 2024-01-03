@@ -49,7 +49,7 @@ class HttpClientPassTest extends TestCase
         $sut->process($container);
         $this->assertEquals(
             [['registerClient', ['foo_client', new Reference('.debug.foo_client')]]],
-            $container->getDefinition('data_collector.http_client')->getMethodCalls(),
+            $container->getDefinition('data_collector.http_client')->getMethodCalls()
         );
     }
 

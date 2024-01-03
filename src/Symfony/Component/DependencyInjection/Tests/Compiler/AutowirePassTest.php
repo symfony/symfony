@@ -575,7 +575,7 @@ class AutowirePassTest extends TestCase
                 new TypedReference(Dunglas::class, Dunglas::class),
                 ['bar'],
             ],
-            $definition->getArguments(),
+            $definition->getArguments()
         );
     }
 
@@ -649,7 +649,7 @@ class AutowirePassTest extends TestCase
                 'default_val',
                 new TypedReference(Lille::class, Lille::class),
             ],
-            $definition->getArguments(),
+            $definition->getArguments()
         );
     }
 
@@ -671,7 +671,7 @@ class AutowirePassTest extends TestCase
                 new TypedReference(A::class, A::class),
                 new TypedReference(Lille::class, Lille::class),
             ],
-            $definition->getArguments(),
+            $definition->getArguments()
         );
     }
 
@@ -688,7 +688,7 @@ class AutowirePassTest extends TestCase
         $definition = $container->getDefinition('foo');
         $this->assertEquals(
             ['foo.txt'],
-            $definition->getArguments(),
+            $definition->getArguments()
         );
     }
 
@@ -747,11 +747,11 @@ class AutowirePassTest extends TestCase
 
         $this->assertEquals(
             ['notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured', 'setChildMethodWithoutDocBlock'],
-            array_column($methodCalls, 0),
+            array_column($methodCalls, 0)
         );
         $this->assertEquals(
             [new TypedReference(A::class, A::class)],
-            $methodCalls[0][1],
+            $methodCalls[0][1]
         );
     }
 

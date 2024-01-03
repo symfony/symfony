@@ -39,7 +39,7 @@ class RouteProcessorTest extends TestCase
         $this->assertCount(1, $record['extra']['requests']);
         $this->assertEquals(
             ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE, 'route_params' => self::TEST_PARAMS],
-            $record['extra']['requests'][0],
+            $record['extra']['requests'][0]
         );
     }
 
@@ -55,7 +55,7 @@ class RouteProcessorTest extends TestCase
         $this->assertCount(1, $record['extra']['requests']);
         $this->assertEquals(
             ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE],
-            $record['extra']['requests'][0],
+            $record['extra']['requests'][0]
         );
     }
 
@@ -75,11 +75,11 @@ class RouteProcessorTest extends TestCase
         $this->assertCount(2, $record['extra']['requests']);
         $this->assertEquals(
             ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE],
-            $record['extra']['requests'][0],
+            $record['extra']['requests'][0]
         );
         $this->assertEquals(
             ['controller' => $controllerFromSubRequest, 'route' => self::TEST_ROUTE],
-            $record['extra']['requests'][1],
+            $record['extra']['requests'][1]
         );
     }
 
@@ -98,7 +98,7 @@ class RouteProcessorTest extends TestCase
         $this->assertCount(1, $record['extra']['requests']);
         $this->assertEquals(
             ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE],
-            $record['extra']['requests'][0],
+            $record['extra']['requests'][0]
         );
 
         $processor->removeRouteData($this->getFinishRequestEvent($mainRequest));

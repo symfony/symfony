@@ -24,7 +24,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
             '/label
     [@class="col-sm-2 control-label required"]
     [.="[trans]Name[/trans]"]
-',
+'
         );
     }
 
@@ -41,7 +41,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
             '/label
     [@for="name"]
     [@class="col-sm-2 control-label required"]
-',
+'
         );
     }
 
@@ -58,7 +58,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
             '/label
     [@for="name"]
     [@class="my&class col-sm-2 control-label required"]
-',
+'
         );
     }
 
@@ -76,7 +76,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
     [@for="name"]
     [@class="my&class col-sm-2 control-label required"]
     [.="[trans]Custom label[/trans]"]
-',
+'
         );
     }
 
@@ -96,7 +96,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
     [@for="name"]
     [@class="my&class col-sm-2 control-label required"]
     [.="[trans]Custom label[/trans]"]
-',
+'
         );
     }
 
@@ -212,7 +212,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
             ./span[text() = "[trans]really helpful text[/trans]"]
         ]
     ]
-',
+'
         );
     }
 }

@@ -157,7 +157,7 @@ EOF;
                         $value->getClientOriginalName(),
                         $value->getClientMimeType(),
                         \UPLOAD_ERR_INI_SIZE,
-                        true,
+                        true
                     );
                 } else {
                     $filtered[$key] = new UploadedFile(
@@ -165,7 +165,7 @@ EOF;
                         $value->getClientOriginalName(),
                         $value->getClientMimeType(),
                         $value->getError(),
-                        true,
+                        true
                     );
                 }
             }

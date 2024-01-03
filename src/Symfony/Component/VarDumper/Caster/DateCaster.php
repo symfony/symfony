@@ -95,7 +95,7 @@ class DateCaster
                 $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
                 $dates[] = sprintf('%s more', ($end = $p->getEndDate())
                     ? ceil(($end->format('U.u') - $d->format('U.u')) / ((int) $now->add($p->getDateInterval())->format('U.u') - (int) $now->format('U.u')))
-                    : $p->recurrences - $i,
+                    : $p->recurrences - $i
                 );
                 break;
             }
@@ -107,7 +107,7 @@ class DateCaster
             self::formatInterval($p->getDateInterval()),
             $p->include_start_date ? '[' : ']',
             self::formatDateTime($p->getStartDate()),
-            ($end = $p->getEndDate()) ? 'to '.self::formatDateTime($end).($p->include_end_date ? ']' : '[') : 'recurring '.$p->recurrences.' time/s',
+            ($end = $p->getEndDate()) ? 'to '.self::formatDateTime($end).($p->include_end_date ? ']' : '[') : 'recurring '.$p->recurrences.' time/s'
         );
 
         $p = [Caster::PREFIX_VIRTUAL.'period' => new ConstStub($period, implode("\n", $dates))];

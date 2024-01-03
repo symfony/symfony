@@ -127,7 +127,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
             $translatedMessage = $this->translator->trans(
                 $this->message,
                 $parameters,
-                $this->translationDomain,
+                $this->translationDomain
             );
         }
 
@@ -141,7 +141,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
             $this->plural,
             $this->code,
             $this->constraint,
-            $this->cause,
+            $this->cause
         ));
     }
 }

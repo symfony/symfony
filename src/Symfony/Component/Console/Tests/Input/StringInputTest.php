@@ -33,7 +33,7 @@ class StringInputTest extends TestCase
     public function testInputOptionWithGivenString()
     {
         $definition = new InputDefinition(
-            [new InputOption('foo', null, InputOption::VALUE_REQUIRED)],
+            [new InputOption('foo', null, InputOption::VALUE_REQUIRED)]
         );
 
         // call to bind

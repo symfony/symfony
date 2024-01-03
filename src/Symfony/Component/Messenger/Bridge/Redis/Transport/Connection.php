@@ -362,7 +362,7 @@ class Connection
                     $this->consumer,
                     $this->redeliverTimeout,
                     $claimableIds,
-                    ['JUSTID'],
+                    ['JUSTID']
                 );
 
                 $this->couldHavePendingMessages = true;
@@ -423,7 +423,7 @@ class Connection
                 $this->consumer,
                 [$this->stream => $messageId],
                 1,
-                1,
+                1
             );
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);

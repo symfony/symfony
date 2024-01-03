@@ -61,7 +61,7 @@ class IcuResFileDumper extends FileDumper
             $bundleTop,                     // Index resources top
             $bundleTop,                     // Index bundle top
             \count($messages->all($domain)), // Index max table length
-            0,                               // Index attributes
+            0                               // Index attributes
         );
 
         $header = pack('vC2v4C12@32',
@@ -70,7 +70,7 @@ class IcuResFileDumper extends FileDumper
             20, 0, 0, 2,            // Rest of the header, ..., Size of a char
             0x52, 0x65, 0x73, 0x42, // Data format identifier
             1, 2, 0, 0,             // Data version
-            1, 4, 0, 0,              // Unicode version
+            1, 4, 0, 0              // Unicode version
         );
 
         return $header.$root.$data;

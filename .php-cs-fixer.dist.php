@@ -38,7 +38,7 @@ return (new PhpCsFixer\Config())
         'modernize_strpos' => true,
         'get_class_to_class_keyword' => true,
         'nullable_type_declaration' => true,
-        'trailing_comma_in_multiline' => ['elements' => ['arguments', 'arrays', 'match', 'parameters']],
+        'trailing_comma_in_multiline' => ['elements' => ['arrays', 'match', 'parameters']],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(
@@ -78,7 +78,7 @@ return (new PhpCsFixer\Config())
             ->notPath('Symfony/Component/Cache/Traits/Redis5Proxy.php')
             ->notPath('Symfony/Component/Cache/Traits/Redis6Proxy.php')
             ->notPath('Symfony/Component/Cache/Traits/RedisCluster5Proxy.php')
-            ->notPath('Symfony/Component/Cache/Traits/RedisCluster6Proxy.php'),
+            ->notPath('Symfony/Component/Cache/Traits/RedisCluster6Proxy.php')
     )
     ->setCacheFile('.php-cs-fixer.cache')
 ;

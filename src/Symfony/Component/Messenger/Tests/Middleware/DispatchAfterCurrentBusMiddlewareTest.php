@@ -71,7 +71,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
                 $this->willHandleMessage(),
                 $this->willHandleMessage(),
                 $this->willHandleMessage(),
-                $this->willHandleMessage(),
+                $this->willHandleMessage()
             );
 
         $messageBus->dispatch($message);
@@ -118,7 +118,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 $this->willHandleMessage(),
                 $this->throwException(new \RuntimeException('Some exception while handling first event')),
-                $this->willHandleMessage(),
+                $this->willHandleMessage()
             );
 
         $this->expectException(DelayedMessageHandlingException::class);
@@ -202,7 +202,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
 
                     return $stack->next()->handle($envelope, $stack);
                 }),
-                $this->willHandleMessage(),
+                $this->willHandleMessage()
             );
 
         $this->expectException(DelayedMessageHandlingException::class);

@@ -47,7 +47,7 @@ class RouterTest extends TestCase
             ],
             [
                 '_locale' => 'en|es',
-            ], [], '', [], [], '"%foo%" == "bar"',
+            ], [], '', [], [], '"%foo%" == "bar"'
         ));
 
         $sc = $this->getPsr11ServiceContainer($routes);
@@ -74,7 +74,7 @@ class RouterTest extends TestCase
             ],
             [
                 '_locale' => 'en|es',
-            ], [], '', [], [], '"%foo%" == "bar"',
+            ], [], '', [], [], '"%foo%" == "bar"'
         ));
 
         $sc = $this->getServiceContainer($routes);
@@ -128,7 +128,7 @@ class RouterTest extends TestCase
                 'bee' => ['bee', 'bee'],
             ],
             [
-            ],
+            ]
         ));
 
         $sc = $this->getPsr11ServiceContainer($routes);
@@ -151,7 +151,7 @@ class RouterTest extends TestCase
                 'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
                 'bee' => ['bee', 'bee'],
             ],
-            $route->getDefaults(),
+            $route->getDefaults()
         );
     }
 
@@ -169,7 +169,7 @@ class RouterTest extends TestCase
                 'bee' => ['bee', 'bee'],
             ],
             [
-            ],
+            ]
         ));
 
         $sc = $this->getServiceContainer($routes);
@@ -190,7 +190,7 @@ class RouterTest extends TestCase
                 'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
                 'bee' => ['bee', 'bee'],
             ],
-            $route->getDefaults(),
+            $route->getDefaults()
         );
     }
 
@@ -206,7 +206,7 @@ class RouterTest extends TestCase
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-            ],
+            ]
         ));
 
         $sc = $this->getPsr11ServiceContainer($routes);
@@ -225,7 +225,7 @@ class RouterTest extends TestCase
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
             ],
-            $route->getRequirements(),
+            $route->getRequirements()
         );
     }
 
@@ -241,7 +241,7 @@ class RouterTest extends TestCase
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-            ],
+            ]
         ));
 
         $sc = $this->getServiceContainer($routes);
@@ -257,7 +257,7 @@ class RouterTest extends TestCase
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
             ],
-            $route->getRequirements(),
+            $route->getRequirements()
         );
     }
 
@@ -275,7 +275,7 @@ class RouterTest extends TestCase
 
         $this->assertEquals(
             '/before/foo/after/%escaped%',
-            $route->getPath(),
+            $route->getPath()
         );
     }
 
@@ -293,7 +293,7 @@ class RouterTest extends TestCase
 
         $this->assertEquals(
             '/before/foo-%escaped%/after/%escaped%',
-            $route->getPath(),
+            $route->getPath()
         );
     }
 
@@ -358,7 +358,7 @@ class RouterTest extends TestCase
 
         $this->assertEquals(
             '/before/foo/after/%escaped%',
-            $route->getHost(),
+            $route->getHost()
         );
     }
 
@@ -379,7 +379,7 @@ class RouterTest extends TestCase
 
         $this->assertEquals(
             '/before/foo/after/%escaped%',
-            $route->getHost(),
+            $route->getHost()
         );
     }
 

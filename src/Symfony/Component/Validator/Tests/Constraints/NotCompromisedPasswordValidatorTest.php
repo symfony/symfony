@@ -154,7 +154,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
             $this->createHttpClientStubCustomEndpoint($expectedEndpointUrl),
             'UTF-8',
             true,
-            $endpoint,
+            $endpoint
         );
         $validator->initialize($this->context);
         $validator->validate(self::PASSWORD_LEAKED, $constraint);
@@ -174,14 +174,14 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
                 '3686792BBC66A72D40D928ED15621124CFE:7',
                 '36EEC709091B810AA240179A44317ED415C:2',
                 '',
-            ],
+            ]
         );
 
         $validator = new NotCompromisedPasswordValidator(
             $this->createHttpClientStub($returnValue),
             'UTF-8',
             true,
-            'https://password-check.internal.example.com/range/%s',
+            'https://password-check.internal.example.com/range/%s'
         );
 
         $validator->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
@@ -243,7 +243,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
                     ->willReturn($returnValue ?? implode("\r\n", self::RETURN));
 
                 return $responseStub;
-            },
+            }
         );
 
         return $httpClientStub;
@@ -260,7 +260,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
                     ->willReturn(implode("\r\n", self::RETURN));
 
                 return $responseStub;
-            },
+            }
         );
 
         return $httpClientStub;

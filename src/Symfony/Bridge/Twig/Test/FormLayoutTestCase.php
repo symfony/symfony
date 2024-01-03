@@ -62,7 +62,7 @@ abstract class FormLayoutTestCase extends FormIntegrationTestCase
             $this->fail(sprintf(
                 "Failed loading HTML:\n\n%s\n\nError: %s",
                 $html,
-                $e->getMessage(),
+                $e->getMessage()
             ));
         }
         $xpath = new \DOMXPath($dom);
@@ -76,7 +76,7 @@ abstract class FormLayoutTestCase extends FormIntegrationTestCase
                 1 == $count ? 'once' : $count.' times',
                 1 == $nodeList->length ? 'once' : $nodeList->length.' times',
                 // strip away <root> and </root>
-                substr($dom->saveHTML(), 6, -8),
+                substr($dom->saveHTML(), 6, -8)
             ));
         } else {
             $this->addToAssertionCount(1);

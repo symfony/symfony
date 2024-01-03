@@ -89,7 +89,7 @@ class RouterController
             \in_array($request->getMethod(), ['DELETE', 'PATCH', 'POST', 'PUT'], true) ? $request->getRequestRequest()->all() : $request->getRequestQuery()->all(),
             $request->getRequestCookies(true)->all(),
             [],
-            $request->getRequestServer(true)->all(),
+            $request->getRequestServer(true)->all()
         );
 
         $context = $this->matcher->getContext();

@@ -295,7 +295,7 @@ class XmlFileLoaderTest extends TestCase
                 'foo' => null,
                 'bar' => null,
             ],
-            $route->getDefaults(),
+            $route->getDefaults()
         );
     }
 
@@ -310,7 +310,7 @@ class XmlFileLoaderTest extends TestCase
                 '_controller' => 'AcmeBlogBundle:Blog:index',
                 'values' => [true, 1, 3.5, 'foo'],
             ],
-            $route->getDefaults(),
+            $route->getDefaults()
         );
     }
 
@@ -325,7 +325,7 @@ class XmlFileLoaderTest extends TestCase
                 '_controller' => 'AcmeBlogBundle:Blog:index',
                 'values' => [[true, 1, 3.5, 'foo']],
             ],
-            $route->getDefaults(),
+            $route->getDefaults()
         );
     }
 
@@ -340,7 +340,7 @@ class XmlFileLoaderTest extends TestCase
                 '_controller' => 'AcmeBlogBundle:Blog:index',
                 'values' => ['list' => [true, 1, 3.5, 'foo']],
             ],
-            $route->getDefaults(),
+            $route->getDefaults()
         );
     }
 
@@ -360,7 +360,7 @@ class XmlFileLoaderTest extends TestCase
                     'title' => 'foo',
                 ],
             ],
-            $route->getDefaults(),
+            $route->getDefaults()
         );
     }
 
@@ -380,7 +380,7 @@ class XmlFileLoaderTest extends TestCase
                     'title' => 'foo',
                 ]],
             ],
-            $route->getDefaults(),
+            $route->getDefaults()
         );
     }
 
@@ -400,7 +400,7 @@ class XmlFileLoaderTest extends TestCase
                     'title' => 'foo',
                 ]],
             ],
-            $route->getDefaults(),
+            $route->getDefaults()
         );
     }
 
@@ -428,7 +428,7 @@ class XmlFileLoaderTest extends TestCase
                 'list' => null,
                 'map' => null,
             ],
-            $route->getDefault('map'),
+            $route->getDefault('map')
         );
     }
 

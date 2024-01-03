@@ -68,7 +68,7 @@ class EarlyExpirationHandler
                 }
             },
             null,
-            CacheItem::class,
+            CacheItem::class
         );
 
         $startTime = microtime(true);

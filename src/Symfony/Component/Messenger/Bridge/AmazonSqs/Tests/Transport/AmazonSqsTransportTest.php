@@ -55,7 +55,7 @@ class AmazonSqsTransportTest extends TestCase
     {
         $transport = $this->getTransport(
             $serializer = $this->createMock(SerializerInterface::class),
-            $connection = $this->createMock(Connection::class),
+            $connection = $this->createMock(Connection::class)
         );
 
         $decodedMessage = new DummyMessage('Decoded.');

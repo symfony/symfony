@@ -61,7 +61,7 @@ class ErrorDetailsStampTest extends TestCase
                 new ArrayDenormalizer(),
                 new FlattenExceptionNormalizer(),
                 new ObjectNormalizer(),
-            ], [new JsonEncoder()]),
+            ], [new JsonEncoder()])
         );
 
         $deserializedEnvelope = $serializer->decode($serializer->encode(new Envelope(new \stdClass(), [$stamp])));

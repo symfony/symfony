@@ -106,7 +106,7 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
             $this->options['secure'] ?? $request->isSecure(),
             $this->options['httponly'],
             false,
-            $this->options['samesite'],
+            $this->options['samesite']
         ));
     }
 }

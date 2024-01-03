@@ -64,7 +64,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
             $options['test_case'],
             $options['root_config'] ?? 'config.yml',
             $options['environment'] ?? strtolower(static::getVarDir().$options['test_case']),
-            $options['debug'] ?? false,
+            $options['debug'] ?? false
         );
     }
 

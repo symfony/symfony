@@ -126,8 +126,8 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
                         $options['em'],
                         $options['query_builder'] ?? $options['em']->getRepository($options['class'])->createQueryBuilder('e'),
                         $options['class'],
-                        $vary,
-                    ),
+                        $vary
+                    )
                 ), $vary);
             }
 

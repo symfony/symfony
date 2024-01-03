@@ -48,19 +48,19 @@ class FileLocatorTest extends TestCase
         $this->assertEquals(
             __DIR__.\DIRECTORY_SEPARATOR.'FileLocatorTest.php',
             $loader->locate('FileLocatorTest.php', __DIR__),
-            '->locate() returns the absolute filename if the file exists in the given path',
+            '->locate() returns the absolute filename if the file exists in the given path'
         );
 
         $this->assertEquals(
             __DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml',
             $loader->locate('foo.xml', __DIR__),
-            '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor',
+            '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor'
         );
 
         $this->assertEquals(
             __DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml',
             $loader->locate(__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__),
-            '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor',
+            '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor'
         );
 
         $loader = new FileLocator([__DIR__.'/Fixtures', __DIR__.'/Fixtures/Again']);
@@ -68,13 +68,13 @@ class FileLocatorTest extends TestCase
         $this->assertEquals(
             [__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.\DIRECTORY_SEPARATOR.'foo.xml'],
             $loader->locate('foo.xml', __DIR__, false),
-            '->locate() returns an array of absolute filenames',
+            '->locate() returns an array of absolute filenames'
         );
 
         $this->assertEquals(
             [__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.\DIRECTORY_SEPARATOR.'foo.xml'],
             $loader->locate('foo.xml', __DIR__.'/Fixtures', false),
-            '->locate() returns an array of absolute filenames',
+            '->locate() returns an array of absolute filenames'
         );
 
         $loader = new FileLocator(__DIR__.'/Fixtures/Again');
@@ -82,7 +82,7 @@ class FileLocatorTest extends TestCase
         $this->assertEquals(
             [__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.\DIRECTORY_SEPARATOR.'foo.xml'],
             $loader->locate('foo.xml', __DIR__.'/Fixtures', false),
-            '->locate() returns an array of absolute filenames',
+            '->locate() returns an array of absolute filenames'
         );
     }
 

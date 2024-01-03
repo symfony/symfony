@@ -69,7 +69,7 @@ class FlockStoreTest extends AbstractStoreTestCase
         $file = sprintf(
             '%s/sf.-php-echo-hello-word-.%s.lock',
             sys_get_temp_dir(),
-            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_'),
+            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
         );
         // ensure the file does not exist before the store
         @unlink($file);
@@ -90,7 +90,7 @@ class FlockStoreTest extends AbstractStoreTestCase
         $file = sprintf(
             '%s/sf.Symfony-Component-Lock-Tests-Store-FlockStoreTestS.%s.lock',
             sys_get_temp_dir(),
-            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_'),
+            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
         );
         // ensure the file does not exist before the store
         @unlink($file);

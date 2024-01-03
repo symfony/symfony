@@ -155,7 +155,7 @@ HTML;
     {
         $twig = new Environment(
             new ArrayLoader(['index' => $template]),
-            ['debug' => true],
+            ['debug' => true]
         );
         $twig->addExtension($this->getExtension());
 

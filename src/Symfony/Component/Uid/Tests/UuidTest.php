@@ -303,7 +303,7 @@ class UuidTest extends TestCase
     {
         $this->assertEquals(
             Uuid::fromString("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
-            Uuid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
+            Uuid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08")
         );
     }
 
@@ -330,7 +330,7 @@ class UuidTest extends TestCase
     {
         $this->assertEquals(
             UuidV1::fromString('94fSqj9oxGtsNbkfQNntwx'),
-            UuidV1::fromBase58('94fSqj9oxGtsNbkfQNntwx'),
+            UuidV1::fromBase58('94fSqj9oxGtsNbkfQNntwx')
         );
     }
 
@@ -357,7 +357,7 @@ class UuidTest extends TestCase
     {
         $this->assertEquals(
             UuidV5::fromString('2VN0S74HBDBB0AQRXAHFVG35KK'),
-            UuidV5::fromBase32('2VN0S74HBDBB0AQRXAHFVG35KK'),
+            UuidV5::fromBase32('2VN0S74HBDBB0AQRXAHFVG35KK')
         );
     }
 
@@ -384,7 +384,7 @@ class UuidTest extends TestCase
     {
         $this->assertEquals(
             UuidV6::fromString('1eb571b4-14c0-6893-bf70-2d4c83cf755a'),
-            UuidV6::fromRfc4122('1eb571b4-14c0-6893-bf70-2d4c83cf755a'),
+            UuidV6::fromRfc4122('1eb571b4-14c0-6893-bf70-2d4c83cf755a')
         );
     }
 

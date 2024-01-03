@@ -91,7 +91,7 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
         return new Response(
             null,
             Response::HTTP_UNAUTHORIZED,
-            ['WWW-Authenticate' => $this->getAuthenticateHeader($errorMessage)],
+            ['WWW-Authenticate' => $this->getAuthenticateHeader($errorMessage)]
         );
     }
 

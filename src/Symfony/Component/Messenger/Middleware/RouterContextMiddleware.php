@@ -42,7 +42,7 @@ class RouterContextMiddleware implements MiddlewareInterface
                 $context->getHttpPort(),
                 $context->getHttpsPort(),
                 $context->getPathInfo(),
-                $context->getQueryString(),
+                $context->getQueryString()
             ));
 
             return $stack->next()->handle($envelope, $stack);

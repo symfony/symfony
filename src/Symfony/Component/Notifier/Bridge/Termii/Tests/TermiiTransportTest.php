@@ -70,7 +70,7 @@ final class TermiiTransportTest extends TransportTestCase
             self::assertSame('https://api.ng.termii.com/api/sms/send', $url);
 
             return $response;
-        },
+        }
         );
         $transport = $this->createTransport($client, $from);
         $sentMessage = $transport->send($message);

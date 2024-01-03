@@ -65,7 +65,7 @@ class FileFormFieldTest extends FormFieldTestCase
         $this->assertEquals(
             $origInfo['extension'],
             $tmpInfo['extension'],
-            "->$method() keeps the same file extension in the tmp_name copy",
+            "->$method() keeps the same file extension in the tmp_name copy"
         );
 
         $field->$method(__DIR__.'/../Fixtures/no-extension');
@@ -74,7 +74,7 @@ class FileFormFieldTest extends FormFieldTestCase
         $this->assertArrayNotHasKey(
             'extension',
             pathinfo($value['tmp_name']),
-            "->$method() does not add a file extension in the tmp_name copy",
+            "->$method() does not add a file extension in the tmp_name copy"
         );
     }
 

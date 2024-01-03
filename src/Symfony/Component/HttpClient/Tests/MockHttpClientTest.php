@@ -79,7 +79,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 [
                     new MockResponse('static response [1]'),
                     new MockResponse('static response [2]'),
-                ],
+                ]
             ),
             [
                 'static response [1]',
@@ -153,7 +153,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 [
                     new MockResponse(),
                     new MockResponse(),
-                ],
+                ]
             ),
         ];
     }

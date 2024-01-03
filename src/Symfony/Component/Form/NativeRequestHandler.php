@@ -82,7 +82,7 @@ class NativeRequestHandler implements RequestHandlerInterface
                 $form->addError(new FormError(
                     $form->getConfig()->getOption('upload_max_size_message')(),
                     null,
-                    ['{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()],
+                    ['{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()]
                 ));
 
                 return;

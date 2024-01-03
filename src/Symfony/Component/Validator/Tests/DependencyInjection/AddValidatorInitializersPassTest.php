@@ -38,7 +38,7 @@ class AddValidatorInitializersPassTest extends TestCase
 
         $this->assertEquals(
             [['addObjectInitializers', [[new Reference('initializer1'), new Reference('initializer2')]]]],
-            $container->getDefinition('validator.builder')->getMethodCalls(),
+            $container->getDefinition('validator.builder')->getMethodCalls()
         );
     }
 }

@@ -228,7 +228,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertEquals(
             [['isBaz', []]],
             $def->getMethodCalls(),
-            'Definition shouldn\'t have only one method call.',
+            'Definition shouldn\'t have only one method call.'
         );
 
         (new ResolveInstanceofConditionalsPass())->process($container);

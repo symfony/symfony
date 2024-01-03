@@ -373,7 +373,7 @@ class DateIntervalTypeTest extends BaseTypeTestCase
                     'minutes' => 'form.trans.minutes',
                     'seconds' => 'form.trans.seconds',
                 ],
-            ],
+            ]
         );
 
         $view = $form->createView();

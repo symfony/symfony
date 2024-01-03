@@ -36,7 +36,7 @@ class CacheCollectorPassTest extends TestCase
                 ->addArgument(null)
                 ->addArgument(null)
                 ->addArgument((new Definition('callable'))
-                    ->setFactory([new Reference('fs'), 'setCallbackWrapper']),
+                    ->setFactory([new Reference('fs'), 'setCallbackWrapper'])
                 ),
             ])
             ->addTag('cache.pool');
@@ -105,7 +105,7 @@ class CacheCollectorPassTest extends TestCase
                     ],
                 ],
             ],
-            $collector->getMethodCalls(),
+            $collector->getMethodCalls()
         );
     }
 }

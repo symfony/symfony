@@ -78,7 +78,7 @@ class GraphvizDumperTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->addArgument(
-            (new Definition('stdClass'))->addArgument(new Reference('bar')),
+            (new Definition('stdClass'))->addArgument(new Reference('bar'))
         );
         $container->register('bar', 'stdClass');
         $dumper = new GraphvizDumper($container);

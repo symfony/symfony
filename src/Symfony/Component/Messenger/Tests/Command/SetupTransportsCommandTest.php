@@ -32,7 +32,7 @@ class SetupTransportsCommandTest extends TestCase
             ->method('get')
             ->will($this->onConsecutiveCalls(
                 $this->createMock(SetupableTransportInterface::class),
-                $this->createMock(TransportInterface::class),
+                $this->createMock(TransportInterface::class)
             ));
         $serviceLocator
             ->method('has')
@@ -56,7 +56,7 @@ class SetupTransportsCommandTest extends TestCase
         $serviceLocator->expects($this->exactly(1))
             ->method('get')
             ->will($this->onConsecutiveCalls(
-                $this->createMock(SetupableTransportInterface::class),
+                $this->createMock(SetupableTransportInterface::class)
             ));
         $serviceLocator->expects($this->exactly(1))
             ->method('has')
@@ -104,7 +104,7 @@ class SetupTransportsCommandTest extends TestCase
         $serviceLocator->expects($this->exactly(1))
             ->method('get')
             ->will($this->onConsecutiveCalls(
-                $amqpTransport,
+                $amqpTransport
             ));
         $serviceLocator
             ->method('has')

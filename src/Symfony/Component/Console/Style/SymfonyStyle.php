@@ -422,8 +422,8 @@ class SymfonyStyle extends OutputStyle
                 explode(\PHP_EOL, $outputWrapper->wrap(
                     $message,
                     $this->lineLength - $prefixLength - $indentLength,
-                    \PHP_EOL,
-                )),
+                    \PHP_EOL
+                ))
             );
 
             if (\count($messages) > 1 && $key < \count($messages) - 1) {

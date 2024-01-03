@@ -27,7 +27,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             '/label
     [@class="control-label required"]
     [.="[trans]Name[/trans]"]
-',
+'
         );
     }
 
@@ -44,7 +44,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             '/label
     [@for="name"]
     [@class="control-label required"]
-',
+'
         );
     }
 
@@ -61,7 +61,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             '/label
     [@for="name"]
     [@class="my&class control-label required"]
-',
+'
         );
     }
 
@@ -79,7 +79,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@for="name"]
     [@class="my&class control-label required"]
     [.="[trans]Custom label[/trans]"]
-',
+'
         );
     }
 
@@ -99,7 +99,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@for="name"]
     [@class="my&class control-label required"]
     [.="[trans]Custom label[/trans]"]
-',
+'
         );
     }
 
@@ -149,7 +149,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@id="name_help"]
     [@class="help-block"]
     [.="[trans]Help text test![/trans]"]
-',
+'
         );
     }
 
@@ -169,7 +169,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@id="name_help"]
     [@class="class-test help-block"]
     [.="[trans]Help text test![/trans]"]
-',
+'
         );
     }
 
@@ -187,7 +187,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@id="name_help"]
     [@class="help-block"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-',
+'
         );
 
         $this->assertMatchesXpath($html,
@@ -196,7 +196,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="help-block"]
     /b
     [.="text"]
-', 0,
+', 0
         );
     }
 
@@ -215,7 +215,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@id="name_help"]
     [@class="help-block"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-',
+'
         );
 
         $this->assertMatchesXpath($html,
@@ -224,7 +224,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="help-block"]
     /b
     [.="text"]
-', 0,
+', 0
         );
     }
 
@@ -243,7 +243,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@id="name_help"]
     [@class="help-block"]
     [.="[trans]Help <b>text</b> test![/trans]"]
-', 0,
+', 0
         );
 
         $this->assertMatchesXpath($html,
@@ -252,7 +252,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="help-block"]
     /b
     [.="text"]
-',
+'
         );
     }
 
@@ -284,7 +284,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
             [count(./li)=2]
     ]
-',
+'
         );
     }
 
@@ -303,7 +303,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         [@class="form-control"]
     ]
     [@id="container"]
-',
+'
         );
     }
 
@@ -321,7 +321,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
                 ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class"][@checked="checked"][@value="1"]
             ]
     ]
-',
+'
         );
     }
 
@@ -339,7 +339,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
                 ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class"][not(@checked)]
             ]
     ]
-',
+'
         );
     }
 
@@ -359,7 +359,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
                 ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class"][@value="foo&bar"]
             ]
     ]
-',
+'
         );
     }
 
@@ -374,7 +374,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [
         ./span[text() = "[trans]really helpful text[/trans]"]
     ]
-',
+'
         );
     }
 
@@ -396,7 +396,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -419,7 +419,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -456,7 +456,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -475,7 +475,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@required="required"]
     [@size="2"]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -498,7 +498,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -524,7 +524,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -547,7 +547,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][@class="foo&bar"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -572,7 +572,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=4]
-',
+'
         );
     }
 
@@ -597,7 +597,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -622,7 +622,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=4]
-',
+'
         );
     }
 
@@ -646,7 +646,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -671,7 +671,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=4]
-',
+'
         );
     }
 
@@ -688,7 +688,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             '/select
     [@class="my&class form-control"]
     [count(./option)=5]
-',
+'
         );
     }
 
@@ -712,7 +712,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -736,7 +736,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -761,7 +761,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -786,7 +786,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -810,7 +810,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -841,7 +841,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         [count(./option)=1]
     ]
     [count(./optgroup)=2]
-',
+'
         );
     }
 
@@ -865,7 +865,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -890,7 +890,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][@class="foo&bar"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -913,7 +913,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -936,7 +936,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -971,7 +971,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1005,7 +1005,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1055,7 +1055,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1089,7 +1089,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1125,7 +1125,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1161,7 +1161,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1207,7 +1207,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1254,7 +1254,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1289,7 +1289,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1334,7 +1334,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1368,7 +1368,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1418,7 +1418,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1452,7 +1452,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1498,7 +1498,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1544,7 +1544,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -1558,7 +1558,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [./option[@value="AT"][@selected="selected"][.="Austria"]]
     [count(./option)>200]
-',
+'
         );
     }
 
@@ -1576,7 +1576,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Country[/trans]"]]
     [./option[@value="AT"][@selected="selected"][.="Austria"]]
     [count(./option)>201]
-',
+'
         );
     }
 
@@ -1613,7 +1613,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value="5"][@selected="selected"]]
     ]
     [count(.//select)=5]
-',
+'
         );
     }
 
@@ -1652,7 +1652,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value=""][.="[trans]Change&Me[/trans]"]]
     ]
     [count(.//select)=5]
-',
+'
         );
     }
 
@@ -1692,7 +1692,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value="5"][@selected="selected"]]
     ]
     [count(.//select)=5]
-',
+'
         );
     }
 
@@ -1734,7 +1734,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value="6"][@selected="selected"]]
     ]
     [count(.//select)=6]
-',
+'
         );
     }
 
@@ -1763,7 +1763,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [@class="form-control"]
             [@value="04:05"]
     ]
-',
+'
         );
     }
 
@@ -1782,7 +1782,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="2011-02-03T04:05"]
-',
+'
         );
     }
 
@@ -1816,7 +1816,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value="'.date('Y').'"][@selected="selected"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -1847,7 +1847,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -1878,7 +1878,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -1910,7 +1910,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [@value="2011"]
     ]
     [count(./input)=3]
-',
+'
         );
     }
 
@@ -1927,7 +1927,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="2011-02-03"]
-',
+'
         );
     }
 
@@ -1956,7 +1956,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value="2000"][@selected="selected"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -1990,7 +1990,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value="1950"][@selected="selected"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -2005,7 +2005,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [@value="foo&bar"]
     [not(@maxlength)]
-',
+'
         );
     }
 
@@ -2022,7 +2022,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [@value="foo&bar"]
     [@maxlength="123"]
-',
+'
         );
     }
 
@@ -2036,7 +2036,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class"]
     [@value="foo&bar"]
-',
+'
         );
     }
 
@@ -2052,7 +2052,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@disabled="disabled"]
-',
+'
         );
     }
 
@@ -2066,7 +2066,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="123"]
-',
+'
         );
     }
 
@@ -2082,7 +2082,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="123"]
-',
+'
         );
     }
 
@@ -2096,7 +2096,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [./option[@value="de"][@selected="selected"][.="German"]]
     [count(./option)>200]
-',
+'
         );
     }
 
@@ -2110,7 +2110,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [./option[@value="de_AT"][@selected="selected"][.="German (Austria)"]]
     [count(./option)>200]
-',
+'
         );
     }
 
@@ -2134,7 +2134,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [@class="my&class form-control"]
             [@value="1234.56"]
     ]
-',
+'
         );
     }
 
@@ -2153,7 +2153,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@value="1234.56"]
     [not(preceding-sibling::*)]
     [not(following-sibling::*)]
-',
+'
         );
     }
 
@@ -2167,7 +2167,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="1234.56"]
-',
+'
         );
     }
 
@@ -2184,7 +2184,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="1234.56"]
-',
+'
         );
     }
 
@@ -2202,7 +2202,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="1234.56"]
-',
+'
         );
     }
 
@@ -2215,7 +2215,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@type="password"]
     [@name="name"]
     [@class="my&class form-control"]
-',
+'
         );
     }
 
@@ -2232,7 +2232,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="foo&bar"]
-',
+'
         );
     }
 
@@ -2248,7 +2248,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@maxlength="123"]
-',
+'
         );
     }
 
@@ -2270,7 +2270,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [@class="input-group-addon"]
             [contains(.., "%")]
     ]
-',
+'
         );
     }
 
@@ -2284,7 +2284,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="10"]
-',
+'
         );
     }
 
@@ -2305,7 +2305,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [@class="input-group-addon"]
             [contains(.., "‱")]
     ]
-',
+'
         );
     }
 
@@ -2329,7 +2329,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
                     [@value="1"]
             ]
     ]
-',
+'
         );
     }
 
@@ -2352,7 +2352,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
                     [not(@checked)]
             ]
     ]
-',
+'
         );
     }
 
@@ -2377,7 +2377,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
                     [@value="foo&bar"]
             ]
     ]
-',
+'
         );
     }
 
@@ -2392,7 +2392,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [
         ./span[text() = "[trans]really helpful text[/trans]"]
     ]
-',
+'
         );
     }
 
@@ -2407,7 +2407,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@value="42"]
     [@min="5"]
     [@class="my&class form-control"]
-',
+'
         );
     }
 
@@ -2423,7 +2423,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@min="5"]
     [@max="57"]
     [@class="my&class form-control"]
-',
+'
         );
     }
 
@@ -2439,7 +2439,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [not(@pattern)]
     [@class="my&class form-control"]
     [.="foo&bar"]
-',
+'
         );
     }
 
@@ -2454,7 +2454,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [@value="foo&bar"]
     [not(@maxlength)]
-',
+'
         );
     }
 
@@ -2471,7 +2471,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [@value="foo&bar"]
     [@maxlength="123"]
-',
+'
         );
     }
 
@@ -2486,7 +2486,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [@value="foo&bar"]
     [not(@maxlength)]
-',
+'
         );
     }
 
@@ -2514,7 +2514,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [./option[@value="5"][@selected="selected"]]
     ]
     [count(./select)=2]
-',
+'
         );
     }
 
@@ -2550,7 +2550,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [count(./option)>59]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -2583,7 +2583,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [not(@size)]
     ]
     [count(./input)=2]
-',
+'
         );
     }
 
@@ -2601,7 +2601,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [@value="04:05"]
     [not(@size)]
-',
+'
         );
     }
 
@@ -2629,7 +2629,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [count(./option)>60]
     ]
     [count(./select)=2]
-',
+'
         );
     }
 
@@ -2657,7 +2657,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [count(./option)>59]
     ]
     [count(./select)=2]
-',
+'
         );
     }
 
@@ -2672,7 +2672,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [not(@required)]
     [./option[@value="Europe/Vienna"][@selected="selected"][.="Europe / Vienna"]]
     [count(.//option)>200]
-',
+'
         );
     }
 
@@ -2688,7 +2688,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Timezone[/trans]"]]
     [count(.//option)>201]
-',
+'
         );
     }
 
@@ -2704,7 +2704,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [@value="http://www.example.com?foo1=bar1&foo2=bar2"]
     [@inputmode="url"]
-',
+'
         );
     }
 
@@ -2719,7 +2719,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="http://www.example.com?foo1=bar1&foo2=bar2"]
-',
+'
         );
     }
 
@@ -2728,7 +2728,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType');
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
-            '/button[@type="button"][@name="name"][.="[trans]Name[/trans]"][@class="my&class btn"]',
+            '/button[@type="button"][@name="name"][.="[trans]Name[/trans]"][@class="my&class btn"]'
         );
     }
 
@@ -2739,7 +2739,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
-            '/button[@type="button"][@name="name"][.="Name"][@class="my&class btn"]',
+            '/button[@type="button"][@name="name"][.="Name"][@class="my&class btn"]'
         );
     }
 
@@ -2773,7 +2773,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\SubmitType');
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
-            '/button[@type="submit"][@name="name"][@class="my&class btn"]',
+            '/button[@type="submit"][@name="name"][@class="my&class btn"]'
         );
     }
 
@@ -2782,7 +2782,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ResetType');
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
-            '/button[@type="reset"][@name="name"][@class="my&class btn"]',
+            '/button[@type="reset"][@name="name"][@class="my&class btn"]'
         );
     }
 
@@ -2848,7 +2848,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="0102030405"]
-',
+'
         );
     }
 
@@ -2863,7 +2863,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@name="name"]
     [@class="my&class form-control"]
     [@value="#0000ff"]
-',
+'
         );
     }
 
@@ -2883,7 +2883,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [@value="1970-W01"]
     [not(@maxlength)]
-',
+'
         );
     }
 
@@ -2904,7 +2904,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     [@class="my&class form-control"]
     [@value="1970-W01"]
     [not(@maxlength)]
-',
+'
         );
     }
 
@@ -2932,7 +2932,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [@class="form-control"]
             [./option[@value="'.$data['week'].'"][@selected="selected"]]
     ]
-    [count(.//select)=2]',
+    [count(.//select)=2]'
         );
     }
 
@@ -2961,7 +2961,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             [@value="1"]
     ]
     [count(./input)=2]
-',
+'
         );
     }
 }

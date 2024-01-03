@@ -205,7 +205,7 @@ final class CommandDataCollector extends DataCollector
     {
         return array_map(
             static fn (int $signal): string => sprintf('%s (%d)', SignalMap::getSignalName($signal), $signal),
-            $this->data['signalable'],
+            $this->data['signalable']
         );
     }
 
@@ -213,7 +213,7 @@ final class CommandDataCollector extends DataCollector
     {
         $keys = array_map(
             static fn (int $signal): string => sprintf('%s (%d)', SignalMap::getSignalName($signal), $signal),
-            array_keys($this->data['handled_signals']),
+            array_keys($this->data['handled_signals'])
         );
 
         return array_combine($keys, array_values($this->data['handled_signals']));

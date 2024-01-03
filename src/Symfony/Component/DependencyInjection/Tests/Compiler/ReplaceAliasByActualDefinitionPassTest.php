@@ -44,7 +44,7 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
         $this->assertFalse($container->has('b'), '->process() removes non-public definitions.');
         $this->assertTrue(
             $container->has('b_alias') && !$container->hasAlias('b_alias'),
-            '->process() replaces alias to actual.',
+            '->process() replaces alias to actual.'
         );
         $this->assertTrue($container->getDefinition('b_alias')->hasTag('container.private'));
 

@@ -38,7 +38,7 @@ class JsonDecodeTest extends TestCase
     {
         $this->assertEquals(
             $expected,
-            $this->decode->decode($toDecode, JsonEncoder::FORMAT, $context),
+            $this->decode->decode($toDecode, JsonEncoder::FORMAT, $context)
         );
     }
 

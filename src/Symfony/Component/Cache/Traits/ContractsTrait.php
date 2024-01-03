@@ -77,7 +77,7 @@ trait ContractsTrait
                 }
             },
             null,
-            CacheItem::class,
+            CacheItem::class
         );
 
         $this->callbackWrapper ??= LockRegistry::compute(...);

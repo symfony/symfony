@@ -89,7 +89,7 @@ class Connection
 
         return new self(
             $configuration,
-            Pheanstalk::create($connectionCredentials['host'], $connectionCredentials['port']),
+            Pheanstalk::create($connectionCredentials['host'], $connectionCredentials['port'])
         );
     }
 
@@ -124,7 +124,7 @@ class Connection
                 $message,
                 PheanstalkInterface::DEFAULT_PRIORITY,
                 $delay / 1000,
-                $this->ttr,
+                $this->ttr
             );
         } catch (Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);

@@ -37,7 +37,7 @@ class TranslationProviderCollectionFactory
             $providers[$name] = $this->fromDsnObject(
                 new Dsn($currentConfig['dsn']),
                 !$currentConfig['locales'] ? $this->enabledLocales : $currentConfig['locales'],
-                !$currentConfig['domains'] ? [] : $currentConfig['domains'],
+                !$currentConfig['domains'] ? [] : $currentConfig['domains']
             );
         }
 

@@ -22,7 +22,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             new ExpressionFunction('is_valid', function (...$arguments) {
                 return sprintf(
                     '0 === $context->getValidator()->inContext($context)->validate(%s)->getViolations()->count()',
-                    implode(', ', $arguments),
+                    implode(', ', $arguments)
                 );
             }, function (array $variables, ...$arguments): bool {
                 return 0 === $variables['context']->getValidator()->inContext($variables['context'])->validate(...$arguments)->getViolations()->count();

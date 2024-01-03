@@ -80,31 +80,31 @@ class ImportMapUpdateCheckerTest extends TestCase
                 packageName: '@hotwired/stimulus',
                 currentVersion: '3.2.1',
                 latestVersion: '4.0.1',
-                updateType: 'major',
+                updateType: 'major'
             ),
             'json5' => new PackageUpdateInfo(
                 packageName: 'json5',
                 currentVersion: '1.0.0',
                 latestVersion: '1.2.0',
-                updateType: 'minor',
+                updateType: 'minor'
             ),
             'bootstrap' => new PackageUpdateInfo(
                 packageName: 'bootstrap',
                 currentVersion: '5.3.1',
                 latestVersion: '5.3.2',
-                updateType: 'patch',
+                updateType: 'patch'
             ),
             'bootstrap/dist/css/bootstrap.min.css' => new PackageUpdateInfo(
                 packageName: 'bootstrap',
                 currentVersion: '5.3.1',
                 latestVersion: '5.3.2',
-                updateType: 'patch',
+                updateType: 'patch'
             ),
             'lodash' => new PackageUpdateInfo(
                 packageName: 'lodash',
                 currentVersion: '4.17.21',
                 latestVersion: '4.17.21',
-                updateType: 'up-to-date',
+                updateType: 'up-to-date'
             ),
         ], $updates);
     }
@@ -140,7 +140,7 @@ class ImportMapUpdateCheckerTest extends TestCase
                 packageName: '@hotwired/stimulus',
                 currentVersion: '3.2.1',
                 latestVersion: '4.0.1',
-                updateType: 'major',
+                updateType: 'major'
             ), ],
             null,
         ];
@@ -156,7 +156,7 @@ class ImportMapUpdateCheckerTest extends TestCase
                 packageName: 'bootstrap',
                 currentVersion: '5.3.1',
                 latestVersion: '5.3.2',
-                updateType: 'patch',
+                updateType: 'patch'
             ), ],
             null,
         ];

@@ -78,7 +78,7 @@ final class SectionTest extends TestCase
                 'activitySubtitle' => $subtitle,
                 'activityText' => $text,
             ],
-            $section->toArray(),
+            $section->toArray()
         );
     }
 
@@ -96,7 +96,7 @@ final class SectionTest extends TestCase
             [
                 ['image' => $imageUrl, 'title' => $title],
             ],
-            $section->toArray()['images'],
+            $section->toArray()['images']
         );
     }
 
@@ -114,7 +114,7 @@ final class SectionTest extends TestCase
             [
                 ['name' => $name, 'value' => $value],
             ],
-            $section->toArray()['facts'],
+            $section->toArray()['facts']
         );
     }
 

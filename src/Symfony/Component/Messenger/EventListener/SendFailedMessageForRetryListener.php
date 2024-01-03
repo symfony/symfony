@@ -98,7 +98,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             $history = array_merge(
                 [$history[0]],
                 \array_slice($history, -$this->historySize + 2),
-                [$stamp],
+                [$stamp]
             );
 
             $envelope = $envelope->withoutAll($stamp::class)->with(...$history);

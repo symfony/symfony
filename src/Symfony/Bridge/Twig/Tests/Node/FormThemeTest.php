@@ -63,9 +63,9 @@ class FormThemeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], true);',
-                $this->getVariableGetter('form'),
+                $this->getVariableGetter('form')
             ),
-            trim($compiler->compile($node)->getSource()),
+            trim($compiler->compile($node)->getSource())
         );
 
         $node = new FormThemeNode($form, $resources, 0, null, true);
@@ -73,9 +73,9 @@ class FormThemeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], false);',
-                $this->getVariableGetter('form'),
+                $this->getVariableGetter('form')
             ),
-            trim($compiler->compile($node)->getSource()),
+            trim($compiler->compile($node)->getSource())
         );
 
         $resources = new ConstantExpression('tpl1', 0);
@@ -85,9 +85,9 @@ class FormThemeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", true);',
-                $this->getVariableGetter('form'),
+                $this->getVariableGetter('form')
             ),
-            trim($compiler->compile($node)->getSource()),
+            trim($compiler->compile($node)->getSource())
         );
 
         $node = new FormThemeNode($form, $resources, 0, null, true);
@@ -95,9 +95,9 @@ class FormThemeTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", false);',
-                $this->getVariableGetter('form'),
+                $this->getVariableGetter('form')
             ),
-            trim($compiler->compile($node)->getSource()),
+            trim($compiler->compile($node)->getSource())
         );
     }
 

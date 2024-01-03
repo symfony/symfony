@@ -156,7 +156,7 @@ class Form extends Link implements \ArrayAccess
                         if (ctype_digit($value) && ('size' === $key || 'error' === $key)) {
                             $value = (int) $value;
                         }
-                    },
+                    }
                 );
 
                 reset($expandedValue);

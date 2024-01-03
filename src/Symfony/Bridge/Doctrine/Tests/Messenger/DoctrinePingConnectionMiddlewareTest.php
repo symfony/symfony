@@ -44,7 +44,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
         $this->middleware = new DoctrinePingConnectionMiddleware(
             $this->managerRegistry,
-            $this->entityManagerName,
+            $this->entityManagerName
         );
     }
 

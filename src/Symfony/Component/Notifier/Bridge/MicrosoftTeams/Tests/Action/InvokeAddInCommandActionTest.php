@@ -58,7 +58,7 @@ final class InvokeAddInCommandActionTest extends TestCase
             [
                 '@type' => 'InvokeAddInCommand',
             ],
-            (new InvokeAddInCommandAction())->toArray(),
+            (new InvokeAddInCommandAction())->toArray()
         );
     }
 }

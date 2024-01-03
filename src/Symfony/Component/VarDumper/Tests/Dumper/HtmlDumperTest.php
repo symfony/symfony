@@ -113,7 +113,7 @@ class HtmlDumperTest extends TestCase
 EOTXT
             ,
 
-            $out,
+            $out
         );
     }
 
@@ -136,7 +136,7 @@ EOTXT
 
 EOTXT
             ,
-            $out,
+            $out
         );
     }
 
@@ -162,7 +162,7 @@ EOTXT
 
 EOTXT
             ,
-            $out,
+            $out
         );
     }
 

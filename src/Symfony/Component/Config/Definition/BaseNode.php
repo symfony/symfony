@@ -497,7 +497,7 @@ abstract class BaseNode implements NodeInterface
                 'Invalid type for path "%s". Expected %s, but got %s.',
                 $this->getPath(),
                 1 === \count($validTypes) ? '"'.reset($validTypes).'"' : 'one of "'.implode('", "', $validTypes).'"',
-                1 === \count($knownTypes) ? '"'.reset($knownTypes).'"' : 'one of "'.implode('", "', $knownTypes).'"',
+                1 === \count($knownTypes) ? '"'.reset($knownTypes).'"' : 'one of "'.implode('", "', $knownTypes).'"'
             ));
             if ($hint = $this->getInfo()) {
                 $e->addHint($hint);

@@ -102,7 +102,7 @@ class TraceableFirewallListenerTest extends TestCase
             [$notSupportingAuthenticator, $supportingAuthenticator],
             $tokenStorage,
             $dispatcher,
-            'main',
+            'main'
         );
 
         $listener = new TraceableAuthenticatorManagerListener(new AuthenticatorManagerListener($authenticatorManager));

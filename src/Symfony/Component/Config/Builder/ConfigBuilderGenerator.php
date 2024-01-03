@@ -139,7 +139,7 @@ public function NAME(): string
 
         $property = $class->addProperty(
             $node->getName(),
-            $this->getType($childClass->getFqcn(), $hasNormalizationClosures),
+            $this->getType($childClass->getFqcn(), $hasNormalizationClosures)
         );
         $nodeTypes = $this->getParameterTypes($node);
         $body = $hasNormalizationClosures ? '
@@ -276,7 +276,7 @@ public function NAME(string $VAR, TYPE $VALUE): static
 
         $property = $class->addProperty(
             $node->getName(),
-            $this->getType($childClass->getFqcn().'[]', $hasNormalizationClosures),
+            $this->getType($childClass->getFqcn().'[]', $hasNormalizationClosures)
         );
 
         $comment = $this->getComment($node);

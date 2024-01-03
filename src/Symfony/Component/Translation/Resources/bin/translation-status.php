@@ -229,7 +229,7 @@ function printTable($translations, $verboseOutput, bool $includeCompletedLanguag
             $locale,
             $translation['translated'],
             $translation['total'],
-            count($translation['mismatches']),
+            count($translation['mismatches'])
         ).\PHP_EOL;
 
         textColorNormal();

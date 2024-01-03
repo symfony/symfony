@@ -36,7 +36,7 @@ class TranslationDebugCommandTest extends AbstractWebTestCase
         $this->assertSame(
             TranslationDebugCommand::EXIT_CODE_MISSING | TranslationDebugCommand::EXIT_CODE_UNUSED,
             $ret,
-            'Returns appropriate exit code in the event of error',
+            'Returns appropriate exit code in the event of error'
         );
         $this->assertStringContainsString('missing    messages     hello_from_construct_arg_service', $tester->getDisplay());
         $this->assertStringContainsString('missing    messages     hello_from_subscriber_service', $tester->getDisplay());

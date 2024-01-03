@@ -27,7 +27,7 @@ class ExcludeTimeTriggerTest extends TestCase
         $scheduled = new ExcludeTimeTrigger(
             $inner,
             new \DateTimeImmutable('2020-02-20T02:02:02Z'),
-            new \DateTimeImmutable('2020-02-20T20:20:20Z'),
+            new \DateTimeImmutable('2020-02-20T20:20:20Z')
         );
 
         $this->assertEquals(new \DateTimeImmutable('2020-02-20T02:02:01Z'), $scheduled->getNextRunDate(new \DateTimeImmutable('2020-02-20T02:02:00Z')));

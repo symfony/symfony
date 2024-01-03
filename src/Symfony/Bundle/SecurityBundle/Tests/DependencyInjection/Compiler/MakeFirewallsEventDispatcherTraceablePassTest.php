@@ -56,7 +56,7 @@ class MakeFirewallsEventDispatcherTraceablePassTest extends TestCase
         $this->assertSame(TraceableEventDispatcher::class, $dispatcherDefinition->getClass());
         $this->assertSame(
             [['name' => 'security.event_dispatcher.main']],
-            $dispatcherDefinition->getTag('event_dispatcher.dispatcher'),
+            $dispatcherDefinition->getTag('event_dispatcher.dispatcher')
         );
     }
 

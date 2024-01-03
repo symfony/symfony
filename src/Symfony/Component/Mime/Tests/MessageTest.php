@@ -164,9 +164,9 @@ EOF;
         $body = new MixedPart(
             new AlternativePart(
                 new TextPart('Text content'),
-                new TextPart('HTML content', 'utf-8', 'html'),
+                new TextPart('HTML content', 'utf-8', 'html')
             ),
-            new DataPart('text data', 'text.txt'),
+            new DataPart('text data', 'text.txt')
         );
         $body->getHeaders()->addHeader('foo', 'bar');
         $e = new Message((new Headers())->addMailboxListHeader('To', ['you@example.com']), $body);

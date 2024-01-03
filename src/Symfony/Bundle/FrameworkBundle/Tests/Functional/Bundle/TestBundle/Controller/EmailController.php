@@ -26,7 +26,7 @@ class EmailController
             ->addCc('cc@symfony.com')
             ->text('Bar!')
             ->html('<p>Foo</p>')
-            ->addPart(new DataPart(file_get_contents(__FILE__), 'foobar.php')),
+            ->addPart(new DataPart(file_get_contents(__FILE__), 'foobar.php'))
         );
 
         $mailer->send((new Email())->to('fabien@symfony.com', 'thomas@symfony.com')->from('fabien@symfony.com')->subject('Foo')
@@ -34,7 +34,7 @@ class EmailController
             ->addCc('cc@symfony.com')
             ->text('Bar!')
             ->html('<p>Foo</p>')
-            ->addPart(new DataPart(file_get_contents(__FILE__), 'foobar.php')),
+            ->addPart(new DataPart(file_get_contents(__FILE__), 'foobar.php'))
         );
 
         return new Response();

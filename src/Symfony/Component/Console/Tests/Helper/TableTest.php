@@ -635,7 +635,7 @@ TABLE
                            'style' => new TableCellStyle([
                                'align' => 'right',
                            ]),
-                       ],
+                       ]
                    ),
                    'Title',
                    new TableCell(
@@ -644,7 +644,7 @@ TABLE
                            'style' => new TableCellStyle([
                                'align' => 'center',
                            ]),
-                       ],
+                       ]
                    ),
                ],
                [
@@ -655,7 +655,7 @@ TABLE
                                'style' => new TableCellStyle([
                                    'align' => 'center',
                                ]),
-                           ],
+                           ]
                        ),
                        'De Monarchia',
                        new TableCell(
@@ -665,7 +665,7 @@ TABLE
                                'style' => new TableCellStyle([
                                    'align' => 'center',
                                ]),
-                           ],
+                           ]
                        ),
                    ],
                    [
@@ -681,7 +681,7 @@ TABLE
                                'style' => new TableCellStyle([
                                    'align' => 'center',
                                ]),
-                           ],
+                           ]
                        ),
                        new TableCell(
                            'tttt',
@@ -689,7 +689,7 @@ TABLE
                                'style' => new TableCellStyle([
                                    'align' => 'right',
                                ]),
-                           ],
+                           ]
                        ),
                    ],
                ],
@@ -719,7 +719,7 @@ TABLE
                                    'fg' => 'black',
                                    'bg' => 'green',
                                ]),
-                           ],
+                           ]
                        ),
                        'De Monarchia',
                        new TableCell(
@@ -731,7 +731,7 @@ TABLE
                                    'bg' => 'green',
                                    'align' => 'center',
                                ]),
-                           ],
+                           ]
                        ),
                    ],
 
@@ -750,7 +750,7 @@ TABLE
                                    'bg' => 'green',
                                    'align' => 'center',
                                ]),
-                           ],
+                           ]
                        ),
                        new TableCell(
                            'tttt',
@@ -760,7 +760,7 @@ TABLE
                                    'bg' => 'green',
                                    'align' => 'right',
                                ]),
-                           ],
+                           ]
                        ),
                    ],
                 ],
@@ -786,7 +786,7 @@ TABLE
                             'style' => new TableCellStyle([
                                 'cellFormat' => '<fg=black;bg=cyan>%s</>',
                             ]),
-                        ],
+                        ]
                     ),
                     'Title',
                     'Author',
@@ -802,7 +802,7 @@ TABLE
                                 'style' => new TableCellStyle([
                                     'cellFormat' => '<info>%s</info>',
                                 ]),
-                            ],
+                            ]
                         ),
                     ],
                     ['978-0804169127', 'Divine Comedy'],
@@ -814,7 +814,7 @@ TABLE
                                 'style' => new TableCellStyle([
                                     'cellFormat' => '<error>%s</error>',
                                 ]),
-                            ],
+                            ]
                         ),
                         'tttt',
                     ],
@@ -2023,7 +2023,7 @@ TABLE;
 
 TABLE
             ,
-            $this->getOutputContent($output),
+            $this->getOutputContent($output)
         );
     }
 
@@ -2053,7 +2053,7 @@ TABLE
 └───────┴───────┘
 
 TABLE,
-            $this->getOutputContent($output),
+            $this->getOutputContent($output)
         );
     }
 }

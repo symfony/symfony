@@ -60,7 +60,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             $this->urlGenerator->setContext(
                 (new RequestContext())
                     ->fromRequest($request)
-                    ->setParameter('_locale', $request->getLocale()),
+                    ->setParameter('_locale', $request->getLocale())
             );
         }
 
@@ -68,7 +68,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             $url = $this->urlGenerator->generate(
                 $this->options['route_name'],
                 $parameters,
-                UrlGeneratorInterface::ABSOLUTE_URL,
+                UrlGeneratorInterface::ABSOLUTE_URL
             );
         } finally {
             if ($request) {

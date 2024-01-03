@@ -34,7 +34,7 @@ class DoctrineTransportTest extends TestCase
     {
         $transport = $this->getTransport(
             $serializer = $this->createMock(SerializerInterface::class),
-            $connection = $this->createMock(Connection::class),
+            $connection = $this->createMock(Connection::class)
         );
 
         $decodedMessage = new DummyMessage('Decoded.');
@@ -56,7 +56,7 @@ class DoctrineTransportTest extends TestCase
     {
         $transport = $this->getTransport(
             null,
-            $connection = $this->createMock(Connection::class),
+            $connection = $this->createMock(Connection::class)
         );
 
         $schema = new Schema();

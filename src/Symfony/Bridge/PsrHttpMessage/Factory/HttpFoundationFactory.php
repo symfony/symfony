@@ -69,7 +69,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $psrRequest->getCookieParams(),
             $this->getFiles($psrRequest->getUploadedFiles()),
             $server,
-            $streamed ? $psrRequest->getBody()->detach() : $psrRequest->getBody()->__toString(),
+            $streamed ? $psrRequest->getBody()->detach() : $psrRequest->getBody()->__toString()
         );
         $request->headers->add($psrRequest->getHeaders());
 
@@ -119,13 +119,13 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $response = new StreamedResponse(
                 $this->createStreamedResponseCallback($psrResponse->getBody()),
                 $psrResponse->getStatusCode(),
-                $psrResponse->getHeaders(),
+                $psrResponse->getHeaders()
             );
         } else {
             $response = new Response(
                 $psrResponse->getBody()->__toString(),
                 $psrResponse->getStatusCode(),
-                $psrResponse->getHeaders(),
+                $psrResponse->getHeaders()
             );
         }
 
@@ -211,7 +211,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             isset($cookieSecure),
             isset($cookieHttpOnly),
             true,
-            $samesite ?? null,
+            $samesite ?? null
         );
     }
 

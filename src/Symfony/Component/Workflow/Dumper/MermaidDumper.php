@@ -73,7 +73,7 @@ class MermaidDumper implements DumperInterface
                 $place,
                 $meta->getPlaceMetadata($place),
                 \in_array($place, $definition->getInitialPlaces(), true),
-                $marking?->has($place) ?? false,
+                $marking?->has($place) ?? false
             );
 
             $output[] = $placeNode;
@@ -156,7 +156,7 @@ class MermaidDumper implements DumperInterface
         if (\array_key_exists('bg_color', $meta)) {
             $nodeStyles[] = sprintf(
                 'fill:%s',
-                $meta['bg_color'],
+                $meta['bg_color']
             );
         }
 

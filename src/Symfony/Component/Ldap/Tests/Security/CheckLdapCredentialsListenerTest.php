@@ -189,7 +189,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     {
         return new CheckPassportEvent(
             new TestAuthenticator(),
-            new Passport(new UserBadge('Wouter', fn () => new InMemoryUser('Wouter', null, ['ROLE_USER'])), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')]),
+            new Passport(new UserBadge('Wouter', fn () => new InMemoryUser('Wouter', null, ['ROLE_USER'])), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
         );
     }
 

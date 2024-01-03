@@ -66,7 +66,7 @@ class HttpFoundationFactoryTest extends TestCase
                 ],
             ],
             ['url' => 'http://dunglas.fr'],
-            ['custom' => $stdClass],
+            ['custom' => $stdClass]
         );
 
         $symfonyRequest = $this->factory->createRequest($serverRequest);
@@ -99,7 +99,7 @@ class HttpFoundationFactoryTest extends TestCase
             [],
             [],
             null,
-            [],
+            []
         );
 
         $symfonyRequest = $this->factory->createRequest($serverRequest, true);
@@ -120,7 +120,7 @@ class HttpFoundationFactoryTest extends TestCase
             [],
             [],
             null,
-            [],
+            []
         );
 
         $this->assertCount(0, $this->factory->createRequest($serverRequest)->request);
@@ -140,7 +140,7 @@ class HttpFoundationFactoryTest extends TestCase
             [],
             [],
             new \stdClass(),
-            [],
+            []
         );
 
         $this->assertCount(0, $this->factory->createRequest($serverRequest)->request);
@@ -160,7 +160,7 @@ class HttpFoundationFactoryTest extends TestCase
             [],
             [],
             null,
-            [],
+            []
         );
 
         $this->assertEquals('/about/kevin', $this->factory->createRequest($serverRequest)->getPathInfo());
@@ -225,7 +225,7 @@ class HttpFoundationFactoryTest extends TestCase
                 ],
             ],
             new Stream('The response body'),
-            200,
+            200
         );
 
         $symfonyResponse = $this->factory->createResponse($response);

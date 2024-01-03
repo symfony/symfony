@@ -82,7 +82,7 @@ final class MobytOptionsTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'The message type "foo-bar" is not supported; supported message types are: "N", "L", "LL"',
+            'The message type "foo-bar" is not supported; supported message types are: "N", "L", "LL"'
         );
 
         new MobytOptions([

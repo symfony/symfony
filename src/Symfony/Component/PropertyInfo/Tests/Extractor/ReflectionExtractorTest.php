@@ -98,7 +98,7 @@ class ReflectionExtractorTest extends TestCase
                 'e',
                 'f',
             ],
-            $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy'),
+            $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
 
         $this->assertNull($this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\NoProperties'));
@@ -154,7 +154,7 @@ class ReflectionExtractorTest extends TestCase
                 'e',
                 'f',
             ],
-            $customExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy'),
+            $customExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
     }
 
@@ -199,7 +199,7 @@ class ReflectionExtractorTest extends TestCase
                 'rootDummyItems',
                 'rootDummyItem',
             ],
-            $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy'),
+            $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
     }
 
@@ -358,7 +358,7 @@ class ReflectionExtractorTest extends TestCase
     {
         $this->assertSame(
             $expected,
-            $this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, []),
+            $this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, [])
         );
     }
 
@@ -389,7 +389,7 @@ class ReflectionExtractorTest extends TestCase
     {
         $this->assertSame(
             $expected,
-            $this->extractor->isWritable(Dummy::class, $property, []),
+            $this->extractor->isWritable(Dummy::class, $property, [])
         );
     }
 

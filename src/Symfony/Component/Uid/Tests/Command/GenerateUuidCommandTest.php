@@ -72,7 +72,7 @@ final class GenerateUuidCommandTest extends TestCase
             UuidV1::class,
             UuidV5::class,
             UuidV4::class,
-            'b2ba9fa1-d84a-4d49-bb0a-691421b27a00',
+            'b2ba9fa1-d84a-4d49-bb0a-691421b27a00'
         )));
         $this->assertSame(0, $commandTester->execute(['--time-based' => '2000-01-02 19:09:17.871524 +00:00']));
         $uuid = Uuid::fromRfc4122(trim($commandTester->getDisplay()));
@@ -108,7 +108,7 @@ final class GenerateUuidCommandTest extends TestCase
             UuidV3::class,
             UuidV4::class,
             null,
-            '6fc5292a-5f9f-4ada-94a4-c4063494d657',
+            '6fc5292a-5f9f-4ada-94a4-c4063494d657'
         )));
         $this->assertSame(0, $commandTester->execute(['--name-based' => 'bar']));
         $this->assertEquals(new UuidV3('54950ff1-375c-33e8-a992-2109e384091f'), Uuid::fromRfc4122(trim($commandTester->getDisplay())));

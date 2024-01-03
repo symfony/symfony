@@ -36,7 +36,7 @@ class SerializerExtractorTest extends TestCase
     {
         $this->assertEquals(
             ['collection'],
-            $this->extractor->getProperties(Dummy::class, ['serializer_groups' => ['a']]),
+            $this->extractor->getProperties(Dummy::class, ['serializer_groups' => ['a']])
         );
     }
 

@@ -40,7 +40,7 @@ class WorkflowExtensionTest extends TestCase
         $metadataStore = new InMemoryMetadataStore(
             ['title' => 'workflow title'],
             ['orderer' => ['title' => 'ordered title']],
-            $transitionsMetadata,
+            $transitionsMetadata
         );
         $definition = new Definition($places, $transitions, null, $metadataStore);
         $workflow = new Workflow($definition, new MethodMarkingStore());

@@ -28,7 +28,7 @@ class MemcachedCaster
         $a += [
             Caster::PREFIX_VIRTUAL.'servers' => $c->getServerList(),
             Caster::PREFIX_VIRTUAL.'options' => new EnumStub(
-                self::getNonDefaultOptions($c),
+                self::getNonDefaultOptions($c)
             ),
         ];
 

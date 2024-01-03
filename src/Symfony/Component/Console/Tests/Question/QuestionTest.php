@@ -62,12 +62,12 @@ class QuestionTest extends TestCase
     public function testSetHiddenWithAutocompleterCallback()
     {
         $this->question->setAutocompleterCallback(
-            fn (string $input): array => [],
+            fn (string $input): array => []
         );
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
-            'A hidden question cannot use the autocompleter.',
+            'A hidden question cannot use the autocompleter.'
         );
 
         $this->question->setHidden(true);
@@ -76,7 +76,7 @@ class QuestionTest extends TestCase
     public function testSetHiddenWithNoAutocompleterCallback()
     {
         $this->question->setAutocompleterCallback(
-            fn (string $input): array => [],
+            fn (string $input): array => []
         );
         $this->question->setAutocompleterCallback(null);
 
@@ -131,7 +131,7 @@ class QuestionTest extends TestCase
         $this->question->setAutocompleterValues($values);
         self::assertSame(
             $expectValues,
-            $this->question->getAutocompleterValues(),
+            $this->question->getAutocompleterValues()
         );
     }
 
@@ -204,11 +204,11 @@ class QuestionTest extends TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
-            'A hidden question cannot use the autocompleter.',
+            'A hidden question cannot use the autocompleter.'
         );
 
         $this->question->setAutocompleterCallback(
-            fn (string $input): array => [],
+            fn (string $input): array => []
         );
     }
 
@@ -220,7 +220,7 @@ class QuestionTest extends TestCase
         $exception = null;
         try {
             $this->question->setAutocompleterCallback(
-                fn (string $input): array => [],
+                fn (string $input): array => []
             );
         } catch (\Exception $exception) {
             // Do nothing

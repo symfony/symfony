@@ -142,7 +142,7 @@ class UlidTest extends TestCase
     {
         $this->assertEquals(
             Ulid::fromString("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
-            Ulid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
+            Ulid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08")
         );
     }
 
@@ -169,7 +169,7 @@ class UlidTest extends TestCase
     {
         $this->assertEquals(
             Ulid::fromString('1BVXue8CnY8ogucrHX3TeF'),
-            Ulid::fromBase58('1BVXue8CnY8ogucrHX3TeF'),
+            Ulid::fromBase58('1BVXue8CnY8ogucrHX3TeF')
         );
     }
 
@@ -196,7 +196,7 @@ class UlidTest extends TestCase
     {
         $this->assertEquals(
             Ulid::fromString('01EW2RYKDCT2SAK454KBR2QG08'),
-            Ulid::fromBase32('01EW2RYKDCT2SAK454KBR2QG08'),
+            Ulid::fromBase32('01EW2RYKDCT2SAK454KBR2QG08')
         );
     }
 
@@ -223,7 +223,7 @@ class UlidTest extends TestCase
     {
         $this->assertEquals(
             Ulid::fromString('0177058f-4dac-d0b2-a990-a49af02bc008'),
-            Ulid::fromRfc4122('0177058f-4dac-d0b2-a990-a49af02bc008'),
+            Ulid::fromRfc4122('0177058f-4dac-d0b2-a990-a49af02bc008')
         );
     }
 

@@ -43,7 +43,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         return new Passport(
             new UserBadge($username),
             new PasswordCredentials($request->request->get('_password', '')),
-            [],
+            []
         );
     }
 

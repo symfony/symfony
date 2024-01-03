@@ -215,7 +215,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
                 '',
                 null,
                 null,
-                Blank::NOT_BLANK_ERROR,
+                Blank::NOT_BLANK_ERROR
             ),
         );
 

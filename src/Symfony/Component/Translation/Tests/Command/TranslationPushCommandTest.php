@@ -357,7 +357,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
             ]),
             $reader,
             [$this->translationAppDir.'/translations'],
-            $locales,
+            $locales
         );
 
         $application = new Application();
@@ -418,7 +418,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
             $this->getProviderCollection($provider, $providerNames, $locales, $domains),
             $reader,
             [$this->translationAppDir.'/translations'],
-            $locales,
+            $locales
         );
     }
 }

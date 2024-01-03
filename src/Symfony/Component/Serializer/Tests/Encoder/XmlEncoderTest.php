@@ -655,7 +655,7 @@ XML;
         $this->assertEquals($expected, $this->encoder->decode(
             $source,
             'xml',
-            [XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_DOCUMENT_TYPE_NODE]],
+            [XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_DOCUMENT_TYPE_NODE]]
         ));
     }
 

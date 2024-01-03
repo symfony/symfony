@@ -203,7 +203,7 @@ abstract class AbstractHeader implements HeaderInterface
         }
 
         $encodedTextLines = explode("\r\n",
-            self::$encoder->encodeString($token, $this->charset, $firstLineOffset, 75 - $encodingWrapperLength),
+            self::$encoder->encodeString($token, $this->charset, $firstLineOffset, 75 - $encodingWrapperLength)
         );
 
         if ('iso-2022-jp' !== strtolower($this->charset)) {

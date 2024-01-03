@@ -45,7 +45,7 @@ class TranslationNodeVisitorTest extends TestCase
                 new ArrayExpression([], 0),
                 new NameExpression('variable', 0),
             ]),
-            0,
+            0
         );
 
         $this->testMessagesExtraction($node, [[$message, TranslationNodeVisitor::UNDEFINED_DOMAIN]]);

@@ -47,7 +47,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->redisClient = $this->createRedisClient($host);
         $this->storage = new RedisSessionHandler(
             $this->redisClient,
-            ['prefix' => self::PREFIX],
+            ['prefix' => self::PREFIX]
         );
     }
 

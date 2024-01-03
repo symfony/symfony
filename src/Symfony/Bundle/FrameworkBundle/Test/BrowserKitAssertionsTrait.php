@@ -96,7 +96,7 @@ trait BrowserKitAssertionsTrait
     {
         self::assertThatForResponse(LogicalAnd::fromConstraints(
             new ResponseConstraint\ResponseHasCookie($name, $path, $domain),
-            new ResponseConstraint\ResponseCookieValueSame($name, $expectedValue, $path, $domain),
+            new ResponseConstraint\ResponseCookieValueSame($name, $expectedValue, $path, $domain)
         ), $message);
     }
 
@@ -119,7 +119,7 @@ trait BrowserKitAssertionsTrait
     {
         self::assertThatForClient(LogicalAnd::fromConstraints(
             new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain),
-            new BrowserKitConstraint\BrowserCookieValueSame($name, $expectedValue, $raw, $path, $domain),
+            new BrowserKitConstraint\BrowserCookieValueSame($name, $expectedValue, $raw, $path, $domain)
         ), $message);
     }
 

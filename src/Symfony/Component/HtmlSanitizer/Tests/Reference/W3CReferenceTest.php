@@ -37,7 +37,7 @@ class W3CReferenceTest extends TestCase
 
         $this->assertSame(
             json_decode(file_get_contents(self::STANDARD_RESOURCES['elements']), true, 512, \JSON_THROW_ON_ERROR),
-            $referenceElements,
+            $referenceElements
         );
     }
 
@@ -49,7 +49,7 @@ class W3CReferenceTest extends TestCase
 
         $this->assertSame(
             json_decode(file_get_contents(self::STANDARD_RESOURCES['attributes']), true, 512, \JSON_THROW_ON_ERROR),
-            array_keys(W3CReference::ATTRIBUTES),
+            array_keys(W3CReference::ATTRIBUTES)
         );
     }
 }

@@ -66,7 +66,7 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
             $uuid[19],
             substr($uuid, -3),
             substr($uuid, -12, 6),
-            $time,
+            $time
         ), '-', 8, 0));
     }
 

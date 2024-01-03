@@ -32,7 +32,7 @@ class DelayedMessageHandlingException extends RuntimeException implements Wrappe
 
         $exceptionMessages = implode(", \n", array_map(
             fn (\Throwable $e) => $e::class.': '.$e->getMessage(),
-            $exceptions,
+            $exceptions
         ));
 
         if (1 === \count($exceptions)) {

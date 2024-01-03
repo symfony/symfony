@@ -36,7 +36,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
                 /following-sibling::input[@id="name"]
             ]
     ]
-',
+'
         );
     }
 
@@ -55,7 +55,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::td
             [./input[@id="name"]]
     ]
-',
+'
         );
     }
 
@@ -85,7 +85,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
         [@id="name__token"]
     ]
     [count(../tr)=3]
-',
+'
         );
     }
 
@@ -122,7 +122,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
         [@id="name__token"]
     ]
     [count(../tr)=3]
-',
+'
         );
     }
 
@@ -141,7 +141,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
             [./button[@type="button"][@name="name"]]
     ]
     [count(//label)=0]
-',
+'
         );
     }
 
@@ -188,7 +188,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
         [@type="hidden"]
         [@id="name__token"]
     ]
-',
+'
         );
     }
 
@@ -206,7 +206,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="names__token"]]
     ]
     [count(./tr[./td/input])=3]
-',
+'
         );
     }
 
@@ -220,7 +220,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
             '/table
     [./tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="names__token"]]]
     [count(./tr[./td/input])=1]
-',
+'
         );
     }
 
@@ -272,7 +272,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
     [@method="post"]
     [@action="http://example.com"]
     [@class="my&class"]
-',
+'
         );
     }
 
@@ -308,7 +308,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
             ]
     ]
     [count(.//input)=3]
-',
+'
         );
     }
 
@@ -318,7 +318,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
         $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add($this->factory
                 ->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, ['error_bubbling' => false])
-                ->add('grandChild', 'Symfony\Component\Form\Extension\Core\Type\FormType'),
+                ->add('grandChild', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             )
             ->getForm();
 
@@ -331,7 +331,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::table[@id="name_child"]
     ]
     [count(.//li[.="[trans]Error![/trans]"])=1]
-',
+'
         );
     }
 
@@ -345,7 +345,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
             ->add($this->factory
                 // No CSRF protection on nested forms
                 ->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-                ->add($this->factory->createNamedBuilder('grandchild', 'Symfony\Component\Form\Extension\Core\Type\TextType')),
+                ->add($this->factory->createNamedBuilder('grandchild', 'Symfony\Component\Form\Extension\Core\Type\TextType'))
             )
             ->getForm();
 
@@ -359,7 +359,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
             ]
     ]
     [count(.//input[@type="hidden"])=1]
-',
+'
         );
     }
 
@@ -393,7 +393,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
             ]
     ]
     [count(.//input)=3]
-',
+'
         );
     }
 
@@ -429,7 +429,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
             ]
     ]
     [count(.//input)=3]
-',
+'
         );
     }
 
@@ -450,7 +450,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::tr[./td/label[.="Custom label: [trans]1[/trans]"]]
         /following-sibling::tr[./td/label[.="Custom label: [trans]2[/trans]"]]
     ]
-',
+'
         );
     }
 
@@ -488,7 +488,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
                 [@id="name__token"]
             ]
     ]
-',
+'
         );
     }
 

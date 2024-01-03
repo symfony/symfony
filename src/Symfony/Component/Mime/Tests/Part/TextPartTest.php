@@ -66,13 +66,13 @@ class TextPartTest extends TestCase
         $p = new TextPart('content');
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'utf-8']),
-            new UnstructuredHeader('Content-Transfer-Encoding', 'quoted-printable'),
+            new UnstructuredHeader('Content-Transfer-Encoding', 'quoted-printable')
         ), $p->getPreparedHeaders());
 
         $p = new TextPart('content', 'iso-8859-1');
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'iso-8859-1']),
-            new UnstructuredHeader('Content-Transfer-Encoding', 'quoted-printable'),
+            new UnstructuredHeader('Content-Transfer-Encoding', 'quoted-printable')
         ), $p->getPreparedHeaders());
     }
 
@@ -83,7 +83,7 @@ class TextPartTest extends TestCase
         $this->assertEquals(base64_encode('content'), implode('', iterator_to_array($p->bodyToIterable())));
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'utf-8']),
-            new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
+            new UnstructuredHeader('Content-Transfer-Encoding', 'base64')
         ), $p->getPreparedHeaders());
     }
 

@@ -67,7 +67,7 @@ class DateType extends AbstractType
                 $dateFormat,
                 $timeFormat,
                 $calendar,
-                $pattern,
+                $pattern
             ));
         } else {
             if ('' !== $pattern && (!str_contains($pattern, 'y') || !str_contains($pattern, 'M') || !str_contains($pattern, 'd'))) {
@@ -123,7 +123,7 @@ class DateType extends AbstractType
                 // see https://bugs.php.net/66323
                 class_exists(\IntlTimeZone::class, false) ? \IntlTimeZone::createDefault() : null,
                 $calendar,
-                $pattern,
+                $pattern
             );
 
             // new \IntlDateFormatter may return null instead of false in case of failure, see https://bugs.php.net/66323
@@ -156,7 +156,7 @@ class DateType extends AbstractType
                 ->add('month', self::WIDGETS[$options['widget']], $monthOptions)
                 ->add('day', self::WIDGETS[$options['widget']], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
-                    $options['model_timezone'], $options['view_timezone'], ['year', 'month', 'day'],
+                    $options['model_timezone'], $options['view_timezone'], ['year', 'month', 'day']
                 ))
                 ->setAttribute('formatter', $formatter)
             ;
@@ -166,15 +166,15 @@ class DateType extends AbstractType
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format']),
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone']),
+                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], ['year', 'month', 'day']),
+                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], ['year', 'month', 'day'])
             ));
         }
 
@@ -242,7 +242,7 @@ class DateType extends AbstractType
 
                 return array_merge(
                     ['year' => $default, 'month' => $default, 'day' => $default],
-                    $placeholder,
+                    $placeholder
                 );
             }
 
@@ -259,7 +259,7 @@ class DateType extends AbstractType
 
                 return array_replace(
                     ['year' => $default, 'month' => $default, 'day' => $default],
-                    $choiceTranslationDomain,
+                    $choiceTranslationDomain
                 );
             }
 

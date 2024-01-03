@@ -250,7 +250,7 @@ class Application implements ResetInterface
                 $definition->getArguments(),
                 [
                     'command' => new InputArgument('command', InputArgument::OPTIONAL, $definition->getArgument('command')->getDescription(), $name),
-                ],
+                ]
             ));
         }
 

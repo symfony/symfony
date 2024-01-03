@@ -80,7 +80,7 @@ class FragmentHandlerTest extends TestCase
                     return $expectedRequest == $request;
                 }),
                 ['foo' => 'foo', 'ignore_errors' => true],
-            ],
+            ]
         );
 
         $this->assertEquals('foo', $handler->render('/', 'foo', ['foo' => 'foo']));

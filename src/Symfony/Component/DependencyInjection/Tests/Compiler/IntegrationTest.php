@@ -881,7 +881,7 @@ class IntegrationTest extends TestCase
             CustomAutoconfiguration::class,
             static function (ChildDefinition $definition, CustomAutoconfiguration $attribute, \ReflectionClass $reflector) {
                 $definition->addTag('app.custom_tag', get_object_vars($attribute) + ['class' => $reflector->getName()]);
-            },
+            }
         );
 
         $container->register('one', TaggedService1::class)
@@ -916,7 +916,7 @@ class IntegrationTest extends TestCase
             CustomAutoconfiguration::class,
             static function (Definition $definition, CustomAutoconfiguration $attribute) {
                 $definition->addTag('app.custom_tag', get_object_vars($attribute));
-            },
+            }
         );
 
         $container->register('one', TaggedService1::class)
@@ -949,7 +949,7 @@ class IntegrationTest extends TestCase
                 $tagAttributes['method'] = $reflector->getName();
 
                 $definition->addTag('app.custom_tag', $tagAttributes);
-            },
+            }
         );
         $container->registerAttributeForAutoconfiguration(
             CustomPropertyAttribute::class,
@@ -958,7 +958,7 @@ class IntegrationTest extends TestCase
                 $tagAttributes['property'] = $reflector->getName();
 
                 $definition->addTag('app.custom_tag', $tagAttributes);
-            },
+            }
         );
         $container->registerAttributeForAutoconfiguration(
             CustomParameterAttribute::class,
@@ -967,7 +967,7 @@ class IntegrationTest extends TestCase
                 $tagAttributes['parameter'] = $reflector->getName();
 
                 $definition->addTag('app.custom_tag', $tagAttributes);
-            },
+            }
         );
         $container->registerAttributeForAutoconfiguration(
             CustomAnyAttribute::class,
@@ -984,7 +984,7 @@ class IntegrationTest extends TestCase
                 }
 
                 $definition->addTag('app.custom_tag', $tagAttributes);
-            },
+            }
         );
 
         $container->register(TaggedService4::class)
@@ -1041,7 +1041,7 @@ class IntegrationTest extends TestCase
                     ->setBindings(['string $foo' => 'bar'])
                     ->setConfigurator(new Reference('my_configurator'))
                 ;
-            },
+            }
         );
 
         $container->register('my_configurator', TaggedService3Configurator::class);
@@ -1066,7 +1066,7 @@ class IntegrationTest extends TestCase
             CustomMethodAttribute::class,
             static function (ChildDefinition $d, CustomMethodAttribute $a, \ReflectionMethod $_r) {
                 $d->addTag('custom_tag', ['attribute' => $a->someAttribute]);
-            },
+            }
         );
 
         $container->register('service', StaticMethodTag::class)

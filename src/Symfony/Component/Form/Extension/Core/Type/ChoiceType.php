@@ -57,8 +57,8 @@ class ChoiceType extends AbstractType
     {
         $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(
             new PropertyAccessDecorator(
-                new DefaultChoiceListFactory(),
-            ),
+                new DefaultChoiceListFactory()
+            )
         );
         $this->translator = $translator;
     }
@@ -434,7 +434,7 @@ class ChoiceType extends AbstractType
             return $this->choiceListFactory->createListFromLoader(
                 $options['choice_loader'],
                 $options['choice_value'],
-                $options['choice_filter'],
+                $options['choice_filter']
             );
         }
 
@@ -444,7 +444,7 @@ class ChoiceType extends AbstractType
         return $this->choiceListFactory->createListFromChoices(
             $choices,
             $options['choice_value'],
-            $options['choice_filter'],
+            $options['choice_filter']
         );
     }
 

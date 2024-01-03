@@ -81,7 +81,7 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
                                 '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
                             ],
                         ] + ($debug || $e->canUseMessageForUser() ? ['hint' => $e->getMessage()] : []),
-                        $exception->getErrors(),
+                        $exception->getErrors()
                     ),
                 ];
                 $data['detail'] = implode("\n", array_map(fn ($e) => $e['propertyPath'].': '.$e['title'], $data['violations']));

@@ -113,7 +113,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 Collection::class,
                 true,
                 new Type($collectionKeyType),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, $class),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)
             )];
         }
 

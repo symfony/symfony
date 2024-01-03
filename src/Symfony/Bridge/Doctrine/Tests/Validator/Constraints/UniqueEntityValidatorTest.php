@@ -104,7 +104,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ;
 
         $classMetadata = $this->createMock(
-            class_exists(ClassMetadataInfo::class) ? ClassMetadataInfo::class : ClassMetadata::class,
+            class_exists(ClassMetadataInfo::class) ? ClassMetadataInfo::class : ClassMetadata::class
         );
         $classMetadata
             ->expects($this->any())
@@ -419,7 +419,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                     next($returnValue);
 
                     return $returnValue;
-                },
+                }
             )
         ;
         $this->em = $this->createEntityManagerMock($repository);

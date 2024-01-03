@@ -380,7 +380,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('argument_resolver.request_payload')
                 ->setArguments([])
                 ->addError('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]" since the Serializer component is not '
-                    .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".'),
+                    .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
                 )
                 ->addTag('container.error')
                 ->clearTag('kernel.event_subscriber');
@@ -539,7 +539,7 @@ class FrameworkExtension extends Extension
                 $container->getDefinition('webhook.transport')
                     ->setArguments([])
                     ->addError('You cannot use the "webhook transport" service since the HttpClient component is not '
-                        .(class_exists(ScopingHttpClient::class) ? 'enabled. Try setting "framework.http_client.enabled" to true.' : 'installed. Try running "composer require symfony/http-client".'),
+                        .(class_exists(ScopingHttpClient::class) ? 'enabled. Try setting "framework.http_client.enabled" to true.' : 'installed. Try running "composer require symfony/http-client".')
                     )
                     ->addTag('container.error');
             }
@@ -547,7 +547,7 @@ class FrameworkExtension extends Extension
                 $container->getDefinition('webhook.body_configurator.json')
                     ->setArguments([])
                     ->addError('You cannot use the "webhook transport" service since the Serializer component is not '
-                        .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".'),
+                        .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
                     )
                     ->addTag('container.error');
             }
@@ -701,7 +701,7 @@ class FrameworkExtension extends Extension
                         $tagAttributes['method'] = $reflector->getName();
                     }
                     $definition->addTag('scheduler.task', $tagAttributes);
-                },
+                }
             );
         }
 
@@ -784,7 +784,7 @@ class FrameworkExtension extends Extension
         if ($httpMethodOverride) {
             $container->getDefinition('http_cache')
                   ->addArgument((new Definition('void'))
-                      ->setFactory([Request::class, 'enableHttpMethodParameterOverride']),
+                      ->setFactory([Request::class, 'enableHttpMethodParameterOverride'])
                   );
         }
     }
@@ -1544,7 +1544,7 @@ class FrameworkExtension extends Extension
                     'cache_vary' => [
                         'scanned_directories' => array_map(fn ($dir) => str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir, $scannedDirectories),
                     ],
-                ],
+                ]
             );
 
             $translator->replaceArgument(4, $options);
@@ -2180,7 +2180,7 @@ class FrameworkExtension extends Extension
                 ->addTag('messenger.receiver', [
                         'alias' => $name,
                         'is_failure_transport' => \in_array($name, $failureTransports, true),
-                    ],
+                    ]
                 )
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);

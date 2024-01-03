@@ -93,7 +93,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="name"]
     [.="[trans]Name[/trans]"]
-',
+'
         );
     }
 
@@ -107,7 +107,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="name"]
     [.="Name"]
-',
+'
         );
     }
 
@@ -122,7 +122,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@class="required"]
     [.="[trans]Name[/trans]"]
-',
+'
         );
     }
 
@@ -137,7 +137,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="name"]
     [.="[trans]Custom label[/trans]"]
-',
+'
         );
     }
 
@@ -150,7 +150,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="name"]
     [.="[trans]Custom label[/trans]"]
-',
+'
         );
     }
 
@@ -165,7 +165,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="name"]
     [.="[trans]Overridden label[/trans]"]
-',
+'
         );
     }
 
@@ -182,7 +182,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="name"]
     [@class="required"]
-',
+'
         );
     }
 
@@ -199,7 +199,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="name"]
     [@class="my&class required"]
-',
+'
         );
     }
 
@@ -217,7 +217,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@for="name"]
     [@class="my&class required"]
     [.="[trans]Custom label[/trans]"]
-',
+'
         );
     }
 
@@ -238,7 +238,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@for="name"]
     [@class="my&class required"]
     [.="[trans]Custom label[/trans]"]
-',
+'
         );
     }
 
@@ -254,7 +254,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="myform_myfield"]
     [.="[trans]form.myfield[/trans]"]
-',
+'
         );
     }
 
@@ -270,7 +270,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="myform_myfield"]
     [.="[trans]form.myform_myfield[/trans]"]
-',
+'
         );
     }
 
@@ -288,7 +288,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="myform_myfield"]
     [.="[trans]form.myfield[/trans]"]
-',
+'
         );
     }
 
@@ -306,7 +306,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="myform_myfield"]
     [.="[trans]field.myfield[/trans]"]
-',
+'
         );
     }
 
@@ -325,7 +325,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="button"]
     [@name="myform[mybutton]"]
     [.="Mybutton"]
-',
+'
         );
     }
 
@@ -342,7 +342,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="button"]
     [@name="myform[mybutton]"]
     [.="[trans]form.mybutton[/trans]"]
-',
+'
         );
     }
 
@@ -359,7 +359,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="button"]
     [@name="myform[mybutton]"]
     [.="[trans]form.myform_mybutton[/trans]"]
-',
+'
         );
     }
 
@@ -376,7 +376,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help text test![/trans]"]
-',
+'
         );
     }
 
@@ -403,7 +403,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertMatchesXpath($html,
             '//input
     [@aria-describedby="name_help"]
-',
+'
         );
     }
 
@@ -419,7 +419,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertMatchesXpath($html,
             '//input
     [not(@aria-describedby)]
-',
+'
         );
     }
 
@@ -438,7 +438,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::li[.="[trans]Error 2[/trans]"]
     ]
     [count(./li)=2]
-',
+'
         );
     }
 
@@ -456,7 +456,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         [@id="text_id"]
     ]
     [@id="container"]
-',
+'
         );
     }
 
@@ -470,7 +470,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@checked="checked"]
     [@value="1"]
-',
+'
         );
     }
 
@@ -483,7 +483,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="checkbox"]
     [@name="name"]
     [not(@checked)]
-',
+'
         );
     }
 
@@ -498,7 +498,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="checkbox"]
     [@name="name"]
     [@value="foo&bar"]
-',
+'
         );
     }
 
@@ -531,7 +531,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -550,7 +550,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@required="required"]
     [@size="2"]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -572,7 +572,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -597,7 +597,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -619,7 +619,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][@class="foo&bar"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -642,7 +642,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@class)][not(@selected)][.="[trans]Choice&B[/trans]"][not(@id)][not(@name)]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -666,7 +666,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=3]
-',
+'
         );
     }
 
@@ -692,7 +692,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=4]
-',
+'
         );
     }
 
@@ -717,7 +717,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -743,7 +743,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=4]
-',
+'
         );
     }
 
@@ -761,7 +761,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/select
     [count(./option)=5]
-',
+'
         );
     }
 
@@ -784,7 +784,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -807,7 +807,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -831,7 +831,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -858,7 +858,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -884,7 +884,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
-',
+'
         );
     }
 
@@ -914,7 +914,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         [count(./option)=1]
     ]
     [count(./optgroup)=2]
-',
+'
         );
     }
 
@@ -937,7 +937,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -961,7 +961,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][@class="foo&bar"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -983,7 +983,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -1005,7 +1005,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
-',
+'
         );
     }
 
@@ -1027,7 +1027,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=3]
-',
+'
         );
     }
 
@@ -1051,7 +1051,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=3]
-',
+'
         );
     }
 
@@ -1074,7 +1074,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=3]
-',
+'
         );
     }
 
@@ -1100,7 +1100,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=4]
-',
+'
         );
     }
 
@@ -1127,7 +1127,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=4]
-',
+'
         );
     }
 
@@ -1149,7 +1149,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=3]
-',
+'
         );
     }
 
@@ -1174,7 +1174,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=4]
-',
+'
         );
     }
 
@@ -1200,7 +1200,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=4]
-',
+'
         );
     }
 
@@ -1226,7 +1226,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=4]
-',
+'
         );
     }
 
@@ -1239,7 +1239,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [./option[@value="AT"][@selected="selected"][.="Austria"]]
     [count(./option)>200]
-',
+'
         );
     }
 
@@ -1256,7 +1256,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Country[/trans]"]]
     [./option[@value="AT"][@selected="selected"][.="Austria"]]
     [count(./option)>201]
-',
+'
         );
     }
 
@@ -1296,7 +1296,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             ]
     ]
     [count(.//select)=5]
-',
+'
         );
     }
 
@@ -1337,7 +1337,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             ]
     ]
     [count(.//select)=5]
-',
+'
         );
     }
 
@@ -1379,7 +1379,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             ]
     ]
     [count(.//select)=5]
-',
+'
         );
     }
 
@@ -1422,7 +1422,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             ]
     ]
     [count(.//select)=6]
-',
+'
         );
     }
 
@@ -1448,7 +1448,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [@name="name[time]"]
             [@value="04:05"]
     ]
-',
+'
         );
     }
 
@@ -1466,7 +1466,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="datetime-local"]
     [@name="name"]
     [@value="2011-02-03T04:05"]
-',
+'
         );
     }
 
@@ -1491,7 +1491,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [./option[@value="'.date('Y').'"][@selected="selected"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -1518,7 +1518,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -1545,7 +1545,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -1573,7 +1573,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [@value="2011"]
     ]
     [count(./input)=3]
-',
+'
         );
     }
 
@@ -1589,7 +1589,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="date"]
     [@name="name"]
     [@value="2011-02-03"]
-',
+'
         );
     }
 
@@ -1626,7 +1626,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [./option[@value="2000"][@selected="selected"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -1656,7 +1656,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [./option[@value="1950"][@selected="selected"]]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -1670,7 +1670,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="foo&bar"]
     [not(@maxlength)]
-',
+'
         );
     }
 
@@ -1686,7 +1686,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="foo&bar"]
     [@maxlength="123"]
-',
+'
         );
     }
 
@@ -1697,7 +1697,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
     [@type="file"]
-',
+'
         );
     }
 
@@ -1710,7 +1710,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="hidden"]
     [@name="name"]
     [@value="foo&bar"]
-',
+'
         );
     }
 
@@ -1725,7 +1725,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="text"]
     [@name="name"]
     [@disabled="disabled"]
-',
+'
         );
     }
 
@@ -1738,7 +1738,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="number"]
     [@name="name"]
     [@value="123"]
-',
+'
         );
     }
 
@@ -1753,7 +1753,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="text"]
     [@name="name"]
     [@value="123"]
-',
+'
         );
     }
 
@@ -1766,7 +1766,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [./option[@value="de"][@selected="selected"][.="German"]]
     [count(./option)>200]
-',
+'
         );
     }
 
@@ -1779,7 +1779,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [./option[@value="de_AT"][@selected="selected"][.="German (Austria)"]]
     [count(./option)>200]
-',
+'
         );
     }
 
@@ -1795,7 +1795,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="1234.56"]
     [contains(.., "€")]
-',
+'
         );
     }
 
@@ -1808,7 +1808,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="text"]
     [@name="name"]
     [@value="1234.56"]
-',
+'
         );
     }
 
@@ -1826,7 +1826,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@step="any"]
     [@name="name"]
     [@value="1234.56"]
-',
+'
         );
     }
 
@@ -1845,7 +1845,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@step="0.1"]
     [@name="name"]
     [@value="1234.56"]
-',
+'
         );
     }
 
@@ -1857,7 +1857,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/input
     [@type="password"]
     [@name="name"]
-',
+'
         );
     }
 
@@ -1873,7 +1873,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="password"]
     [@name="name"]
     [@value="foo&bar"]
-',
+'
         );
     }
 
@@ -1888,7 +1888,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="password"]
     [@name="name"]
     [@maxlength="123"]
-',
+'
         );
     }
 
@@ -1902,7 +1902,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="10"]
     [contains(.., "%")]
-',
+'
         );
     }
 
@@ -1917,7 +1917,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="10"]
     [not(contains(.., "%"))]
-',
+'
         );
     }
 
@@ -1932,7 +1932,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="10"]
     [contains(.., "‱")]
-',
+'
         );
     }
 
@@ -1946,7 +1946,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@checked="checked"]
     [@value="1"]
-',
+'
         );
     }
 
@@ -1959,7 +1959,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="radio"]
     [@name="name"]
     [not(@checked)]
-',
+'
         );
     }
 
@@ -1974,7 +1974,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="radio"]
     [@name="name"]
     [@value="foo&bar"]
-',
+'
         );
     }
 
@@ -1988,7 +1988,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="42"]
     [@min="5"]
-',
+'
         );
     }
 
@@ -2003,7 +2003,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@value="42"]
     [@min="5"]
     [@max="57"]
-',
+'
         );
     }
 
@@ -2018,7 +2018,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [not(@pattern)]
     [.="foo&bar"]
-',
+'
         );
     }
 
@@ -2032,7 +2032,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="foo&bar"]
     [not(@maxlength)]
-',
+'
         );
     }
 
@@ -2048,7 +2048,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="foo&bar"]
     [@maxlength="123"]
-',
+'
         );
     }
 
@@ -2062,7 +2062,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="foo&bar"]
     [not(@maxlength)]
-',
+'
         );
     }
 
@@ -2087,7 +2087,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [./option[@value="5"][@selected="selected"]]
     ]
     [count(./select)=2]
-',
+'
         );
     }
 
@@ -2119,7 +2119,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [count(./option)>59]
     ]
     [count(./select)=3]
-',
+'
         );
     }
 
@@ -2149,7 +2149,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [@required="required"]
     ]
     [count(./input)=2]
-',
+'
         );
     }
 
@@ -2166,7 +2166,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="04:05"]
     [not(@size)]
-',
+'
         );
     }
 
@@ -2192,7 +2192,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [count(./option)>60]
     ]
     [count(./select)=2]
-',
+'
         );
     }
 
@@ -2218,7 +2218,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [count(./option)>59]
     ]
     [count(./select)=2]
-',
+'
         );
     }
 
@@ -2244,7 +2244,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [not(@required)]
     [./option[@value="Europe/Vienna"][@selected="selected"][.="Europe / Vienna"]]
     [count(./option)>200]
-',
+'
         );
     }
 
@@ -2259,7 +2259,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/select
     [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Timezone[/trans]"]]
     [count(./option)>201]
-',
+'
         );
     }
 
@@ -2274,7 +2274,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [@value="http://www.example.com?foo1=bar1&foo2=bar2"]
     [@inputmode="url"]
-',
+'
         );
     }
 
@@ -2288,7 +2288,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="url"]
     [@name="name"]
     [@value="http://www.example.com?foo1=bar1&foo2=bar2"]
-',
+'
         );
     }
 
@@ -2304,7 +2304,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertMatchesXpath($html,
             '//div[@id="name_items"][@data-prototype]
             |
-            //table[@id="name_items"][@data-prototype]',
+            //table[@id="name_items"][@data-prototype]'
         );
     }
 
@@ -2325,7 +2325,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType');
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-            '/button[@type="button"][@name="name"][.="[trans]Name[/trans]"]',
+            '/button[@type="button"][@name="name"][.="[trans]Name[/trans]"]'
         );
     }
 
@@ -2343,7 +2343,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-            '/button[@type="button"][@name="name"][.="Name"]',
+            '/button[@type="button"][@name="name"][.="Name"]'
         );
     }
 
@@ -2352,7 +2352,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\SubmitType');
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-            '/button[@type="submit"][@name="name"]',
+            '/button[@type="submit"][@name="name"]'
         );
     }
 
@@ -2361,7 +2361,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ResetType');
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-            '/button[@type="reset"][@name="name"]',
+            '/button[@type="reset"][@name="name"]'
         );
     }
 
@@ -2390,7 +2390,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/form
     [./input[@type="hidden"][@name="_method"][@value="PUT"]]
     [@method="post"]
-    [@action="http://example.com/directory"]',
+    [@action="http://example.com/directory"]'
         );
     }
 
@@ -2582,7 +2582,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="tel"]
     [@name="name"]
     [@value="0102030405"]
-',
+'
         );
     }
 
@@ -2596,7 +2596,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@type="color"]
     [@name="name"]
     [@value="#0000ff"]
-',
+'
         );
     }
 
@@ -2615,7 +2615,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="name"]
     [.="[trans]Address is Paris, rue de la Paix[/trans]"]
-',
+'
         );
     }
 
@@ -2635,7 +2635,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/*
     [@id="name_help"]
     [.="[trans]for company ACME Ltd.[/trans]"]
-',
+'
         );
     }
 
@@ -2650,7 +2650,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/label
     [@for="name"]
     [.="[trans]foo[/trans]"]
-',
+'
         );
     }
 
@@ -2665,7 +2665,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/*
     [@id="name_help"]
     [.="[trans]foo[/trans]"]
-',
+'
         );
     }
 
@@ -2687,7 +2687,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/*
     [@id="name_help"]
     [.="[trans]foo[/trans]"]
-',
+'
         );
     }
 
@@ -2710,7 +2710,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '/input
     [@title="[trans]Message to ACME Ltd.[/trans]"]
     [@placeholder="[trans]Enter a message to ACME Ltd.[/trans]"]
-',
+'
         );
     }
 
@@ -2732,7 +2732,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertMatchesXpath($html,
             '/button
     [.="[trans]Submit to ACME Ltd.[/trans]"]
-',
+'
         );
     }
 
@@ -2785,7 +2785,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="holidays"]
     [@class="my&class"]
     [@value="1970-W01"]
-',
+'
         );
     }
 
@@ -2805,7 +2805,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="holidays"]
     [@class="my&class"]
     [@value="1970-W01"]
-',
+'
         );
     }
 
@@ -2831,7 +2831,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [@id="name_week"]
             [./option[@value="'.$data['week'].'"][@selected="selected"]]
     ]
-    [count(.//select)=2]',
+    [count(.//select)=2]'
         );
     }
 
@@ -2857,7 +2857,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             [@type="number"]
             [@value="1"]
     ]
-    [count(./input)=2]',
+    [count(./input)=2]'
         );
     }
 }

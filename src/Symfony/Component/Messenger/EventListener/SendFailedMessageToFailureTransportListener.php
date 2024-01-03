@@ -52,7 +52,7 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         $envelope = $envelope->with(
             new SentToFailureTransportStamp($event->getReceiverName()),
             new DelayStamp(0),
-            new RedeliveryStamp(0),
+            new RedeliveryStamp(0)
         );
 
         $this->logger?->info('Rejected message {class} will be sent to the failure transport {transport}.', [

@@ -1905,7 +1905,7 @@ class OptionsResolverTest extends TestCase
                         ],
                     ],
                 ],
-            ],
+            ]
         ));
     }
 

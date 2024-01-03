@@ -56,7 +56,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             null,
             new Choice([
                 'choices' => ['foo', 'bar'],
-            ]),
+            ])
         );
 
         $this->assertNoViolation();

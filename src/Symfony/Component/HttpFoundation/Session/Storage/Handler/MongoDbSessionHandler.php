@@ -96,7 +96,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
         $write = new BulkWrite();
         $write->delete(
             [$this->options['id_field'] => $sessionId],
-            ['limit' => 1],
+            ['limit' => 1]
         );
 
         $this->manager->executeBulkWrite($this->namespace, $write);
@@ -130,7 +130,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
         $write->update(
             [$this->options['id_field'] => $sessionId],
             ['$set' => $fields],
-            ['upsert' => true],
+            ['upsert' => true]
         );
 
         $this->manager->executeBulkWrite($this->namespace, $write);

@@ -108,7 +108,7 @@ class FormRegistry implements FormRegistryInterface
             return $this->resolvedTypeFactory->createResolvedType(
                 $type,
                 array_merge([], ...$typeExtensions),
-                $parentType ? $this->getType($parentType) : null,
+                $parentType ? $this->getType($parentType) : null
             );
         } finally {
             unset($this->checkedTypes[$fqcn]);

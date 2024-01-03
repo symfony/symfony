@@ -88,7 +88,7 @@ class DebugCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['class' => 'App\\NotFoundResource'], ['decorated' => false]);
 
-        $this->assertStringContainsString('[ERROR] Class "App\NotFoundResource" was not found.', $tester->getDisplay(true),
+        $this->assertStringContainsString('[ERROR] Class "App\NotFoundResource" was not found.', $tester->getDisplay(true)
         );
     }
 }

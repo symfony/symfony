@@ -41,7 +41,7 @@ class TransportNamesStampTest extends TestCase
             new SymfonySerializer([
                 new ArrayDenormalizer(),
                 new ObjectNormalizer(),
-            ], [new JsonEncoder()]),
+            ], [new JsonEncoder()])
         );
 
         $deserializedEnvelope = $serializer->decode($serializer->encode(new Envelope(new \stdClass(), [$stamp])));

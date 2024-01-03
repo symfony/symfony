@@ -20,7 +20,7 @@ final class AutowiringFailedExceptionTest extends TestCase
     {
         $exception = new AutowiringFailedException(
             'App\DummyService',
-            'Cannot autowire service "App\DummyService": argument "$email" of method "__construct()" is type-hinted "string", you should configure its value explicitly.',
+            'Cannot autowire service "App\DummyService": argument "$email" of method "__construct()" is type-hinted "string", you should configure its value explicitly.'
         );
 
         self::assertNull($exception->getMessageCallback());
@@ -35,7 +35,7 @@ final class AutowiringFailedExceptionTest extends TestCase
                 ++$counter;
 
                 throw new \Exception('boo');
-            },
+            }
         );
 
         $this->assertSame(0, $counter);

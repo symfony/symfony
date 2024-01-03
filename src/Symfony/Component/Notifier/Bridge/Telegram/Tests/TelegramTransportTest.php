@@ -88,7 +88,7 @@ final class TelegramTransportTest extends TransportTestCase
         $transport = $this->createTransport($client, 'testChannel');
         $transport->send(new ChatMessage(
             'testMessage',
-            (new TelegramOptions())->edit(123)),
+            (new TelegramOptions())->edit(123))
         );
     }
 
@@ -168,7 +168,7 @@ final class TelegramTransportTest extends TransportTestCase
         $transport = $this->createTransport($client, 'testChannel');
         $transport->send(new ChatMessage(
             'testMessage',
-            (new TelegramOptions())->edit(123),
+            (new TelegramOptions())->edit(123)
         ));
     }
 
@@ -188,7 +188,7 @@ final class TelegramTransportTest extends TransportTestCase
         $transport = $this->createTransport($client, 'testChannel');
         $transport->send(new ChatMessage(
             'testMessage',
-            (new TelegramOptions())->answerCallbackQuery('123', true, 1),
+            (new TelegramOptions())->answerCallbackQuery('123', true, 1)
         ));
     }
 

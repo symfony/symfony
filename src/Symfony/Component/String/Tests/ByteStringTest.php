@@ -75,7 +75,7 @@ class ByteStringTest extends AbstractAsciiTestCase
                 [[0x61], "Spa\u{0308}ßchen", 2],
                 [[0xCC], "Spa\u{0308}ßchen", 3],
                 [[0xE0], 'नमस्ते', 6],
-            ],
+            ]
         );
     }
 
@@ -85,7 +85,7 @@ class ByteStringTest extends AbstractAsciiTestCase
             parent::provideLength(),
             [
                 [2, 'ä'],
-            ],
+            ]
         );
     }
 
@@ -96,7 +96,7 @@ class ByteStringTest extends AbstractAsciiTestCase
             [
                 [10, "f\u{001b}[0moo\x80bar\xfe\xfe1"], // foo?bar??1
                 [13, "f\u{001b}[0moo\x80bar\xfe\xfe1", false], // f[0moo?bar??1
-            ],
+            ]
         );
     }
 }

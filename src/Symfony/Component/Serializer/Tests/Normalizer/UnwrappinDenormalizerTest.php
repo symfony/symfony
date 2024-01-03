@@ -55,7 +55,7 @@ class UnwrappinDenormalizerTest extends TestCase
             ['data' => ['foo' => 'foo', 'bar' => 'bar', 'baz' => true]],
             ObjectDummy::class,
             'any',
-            [UnwrappingDenormalizer::UNWRAP_PATH => '[data]'],
+            [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']
         );
 
         $this->assertEquals('foo', $result->getFoo());
@@ -74,7 +74,7 @@ class UnwrappinDenormalizerTest extends TestCase
             ['data' => ['foo' => 'foo', 'bar' => 'bar', 'baz' => true]],
             ObjectDummy::class,
             'any',
-            [UnwrappingDenormalizer::UNWRAP_PATH => '[invalid]'],
+            [UnwrappingDenormalizer::UNWRAP_PATH => '[invalid]']
         );
 
         $this->assertNull($obj->getFoo());

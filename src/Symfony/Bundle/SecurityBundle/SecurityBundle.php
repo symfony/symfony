@@ -98,7 +98,7 @@ class SecurityBundle extends Bundle
 
         $container->addCompilerPass(new AddEventAliasesPass(array_merge(
             AuthenticationEvents::ALIASES,
-            SecurityEvents::ALIASES,
+            SecurityEvents::ALIASES
         )));
 
         // must be registered before DecoratorServicePass

@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2024-01-04T10:50:17Z
+
+> I propose to accept English where translations are missing because this makes it easier to automate and also to spot what's missing.
+
+But this will make it hard to know if a translation is missing or not. Do we really want to force users to do this?
+
+```php
+$missing = $original !== $translation
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-04T11:10:45Z
+
+I added `state="needs-translation"` to all `<target>` that aren't translated, as defined by the xliff spec for this purpose.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-04T11:32:16Z
+
+PR ready, tests fixed!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-01-04T11:32:23Z
+
+I don't think the current xliff reader takes `needs-translation` into account. Something to add in this PR as well, right?
+
+---------------------------------------------------------------------------
+
+by thunderer at 2024-01-04T11:34:46Z
+
+@nicolas-grekas I'm wondering, this will cause conflicts in all existing translation PRs, would it be possible to merge them before this one? Afterwards it seems like you could rerun the script to update the files.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2024-01-04T11:38:11Z
+
+> I don't think the current xliff reader takes needs-translation into account.
+
+Oh.. Does this mean my fallback locale is never used?
+Ie:
+
+```
+framework:
+    default_locale: 'fr'
+    translator:
+        fallbacks: ['sv']
+```
+
+If `validators.fr.xlf` is missing a translation, will it pick it up from validators.sv.xlf? Or, will the XliffReader think the translation is there?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-04T13:41:33Z
+
+> xliff reader takes needs-translation into account
+
+Indeed. Updated!

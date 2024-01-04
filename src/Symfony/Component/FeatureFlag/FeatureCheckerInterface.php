@@ -19,5 +19,11 @@ interface FeatureCheckerInterface
      */
     public function isEnabled(string $featureName, mixed $expectedValue = true): bool;
 
+    /**
+     * @param string $featureName   the name of the feature to check
+     * @param mixed  $expectedValue comparison value required to determine if the feature is disabled
+     */
+    public function isDisabled(string $featureName, mixed $expectedValue = true): bool;
+
     public function getValue(string $featureName): mixed;
 }

@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints\Charset;
 use Symfony\Component\Validator\Constraints\CharsetValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\StringableValue;
 
 class CharsetValidatorTest extends ConstraintValidatorTestCase
 {
@@ -66,12 +67,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
         yield ['my ûtf 8', ['ASCII', 'UTF-8']];
         yield ['my ûtf 8', ['UTF-8']];
         yield ['string', ['ISO-8859-1']];
-        yield [new class() implements \Stringable {
-            public function __toString(): string
-            {
-                return 'my ûtf 8';
-            }
-        }, ['UTF-8']];
+        yield [new StringableValue('my ûtf 8'), ['UTF-8']];
     }
 
     public static function provideInvalidValues()

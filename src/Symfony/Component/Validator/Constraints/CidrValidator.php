@@ -28,7 +28,7 @@ class CidrValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_string($value)) {
+        if (!\is_string($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 

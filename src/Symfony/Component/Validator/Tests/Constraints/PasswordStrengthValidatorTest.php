@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
 use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\StringableValue;
 
 class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
 {
@@ -25,7 +26,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testValidValues(string $value, int $expectedStrength)
+    public function testValidValues(string|\Stringable $value, int $expectedStrength)
     {
         $this->validator->validate($value, new PasswordStrength(minScore: $expectedStrength));
 
@@ -48,6 +49,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
         yield ['Reasonable-pwd', PasswordStrength::STRENGTH_MEDIUM];
         yield ['This 1s a very g00d Pa55word! ;-)', PasswordStrength::STRENGTH_VERY_STRONG];
         yield ['pudding-smack-👌🏼-fox-😎', PasswordStrength::STRENGTH_VERY_STRONG];
+        yield [new StringableValue('How-is-this'), PasswordStrength::STRENGTH_WEAK];
     }
 
     /**

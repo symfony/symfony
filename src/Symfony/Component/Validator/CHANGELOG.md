@@ -4,6 +4,7 @@ CHANGELOG
 7.1
 ---
 
+ * Add support for `Stringable` values when using the `Cidr`, `CssColor`, `ExpressionSyntax` and `PasswordStrength` constraints
  * Add `MacAddress` constraint
  * Add `list` and `associative_array` types to `Type` constraint
  * Add the `Charset` constraint

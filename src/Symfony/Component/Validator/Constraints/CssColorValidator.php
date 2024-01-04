@@ -62,7 +62,7 @@ class CssColorValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_string($value)) {
+        if (!\is_string($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -76,7 +76,7 @@ class CssColorValidator extends ConstraintValidator
         }
 
         $this->context->buildViolation($constraint->message)
-            ->setParameter('{{ value }}', $this->formatValue($value))
+            ->setParameter('{{ value }}', $this->formatValue((string) $value))
             ->setCode(CssColor::INVALID_FORMAT_ERROR)
             ->addViolation();
     }

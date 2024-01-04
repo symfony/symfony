@@ -428,15 +428,15 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-translation">The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</target>
+                <target>Přípona souboru je neplatná ({{ extension }}). Povolené přípony jsou {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+                <target>Zjištěné kódování znaků je neplatné ({{ detected }}). Povolená kódování jsou {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-translation">This is not a valid MAC address.</target>
+                <target>Tohle není platná MAC adresa.</target>
             </trans-unit>
         </body>
     </file>

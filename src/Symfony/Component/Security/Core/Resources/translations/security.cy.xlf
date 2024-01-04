@@ -1,78 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-    <file source-language="en" target-language="ru" datatype="plaintext" original="file.ext">
+    <file source-language="en" target-language="cy" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
-                <target>Ошибка аутентификации.</target>
+                <target state="needs-translation">An authentication exception occurred.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
-                <target>Аутентификационные данные не найдены.</target>
+                <target state="needs-translation">Authentication credentials could not be found.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
-                <target>Запрос аутентификации не может быть обработан в связи с проблемой в системе.</target>
+                <target state="needs-translation">Authentication request could not be processed due to a system problem.</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>
-                <target>Недействительные аутентификационные данные.</target>
+                <target state="needs-translation">Invalid credentials.</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
-                <target>Cookie уже был использован кем-то другим.</target>
+                <target state="needs-translation">Cookie has already been used by someone else.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Отсутствуют права на запрос этого ресурса.</target>
+                <target state="needs-translation">Not privileged to request the resource.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>
-                <target>Недействительный токен CSRF.</target>
+                <target state="needs-translation">Invalid CSRF token.</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>No authentication provider found to support the authentication token.</source>
-                <target>Не найден провайдер аутентификации, поддерживающий токен аутентификации.</target>
+                <target state="needs-translation">No authentication provider found to support the authentication token.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>Сессия не найдена, ее время истекло, либо cookies не включены.</target>
+                <target state="needs-translation">No session available, it either timed out or cookies are not enabled.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
-                <target>Токен не найден.</target>
+                <target state="needs-translation">No token could be found.</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Имя пользователя не найдено.</target>
+                <target state="needs-translation">Username could not be found.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
-                <target>Время действия учетной записи истекло.</target>
+                <target state="needs-translation">Account has expired.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>Credentials have expired.</source>
-                <target>Время действия аутентификационных данных истекло.</target>
+                <target state="needs-translation">Credentials have expired.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>
-                <target>Учетная запись отключена.</target>
+                <target state="needs-translation">Account is disabled.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
-                <target>Учетная запись заблокирована.</target>
+                <target state="needs-translation">Account is locked.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>Слишком много неудачных попыток входа, пожалуйста, попробуйте позже.</target>
+                <target state="needs-translation">Too many failed login attempts, please try again later.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
-                <target>Ссылка для входа недействительна или просрочена.</target>
+                <target state="needs-translation">Invalid or expired login link.</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>Слишком много неудачных попыток входа в систему, повторите попытку через %minutes% минуту.</target>
+                <target state="needs-translation">Too many failed login attempts, please try again in %minutes% minute.</target>
             </trans-unit>
         </body>
     </file>

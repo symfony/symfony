@@ -30,13 +30,12 @@ final class MessageMediaTransport extends AbstractTransport
     protected const HOST = 'api.messagemedia.com';
 
     public function __construct(
-        private string $apiKey,
+        #[\SensitiveParameter] private string $apiKey,
         #[\SensitiveParameter] private string $apiSecret,
         private ?string $from = null,
         HttpClientInterface $client = null,
         EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

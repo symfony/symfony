@@ -20,7 +20,7 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
  */
 class SendgridSmtpTransport extends EsmtpTransport
 {
-    public function __construct(string $key, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(#[\SensitiveParameter] string $key, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct('smtp.sendgrid.net', 465, true, $dispatcher, $logger);
 

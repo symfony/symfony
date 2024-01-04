@@ -14,6 +14,11 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ *  The Isbn constraint is used to validate that a given value conforms to the structure of an ISBN (International Standard Book Number).
+ *  This class supports both ISBN-10 and ISBN-13 formats. It can be applied to properties or methods within your Symfony application
+ *  to ensure that values assigned to these elements are valid ISBNs. This validation is particularly useful in applications dealing
+ *  with books, publications, libraries, or any context where standardized book identification is required.
+ *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
  * @author Manuel Reinhard <manu@sprain.ch>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -38,12 +43,41 @@ class Isbn extends Constraint
         self::TYPE_NOT_RECOGNIZED_ERROR => 'TYPE_NOT_RECOGNIZED_ERROR',
     ];
 
+    /**
+     * @var string Message to display when an invalid ISBN-10 is provided.
+     */
     public string $isbn10Message = 'This value is not a valid ISBN-10.';
-    public string $isbn13Message = 'This value is not a valid ISBN-13.';
-    public string $bothIsbnMessage = 'This value is neither a valid ISBN-10 nor a valid ISBN-13.';
-    public ?string $type = null;
-    public ?string $message = null;
 
+    /**
+     * @var string Message to display when an invalid ISBN-13 is provided.
+     */
+    public string $isbn13Message = 'This value is not a valid ISBN-13.';
+
+    /**
+     * @var string Message to display when the value is neither a valid ISBN-10 nor a valid ISBN-13.
+     */
+    public string $bothIsbnMessage = 'This value is neither a valid ISBN-10 nor a valid ISBN-13.';
+
+    /**
+     * @var string|array|null The type of ISBN validation to apply ('isbn10', 'isbn13', or both). Default is null, which means both types are validated.
+     */
+    public string|array|null $type;
+
+    /**
+     * @var string The default message to display when the value is not a valid ISBN.
+     */
+    public string $message;
+
+    /**
+     * @param string|array|null $type The type of ISBN validation (ISBN_10, ISBN_13, or both).
+     * @param string|null $message The error message to use if validation fails.
+     * @param string|null $isbn10Message Custom message for invalid ISBN-10.
+     * @param string|null $isbn13Message Custom message for invalid ISBN-13.
+     * @param string|null $bothIsbnMessage Custom message when value is neither valid ISBN-10 nor ISBN-13.
+     * @param array|null $groups The groups this constraint belongs to.
+     * @param mixed $payload A payload that can be used by the validator.
+     * @param array $options Additional options for the constraint.
+     */
     public function __construct(
         string|array $type = null,
         string $message = null,
@@ -68,6 +102,11 @@ class Isbn extends Constraint
         $this->bothIsbnMessage = $bothIsbnMessage ?? $this->bothIsbnMessage;
     }
 
+    /**
+     * Returns the default option name.
+     *
+     * @return string|null
+     */
     public function getDefaultOption(): ?string
     {
         return 'type';

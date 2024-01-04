@@ -432,11 +432,11 @@
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+                <target>Təsbit edilən simvol şifrləməsi yanlışdır. ({{ detected }}). İcazə verilən şifrləmələr bunlardır: {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-translation">This is not a valid MAC address.</target>
+                <target>Bu MAC ünvanı yanlışdır.</target>
             </trans-unit>
         </body>
     </file>

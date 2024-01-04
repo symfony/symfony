@@ -24,7 +24,6 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
         private readonly FeatureRegistryInterface $featureRegistry,
         private readonly TraceableFeatureChecker $featureChecker,
     ) {
-        $this->reset();
     }
 
     public function collect(Request $request, Response $response, \Throwable $exception = null): void
@@ -36,6 +35,7 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
         $checks = $this->featureChecker->getChecks();
         $values = $this->featureChecker->getValues();
 
+        $this->data['features'] = [];
         foreach ($this->featureRegistry->getNames() as $featureName) {
             $this->data['features'][$featureName] = [
                 'is_enabled' => $checks[$featureName] ?? null,
@@ -46,18 +46,11 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
 
     public function getFeatures(): array
     {
-        return $this->data['features'];
+        return $this->data['features'] ?? [];
     }
 
     public function getName(): string
     {
         return 'feature_flag';
-    }
-
-    public function reset(): void
-    {
-        $this->data = ['features' => []];
-
-        $this->featureChecker->reset();
     }
 }

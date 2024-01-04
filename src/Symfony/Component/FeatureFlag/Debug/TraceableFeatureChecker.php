@@ -12,9 +12,8 @@
 namespace Symfony\Component\FeatureFlag\Debug;
 
 use Symfony\Component\FeatureFlag\FeatureCheckerInterface;
-use Symfony\Contracts\Service\ResetInterface;
 
-final class TraceableFeatureChecker implements FeatureCheckerInterface, ResetInterface
+final class TraceableFeatureChecker implements FeatureCheckerInterface
 {
     /** @var array<string, bool> */
     private array $checks = [];
@@ -48,11 +47,5 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface, ResetInt
     public function getValues(): array
     {
         return $this->values;
-    }
-
-    public function reset(): void
-    {
-        $this->checks = [];
-        $this->values = [];
     }
 }

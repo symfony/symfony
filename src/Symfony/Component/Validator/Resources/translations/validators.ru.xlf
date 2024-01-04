@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
-                <target>Значение не является допустимым IP адресом.</target>
+                <target state="needs-review-translation">Это значение не является действительным IP-адресом.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Значение не является допустимым международным номером банковского счета (IBAN).</target>
+                <target state="needs-review-translation">Это значение не является действительным Международным банковским счетом (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Значение не соответствует формату BIC.</target>
+                <target state="needs-review-translation">Это значение не является действительным Бизнес-идентификатором (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83">
                 <source>This is not a valid UUID.</source>
-                <target>Значение не соответствует формату UUID.</target>
+                <target state="needs-review-translation">Это значение не является действительным UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -435,8 +435,8 @@
                 <target>Обнаруженная кодировка символов недопустима ({{ detected }}). Разрешенные кодировки: {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
-                <source>This is not a valid MAC address.</source>
-                <target>Этот MAC-адрес недействительный.</target>
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">Это значение не является действительным MAC-адресом.</target>
             </trans-unit>
         </body>
     </file>

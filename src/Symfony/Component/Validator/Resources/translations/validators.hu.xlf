@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="hu" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -335,24 +335,24 @@
                 <target>Ez az érték érvényes JSON kell, hogy legyen.</target>
             </trans-unit>
             <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Ez a gyűjtemény csak egyedi elemeket tartalmazhat.</target>
+            </trans-unit>
+            <trans-unit id="88">
                 <source>This value should be positive.</source>
                 <target>Ennek az értéknek pozitívnak kell lennie.</target>
             </trans-unit>
-            <trans-unit id="88">
+            <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
                 <target>Ennek az értéknek pozitívnak vagy nullának kell lennie.</target>
             </trans-unit>
-            <trans-unit id="89">
+            <trans-unit id="90">
                 <source>This value should be negative.</source>
                 <target>Ennek az értéknek negatívnak kell lennie.</target>
             </trans-unit>
-            <trans-unit id="90">
+            <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
                 <target>Ennek az értéknek negatívnak vagy nullának kell lennie.</target>
-            </trans-unit>
-            <trans-unit id="91">
-                <source>This collection should contain only unique elements.</source>
-                <target>Ez a gyűjtemény csak egyedi elemeket tartalmazhat.</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>

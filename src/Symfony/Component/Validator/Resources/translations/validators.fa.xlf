@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="fa" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -35,12 +35,12 @@
                 <target>یک یا چند مقدار داده شده نامعتبر است.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>فیلدهای {{ fields }} مورد انتظار نبود.</target>
+                <source>This field was not expected.</source>
+                <target state="needs-translation">This field was not expected.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>فیلدهای {{ fields }} مفقود شده اند.</target>
+                <source>This field is missing.</source>
+                <target state="needs-translation">This field is missing.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -425,6 +425,18 @@
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>استفاده از کاراکترهای همپوشانی پنهان (hidden overlay characters) مجاز نیست.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target state="needs-translation">The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This is not a valid MAC address.</source>
+                <target state="needs-translation">This is not a valid MAC address.</target>
             </trans-unit>
         </body>
     </file>

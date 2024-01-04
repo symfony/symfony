@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="mn" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -385,6 +385,58 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Энэ утга зөв International Securities Identification Number (ISIN) биш байна.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target state="needs-translation">This value should be a valid expression.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target state="needs-translation">This value is not a valid CSS color.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target state="needs-translation">This value is not a valid CIDR notation.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target state="needs-translation">The value of the netmask should be between {{ min }} and {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target state="needs-translation">The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target state="needs-translation">The password strength is too low. Please use a stronger password.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target state="needs-translation">This value contains characters that are not allowed by the current restriction-level.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target state="needs-translation">Using invisible characters is not allowed.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target state="needs-translation">Mixing numbers from different scripts is not allowed.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target state="needs-translation">Using hidden overlay characters is not allowed.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target state="needs-translation">The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This is not a valid MAC address.</source>
+                <target state="needs-translation">This is not a valid MAC address.</target>
             </trans-unit>
         </body>
     </file>

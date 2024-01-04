@@ -436,7 +436,7 @@
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-translation">This is not a valid MAC address.</target>
+                <target state="needs-review-translation">これは有効なMACアドレスではありません。</target>
             </trans-unit>
         </body>
     </file>

@@ -428,7 +428,7 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target>D’Extensioun vum Fichier ass net valabel ({{ extension }}). Valabel Extensioune sinn {{ extensions }}.</target>
+                <target>D'Extensioun vum Fichier ass net valabel ({{ extension }}). Valabel Extensioune sinn {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>

@@ -68,7 +68,7 @@
             </trans-unit>
             <trans-unit id="112">
                 <source>Please select a valid language.</source>
-                <target state="needs-translation">Please select a valid language.</target>
+                <target state="needs-review-translation">Ju lutem zgjidhni një gjuhë të vlefshme.</target>
             </trans-unit>
             <trans-unit id="113">
                 <source>Please select a valid locale.</source>

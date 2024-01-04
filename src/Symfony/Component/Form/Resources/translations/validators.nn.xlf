@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>CSRF-nøkkelen er ikkje gyldig.</target>
+                <target state="needs-review-translation">CSRF-teiknet er ugyldig. Ver venleg og prøv å sende inn skjemaet på nytt.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>

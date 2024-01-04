@@ -75,8 +75,6 @@ class Application implements ResetInterface
     private array $commands = [];
     private bool $wantHelps = false;
     private ?Command $runningCommand = null;
-    private string $name;
-    private string $version;
     private ?CommandLoaderInterface $commandLoader = null;
     private bool $catchExceptions = true;
     private bool $catchErrors = false;
@@ -91,10 +89,10 @@ class Application implements ResetInterface
     private ?SignalRegistry $signalRegistry = null;
     private array $signalsToDispatchEvent = [];
 
-    public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
-    {
-        $this->name = $name;
-        $this->version = $version;
+    public function __construct(
+        private string $name = 'UNKNOWN',
+        private string $version = 'UNKNOWN',
+    ) {
         $this->terminal = new Terminal();
         $this->defaultCommand = 'list';
         if (\defined('SIGINT') && SignalRegistry::isSupported()) {

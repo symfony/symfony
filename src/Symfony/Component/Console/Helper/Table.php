@@ -45,7 +45,6 @@ class Table
     private array $rows = [];
     private array $effectiveColumnWidths = [];
     private int $numberOfColumns;
-    private OutputInterface $output;
     private TableStyle $style;
     private array $columnStyles = [];
     private array $columnWidths = [];
@@ -55,10 +54,9 @@ class Table
 
     private static array $styles;
 
-    public function __construct(OutputInterface $output)
-    {
-        $this->output = $output;
-
+    public function __construct(
+        private OutputInterface $output,
+    ) {
         self::$styles ??= self::initStyles();
 
         $this->setStyle('default');

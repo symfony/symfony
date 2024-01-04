@@ -44,18 +44,19 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     private AdapterInterface $pool;
     private AdapterInterface $tags;
     private array $knownTagVersions = [];
-    private float $knownTagVersionsTtl;
 
     private static \Closure $setCacheItemTags;
     private static \Closure $setTagVersions;
     private static \Closure $getTagsByKey;
     private static \Closure $saveTags;
 
-    public function __construct(AdapterInterface $itemsPool, AdapterInterface $tagsPool = null, float $knownTagVersionsTtl = 0.15)
-    {
+    public function __construct(
+        AdapterInterface $itemsPool,
+        AdapterInterface $tagsPool = null,
+        private float $knownTagVersionsTtl = 0.15,
+    ) {
         $this->pool = $itemsPool;
         $this->tags = $tagsPool ?? $itemsPool;
-        $this->knownTagVersionsTtl = $knownTagVersionsTtl;
         self::$setCacheItemTags ??= \Closure::bind(
             static function (array $items, array $itemTags) {
                 foreach ($items as $key => $item) {

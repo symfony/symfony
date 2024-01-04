@@ -31,13 +31,11 @@ class ProgressIndicator
         'very_verbose_no_ansi' => ' %message% (%elapsed:6s%, %memory:6s%)',
     ];
 
-    private OutputInterface $output;
     private int $startTime;
     private ?string $format = null;
     private ?string $message = null;
     private array $indicatorValues;
     private int $indicatorCurrent;
-    private int $indicatorChangeInterval;
     private float $indicatorUpdateTime;
     private bool $started = false;
 
@@ -50,9 +48,12 @@ class ProgressIndicator
      * @param int        $indicatorChangeInterval Change interval in milliseconds
      * @param array|null $indicatorValues         Animated indicator characters
      */
-    public function __construct(OutputInterface $output, string $format = null, int $indicatorChangeInterval = 100, array $indicatorValues = null)
-    {
-        $this->output = $output;
+    public function __construct(
+        private OutputInterface $output,
+        string $format = null,
+        private int $indicatorChangeInterval = 100,
+        array $indicatorValues = null,
+    ) {
 
         $format ??= $this->determineBestFormat();
         $indicatorValues ??= ['-', '\\', '|', '/'];
@@ -63,7 +64,6 @@ class ProgressIndicator
         }
 
         $this->format = self::getFormatDefinition($format);
-        $this->indicatorChangeInterval = $indicatorChangeInterval;
         $this->indicatorValues = $indicatorValues;
         $this->startTime = time();
     }

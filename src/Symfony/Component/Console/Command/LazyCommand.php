@@ -27,17 +27,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class LazyCommand extends Command
 {
     private \Closure|Command $command;
-    private ?bool $isEnabled;
 
-    public function __construct(string $name, array $aliases, string $description, bool $isHidden, \Closure $commandFactory, ?bool $isEnabled = true)
-    {
+    public function __construct(
+        string $name,
+        array $aliases,
+        string $description,
+        bool $isHidden,
+        \Closure $commandFactory,
+        private ?bool $isEnabled = true,
+    ) {
         $this->setName($name)
             ->setAliases($aliases)
             ->setHidden($isHidden)
             ->setDescription($description);
 
         $this->command = $commandFactory;
-        $this->isEnabled = $isEnabled;
     }
 
     public function ignoreValidationErrors(): void

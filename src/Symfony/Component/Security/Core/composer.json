@@ -31,7 +31,7 @@
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/ldap": "^5.4|^6.0",
         "symfony/string": "^5.4|^6.0",
-        "symfony/translation": "^5.4|^6.0",
+        "symfony/translation": "^5.4.35|~6.3.12|^6.4.3",
         "symfony/validator": "^5.4|^6.0",
         "psr/log": "^1|^2|^3"
     },
@@ -40,6 +40,7 @@
         "symfony/http-foundation": "<5.4",
         "symfony/security-guard": "<5.4",
         "symfony/ldap": "<5.4",
+        "symfony/translation": "<5.4.35|>=6.0,<6.3.12|>=6.4,<6.4.3",
         "symfony/validator": "<5.4"
     },
     "autoload": {

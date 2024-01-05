@@ -18,6 +18,10 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
+ * Ensures that the value is valid against the BIC format.
+ *
+ * @see https://en.wikipedia.org/wiki/ISO_9362
+ *
  * @author Michael Hirschler <michael.vhirsch@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -43,6 +47,12 @@ class Bic extends Constraint
     public ?string $iban = null;
     public ?string $ibanPropertyPath = null;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string|null              $iban             An IBAN value to validate that its country code is the same as the BIC's one
+     * @param string|null              $ibanPropertyPath Property path to the IBAN value when validating objects
+     * @param string[]|null            $groups
+     */
     public function __construct(array $options = null, string $message = null, string $iban = null, string $ibanPropertyPath = null, string $ibanMessage = null, array $groups = null, mixed $payload = null)
     {
         if (!class_exists(Countries::class)) {

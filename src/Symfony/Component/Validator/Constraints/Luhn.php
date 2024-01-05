@@ -14,7 +14,9 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Metadata for the LuhnValidator.
+ * Validates that a value (typically a credit card number) passes the Luhn algorithm.
+ *
+ * @see https://en.wikipedia.org/wiki/Luhn_algorithm
  *
  * @author Tim Nagel <t.nagel@infinite.net.au>
  * @author Greg Knapp http://gregk.me/2011/php-implementation-of-bank-card-luhn-algorithm/
@@ -33,6 +35,10 @@ class Luhn extends Constraint
 
     public string $message = 'Invalid card number.';
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
+     */
     public function __construct(
         array $options = null,
         string $message = null,

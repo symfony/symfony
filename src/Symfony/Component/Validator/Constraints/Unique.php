@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
+ * Validates that all the elements of the given collection are unique.
+ *
  * @author Yevgeniy Zholkevskiy <zhenya.zholkevskiy@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -33,7 +35,9 @@ class Unique extends Constraint
     public $normalizer;
 
     /**
-     * @param array|string $fields the combination of fields that must contain unique values or a set of options
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
+     * @param string[]|string|null     $fields  Defines the key or keys in the collection that should be checked for uniqueness (defaults to null, which ensure uniqueness for all keys)
      */
     public function __construct(
         array $options = null,

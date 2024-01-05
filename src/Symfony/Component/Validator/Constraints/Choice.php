@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates that a value is one of a given set of valid choices.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -47,6 +49,16 @@ class Choice extends Constraint
         return 'choices';
     }
 
+    /**
+     * @param array|null           $choices  An array of choices (required unless a callback is specified)
+     * @param callable|string|null $callback Callback method to use instead of the choice option to get the choices
+     * @param bool|null            $multiple Whether to expect the value to be an array of valid choices (defaults to false)
+     * @param bool|null            $strict   This option defaults to true and should not be used
+     * @param int|null             $min      Minimum of valid choices if multiple values are expected
+     * @param int|null             $max      Maximum of valid choices if multiple values are expected
+     * @param string[]|null        $groups
+     * @param bool|null            $match    Whether to validate the values are part of the choices or not (defaults to true)
+     */
     public function __construct(
         string|array $options = [],
         array $choices = null,

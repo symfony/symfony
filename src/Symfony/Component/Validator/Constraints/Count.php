@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
+ * Validates a collection's element count.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -40,6 +42,14 @@ class Count extends Constraint
     public ?int $max = null;
     public ?int $divisibleBy = null;
 
+    /**
+     * @param int|array<string,mixed>|null $exactly     The exact expected number of elements
+     * @param int|null                     $min         Minimum expected number of elements
+     * @param int|null                     $max         Maximum expected number of elements
+     * @param int|null                     $divisibleBy The number the collection count should be divisible by
+     * @param string[]|null                $groups
+     * @param array<mixed,string>          $options
+     */
     public function __construct(
         int|array $exactly = null,
         int $min = null,

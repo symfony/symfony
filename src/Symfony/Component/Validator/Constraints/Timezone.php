@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
+ * Validates that a value is a valid timezone identifier.
+ *
  * @author Javier Spagnoletti <phansys@gmail.com>
  * @author Hugo Hamon <hugohamon@neuf.fr>
  */
@@ -38,6 +40,15 @@ class Timezone extends Constraint
         self::TIMEZONE_IDENTIFIER_INTL_ERROR => 'TIMEZONE_IDENTIFIER_INTL_ERROR',
     ];
 
+    /**
+     * @param int|array<string,mixed>|null $zone           Restrict valid timezones to this geographical zone (defaults to {@see \DateTimeZone::ALL})
+     * @param string|null                  $countryCode    Restrict the valid timezones to this country if the zone option is {@see \DateTimeZone::PER_COUNTRY}
+     * @param bool|null                    $intlCompatible Whether to restrict valid timezones to ones available in PHP's intl (defaults to false)
+     * @param string[]|null                $groups
+     * @param array<string,mixed>          $options
+     *
+     * @see \DateTimeZone
+     */
     public function __construct(
         int|array $zone = null,
         string $message = null,

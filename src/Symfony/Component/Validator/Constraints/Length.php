@@ -16,6 +16,8 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
+ * Validates that a given string length is between some minimum and maximum value.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -56,7 +58,15 @@ class Length extends Constraint
     public string $countUnit = self::COUNT_CODEPOINTS;
 
     /**
-     * @param self::COUNT_*|null $countUnit
+     * @param int|array<string,mixed>|null $exactly    The exact expected length
+     * @param int|null                     $min        The minimum expected length
+     * @param int|null                     $max        The maximum expected length
+     * @param string|null                  $charset    The charset to be used when computing value's length (defaults to UTF-8)
+     * @param callable|null                $normalizer A callable to normalize value before it is validated
+     * @param self::COUNT_*|null           $countUnit  The character count unit for the length check (defaults to {@see Length::COUNT_CODEPOINTS})
+     * @param string[]|null                $groups
+     * @param array<string,mixed>          $options
+     *
      */
     public function __construct(
         int|array $exactly = null,

@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Metadata for the CardSchemeValidator.
+ * Validates a credit card number for a given credit card company.
  *
  * @author Tim Nagel <t.nagel@infinite.net.au>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -46,6 +46,11 @@ class CardScheme extends Constraint
     public string $message = 'Unsupported card type or invalid card number.';
     public array|string|null $schemes = null;
 
+    /**
+     * @param string|string[]|array<string,mixed>|null $schemes Name(s) of the number scheme(s) used to validate the credit card number
+     * @param string[]|null                            $groups
+     * @param array<string,mixed>                      $options
+     */
     public function __construct(array|string|null $schemes, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($schemes) && \is_string(key($schemes))) {

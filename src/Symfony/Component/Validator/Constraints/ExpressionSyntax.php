@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates that a value is valid as an ExpressionLanguage expression.
+ *
  * @author Andrey Sevastianov <mrpkmail@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -29,6 +31,12 @@ class ExpressionSyntax extends Constraint
     public ?string $service = null;
     public ?array $allowedVariables = null;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string|null              $service          The service used to validate the constraint instead of the default one
+     * @param string[]|null            $allowedVariables Restrict the available variables in the expression to these values (defaults to null that allows any variable)
+     * @param string[]|null            $groups
+     */
     public function __construct(array $options = null, string $message = null, string $service = null, array $allowedVariables = null, array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);

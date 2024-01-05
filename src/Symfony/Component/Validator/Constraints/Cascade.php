@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
+ * Validates a whole class, including nested objects in properties.
+ *
  * @author Jules Pietri <jules@heahprod.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
@@ -22,6 +24,10 @@ class Cascade extends Constraint
 {
     public array $exclude = [];
 
+    /**
+     * @param string[]|string|array<string,mixed>|null $exclude Properties excluded from validation
+     * @param array<string,mixed>|null                 $options
+     */
     public function __construct(array|string $exclude = null, array $options = null)
     {
         if (\is_array($exclude) && !array_is_list($exclude)) {

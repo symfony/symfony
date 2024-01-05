@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates that a value is a valid host name.
+ *
  * @author Dmitrii Poddubnyi <dpoddubny@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -28,6 +30,11 @@ class Hostname extends Constraint
     public string $message = 'This value is not a valid hostname.';
     public bool $requireTld = true;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param bool|null                $requireTld Whether to require the hostname to include its top-level domain (defaults to true)
+     * @param string[]|null            $groups
+     */
     public function __construct(
         array $options = null,
         string $message = null,

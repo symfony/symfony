@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Defines custom validation rules through arbitrary callback methods.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -24,6 +26,10 @@ class Callback extends Constraint
      */
     public $callback;
 
+    /**
+     * @param string|string[]|callable|array<string,mixed>|null $callback The callback definition
+     * @param string[]|null                                     $groups
+     */
     public function __construct(array|string|callable $callback = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         // Invocation through attributes with an array parameter only

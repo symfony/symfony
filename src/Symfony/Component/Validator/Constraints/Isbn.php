@@ -61,7 +61,7 @@ class Isbn extends Constraint
     /**
      * @var string|array|null The type of ISBN validation to apply ('isbn10', 'isbn13', or both). Default is null, which means both types are validated.
      */
-    public string|array|null $type;
+    public string|array|null $type = null;
 
     /**
      * @var string The default message to display when the value is not a valid ISBN.

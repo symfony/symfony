@@ -170,6 +170,41 @@ class CollectionTest extends TestCase
             'extraFieldsMessage' => 'foo bar baz',
         ]);
 
+        $this->assertSame([], $constraint->fields);
+        $this->assertTrue($constraint->allowExtraFields);
+        $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
+    }
+
+    public function testEmptyConstraintListFor()
+    {
+        $constraint = new Collection([
+                'foo' => [],
+            ],
+            null,
+            null,
+            true,
+            null,
+            'foo bar baz'
+        );
+
+        $this->assertArrayHasKey('foo', $constraint->fields);
+        $this->assertInstanceOf(Required::class, $constraint->fields['foo']);
+        $this->assertTrue($constraint->allowExtraFields);
+        $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
+    }
+
+    public function testEmptyConstraintListForFieldInOptions()
+    {
+        $constraint = new Collection([
+            'fields' => [
+                'foo' => [],
+            ],
+            'allowExtraFields' => true,
+            'extraFieldsMessage' => 'foo bar baz',
+        ]);
+
+        $this->assertArrayHasKey('foo', $constraint->fields);
+        $this->assertInstanceOf(Required::class, $constraint->fields['foo']);
         $this->assertTrue($constraint->allowExtraFields);
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }

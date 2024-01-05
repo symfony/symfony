@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-04T14:27:20Z
+
+(fabbot unrelated)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-04T21:48:38Z
+
+Good catch, to avoid such mistakes we could check inside the loop if class instanceof `AbstractFactory`, but that would be on runtime, and I don't think its worth
+
+WDYT @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-05T04:23:42Z
+
+Maybe naive but is something like that possible ?
+
+```diff
+-foreach ($classToServices as $class => $service) {
++foreach ($classToServices as $service) {
+    $package = substr($service, \strlen('notifier.transport_factory.'));
+
+-    if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $class, $parentPackages)) {
++    if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $container->getDefinition($service)->getClass(), $parentPackages)) {
+        $container->removeDefinition($service);
+    }
+  }
+```
+
+And then keep only the ids (that may be collected thanks to the tag too i guess?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-05T08:05:35Z
+
+> Maybe naive but is something like that possible ?
+
+Possible, can you give it a try on 7.1?
+
+> (that may be collected thanks to the tag too i guess?)
+
+That'd require a compiler pass. Which is maybe not a bad idea since it would allow registering external notifiers/etc.
+To be confirmed there's a use case for that.

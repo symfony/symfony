@@ -36,8 +36,7 @@ final class NtfyTransport extends AbstractTransport
         private bool $secureHttp = true,
         HttpClientInterface $client = null,
         EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -46,7 +45,7 @@ final class NtfyTransport extends AbstractTransport
         return $this->topic;
     }
 
-    public function setPassword(?string $password): self
+    public function setPassword(#[\SensitiveParameter] ?string $password): self
     {
         $this->password = $password;
 

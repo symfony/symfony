@@ -41,7 +41,7 @@ final class GoogleChatTransport extends AbstractTransport
      */
     public function __construct(
         private string $space,
-        private string $accessKey,
+        #[\SensitiveParameter] private string $accessKey,
         #[\SensitiveParameter] private string $accessToken,
         private ?string $threadKey = null,
         HttpClientInterface $client = null,

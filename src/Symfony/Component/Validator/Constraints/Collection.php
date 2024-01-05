@@ -35,10 +35,7 @@ class Collection extends Composite
 
     public function __construct(array $fields = null, array $groups = null, mixed $payload = null, bool $allowExtraFields = null, bool $allowMissingFields = null, string $extraFieldsMessage = null, string $missingFieldsMessage = null)
     {
-        if (\is_array($fields)
-            && (($firstField = reset($fields)) instanceof Constraint
-                || ($firstField[0] ?? null) instanceof Constraint
-            )) {
+        if (\is_array($fields) && ([] === $fields || ($firstField = reset($fields)) instanceof Constraint || ($firstField[0] ?? null) instanceof Constraint)) {
             $fields = ['fields' => $fields];
         }
 

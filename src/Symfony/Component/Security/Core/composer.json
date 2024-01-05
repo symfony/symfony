@@ -30,7 +30,7 @@
         "symfony/http-foundation": "^6.4|^7.0",
         "symfony/ldap": "^6.4|^7.0",
         "symfony/string": "^6.4|^7.0",
-        "symfony/translation": "^6.4|^7.0",
+        "symfony/translation": "^6.4.3|^7.0.3",
         "symfony/validator": "^6.4|^7.0",
         "psr/log": "^1|^2|^3"
     },
@@ -38,6 +38,7 @@
         "symfony/event-dispatcher": "<6.4",
         "symfony/http-foundation": "<6.4",
         "symfony/ldap": "<6.4",
+        "symfony/translation": "<6.4.3|>=7.0,<7.0.3",
         "symfony/validator": "<6.4"
     },
     "autoload": {

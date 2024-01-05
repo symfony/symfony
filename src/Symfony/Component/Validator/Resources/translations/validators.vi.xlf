@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="vi" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -361,19 +361,19 @@
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
                 <target>Mật khẩu này đã bị rò rỉ dữ liệu, không được sử dụng nữa. Xin vui lòng sử dụng mật khẩu khác.</target>
-           </trans-unit>
-           <trans-unit id="94">
-               <source>This value should be between {{ min }} and {{ max }}.</source>
-               <target>Giá trị này nên thuộc giữa {{ min }} và {{ max }}.</target>
-           </trans-unit>
-           <trans-unit id="95">
-               <source>This value is not a valid hostname.</source>
-               <target>Giá trị này không phải là tên máy chủ hợp lệ.</target>
-           </trans-unit>
-           <trans-unit id="96">
-               <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-               <target>Số lượng các phần tử trong bộ sưu tập này nên là bội số của {{ compared_value }}.</target>
-           </trans-unit>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Giá trị này nên thuộc giữa {{ min }} và {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Giá trị này không phải là tên máy chủ hợp lệ.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Số lượng các phần tử trong bộ sưu tập này nên là bội số của {{ compared_value }}.</target>
+            </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
                 <target>Giá trị này nên thỏa mãn ít nhất một trong những ràng buộc sau:</target>
@@ -429,6 +429,14 @@
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>Phần mở rộng của tệp không hợp lệ ({{ extension }}). Phần mở rộng cho phép là {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This is not a valid MAC address.</source>
+                <target state="needs-translation">This is not a valid MAC address.</target>
             </trans-unit>
         </body>
     </file>

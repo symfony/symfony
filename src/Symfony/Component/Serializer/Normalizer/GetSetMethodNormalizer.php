@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Annotation\Ignore as LegacyIgnore;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 /**
@@ -97,7 +98,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     private function isGetMethod(\ReflectionMethod $method): bool
     {
         return !$method->isStatic()
-            && !$method->getAttributes(Ignore::class)
+            && !($method->getAttributes(Ignore::class) || $method->getAttributes(LegacyIgnore::class))
             && !$method->getNumberOfRequiredParameters()
             && ((2 < ($methodLength = \strlen($method->name)) && str_starts_with($method->name, 'is'))
                 || (3 < $methodLength && (str_starts_with($method->name, 'has') || str_starts_with($method->name, 'get')))

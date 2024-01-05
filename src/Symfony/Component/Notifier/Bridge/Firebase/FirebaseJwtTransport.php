@@ -124,7 +124,7 @@ final class FirebaseJwtTransport extends AbstractTransport
         return $header . '.' . $payload . '.' . $signature;
     }
 
-    protected function urlSafeEncode($data): string
+    protected function urlSafeEncode(string|array $data): string
     {
         if (is_array($data)) {
             $data = json_encode($data, JSON_UNESCAPED_SLASHES);

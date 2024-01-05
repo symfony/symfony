@@ -40,7 +40,7 @@
         "symfony/mime": "^4.4|^5.0|^6.0",
         "symfony/property-access": "^4.4|^5.0|^6.0",
         "symfony/property-info": "^5.3|^6.0",
-        "symfony/translation": "^4.4|^5.0|^6.0",
+        "symfony/translation": "^5.4.35|~6.3.12|^6.4.3",
         "doctrine/annotations": "^1.13|^2",
         "doctrine/cache": "^1.11|^2.0",
         "egulias/email-validator": "^2.1.10|^3|^4"
@@ -54,7 +54,7 @@
         "symfony/http-kernel": "<4.4",
         "symfony/intl": "<4.4",
         "symfony/property-info": "<5.3",
-        "symfony/translation": "<4.4",
+        "symfony/translation": "<5.4.35|>=6.0,<6.3.12|>=6.4,<6.4.3",
         "symfony/yaml": "<4.4"
     },
     "suggest": {

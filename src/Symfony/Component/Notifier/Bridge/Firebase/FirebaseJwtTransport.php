@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class FirebaseJwtTransport extends AbstractTransport
 {
-    protected const HOST = "fcm.googleapis.com/v1/projects/project_id/messages:send";
+    protected const HOST = 'fcm.googleapis.com/v1/projects/project_id/messages:send';
 
     private array $credentials;
 

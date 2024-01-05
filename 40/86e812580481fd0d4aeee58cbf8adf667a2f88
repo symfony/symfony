@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by squrious at 2023-10-12T11:47:20Z
+
+I move this PR to WIP as I'm currently updating all type hints that could be more specific
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-10-23T15:45:45Z
+
+@GromNaN I fixed typos and params alignment :)
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-10-25T16:00:07Z
+
+I applied your recommendations in a new commit so we can see the changes:
+- Document defaults behaviors when it was possible
+- Replace `@link` with `@see`
+- Remove all `<pre>` tags
+- Fix some mistakes
+- Use more `{@see}` to reference structural elements like class constants
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-29T21:42:43Z
+
+Can you please rebase?
+
+---------------------------------------------------------------------------
+
+by squrious at 2024-01-02T09:22:27Z
+
+Rebased on 7.1!
+
+@nicolas-grekas I also applied your suggestions :)
+
+> Thanks for working on this. I have mixed feelings here and I'm already sorry about that. That's a lot of added lines to review and maintain. Are we sure all this is not just boilerplate? Eg is the repetition of the description for groups, payload, options, error message, etc. that useful? I'm not the best person to answer this question because I'm too much into this already but I'm still wondering. Any other opinion?
+
+I agree the repetitions are very redundant and add a lot to maintain. Maybe it's not so useful for groups, payload and error messages as their behavior is likely to be known when working with the validator. But for the options it's a bit different, as the first constructor argument may be used as the default option depending on the constraint. Documenting this aspect may worth it I guess.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-02T09:31:01Z
+
+In #51393, we're wondering about a way to deprecate passing options as an array and require using named arguments instead, so maybe we shouldn't document the array-style?
+
+I'm all for removing redundant descriptions (groups, payload, etc), can you please update accordingly?
+
+---------------------------------------------------------------------------
+
+by squrious at 2024-01-02T09:47:03Z
+
+> In #51393, we're wondering about a way to deprecate passing options as an array and require using named arguments instead, so maybe we shouldn't document the array-style?
+
+If it's about to be deprecated, yup let's get rid of those too.
+
+> I'm all for removing redundant descriptions (groups, payload, etc), can you please update accordingly?
+
+Yes! Just a little question: should I remove the messages documentation if the behavior is a little bit specific to the constraint? Eg in `Choice`, we have `$multipleMessage`, `$minMessage`, etc. Should they be removed too?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-02T09:54:30Z
+
+We should remove low-value descriptions (things that should be obvious once you get the basics of how things work)

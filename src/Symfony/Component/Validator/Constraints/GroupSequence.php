@@ -19,8 +19,30 @@ namespace Symfony\Component\Validator\Constraints;
  * previous groups in the sequence succeeded. This approach is beneficial for scenarios where certain validation
  * groups are more resource-intensive or rely on the success of prior validations.
  *
- * Group sequences can also be used to override the "Default" validation group for a class. When a class has an
- * associated group sequence and is validated in the "Default" group, the group sequence is applied instead.
+ * For example, when validating an address:
+ *
+ *     $validator->validate($address, null, new GroupSequence(['Basic', 'Strict']));
+ *
+ * In this case, all constraints in the "Basic" group are validated first. If none of the "Basic" constraints fail,
+ * the "Strict" group constraints are then validated. This is useful if, for instance, the "Strict" group contains
+ * more resource-intensive checks.
+ *
+ * Group sequences can also be used to override the "Default" validation group for a class:
+ *
+ *     #[GroupSequence(['Address', 'Strict'])]
+ *     class Address
+ *     {
+ *         // ...
+ *     }
+ *
+ * When you validate the `Address` object in the "Default" group, the specified group sequence is applied:
+ *
+ *     $validator->validate($address);
+ *
+ * To validate the constraints of the "Default" group for a class with an overridden default group,
+ * pass the class name as the group name:
+ *
+ *     $validator->validate($address, null, "Address")
  *
  * This feature allows for fine-grained control over the validation process, ensuring efficient and effective
  * validation flows.

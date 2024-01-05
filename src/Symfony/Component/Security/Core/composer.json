@@ -40,7 +40,7 @@
         "symfony/http-foundation": "<5.4",
         "symfony/security-guard": "<5.4",
         "symfony/ldap": "<5.4",
-        "symfony/translation": "<5.4.35|>=6.0,<6.3.12|>=6.4,<6.4.3",
+        "symfony/translation": "<5.4.35|>=6.0,<6.3.12|>=6.4,<6.4.3|>=7.0,<7.0.3",
         "symfony/validator": "<5.4"
     },
     "autoload": {

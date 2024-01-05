@@ -50,7 +50,7 @@
         "symfony/error-handler": "<5.4",
         "symfony/framework-bundle": "<5.4",
         "symfony/http-kernel": "<5.4",
-        "symfony/translation": "<5.4.35|>=6.0,<6.3.12|>=6.4,<6.4.3",
+        "symfony/translation": "<5.4.35|>=6.0,<6.3.12|>=6.4,<6.4.3|>=7.0,<7.0.3",
         "symfony/translation-contracts": "<2.5",
         "symfony/twig-bridge": "<6.3"
     },

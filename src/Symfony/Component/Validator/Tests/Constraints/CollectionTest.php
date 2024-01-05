@@ -145,4 +145,24 @@ class CollectionTest extends TestCase
         $this->assertTrue($constraint->allowExtraFields);
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
+
+    public function testEmptyFields()
+    {
+        $constraint = new Collection([], [], null, true, null, 'foo bar baz');
+
+        $this->assertTrue($constraint->allowExtraFields);
+        $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
+    }
+
+    public function testEmptyFieldsInOptions()
+    {
+        $constraint = new Collection([
+            'fields' => [],
+            'allowExtraFields' => true,
+            'extraFieldsMessage' => 'foo bar baz',
+        ]);
+
+        $this->assertTrue($constraint->allowExtraFields);
+        $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
+    }
 }

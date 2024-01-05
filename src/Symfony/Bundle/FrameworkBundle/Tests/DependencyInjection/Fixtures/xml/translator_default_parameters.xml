@@ -10,8 +10,8 @@
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
         <framework:translator enabled="true">
-            <framework:global name="%%app_name%%" value="My application" />
-            <framework:global name="{app_version}" value="1.2.3" />
+            <framework:default-parameter name="%%app_name%%" value="My application" />
+            <framework:default-parameter name="{app_version}" value="1.2.3" />
         </framework:translator>
     </framework:config>
 </container>

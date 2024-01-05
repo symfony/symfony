@@ -5,6 +5,4 @@ framework:
     php_errors:
         log: true
     translator:
-        globals:
-            '%%app_name%%': 'My application'
-            '{app_version}': '1.2.3'
+        default_parameters: []

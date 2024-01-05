@@ -13,9 +13,9 @@ namespace Symfony\Component\Translation;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class GlobalsTranslator implements TranslatorInterface
+final class DefaultParametersTranslator implements TranslatorInterface
 {
-    private array $globals = [];
+    private array $defaultParameters = [];
 
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -24,7 +24,7 @@ final class GlobalsTranslator implements TranslatorInterface
 
     public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
     {
-        $parameters = array_replace($this->globals, $parameters);
+        $parameters = array_replace($this->defaultParameters, $parameters);
 
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
@@ -34,8 +34,8 @@ final class GlobalsTranslator implements TranslatorInterface
         return $this->translator->getLocale();
     }
 
-    public function addGlobal(string $name, mixed $value): void
+    public function addDefaultParameter(string $name, mixed $value): void
     {
-        $this->globals[$name] = $value;
+        $this->defaultParameters[$name] = $value;
     }
 }

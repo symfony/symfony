@@ -18,6 +18,10 @@
         <target>with</target>
         <note>note</note>
       </trans-unit>
+      <trans-unit id="5">
+        <source>skipped</source>
+        <target state="needs-translation">skipped</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

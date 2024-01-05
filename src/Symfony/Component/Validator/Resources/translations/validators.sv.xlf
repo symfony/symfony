@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="sv" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -390,7 +390,7 @@
                 <source>This value should be a valid expression.</source>
                 <target>Det här värdet bör vara ett giltigt uttryck.</target>
             </trans-unit>
-               <trans-unit id="101">
+            <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
                 <target>Det här värdet är inte en giltig CSS-färg.</target>
             </trans-unit>
@@ -433,6 +433,10 @@
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
                 <target>Den upptäckta teckenkodningen är ogiltig ({{ detected }}). Tillåtna kodningar är {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This is not a valid MAC address.</source>
+                <target state="needs-translation">This is not a valid MAC address.</target>
             </trans-unit>
         </body>
     </file>

@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="pt" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="28">
                 <source>This form should not contain extra fields.</source>
@@ -14,7 +14,7 @@
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
                 <target>O token CSRF está inválido. Por favor, tente enviar o formulário novamente.</target>
             </trans-unit>
-             <trans-unit id="99">
+            <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
                 <target>Este valor não é uma cor HTML5 válida.</target>
             </trans-unit>
@@ -50,7 +50,7 @@
                 <source>Please enter a valid date and time.</source>
                 <target>Por favor, informe uma data e horário válidos.</target>
             </trans-unit>
-             <trans-unit id="108">
+            <trans-unit id="108">
                 <source>Please enter a valid date.</source>
                 <target>Por favor, informe uma data válida.</target>
             </trans-unit>

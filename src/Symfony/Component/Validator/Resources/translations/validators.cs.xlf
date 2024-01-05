@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="cs" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -414,18 +414,30 @@
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
                 <target>Tato hodnota obsahuje znaky, které nejsou povoleny aktuální úrovní omezení.</target>
             </trans-unit>
-           <trans-unit id="107">
-               <source>Using invisible characters is not allowed.</source>
-               <target>Používání neviditelných znaků není povoleno.</target>
-           </trans-unit>
-           <trans-unit id="108">
-               <source>Mixing numbers from different scripts is not allowed.</source>
-               <target>Kombinování čísel z různých písem není povoleno.</target>
-           </trans-unit>
-           <trans-unit id="109">
-               <source>Using hidden overlay characters is not allowed.</source>
-               <target>Použití skrytých překrývajících znaků není povoleno.</target>
-           </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Používání neviditelných znaků není povoleno.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Kombinování čísel z různých písem není povoleno.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Použití skrytých překrývajících znaků není povoleno.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Přípona souboru je neplatná ({{ extension }}). Povolené přípony jsou {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Zjištěné kódování znaků je neplatné ({{ detected }}). Povolená kódování jsou {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This is not a valid MAC address.</source>
+                <target>Tohle není platná MAC adresa.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

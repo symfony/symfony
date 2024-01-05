@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Introduce `PropertyDocBlockExtractorInterface` to extract a property's doc block
+ * Restrict access to `PhpStanExtractor` based on visibility
 
 6.4
 ---

@@ -17,6 +17,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyPropertyAndGetterWithDifferentTypes;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
@@ -474,6 +475,26 @@ class PhpStanExtractorTest extends TestCase
             [Php80Dummy::class, 'collection', [new Type(Type::BUILTIN_TYPE_ARRAY, collection: true, collectionValueType: new Type(Type::BUILTIN_TYPE_STRING))]],
             [Php80PromotedDummy::class, 'promoted', null],
         ];
+    }
+
+    public static function allowPrivateAccessProvider(): array
+    {
+        return [
+            [true, [new Type(Type::BUILTIN_TYPE_STRING)]],
+            [false, [new Type(Type::BUILTIN_TYPE_ARRAY, collection: true, collectionKeyType: new Type('int'), collectionValueType: new Type('string'))]],
+        ];
+    }
+
+    /**
+     * @dataProvider allowPrivateAccessProvider
+     */
+    public function testAllowPrivateAccess(bool $allowPrivateAccess, array $expectedTypes)
+    {
+        $extractor = new PhpStanExtractor(allowPrivateAccess: $allowPrivateAccess);
+        $this->assertEquals(
+            $expectedTypes,
+            $extractor->getTypes(DummyPropertyAndGetterWithDifferentTypes::class, 'foo')
+        );
     }
 }
 

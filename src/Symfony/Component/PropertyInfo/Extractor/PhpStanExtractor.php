@@ -53,7 +53,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
      * @param list<string>|null $accessorPrefixes
      * @param list<string>|null $arrayMutatorPrefixes
      */
-    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null)
+    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, private bool $allowPrivateAccess = true)
     {
         if (!class_exists(ContextFactory::class)) {
             throw new \LogicException(sprintf('Unable to use the "%s" class as the "phpdocumentor/type-resolver" package is not installed. Try running composer require "phpdocumentor/type-resolver".', __CLASS__));
@@ -232,6 +232,10 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
             return null;
         }
 
+        if (!$this->canAccessMemberBasedOnItsVisibility($reflectionProperty)) {
+            return null;
+        }
+
         // Type can be inside property docblock as `@var`
         $rawDocNode = $reflectionProperty->getDocComment();
         $phpDocNode = $rawDocNode ? $this->getPhpDocNode($rawDocNode) : null;
@@ -274,8 +278,11 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
                 }
 
                 if (
-                    (self::ACCESSOR === $type && 0 === $reflectionMethod->getNumberOfRequiredParameters())
-                    || (self::MUTATOR === $type && $reflectionMethod->getNumberOfParameters() >= 1)
+                    (
+                        (self::ACCESSOR === $type && 0 === $reflectionMethod->getNumberOfRequiredParameters())
+                        || (self::MUTATOR === $type && $reflectionMethod->getNumberOfParameters() >= 1)
+                    )
+                    && $this->canAccessMemberBasedOnItsVisibility($reflectionMethod)
                 ) {
                     break;
                 }
@@ -304,5 +311,10 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         $tokens->consumeTokenType(Lexer::TOKEN_END);
 
         return $phpDocNode;
+    }
+
+    private function canAccessMemberBasedOnItsVisibility(\ReflectionProperty|\ReflectionMethod $member): bool
+    {
+        return $this->allowPrivateAccess || $member->isPublic();
     }
 }

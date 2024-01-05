@@ -167,7 +167,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Bridge as TranslationBridge;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Extractor\PhpAstExtractor;
-use Symfony\Component\Translation\GlobalsTranslator;
+use Symfony\Component\Translation\DefaultParametersTranslator;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
@@ -1568,15 +1568,15 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (!empty($config['globals'])) {
+        if (!empty($config['default_parameters'])) {
             $def = $container
-                ->register('translator.globals', GlobalsTranslator::class)
+                ->register('translator.default_parameters', DefaultParametersTranslator::class)
                 ->setDecoratedService('translator', null, -1) // Lower priority than "translator.data_collector"
                 ->setArguments([
-                    new Reference('translator.globals.inner'),
+                    new Reference('translator.default_parameters.inner'),
                 ]);
-            foreach ($config['globals'] as $key => $value) {
-                $def->addMethodCall('addGlobal', [$key, $value]);
+            foreach ($config['default_parameters'] as $key => $value) {
+                $def->addMethodCall('addDefaultParameter', [$key, $value]);
             }
         }
 

@@ -428,15 +428,15 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-translation">The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</target>
+                <target state="needs-review-translation">Fitxategiaren luzapena ez da zuzena ({{ extension }}). Baimendutako luzapenak hauek dira: {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+                <target state="needs-review-translation">Detektatutako karaktere-kodetzea ez da zuzena ({{ detected }}). Baimendutako kodetzeak hauek dira: {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-translation">This is not a valid MAC address.</target>
+                <target state="needs-review-translation">Hau ez da MAC helbide balioduna.</target>
             </trans-unit>
         </body>
     </file>

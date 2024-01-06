@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-15T08:20:28Z
+
+In the same idea, I'm not sure to clearly understand the convention in the code base on which class to use when one is available in Contracts, PSR and in the component itself (e.g. EventDispatcher)? :thinking:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-18T15:14:17Z
+
+> why the ClockSensitiveTrait::mockTime returns a PSR ClockInterface, instead of a Symfony ClockInterface
+
+No specific reason I can think of...
+
+> In the same idea, I'm not sure to clearly understand the convention in the code base on which class to use when one is available in Contracts, PSR and in the component itself (e.g. EventDispatcher)? 🤔
+
+See SOLID principles: use the most abstract interface when it fits your need. If you need a more capable interface, use the more capable one.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-12-18T15:16:11Z
+
+Anytime a component only needs the API of the PSR interface, we use that as parameter type as it makes the component usable with any PSR-20 implementation and not just `symfony/clock`
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-12-18T15:18:22Z
+
+Got it, thank you both :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T15:41:32Z
+
+@ruudk please advise what you'd like to do with this PR. "Draft status" is blurry for OSS maintainers.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2024-01-02T14:59:45Z
+
+I made it Draft because I wasn't sure. So I made it ready for review now.
+
+I think that the return type should be the thing that is going to be returned. That allows the developer, when using this in the test, to call `withTimeZone` on the returned Symfony Clock. Obviously, that already works, except that PHPStorm and PHPStan don't understand it.

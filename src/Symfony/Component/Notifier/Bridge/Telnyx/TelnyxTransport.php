@@ -65,7 +65,7 @@ final class TelnyxTransport extends AbstractTransport
         if (!preg_match('/^[+]+[1-9][0-9]{9,14}$/', $from)) {
             if ('' === $from) {
                 throw new IncompleteDsnException('This phone number is invalid.');
-            } elseif ('' !== $from && null === $this->messagingProfileId) {
+            } elseif (null === $this->messagingProfileId) {
                 throw new IncompleteDsnException('The sending messaging profile must be specified.');
             }
 

@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by thunderer at 2024-01-04T13:59:30Z
+
+@nicolas-grekas I specifically mentioned professional translator, because I actually work with one. I can provide a proof of that if necessary. When I had a native speaker available, I mentioned it explicitly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-04T14:03:03Z
+
+OK, great. I'm surprised you're able to deliver so many languages at this rate.
+On my side, the constant stream of PRs on the topic is a burden I'd like to cut, so there is my proposal.
+I'd be happy to have reviews on GPT-generated translations instead!
+
+---------------------------------------------------------------------------
+
+by thunderer at 2024-01-04T14:09:10Z
+
+Hi Nicolas, I was always explicit in my PRs about where the translations come from. I saw that maybe I'll be able to help quicker so I contacted a company and ordered those translations - all of them were made by native speakers or sworn translators, I have asked for that. Since they were ready today, I submitted all PRs. I didn't assign myself until they were ready, to not block anyone who would like to contribute. Would it be possible for you to merge my PRs once I rebase them?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-04T14:12:34Z
+
+Sure, I can do that. If you have more patches on the topic, it'd be nice if you could group them in one PR also. :pray:
+
+---------------------------------------------------------------------------
+
+by thunderer at 2024-01-04T14:13:47Z
+
+@nicolas-grekas excellent, I'll rebase them shortly.
+
+---------------------------------------------------------------------------
+
+by thunderer at 2024-01-04T14:37:42Z
+
+@nicolas-grekas all PRs rebased, checked diffs and they update only the `<target>` line removing the `needs-translation` attribute. I will group the changes next time for all translations I have available at given time, I'm sorry for causing additional work. I thought that one-PR-per-issue is expected since @carsonbot raised separate issues.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-04T14:56:57Z
+
+PR rebased and ready.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-04T21:45:52Z
+
+@nicolas-grekas what do you think of having a list of native speakers, ready to review such messages, which could then get a ping after ChatGPT proposed a translation?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-05T07:02:34Z
+
+@OskarStark we would need a way to manage that list. And since things should remain open, people should be able to subscribe and unsubscribe at will.
+
+One idea in this direction could be to have one special issue managed by carsbonbot that is opened/closed when needed, and that people could register to to be notified of when a new translation is needed. Or maybe one issue per language (but I'm not sure this is a good idea as that'd also mean spamming notifications - one single issue wouldn't). @Nyholm WDYT also?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-05T07:18:31Z
+
+> having a list of native speakers
+
+~Oh, another idea would be to add willing translators to .github/CODEOWNER~
+
+---------------------------------------------------------------------------
+
+by thunderer at 2024-01-05T07:21:31Z
+
+@nicolas-grekas I volunteer as tribute for Polish. :smile:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-05T07:41:47Z
+
+> Oh, another idea would be to add willing translators to .github/CODEOWNER
+
+That wouldn't work, I already had that idea for bridges in Notifier, Mailer etc. but this file only has some effect for members of the repo/orga 😢
+
+---------------------------------------------------------------------------
+
+by rosier at 2024-01-05T17:25:34Z
+
+> In order to still allow and call for human review, I propose to use the `state="needs-review-translation"` on `<target>` tags as defined by XLIFF.
+
+WDYT of using `state="needs-review"` since the translation is already done by GPT and it just needs to be reviewed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-06T11:27:15Z
+
+> WDYT of using state="needs-review"
+
+It's not in the xliff spec: https://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#state

@@ -164,6 +164,11 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
         return (\strlen($this->uid) - \strlen($other->uid)) ?: ($this->uid <=> $other->uid);
     }
 
+    final public function toString(): string
+    {
+        return $this->__toString();
+    }
+
     public function __toString(): string
     {
         return $this->uid;

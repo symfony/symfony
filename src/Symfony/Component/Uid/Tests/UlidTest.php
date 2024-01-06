@@ -290,4 +290,9 @@ class UlidTest extends TestCase
     {
         $this->assertSame('7ZZZZZZZZZZZZZZZZZZZZZZZZZ', (string) new MaxUlid());
     }
+
+    public function testToString()
+    {
+        $this->assertSame('01HK77WP8T7107EZH9CNAES202', (new Ulid('01HK77WP8T7107EZH9CNAES202'))->toString());
+    }
 }

@@ -471,4 +471,9 @@ class UuidTest extends TestCase
         $this->assertNotEquals($uuidV7, $sameUuidV7100NanosecondsLater);
         $this->assertSame(hexdec('0'.substr($uuidV7, -2)) + 1, hexdec('0'.substr($sameUuidV7100NanosecondsLater, -2)));
     }
+
+    public function testToString()
+    {
+        $this->assertSame('a45a8538-77a9-4335-bd30-236f59b81b81', (new UuidV4('a45a8538-77a9-4335-bd30-236f59b81b81'))->toString());
+    }
 }

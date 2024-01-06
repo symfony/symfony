@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-01-04T16:39:22Z
+
+The file name looks weird as this script is not really _checking_ translations but adding missing untranslated messages.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-05T07:14:49Z
+
+Script renamed to sync-translations.php
+I also added a comment to explain how it should be used when adding a new message to translate.

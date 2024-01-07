@@ -404,39 +404,39 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target state="needs-translation">The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</target>
+                <target state="needs-review-translation">O nome do ficheiro é demasiado longo. Debe ter {{ filename_max_length }} caracteres ou menos.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target state="needs-translation">The password strength is too low. Please use a stronger password.</target>
+                <target state="needs-review-translation">A forza do contrasinal é demasiado baixa. Utilice un contrasinal máis forte.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target state="needs-translation">This value contains characters that are not allowed by the current restriction-level.</target>
+                <target state="needs-review-translation">Este valor contén caracteres que non están permitidos polo nivel de restrición actual.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
-                <target state="needs-translation">Using invisible characters is not allowed.</target>
+                <target state="needs-review-translation">Non se permite usar caracteres invisibles.</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target state="needs-translation">Mixing numbers from different scripts is not allowed.</target>
+                <target state="needs-review-translation">Non se permite mesturar números de diferentes scripts.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
-                <target state="needs-translation">Using hidden overlay characters is not allowed.</target>
+                <target state="needs-review-translation">Non se permite usar caracteres de superposición ocultos.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-translation">The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</target>
+                <target state="needs-review-translation">A extensión do ficheiro non é válida ({{ extension }}). As extensións permitidas son {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+                <target state="needs-review-translation">A codificación de caracteres detectada non é válida ({{ detected }}). As codificacións permitidas son {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-translation">This is not a valid MAC address.</target>
+                <target state="needs-review-translation">Esta non é unha dirección MAC válida.</target>
             </trans-unit>
         </body>
     </file>

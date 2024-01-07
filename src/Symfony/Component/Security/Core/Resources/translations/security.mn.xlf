@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target state="needs-translation">Too many failed login attempts, please try again in %minutes% minute.</target>
+                <target state="needs-review-translation">Нэвтрэх оролдлого ихээр амжилтгүй болсон, %minutes% минутын дараа дахин оролдоно уу.</target>
             </trans-unit>
         </body>
     </file>

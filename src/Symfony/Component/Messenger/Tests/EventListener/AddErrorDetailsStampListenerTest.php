@@ -33,6 +33,20 @@ final class AddErrorDetailsStampListenerTest extends TestCase
         $this->assertEquals($expectedStamp, $event->getEnvelope()->last(ErrorDetailsStamp::class));
     }
 
+    public function testExceptionDetailsWithoutStackTraceAreAdded()
+    {
+        $listener = new AddErrorDetailsStampListener(['my_receiver' => false]);
+
+        $envelope = new Envelope(new \stdClass());
+        $exception = new \Exception('It failed!');
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
+        $expectedStamp = ErrorDetailsStamp::create($exception, false);
+
+        $listener->onMessageFailed($event);
+
+        $this->assertEquals($expectedStamp, $event->getEnvelope()->last(ErrorDetailsStamp::class));
+    }
+
     public function testWorkerAddsNewErrorDetailsStampOnFailure()
     {
         $listener = new AddErrorDetailsStampListener();

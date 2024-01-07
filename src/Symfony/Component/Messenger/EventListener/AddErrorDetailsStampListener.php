@@ -17,9 +17,17 @@ use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 
 final class AddErrorDetailsStampListener implements EventSubscriberInterface
 {
+    /**
+     * @param array<string, bool> $includeStackTrace
+     */
+    public function __construct(
+        private readonly array $includeStackTrace = [],
+    ) {
+    }
+
     public function onMessageFailed(WorkerMessageFailedEvent $event): void
     {
-        $stamp = ErrorDetailsStamp::create($event->getThrowable());
+        $stamp = ErrorDetailsStamp::create($event->getThrowable(), $this->includeStackTrace[$event->getReceiverName()] ?? true);
         $previousStamp = $event->getEnvelope()->last(ErrorDetailsStamp::class);
 
         // Do not append duplicate information

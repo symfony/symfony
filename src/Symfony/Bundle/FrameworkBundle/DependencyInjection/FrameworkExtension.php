@@ -2332,6 +2332,7 @@ class FrameworkExtension extends Extension
         }
 
         $senderAliases = [];
+        $includeStackTraceInError = [];
         $transportRetryReferences = [];
         $transportRateLimiterReferences = [];
         foreach ($config['transports'] as $name => $transport) {
@@ -2346,6 +2347,8 @@ class FrameworkExtension extends Extension
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;
+
+            $includeStackTraceInError[$name] = $transport['include_stack_trace_in_error'] ?? $config['include_stack_trace_in_error'];
 
             if (null !== $transport['retry_strategy']['service']) {
                 $transportRetryReferences[$name] = new Reference($transport['retry_strategy']['service']);
@@ -2417,6 +2420,10 @@ class FrameworkExtension extends Extension
         $container->getDefinition('messenger.senders_locator')
             ->replaceArgument(0, $messageToSendersMapping)
             ->replaceArgument(1, $sendersServiceLocator)
+        ;
+
+        $container->getDefinition('messenger.failure.add_error_details_stamp_listener')
+            ->replaceArgument(0, $includeStackTraceInError)
         ;
 
         $container->getDefinition('messenger.retry.send_failed_message_for_retry_listener')

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `$includeStackTrace` parameters to `AddErrorDetailsStampListener` and `ErrorDetailsStamp` to allow excluding the stack trace from the `ErrorDetailsStamp`
+
 7.2
 ---
 

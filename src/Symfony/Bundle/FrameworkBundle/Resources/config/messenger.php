@@ -183,6 +183,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.failure.add_error_details_stamp_listener', AddErrorDetailsStampListener::class)
+            ->args([
+                abstract_arg('include_stack_trace_in_error'),
+            ])
             ->tag('kernel.event_subscriber')
 
         ->set('messenger.failure.send_failed_message_to_failure_transport_listener', SendFailedMessageToFailureTransportListener::class)

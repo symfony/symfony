@@ -36,11 +36,11 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target state="needs-translation">This field was not expected.</target>
+                <target state="needs-review-translation">این فیلد انتظار نمی‌رفت.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target state="needs-translation">This field is missing.</target>
+                <target state="needs-review-translation">این فیلد گمشده است.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -428,15 +428,15 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-translation">The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</target>
+                <target state="needs-review-translation">پسوند فایل نامعتبر است ({{ extension }}). پسوندهای مجاز {{ extensions }} هستند.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+                <target state="needs-review-translation">رمزگذاری کاراکتر تشخیص داده شده نامعتبر است ({{ detected }}). رمزگذاری‌های مجاز {{ encodings }} هستند.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-translation">This is not a valid MAC address.</target>
+                <target state="needs-review-translation">این یک آدرس MAC معتبر نیست.</target>
             </trans-unit>
         </body>
     </file>

@@ -392,51 +392,51 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
-                <target state="needs-translation">This value is not a valid CSS color.</target>
+                <target state="needs-review-translation">Այս արժեքը վավեր CSS գույն չէ։</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target state="needs-translation">This value is not a valid CIDR notation.</target>
+                <target state="needs-review-translation">Այս արժեքը վավեր CIDR նշում չէ։</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
-                <target state="needs-translation">The value of the netmask should be between {{ min }} and {{ max }}.</target>
+                <target state="needs-review-translation">Ցանցային դիմակի արժեքը պետք է լինի {{ min }}-ի և {{ max }}-ի միջև։</target>
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target state="needs-translation">The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</target>
+                <target state="needs-review-translation">Ֆայլի անունը շատ երկար է։ Այն պետք է ունենա {{ filename_max_length }} նիշ կամ պակաս։</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target state="needs-translation">The password strength is too low. Please use a stronger password.</target>
+                <target state="needs-review-translation">Գաղտնաբառի անվտանգությունը շատ ցածր է։ Խնդրում ենք գործածել ավելի ամրագույն գաղտնաբառ։</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target state="needs-translation">This value contains characters that are not allowed by the current restriction-level.</target>
+                <target state="needs-review-translation">Այս արժեքը պարունակում է այն նիշերը, որոնք չեն թույլատրվում ըստ ընթացիկ սահմանումների։</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
-                <target state="needs-translation">Using invisible characters is not allowed.</target>
+                <target state="needs-review-translation">Անտեսանելի նիշերի օգտագործումը չի թույլատրվում։</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target state="needs-translation">Mixing numbers from different scripts is not allowed.</target>
+                <target state="needs-review-translation">Թվերի խառնուրդը տարբեր սցենարներից չի թույլատրվում։</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
-                <target state="needs-translation">Using hidden overlay characters is not allowed.</target>
+                <target state="needs-review-translation">Թաքնված ծածկանիշերի օգտագործումը չի թույլատրվում։</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-translation">The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</target>
+                <target state="needs-review-translation">Ֆայլի ընդլայնումը անվավեր է ({{ extension }})։ Թույլատրվող ընդլայնումներն են՝ {{ extensions }}։</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+                <target state="needs-review-translation">Հայտնաբերված նիշագրության կոդը անվավեր է ({{ detected }})։ Թույլատրվող կոդերն են՝ {{ encodings }}։</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-translation">This is not a valid MAC address.</target>
+                <target state="needs-review-translation">Սա վավեր MAC հասցե չէ։</target>
             </trans-unit>
         </body>
     </file>

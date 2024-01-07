@@ -36,14 +36,15 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
 
     public function warmUp(string $cacheDir, string $buildDir = null): array
     {
-        if (!$buildDir) {
-            return [];
+        if (null === $buildDir) {
+            trigger_deprecation('symfony/framework-bundle', '7.1', sprintf('Not passing a build dir as the second argument to "%s()" is deprecated.', __METHOD__));
+            // return [];
         }
 
         $router = $this->container->get('router');
 
         if ($router instanceof WarmableInterface) {
-            return (array) $router->warmUp($cacheDir, $buildDir);
+            return (array) $router->warmUp($cacheDir, $buildDir, false);
         }
 
         throw new \LogicException(sprintf('The router "%s" cannot be warmed up because it does not implement "%s".', get_debug_type($router), WarmableInterface::class));

@@ -9,6 +9,7 @@ Cache
 FrameworkBundle
 ---------------
 
+ * Deprecate not passing a build dir to `RouterCacheWarmer::warmUp()` and `Router::warmUp()`
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
 
 Messenger

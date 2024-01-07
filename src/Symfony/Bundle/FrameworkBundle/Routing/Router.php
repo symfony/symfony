@@ -84,14 +84,17 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
 
     public function warmUp(string $cacheDir, string $buildDir = null): array
     {
-        if (!$buildDir) {
-            return [];
+        if (null === $buildDir) {
+            if (\func_num_args() < 3) {
+                trigger_deprecation('symfony/framework-bundle', '7.1', sprintf('Not passing a build dir as the second argument to "%s()" is deprecated.', __METHOD__));
+            }
+            // return [];
         }
 
         $currentDir = $this->getOption('cache_dir');
 
-        // force cache generation in build_dir
-        $this->setOption('cache_dir', $buildDir);
+        // force cache generation (in build_dir if present)
+        $this->setOption('cache_dir', $buildDir ?? $cacheDir);
         $this->getMatcher();
         $this->getGenerator();
 

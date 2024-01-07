@@ -7,6 +7,7 @@ CHANGELOG
  * `WrappedExceptionsInterface` now extends PHP's `Throwable` interface
  * Add `#[AsMessage]` attribute with `$transport` parameter for message routing
  * Add `--format` option to the `messenger:stats` command
+ * Add `$includeStackTrace` parameters to `AddErrorDetailsStampListener` and `ErrorDetailsStamp` to allow excluding the stack trace from the `ErrorDetailsStamp`
 
 7.1
 ---

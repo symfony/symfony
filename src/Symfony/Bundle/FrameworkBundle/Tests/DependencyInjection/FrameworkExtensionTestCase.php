@@ -1112,6 +1112,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->createContainerFromFile('messenger_routing_invalid_transport');
     }
 
+    /**
+     * @testWith ["messenger_with_include_stack_trace_true", {"sender.biz": true, "sender.bar": false, "sender.foo": true}]
+     *           ["messenger_with_include_stack_trace_false", {"sender.biz": false, "sender.bar": true, "sender.foo": false}]
+     */
+    public function testMessengerWithIncludeStackTrace(string $file, array $expected)
+    {
+        $container = $this->createContainerFromFile($file);
+
+        $this->assertSame($expected, $container->getDefinition('messenger.failure.add_error_details_stamp_listener')->getArgument(0));
+    }
+
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');

@@ -23,4 +23,5 @@ if (getcwd() === realpath(__DIR__.'/src/Symfony/Bridge/PhpUnit')) {
     putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 putenv('SYMFONY_PHPUNIT_DIR='.__DIR__.'/.phpunit');
+putenv('SYMFONY_PHPUNIT_REQUIRE=nikic/php-parser:^4.13');
 require __DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit';

@@ -396,47 +396,47 @@
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target state="needs-translation">This value is not a valid CIDR notation.</target>
+                <target state="needs-review-translation">Ang halagang ito ay hindi wastong notasyong CIDR.</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
-                <target state="needs-translation">The value of the netmask should be between {{ min }} and {{ max }}.</target>
+                <target state="needs-review-translation">Ang halaga ng netmask ay dapat nasa pagitan ng {{ min }} at {{ max }}.</target>
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target state="needs-translation">The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</target>
+                <target state="needs-review-translation">Ang pangalan ng file ay masyadong mahaba. Dapat itong magkaroon ng {{ filename_max_length }} karakter o mas kaunti.|Ang pangalan ng file ay masyadong mahaba. Dapat itong magkaroon ng {{ filename_max_length }} mga karakter o mas kaunti.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target state="needs-translation">The password strength is too low. Please use a stronger password.</target>
+                <target state="needs-review-translation">Ang lakas ng password ay masyadong mababa. Mangyaring gumamit ng mas malakas na password.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target state="needs-translation">This value contains characters that are not allowed by the current restriction-level.</target>
+                <target state="needs-review-translation">Ang halagang ito ay naglalaman ng mga karakter na hindi pinapayagan ng kasalukuyang antas ng paghihigpit.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
-                <target state="needs-translation">Using invisible characters is not allowed.</target>
+                <target state="needs-review-translation">Hindi pinapayagan ang paggamit ng mga hindi nakikitang karakter.</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target state="needs-translation">Mixing numbers from different scripts is not allowed.</target>
+                <target state="needs-review-translation">Hindi pinapayagan ang paghahalo ng mga numero mula sa iba't ibang script.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
-                <target state="needs-translation">Using hidden overlay characters is not allowed.</target>
+                <target state="needs-review-translation">Hindi pinapayagan ang paggamit ng mga nakatagong overlay na karakter.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-translation">The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</target>
+                <target state="needs-review-translation">Ang extension ng file ay hindi wasto ({{ extension }}). Ang mga pinapayagang extension ay {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+                <target state="needs-review-translation">Ang nakitang encoding ng karakter ay hindi wasto ({{ detected }}). Ang mga pinapayagang encoding ay {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-translation">This is not a valid MAC address.</target>
+                <target state="needs-review-translation">Ito ay hindi isang wastong MAC address.</target>
             </trans-unit>
         </body>
     </file>

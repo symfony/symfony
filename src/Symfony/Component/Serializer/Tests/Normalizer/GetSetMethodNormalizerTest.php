@@ -30,6 +30,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ClassWithIgnoreAnnotation;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ClassWithIgnoreAttribute;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
@@ -426,9 +427,22 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new ObjectWithJustStaticSetterDummy()));
     }
 
-    public function testNotIgnoredMethodSupport()
+    /**
+     * @param class-string $class
+     *
+     * @dataProvider provideNotIgnoredMethodSupport
+     */
+    public function testNotIgnoredMethodSupport(string $class)
     {
-        $this->assertFalse($this->normalizer->supportsNormalization(new ClassWithIgnoreAttribute()));
+        $this->assertFalse($this->normalizer->supportsNormalization(new $class()));
+    }
+
+    public static function provideNotIgnoredMethodSupport(): iterable
+    {
+        return [
+            [ClassWithIgnoreAttribute::class],
+            [ClassWithIgnoreAnnotation::class],
+        ];
     }
 
     public function testPrivateSetter()

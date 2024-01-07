@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target state="needs-translation">This password has been leaked in a data breach, it must not be used. Please use another password.</target>
+                <target state="needs-review-translation">Hierdie wagwoord is in 'n data-oortreding uitgelek, dit mag nie gebruik word nie. Gebruik asseblief 'n ander wagwoord.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -404,39 +404,39 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target state="needs-translation">The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</target>
+                <target state="needs-review-translation">Die lêernaam is te lank. Dit moet {{ filename_max_length }} karakter of minder hê.|Die lêernaam is te lank. Dit moet {{ filename_max_length }} karakters of minder hê.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target state="needs-translation">The password strength is too low. Please use a stronger password.</target>
+                <target state="needs-review-translation">Die wagwoordsterkte is te laag. Gebruik asseblief 'n sterker wagwoord.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target state="needs-translation">This value contains characters that are not allowed by the current restriction-level.</target>
+                <target state="needs-review-translation">Hierdie waarde bevat karakters wat nie toegelaat word deur die huidige beperkingsvlak nie.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
-                <target state="needs-translation">Using invisible characters is not allowed.</target>
+                <target state="needs-review-translation">Die gebruik van onsigbare karakters word nie toegelaat nie.</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target state="needs-translation">Mixing numbers from different scripts is not allowed.</target>
+                <target state="needs-review-translation">Die meng van nommers van verskillende skrifte word nie toegelaat nie.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
-                <target state="needs-translation">Using hidden overlay characters is not allowed.</target>
+                <target state="needs-review-translation">Die gebruik van verborge oorvleuelende karakters word nie toegelaat nie.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-translation">The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</target>
+                <target state="needs-review-translation">Die uitbreiding van die lêer is ongeldig ({{ extension }}). Toegelate uitbreidings is {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-translation">The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</target>
+                <target state="needs-review-translation">Die opgespoorde karakterkodering is ongeldig ({{ detected }}). Toegelate koderings is {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-translation">This is not a valid MAC address.</target>
+                <target state="needs-review-translation">Dit is nie 'n geldige MAC-adres nie.</target>
             </trans-unit>
         </body>
     </file>

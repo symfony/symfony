@@ -89,6 +89,18 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         parent::__construct($namespace, $defaultLifetime);
     }
 
+    public static function createConnection(#[\SensitiveParameter] string $dsn, array $options = []): \PDO|string
+    {
+        if ($options['lazy'] ?? true) {
+            return $dsn;
+        }
+
+        $pdo = new \PDO($dsn);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        return $pdo;
+    }
+
     /**
      * Creates the table to store cache items which can be called once for setup.
      *

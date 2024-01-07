@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
@@ -39,6 +40,16 @@ class PdoAdapterTest extends AdapterTestCase
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new PdoAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
+    }
+
+    public function testCreateConnectionReturnsStringWithLazyTrue()
+    {
+        self::assertSame('sqlite:'.self::$dbFile, AbstractAdapter::createConnection('sqlite:'.self::$dbFile));
+    }
+
+    public function testCreateConnectionReturnsPDOWithLazyFalse()
+    {
+        self::assertInstanceOf(\PDO::class, AbstractAdapter::createConnection('sqlite:'.self::$dbFile, ['lazy' => false]));
     }
 
     public function testCleanupExpiredItems()

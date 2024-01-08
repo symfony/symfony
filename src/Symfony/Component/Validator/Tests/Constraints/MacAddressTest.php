@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\MacAddress;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
@@ -24,23 +23,9 @@ class MacAddressTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $mac = new MacAddress(['normalizer' => 'trim']);
+        $mac = new MacAddress(normalizer: 'trim');
 
-        $this->assertEquals('trim', $mac->normalizer);
-    }
-
-    public function testInvalidNormalizerThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
-        new MacAddress(['normalizer' => 'Unknown Callable']);
-    }
-
-    public function testInvalidNormalizerObjectThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
-        new MacAddress(['normalizer' => new \stdClass()]);
+        $this->assertEquals(trim(...), $mac->normalizer);
     }
 
     public function testAttributes()
@@ -51,7 +36,7 @@ class MacAddressTest extends TestCase
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame('myMessage', $aConstraint->message);
-        self::assertSame('trim', $aConstraint->normalizer);
+        self::assertEquals(trim(...), $aConstraint->normalizer);
         self::assertSame(['Default', 'MacAddressDummy'], $aConstraint->groups);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();

@@ -23,7 +23,7 @@ class CharsetTest extends TestCase
     {
         $encoding = new Charset('UTF-8');
 
-        $this->assertSame(['UTF-8'], $encoding->encodings);
+        $this->assertSame('UTF-8', $encoding->encodings);
     }
 
     public function testMultipleEncodingCanBeSet()
@@ -48,7 +48,7 @@ class CharsetTest extends TestCase
         $this->assertTrue($loader->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
-        $this->assertSame(['UTF-8'], $aConstraint->encodings);
+        $this->assertSame('UTF-8', $aConstraint->encodings);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         $this->assertSame(['ASCII', 'UTF-8'], $bConstraint->encodings);

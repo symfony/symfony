@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Validates that a value is a valid MAC address.
@@ -28,25 +27,16 @@ class MacAddress extends Constraint
         self::INVALID_MAC_ERROR => 'INVALID_MAC_ERROR',
     ];
 
-    public string $message = 'This is not a valid MAC address.';
-
-    /** @var callable|null */
-    public $normalizer;
+    public ?\Closure $normalizer;
 
     public function __construct(
-        array $options = null,
-        string $message = null,
+        public string $message = 'This value is not a valid MAC address.',
         callable $normalizer = null,
         array $groups = null,
         mixed $payload = null,
     ) {
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
-        $this->message = $message ?? $this->message;
-        $this->normalizer = $normalizer ?? $this->normalizer;
-
-        if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
-        }
+        $this->normalizer = null !== $normalizer ? $normalizer(...) : null;
     }
 }

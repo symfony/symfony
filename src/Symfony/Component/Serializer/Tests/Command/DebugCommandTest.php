@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Command\DebugCommand;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
-use Symfony\Component\Serializer\Tests\Dummy\DummyClass;
+use Symfony\Component\Serializer\Tests\Dummy\DummyClassWithDiscriminatorMap;
 use Symfony\Component\Serializer\Tests\Dummy\DummyClassOne;
 
 /**
@@ -85,12 +85,12 @@ class DebugCommandTest extends TestCase
         $command = new DebugCommand(new ClassMetadataFactory(new AttributeLoader()));
 
         $tester = new CommandTester($command);
-        $tester->execute(['class' => DummyClass::class], ['decorated' => false]);
+        $tester->execute(['class' => DummyClassWithDiscriminatorMap::class], ['decorated' => false]);
 
         $this->assertSame(<<<TXT
 
-            Symfony\Component\Serializer\Tests\Dummy\DummyClass
-            ---------------------------------------------------
+            Symfony\Component\Serializer\Tests\Dummy\DummyClassWithDiscriminatorMap
+            -----------------------------------------------------------------------
 
             +----------+------------------------------------------------------------------------+
             | Property | Options                                                                |

@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
     'one' => DummyClassOne::class,
     'two' => DummyClassTwo::class,
 ])]
-class DummyClass
+class DummyClassWithDiscriminatorMap
 {
     public string $type;
 }

@@ -62,7 +62,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     public function __construct(
         \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
         private string $namespace = '',
-        private int $defaultLifetime = 0,
+        int $defaultLifetime = 0,
         MarshallerInterface $marshaller = null,
     ) {
         if ($redis instanceof \Predis\ClientInterface && $redis->getConnection() instanceof ClusterInterface && !$redis->getConnection() instanceof PredisCluster) {

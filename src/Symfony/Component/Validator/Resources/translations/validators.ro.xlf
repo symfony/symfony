@@ -432,11 +432,11 @@
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-review-translation">Codificarea caracterelor detectată este invalidă ({{ detected }}). Codificările permise sunt {{ encodings }}.</target>
+                <target>Codificarea caracterelor detectate nu este valabilă ({{ detected }}). Codificările permise sunt {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This is not a valid MAC address.</source>
-                <target state="needs-review-translation">Acesta nu este un adresă MAC validă.</target>
+                <target>Aceasta nu este o adresă MAC validă.</target>
             </trans-unit>
         </body>
     </file>

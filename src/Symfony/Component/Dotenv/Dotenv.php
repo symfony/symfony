@@ -35,15 +35,13 @@ final class Dotenv
     private string $data;
     private int $end;
     private array $values = [];
-    private string $envKey;
-    private string $debugKey;
     private array $prodEnvs = ['prod'];
     private bool $usePutenv = false;
 
-    public function __construct(string $envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG')
-    {
-        $this->envKey = $envKey;
-        $this->debugKey = $debugKey;
+    public function __construct(
+        private string $envKey = 'APP_ENV',
+        private string $debugKey = 'APP_DEBUG',
+    ) {
     }
 
     /**

@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-08T07:11:01Z
+
+What about merging this on 5.4? This would reduce the pressure on deps constraints.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-08T08:30:45Z
+
+Not sure, this is not a bugfix to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-08T08:41:33Z
+
+We also merge deps-related changed to 5.4: support for latest Doctrine, latest PHP, etc. This is similar to me. This makes Symfony a low contributor to deps-hell (aka makes upgrading easier)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-01-08T08:49:24Z
+
+If it's compatible with 5.4, I don't see any reason to not allowing this new version.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-08T08:56:33Z
+
+fair enough, rebased on `6.3` as the `PhpAstExtractor` class was introduced in 6.2
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-01-08T09:32:52Z
+
+Note that currently, we explicitly say that this is *not* allowed as a bug fix in the [maintenance docs](https://symfony.com/doc/current/contributing/code/maintenance.html):
+
+> [...] the following changes are never accepted in a patch version:
+>
+> - **Support for newer major versions of Composer dependencies**: Taking into account support for newer versions of an existing dependency is not acceptable.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-08T09:45:23Z
+
+@wouterj we have some contradiction on the topic, because we also have this "seamless deps" rule that makes us fix compat with Doctrine / PHP / Windows / infra-level stuff on lower branches, the reason being that wider deps ranges makes it easier to upgrade for end users.
+Here, we fall in this categry to me, *especially* because we don't set the version boundaries. But also because php-parser is a widely used deps and making Symfony restrict which versions are allowed is contributing to deps hell.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-01-08T09:56:53Z
+
+Yes, "Newer versions of PHP" and "Newer versions of popular OSes" are mentioned in the "allowed on a case by case basis" section :)
+
+Btw, not saying I'm against this change, especially as we don't set version ranges explicitly for this optional dep. But I think we should then update our policy on this (and find the reason why we set the current policy like this, is there something non-obvious that bit us in the past and we shouldn't forget now?)

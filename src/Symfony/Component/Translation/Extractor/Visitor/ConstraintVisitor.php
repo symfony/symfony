@@ -42,7 +42,7 @@ final class ConstraintVisitor extends AbstractVisitor implements NodeVisitor
             return null;
         }
 
-        $parts = $className->parts;
+        $parts = $className->getParts();
         $isConstraintClass = false;
 
         foreach ($parts as $part) {

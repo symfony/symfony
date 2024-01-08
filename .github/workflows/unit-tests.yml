@@ -128,6 +128,10 @@ jobs:
           echo SYMFONY_REQUIRE=">=$([ '${{ matrix.mode }}' = low-deps ] && echo 4.4 || echo $SYMFONY_VERSION)" >> $GITHUB_ENV
           [[ "${{ matrix.mode }}" = *-deps ]] && mv composer.json.phpunit composer.json || true
 
+          if [[ "${{ matrix.mode }}" = low-deps ]]; then
+            echo SYMFONY_PHPUNIT_REQUIRE="nikic/php-parser:^4.16" >> $GITHUB_ENV
+          fi
+
       - name: Install dependencies
         run: |
           echo "::group::composer update"

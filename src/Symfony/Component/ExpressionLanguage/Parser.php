@@ -29,14 +29,12 @@ class Parser
     private TokenStream $stream;
     private array $unaryOperators;
     private array $binaryOperators;
-    private array $functions;
     private ?array $names;
     private bool $lint = false;
 
-    public function __construct(array $functions)
-    {
-        $this->functions = $functions;
-
+    public function __construct(
+        private array $functions,
+    ) {
         $this->unaryOperators = [
             'not' => ['precedence' => 50],
             '!' => ['precedence' => 50],

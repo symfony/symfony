@@ -30,25 +30,20 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterface
 {
-    protected ?LoggerInterface $logger;
-    protected Stopwatch $stopwatch;
-
     /**
      * @var \SplObjectStorage<WrappedListener, array{string, string}>|null
      */
     private ?\SplObjectStorage $callStack = null;
-    private EventDispatcherInterface $dispatcher;
     private array $wrappedListeners = [];
     private array $orphanedEvents = [];
-    private ?RequestStack $requestStack;
     private string $currentRequestHash = '';
 
-    public function __construct(EventDispatcherInterface $dispatcher, Stopwatch $stopwatch, LoggerInterface $logger = null, RequestStack $requestStack = null)
-    {
-        $this->dispatcher = $dispatcher;
-        $this->stopwatch = $stopwatch;
-        $this->logger = $logger;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        protected Stopwatch $stopwatch,
+        protected ?LoggerInterface $logger = null,
+        private ?RequestStack $requestStack = null,
+    ) {
     }
 
     public function addListener(string $eventName, callable|array $listener, int $priority = 0): void

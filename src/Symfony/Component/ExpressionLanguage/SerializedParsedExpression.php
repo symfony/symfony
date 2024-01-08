@@ -20,16 +20,15 @@ use Symfony\Component\ExpressionLanguage\Node\Node;
  */
 class SerializedParsedExpression extends ParsedExpression
 {
-    private string $nodes;
-
     /**
      * @param string $expression An expression
      * @param string $nodes      The serialized nodes for the expression
      */
-    public function __construct(string $expression, string $nodes)
-    {
+    public function __construct(
+        string $expression,
+        private string $nodes,
+    ) {
         $this->expression = $expression;
-        $this->nodes = $nodes;
     }
 
     public function getNodes(): Node

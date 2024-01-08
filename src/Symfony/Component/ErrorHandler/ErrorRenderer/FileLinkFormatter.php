@@ -25,15 +25,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class FileLinkFormatter
 {
     private array|false $fileLinkFormat;
-    private ?RequestStack $requestStack = null;
-    private ?string $baseDir = null;
-    private \Closure|string|null $urlFormat;
 
     /**
      * @param string|\Closure $urlFormat the URL format, or a closure that returns it on-demand
      */
-    public function __construct(string|array $fileLinkFormat = null, RequestStack $requestStack = null, string $baseDir = null, string|\Closure $urlFormat = null)
-    {
+    public function __construct(
+        string|array $fileLinkFormat = null,
+        private ?RequestStack $requestStack = null,
+        private ?string $baseDir = null,
+        private null|string|\Closure $urlFormat = null,
+    ) {
         $fileLinkFormat ??= $_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? '';
 
         if (!\is_array($f = $fileLinkFormat)) {
@@ -43,9 +44,6 @@ class FileLinkFormatter
         }
 
         $this->fileLinkFormat = $fileLinkFormat;
-        $this->requestStack = $requestStack;
-        $this->baseDir = $baseDir;
-        $this->urlFormat = $urlFormat;
     }
 
     public function format(string $file, int $line): string|false

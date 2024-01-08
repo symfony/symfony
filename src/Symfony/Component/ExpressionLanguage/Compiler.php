@@ -21,11 +21,10 @@ use Symfony\Contracts\Service\ResetInterface;
 class Compiler implements ResetInterface
 {
     private string $source = '';
-    private array $functions;
 
-    public function __construct(array $functions)
-    {
-        $this->functions = $functions;
+    public function __construct(
+        private array $functions,
+    ) {
     }
 
     public function getFunction(string $name): array

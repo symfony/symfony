@@ -57,10 +57,8 @@ HTML;
 
     public function testRendersStackWithoutBinaryStrings()
     {
-        if (\PHP_VERSION_ID >= 70400) {
-            // make sure method arguments are available in stack traces (see https://www.php.net/manual/en/ini.core.php)
-            ini_set('zend.exception_ignore_args', false);
-        }
+        // make sure method arguments are available in stack traces (see https://www.php.net/manual/en/ini.core.php)
+        ini_set('zend.exception_ignore_args', false);
 
         $binaryData = file_get_contents(__DIR__.'/../Fixtures/pixel.png');
         $exception = $this->getRuntimeException($binaryData);

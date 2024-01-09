@@ -257,7 +257,7 @@ class RedisExtIntegrationTest extends TestCase
             ], $message['data']);
             $connection->reject($message['id']);
         } finally {
-            $redis->del('messenger-lazy');
+            $redis->unlink('messenger-lazy');
         }
     }
 
@@ -295,14 +295,13 @@ class RedisExtIntegrationTest extends TestCase
         } catch (TransportException $e) {
             $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
         } finally {
-            $redis->del('messenger-json-error');
+            $redis->unlink('messenger-json-error');
         }
     }
 
     public function testGetNonBlocking()
     {
         $redis = new \Redis();
-
         $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['delete_after_ack' => true], $redis);
 
         try {
@@ -311,7 +310,7 @@ class RedisExtIntegrationTest extends TestCase
             $this->assertNotEmpty($message = $connection->get());
             $connection->reject($message['id']);
         } finally {
-            $redis->del('messenger-getnonblocking');
+            $redis->unlink('messenger-getnonblocking');
         }
     }
 
@@ -330,7 +329,7 @@ class RedisExtIntegrationTest extends TestCase
             $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true]);
             $this->assertNotNull($connection->get());
         } finally {
-            $redis->del('messenger-rejectthenget');
+            $redis->unlink('messenger-rejectthenget');
         }
     }
 

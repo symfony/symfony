@@ -236,7 +236,8 @@ class ChoiceType extends AbstractType
             'expanded' => $options['expanded'],
             'preferred_choices' => $choiceListView->preferredChoices,
             'choices' => $choiceListView->choices,
-            'separator' => '-------------------',
+            'separator' => $options['separator'],
+            'separator_html' => $options['separator_html'],
             'placeholder' => null,
             'placeholder_attr' => [],
             'choice_translation_domain' => $choiceTranslationDomain,
@@ -344,6 +345,8 @@ class ChoiceType extends AbstractType
             'choice_attr' => null,
             'choice_translation_parameters' => [],
             'preferred_choices' => [],
+            'separator' => '-------------------',
+            'separator_html' => false,
             'duplicate_preferred_choices' => true,
             'group_by' => null,
             'empty_data' => $emptyData,
@@ -374,6 +377,8 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_translation_parameters', ['null', 'array', 'callable', ChoiceTranslationParameters::class]);
         $resolver->setAllowedTypes('placeholder_attr', ['array']);
         $resolver->setAllowedTypes('preferred_choices', ['array', \Traversable::class, 'callable', 'string', PropertyPath::class, PreferredChoice::class]);
+        $resolver->setAllowedTypes('separator', ['string']);
+        $resolver->setAllowedTypes('separator_html', ['bool']);
         $resolver->setAllowedTypes('duplicate_preferred_choices', 'bool');
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
     }

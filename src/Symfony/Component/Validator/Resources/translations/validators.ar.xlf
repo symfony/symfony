@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
-                <target>هذه القيمة ليست عنوان رقمى صحيح.</target>
+                <target state="needs-review-translation">هذه القيمة ليست عنوان IP صالحًا.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>الرقم IBAN (رقم الحساب المصرفي الدولي) الذي تم إدخاله غير صالح.</target>
+                <target state="needs-review-translation">هذه القيمة ليست رقم حساب بنكي دولي (IBAN) صالحًا.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>هذه القيمة ليست رمز معرّف نشاط تجاري صالح (BIC).</target>
+                <target state="needs-review-translation">هذه القيمة ليست رمز معرف الأعمال (BIC) صالحًا.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83">
                 <source>This is not a valid UUID.</source>
-                <target>هذا ليس UUID صالح.</target>
+                <target state="needs-review-translation">هذه القيمة ليست UUID صالحًا.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -435,8 +435,8 @@
                 <target state="needs-review-translation">تم اكتشاف ترميز الأحرف غير صالح ({{ detected }}). الترميزات المسموح بها هي {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
-                <source>This is not a valid MAC address.</source>
-                <target state="needs-review-translation">هذا ليس عنوان MAC صالحًا.</target>
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">هذه القيمة ليست عنوان MAC صالحًا.</target>
             </trans-unit>
         </body>
     </file>

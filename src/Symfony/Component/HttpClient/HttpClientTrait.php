@@ -85,8 +85,8 @@ trait HttpClientTrait
             if (isset($options['body']) && '' !== $options['body']) {
                 throw new InvalidArgumentException('Define either the "json" or the "body" option, setting both is not supported.');
             }
-            $options['body'] = self::jsonEncode($options['json']);
-            unset($options['json']);
+            $options['body'] = self::jsonEncode($options['json'], $options['json_flags'] ?? null);
+            unset($options['json'], $options['json_flags']);
 
             if (!isset($options['normalized_headers']['content-type'])) {
                 $options['normalized_headers']['content-type'] = ['Content-Type: application/json'];

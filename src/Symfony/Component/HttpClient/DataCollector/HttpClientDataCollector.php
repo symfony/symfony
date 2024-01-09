@@ -195,7 +195,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         $dataArg = [];
 
         if ($json = $trace['options']['json'] ?? null) {
-            $dataArg[] = '--data-raw '.$this->escapePayload(self::jsonEncode($json));
+            $dataArg[] = '--data-raw '.$this->escapePayload(self::jsonEncode($json, $trace['options']['json_flags'] ?? null));
         } elseif ($body = $trace['options']['body'] ?? null) {
             if (\is_string($body)) {
                 $dataArg[] = '--data-raw '.$this->escapePayload($body);

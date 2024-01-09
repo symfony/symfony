@@ -62,7 +62,7 @@ HTML;
             ini_set('zend.exception_ignore_args', false);
         }
 
-        $binaryData = file_get_contents(__DIR__ . '/../Fixtures/pixel.png');
+        $binaryData = file_get_contents(__DIR__.'/../Fixtures/pixel.png');
         $exception = $this->getRuntimeException($binaryData);
 
         $rendered = (new HtmlErrorRenderer(true))->render($exception)->getAsString();

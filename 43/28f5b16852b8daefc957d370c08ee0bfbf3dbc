@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-11-03T21:05:16Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "7.1".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mboultoureau at 2023-11-03T21:07:51Z
+
+The `separator` option is only available in the Twig template, so I've kept this behavior for this new option. Should I add them so that they're both accessible from the form builder to maintain consistency (like `label` / `label_html` and `help` / `help_html`)?
+
+---------------------------------------------------------------------------
+
+by mboultoureau at 2023-12-20T09:13:05Z
+
+Approved corrections

@@ -100,7 +100,7 @@ final class CodeExtension extends AbstractExtension
             } elseif (preg_match('/[^\x07-\x0D\x1B\x20-\xFF]/', $item[1])) {
                 $formattedValue = '<em>binary string</em>';
             } else {
-                $formattedValue = str_replace("\n", '', $this->escape(var_export($item[1], true)));
+                $formattedValue = str_replace("\n", '', htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
             }
 
             $result[] = \is_int($key) ? $formattedValue : sprintf("'%s' => %s", htmlspecialchars($key, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $formattedValue);

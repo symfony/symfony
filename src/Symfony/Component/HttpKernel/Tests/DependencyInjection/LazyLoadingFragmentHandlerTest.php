@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,9 +30,8 @@ class LazyLoadingFragmentHandlerTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push(Request::create('/'));
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->once())->method('has')->with('foo')->willReturn(true);
-        $container->expects($this->once())->method('get')->willReturn($renderer);
+        $container = new Container();
+        $container->set('foo', $renderer);
 
         $handler = new LazyLoadingFragmentHandler($container, $requestStack, false);
 

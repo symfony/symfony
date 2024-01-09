@@ -12,7 +12,7 @@
 namespace Symfony\Component\Scheduler\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -36,14 +36,12 @@ class DispatchSchedulerEventListenerTest extends TestCase
         $defaultRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'default']);
 
         $schedulerProvider = new SomeScheduleProvider([$defaultRecurringMessage]);
-        $scheduleProviderLocator = $this->createMock(ContainerInterface::class);
-        $scheduleProviderLocator->expects($this->any())->method('has')->willReturn(true);
-        $scheduleProviderLocator->expects($this->any())->method('get')->willReturn($schedulerProvider);
+        $scheduleProviderLocator = new Container();
+        $scheduleProviderLocator->set('default', $schedulerProvider);
 
         $context = new MessageContext('default', 'default', $trigger, $this->createMock(\DateTimeImmutable::class));
         $envelope = (new Envelope(new \stdClass()))->with(new ScheduledStamp($context));
 
-        /** @var ContainerInterface $scheduleProviderLocator */
         $listener = new DispatchSchedulerEventListener($scheduleProviderLocator, $eventDispatcher = new EventDispatcher());
         $workerReceivedEvent = new WorkerMessageReceivedEvent($envelope, 'default');
         $workerHandledEvent = new WorkerMessageHandledEvent($envelope, 'default');

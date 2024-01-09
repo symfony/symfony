@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTest;
 
@@ -107,7 +106,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
     protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null)
     {
         if (!$container) {
-            $container = $this->createMockContainer();
+            $container = new Container();
         }
 
         return new ControllerResolver($container, $logger);
@@ -116,11 +115,6 @@ class ControllerResolverTest extends ContainerControllerResolverTest
     protected function createMockParser()
     {
         return $this->createMock(ControllerNameParser::class);
-    }
-
-    protected function createMockContainer()
-    {
-        return $this->createMock(ContainerInterface::class);
     }
 }
 

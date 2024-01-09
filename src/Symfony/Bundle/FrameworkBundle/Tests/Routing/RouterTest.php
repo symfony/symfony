@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChec
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -406,7 +408,8 @@ class RouterTest extends TestCase
         $routes->add('foo', new Route('/%object%'));
 
         $sc = $this->getPsr11ServiceContainer($routes);
-        $parameters = $this->getParameterBag(['object' => new \stdClass()]);
+        $parameters = new Container();
+        $parameters->set('object', new \stdClass());
 
         $router = new Router($sc, 'foo', [], null, $parameters);
 
@@ -424,19 +427,15 @@ class RouterTest extends TestCase
 
         $sc = $this->getServiceContainer($routes);
 
-        $pc = $this->createMock(ContainerInterface::class);
-        $pc
-            ->expects($this->once())
-            ->method('get')
-            ->willReturn(new \stdClass())
-        ;
+        $pc = new Container();
+        $pc->set('object', new \stdClass());
 
         $router = new Router($sc, 'foo', [], null, $pc);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
 
-        $router->getRouteCollection()->get('foo');
+        $router->getRouteCollection();
     }
 
     /**
@@ -483,7 +482,9 @@ class RouterTest extends TestCase
 
         $router = new Router($sc, 'foo', [], null, $parameters);
 
-        $router->getRouteCollection();
+        $routeCollection = $router->getRouteCollection();
+
+        $this->assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
     }
 
     public function testGetRouteCollectionAddsContainerParametersResourceWithSfContainer()
@@ -617,13 +618,8 @@ class RouterTest extends TestCase
             ->willReturn($routes)
         ;
 
-        $sc = $this->getMockBuilder(Container::class)->onlyMethods(['get'])->getMock();
-
-        $sc
-            ->expects($this->once())
-            ->method('get')
-            ->willReturn($loader)
-        ;
+        $sc = new Container();
+        $sc->set('routing.loader', $loader);
 
         return $sc;
     }
@@ -638,26 +634,14 @@ class RouterTest extends TestCase
             ->willReturn($routes)
         ;
 
-        $sc = $this->createMock(ContainerInterface::class);
+        $container = new Container();
+        $container->set('routing.loader', $loader);
 
-        $sc
-            ->expects($this->once())
-            ->method('get')
-            ->willReturn($loader)
-        ;
-
-        return $sc;
+        return $container;
     }
 
     private function getParameterBag(array $params = []): ContainerInterface
     {
-        $bag = $this->createMock(ContainerInterface::class);
-        $bag
-            ->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(fn ($key) => $params[$key] ?? null)
-        ;
-
-        return $bag;
+        return new ContainerBag(new Container(new ParameterBag($params)));
     }
 }

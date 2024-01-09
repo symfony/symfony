@@ -432,11 +432,11 @@
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-review-translation">Kodimi i karaktereve të zbuluar është i pavlefshëm ({{ detected }}). Kodimet e lejuara janë {{ encodings }}.</target>
+                <target>Kodimi i karakterit të identifikuar  është i pavlefshëm ({{ detected }}). Kodimet e lejuara janë {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">Kjo vlerë nuk është një adresë MAC e vlefshme.</target>
+                <target>Kjo nuk është një adresë e vlefshme e Kontrollit të Qasjes në Media (MAC).</target>
             </trans-unit>
         </body>
     </file>

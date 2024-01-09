@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-07T10:46:30Z
+
+PR rebased
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-09T07:38:37Z
+
+@nicolas-grekas After #53444 we now need to update the source of `112` everywhere to "This value is not a valid MAC address.".
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-09T08:11:37Z
+
+> This value is not a valid MAC address.
+
+updated!

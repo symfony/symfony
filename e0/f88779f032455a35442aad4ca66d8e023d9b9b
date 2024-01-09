@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-12-12T11:33:56Z
+
+Please note that we usually don't merge changes without a test that covers them.
+
+---------------------------------------------------------------------------
+
+by aleho at 2023-12-12T12:35:19Z
+
+I can try to add a test case for that.
+
+Would loading a local, binary file into a string in a test-case be OK?
+
+(Asserting memory exhaustion in `var_dump` to me seems a bit hard to test ;))
+
+---------------------------------------------------------------------------
+
+by aleho at 2023-12-13T09:43:43Z
+
+I just had a look at the tests and figured it might indeed be hard to test for `var_export` not being called with a binary string. I hope just a hard-coded check for the replacement string is OK.

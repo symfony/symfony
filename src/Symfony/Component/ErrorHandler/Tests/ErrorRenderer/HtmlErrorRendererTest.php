@@ -55,6 +55,7 @@ HTML;
         ];
     }
 
+<<<<<<< HEAD
     /**
      * @dataProvider provideFileLinkFormats
      */
@@ -96,5 +97,44 @@ HTML;
             false,
             'href="phpstorm://open?file='.__DIR__,
         ];
+=======
+    public function testRendersStackWithoutBinaryStrings()
+    {
+        // make sure method arguments are available in stack traces (see https://www.php.net/manual/en/ini.core.php)
+        ini_set('zend.exception_ignore_args', false);
+
+        $binaryData = file_get_contents(__DIR__.'/../Fixtures/pixel.png');
+        $exception = $this->getRuntimeException($binaryData);
+
+        $rendered = (new HtmlErrorRenderer(true))->render($exception)->getAsString();
+
+        $this->assertStringContainsString(
+            "buildRuntimeException('FooException')",
+            $rendered,
+            '->render() contains the method call with "FooException"'
+        );
+
+        $this->assertStringContainsString(
+            'getRuntimeException(binary string)',
+            $rendered,
+            '->render() contains the method call with "binary string" replacement'
+        );
+
+        $this->assertStringContainsString(
+            '<em>binary string</em>',
+            $rendered,
+            '->render() returns the HTML content with "binary string" replacement'
+        );
+    }
+
+    private function getRuntimeException(string $unusedArgument): \RuntimeException
+    {
+        return $this->buildRuntimeException('FooException');
+    }
+
+    private function buildRuntimeException(string $message): \RuntimeException
+    {
+        return new \RuntimeException($message);
+>>>>>>> 6.3
     }
 }

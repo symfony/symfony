@@ -167,6 +167,8 @@ class HtmlErrorRenderer implements ErrorRendererInterface
                 $formattedValue = '<em>'.strtolower(var_export($item[1], true)).'</em>';
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
+            } elseif (preg_match('/[^\x07-\x0D\x1B\x20-\xFF]/', $item[1])) {
+                $formattedValue = '<em>binary string</em>';
             } else {
                 $formattedValue = str_replace("\n", '', $this->escape(var_export($item[1], true)));
             }

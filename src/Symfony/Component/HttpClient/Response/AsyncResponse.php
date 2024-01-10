@@ -34,7 +34,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
     private const FIRST_CHUNK_YIELDED = 1;
     private const LAST_CHUNK_YIELDED = 2;
 
-    private ?HttpClientInterface $client;
+    private HttpClientInterface $client;
     private ResponseInterface $response;
     private array $info = ['canceled' => false];
     private $passthru;

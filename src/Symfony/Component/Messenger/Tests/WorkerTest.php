@@ -38,11 +38,12 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
+use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @group time-sensitive
@@ -513,57 +514,6 @@ class WorkerTest extends TestCase
     }
 }
 
-class DummyReceiver implements ReceiverInterface
-{
-    private $deliveriesOfEnvelopes;
-    private $acknowledgedEnvelopes;
-    private $rejectedEnvelopes;
-    private $acknowledgeCount = 0;
-    private $rejectCount = 0;
-
-    /**
-     * @param Envelope[][] $deliveriesOfEnvelopes
-     */
-    public function __construct(array $deliveriesOfEnvelopes)
-    {
-        $this->deliveriesOfEnvelopes = $deliveriesOfEnvelopes;
-    }
-
-    public function get(): iterable
-    {
-        $val = array_shift($this->deliveriesOfEnvelopes);
-
-        return $val ?? [];
-    }
-
-    public function ack(Envelope $envelope): void
-    {
-        ++$this->acknowledgeCount;
-        $this->acknowledgedEnvelopes[] = $envelope;
-    }
-
-    public function reject(Envelope $envelope): void
-    {
-        ++$this->rejectCount;
-        $this->rejectedEnvelopes[] = $envelope;
-    }
-
-    public function getAcknowledgeCount(): int
-    {
-        return $this->acknowledgeCount;
-    }
-
-    public function getRejectCount(): int
-    {
-        return $this->rejectCount;
-    }
-
-    public function getAcknowledgedEnvelopes(): array
-    {
-        return $this->acknowledgedEnvelopes;
-    }
-}
-
 class DummyQueueReceiver extends DummyReceiver implements QueueReceiverInterface
 {
     public function getFromQueues(array $queueNames): iterable
@@ -595,20 +545,5 @@ class DummyBatchHandler implements BatchHandlerInterface
         foreach ($jobs as [$job, $ack]) {
             $ack->ack($job);
         }
-    }
-}
-
-class ResettableDummyReceiver extends DummyReceiver implements ResetInterface
-{
-    private $hasBeenReset = false;
-
-    public function reset()
-    {
-        $this->hasBeenReset = true;
-    }
-
-    public function hasBeenReset(): bool
-    {
-        return $this->hasBeenReset;
     }
 }

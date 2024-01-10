@@ -257,11 +257,11 @@ class HttpClientTraitTest extends TestCase
     /**
      * @dataProvider provideParseUrl
      */
-    public function testParseUrl(array $expected, string $url, array $query = [])
+    public function testParseUrl(array $expected, string $url, array $query = [], bool $flattenUrl = false)
     {
         $expected = array_combine(['scheme', 'authority', 'path', 'query', 'fragment'], $expected);
 
-        $this->assertSame($expected, self::parseUrl($url, $query));
+        $this->assertSame($expected, self::parseUrl($url, $query, flattenQueryString: $flattenUrl));
     }
 
     public static function provideParseUrl(): iterable
@@ -283,6 +283,10 @@ class HttpClientTraitTest extends TestCase
         yield [[null, null, 'bar', '?a=b&a[b%20c]=d&e%3Df=%E2%9C%93', null], 'bar?a=b', ['a' => ['b c' => 'd'], 'e=f' => '✓']];
         // IDNA 2008 compliance
         yield [['https:', '//xn--fuball-cta.test', null, null, null], 'https://fußball.test'];
+        // Test query string flattening
+        yield [[null, null, 'bar', '?a=b&a=c', null], 'bar', ['a' => ['b', 'c']], true];
+        yield [[null, null, 'bar', '?a=b&a=c&d=e&d=f', null], 'bar', ['a' => ['b', 'c'], 'd' => ['e', 'f']], true];
+        yield [[null, null, 'bar', '?a=b&a[c]=d', null], 'bar', ['a' => ['b', 'c' => 'd']], true];
     }
 
     /**

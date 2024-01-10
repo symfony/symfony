@@ -7,6 +7,7 @@ CHANGELOG
  * Add `HttpOptions::setHeader()` to add or replace a single header
  * Allow mocking `start_time` info in `MockResponse`
  * Add `MockResponse::fromFile()` and `JsonMockResponse::fromFile()` methods to help using fixtures files
+ * Add support for `flatten_query_string` in HttpClient options
 
 7.0
 ---

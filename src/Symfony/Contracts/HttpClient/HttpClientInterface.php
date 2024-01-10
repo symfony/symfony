@@ -67,6 +67,8 @@ interface HttpClientInterface
         'peer_fingerprint' => null,
         'capture_peer_cert_chain' => false,
         'crypto_method' => \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT, // STREAM_CRYPTO_METHOD_TLSv*_CLIENT - minimum TLS version
+        'flatten_query_string' => false, // bool - whether the query string parameter keys with an array notation should
+                                         // be flattened (i.e. "foo[0]=bar&foo[1]=baz" becomes "foo=bar&foo=baz")
         'extra' => [],          // array - additional options that can be ignored if unsupported, unlike regular options
     ];
 

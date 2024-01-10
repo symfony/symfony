@@ -175,7 +175,7 @@ trait HttpClientTrait
             }
 
             // Validate and resolve URL
-            $url = self::parseUrl($url, $options['query']);
+            $url = self::parseUrl($url, $options['query'], flattenQueryString: $options['flatten_query_string'] ?? false);
             $url = self::resolveUrl($url, $options['base_uri'], $defaultOptions['query'] ?? []);
         }
 
@@ -618,7 +618,7 @@ trait HttpClientTrait
      *
      * @throws InvalidArgumentException When an invalid URL is passed
      */
-    private static function parseUrl(string $url, array $query = [], array $allowedSchemes = ['http' => 80, 'https' => 443]): array
+    private static function parseUrl(string $url, array $query = [], array $allowedSchemes = ['http' => 80, 'https' => 443], bool $flattenQueryString = false): array
     {
         if (false === $parts = parse_url($url)) {
             throw new InvalidArgumentException(sprintf('Malformed URL "%s".', $url));
@@ -626,6 +626,10 @@ trait HttpClientTrait
 
         if ($query) {
             $parts['query'] = self::mergeQueryString($parts['query'] ?? null, $query, true);
+
+            if ($flattenQueryString) {
+                $parts['query'] = preg_replace('/\[\d++]=/', '=', $parts['query']);
+            }
         }
 
         $port = $parts['port'] ?? 0;

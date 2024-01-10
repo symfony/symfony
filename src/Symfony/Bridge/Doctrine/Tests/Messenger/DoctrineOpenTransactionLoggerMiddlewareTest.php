@@ -51,8 +51,8 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
     public function testMiddlewareWrapsInTransactionAndFlushes()
     {
         $this->connection->expects($this->exactly(1))
-            ->method('isTransactionActive')
-            ->will($this->onConsecutiveCalls(true, true, false))
+            ->method('getTransactionNestingLevel')
+            ->willReturn(1)
         ;
 
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());

@@ -23,31 +23,28 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResolvedFormType implements ResolvedFormTypeInterface
 {
-    private FormTypeInterface $innerType;
-
     /**
      * @var FormTypeExtensionInterface[]
      */
     private array $typeExtensions;
-
-    private ?ResolvedFormTypeInterface $parent;
 
     private OptionsResolver $optionsResolver;
 
     /**
      * @param FormTypeExtensionInterface[] $typeExtensions
      */
-    public function __construct(FormTypeInterface $innerType, array $typeExtensions = [], ResolvedFormTypeInterface $parent = null)
-    {
+    public function __construct(
+        private FormTypeInterface $innerType,
+        array $typeExtensions = [],
+        private ?ResolvedFormTypeInterface $parent = null,
+    ) {
         foreach ($typeExtensions as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
                 throw new UnexpectedTypeException($extension, FormTypeExtensionInterface::class);
             }
         }
 
-        $this->innerType = $innerType;
         $this->typeExtensions = $typeExtensions;
-        $this->parent = $parent;
     }
 
     public function getBlockPrefix(): string

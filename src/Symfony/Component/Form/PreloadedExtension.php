@@ -21,8 +21,6 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
 class PreloadedExtension implements FormExtensionInterface
 {
     private array $types = [];
-    private array $typeExtensions = [];
-    private ?FormTypeGuesserInterface $typeGuesser;
 
     /**
      * Creates a new preloaded extension.
@@ -30,11 +28,11 @@ class PreloadedExtension implements FormExtensionInterface
      * @param FormTypeInterface[]            $types          The types that the extension should support
      * @param FormTypeExtensionInterface[][] $typeExtensions The type extensions that the extension should support
      */
-    public function __construct(array $types, array $typeExtensions, FormTypeGuesserInterface $typeGuesser = null)
-    {
-        $this->typeExtensions = $typeExtensions;
-        $this->typeGuesser = $typeGuesser;
-
+    public function __construct(
+        array $types,
+        private array $typeExtensions,
+        private ?FormTypeGuesserInterface $typeGuesser = null,
+    ) {
         foreach ($types as $type) {
             $this->types[$type::class] = $type;
         }

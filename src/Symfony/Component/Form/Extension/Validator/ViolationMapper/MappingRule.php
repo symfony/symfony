@@ -19,15 +19,11 @@ use Symfony\Component\Form\FormInterface;
  */
 class MappingRule
 {
-    private FormInterface $origin;
-    private string $propertyPath;
-    private string $targetPath;
-
-    public function __construct(FormInterface $origin, string $propertyPath, string $targetPath)
-    {
-        $this->origin = $origin;
-        $this->propertyPath = $propertyPath;
-        $this->targetPath = $targetPath;
+    public function __construct(
+        private FormInterface $origin,
+        private string $propertyPath,
+        private string $targetPath,
+    ) {
     }
 
     public function getOrigin(): FormInterface

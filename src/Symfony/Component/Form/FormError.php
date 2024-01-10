@@ -21,11 +21,6 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
 class FormError
 {
     protected string $messageTemplate;
-    protected array $messageParameters;
-    protected ?int $messagePluralization;
-
-    private string $message;
-    private mixed $cause;
 
     /**
      * The form that spawned this error.
@@ -45,13 +40,14 @@ class FormError
      *
      * @see \Symfony\Component\Translation\Translator
      */
-    public function __construct(string $message, string $messageTemplate = null, array $messageParameters = [], int $messagePluralization = null, mixed $cause = null)
-    {
-        $this->message = $message;
+    public function __construct(
+        private string $message,
+        string $messageTemplate = null,
+        protected array $messageParameters = [],
+        protected ?int $messagePluralization = null,
+        private mixed $cause = null,
+    ) {
         $this->messageTemplate = $messageTemplate ?: $message;
-        $this->messageParameters = $messageParameters;
-        $this->messagePluralization = $messagePluralization;
-        $this->cause = $cause;
     }
 
     /**

@@ -35,11 +35,9 @@ class FileType extends AbstractType
         self::MIB_BYTES => 'MiB',
     ];
 
-    private ?TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator = null)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\EventListener;
+namespace Symfony\Component\Scheduler\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -25,7 +25,7 @@ use Symfony\Component\Scheduler\EventListener\DispatchSchedulerEventListener;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
 use Symfony\Component\Scheduler\RecurringMessage;
-use Symfony\Component\Scheduler\Tests\Messenger\SomeScheduleProvider;
+use Symfony\Component\Scheduler\Tests\Fixtures\SomeScheduleProvider;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class DispatchSchedulerEventListenerTest extends TestCase

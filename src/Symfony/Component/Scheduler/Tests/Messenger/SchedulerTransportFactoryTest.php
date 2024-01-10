@@ -20,8 +20,8 @@ use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransport;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Scheduler\RecurringMessage;
-use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
+use Symfony\Component\Scheduler\Tests\Fixtures\SomeScheduleProvider;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
@@ -99,19 +99,6 @@ class SchedulerTransportFactoryTest extends TestCase
             ]),
             $this->createMock(ClockInterface::class),
         );
-    }
-}
-
-class SomeScheduleProvider implements ScheduleProviderInterface
-{
-    public function __construct(
-        private readonly array $messages,
-    ) {
-    }
-
-    public function getSchedule(): Schedule
-    {
-        return (new Schedule())->add(...$this->messages);
     }
 }
 

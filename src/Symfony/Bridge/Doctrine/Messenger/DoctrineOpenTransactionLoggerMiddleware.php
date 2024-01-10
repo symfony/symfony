@@ -26,8 +26,8 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
 class DoctrineOpenTransactionLoggerMiddleware extends AbstractDoctrineMiddleware
 {
     private $logger;
-    /** @var bool */
-    private $isHandling = false;
+    /** @var int */
+    private $currentTransactionLevel = 0;
 
     public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName = null, LoggerInterface $logger = null)
     {
@@ -38,21 +38,19 @@ class DoctrineOpenTransactionLoggerMiddleware extends AbstractDoctrineMiddleware
 
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
-        if ($this->isHandling) {
-            return $stack->next()->handle($envelope, $stack);
-        }
-
-        $this->isHandling = true;
+        $prevTransactionLevel = $this->currentTransactionLevel;
+        $this->currentTransactionLevel = $entityManager->getConnection()->getTransactionNestingLevel();
 
         try {
             return $stack->next()->handle($envelope, $stack);
         } finally {
-            if ($entityManager->getConnection()->isTransactionActive()) {
+            if ($this->currentTransactionLevel !== $entityManager->getConnection()->getTransactionNestingLevel()) {
                 $this->logger->error('A handler opened a transaction but did not close it.', [
                     'message' => $envelope->getMessage(),
                 ]);
             }
-            $this->isHandling = false;
+
+            $this->currentTransactionLevel = $prevTransactionLevel;
         }
     }
 }

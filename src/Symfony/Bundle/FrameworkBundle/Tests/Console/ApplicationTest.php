@@ -243,11 +243,6 @@ class ApplicationTest extends TestCase
     {
         $container = $this->createMock(ContainerInterface::class);
 
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->any())
-            ->method('push')
-        ;
-
         if ($useDispatcher) {
             $dispatcher = $this->createMock(EventDispatcherInterface::class);
             $dispatcher
@@ -258,7 +253,7 @@ class ApplicationTest extends TestCase
             $container->expects($this->atLeastOnce())
                 ->method('get')
                 ->willReturnMap([
-                    ['.virtual_request_stack', 2, $requestStack],
+                    ['.virtual_request_stack', 2, new RequestStack()],
                     ['event_dispatcher', 1, $dispatcher],
                 ])
             ;

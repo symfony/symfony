@@ -55,7 +55,6 @@ HTML;
         ];
     }
 
-<<<<<<< HEAD
     /**
      * @dataProvider provideFileLinkFormats
      */
@@ -97,7 +96,8 @@ HTML;
             false,
             'href="phpstorm://open?file='.__DIR__,
         ];
-=======
+    }
+
     public function testRendersStackWithoutBinaryStrings()
     {
         // make sure method arguments are available in stack traces (see https://www.php.net/manual/en/ini.core.php)
@@ -135,6 +135,5 @@ HTML;
     private function buildRuntimeException(string $message): \RuntimeException
     {
         return new \RuntimeException($message);
->>>>>>> 6.3
     }
 }

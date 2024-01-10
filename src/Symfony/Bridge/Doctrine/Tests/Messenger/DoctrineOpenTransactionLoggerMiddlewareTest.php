@@ -52,7 +52,7 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
     {
         $this->connection->expects($this->exactly(1))
             ->method('getTransactionNestingLevel')
-            ->willReturn(1)
+            ->will($this->onConsecutiveCalls(1, 1, 0))
         ;
 
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());

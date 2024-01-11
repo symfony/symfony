@@ -25,6 +25,7 @@
         "psr/container": "^1.1|^2.0",
         "psr/cache": "^1.0|^2.0|^3.0",
         "symfony/cache": "^6.4|^7.0",
+        "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/event-dispatcher": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",
         "symfony/http-foundation": "^6.4|^7.0",
@@ -35,6 +36,7 @@
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
+        "symfony/dependency-injection": "<6.4",
         "symfony/event-dispatcher": "<6.4",
         "symfony/http-foundation": "<6.4",
         "symfony/ldap": "<6.4",

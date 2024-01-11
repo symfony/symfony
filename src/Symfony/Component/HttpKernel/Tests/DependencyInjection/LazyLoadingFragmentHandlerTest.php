@@ -27,8 +27,8 @@ class LazyLoadingFragmentHandlerTest extends TestCase
         $renderer->expects($this->once())->method('getName')->willReturn('foo');
         $renderer->expects($this->any())->method('render')->willReturn(new Response());
 
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn(Request::create('/'));
+        $requestStack = new RequestStack();
+        $requestStack->push(Request::create('/'));
 
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->once())->method('has')->with('foo')->willReturn(true);

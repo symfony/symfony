@@ -351,14 +351,12 @@ class SessionListenerTest extends TestCase
         $sessionFactory = $this->createMock(SessionFactory::class);
         $sessionFactory->expects($this->once())->method('createSession')->willReturn($session);
 
-        $requestStack = $this->createMock(RequestStack::class);
-
         $sessionStorage = $this->createMock(NativeSessionStorage::class);
         $sessionStorage->expects($this->never())->method('setOptions')->with(['cookie_secure' => true]);
 
         $container = new Container();
         $container->set('session_factory', $sessionFactory);
-        $container->set('request_stack', $requestStack);
+        $container->set('request_stack', new RequestStack());
 
         $request = new Request();
         $listener = new SessionListener($container);

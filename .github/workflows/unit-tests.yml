@@ -129,7 +129,7 @@ jobs:
           [[ "${{ matrix.mode }}" = *-deps ]] && mv composer.json.phpunit composer.json || true
 
           if [[ "${{ matrix.mode }}" = low-deps ]]; then
-            echo SYMFONY_PHPUNIT_REQUIRE="nikic/php-parser:^4.16" >> $GITHUB_ENV
+            echo SYMFONY_PHPUNIT_REQUIRE="nikic/php-parser:^4.18" >> $GITHUB_ENV
           fi
 
       - name: Install dependencies

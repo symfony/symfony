@@ -140,7 +140,7 @@
         "league/uri": "^6.5|^7.0",
         "masterminds/html5": "^2.7.2",
         "monolog/monolog": "^1.25.1|^2",
-        "nikic/php-parser": "^4.16|^5.0",
+        "nikic/php-parser": "^4.18|^5.0",
         "nyholm/psr7": "^1.0",
         "pda/pheanstalk": "^4.0",
         "php-http/discovery": "^1.15",

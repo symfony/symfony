@@ -298,6 +298,10 @@ class DeprecationErrorHandler
             return $b->count() - $a->count();
         };
 
+        $outputIsCli = !$configuration->shouldWriteToLogFile();
+        // TODO: fix this; we need to detect here if the `simple-phpunit` command was run with `-v` option
+        $commandIsVerbose = false;
+        $deprecationsAreHidden = $outputIsCli && !$commandIsVerbose;
         if ($configuration->shouldWriteToLogFile()) {
             if (false === $handle = @fopen($file = $configuration->getLogFile(), 'a')) {
                 throw new \InvalidArgumentException(sprintf('The configured log file "%s" is not writeable.', $file));
@@ -315,7 +319,7 @@ class DeprecationErrorHandler
                 );
                 if ($configuration->shouldWriteToLogFile()) {
                     fwrite($handle, "\n$deprecationGroupMessage\n");
-                } else {
+                } elseif (!$deprecationsAreHidden) {
                     fwrite($handle, "\n".self::colorize($deprecationGroupMessage, 'legacy' !== $group && 'indirect' !== $group)."\n");
                 }
 
@@ -327,7 +331,9 @@ class DeprecationErrorHandler
                 uasort($notices, $cmp);
 
                 foreach ($notices as $msg => $notice) {
-                    fwrite($handle, sprintf("\n  %sx: %s\n", $notice->count(), $msg));
+                    if (!$deprecationsAreHidden) {
+                        fwrite($handle, sprintf("\n  %sx: %s\n", $notice->count(), $msg));
+                    }
 
                     $countsByCaller = $notice->getCountsByCaller();
                     arsort($countsByCaller);
@@ -336,10 +342,16 @@ class DeprecationErrorHandler
                     foreach ($countsByCaller as $method => $count) {
                         if ('count' !== $method) {
                             if (!$limit--) {
-                                fwrite($handle, "    ...\n");
+                                if (!$deprecationsAreHidden) {
+                                    fwrite($handle, "    ...\n");
+                                }
+
                                 break;
                             }
-                            fwrite($handle, sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
+
+                            if (!$deprecationsAreHidden) {
+                                fwrite($handle, sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
+                            }
                         }
                     }
                 }
@@ -348,6 +360,21 @@ class DeprecationErrorHandler
 
         if (!empty($notices)) {
             fwrite($handle, "\n");
+        }
+
+        if ($deprecationsAreHidden) {
+            $summary = '';
+            foreach ($groups as $group) {
+                if ($count = $this->deprecationGroups[$group]->count()) {
+                    $summary .= sprintf('%s %s, ', self::colorize(' '.$count.' ', 'direct' === $group), $group);
+                }
+            }
+
+            if ('' !== $summary) {
+                $summary = sprintf("There are %s deprecations in your project.\nRun this command with the -v option to see their details.\n", rtrim($summary, ', '));
+
+                fwrite($handle, $summary);
+            }
         }
     }
 

@@ -28,6 +28,10 @@ return (new PhpCsFixer\Config())
         '@PHPUnit75Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
+        'phpdoc_types_order' => [
+            'null_adjustment' => 'always_last',
+            'sort_algorithm' => 'alpha',
+        ],
         'protected_to_private' => false,
         'native_constant_invocation' => ['strict' => false],
         'no_superfluous_phpdoc_tags' => [

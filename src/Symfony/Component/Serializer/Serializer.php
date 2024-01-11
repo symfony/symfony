@@ -73,8 +73,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     private array $normalizerCache = [];
 
     /**
-     * @param array<NormalizerInterface|DenormalizerInterface> $normalizers
-     * @param array<EncoderInterface|DecoderInterface>         $encoders
+     * @param array<DenormalizerInterface|NormalizerInterface> $normalizers
+     * @param array<DecoderInterface|EncoderInterface>         $encoders
      */
     public function __construct(
         private array $normalizers = [],

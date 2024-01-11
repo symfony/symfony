@@ -220,7 +220,7 @@ class Filesystem
     /**
      * Change the owner of an array of files or directories.
      *
-     * @param string|int $user      A user name or number
+     * @param int|string $user      A user name or number
      * @param bool       $recursive Whether change the owner recursively or not
      *
      * @throws IOException When the change fails
@@ -246,7 +246,7 @@ class Filesystem
     /**
      * Change the group of an array of files or directories.
      *
-     * @param string|int $group     A group name or number
+     * @param int|string $group     A group name or number
      * @param bool       $recursive Whether change the group recursively or not
      *
      * @throws IOException When the change fails
@@ -628,7 +628,7 @@ class Filesystem
     /**
      * Atomically dumps content into a file.
      *
-     * @param string|resource $content The data to write into the file
+     * @param resource|string $content The data to write into the file
      *
      * @throws IOException if the file cannot be written to
      */
@@ -672,7 +672,7 @@ class Filesystem
     /**
      * Appends content to an existing file.
      *
-     * @param string|resource $content The content to append
+     * @param resource|string $content The content to append
      * @param bool            $lock    Whether the file should be locked when writing to it
      *
      * @throws IOException If the file is not writable

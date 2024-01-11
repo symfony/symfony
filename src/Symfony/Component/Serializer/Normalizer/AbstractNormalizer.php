@@ -198,7 +198,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @param bool $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
-     * @return string[]|AttributeMetadataInterface[]|bool
+     * @return AttributeMetadataInterface[]|bool|string[]
      *
      * @throws LogicException if the 'allow_extra_attributes' context variable is false and no class metadata factory is provided
      */

@@ -22,7 +22,7 @@ class Query
 {
     private array $params = [];
 
-    /** @var array<ParameterType|int> */
+    /** @var array<int|ParameterType> */
     private array $types = [];
 
     private ?float $start = null;
@@ -64,7 +64,7 @@ class Query
     }
 
     /**
-     * @param array<string|int, string|int|float> $values
+     * @param array<int|string, float|int|string> $values
      */
     public function setValues(array $values): void
     {

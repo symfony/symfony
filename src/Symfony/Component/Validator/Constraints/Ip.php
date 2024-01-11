@@ -74,7 +74,7 @@ class Ip extends Constraint
 
     /**
      * @param array<string,mixed>|null            $options
-     * @param self::V4*|self::V6*|self::ALL*|null $version The IP version to validate (defaults to {@see self::V4})
+     * @param self::ALL*|self::V4*|self::V6*|null $version The IP version to validate (defaults to {@see self::V4})
      * @param string[]|null                       $groups
      */
     public function __construct(

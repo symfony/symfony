@@ -94,7 +94,7 @@ class Definition
     /**
      * Sets a factory.
      *
-     * @param string|array|Reference|null $factory A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param array|Reference|string|null $factory A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
@@ -116,7 +116,7 @@ class Definition
     /**
      * Gets the factory.
      *
-     * @return string|array|null The PHP function or an array containing a class/Reference and a method to call
+     * @return array|string|null The PHP function or an array containing a class/Reference and a method to call
      */
     public function getFactory(): string|array|null
     {
@@ -691,7 +691,7 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param string|array|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param array|Reference|string|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */

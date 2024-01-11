@@ -36,7 +36,7 @@ class ContainerAwareEventManager extends EventManager
     private ContainerInterface $container;
 
     /**
-     * @param list<array{string[], string|object}> $listeners List of [events, listener] tuples
+     * @param list<array{string[], object|string}> $listeners List of [events, listener] tuples
      */
     public function __construct(ContainerInterface $container, array $listeners = [])
     {

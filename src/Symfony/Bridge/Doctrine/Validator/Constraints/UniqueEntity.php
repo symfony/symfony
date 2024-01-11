@@ -38,7 +38,7 @@ class UniqueEntity extends Constraint
 
     /**
      * @param array|string         $fields           The combination of fields that must contain unique values or a set of options
-     * @param bool|string[]|string $ignoreNull       The combination of fields that ignore null values
+     * @param bool|string|string[] $ignoreNull       The combination of fields that ignore null values
      * @param string|null          $em               The entity manager used to query for uniqueness instead of the manager of this class
      * @param string|null          $entityClass      The entity class to enforce uniqueness on instead of the current class
      * @param string|null          $repositoryMethod The repository method to check uniqueness instead of findBy. The method will receive as its argument

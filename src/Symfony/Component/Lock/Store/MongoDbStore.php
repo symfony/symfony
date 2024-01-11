@@ -61,7 +61,7 @@ class MongoDbStore implements PersistingStoreInterface
     private float $initialTtl;
 
     /**
-     * @param Collection|Client|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
+     * @param Client|Collection|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
      * @param array                            $options    See below
      * @param float                            $initialTtl The expiration delay of locks in seconds
      *

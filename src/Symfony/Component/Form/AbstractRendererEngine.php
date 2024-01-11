@@ -43,7 +43,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface, Re
     protected array $resources = [];
 
     /**
-     * @var array<array<int|false>>
+     * @var array<array<false|int>>
      */
     private array $resourceHierarchyLevels = [];
 

@@ -66,7 +66,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
      *
      * @param array|bool $recursive Whether values should be resolved recursively or not
      *
-     * @return string|int|float|bool|array|Data[]|null
+     * @return array|bool|Data[]|float|int|string|null
      */
     public function getValue(array|bool $recursive = false): string|int|float|bool|array|null
     {

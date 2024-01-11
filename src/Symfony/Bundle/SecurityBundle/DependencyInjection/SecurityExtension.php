@@ -697,7 +697,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     /**
      * @param array<string, mixed> $config
      *
-     * @return Reference|array<string, mixed>
+     * @return array<string, mixed>|Reference
      */
     private function createHasher(array $config): Reference|array
     {

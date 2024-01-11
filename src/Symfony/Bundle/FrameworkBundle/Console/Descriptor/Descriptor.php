@@ -94,7 +94,7 @@ abstract class Descriptor implements DescriptorInterface
      * Common options are:
      * * name: name of described service
      *
-     * @param Definition|Alias|object $service
+     * @param Alias|Definition|object $service
      */
     abstract protected function describeContainerService(object $service, array $options = [], ContainerBuilder $container = null): void;
 

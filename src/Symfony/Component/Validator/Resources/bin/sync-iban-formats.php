@@ -181,7 +181,7 @@ final class WikipediaIbanProvider
     }
 
     /**
-     * @return list<array<string, string|int>>
+     * @return list<array<string, int|string>>
      */
     private function readIbanFormatsTable(): array
     {

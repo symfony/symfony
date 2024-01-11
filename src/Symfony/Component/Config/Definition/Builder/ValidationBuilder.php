@@ -28,7 +28,7 @@ class ValidationBuilder
     /**
      * Registers a closure to run as normalization or an expression builder to build it if null is provided.
      *
-     * @return ExprBuilder|$this
+     * @return $this|ExprBuilder
      */
     public function rule(\Closure $closure = null): ExprBuilder|static
     {

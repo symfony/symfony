@@ -266,7 +266,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     }
 
     /**
-     * @return string|resource
+     * @return resource|string
      */
     public function getContent()
     {
@@ -343,7 +343,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * Gets the parsed controller.
      *
-     * @return array|string|Data The controller as a string or array of data
+     * @return array|Data|string The controller as a string or array of data
      *                           with keys 'class', 'method', 'file' and 'line'
      */
     public function getController(): array|string|Data

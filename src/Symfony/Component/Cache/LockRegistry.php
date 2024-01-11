@@ -147,7 +147,7 @@ final class LockRegistry
     }
 
     /**
-     * @return resource|false
+     * @return false|resource
      */
     private static function open(int $key)
     {

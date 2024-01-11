@@ -70,7 +70,7 @@ final class Response
     }
 
     /**
-     * @return string|array|null The first header value if $first is true, an array of values otherwise
+     * @return array|string|null The first header value if $first is true, an array of values otherwise
      */
     public function getHeader(string $header, bool $first = true): string|array|null
     {

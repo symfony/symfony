@@ -26,7 +26,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
     private array $passwordHashers;
 
     /**
-     * @param array<string, PasswordHasherInterface|array> $passwordHashers
+     * @param array<string, array|PasswordHasherInterface> $passwordHashers
      */
     public function __construct(array $passwordHashers)
     {

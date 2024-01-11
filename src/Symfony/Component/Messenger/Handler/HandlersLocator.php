@@ -25,7 +25,7 @@ class HandlersLocator implements HandlersLocatorInterface
     private array $handlers;
 
     /**
-     * @param HandlerDescriptor[][]|callable[][] $handlers
+     * @param callable[][]|HandlerDescriptor[][] $handlers
      */
     public function __construct(array $handlers)
     {

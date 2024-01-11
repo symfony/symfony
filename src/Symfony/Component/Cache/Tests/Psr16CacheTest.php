@@ -113,7 +113,7 @@ class Psr16CacheTest extends SimpleCacheTest
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
-        /** @var PruneableInterface|CacheInterface $cache */
+        /** @var CacheInterface|PruneableInterface $cache */
         $cache = $this->createSimpleCache();
         $cache->clear();
 

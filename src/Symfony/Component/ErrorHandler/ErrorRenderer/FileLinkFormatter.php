@@ -27,7 +27,7 @@ class FileLinkFormatter
     private array|false $fileLinkFormat;
 
     /**
-     * @param string|\Closure $urlFormat the URL format, or a closure that returns it on-demand
+     * @param \Closure|string $urlFormat the URL format, or a closure that returns it on-demand
      */
     public function __construct(
         string|array $fileLinkFormat = null,

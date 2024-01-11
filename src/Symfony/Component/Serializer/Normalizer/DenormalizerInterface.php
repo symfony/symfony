@@ -66,7 +66,7 @@ interface DenormalizerInterface
      * Use type "object" to match any classes or interfaces,
      * and type "*" to match any types.
      *
-     * @return array<class-string|'*'|'object'|string, bool|null>
+     * @return array<'*'|'object'|class-string|string, bool|null>
      */
     public function getSupportedTypes(?string $format): array;
 }

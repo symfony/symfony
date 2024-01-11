@@ -174,7 +174,7 @@ class InputDefinition
     }
 
     /**
-     * @return array<string|bool|int|float|array|null>
+     * @return array<array|bool|float|int|string|null>
      */
     public function getArgumentDefaults(): array
     {
@@ -307,7 +307,7 @@ class InputDefinition
     }
 
     /**
-     * @return array<string|bool|int|float|array|null>
+     * @return array<array|bool|float|int|string|null>
      */
     public function getOptionDefaults(): array
     {

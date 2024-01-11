@@ -72,7 +72,7 @@ abstract class AbstractUnicodeString extends AbstractString
      *
      * Install the intl extension for best results.
      *
-     * @param string[]|\Transliterator[]|\Closure[] $rules See "*-Latin" rules from Transliterator::listIDs()
+     * @param \Closure[]|string[]|\Transliterator[] $rules See "*-Latin" rules from Transliterator::listIDs()
      */
     public function ascii(array $rules = []): self
     {

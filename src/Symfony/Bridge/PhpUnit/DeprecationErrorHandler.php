@@ -62,7 +62,7 @@ class DeprecationErrorHandler
      * The mode can alternatively be "/some-regexp/" to stop the test suite whenever
      * a deprecation message matches the given regular expression.
      *
-     * @param int|string|false $mode The reporting mode, defaults to not allowing any deprecations
+     * @param false|int|string $mode The reporting mode, defaults to not allowing any deprecations
      */
     public static function register($mode = 0)
     {

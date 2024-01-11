@@ -24,7 +24,7 @@ interface GroupProviderInterface
      * Returns which validation groups should be used for a certain state
      * of the object.
      *
-     * @return string[]|string[][]|GroupSequence
+     * @return GroupSequence|string[]|string[][]
      */
     public function getGroups(object $object): array|GroupSequence;
 }

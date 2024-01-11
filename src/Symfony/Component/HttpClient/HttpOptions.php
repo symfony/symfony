@@ -84,7 +84,7 @@ class HttpOptions
     }
 
     /**
-     * @param array|string|resource|\Traversable|\Closure $body
+     * @param array|\Closure|resource|string|\Traversable $body
      *
      * @return $this
      */

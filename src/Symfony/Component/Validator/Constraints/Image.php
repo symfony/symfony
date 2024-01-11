@@ -105,10 +105,10 @@ class Image extends File
      * @param int|null                 $maxWidth                    Maximum image width
      * @param int|null                 $maxHeight                   Maximum image height
      * @param int|null                 $minHeight                   Minimum image weight
-     * @param int|float|null           $maxRatio                    Maximum image ratio
-     * @param int|float|null           $minRatio                    Minimum image ration
-     * @param int|float|null           $minPixels                   Minimum amount of pixels
-     * @param int|float|null           $maxPixels                   Maximum amount of pixels
+     * @param float|int|null           $maxRatio                    Maximum image ratio
+     * @param float|int|null           $minRatio                    Minimum image ration
+     * @param float|int|null           $minPixels                   Minimum amount of pixels
+     * @param float|int|null           $maxPixels                   Maximum amount of pixels
      * @param bool|null                $allowSquare                 Whether to allow a square image (defaults to true)
      * @param bool|null                $allowLandscape              Whether to allow a landscape image (defaults to true)
      * @param bool|null                $allowPortrait               Whether to allow a portrait image (defaults to true)

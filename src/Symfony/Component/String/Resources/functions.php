@@ -27,7 +27,7 @@ if (!\function_exists(b::class)) {
 
 if (!\function_exists(s::class)) {
     /**
-     * @return UnicodeString|ByteString
+     * @return ByteString|UnicodeString
      */
     function s(?string $string = ''): AbstractString
     {

@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class FormValidator extends ConstraintValidator
 {
     /**
-     * @var \SplObjectStorage<FormInterface, array<int, string|string[]|GroupSequence>>
+     * @var \SplObjectStorage<FormInterface, array<int, GroupSequence|string|string[]>>
      */
     private \SplObjectStorage $resolvedGroups;
 
@@ -203,7 +203,7 @@ class FormValidator extends ConstraintValidator
     /**
      * Returns the validation groups of the given form.
      *
-     * @return string|GroupSequence|array<string|GroupSequence>
+     * @return array<GroupSequence|string>|GroupSequence|string
      */
     private function getValidationGroups(FormInterface $form): string|GroupSequence|array
     {
@@ -242,9 +242,9 @@ class FormValidator extends ConstraintValidator
     /**
      * Post-processes the validation groups option for a given form.
      *
-     * @param string|GroupSequence|array<string|GroupSequence>|callable $groups The validation groups
+     * @param array<GroupSequence|string>|callable|GroupSequence|string $groups The validation groups
      *
-     * @return GroupSequence|array<string|GroupSequence>
+     * @return array<GroupSequence|string>|GroupSequence
      */
     private static function resolveValidationGroups(string|GroupSequence|array|callable $groups, FormInterface $form): GroupSequence|array
     {

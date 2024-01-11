@@ -25,7 +25,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
     private LoggerInterface $logger;
 
     /**
-     * @param TranslatorInterface&TranslatorBagInterface&LocaleAwareInterface $translator The translator must implement TranslatorBagInterface
+     * @param LocaleAwareInterface&TranslatorBagInterface&TranslatorInterface $translator The translator must implement TranslatorBagInterface
      */
     public function __construct(TranslatorInterface $translator, LoggerInterface $logger)
     {

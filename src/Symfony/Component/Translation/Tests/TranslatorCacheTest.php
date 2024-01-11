@@ -104,7 +104,7 @@ class TranslatorCacheTest extends TestCase
         $catalogue = new MessageCatalogue($locale, []);
         $catalogue->addResource(new StaleResource()); // better use a helper class than a mock, because it gets serialized in the cache and re-loaded
 
-        /** @var MockObject&LoaderInterface $loader */
+        /** @var LoaderInterface&MockObject $loader */
         $loader = $this->createMock(LoaderInterface::class);
         $loader
             ->expects($this->exactly(2))

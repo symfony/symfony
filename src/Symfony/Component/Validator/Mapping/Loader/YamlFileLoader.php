@@ -72,7 +72,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param array $nodes The YAML nodes
      *
-     * @return array<array|scalar|Constraint>
+     * @return array<array|Constraint|scalar>
      */
     protected function parseNodes(array $nodes): array
     {

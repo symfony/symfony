@@ -27,7 +27,7 @@ class DataPart extends TextPart
     private ?string $cid = null;
 
     /**
-     * @param resource|string|File $body Use a File instance to defer loading the file until rendering
+     * @param File|resource|string $body Use a File instance to defer loading the file until rendering
      */
     public function __construct($body, string $filename = null, string $contentType = null, string $encoding = null)
     {

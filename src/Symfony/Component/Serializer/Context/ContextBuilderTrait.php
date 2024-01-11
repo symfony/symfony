@@ -30,7 +30,7 @@ trait ContextBuilderTrait
     }
 
     /**
-     * @param ContextBuilderInterface|array<string, mixed> $context
+     * @param array<string, mixed>|ContextBuilderInterface $context
      */
     public function withContext(ContextBuilderInterface|array $context): static
     {

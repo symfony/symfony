@@ -37,7 +37,7 @@ class DateTime extends Constraint
     public string $message = 'This value is not a valid datetime.';
 
     /**
-     * @param string|array<string,mixed>|null $format  The datetime format to match (defaults to 'Y-m-d H:i:s')
+     * @param array<string,mixed>|string|null $format  The datetime format to match (defaults to 'Y-m-d H:i:s')
      * @param string[]|null                   $groups
      * @param array<string,mixed>             $options
      */

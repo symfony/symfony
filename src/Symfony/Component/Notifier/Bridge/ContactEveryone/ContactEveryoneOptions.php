@@ -53,7 +53,7 @@ final class ContactEveryoneOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param 'fr_FR'|'en_GB' $locale
+     * @param 'en_GB'|'fr_FR' $locale
      *
      * @return $this
      */

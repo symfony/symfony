@@ -31,7 +31,7 @@ class Type extends Constraint
     public string|array|null $type = null;
 
     /**
-     * @param string|string[]|array<string,mixed>|null $type    The type(s) to enforce on the value
+     * @param array<string,mixed>|string|string[]|null $type    The type(s) to enforce on the value
      * @param string[]|null                            $groups
      * @param array<string,mixed>                      $options
      */

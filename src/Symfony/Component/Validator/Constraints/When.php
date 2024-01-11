@@ -29,8 +29,8 @@ class When extends Composite
     public array $values = [];
 
     /**
-     * @param string|Expression|array<string,mixed> $expression  The condition to evaluate, written with the ExpressionLanguage syntax
-     * @param Constraint[]|Constraint|null          $constraints One or multiple constraints that are applied if the expression returns true
+     * @param array<string,mixed>|Expression|string $expression  The condition to evaluate, written with the ExpressionLanguage syntax
+     * @param Constraint|Constraint[]|null          $constraints One or multiple constraints that are applied if the expression returns true
      * @param array<string,mixed>|null              $values      The values of the custom variables used in the expression (defaults to [])
      * @param string[]|null                         $groups
      * @param array<string,mixed>                   $options

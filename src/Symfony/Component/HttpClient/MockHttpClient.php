@@ -33,7 +33,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
     private array $defaultOptions = [];
 
     /**
-     * @param callable|callable[]|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
+     * @param callable|callable[]|iterable|ResponseInterface|ResponseInterface[]|null $responseFactory
      */
     public function __construct(callable|iterable|ResponseInterface $responseFactory = null, ?string $baseUri = 'https://example.com')
     {
@@ -42,7 +42,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
     }
 
     /**
-     * @param callable|callable[]|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
+     * @param callable|callable[]|iterable|ResponseInterface|ResponseInterface[]|null $responseFactory
      */
     public function setResponseFactory($responseFactory): void
     {

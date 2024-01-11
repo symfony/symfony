@@ -128,7 +128,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         $parentClass = null;
         $types = [];
-        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
+        /** @var DocBlock\Tags\Param|DocBlock\Tags\Return_|DocBlock\Tags\Var_ $tag */
         foreach ($docBlock->getTagsByName($tag) as $tag) {
             if ($tag && !$tag instanceof InvalidTag && null !== $tag->getType()) {
                 foreach ($this->phpDocTypeHelper->getTypes($tag->getType()) as $type) {
@@ -174,7 +174,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         $types = [];
-        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
+        /** @var DocBlock\Tags\Param|DocBlock\Tags\Return_|DocBlock\Tags\Var_ $tag */
         foreach ($docBlock->getTagsByName('param') as $tag) {
             if ($tag && null !== $tag->getType()) {
                 $types[] = $this->phpDocTypeHelper->getTypes($tag->getType());

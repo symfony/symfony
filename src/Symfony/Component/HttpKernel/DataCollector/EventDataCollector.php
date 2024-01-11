@@ -33,7 +33,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     private ?Request $currentRequest = null;
 
     /**
-     * @param iterable<EventDispatcherInterface>|EventDispatcherInterface|null $dispatchers
+     * @param EventDispatcherInterface|iterable<EventDispatcherInterface>|null $dispatchers
      */
     public function __construct(
         iterable|EventDispatcherInterface $dispatchers = null,

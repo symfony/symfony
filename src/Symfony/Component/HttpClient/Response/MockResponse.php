@@ -37,7 +37,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
     private static int $idSequence = 0;
 
     /**
-     * @param string|iterable<string|\Throwable> $body The response body as a string or an iterable of strings,
+     * @param iterable<string|\Throwable>|string $body The response body as a string or an iterable of strings,
      *                                                 yielding an empty string simulates an idle timeout,
      *                                                 throwing or yielding an exception yields an ErrorChunk
      *

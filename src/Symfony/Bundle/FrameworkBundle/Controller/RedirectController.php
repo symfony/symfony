@@ -49,7 +49,7 @@ class RedirectController
      *
      * @param string     $route             The route name to redirect to
      * @param bool       $permanent         Whether the redirection is permanent
-     * @param bool|array $ignoreAttributes  Whether to ignore attributes or an array of attributes to ignore
+     * @param array|bool $ignoreAttributes  Whether to ignore attributes or an array of attributes to ignore
      * @param bool       $keepRequestMethod Whether redirect action should keep HTTP request method
      *
      * @throws HttpException In case the route name is empty

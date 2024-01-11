@@ -792,7 +792,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds the service aliases.
      *
-     * @param array<string, string|Alias> $aliases
+     * @param array<string, Alias|string> $aliases
      */
     public function addAliases(array $aliases): void
     {
@@ -804,7 +804,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service aliases.
      *
-     * @param array<string, string|Alias> $aliases
+     * @param array<string, Alias|string> $aliases
      */
     public function setAliases(array $aliases): void
     {

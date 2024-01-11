@@ -20,7 +20,7 @@ namespace Symfony\Component\Serializer\Context;
 interface ContextBuilderInterface
 {
     /**
-     * @param self|array<string, mixed> $context
+     * @param array<string, mixed>|self $context
      */
     public function withContext(self|array $context): static;
 

@@ -47,7 +47,7 @@ class CardScheme extends Constraint
     public array|string|null $schemes = null;
 
     /**
-     * @param string|string[]|array<string,mixed>|null $schemes Name(s) of the number scheme(s) used to validate the credit card number
+     * @param array<string,mixed>|string|string[]|null $schemes Name(s) of the number scheme(s) used to validate the credit card number
      * @param string[]|null                            $groups
      * @param array<string,mixed>                      $options
      */

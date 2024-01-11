@@ -24,7 +24,7 @@ final class InputBag extends ParameterBag
     /**
      * Returns a scalar input value by name.
      *
-     * @param string|int|float|bool|null $default The default value if the input key does not exist
+     * @param bool|float|int|string|null $default The default value if the input key does not exist
      */
     public function get(string $key, mixed $default = null): string|int|float|bool|null
     {
@@ -63,7 +63,7 @@ final class InputBag extends ParameterBag
     /**
      * Sets an input by name.
      *
-     * @param string|int|float|bool|array|null $value
+     * @param array|bool|float|int|string|null $value
      */
     public function set(string $key, mixed $value): void
     {

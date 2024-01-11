@@ -23,8 +23,8 @@ class StopwatchPeriod
     private int $memory;
 
     /**
-     * @param int|float $start         The relative time of the start of the period (in milliseconds)
-     * @param int|float $end           The relative time of the end of the period (in milliseconds)
+     * @param float|int $start         The relative time of the start of the period (in milliseconds)
+     * @param float|int $end           The relative time of the end of the period (in milliseconds)
      * @param bool      $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
     public function __construct(int|float $start, int|float $end, bool $morePrecision = false)

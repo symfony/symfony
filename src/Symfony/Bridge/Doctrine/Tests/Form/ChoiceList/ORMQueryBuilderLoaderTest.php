@@ -270,7 +270,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     }
 
     /**
-     * @return (LegacyQueryMock&MockObject)|(Query&MockObject)
+     * @return (LegacyQueryMock&MockObject)|(MockObject&Query)
      */
     private function getQueryMock(): AbstractQuery
     {

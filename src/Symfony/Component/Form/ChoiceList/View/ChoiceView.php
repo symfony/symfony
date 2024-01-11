@@ -39,7 +39,7 @@ class ChoiceView
      *
      * @param mixed                              $data                       The original choice
      * @param string                             $value                      The view representation of the choice
-     * @param string|TranslatableInterface|false $label                      The label displayed to humans; pass false to discard the label
+     * @param false|string|TranslatableInterface $label                      The label displayed to humans; pass false to discard the label
      * @param array                              $attr                       Additional attributes for the HTML tag
      * @param array                              $labelTranslationParameters Additional parameters used to translate the label
      */

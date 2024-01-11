@@ -180,7 +180,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * Filter key.
      *
      * @param int                                     $filter  FILTER_* constant
-     * @param int|array{flags?: int, options?: array} $options Flags from FILTER_* constants
+     * @param array{flags?: int, options?: array}|int $options Flags from FILTER_* constants
      *
      * @see https://php.net/filter-var
      */

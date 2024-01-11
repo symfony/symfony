@@ -21,7 +21,7 @@ final class ValidationStamp implements StampInterface
     private array|GroupSequence $groups;
 
     /**
-     * @param string[]|GroupSequence $groups
+     * @param GroupSequence|string[] $groups
      */
     public function __construct(array|GroupSequence $groups)
     {

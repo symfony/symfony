@@ -58,7 +58,7 @@ class Crawler implements \Countable, \IteratorAggregate
     private ?HTML5 $html5Parser = null;
 
     /**
-     * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A Node to use as the base for the crawling
+     * @param \DOMNode|\DOMNode[]|\DOMNodeList|string|null $node A Node to use as the base for the crawling
      */
     public function __construct(\DOMNodeList|\DOMNode|array|string $node = null, string $uri = null, string $baseHref = null, bool $useHtml5Parser = true)
     {
@@ -102,7 +102,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * This method uses the appropriate specialized add*() method based
      * on the type of the argument.
      *
-     * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A node
+     * @param \DOMNode|\DOMNode[]|\DOMNodeList|string|null $node A node
      *
      * @throws \InvalidArgumentException when node is not the expected type
      */
@@ -1152,7 +1152,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Creates a crawler for some subnodes.
      *
-     * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $nodes
+     * @param \DOMNode|\DOMNode[]|\DOMNodeList|string|null $nodes
      */
     private function createSubCrawler(\DOMNodeList|\DOMNode|array|string|null $nodes): static
     {

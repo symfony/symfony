@@ -29,7 +29,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     private array $processedConfigs = [];
 
     /**
-     * @return string|false
+     * @return false|string
      */
     public function getXsdValidationBasePath()
     {

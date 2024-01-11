@@ -49,7 +49,7 @@ final class HttplugPromise implements HttplugPromiseInterface
     }
 
     /**
-     * @return Psr7ResponseInterface|mixed
+     * @return mixed|Psr7ResponseInterface
      */
     public function wait($unwrap = true): mixed
     {

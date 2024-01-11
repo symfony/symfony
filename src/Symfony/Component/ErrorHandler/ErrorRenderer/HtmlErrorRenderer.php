@@ -43,7 +43,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     /**
      * @param bool|callable   $debug        The debugging mode as a boolean or a callable that should return it
-     * @param string|callable $outputBuffer The output buffer as a string or a callable that should return it
+     * @param callable|string $outputBuffer The output buffer as a string or a callable that should return it
      */
     public function __construct(
         bool|callable $debug = false,

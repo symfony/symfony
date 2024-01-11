@@ -25,7 +25,7 @@ class Sequentially extends Composite
     public array|Constraint $constraints = [];
 
     /**
-     * @param Constraint[]|array<string,mixed>|null $constraints An array of validation constraints
+     * @param array<string,mixed>|Constraint[]|null $constraints An array of validation constraints
      * @param string[]|null                         $groups
      */
     public function __construct(mixed $constraints = null, array $groups = null, mixed $payload = null)

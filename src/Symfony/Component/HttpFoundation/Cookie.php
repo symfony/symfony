@@ -74,7 +74,7 @@ class Cookie
     /**
      * @see self::__construct
      *
-     * @param self::SAMESITE_*|''|null $sameSite
+     * @param ''|self::SAMESITE_*|null $sameSite
      */
     public static function create(string $name, string $value = null, int|string|\DateTimeInterface $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX, bool $partitioned = false): self
     {
@@ -84,13 +84,13 @@ class Cookie
     /**
      * @param string                        $name     The name of the cookie
      * @param string|null                   $value    The value of the cookie
-     * @param int|string|\DateTimeInterface $expire   The time the cookie expires
+     * @param \DateTimeInterface|int|string $expire   The time the cookie expires
      * @param string|null                   $path     The path on the server in which the cookie will be available on
      * @param string|null                   $domain   The domain that the cookie is available to
      * @param bool|null                     $secure   Whether the client should send back the cookie only over HTTPS or null to auto-enable this when the request is already using HTTPS
      * @param bool                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
      * @param bool                          $raw      Whether the cookie value should be sent with no url encoding
-     * @param self::SAMESITE_*|''|null      $sameSite Whether the cookie will be available for cross-site requests
+     * @param ''|self::SAMESITE_*|null      $sameSite Whether the cookie will be available for cross-site requests
      *
      * @throws \InvalidArgumentException
      */
@@ -220,7 +220,7 @@ class Cookie
     /**
      * Creates a cookie copy with SameSite attribute.
      *
-     * @param self::SAMESITE_*|''|null $sameSite
+     * @param ''|self::SAMESITE_*|null $sameSite
      */
     public function withSameSite(?string $sameSite): static
     {

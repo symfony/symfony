@@ -22,12 +22,12 @@ use Symfony\Component\Validator\Constraint;
 class Callback extends Constraint
 {
     /**
-     * @var string|callable
+     * @var callable|string
      */
     public $callback;
 
     /**
-     * @param string|string[]|callable|array<string,mixed>|null $callback The callback definition
+     * @param array<string,mixed>|callable|string|string[]|null $callback The callback definition
      * @param string[]|null                                     $groups
      */
     public function __construct(array|string|callable $callback = null, array $groups = null, mixed $payload = null, array $options = [])

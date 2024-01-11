@@ -19,7 +19,7 @@ final class TransportNamesStamp implements StampInterface
     private array $transportNames;
 
     /**
-     * @param string[]|string $transportNames Transport names to be used for the message
+     * @param string|string[] $transportNames Transport names to be used for the message
      */
     public function __construct(array|string $transportNames)
     {

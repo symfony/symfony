@@ -149,7 +149,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
     }
 
     /**
-     * @param UriInterface|string $uri
+     * @param string|UriInterface $uri
      */
     public function createRequest(string $method, $uri = ''): RequestInterface
     {

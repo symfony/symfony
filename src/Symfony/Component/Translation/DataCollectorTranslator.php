@@ -31,7 +31,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     private array $messages = [];
 
     /**
-     * @param TranslatorInterface&TranslatorBagInterface&LocaleAwareInterface $translator
+     * @param LocaleAwareInterface&TranslatorBagInterface&TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {

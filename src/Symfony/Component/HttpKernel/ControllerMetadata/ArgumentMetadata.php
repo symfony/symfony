@@ -102,7 +102,7 @@ class ArgumentMetadata
 
     /**
      * @param class-string          $name
-     * @param self::IS_INSTANCEOF|0 $flags
+     * @param 0|self::IS_INSTANCEOF $flags
      *
      * @return array<object>
      */
@@ -119,7 +119,7 @@ class ArgumentMetadata
      * @template T of object
      *
      * @param class-string<T>       $name
-     * @param self::IS_INSTANCEOF|0 $flags
+     * @param 0|self::IS_INSTANCEOF $flags
      *
      * @return array<T>
      */

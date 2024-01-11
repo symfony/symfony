@@ -25,7 +25,7 @@ class Traverse extends Constraint
     public bool $traverse = true;
 
     /**
-     * @param bool|array<string,mixed>|null $traverse Whether to traverse the given object or not (defaults to true). Pass an associative array to configure the constraint's options (e.g. payload).
+     * @param array<string,mixed>|bool|null $traverse Whether to traverse the given object or not (defaults to true). Pass an associative array to configure the constraint's options (e.g. payload).
      */
     public function __construct(bool|array $traverse = null)
     {

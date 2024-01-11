@@ -97,7 +97,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Adds default children when none are set.
      *
-     * @param int|string|array|null $children The number of children|The child name|The children names to be added
+     * @param array|int|string|null $children The number of children|The child name|The children names to be added
      */
     public function setAddChildrenIfNoneSet(int|string|array|null $children = ['defaults']): void
     {

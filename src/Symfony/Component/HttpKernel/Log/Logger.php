@@ -55,7 +55,7 @@ class Logger extends AbstractLogger implements DebugLoggerInterface
     private $handle;
 
     /**
-     * @param string|resource|null $output
+     * @param resource|string|null $output
      */
     public function __construct(string $minLevel = null, $output = null, callable $formatter = null, private readonly ?RequestStack $requestStack = null, bool $debug = false)
     {

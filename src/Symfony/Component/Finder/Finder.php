@@ -114,7 +114,7 @@ class Finder implements \IteratorAggregate, \Countable
      *     $finder->depth('< 3') // the Finder will descend at most 3 levels of directories below the starting point.
      *     $finder->depth(['>= 1', '< 3'])
      *
-     * @param string|int|string[]|int[] $levels The depth level expression or an array of depth levels
+     * @param int|int[]|string|string[] $levels The depth level expression or an array of depth levels
      *
      * @return $this
      *
@@ -297,7 +297,7 @@ class Finder implements \IteratorAggregate, \Countable
      *     $finder->size(4);
      *     $finder->size(['> 10K', '< 20K'])
      *
-     * @param string|int|string[]|int[] $sizes A size range string or an integer or an array of size ranges
+     * @param int|int[]|string|string[] $sizes A size range string or an integer or an array of size ranges
      *
      * @return $this
      *
@@ -320,7 +320,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      *     $finder->in(__DIR__)->exclude('ruby');
      *
-     * @param string|array $dirs A directory path or an array of directories
+     * @param array|string $dirs A directory path or an array of directories
      *
      * @return $this
      *

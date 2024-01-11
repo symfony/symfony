@@ -316,9 +316,9 @@ trait HttpClientTrait
     }
 
     /**
-     * @param array|string|resource|\Traversable|\Closure $body
+     * @param array|\Closure|resource|string|\Traversable $body
      *
-     * @return string|resource|\Closure
+     * @return \Closure|resource|string
      *
      * @throws InvalidArgumentException When an invalid body is passed
      */

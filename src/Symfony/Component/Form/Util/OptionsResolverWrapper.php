@@ -67,7 +67,7 @@ class OptionsResolverWrapper extends OptionsResolver
     }
 
     /**
-     * @param string|array $allowedTypes
+     * @param array|string $allowedTypes
      *
      * @return $this
      */
@@ -83,7 +83,7 @@ class OptionsResolverWrapper extends OptionsResolver
     }
 
     /**
-     * @param string|array $allowedTypes
+     * @param array|string $allowedTypes
      *
      * @return $this
      */

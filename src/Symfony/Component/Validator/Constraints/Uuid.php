@@ -96,7 +96,7 @@ class Uuid extends Constraint
 
     /**
      * @param array<string,mixed>|null $options
-     * @param self::V*[]|self::V*|null $versions Specific UUID versions (defaults to {@see Uuid::ALL_VERSIONS})
+     * @param self::V*|self::V*[]|null $versions Specific UUID versions (defaults to {@see Uuid::ALL_VERSIONS})
      * @param bool|null                $strict   Whether to force the value to follow the RFC's input format rules; pass false to allow alternate formats (defaults to true)
      * @param string[]|null            $groups
      */

@@ -23,13 +23,13 @@ abstract class AbstractPipes implements PipesInterface
     public array $pipes = [];
 
     private string $inputBuffer = '';
-    /** @var resource|string|\Iterator */
+    /** @var \Iterator|resource|string */
     private $input;
     private bool $blocked = true;
     private ?string $lastError = null;
 
     /**
-     * @param resource|string|\Iterator $input
+     * @param \Iterator|resource|string $input
      */
     public function __construct($input)
     {

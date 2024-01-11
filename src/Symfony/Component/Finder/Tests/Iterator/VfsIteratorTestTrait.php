@@ -15,7 +15,7 @@ trait VfsIteratorTestTrait
 {
     private static int $vfsNextSchemeIndex = 0;
 
-    /** @var array<string, \Closure(string, 'list_dir_open'|'list_dir_rewind'|'is_dir'): (list<string>|bool)> */
+    /** @var array<string, \Closure(string, 'is_dir'|'list_dir_open'|'list_dir_rewind'): (bool|list<string>)> */
     public static array $vfsProviders;
 
     protected string $vfsScheme;
@@ -30,7 +30,7 @@ trait VfsIteratorTestTrait
         $this->vfsScheme = 'symfony-finder-vfs-test-'.++self::$vfsNextSchemeIndex;
 
         $vfsWrapperClass = \get_class(new class() {
-            /** @var array<string, \Closure(string, 'list_dir_open'|'list_dir_rewind'|'is_dir'): (list<string>|bool)> */
+            /** @var array<string, \Closure(string, 'is_dir'|'list_dir_open'|'list_dir_rewind'): (bool|list<string>)> */
             public static array $vfsProviders = [];
 
             /** @var resource */

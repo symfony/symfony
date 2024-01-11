@@ -28,7 +28,7 @@ interface NormalizerInterface
      * @param string|null $format  Format the normalization result will be encoded as
      * @param array       $context Context options for the normalizer
      *
-     * @return array|string|int|float|bool|\ArrayObject|null \ArrayObject is used to make sure an empty object is encoded as an object not an array
+     * @return array|\ArrayObject|bool|float|int|string|null \ArrayObject is used to make sure an empty object is encoded as an object not an array
      *
      * @throws InvalidArgumentException   Occurs when the object given is not a supported type for the normalizer
      * @throws CircularReferenceException Occurs when the normalizer detects a circular reference when no circular
@@ -59,7 +59,7 @@ interface NormalizerInterface
      * Use type "object" to match any classes or interfaces,
      * and type "*" to match any types.
      *
-     * @return array<class-string|'*'|'object'|string, bool|null>
+     * @return array<'*'|'object'|class-string|string, bool|null>
      */
     public function getSupportedTypes(?string $format): array;
 }

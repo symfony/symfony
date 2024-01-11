@@ -82,7 +82,7 @@ final class OptionConfigurator
      *
      * @param string          $package The name of the composer package that is triggering the deprecation
      * @param string          $version The version of the package that introduced the deprecation
-     * @param string|\Closure $message The deprecation message to use
+     * @param \Closure|string $message The deprecation message to use
      *
      * @return $this
      */

@@ -30,7 +30,7 @@ class Autowire
     /**
      * Use only ONE of the following.
      *
-     * @param string|array|ArgumentInterface|null $value      Value to inject (ie "%kernel.project_dir%/some/path")
+     * @param ArgumentInterface|array|string|null $value      Value to inject (ie "%kernel.project_dir%/some/path")
      * @param string|null                         $service    Service ID (ie "some.service")
      * @param string|null                         $expression Expression (ie 'service("some.service").someMethod()')
      * @param string|null                         $env        Environment variable name (ie 'SOME_ENV_VARIABLE')

@@ -25,7 +25,7 @@ class Cascade extends Constraint
     public array $exclude = [];
 
     /**
-     * @param string[]|string|array<string,mixed>|null $exclude Properties excluded from validation
+     * @param array<string,mixed>|string|string[]|null $exclude Properties excluded from validation
      * @param array<string,mixed>|null                 $options
      */
     public function __construct(array|string $exclude = null, array $options = null)

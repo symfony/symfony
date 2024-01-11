@@ -31,7 +31,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * {@link \Symfony\Component\Validator\Constraints\Valid} is assumed.
      *
      * @param Constraint|Constraint[]                               $constraints The constraint(s) to validate against
-     * @param string|GroupSequence|array<string|GroupSequence>|null $groups      The validation groups to validate. If none is given, "Default" is assumed
+     * @param array<GroupSequence|string>|GroupSequence|string|null $groups      The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return ConstraintViolationListInterface A list of constraint violations
      *                                          If the list is empty, validation
@@ -44,7 +44,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * for this property.
      *
      * @param string                                                $propertyName The name of the validated property
-     * @param string|GroupSequence|array<string|GroupSequence>|null $groups       The validation groups to validate. If none is given, "Default" is assumed
+     * @param array<GroupSequence|string>|GroupSequence|string|null $groups       The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return ConstraintViolationListInterface A list of constraint violations
      *                                          If the list is empty, validation
@@ -59,7 +59,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * @param object|string                                         $objectOrClass The object or its class name
      * @param string                                                $propertyName  The name of the property
      * @param mixed                                                 $value         The value to validate against the property's constraints
-     * @param string|GroupSequence|array<string|GroupSequence>|null $groups        The validation groups to validate. If none is given, "Default" is assumed
+     * @param array<GroupSequence|string>|GroupSequence|string|null $groups        The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return ConstraintViolationListInterface A list of constraint violations
      *                                          If the list is empty, validation

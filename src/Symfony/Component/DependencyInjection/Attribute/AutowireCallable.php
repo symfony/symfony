@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class AutowireCallable extends Autowire
 {
     /**
-     * @param string|array|null $callable The callable to autowire
+     * @param array|string|null $callable The callable to autowire
      * @param string|null       $service  The service containing the callable to autowire
      * @param string|null       $method   The method name that will be autowired
      * @param bool|class-string $lazy     Whether to use lazy-loading for this argument

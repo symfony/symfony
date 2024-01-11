@@ -79,7 +79,7 @@ final class WorkflowExtension extends AbstractExtension
     /**
      * Returns marked places.
      *
-     * @return string[]|int[]
+     * @return int[]|string[]
      */
     public function getMarkedPlaces(object $subject, bool $placesNameOnly = true, string $name = null): array
     {

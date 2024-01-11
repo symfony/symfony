@@ -47,7 +47,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * Unwraps instances of AbstractString back to strings.
      *
-     * @return string[]|array
+     * @return array|string[]
      */
     public static function unwrap(array $values): array
     {
@@ -65,7 +65,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * Wraps (and normalizes) strings in instances of AbstractString.
      *
-     * @return static[]|array
+     * @return array|static[]
      */
     public static function wrap(array $values): array
     {

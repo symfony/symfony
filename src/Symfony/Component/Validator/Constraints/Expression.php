@@ -39,7 +39,7 @@ class Expression extends Constraint
     public bool $negate = true;
 
     /**
-     * @param string|ExpressionObject|array<string,mixed>|null $expression The expression to evaluate
+     * @param array<string,mixed>|ExpressionObject|string|null $expression The expression to evaluate
      * @param array<string,mixed>|null                         $values     The values of the custom variables used in the expression (defaults to an empty array)
      * @param string[]|null                                    $groups
      * @param array<string,mixed>                              $options

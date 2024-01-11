@@ -60,17 +60,17 @@ trait ContextMetadataTestTrait
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new PhpDocExtractor());
         new Serializer([new DateTimeNormalizer(), $normalizer]);
 
-        /** @var ContextMetadataDummy|ContextChildMetadataDummy $dummy */
+        /** @var ContextChildMetadataDummy|ContextMetadataDummy $dummy */
         $dummy = $normalizer->denormalize(['date' => '2011-07-28T08:44:00+00:00'], $contextMetadataDummyClass);
         self::assertEquals(new \DateTimeImmutable('2011-07-28T08:44:00+00:00'), $dummy->date);
 
-        /** @var ContextMetadataDummy|ContextChildMetadataDummy $dummy */
+        /** @var ContextChildMetadataDummy|ContextMetadataDummy $dummy */
         $dummy = $normalizer->denormalize(['date' => '2011-07-28T08:44:00+00:00'], ContextMetadataDummy::class, null, [
             ObjectNormalizer::GROUPS => 'extended',
         ]);
         self::assertEquals(new \DateTimeImmutable('2011-07-28T08:44:00+00:00'), $dummy->date, 'base denormalization context is unchanged for this group');
 
-        /** @var ContextMetadataDummy|ContextChildMetadataDummy $dummy */
+        /** @var ContextChildMetadataDummy|ContextMetadataDummy $dummy */
         $dummy = $normalizer->denormalize(['date' => '28/07/2011'], $contextMetadataDummyClass, null, [
             ObjectNormalizer::GROUPS => 'simple',
         ]);

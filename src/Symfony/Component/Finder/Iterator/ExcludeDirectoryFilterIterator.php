@@ -35,7 +35,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
 
     /**
      * @param \Iterator<string, SplFileInfo>          $iterator    The Iterator to filter
-     * @param list<string|callable(SplFileInfo):bool> $directories An array of directories to exclude
+     * @param list<callable(SplFileInfo):bool|string> $directories An array of directories to exclude
      */
     public function __construct(\Iterator $iterator, array $directories)
     {

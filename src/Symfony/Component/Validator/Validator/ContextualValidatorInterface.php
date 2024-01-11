@@ -40,7 +40,7 @@ interface ContextualValidatorInterface
      *
      * @param mixed                                                 $value       The value to validate
      * @param Constraint|Constraint[]|null                          $constraints The constraint(s) to validate against
-     * @param string|GroupSequence|array<string|GroupSequence>|null $groups      The validation groups to validate. If none is given, "Default" is assumed
+     * @param array<GroupSequence|string>|GroupSequence|string|null $groups      The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return $this
      */
@@ -51,7 +51,7 @@ interface ContextualValidatorInterface
      * for this property.
      *
      * @param string                                                $propertyName The name of the validated property
-     * @param string|GroupSequence|array<string|GroupSequence>|null $groups       The validation groups to validate. If none is given, "Default" is assumed
+     * @param array<GroupSequence|string>|GroupSequence|string|null $groups       The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return $this
      */
@@ -64,7 +64,7 @@ interface ContextualValidatorInterface
      * @param object|string                                         $objectOrClass The object or its class name
      * @param string                                                $propertyName  The name of the property
      * @param mixed                                                 $value         The value to validate against the property's constraints
-     * @param string|GroupSequence|array<string|GroupSequence>|null $groups        The validation groups to validate. If none is given, "Default" is assumed
+     * @param array<GroupSequence|string>|GroupSequence|string|null $groups        The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return $this
      */

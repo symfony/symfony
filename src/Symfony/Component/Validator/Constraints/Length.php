@@ -58,7 +58,7 @@ class Length extends Constraint
     public string $countUnit = self::COUNT_CODEPOINTS;
 
     /**
-     * @param int|array<string,mixed>|null $exactly    The exact expected length
+     * @param array<string,mixed>|int|null $exactly    The exact expected length
      * @param int|null                     $min        The minimum expected length
      * @param int|null                     $max        The maximum expected length
      * @param string|null                  $charset    The charset to be used when computing value's length (defaults to UTF-8)

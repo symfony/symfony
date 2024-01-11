@@ -71,8 +71,8 @@ class Type
     private array $collectionValueType;
 
     /**
-     * @param Type[]|Type|null $collectionKeyType
-     * @param Type[]|Type|null $collectionValueType
+     * @param Type|Type[]|null $collectionKeyType
+     * @param Type|Type[]|null $collectionValueType
      *
      * @throws \InvalidArgumentException
      */

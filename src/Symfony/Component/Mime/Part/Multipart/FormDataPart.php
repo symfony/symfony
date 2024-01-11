@@ -26,7 +26,7 @@ final class FormDataPart extends AbstractMultipartPart
     private array $fields = [];
 
     /**
-     * @param array<string|array|DataPart> $fields
+     * @param array<array|DataPart|string> $fields
      */
     public function __construct(array $fields = [])
     {

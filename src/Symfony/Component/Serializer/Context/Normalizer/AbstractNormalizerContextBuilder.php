@@ -77,7 +77,7 @@ abstract class AbstractNormalizerContextBuilder implements ContextBuilderInterfa
      *
      * Eg: ['foo', 'bar', 'object' => ['baz']]
      *
-     * @param array<string|array>|null $attributes
+     * @param array<array|string>|null $attributes
      *
      * @throws InvalidArgumentException
      */

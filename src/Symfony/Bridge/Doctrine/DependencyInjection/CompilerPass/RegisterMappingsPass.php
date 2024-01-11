@@ -80,7 +80,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param string[]             $managerParameters       list of container parameters that could
      *                                                      hold the manager name
      * @param string               $driverPattern           Pattern for the metadata driver service name
-     * @param string|false         $enabledParameter        Service container parameter that must be
+     * @param false|string         $enabledParameter        Service container parameter that must be
      *                                                      present to enable the mapping. Set to false
      *                                                      to not do any check, optional.
      * @param string               $configurationPattern    Pattern for the Configuration service name,

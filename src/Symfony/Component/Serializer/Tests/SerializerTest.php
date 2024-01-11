@@ -1729,12 +1729,12 @@ class Bar
 class DummyUnionType
 {
     /**
-     * @var \DateTimeImmutable|bool|null
+     * @var bool|\DateTimeImmutable|null
      */
     public $changed = false;
 
     /**
-     * @param \DateTimeImmutable|bool|null
+     * @param bool|\DateTimeImmutable|null
      *
      * @return $this
      */
@@ -1768,11 +1768,11 @@ class DummyCTypeForUnion
 
 class DummyUnionWithAAndCAndB
 {
-    /** @var DummyATypeForUnion|DummyCTypeForUnion|DummyBTypeForUnion */
+    /** @var DummyATypeForUnion|DummyBTypeForUnion|DummyCTypeForUnion */
     public $v;
 
     /**
-     * @param DummyATypeForUnion|DummyCTypeForUnion|DummyBTypeForUnion $v
+     * @param DummyATypeForUnion|DummyBTypeForUnion|DummyCTypeForUnion $v
      */
     public function __construct($v)
     {

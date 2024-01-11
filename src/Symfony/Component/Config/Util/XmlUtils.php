@@ -36,7 +36,7 @@ class XmlUtils
      * Parses an XML string.
      *
      * @param string               $content          An XML string
-     * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
+     * @param callable|string|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
      * @throws XmlParsingException When parsing of XML file returns error
      * @throws InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
@@ -106,7 +106,7 @@ class XmlUtils
      * Loads an XML file.
      *
      * @param string               $file             An XML file path
-     * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
+     * @param callable|string|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
      * @throws \InvalidArgumentException When loading of XML file returns error
      * @throws XmlParsingException       When XML parsing returns any errors

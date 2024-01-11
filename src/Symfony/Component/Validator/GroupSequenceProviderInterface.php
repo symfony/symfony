@@ -22,7 +22,7 @@ interface GroupSequenceProviderInterface
      * Returns which validation groups should be used for a certain state
      * of the object.
      *
-     * @return string[]|string[][]|GroupSequence
+     * @return GroupSequence|string[]|string[][]
      */
     public function getGroupSequence(): array|GroupSequence;
 }

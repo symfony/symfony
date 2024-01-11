@@ -303,7 +303,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Returns the FQCN of the security voters enabled in the application.
      *
-     * @return string[]|Data
+     * @return Data|string[]
      */
     public function getVoters(): array|Data
     {

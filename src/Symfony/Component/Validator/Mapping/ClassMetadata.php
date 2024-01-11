@@ -379,7 +379,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     /**
      * Sets the default group sequence for this class.
      *
-     * @param string[]|GroupSequence $groupSequence An array of group names
+     * @param GroupSequence|string[] $groupSequence An array of group names
      *
      * @return $this
      *

@@ -55,7 +55,7 @@ class Process implements \IteratorAggregate
     private array|string $commandline;
     private ?string $cwd;
     private array $env = [];
-    /** @var resource|string|\Iterator|null */
+    /** @var \Iterator|resource|string|null */
     private $input;
     private ?float $starttime = null;
     private ?float $lastOutputTime = null;
@@ -137,7 +137,7 @@ class Process implements \IteratorAggregate
      * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
      * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
      * @param mixed          $input   The input as stream resource, scalar or \Traversable, or null for no input
-     * @param int|float|null $timeout The timeout in seconds or null to disable
+     * @param float|int|null $timeout The timeout in seconds or null to disable
      *
      * @throws LogicException When proc_open is not installed
      */
@@ -183,7 +183,7 @@ class Process implements \IteratorAggregate
      * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
      * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
      * @param mixed          $input   The input as stream resource, scalar or \Traversable, or null for no input
-     * @param int|float|null $timeout The timeout in seconds or null to disable
+     * @param float|int|null $timeout The timeout in seconds or null to disable
      *
      * @throws LogicException When proc_open is not installed
      */
@@ -879,7 +879,7 @@ class Process implements \IteratorAggregate
     /**
      * Stops the process.
      *
-     * @param int|float $timeout The timeout in seconds
+     * @param float|int $timeout The timeout in seconds
      * @param int|null  $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL (9)
      *
      * @return int|null The exit-code of the process or null if it's not running
@@ -1111,7 +1111,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the Process input.
      *
-     * @return resource|string|\Iterator|null
+     * @return \Iterator|resource|string|null
      */
     public function getInput()
     {
@@ -1123,7 +1123,7 @@ class Process implements \IteratorAggregate
      *
      * This content will be passed to the underlying process standard input.
      *
-     * @param string|resource|\Traversable|self|null $input The content
+     * @param resource|self|string|\Traversable|null $input The content
      *
      * @return $this
      *

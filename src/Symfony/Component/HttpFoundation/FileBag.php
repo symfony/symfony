@@ -56,7 +56,7 @@ class FileBag extends ParameterBag
     /**
      * Converts uploaded files to UploadedFile instances.
      *
-     * @return UploadedFile[]|UploadedFile|null
+     * @return UploadedFile|UploadedFile[]|null
      */
     protected function convertFileInformation(array|UploadedFile $file): array|UploadedFile|null
     {

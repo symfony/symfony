@@ -42,7 +42,7 @@ final class DomVisitor
      * * If an element is present as a key and contains "false", the element should be blocked.
      * * If an element is not present as a key, the element should be dropped.
      *
-     * @var array<string, false|array<string, bool>>
+     * @var array<string, array<string, bool>|false>
      */
     private array $elementsConfig;
 
@@ -62,7 +62,7 @@ final class DomVisitor
     private array $attributeSanitizers = [];
 
     /**
-     * @param array<string, false|array<string, bool>> $elementsConfig
+     * @param array<string, array<string, bool>|false> $elementsConfig
      */
     public function __construct(HtmlSanitizerConfig $config, array $elementsConfig)
     {

@@ -231,7 +231,7 @@ abstract class AdapterTestCase extends CachePoolTest
             $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
         }
 
-        /** @var PruneableInterface|CacheItemPoolInterface $cache */
+        /** @var CacheItemPoolInterface|PruneableInterface $cache */
         $cache = $this->createCachePool();
 
         $doSet = function ($name, $value, \DateInterval $expiresAfter = null) use ($cache) {

@@ -32,7 +32,7 @@ class StreamWrapper
     /** @var resource|string|null */
     private $content;
 
-    /** @var resource|callable|null */
+    /** @var callable|resource|null */
     private $handle;
 
     private bool $blocking = true;
@@ -79,7 +79,7 @@ class StreamWrapper
     }
 
     /**
-     * @param resource|callable|null $handle  The resource handle that should be monitored when
+     * @param callable|resource|null $handle  The resource handle that should be monitored when
      *                                        stream_select() is used on the created stream
      * @param resource|null          $content The seekable resource where the response body is buffered
      */
@@ -267,7 +267,7 @@ class StreamWrapper
     }
 
     /**
-     * @return resource|false
+     * @return false|resource
      */
     public function stream_cast(int $castAs)
     {

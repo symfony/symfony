@@ -28,7 +28,7 @@ class TextPart extends AbstractPart
 
     private static array $encoders = [];
 
-    /** @var resource|string|File */
+    /** @var File|resource|string */
     private $body;
     private ?string $charset;
     private string $subtype;
@@ -38,7 +38,7 @@ class TextPart extends AbstractPart
     private ?bool $seekable = null;
 
     /**
-     * @param resource|string|File $body Use a File instance to defer loading the file until rendering
+     * @param File|resource|string $body Use a File instance to defer loading the file until rendering
      */
     public function __construct($body, ?string $charset = 'utf-8', string $subtype = 'plain', string $encoding = null)
     {

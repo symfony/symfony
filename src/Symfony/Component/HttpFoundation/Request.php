@@ -117,7 +117,7 @@ class Request
     public HeaderBag $headers;
 
     /**
-     * @var string|resource|false|null
+     * @var false|resource|string|null
      */
     protected $content;
 
@@ -203,7 +203,7 @@ class Request
      * @param array                $cookies    The COOKIE parameters
      * @param array                $files      The FILES parameters
      * @param array                $server     The SERVER parameters
-     * @param string|resource|null $content    The raw body data
+     * @param resource|string|null $content    The raw body data
      */
     public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
     {
@@ -221,7 +221,7 @@ class Request
      * @param array                $cookies    The COOKIE parameters
      * @param array                $files      The FILES parameters
      * @param array                $server     The SERVER parameters
-     * @param string|resource|null $content    The raw body data
+     * @param resource|string|null $content    The raw body data
      */
     public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
     {
@@ -275,7 +275,7 @@ class Request
      * @param array                $cookies    The request cookies ($_COOKIE)
      * @param array                $files      The request files ($_FILES)
      * @param array                $server     The server parameters ($_SERVER)
-     * @param string|resource|null $content    The raw body data
+     * @param resource|string|null $content    The raw body data
      */
     public static function create(string $uri, string $method = 'GET', array $parameters = [], array $cookies = [], array $files = [], array $server = [], $content = null): static
     {
@@ -1383,7 +1383,7 @@ class Request
      *
      * @param bool $asResource If true, a resource will be returned
      *
-     * @return string|resource
+     * @return resource|string
      *
      * @psalm-return ($asResource is true ? resource : string)
      */

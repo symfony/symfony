@@ -124,7 +124,7 @@ class PhpDumper extends Dumper
      *  * namespace:  The class namespace
      *  * as_files:   To split the container in several files
      *
-     * @return string|array A PHP class representing the service container or an array of PHP files if the "as_files" option is set
+     * @return array|string A PHP class representing the service container or an array of PHP files if the "as_files" option is set
      *
      * @throws EnvParameterException When an env var exists but has not been dumped
      */

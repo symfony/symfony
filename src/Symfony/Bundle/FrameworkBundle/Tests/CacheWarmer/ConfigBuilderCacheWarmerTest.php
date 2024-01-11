@@ -90,7 +90,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $warmer = new ConfigBuilderCacheWarmer($kernel);
         $warmer->warmUp($kernel->getCacheDir());
 
-        self::assertDirectoryDoesNotExist($kernel->getBuildDir().'/Symfony');
+        self::assertDirectoryExists($kernel->getBuildDir().'/Symfony');
         self::assertDirectoryDoesNotExist($kernel->getCacheDir().'/Symfony');
 
         $warmer->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());

@@ -299,8 +299,7 @@ class DeprecationErrorHandler
         };
 
         $outputIsCli = !$configuration->shouldWriteToLogFile();
-        // TODO: fix this; we need to detect here if the `simple-phpunit` command was run with `-v` option
-        $commandIsVerbose = false;
+        $commandIsVerbose = [] !== array_intersect(['v', 'verbose'], array_keys(getopt('v', ['verbose'])));
         $deprecationsAreHidden = $outputIsCli && !$commandIsVerbose;
         if ($configuration->shouldWriteToLogFile()) {
             if (false === $handle = @fopen($file = $configuration->getLogFile(), 'a')) {

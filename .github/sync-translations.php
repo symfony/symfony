@@ -33,6 +33,9 @@ function dumpXliff1(string $defaultLocale, MessageCatalogue $messages, string $d
         $metadata = $messages->getMetadata($source, $domain);
 
         $translation->setAttribute('id', $metadata['id']);
+        if (isset($metadata['resname'])) {
+            $translation->setAttribute('resname', $metadata['resname']);
+        }
 
         $s = $translation->appendChild($dom->createElement('source'));
         $s->appendChild($dom->createTextNode($source));
@@ -64,23 +67,32 @@ foreach (['Security/Core' => 'security', 'Form' => 'validators', 'Validator' => 
     $dir = __DIR__.'/../src/Symfony/Component/'.$component.'/Resources/translations';
 
     $enCatalogue = (new XliffFileLoader())->load($dir.'/'.$domain.'.en.xlf', 'en', $domain);
+    file_put_contents($dir.'/'.$domain.'.en.xlf', dumpXliff1('en', $enCatalogue, $domain));
+
     $finder = new Finder();
 
     foreach ($finder->files()->in($dir)->name('*.xlf') as $file) {
         $locale = substr($file->getBasename(), 1 + strlen($domain), -4);
 
+        if ('en' === $locale) {
+            continue;
+        }
+
         $catalogue = (new XliffFileLoader())->load($file, $locale, $domain);
         $localeCatalogue = new MessageCatalogue($locale);
 
-        foreach ($enCatalogue->all($domain) as $id => $translation) {
+        foreach ($enCatalogue->all($domain) as $resname => $source) {
             $metadata = [];
-            if ($catalogue->defines($id, $domain)) {
-                $translation = $catalogue->get($id, $domain);
-                $metadata = $catalogue->getMetadata($id, $domain);
+            if ($catalogue->defines($resname, $domain)) {
+                $translation = $catalogue->get($resname, $domain);
+                $metadata = $catalogue->getMetadata($resname, $domain);
             }
-            $metadata['id'] = $enCatalogue->getMetadata($id, $domain)['id'];
-            $localeCatalogue->set($id, $translation, $domain);
-            $localeCatalogue->setMetadata($id, $metadata, $domain);
+            $metadata['id'] = $enCatalogue->getMetadata($resname, $domain)['id'];
+            if ($resname !== $source) {
+                $metadata['resname'] = $resname;
+            }
+            $localeCatalogue->set($source, $translation, $domain);
+            $localeCatalogue->setMetadata($source, $metadata, $domain);
         }
 
         file_put_contents($file, dumpXliff1('en', $localeCatalogue, $domain));

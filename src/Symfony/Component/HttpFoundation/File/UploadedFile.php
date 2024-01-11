@@ -175,14 +175,14 @@ class UploadedFile extends File
      *
      * @throws FileException if, for any reason, the file could not have been moved
      */
-    public function move(string $directory, string $name = null): File
+    public function move(string $directory, string $name = null, int $dirmode = 0755, int $filemode = 0644): File
     {
         if ($this->isValid()) {
             if ($this->test) {
-                return parent::move($directory, $name);
+                return parent::move($directory, $name, $dirmode, $filemode);
             }
 
-            $target = $this->getTargetFile($directory, $name);
+            $target = $this->getTargetFile($directory, $name, $dirmode);
 
             set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
             try {
@@ -194,7 +194,7 @@ class UploadedFile extends File
                 throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s).', $this->getPathname(), $target, strip_tags($error)));
             }
 
-            @chmod($target, 0666 & ~umask());
+            @chmod($target, $filemode & ~umask());
 
             return $target;
         }

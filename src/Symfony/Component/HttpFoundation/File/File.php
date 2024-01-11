@@ -82,9 +82,9 @@ class File extends \SplFileInfo
      *
      * @throws FileException if the target file could not be created
      */
-    public function move(string $directory, string $name = null): self
+    public function move(string $directory, string $name = null, int $dirmode = 0755, int $filemode = 0644): self
     {
-        $target = $this->getTargetFile($directory, $name);
+        $target = $this->getTargetFile($directory, $name, $dirmode);
 
         set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
         try {
@@ -96,7 +96,7 @@ class File extends \SplFileInfo
             throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s).', $this->getPathname(), $target, strip_tags($error)));
         }
 
-        @chmod($target, 0666 & ~umask());
+        @chmod($target, $filemode & ~umask());
 
         return $target;
     }
@@ -112,10 +112,10 @@ class File extends \SplFileInfo
         return $content;
     }
 
-    protected function getTargetFile(string $directory, string $name = null): self
+    protected function getTargetFile(string $directory, string $name = null, int $dirmode = 0755): self
     {
         if (!is_dir($directory)) {
-            if (false === @mkdir($directory, 0777, true) && !is_dir($directory)) {
+            if (false === @mkdir($directory, $dirmode, true) && !is_dir($directory)) {
                 throw new FileException(sprintf('Unable to create the "%s" directory.', $directory));
             }
         } elseif (!is_writable($directory)) {

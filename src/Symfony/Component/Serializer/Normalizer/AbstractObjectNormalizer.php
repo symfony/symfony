@@ -153,7 +153,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function normalize(mixed $object, string $format = null, array $context = [])
     {
-        $context['cache_key'] = $this->getCacheKey($format, $context);
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getCacheKey($format, $context);
+        }
 
         $this->validateCallbackContext($context);
 
@@ -300,7 +302,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
     {
-        $context['cache_key'] = $this->getCacheKey($format, $context);
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getCacheKey($format, $context);
+        }
 
         $this->validateCallbackContext($context);
 
@@ -743,10 +747,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function getCacheKey(?string $format, array $context): bool|string
     {
-        if (isset($context['cache_key'])) {
-            return $context['cache_key'];
-        }
-
         foreach ($context[self::EXCLUDE_FROM_CACHE_KEY] ?? $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] as $key) {
             unset($context[$key]);
         }

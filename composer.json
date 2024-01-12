@@ -121,7 +121,7 @@
         "amphp/http-client": "^4.2.1",
         "amphp/http-tunnel": "^1.0",
         "async-aws/ses": "^1.0",
-        "async-aws/sqs": "^1.0",
+        "async-aws/sqs": "^1.0|^2.0",
         "async-aws/sns": "^1.0",
         "cache/integration-tests": "dev-master",
         "doctrine/annotations": "^1.13.1|^2",

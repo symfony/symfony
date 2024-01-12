@@ -17,6 +17,7 @@ use AsyncAws\Sqs\Result\GetQueueUrlResult;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\Message;
+use Composer\InstalledVersions;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -342,6 +343,16 @@ class ConnectionTest extends TestCase
 
     private function getMockedQueueUrlResponse(): MockResponse
     {
+        if ($this->isAsyncAwsSqsVersion2Installed()) {
+            return new MockResponse(
+                <<<JSON
+{
+    "QueueUrl": "https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue"
+}
+JSON
+            );
+        }
+
         return new MockResponse(<<<XML
 <GetQueueUrlResponse>
     <GetQueueUrlResult>
@@ -357,6 +368,28 @@ XML
 
     private function getMockedReceiveMessageResponse(): MockResponse
     {
+        if ($this->isAsyncAwsSqsVersion2Installed()) {
+            return new MockResponse(<<<JSON
+{
+    "Messages": [
+        {
+            "Attributes": {
+                "SenderId": "195004372649",
+                "ApproximateFirstReceiveTimestamp": "1250700979248",
+                "ApproximateReceiveCount": "5",
+                "SentTimestamp": "1238099229000"
+            },
+            "Body": "This is a test message",
+            "MD5OfBody": "fafb00f5732ab283681e124bf8747ed1",
+            "MessageId": "5fea7756-0ea4-451a-a703-a558b933e274",
+            "ReceiptHandle": "MbZj6wDWli+JvwwJaBV+3dcjk2YW2vA3+STFFljTM8tJJg6HRG6PYSasuWXPJB+CwLj1FjgXUv1uSj1gUPAWV66FU/WeR4mq2OKpEGYWbnLmpRCJVAyeMjeU5ZBdtcQ+QEauMZc8ZRv37sIW2iJKq3M9MFx1YvV11A2x/KSbkJ0="
+        }
+    ]
+}
+JSON
+            );
+        }
+
         return new MockResponse(<<<XML
 <ReceiveMessageResponse>
   <ReceiveMessageResult>
@@ -393,5 +426,12 @@ XML
 </ReceiveMessageResponse>
 XML
         );
+    }
+
+    private function isAsyncAwsSqsVersion2Installed(): bool
+    {
+        $version = InstalledVersions::getVersion('async-aws/sqs');
+
+        return 'dev-master' === $version || version_compare($version, '2.0.0') >= 0;
     }
 }

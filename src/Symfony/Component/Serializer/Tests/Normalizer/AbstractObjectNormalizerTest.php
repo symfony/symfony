@@ -548,6 +548,131 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals(new DummyWithStringObject(new DummyString()), $actual);
         $this->assertEquals('', $actual->value->value);
     }
+
+    public function testProvidingContextCacheKeyGeneratesSameChildContextCacheKey()
+    {
+        $foobar = new Dummy();
+        $foobar->foo = new EmptyDummy();
+        $foobar->bar = 'bar';
+        $foobar->baz = 'baz';
+        $data = [
+            'foo' => [],
+            'bar' => 'bar',
+            'baz' => 'baz',
+        ];
+
+        $normalizer = new class() extends AbstractObjectNormalizerDummy {
+            public $childContextCacheKey;
+
+            protected function extractAttributes(object $object, string $format = null, array $context = []): array
+            {
+                return array_keys((array) $object);
+            }
+
+            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+            {
+                return $object->{$attribute};
+            }
+
+            protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
+            {
+                $childContext = parent::createChildContext($parentContext, $attribute, $format);
+                $this->childContextCacheKey = $childContext['cache_key'];
+
+                return $childContext;
+            }
+        };
+
+        $serializer = new Serializer([$normalizer]);
+
+        $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded', 'iri' => '/dummy/1']);
+        $firstChildContextCacheKey = $normalizer->childContextCacheKey;
+
+        $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded', 'iri' => '/dummy/2']);
+        $secondChildContextCacheKey = $normalizer->childContextCacheKey;
+
+        $this->assertSame($firstChildContextCacheKey, $secondChildContextCacheKey);
+    }
+
+    public function testChildContextKeepsOriginalContextCacheKey()
+    {
+        $foobar = new Dummy();
+        $foobar->foo = new EmptyDummy();
+        $foobar->bar = 'bar';
+        $foobar->baz = 'baz';
+        $data = [
+            'foo' => [],
+            'bar' => 'bar',
+            'baz' => 'baz',
+        ];
+
+        $normalizer = new class() extends AbstractObjectNormalizerDummy {
+            public $childContextCacheKey;
+
+            protected function extractAttributes(object $object, string $format = null, array $context = []): array
+            {
+                return array_keys((array) $object);
+            }
+
+            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+            {
+                return $object->{$attribute};
+            }
+
+            protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
+            {
+                $childContext = parent::createChildContext($parentContext, $attribute, $format);
+                $this->childContextCacheKey = $childContext['cache_key'];
+
+                return $childContext;
+            }
+        };
+
+        $serializer = new Serializer([$normalizer]);
+        $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded', 'iri' => '/dummy/1']);
+
+        $this->assertSame('hardcoded-foo', $normalizer->childContextCacheKey);
+    }
+
+    public function testChildContextCacheKeyStaysFalseWhenOriginalCacheKeyIsFalse()
+    {
+        $foobar = new Dummy();
+        $foobar->foo = new EmptyDummy();
+        $foobar->bar = 'bar';
+        $foobar->baz = 'baz';
+        $data = [
+            'foo' => [],
+            'bar' => 'bar',
+            'baz' => 'baz',
+        ];
+
+        $normalizer = new class() extends AbstractObjectNormalizerDummy {
+            public $childContextCacheKey;
+
+            protected function extractAttributes(object $object, string $format = null, array $context = []): array
+            {
+                return array_keys((array) $object);
+            }
+
+            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+            {
+                return $object->{$attribute};
+            }
+
+            protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
+            {
+                $childContext = parent::createChildContext($parentContext, $attribute, $format);
+                $this->childContextCacheKey = $childContext['cache_key'];
+
+                return $childContext;
+            }
+        };
+
+        $serializer = new Serializer([$normalizer]);
+        $serializer->normalize($foobar, null, ['cache_key' => false]);
+
+        $this->assertFalse($normalizer->childContextCacheKey);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer

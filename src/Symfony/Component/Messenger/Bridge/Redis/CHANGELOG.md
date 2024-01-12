@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add option to auto generate unique consumer name.
+
 6.3
 ---
 

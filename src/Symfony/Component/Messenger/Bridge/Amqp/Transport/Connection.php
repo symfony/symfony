@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * An AMQP connection.
@@ -516,8 +517,8 @@ class Connection
                     static function (): bool {
                         return false;
                     },
-                    static function (): bool {
-                        return false;
+                    static function () {
+                        throw new TransportException('Message publication failed due to a negative acknowledgment (nack) from the broker.');
                     }
                 );
             }

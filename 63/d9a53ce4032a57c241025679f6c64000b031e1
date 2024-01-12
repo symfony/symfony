@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by crynobone at 2024-01-12T08:58:03Z
+
+> if we're missing an initialization here, it means the patch should likely go on 5.4
+
+Not exactly, since 7.0 changed from `protected $colors;` to `protected bool $colors;`.

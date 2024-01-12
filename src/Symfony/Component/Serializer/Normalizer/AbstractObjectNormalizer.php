@@ -153,9 +153,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function normalize(mixed $object, string $format = null, array $context = [])
     {
-        if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getCacheKey($format, $context);
-        }
+        $context['cache_key'] = $this->getCacheKey($format, $context);
 
         $this->validateCallbackContext($context);
 
@@ -287,8 +285,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * Gets the attribute value.
-     *
-     * @return mixed
      */
     abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 
@@ -302,14 +298,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
     }
 
-    /**
-     * @return mixed
-     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
     {
-        if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getCacheKey($format, $context);
-        }
+        $context['cache_key'] = $this->getCacheKey($format, $context);
 
         $this->validateCallbackContext($context);
 
@@ -734,7 +725,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
         $context = parent::createChildContext($parentContext, $attribute, $format);
-        $context['cache_key'] = $this->getCacheKey($format, $context);
+        if (isset($context['cache_key'])) {
+            if (false !== $context['cache_key']) {
+                $context['cache_key'] .= '-'.$attribute;
+            }
+        } else {
+            $context['cache_key'] = $this->getCacheKey($format, $context);
+        }
 
         return $context;
     }
@@ -746,6 +743,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function getCacheKey(?string $format, array $context): bool|string
     {
+        if (isset($context['cache_key'])) {
+            return $context['cache_key'];
+        }
+
         foreach ($context[self::EXCLUDE_FROM_CACHE_KEY] ?? $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] as $key) {
             unset($context[$key]);
         }

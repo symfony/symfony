@@ -788,6 +788,43 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('called', $object->bar);
     }
 
+    public function testChildContextKeepsOriginalContextCacheKey()
+    {
+        $foobar = new Dummy();
+        $foobar->foo = new EmptyDummy();
+        $foobar->bar = 'bar';
+        $foobar->baz = 'baz';
+        $data = [
+            'foo' => [],
+            'bar' => 'bar',
+            'baz' => 'baz',
+        ];
+
+        $normalizer = new class() extends AbstractObjectNormalizerDummy {
+            protected function extractAttributes(object $object, string $format = null, array $context = []): array
+            {
+                return array_keys((array) $object);
+            }
+
+            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+            {
+                return $object->{$attribute};
+            }
+
+            protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
+            {
+                $childContext = parent::createChildContext($parentContext, $attribute, $format);
+                AbstractObjectNormalizerTest::assertSame('hardcoded-'.$attribute, $childContext['cache_key']);
+
+                return $childContext;
+            }
+        };
+
+        $serializer = new Serializer([$normalizer]);
+        $normalizedObject = $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded']);
+        $this->assertSame($data, $normalizedObject);
+    }
+
     public function testDenormalizeUnionOfEnums()
     {
         $serializer = new Serializer([

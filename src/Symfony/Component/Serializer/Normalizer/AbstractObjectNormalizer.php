@@ -287,6 +287,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * Gets the attribute value.
+     *
+     * @return mixed
      */
     abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 

@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\LogicException;
-use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * An AMQP connection.
@@ -494,7 +494,7 @@ class Connection
                 $this->amqpChannel->confirmSelect();
                 $this->amqpChannel->setConfirmCallback(
                     static fn (): bool => false,
-                    static fn () => throw new RuntimeException('Confirm calls back with nack.'),
+                    static fn () => throw new TransportException('Confirm calls back with nack.'),
                 );
             }
 

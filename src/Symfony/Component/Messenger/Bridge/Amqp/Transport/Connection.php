@@ -495,7 +495,7 @@ class Connection
                 $this->amqpChannel->confirmSelect();
                 $this->amqpChannel->setConfirmCallback(
                     static fn (): bool => false,
-                    static fn (): bool => throw new RuntimeException('Confirm calls back with nack'),
+                    static fn (): bool => throw new RuntimeException('Confirm calls back with nack.'),
                 );
             }
 

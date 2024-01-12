@@ -16,7 +16,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class DefaultParametersTranslator implements TranslatorInterface
 {
     /**
-     * @param TranslatorInterface $translator
      * @param array<string, string> $defaultParameters
      */
     public function __construct(

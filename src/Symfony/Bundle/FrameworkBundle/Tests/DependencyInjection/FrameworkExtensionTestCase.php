@@ -1201,11 +1201,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testTranslatorDefaultParameters()
     {
         $container = $this->createContainerFromFile('translator_default_parameters');
-        $calls = $container->getDefinition('translator.default_parameters')->getMethodCalls();
-        $this->assertSame([
-            ['addDefaultParameter', ['%%app_name%%', 'My application']],
-            ['addDefaultParameter', ['{app_version}', '1.2.3']],
-        ], $calls);
+        $this->assertSame(
+            ['%%app_name%%' => 'My application', '{app_version}' => '1.2.3'],
+            $container->getDefinition('translator.default_parameters')->getArgument(1),
+        );
     }
 
     public function testTranslatorWithoutDefaultParameters()

@@ -1568,16 +1568,14 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (!empty($config['default_parameters'])) {
-            $def = $container
+        if ([] !== $config['default_parameters']) {
+            $container
                 ->register('translator.default_parameters', DefaultParametersTranslator::class)
                 ->setDecoratedService('translator', null, -1) // Lower priority than "translator.data_collector"
                 ->setArguments([
                     new Reference('translator.default_parameters.inner'),
+                    $config['default_parameters'],
                 ]);
-            foreach ($config['default_parameters'] as $key => $value) {
-                $def->addMethodCall('addDefaultParameter', [$key, $value]);
-            }
         }
 
         if (!$config['providers']) {

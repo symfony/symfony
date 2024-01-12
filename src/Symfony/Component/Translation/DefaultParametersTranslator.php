@@ -15,10 +15,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DefaultParametersTranslator implements TranslatorInterface
 {
-    private array $defaultParameters = [];
-
+    /**
+     * @param TranslatorInterface $translator
+     * @param array<string, string> $defaultParameters
+     */
     public function __construct(
         private readonly TranslatorInterface $translator,
+        private readonly array $defaultParameters,
     ) {
     }
 
@@ -32,10 +35,5 @@ final class DefaultParametersTranslator implements TranslatorInterface
     public function getLocale(): string
     {
         return $this->translator->getLocale();
-    }
-
-    public function addDefaultParameter(string $name, mixed $value): void
-    {
-        $this->defaultParameters[$name] = $value;
     }
 }

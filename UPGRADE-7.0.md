@@ -429,6 +429,8 @@ SecurityBundle
 --------------
 
  * Enabling SecurityBundle and not configuring it is not allowed, either remove the bundle or configure at least one firewall
+ * Remove the `enable_authenticator_manager` config option
+ * Remove the `security.firewalls.logout.csrf_token_generator` config option, use `security.firewalls.logout.csrf_token_manager` instead
  * Remove the `require_previous_session` config option from authenticators
 
 Serializer

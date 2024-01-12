@@ -7,6 +7,7 @@ CHANGELOG
  * Add option `sentinel_master` as an alias for `redis_sentinel`
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter`
  * Add support for URL encoded characters in Couchbase DSN
+ * Add support for using DSN with PDOAdapter
 
 7.0
 ---

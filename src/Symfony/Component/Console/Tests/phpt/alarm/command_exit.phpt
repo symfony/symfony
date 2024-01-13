@@ -6,8 +6,8 @@ Test command that exits
 <?php
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\AlarmableCommandInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,26 +19,25 @@ while (!file_exists($vendor.'/vendor')) {
 }
 require $vendor.'/vendor/autoload.php';
 
-class MyCommand extends Command implements SignalableCommandInterface
+class MyCommand extends Command implements AlarmableCommandInterface
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        posix_kill(posix_getpid(), \SIGINT);
+        sleep(5);
 
         $output->writeln('should not be displayed');
 
         return 0;
     }
 
-
-    public function getSubscribedSignals(): array
+    public function getAlarmInterval(InputInterface $input): int
     {
-        return [\SIGINT];
+        return 1;
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleAlarm(int|false $previousExitCode = 0): int|false
     {
-        echo "Received signal!";
+        echo "Received alarm!";
 
         return 0;
     }
@@ -53,4 +52,4 @@ $app
     ->run()
 ;
 --EXPECT--
-Received signal!
+Received alarm!

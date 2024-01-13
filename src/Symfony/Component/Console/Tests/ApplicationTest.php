@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\AlarmableCommandInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\LazyCommand;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\Console\Event\ConsoleAlarmEvent;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleSignalEvent;
@@ -69,6 +71,9 @@ class ApplicationTest extends TestCase
         unset($_SERVER['SHELL_VERBOSITY']);
 
         if (\function_exists('pcntl_signal')) {
+            // We cancel any pending alarms
+            pcntl_alarm(0);
+
             // We reset all signals to their default value to avoid side effects
             for ($i = 1; $i <= 15; ++$i) {
                 if (9 === $i) {
@@ -2226,6 +2231,234 @@ class ApplicationTest extends TestCase
         $this->assertSame($previousSttyMode, $sttyMode);
     }
 
+    /**
+     * @requires extension pcntl
+     */
+    public function testInputIsBoundWhenPassedToGetAlarmInterval()
+    {
+        $command = new #[AsCommand(name: 'alarm')] class(0) extends AlarmableCommand {
+            protected function configure(): void
+            {
+                $this
+                    ->addArgument('arg', InputArgument::REQUIRED)
+                    ->addOption('option', mode: InputOption::VALUE_REQUIRED)
+                ;
+            }
+
+            public function getAlarmInterval(InputInterface $input): int
+            {
+                TestCase::assertTrue($input->hasArgument('arg'));
+                TestCase::assertSame('argval', $input->getArgument('arg'));
+                TestCase::assertTrue($input->hasOption('option'));
+                TestCase::assertSame('optionval', $input->getOption('option'));
+
+                return parent::getAlarmInterval($input);
+            }
+        };
+
+        $application = $this->createSignalableApplication($command, null);
+        $application->setCatchExceptions(false);
+
+        $input = new ArrayInput(['alarm', 'arg' => 'argval', '--option' => 'optionval']);
+
+        $this->assertSame(0, $application->run($input));
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testAlarmSubscriberNotCalledByDefault()
+    {
+        $command = new BaseSignableCommand(false);
+
+        $subscriber = new AlarmEventSubscriber();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+        $this->assertFalse($subscriber->signaled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testAlarmSubscriberNotCalledForOtherSignals()
+    {
+        $command = new SignableCommand();
+
+        $subscriber1 = new SignalEventSubscriber();
+        $subscriber2 = new AlarmEventSubscriber();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber1);
+        $dispatcher->addSubscriber($subscriber2);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($subscriber1->signaled);
+        $this->assertFalse($subscriber2->signaled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testAlarmSubscriber()
+    {
+        $command = new BaseSignableCommand(signal: \SIGALRM);
+
+        $subscriber1 = new AlarmEventSubscriber();
+        $subscriber2 = new AlarmEventSubscriber();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber1);
+        $dispatcher->addSubscriber($subscriber2);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($subscriber1->signaled);
+        $this->assertTrue($subscriber2->signaled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testAlarmDispatchWithoutEventDispatcher()
+    {
+        $command = new AlarmableCommand(1);
+        $command->loop = 11000;
+
+        $application = $this->createSignalableApplication($command, null);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['alarm'])));
+        $this->assertTrue($command->signaled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testAlarmableCommandInterfaceWithoutSignal()
+    {
+        $command = new AlarmableCommand(0);
+        $command->loop = 11000;
+
+        $dispatcher = new EventDispatcher();
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($dispatcher);
+        $application->add($command);
+
+        $this->assertSame(0, $application->run(new ArrayInput(['alarm'])));
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testAlarmableCommandHandlerCalledAfterEventListener()
+    {
+        $command = new AlarmableCommand(1);
+        $command->loop = 11000;
+
+        $subscriber = new AlarmEventSubscriber();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['alarm'])));
+        $this->assertSame([AlarmEventSubscriber::class, AlarmableCommand::class], $command->signalHandlers);
+    }
+
+    /**
+     * @requires extension pcntl
+     *
+     * @testWith [false]
+     *           [4]
+     */
+    public function testAlarmSubscriberCalledAfterSignalSubscriberAndInheritsExitCode(int|false $exitCode)
+    {
+        $command = new BaseSignableCommand(signal: \SIGALRM);
+
+        $subscriber1 = new class($exitCode) extends SignalEventSubscriber {
+            public function __construct(private int|false $exitCode)
+            {
+            }
+
+            public function onSignal(ConsoleSignalEvent $event): void
+            {
+                parent::onSignal($event);
+
+                if (false === $this->exitCode) {
+                    $event->abortExit();
+                } else {
+                    $event->setExitCode($this->exitCode);
+                }
+            }
+        };
+        $subscriber2 = new class($exitCode) extends AlarmEventSubscriber {
+            public function __construct(private int|false $exitCode)
+            {
+            }
+
+            public function onAlarm(ConsoleAlarmEvent $event): void
+            {
+                TestCase::assertSame($this->exitCode, $event->getExitCode());
+
+                parent::onAlarm($event);
+            }
+        };
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber1);
+        $dispatcher->addSubscriber($subscriber2);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertSame([SignalEventSubscriber::class, AlarmEventSubscriber::class], $command->signalHandlers);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testHandleAlarmCalledInsteadOfHandleSignalWithoutDispatcher()
+    {
+        $command = new SignableAndAlarmableCommand(1);
+        $command->loop = 11000;
+
+        $application = $this->createSignalableApplication($command, null);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['signal-and-alarm'])));
+        $this->assertSame([SignableAndAlarmableCommand::class], $command->signalHandlers);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testHandleAlarmCalledInsteadOfHandleSignalWithDispatcher()
+    {
+        $command = new SignableAndAlarmableCommand(1);
+        $command->loop = 11000;
+
+        $subscriber1 = new SignalEventSubscriber();
+        $subscriber2 = new AlarmEventSubscriber();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber1);
+        $dispatcher->addSubscriber($subscriber2);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['signal-and-alarm'])));
+        $this->assertSame([SignalEventSubscriber::class, AlarmEventSubscriber::class, SignableAndAlarmableCommand::class], $command->signalHandlers);
+    }
+
     private function createSignalableApplication(Command $command, ?EventDispatcherInterface $dispatcher): Application
     {
         $application = new Application();
@@ -2233,7 +2466,7 @@ class ApplicationTest extends TestCase
         if ($dispatcher) {
             $application->setDispatcher($dispatcher);
         }
-        $application->add(new LazyCommand('signal', [], '', false, fn () => $command, true));
+        $application->add(new LazyCommand($command::getDefaultName(), [], '', false, fn () => $command, true));
 
         return $application;
     }
@@ -2421,5 +2654,68 @@ class SignalEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return ['console.signal' => 'onSignal'];
+    }
+}
+
+#[AsCommand(name: 'alarm')]
+class AlarmableCommand extends BaseSignableCommand implements AlarmableCommandInterface
+{
+    public function __construct(private int $alarmTime)
+    {
+        parent::__construct(false);
+    }
+
+    public function getAlarmInterval(InputInterface $input): int
+    {
+        return $this->alarmTime;
+    }
+
+    public function handleAlarm(false|int $previousExitCode = 0): int|false
+    {
+        $this->signaled = true;
+        $this->signalHandlers[] = __CLASS__;
+
+        return false;
+    }
+}
+
+class AlarmEventSubscriber implements EventSubscriberInterface
+{
+    public bool $signaled = false;
+
+    public function onAlarm(ConsoleAlarmEvent $event): void
+    {
+        $this->signaled = true;
+        $event->getCommand()->signaled = true;
+        $event->getCommand()->signalHandlers[] = __CLASS__;
+
+        $event->abortExit();
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return ['console.alarm' => 'onAlarm'];
+    }
+}
+
+#[AsCommand(name: 'signal-and-alarm')]
+class SignableAndAlarmableCommand extends SignableCommand implements AlarmableCommandInterface
+{
+    public function __construct(private int $alarmTime)
+    {
+        parent::__construct(false);
+    }
+
+    public function getAlarmInterval(InputInterface $input): int
+    {
+        return $this->alarmTime;
+    }
+
+    public function handleAlarm(false|int $previousExitCode = 0): int|false
+    {
+        $this->signaled = true;
+        $this->signalHandlers[] = __CLASS__;
+
+        return false;
     }
 }

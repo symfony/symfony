@@ -21,13 +21,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
  * @internal
  *
  * @author Jules Pietri <jules@heahprod.com>
  */
-final class TraceableCommand extends Command implements SignalableCommandInterface
+class TraceableCommand extends Command implements SignalableCommandInterface
 {
     public readonly Command $command;
     public int $exitCode;
@@ -48,7 +49,7 @@ final class TraceableCommand extends Command implements SignalableCommandInterfa
 
     public function __construct(
         Command $command,
-        private readonly Stopwatch $stopwatch,
+        protected readonly Stopwatch $stopwatch,
     ) {
         if ($command instanceof LazyCommand) {
             $command = $command->getCommand();
@@ -103,6 +104,13 @@ final class TraceableCommand extends Command implements SignalableCommandInterfa
 
         $event->stop();
 
+        $this->recordHandledSignal($signal, $event);
+
+        return $exit;
+    }
+
+    protected function recordHandledSignal(int $signal, StopwatchEvent $event): void
+    {
         if (!isset($this->handledSignals[$signal])) {
             $this->handledSignals[$signal] = [
                 'handled' => 0,
@@ -117,8 +125,6 @@ final class TraceableCommand extends Command implements SignalableCommandInterfa
             $this->handledSignals[$signal]['memory'],
             $event->getMemory() >> 20
         );
-
-        return $exit;
     }
 
     /**

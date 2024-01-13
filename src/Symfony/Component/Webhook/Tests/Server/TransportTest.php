@@ -25,7 +25,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TransportTest extends TestCase
 {
-    public function testSendWithDispatcher(): void
+    public function testSendWithDispatcher()
     {
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addListener(WebhookSentEvent::class, $listener = new DebugEventListener());
@@ -55,7 +55,7 @@ class TransportTest extends TestCase
         self::assertSame('OK', $eventReceivedInListener->getResponse()->getContent());
     }
 
-    public function testSendWithoutDispatcher(): void
+    public function testSendWithoutDispatcher()
     {
         $transport = new Transport(
             new MockHttpClient(function (string $method, string $url) {

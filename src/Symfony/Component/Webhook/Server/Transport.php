@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Webhook\Server;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\HttpOptions;
 use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Webhook\Event\WebhookSentEvent;
 use Symfony\Component\Webhook\Subscriber;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -26,6 +28,7 @@ class Transport implements TransportInterface
         private readonly RequestConfiguratorInterface $headers,
         private readonly RequestConfiguratorInterface $body,
         private readonly RequestConfiguratorInterface $signer,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -37,6 +40,8 @@ class Transport implements TransportInterface
         $this->body->configure($event, $subscriber->getSecret(), $options);
         $this->signer->configure($event, $subscriber->getSecret(), $options);
 
-        $this->client->request('POST', $subscriber->getUrl(), $options->toArray());
+        $response = $this->client->request('POST', $subscriber->getUrl(), $options->toArray());
+
+        $this->eventDispatcher?->dispatch(new WebhookSentEvent($subscriber, $event, $response));
     }
 }

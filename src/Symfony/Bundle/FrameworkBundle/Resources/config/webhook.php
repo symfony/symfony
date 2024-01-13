@@ -27,6 +27,7 @@ return static function (ContainerConfigurator $container) {
                 service('webhook.headers_configurator'),
                 service('webhook.body_configurator.json'),
                 service('webhook.signer'),
+                service('event_dispatcher')->nullOnInvalid(),
             ])
 
         ->set('webhook.headers_configurator', HeadersConfigurator::class)

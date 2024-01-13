@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Command\AlarmableCommandInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\CompleteCommand;
 use Symfony\Component\Console\Command\DumpCompletionCommand;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
+use Symfony\Component\Console\Event\ConsoleAlarmEvent;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleSignalEvent;
@@ -97,7 +99,7 @@ class Application implements ResetInterface
         $this->defaultCommand = 'list';
         if (\defined('SIGINT') && SignalRegistry::isSupported()) {
             $this->signalRegistry = new SignalRegistry();
-            $this->signalsToDispatchEvent = [\SIGINT, \SIGTERM, \SIGUSR1, \SIGUSR2];
+            $this->signalsToDispatchEvent = [\SIGINT, \SIGTERM, \SIGUSR1, \SIGUSR2, \SIGALRM];
         }
     }
 
@@ -975,7 +977,18 @@ class Application implements ResetInterface
             }
         }
 
+        // bind before getAlarmTime() and the console.command event, so the method and listeners have access to input options/arguments
+        try {
+            $command->mergeApplicationDefinition();
+            $input->bind($command->getDefinition());
+        } catch (ExceptionInterface) {
+            // ignore invalid options/arguments for now, to allow the event listeners to customize the InputDefinition
+        }
+
         $commandSignals = $command instanceof SignalableCommandInterface ? $command->getSubscribedSignals() : [];
+        if ($command instanceof AlarmableCommandInterface && \defined('SIGALRM') && SignalRegistry::isSupported() && !\in_array(\SIGALRM, $commandSignals, true)) {
+            $commandSignals[] = \SIGALRM;
+        }
         if ($commandSignals || $this->dispatcher && $this->signalsToDispatchEvent) {
             if (!$this->signalRegistry) {
                 throw new RuntimeException('Unable to subscribe to signal events. Make sure that the "pcntl" extension is installed and that "pcntl_*" functions are not disabled by your php.ini\'s "disable_functions" directive.');
@@ -992,19 +1005,34 @@ class Application implements ResetInterface
             if ($this->dispatcher) {
                 // We register application signals, so that we can dispatch the event
                 foreach ($this->signalsToDispatchEvent as $signal) {
-                    $event = new ConsoleSignalEvent($command, $input, $output, $signal);
+                    $signalEvent = new ConsoleSignalEvent($command, $input, $output, $signal);
+                    $alarmEvent = \SIGALRM === $signal ? new ConsoleAlarmEvent($command, $input, $output) : null;
 
-                    $this->signalRegistry->register($signal, function ($signal) use ($event, $command, $commandSignals) {
-                        $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
-                        $exitCode = $event->getExitCode();
+                    $this->signalRegistry->register($signal, function ($signal) use ($signalEvent, $alarmEvent, $command, $commandSignals, $input, $output) {
+                        $this->dispatcher->dispatch($signalEvent, ConsoleEvents::SIGNAL);
+                        $exitCode = $signalEvent->getExitCode();
 
+                        if (null !== $alarmEvent) {
+                            if (false !== $exitCode) {
+                                $alarmEvent->setExitCode($exitCode);
+                            } else {
+                                $alarmEvent->abortExit();
+                            }
+                            $this->dispatcher->dispatch($alarmEvent, ConsoleEvents::ALARM);
+                            $exitCode = $alarmEvent->getExitCode();
+                        }
+
+                        if (\SIGALRM === $signal && $command instanceof AlarmableCommandInterface) {
+                            $exitCode = $command->handleAlarm($exitCode);
+                            $this->signalRegistry->scheduleAlarm($command->getAlarmTime($input));
+                        }
                         // If the command is signalable, we call the handleSignal() method
-                        if (\in_array($signal, $commandSignals, true)) {
+                        elseif (\in_array($signal, $commandSignals, true)) {
                             $exitCode = $command->handleSignal($signal, $exitCode);
                         }
 
                         if (false !== $exitCode) {
-                            $event = new ConsoleTerminateEvent($command, $event->getInput(), $event->getOutput(), $exitCode, $signal);
+                            $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode, $signal);
                             $this->dispatcher->dispatch($event, ConsoleEvents::TERMINATE);
 
                             exit($event->getExitCode());
@@ -1017,24 +1045,27 @@ class Application implements ResetInterface
             }
 
             foreach ($commandSignals as $signal) {
-                $this->signalRegistry->register($signal, function (int $signal) use ($command): void {
-                    if (false !== $exitCode = $command->handleSignal($signal)) {
+                $this->signalRegistry->register($signal, function (int $signal) use ($command, $input): void {
+                    if (\SIGALRM === $signal && $command instanceof AlarmableCommandInterface) {
+                        $exitCode = $command->handleAlarm();
+                        $this->signalRegistry->scheduleAlarm($command->getAlarmTime($input));
+                    } else {
+                        $exitCode = $command->handleSignal($signal);
+                    }
+
+                    if (false !== $exitCode) {
                         exit($exitCode);
                     }
                 });
+            }
+
+            if ($command instanceof AlarmableCommandInterface) {
+                $this->signalRegistry->scheduleAlarm($command->getAlarmTime($input));
             }
         }
 
         if (null === $this->dispatcher) {
             return $command->run($input, $output);
-        }
-
-        // bind before the console.command event, so the listeners have access to input options/arguments
-        try {
-            $command->mergeApplicationDefinition();
-            $input->bind($command->getDefinition());
-        } catch (ExceptionInterface) {
-            // ignore invalid options/arguments for now, to allow the event listeners to customize the InputDefinition
         }
 
         $event = new ConsoleCommandEvent($command, $input, $output);

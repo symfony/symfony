@@ -180,6 +180,15 @@ class Connection
         }
     }
 
+    public function keepalive(string $id): void
+    {
+        try {
+            $this->client->useTube($this->tube)->touch(new JobId((int) $id));
+        } catch (Exception $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+    }
+
     public function getMessageCount(): int
     {
         try {

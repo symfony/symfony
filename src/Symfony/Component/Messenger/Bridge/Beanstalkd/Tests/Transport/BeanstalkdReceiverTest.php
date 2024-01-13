@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceiver;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
@@ -76,6 +77,17 @@ final class BeanstalkdReceiverTest extends TestCase
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
         $receiver->get();
+    }
+
+    public function testKeepalive()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('keepalive')->with(1);
+
+        $receiver = new BeanstalkdReceiver($connection, $serializer);
+        $receiver->keepalive(new Envelope(new DummyMessage('foo'), [new BeanstalkdReceivedStamp(1, 'bar')]));
     }
 
     private function createBeanstalkdEnvelope(): array

@@ -14,15 +14,15 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  */
-class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterface
+class BeanstalkdReceiver implements KeepaliveReceiverInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
 
@@ -63,6 +63,11 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
     public function reject(Envelope $envelope): void
     {
         $this->connection->reject($this->findBeanstalkdReceivedStamp($envelope)->getId());
+    }
+
+    public function keepalive(Envelope $envelope): void
+    {
+        $this->connection->keepalive($this->findBeanstalkdReceivedStamp($envelope)->getId());
     }
 
     public function getMessageCount(): int

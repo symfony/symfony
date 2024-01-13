@@ -22,7 +22,7 @@
     },
     "require-dev": {
         "psr/cache": "^1.0|^2.0|^3.0",
-        "symfony/console": "^6.4|^7.0",
+        "symfony/console": "^7.1",
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/event-dispatcher": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
@@ -36,7 +36,7 @@
         "symfony/validator": "^6.4|^7.0"
     },
     "conflict": {
-        "symfony/console": "<6.4",
+        "symfony/console": "<7.1",
         "symfony/event-dispatcher": "<6.4",
         "symfony/event-dispatcher-contracts": "<2.5",
         "symfony/framework-bundle": "<6.4",

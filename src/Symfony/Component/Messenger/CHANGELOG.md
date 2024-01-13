@@ -8,6 +8,7 @@ CHANGELOG
  * Add `--all` option to the `messenger:consume` command
  * Make `#[AsMessageHandler]` final
  * Add parameter `$jitter` to `MultiplierRetryStrategy` in order to randomize delay and prevent the thundering herd effect
+ * Add the ability to asynchronously notify transports about which messages are still being processed by the handler, using `pcntl_alarm()`
 
 7.0
 ---

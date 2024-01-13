@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Command;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\AlarmableCommandInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -41,8 +42,10 @@ use Symfony\Component\Messenger\Worker;
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
 #[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
-class ConsumeMessagesCommand extends Command implements SignalableCommandInterface
+class ConsumeMessagesCommand extends Command implements SignalableCommandInterface, AlarmableCommandInterface
 {
+    private const DEFAULT_KEEPALIVE_INTERVAL = 5;
+
     private RoutableMessageBus $routableBus;
     private ContainerInterface $receiverLocator;
     private EventDispatcherInterface $eventDispatcher;
@@ -53,6 +56,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
     private ?ContainerInterface $rateLimiterLocator;
     private ?array $signals;
     private ?Worker $worker = null;
+    private ?int $keepaliveInterval = null;
 
     public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null, array $receiverNames = [], ?ResetServicesListener $resetServicesListener = null, array $busIds = [], ?ContainerInterface $rateLimiterLocator = null, ?array $signals = null)
     {
@@ -85,6 +89,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Consume messages from all receivers'),
+                new InputOption('keepalive', null, InputOption::VALUE_OPTIONAL, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -286,6 +291,25 @@ EOF
         $this->logger?->info('Received signal {signal}.', ['signal' => $signal, 'transport_names' => $this->worker->getMetadata()->getTransportNames()]);
 
         $this->worker->stop();
+
+        return false;
+    }
+
+    public function getAlarmTime(InputInterface $input): int
+    {
+        return $this->keepaliveInterval ??= $input->hasParameterOption('--keepalive')
+            ? (int) ($input->getOption('keepalive') ?? self::DEFAULT_KEEPALIVE_INTERVAL) : 0;
+    }
+
+    public function handleAlarm(false|int $previousExitCode = 0): int|false
+    {
+        if (!$this->worker) {
+            return false;
+        }
+
+        $this->logger?->info('Sending keepalive request.', ['transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+        $this->worker->keepalive();
 
         return false;
     }

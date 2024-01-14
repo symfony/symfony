@@ -99,6 +99,11 @@ class ValidatorBuilderTest extends TestCase
         $this->assertSame($this->builder, $this->builder->setTranslationDomain('TRANS_DOMAIN'));
     }
 
+    public function testDisableTranslation()
+    {
+        $this->assertSame($this->builder, $this->builder->disableTranslation());
+    }
+
     public function testGetValidator()
     {
         $this->assertInstanceOf(RecursiveValidator::class, $this->builder->getValidator());

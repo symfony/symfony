@@ -31,6 +31,11 @@ class NormalizerBuilderFixtureTest extends TestCase
     }
 
     /**
+     * If one does changes to the NormalizerBuilder, this test will probably fail.
+     * Run `php Tests/Builder/generateUpdatedFixtures.php` to update the fixtures.
+     *
+     * This will help reviewers to see the effect of the changes in the NormalizerBuilder.
+     *
      * @dataProvider fixtureClassGenerator
      */
     public function testBuildFixtures(string $inputClass, string $expectedOutputFile)

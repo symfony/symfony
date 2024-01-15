@@ -40,6 +40,7 @@ class FixtureHelper
     public static function getFixturesAndResultFiles(): iterable
     {
         $rootDir = \dirname(__DIR__).'/Fixtures/CustomNormalizer';
+
         return [
             NoTypeHints\PublicProperties::class => $rootDir.'/NoTypeHints/ExpectedNormalizer/PublicProperties.php',
             NoTypeHints\ConstructorInjection::class => $rootDir.'/NoTypeHints/ExpectedNormalizer/ConstructorInjection.php',

@@ -33,7 +33,7 @@ class CustomNormalizerHelper
         private DefinitionExtractor $definitionExtractor,
         private array $paths,
         private string $projectDir,
-        private ?LoggerInterface $logger = null
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -60,7 +60,7 @@ class CustomNormalizerHelper
                 }
 
                 $reflectionClass = new \ReflectionClass($classNs);
-                if ([] === $reflectionClass->getAttributes(Serializable::class)) {
+                if ([] === $reflectionClass->getAttributes(Serializable::class, \ReflectionAttribute::IS_INSTANCEOF)) {
                     continue;
                 }
 

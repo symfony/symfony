@@ -33,7 +33,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected ?string $key = null;
     protected bool $removeKeyItem = false;
     protected bool $addDefaults = false;
-    protected int|string|array|null|false $addDefaultChildren = false;
+    protected int|string|array|false|null $addDefaultChildren = false;
     protected NodeBuilder $nodeBuilder;
     protected bool $normalizeKeys = true;
 

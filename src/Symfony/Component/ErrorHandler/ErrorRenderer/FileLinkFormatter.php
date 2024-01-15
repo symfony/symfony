@@ -33,7 +33,7 @@ class FileLinkFormatter
         string|array $fileLinkFormat = null,
         private ?RequestStack $requestStack = null,
         private ?string $baseDir = null,
-        private null|string|\Closure $urlFormat = null,
+        private string|\Closure|null $urlFormat = null,
     ) {
         $fileLinkFormat ??= $_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? '';
 

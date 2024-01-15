@@ -349,7 +349,7 @@ class ProcessTest extends TestCase
     /**
      * @dataProvider provideInputValues
      */
-    public function testValidInput(?string $expected, null|float|string $value)
+    public function testValidInput(?string $expected, float|string|null $value)
     {
         $process = $this->getProcess('foo');
         $process->setInput($value);

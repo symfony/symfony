@@ -35,7 +35,7 @@
         "symfony/messenger": "^6.4|^7.0",
         "symfony/mime": "^6.4|^7.0",
         "symfony/property-access": "^6.4|^7.0",
-        "symfony/property-info": "^6.4|^7.0",
+        "symfony/property-info": "^7.1",
         "symfony/translation-contracts": "^2.5|^3",
         "symfony/uid": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
@@ -48,7 +48,7 @@
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/dependency-injection": "<6.4",
         "symfony/property-access": "<6.4",
-        "symfony/property-info": "<6.4",
+        "symfony/property-info": "<7.1",
         "symfony/uid": "<6.4",
         "symfony/validator": "<6.4",
         "symfony/yaml": "<6.4"

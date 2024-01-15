@@ -338,7 +338,12 @@ class NormalizerBuilder
     private function addDenormailizeMethod(ClassDefinition $definition, Namespace_ $namespace, Class_ $class): void
     {
         $needsChildDenormalizer = false;
-        $body = [];
+        $body = [
+            new Node\Stmt\Expression(new Node\Expr\Assign(
+                new Node\Expr\Variable('data'),
+                new Node\Expr\Cast\Array_(new Node\Expr\Variable('data'))
+            )),
+        ];
 
         if (ClassDefinition::CONSTRUCTOR_NONE === $definition->getConstructorType()) {
             $body[] = new Node\Stmt\Expression(new Node\Expr\Assign(

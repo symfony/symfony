@@ -47,6 +47,7 @@ class Symfony_Component_Serializer_Tests_Fixtures_CustomNormalizer_FullTypeHints
     }
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        $data = (array) $data;
         $output = new ComplexTypesSetter();
         if (array_key_exists('simple', $data)) {
             $setter0 = $this->denormalizeChild($data['simple'], \Symfony\Component\Serializer\Tests\Fixtures\CustomNormalizer\FullTypeHints\DummyObject::class, $format, $context, false);

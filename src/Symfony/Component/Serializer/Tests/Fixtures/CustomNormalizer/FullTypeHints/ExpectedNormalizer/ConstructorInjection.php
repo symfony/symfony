@@ -47,6 +47,7 @@ class Symfony_Component_Serializer_Tests_Fixtures_CustomNormalizer_FullTypeHints
     }
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        $data = (array) $data;
         $argument7 = $this->denormalizeChild($data['relation'], \Symfony\Component\Serializer\Tests\Fixtures\CustomNormalizer\FullTypeHints\DummyObject::class, $format, $context, false);
         $output = new ConstructorInjection($data['name'], $data['age'], $data['height'], $data['handsome'], $data['nameOfFriends'], $data['picture'], $data['pet'], $argument7);
         return $output;

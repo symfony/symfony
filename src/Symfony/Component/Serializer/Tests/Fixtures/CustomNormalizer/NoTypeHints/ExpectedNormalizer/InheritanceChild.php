@@ -44,6 +44,7 @@ class Symfony_Component_Serializer_Tests_Fixtures_CustomNormalizer_NoTypeHints_I
     }
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        $data = (array) $data;
         $output = new InheritanceChild($data['childCute'], $data['cute']);
         if (array_key_exists('childName', $data)) {
             $output->childName = $data['childName'];

@@ -47,6 +47,7 @@ class Symfony_Component_Serializer_Tests_Fixtures_CustomNormalizer_FullTypeHints
     }
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        $data = (array) $data;
         $argument0 = $this->denormalizeChild($data['simple'], \Symfony\Component\Serializer\Tests\Fixtures\CustomNormalizer\FullTypeHints\DummyObject::class, $format, $context, false);
         $argument2 = $this->denormalizeChild($data['array'], \Symfony\Component\Serializer\Tests\Fixtures\CustomNormalizer\FullTypeHints\DummyObject::class, $format, $context, true);
         $exceptions = [];

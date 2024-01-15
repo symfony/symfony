@@ -28,6 +28,7 @@ class Symfony_Component_Serializer_Tests_Fixtures_CustomNormalizer_FullTypeHints
     }
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        $data = (array) $data;
         $output = new ExtraSetter($data['name']);
         if (array_key_exists('age', $data)) {
             $output->setAge($data['age']);

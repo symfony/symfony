@@ -11,60 +11,18 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use PhpParser\ParserFactory;
-use PHPStan\PhpDocParser\Parser\PhpDocParser;
-use PHPUnit\Framework\MockObject\MockObject;
+require_once __DIR__.'/ObjectNormalizerTest.php';
+
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Builder\DefinitionExtractor;
 use Symfony\Component\Serializer\Builder\NormalizerBuilder;
-use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
-use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\xx;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Builder\FixtureHelper;
-use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
-use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
-use Symfony\Component\Serializer\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Sibling;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\AttributesTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\ContextMetadataTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\GroupsTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\IgnoredAttributesTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectToPopulateTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipNullValuesTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipUninitializedValuesTestTrait;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObjectWithGetters;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -298,178 +256,5 @@ class AutoNormalizerTest extends TestCase
             ],
             $serializer->normalize($obj, 'any')
         );
-    }
-}
-
-
-class ObjectConstructorDummy
-{
-    protected $foo;
-    public $bar;
-    private $baz;
-
-    public function __construct($foo, $bar, $baz)
-    {
-        $this->foo = $foo;
-        $this->bar = $bar;
-        $this->baz = $baz;
-    }
-
-    public function getFoo()
-    {
-        return $this->foo;
-    }
-
-    public function isBaz()
-    {
-        return $this->baz;
-    }
-
-    public function otherMethod()
-    {
-        throw new \RuntimeException('Dummy::otherMethod() should not be called');
-    }
-}
-
-
-class ObjectConstructorOptionalArgsDummy
-{
-    protected $foo;
-    public $bar;
-    private $baz;
-
-    public function __construct($foo, $bar = [], $baz = [])
-    {
-        $this->foo = $foo;
-        $this->bar = $bar;
-        $this->baz = $baz;
-    }
-
-    public function getFoo()
-    {
-        return $this->foo;
-    }
-
-    public function getBaz()
-    {
-        return $this->baz;
-    }
-
-    public function otherMethod()
-    {
-        throw new \RuntimeException('Dummy::otherMethod() should not be called');
-    }
-}
-
-class ObjectConstructorArgsWithDefaultValueDummy
-{
-    protected $foo;
-    protected $bar;
-
-    public function __construct($foo = [], $bar = null)
-    {
-        $this->foo = $foo;
-        $this->bar = $bar;
-    }
-
-    public function getFoo()
-    {
-        return $this->foo;
-    }
-
-    public function getBar()
-    {
-        return $this->bar;
-    }
-
-    public function otherMethod()
-    {
-        throw new \RuntimeException('Dummy::otherMethod() should not be called');
-    }
-}
-
-class ObjectWithStaticPropertiesAndMethods
-{
-    public $foo = 'K';
-    public static $bar = 'A';
-
-    public static function getBaz()
-    {
-        return 'L';
-    }
-}
-
-class ObjectTypeHinted
-{
-    public function setFoo(array $f)
-    {
-    }
-}
-
-class ObjectInner
-{
-    public $foo;
-    public $bar;
-}
-
-class DummyWithConstructorObject
-{
-    private $id;
-    private $inner;
-
-    public function __construct($id, ObjectInner $inner)
-    {
-        $this->id = $id;
-        $this->inner = $inner;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function getInner()
-    {
-        return $this->inner;
-    }
-}
-
-class DummyWithConstructorInexistingObject
-{
-    public function __construct($id, Unknown $unknown)
-    {
-    }
-}
-
-class ObjectWithUpperCaseAttributeNames
-{
-    private $Foo = 'Foo';
-    public $Bar = 'BarBar';
-
-    public function getFoo()
-    {
-        return $this->Foo;
-    }
-}
-
-class DummyWithNullableConstructorObject
-{
-    private $id;
-    private $inner;
-
-    public function __construct($id, ?ObjectConstructorDummy $inner)
-    {
-        $this->id = $id;
-        $this->inner = $inner;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function getInner()
-    {
-        return $this->inner;
     }
 }

@@ -44,6 +44,7 @@ class Symfony_Component_Serializer_Tests_Fixtures_CustomNormalizer_NoTypeHints_C
     }
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        $data = (array) $data;
         $output = new ConstructorInjection($data['name'], $data['age'], $data['height'], $data['handsome'], $data['nameOfFriends'], $data['picture'], $data['pet'], $data['relation']);
         return $output;
     }

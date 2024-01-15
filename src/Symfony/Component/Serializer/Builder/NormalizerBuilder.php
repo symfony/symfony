@@ -15,7 +15,6 @@ use PhpParser\Builder\Class_;
 use PhpParser\Builder\Namespace_;
 use PhpParser\BuilderFactory;
 use PhpParser\Node;
-use PhpParser\Node\Expr;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter;
 use Symfony\Component\Serializer\Exception\DenormalizingUnionFailedException;
@@ -301,7 +300,7 @@ class NormalizerBuilder
             ->addParam($this->factory->param('format')->setType('?string'))
             ->setReturnType('array')
             ->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_([
-                new Node\ArrayItem(
+                new Node\Expr\ArrayItem(
                     new Node\Expr\ConstFetch(new Node\Name('true')),
                     new Node\Expr\ClassConstFetch(new Node\Name($definition->getSourceClassName()), 'class')
                 ),
@@ -370,7 +369,7 @@ class NormalizerBuilder
                 if (\is_object($defaultValue)) {
                     // public function __construct($foo = new \stdClass());
                     // There is no support for parameters to the object.
-                    $defaultValue = new Expr\New_(new Node\Name\FullyQualified($defaultValue::class));
+                    $defaultValue = new Node\Expr\New_(new Node\Name\FullyQualified($defaultValue::class));
                 } else {
                     $defaultValue = $this->factory->val($defaultValue);
                 }
@@ -404,7 +403,7 @@ class NormalizerBuilder
                                         new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name\FullyQualified($targetClasses[0]), 'class')),
                                         new Node\Arg(new Node\Expr\Variable('format')),
                                         new Node\Arg(new Node\Expr\Variable('context')),
-                                        new Node\Arg(new Expr\ConstFetch(new Node\Name($canBeIterable ? 'true' : 'false'))),
+                                        new Node\Arg(new Node\Expr\ConstFetch(new Node\Name($canBeIterable ? 'true' : 'false'))),
                                     ]
                                 )
                             )
@@ -413,7 +412,7 @@ class NormalizerBuilder
                 }
 
                 if ($propertyDefinition->hasConstructorDefaultValue()) {
-                    $variableOutput = [new Node\Stmt\If_(new Expr\BooleanNot(
+                    $variableOutput = [new Node\Stmt\If_(new Node\Expr\BooleanNot(
                         $this->factory->funcCall('array_key_exists', [
                             new Node\Arg(new Node\Scalar\String_($propertyDefinition->getNormalizedName())),
                             new Node\Arg(new Node\Expr\Variable('data')),
@@ -477,7 +476,7 @@ class NormalizerBuilder
                                         new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name\FullyQualified($targetClasses[0]), 'class')),
                                         new Node\Arg(new Node\Expr\Variable('format')),
                                         new Node\Arg(new Node\Expr\Variable('context')),
-                                        new Node\Arg(new Expr\ConstFetch(new Node\Name($propertyDefinition->isCollection() ? 'true' : 'false'))),
+                                        new Node\Arg(new Node\Expr\ConstFetch(new Node\Name($propertyDefinition->isCollection() ? 'true' : 'false'))),
                                     ]
                                 )
                             )
@@ -553,7 +552,7 @@ class NormalizerBuilder
                 ]);
             }
 
-            $bodyArrayItems[] = new Node\ArrayItem($accessor, new Node\Scalar\String_($propertyDefinition->getNormalizedName()));
+            $bodyArrayItems[] = new Node\Expr\ArrayItem($accessor, new Node\Scalar\String_($propertyDefinition->getNormalizedName()));
         }
 
         // public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
@@ -577,11 +576,11 @@ class NormalizerBuilder
      *
      * @return Node\Stmt[]
      */
-    private function generateCodeToDeserializeMultiplePossibleClasses(array $targetClasses, bool $canBeIterable, string $tempVariableName, Expr $variable, string $keyName, string $classNs): array
+    private function generateCodeToDeserializeMultiplePossibleClasses(array $targetClasses, bool $canBeIterable, string $tempVariableName, Node\Expr $variable, string $keyName, string $classNs): array
     {
         $arrayItems = [];
         foreach ($targetClasses as $class) {
-            $arrayItems[] = new Node\ArrayItem(new Expr\ClassConstFetch(new Node\Name\FullyQualified($class), 'class'));
+            $arrayItems[] = new Node\Expr\ArrayItem(new Node\Expr\ClassConstFetch(new Node\Name\FullyQualified($class), 'class'));
         }
 
         return [
@@ -616,7 +615,7 @@ class NormalizerBuilder
                                                 new Node\Arg(new Node\Expr\Variable('class')),
                                                 new Node\Arg(new Node\Expr\Variable('format')),
                                                 new Node\Arg(new Node\Expr\Variable('context')),
-                                                new Node\Arg(new Expr\ConstFetch(new Node\Name($canBeIterable ? 'true' : 'false'))),
+                                                new Node\Arg(new Node\Expr\ConstFetch(new Node\Name($canBeIterable ? 'true' : 'false'))),
                                             ]
                                         )
                                     )

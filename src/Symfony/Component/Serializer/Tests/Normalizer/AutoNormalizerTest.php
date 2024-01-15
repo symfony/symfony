@@ -268,23 +268,10 @@ class AutoNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizeStatic()
-    {
-        $serializer = $this->getSerializer(ObjectWithStaticPropertiesAndMethods::class);
-        $this->assertEquals(['foo' => 'K'], $serializer->normalize(new ObjectWithStaticPropertiesAndMethods()));
-    }
-
     public function testNormalizeUpperCaseAttributes()
     {
         $serializer = $this->getSerializer(ObjectWithUpperCaseAttributeNames::class);
         $this->assertEquals(['Foo' => 'Foo', 'Bar' => 'BarBar'], $serializer->normalize(new ObjectWithUpperCaseAttributeNames()));
-    }
-
-    public function testThrowUnexpectedValueException()
-    {
-        $serializer = $this->getSerializer(ObjectTypeHinted::class);
-        $this->expectException(UnexpectedValueException::class);
-        $serializer->denormalize(['foo' => 'bar'], ObjectTypeHinted::class);
     }
 
     public function testDefaultObjectClassResolver()

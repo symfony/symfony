@@ -11,14 +11,18 @@
 
 namespace Symfony\Component\Serializer\Builder;
 
-use Symfony\Component\Serializer\Builder\CodeGenerator\ClassGenerator;
-use Symfony\Component\Serializer\Builder\CodeGenerator\Method;
-use Symfony\Component\Serializer\Builder\CodeGenerator\Property;
+use PhpParser\Builder\Class_;
+use PhpParser\Builder\Namespace_;
+use PhpParser\Node\Expr;
+use PhpParser\ParserFactory;
 use Symfony\Component\Serializer\Exception\DenormalizingUnionFailedException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use PhpParser\BuilderFactory;
+use PhpParser\PrettyPrinter;
+use PhpParser\Node;
 
 /**
  * The main class to create a new Normalizer from a ClassDefinition.
@@ -29,18 +33,37 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class NormalizerBuilder
 {
+    private PrettyPrinter\Standard $printer;
+    private BuilderFactory $factory;
+
+    public function __construct()
+    {
+        if (!class_exists(ParserFactory::class)) {
+            throw new \LogicException(sprintf('You cannot use "%s" as the "nikic/php-parser" package is not installed. Try running "composer require nikic/php-parser".', static::class));
+        }
+
+        $this->factory = new BuilderFactory;
+        $this->printer = new PrettyPrinter\Standard();
+    }
+
     public function build(ClassDefinition $definition, string $outputDir): BuildResult
     {
+        $namespace = $this->factory->namespace($definition->getNewNamespace())
+            ->addStmt($this->factory->use($definition->getNamespaceAndClass()));
+
+        $class = $this->factory->class($definition->getNewClassName());
+        $this->addRequiredMethods($definition, $namespace, $class);
+        $this->addNormailizeMethod($definition, $namespace, $class);
+        $this->addDenormailizeMethod($definition, $namespace, $class);
+
+        // Add class to namespace
+        $namespace->addStmt($class);
+        $node = $namespace->getNode();
+
+        // Print
         @mkdir($outputDir, 0777, true);
-        $generator = new ClassGenerator($definition->getNewClassName(), $definition->getNewNamespace());
-
-        $generator->addImport($definition->getNamespaceAndClass());
-        $this->addRequiredMethods($generator, $definition);
-        $this->addNormailizeMethod($generator, $definition);
-        $this->addDenormailizeMethod($generator, $definition);
-
         $outputFile = $outputDir.'/'.$definition->getNewClassName().'.php';
-        file_put_contents($outputFile, $generator->toString());
+        file_put_contents($outputFile, $this->printer->prettyPrintFile([$node]));
 
         return new BuildResult(
             $outputFile,
@@ -52,239 +75,462 @@ class NormalizerBuilder
     /**
      * Generate a private helper class to normalize subtypes.
      */
-    private function generateNormalizeChildMethod(ClassGenerator $generator): void
+    private function generateNormalizeChildMethod(Namespace_ $namespace, Class_ $class): void
     {
-        $generator->addImport(NormalizerAwareInterface::class);
-        $generator->addImplements('NormalizerAwareInterface');
-
-        $generator->addProperty(Property::create('normalizer')->setType('null|NormalizerInterface')->setDefaultValue(null)->setVisibility('private'));
+        $namespace->addStmt($this->factory->use(NormalizerAwareInterface::class));
+        $class->implement('NormalizerAwareInterface');
+        $class->addStmt($this->factory->property('normalizer')
+            ->makePrivate()
+            ->setType('null|NormalizerInterface')
+            ->setDefault(null));
 
         // public function setNormalizer(NormalizerInterface $normalizer): void;
-        $generator->addMethod(Method::create('setNormalizer')
-            ->addArgument('normalizer', 'NormalizerInterface')
+        $class->addStmt($this->factory->method('setNormalizer')
+            ->makePublic()
+            ->addParam($this->factory->param('normalizer')->setType('NormalizerInterface'))
             ->setReturnType('void')
-            ->setBody('$this->normalizer = $normalizer;')
+            ->addStmt(
+                new Node\Stmt\Expression(
+                    new Node\Expr\Assign(
+                        $this->factory->propertyFetch(new Node\Expr\Variable('this'), 'normalizer'),
+                        new Node\Expr\Variable('normalizer')
+                    )
+                )
+            )
         );
 
-        $generator->addMethod(Method::create('normalizeChild')
-            ->setVisibility('private')
-            ->addArgument('object', 'mixed')
-            ->addArgument('format', '?string')
-            ->addArgument('context', 'array')
-            ->addArgument('canBeIterable', 'bool')
+
+        // private function normalizeChild(mixed $object, ?string $format, array $context, bool $canBeIterable): mixed;
+        $class->addStmt($this->factory->method('normalizeChild')
+            ->makePrivate()
+            ->addParam($this->factory->param('object')->setType('mixed'))
+            ->addParam($this->factory->param('format')->setType('?string'))
+            ->addParam($this->factory->param('context')->setType('array'))
+            ->addParam($this->factory->param('canBeIterable')->setType('bool'))
             ->setReturnType('mixed')
-            ->setBody(<<<PHP
-if (is_scalar(\$object) || null === \$object) {
-    return \$object;
-}
-
-if (\$canBeIterable === true && is_iterable(\$object)) {
-    return array_map(fn(\$item) => \$this->normalizeChild(\$item, \$format, \$context, true), \$object);
-}
-
-return \$this->normalizer->normalize(\$object, \$format, \$context);
-
-PHP
-            )
+            ->addStmts([
+                new Node\Stmt\If_(
+                    new Node\Expr\BinaryOp\BooleanOr(
+                        $this->factory->funcCall(new Node\Name('is_scalar'), [
+                            new Node\Arg(new Node\Expr\Variable('object')),
+                        ]),
+                        new Node\Expr\BinaryOp\Identical(
+                            new Node\Expr\ConstFetch(new Node\Name('null')),
+                            new Node\Expr\Variable('object')
+                        )
+                    ),
+                    [
+                        'stmts' => [
+                            new Node\Stmt\Return_(new Node\Expr\Variable('object')),
+                        ],
+                    ]
+                ),
+                // new line
+                new Node\Stmt\If_(
+                    new Node\Expr\BinaryOp\BooleanAnd(
+                        new Node\Expr\Variable('canBeIterable'),
+                        $this->factory->funcCall(new Node\Name('is_iterable'), [
+                            new Node\Arg(new Node\Expr\Variable('object')),
+                        ])
+                    ),
+                    [
+                        'stmts' => [
+                            new Node\Stmt\Return_(
+                                new Node\Expr\FuncCall(
+                                    new Node\Name('array_map'),
+                                    [
+                                        new Node\Arg(
+                                            new Node\Expr\Closure([
+                                                'params' => [new Node\Param(new Node\Expr\Variable('item'))],
+                                                'stmts' => [
+                                                    new Node\Stmt\Return_(
+                                                        $this->factory->methodCall(
+                                                            new Node\Expr\Variable('this'),
+                                                            'normalizeChild',
+                                                            [
+                                                                new Node\Arg(new Node\Expr\Variable('item')),
+                                                                new Node\Arg(new Node\Expr\Variable('format')),
+                                                                new Node\Arg(new Node\Expr\Variable('context')),
+                                                                new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
+                                                            ]
+                                                        )
+                                                    ),
+                                                ],
+                                            ])
+                                        ),
+                                        new Node\Arg(new Node\Expr\Variable('object')),
+                                    ]
+                                )
+                            ),
+                        ],
+                    ]
+                ),
+                // new line
+                new Node\Stmt\Return_(
+                    $this->factory->methodCall(
+                        $this->factory->propertyFetch(new Node\Expr\Variable('this'), 'normalizer'),
+                        'normalize',
+                        [
+                            new Node\Arg(new Node\Expr\Variable('object')),
+                            new Node\Arg(new Node\Expr\Variable('format')),
+                            new Node\Arg(new Node\Expr\Variable('context')),
+                        ]
+                    )
+                ),
+            ])
         );
     }
 
     /**
      * Generate a private helper class to de-normalize subtypes.
      */
-    private function generateDenormalizeChildMethod(ClassGenerator $generator): void
+    private function generateDenormalizeChildMethod(Namespace_ $namespace, Class_ $class): void
     {
-        $generator->addImport(DenormalizingUnionFailedException::class);
-        $generator->addImport(DenormalizerAwareInterface::class);
-        $generator->addImplements('DenormalizerAwareInterface');
-
-        $generator->addProperty(Property::create('denormalizer')->setType('null|DenormalizerInterface')->setDefaultValue(null)->setVisibility('private'));
+        $namespace->addStmt($this->factory->use(DenormalizingUnionFailedException::class));
+        $namespace->addStmt($this->factory->use(DenormalizerAwareInterface::class));
+        $class->implement('DenormalizerAwareInterface');
+        $class->addStmt($this->factory->property('denormalizer')
+            ->makePrivate()
+            ->setType('null|DenormalizerInterface')
+            ->setDefault(null));
 
         // public function setNormalizer(NormalizerInterface $normalizer): void;
-        $generator->addMethod(Method::create('setDenormalizer')
-            ->addArgument('denormalizer', 'DenormalizerInterface')
+        $class->addStmt($this->factory->method('setDenormalizer')
+            ->makePublic()
+            ->addParam($this->factory->param('denormalizer')->setType('DenormalizerInterface'))
             ->setReturnType('void')
-            ->setBody('$this->denormalizer = $denormalizer;')
+            ->addStmt(
+                new Node\Stmt\Expression(
+                    new Node\Expr\Assign(
+                        $this->factory->propertyFetch(new Node\Expr\Variable('this'), 'denormalizer'),
+                        new Node\Expr\Variable('denormalizer')
+                    )
+                )
+            )
         );
 
-        $generator->addMethod(Method::create('denormalizeChild')
-            ->setVisibility('private')
-            ->addArgument('data', 'mixed')
-            ->addArgument('type', 'string')
-            ->addArgument('format', '?string')
-            ->addArgument('context', 'array')
-            ->addArgument('canBeIterable', 'bool')
+
+        // private function denormalizeChild(mixed $data, string $type, ?string $format, array $context, bool $canBeIterable): mixed;
+        $class->addStmt($this->factory->method('denormalizeChild')
+            ->makePrivate()
+            ->addParam($this->factory->param('data')->setType('mixed'))
+            ->addParam($this->factory->param('type')->setType('string'))
+            ->addParam($this->factory->param('format')->setType('?string'))
+            ->addParam($this->factory->param('context')->setType('array'))
+            ->addParam($this->factory->param('canBeIterable')->setType('bool'))
             ->setReturnType('mixed')
-            ->setBody(<<<PHP
-if (is_scalar(\$data) || null === \$data) {
-    return \$data;
-}
-
-if (\$canBeIterable === true && is_iterable(\$data)) {
-    return array_map(fn(\$item) => \$this->denormalizeChild(\$item, \$type, \$format, \$context, true), \$data);
-}
-
-return \$this->denormalizer->denormalize(\$data, \$type, \$format, \$context);
-
-PHP
-            )
+            ->addStmts([
+                new Node\Stmt\If_(
+                    new Node\Expr\BinaryOp\BooleanOr(
+                        $this->factory->funcCall(new Node\Name('is_scalar'), [
+                            new Node\Arg(new Node\Expr\Variable('data')),
+                        ]),
+                        new Node\Expr\BinaryOp\Identical(
+                            new Node\Expr\ConstFetch(new Node\Name('null')),
+                            new Node\Expr\Variable('data')
+                        )
+                    ),
+                    [
+                        'stmts' => [
+                            new Node\Stmt\Return_(new Node\Expr\Variable('data')),
+                        ],
+                    ]
+                ),
+                // new line
+                new Node\Stmt\If_(
+                    new Node\Expr\BinaryOp\BooleanAnd(
+                        new Node\Expr\Variable('canBeIterable'),
+                        $this->factory->funcCall(new Node\Name('is_iterable'), [
+                            new Node\Arg(new Node\Expr\Variable('data')),
+                        ])
+                    ),
+                    [
+                        'stmts' => [
+                            new Node\Stmt\Return_(
+                                new Node\Expr\FuncCall(
+                                    new Node\Name('array_map'),
+                                    [
+                                        new Node\Arg(
+                                            new Node\Expr\Closure([
+                                                'params' => [new Node\Param(new Node\Expr\Variable('item'))],
+                                                'stmts' => [
+                                                    new Node\Stmt\Return_(
+                                                        $this->factory->methodCall(
+                                                            new Node\Expr\Variable('this'),
+                                                            'denormalizeChild',
+                                                            [
+                                                                new Node\Arg(new Node\Expr\Variable('item')),
+                                                                new Node\Arg(new Node\Expr\Variable('type')),
+                                                                new Node\Arg(new Node\Expr\Variable('format')),
+                                                                new Node\Arg(new Node\Expr\Variable('context')),
+                                                                new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
+                                                            ]
+                                                        )
+                                                    ),
+                                                ],
+                                            ])
+                                        ),
+                                        new Node\Arg(new Node\Expr\Variable('data')),
+                                    ]
+                                )
+                            ),
+                        ],
+                    ]
+                ),
+                // new line
+                new Node\Stmt\Return_(
+                    $this->factory->methodCall(
+                        $this->factory->propertyFetch(new Node\Expr\Variable('this'), 'denormalizer'),
+                        'denormalize',
+                        [
+                            new Node\Arg(new Node\Expr\Variable('data')),
+                            new Node\Arg(new Node\Expr\Variable('type')),
+                            new Node\Arg(new Node\Expr\Variable('format')),
+                            new Node\Arg(new Node\Expr\Variable('context')),
+                        ]
+                    )
+                ),
+            ])
         );
     }
 
     /**
      * Add methods required by NormalizerInterface and DenormalizerInterface.
      */
-    private function addRequiredMethods(ClassGenerator $generator, ClassDefinition $definition): void
+    private function addRequiredMethods(ClassDefinition $definition, Namespace_ $namespace, Class_ $class): void
     {
-        $generator->addImport(NormalizerInterface::class);
-        $generator->addImport(DenormalizerInterface::class);
-        $generator->addImplements('NormalizerInterface');
-        $generator->addImplements('DenormalizerInterface');
+        $namespace
+            ->addStmt($this->factory->use(NormalizerInterface::class))
+            ->addStmt($this->factory->use(DenormalizerInterface::class));
+
+        $class->implement('NormalizerInterface', 'DenormalizerInterface');
 
         // public function getSupportedTypes(?string $format): array;
-        $generator->addMethod(Method::create('getSupportedTypes')
-            ->addArgument('format', '?string')
+        $class->addStmt($this->factory->method('getSupportedTypes')
+            ->makePublic()
+            ->addParam($this->factory->param('format')->setType('?string'))
             ->setReturnType('array')
-            ->setBody(sprintf('return [%s::class => true];', $definition->getSourceClassName()))
+            ->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_([
+                new Node\ArrayItem(
+                    new Node\Expr\ConstFetch(new Node\Name('true')),
+                    new Node\Expr\ClassConstFetch(new Node\Name($definition->getSourceClassName()), 'class')
+                ),
+            ])))
         );
 
         // public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool;
-        $generator->addMethod(Method::create('supportsNormalization')
-            ->addArgument('data', 'mixed')
-            ->addArgument('format', '?string', null)
-            ->addArgument('context', 'array', [])
+        $class->addStmt($this->factory->method('supportsNormalization')
+            ->makePublic()
+            ->addParam($this->factory->param('data')->setType('mixed'))
+            ->addParam($this->factory->param('format')->setType('string')->setDefault(null))
+            ->addParam($this->factory->param('context')->setType('array')->setDefault([]))
             ->setReturnType('bool')
-            ->setBody(sprintf('return $data instanceof %s;', $definition->getSourceClassName()))
+            ->addStmt(new Node\Stmt\Return_(new Node\Expr\Instanceof_(
+                new Node\Expr\Variable('data'),
+                new Node\Name($definition->getSourceClassName())
+            )))
         );
 
         // public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool;
-        $generator->addMethod(Method::create('supportsDenormalization')
-            ->addArgument('data', 'mixed')
-            ->addArgument('type', 'string')
-            ->addArgument('format', '?string', null)
-            ->addArgument('context', 'array', [])
+        $class->addStmt($this->factory->method('supportsDenormalization')
+            ->makePublic()
+            ->addParam($this->factory->param('data')->setType('mixed'))
+            ->addParam($this->factory->param('type')->setType('string'))
+            ->addParam($this->factory->param('format')->setType('string')->setDefault(null))
+            ->addParam($this->factory->param('context')->setType('array')->setDefault([]))
             ->setReturnType('bool')
-            ->setBody(sprintf('return $type === %s::class;', $definition->getSourceClassName()))
+            ->addStmt(new Node\Stmt\Return_(new Node\Expr\BinaryOp\Identical(
+                new Node\Expr\Variable('type'),
+                new Node\Expr\ClassConstFetch(new Node\Name($definition->getSourceClassName()), 'class')
+            )))
         );
     }
 
-    private function addDenormailizeMethod(ClassGenerator $generator, ClassDefinition $definition): void
+    private function addDenormailizeMethod(ClassDefinition $definition, Namespace_ $namespace, Class_ $class): void
     {
         $needsChildDenormalizer = false;
-        $preCreateObject = '';
+        $body = [];
 
         if (ClassDefinition::CONSTRUCTOR_NONE === $definition->getConstructorType()) {
-            $body = sprintf('$output = new %s();', $definition->getSourceClassName()).\PHP_EOL;
+            $body[] = new Node\Stmt\Expression(new Node\Expr\Assign(
+                new Node\Expr\Variable('output'),
+                new Node\Expr\New_(
+                    new Node\Name($definition->getSourceClassName())
+                )
+            ));
         } elseif (ClassDefinition::CONSTRUCTOR_PUBLIC !== $definition->getConstructorType()) {
-            $body = sprintf('$output = (new \\ReflectionClass(%s::class))->newInstanceWithoutConstructor();', $definition->getSourceClassName()).\PHP_EOL;
+            $body[] = new Node\Stmt\Expression(new Node\Expr\Assign(
+                new Node\Expr\Variable('output'),
+                $this->factory->methodCall(
+                    new Node\Expr\New_(
+                        new Node\Name\FullyQualified('ReflectionClass'),
+                        [new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($definition->getSourceClassName()), 'class'))]
+                    ),
+                    'newInstanceWithoutConstructor'
+            )));
         } else {
-            $body = sprintf('$output = new %s(', $definition->getSourceClassName()).\PHP_EOL;
+            $constructorArguments = [];
 
             foreach ($definition->getConstructorArguments() as $i => $propertyDefinition) {
-                $body .= '    ';
-                $variable = sprintf('$data[\'%s\']', $propertyDefinition->getNormalizedName());
+                $variable = new Node\Expr\ArrayDimFetch(new Node\Expr\Variable('data'), new Node\Scalar\String_($propertyDefinition->getNormalizedName()));
                 $targetClasses = $propertyDefinition->getNonPrimitiveTypes();
                 $canBeIterable = $propertyDefinition->isCollection();
 
                 if ([] === $targetClasses && $propertyDefinition->hasConstructorDefaultValue()) {
-                    $variable .= ' ?? '.var_export($propertyDefinition->getConstructorDefaultValue(), true);
-                } elseif ([] !== $targetClasses) {
-                    $needsChildDenormalizer = true;
-                    $printedCanBeIterable = $canBeIterable ? 'true' : 'false';
-                    $tempVariableName = '$argument'.$i;
-
-                    if (\count($targetClasses) > 1) {
-                        $variableOutput = $this->generateCodeToDeserializeMultiplePossibleClasses($targetClasses, $printedCanBeIterable, $tempVariableName, $variable, $propertyDefinition->getNormalizedName(), $definition->getNamespaceAndClass());
-                    } else {
-                        $variableOutput = <<<PHP
-{$tempVariableName} = \$this->denormalizeChild($variable, \\{$targetClasses[0]}::class, \$format, \$context, $printedCanBeIterable);
-
-PHP;
-                    }
-
-                    if ($propertyDefinition->hasConstructorDefaultValue()) {
-                        $export = var_export($propertyDefinition->getConstructorDefaultValue(), true);
-                        $variableOutput = <<<PHP
-if (!array_key_exists('{$propertyDefinition->getNormalizedName()}', \$data)) {
-    {$tempVariableName} = {$export};
-} else {
-    {$variableOutput}
-}
-PHP;
-                    }
-
-                    // Make sure we continue to reference the temp var
-                    $variable = $tempVariableName;
-                    $preCreateObject .= $variableOutput;
+                    $constructorArguments[] = new Node\Arg(new Node\Expr\BinaryOp\Coalesce(
+                        $variable,
+                        $this->factory->val($propertyDefinition->getConstructorDefaultValue())
+                    ));
+                    continue;
+                } elseif ([] === $targetClasses) {
+                    $constructorArguments[] = new Node\Arg(new Node\Expr\Variable($variable));
+                    continue;
                 }
 
-                $body .= $variable.','.\PHP_EOL;
+                $needsChildDenormalizer = true;
+                $tempVariableName = 'argument'.$i;
+
+                if (\count($targetClasses) > 1) {
+                    $variableOutput = $this->generateCodeToDeserializeMultiplePossibleClasses($targetClasses, $canBeIterable, $tempVariableName, $variable, $propertyDefinition->getNormalizedName(), $definition->getNamespaceAndClass());
+                } else {
+                    $variableOutput = [
+                        new Node\Stmt\Expression(
+                            new Node\Expr\Assign(
+                                new Node\Expr\Variable($tempVariableName),
+                                $this->factory->methodCall(
+                                    new Node\Expr\Variable('this'),
+                                    'denormalizeChild',
+                                    [
+                                        new Node\Arg($variable),
+                                        new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($targetClasses[0]), 'class')),
+                                        new Node\Arg(new Node\Expr\Variable('format')),
+                                        new Node\Arg(new Node\Expr\Variable('context')),
+                                        new Node\Arg(new Expr\ConstFetch(new Node\Name($canBeIterable ? 'true' : 'false'))),
+                                    ]
+                                )
+                            )
+                        ),
+                    ];
+                }
+
+                if ($propertyDefinition->hasConstructorDefaultValue()) {
+                    $variableOutput = [new Node\Stmt\If_(new Expr\BooleanNot(
+                        $this->factory->funcCall('array_key_exists', [
+                            new Node\Arg(new Node\Scalar\String_($propertyDefinition->getNormalizedName())),
+                            new Node\Arg(new Node\Expr\Variable('data')),
+                        ])
+                    ), [
+                        'stmts' => [
+                            new Node\Stmt\Expression(new Node\Expr\Assign(
+                                new Node\Expr\Variable($tempVariableName),
+                                $this->factory->val($propertyDefinition->getConstructorDefaultValue())
+                            )),
+                        ],
+                        'else' => $variableOutput
+                        ]
+                    )];
+                }
+
+                // Add $variableOutput to the end of $body
+                $body = array_merge($body, $variableOutput);
+
+                $constructorArguments[] = new Node\Arg(new Node\Expr\Variable($tempVariableName));
             }
 
-            $body .= ');'.\PHP_EOL;
+            $body[] = new Node\Stmt\Expression(new Node\Expr\Assign(
+                new Node\Expr\Variable('output'),
+                new Node\Expr\New_(
+                    new Node\Name($definition->getSourceClassName()),
+                    $constructorArguments
+                ),
+            ));
         }
 
+        // Start working with non-constructor properties
         $i = 0;
         foreach ($definition->getDefinitions() as $propertyDefinition) {
             if (!$propertyDefinition->isWriteable() || $propertyDefinition->isConstructorArgument()) {
                 continue;
             }
 
-            $variable = sprintf('$data[\'%s\']', $propertyDefinition->getNormalizedName());
-            $accessor = '';
+            $tempVariableName = null;
+            $variableOutput = [];
+
+            $variable = new Node\Expr\ArrayDimFetch(new Node\Expr\Variable('data'), new Node\Scalar\String_($propertyDefinition->getNormalizedName()));
             $targetClasses = $propertyDefinition->getNonPrimitiveTypes();
 
             if ([] !== $targetClasses) {
                 $needsChildDenormalizer = true;
-                $printedCanBeIterable = $propertyDefinition->isCollection() ? 'true' : 'false';
-                $tempVariableName = '$setter'.$i++;
+                $tempVariableName = 'setter'.$i++;
 
                 if (\count($targetClasses) > 1) {
-                    $accessor .= $this->generateCodeToDeserializeMultiplePossibleClasses($targetClasses, $printedCanBeIterable, $tempVariableName, $variable, $propertyDefinition->getNormalizedName(), $definition->getNamespaceAndClass());
+                    $variableOutput = $this->generateCodeToDeserializeMultiplePossibleClasses($targetClasses, $propertyDefinition->isCollection(), $tempVariableName, $variable, $propertyDefinition->getNormalizedName(), $definition->getNamespaceAndClass());
                 } else {
-                    $accessor .= <<<PHP
-{$tempVariableName} = \$this->denormalizeChild($variable, \\{$targetClasses[0]}::class, \$format, \$context, $printedCanBeIterable);
-
-PHP;
+                    $variableOutput = [
+                        new Node\Stmt\Expression(
+                            new Node\Expr\Assign(
+                                new Node\Expr\Variable($tempVariableName),
+                                $this->factory->methodCall(
+                                    new Node\Expr\Variable('this'),
+                                    'denormalizeChild',
+                                    [
+                                        new Node\Arg($variable),
+                                        new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($targetClasses[0]), 'class')),
+                                        new Node\Arg(new Node\Expr\Variable('format')),
+                                        new Node\Arg(new Node\Expr\Variable('context')),
+                                        new Node\Arg(new Expr\ConstFetch(new Node\Name($propertyDefinition->isCollection() ? 'true' : 'false'))),
+                                    ]
+                                )
+                            )
+                        ),
+                    ];
                 }
-                $accessor .= '    ';
 
-                // Make sure we continue to reference the temp var
-                $variable = $tempVariableName;
+
             }
 
+            $result = $tempVariableName === null ? $variable : new Node\Expr\Variable($tempVariableName);
             if (null !== $method = $propertyDefinition->getSetterName()) {
-                $accessor .= sprintf('$output->%s(%s);', $method, $variable);
+                $variableOutput[] = new Node\Stmt\Expression(new Node\Expr\MethodCall(
+                    new Node\Expr\Variable('output'),
+                    $method,
+                    [new Node\Arg($result)]
+                ));
             } else {
-                $accessor .= sprintf('$output->%s = %s;', $propertyDefinition->getPropertyName(), $variable);
+                $variableOutput[] = new Node\Stmt\Expression(new Node\Expr\Assign(
+                    new Node\Expr\PropertyFetch(new Node\Expr\Variable('output'), $propertyDefinition->getPropertyName()),
+                    $result
+                ));
             }
 
-            $body .= <<<PHP
-if (array_key_exists('{$propertyDefinition->getNormalizedName()}', \$data)) {
-    $accessor
-}
-
-PHP;
+            $body[] = new Node\Stmt\If_(
+                $this->factory->funcCall('array_key_exists', [
+                    new Node\Arg(new Node\Scalar\String_($propertyDefinition->getNormalizedName())),
+                    new Node\Arg(new Node\Expr\Variable('data')),
+                ]),
+                ['stmts' => $variableOutput]
+            );
         }
 
-        $body .= \PHP_EOL.'return $output;';
-
-        $generator->addMethod(Method::create('denormalize')
-            ->addArgument('data', 'mixed')
-            ->addArgument('type', 'string')
-            ->addArgument('format', '?string', null)
-            ->addArgument('context', 'array', [])
+        $class->addStmt($this->factory->method('denormalize')
+            ->makePublic()
+            ->addParam($this->factory->param('data')->setType('mixed'))
+            ->addParam($this->factory->param('type')->setType('string'))
+            ->addParam($this->factory->param('format')->setType('?string')->setDefault(null))
+            ->addParam($this->factory->param('context')->setType('array')->setDefault([]))
             ->setReturnType('mixed')
-            ->setBody($preCreateObject.\PHP_EOL.$body));
+            ->addStmts([])
+            ->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('output')))
+        );
 
         if ($needsChildDenormalizer) {
-            $this->generateDenormalizeChildMethod($generator);
+            $this->generateDenormalizeChildMethod($namespace, $class);
         }
     }
 
-    private function addNormailizeMethod(ClassGenerator $generator, ClassDefinition $definition): void
+    private function addNormailizeMethod(ClassDefinition $definition, Namespace_ $namespace, Class_ $class): void
     {
-        $body = '';
+        $bodyArrayItems = [];
         $needsChildNormalizer = false;
         foreach ($definition->getDefinitions() as $propertyDefinition) {
             if (!$propertyDefinition->isReadable()) {
@@ -292,61 +538,136 @@ PHP;
             }
 
             if (null !== $method = $propertyDefinition->getGetterName()) {
-                $accessor = sprintf('$object->%s()', $method);
+                // $object->$method()
+                $accessor = $this->factory->methodCall(new Node\Expr\Variable('object'), $method);
             } else {
-                $accessor = sprintf('$object->%s', $propertyDefinition->getPropertyName());
+                // $object->property
+                $accessor = $this->factory->propertyFetch(new Node\Expr\Variable('object'), $propertyDefinition->getPropertyName());
             }
 
             if ($propertyDefinition->hasNoTypeDefinition() || [] !== $propertyDefinition->getNonPrimitiveTypes()) {
                 $needsChildNormalizer = true;
-                $accessor = sprintf('$this->normalizeChild(%s, $format, $context, %s)', $accessor, $propertyDefinition->isCollection() || $propertyDefinition->hasNoTypeDefinition() ? 'true' : 'false');
+                // $this->normalizeChild($accessor, $format, $context, bool);
+                $accessor = $this->factory->methodCall(new Node\Expr\Variable('this'), 'normalizeChild', [
+                    $accessor,
+                    new Node\Arg(new Node\Expr\Variable('format')),
+                    new Node\Arg(new Node\Expr\Variable('context')),
+                    new Node\Arg(new Node\Expr\ConstFetch(new Node\Name($propertyDefinition->isCollection() || $propertyDefinition->hasNoTypeDefinition() ? 'true' : 'false'))),
+                ]);
             }
 
-            $body .= <<<PHP
-    '{$propertyDefinition->getNormalizedName()}' => $accessor,
-PHP.\PHP_EOL;
+            $bodyArrayItems[] = new Node\ArrayItem($accessor, new Node\Scalar\String_($propertyDefinition->getNormalizedName()));
         }
 
         // public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
-        $generator->addMethod(Method::create('normalize')
-            ->addArgument('object', 'mixed')
-            ->addArgument('format', '?string', null)
-            ->addArgument('context', 'array', [])
+        $class->addStmt($this->factory->method('normalize')
+            ->makePublic()
+            ->addParam($this->factory->param('object')->setType('mixed'))
+            ->addParam($this->factory->param('format')->setType('string')->setDefault(null))
+            ->addParam($this->factory->param('context')->setType('array')->setDefault([]))
             ->setReturnType('array|string|int|float|bool|\ArrayObject|null')
-            ->setComment(sprintf('@param %s $object', $definition->getSourceClassName()))
-            ->setBody('return ['.\PHP_EOL.$body.'];')
-        );
+            ->setDocComment(sprintf('/*'.PHP_EOL.'* @param %s $object'.PHP_EOL.'*/', $definition->getSourceClassName()))
+            ->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($bodyArrayItems))));
 
         if ($needsChildNormalizer) {
-            $this->generateNormalizeChildMethod($generator);
+            $this->generateNormalizeChildMethod($namespace, $class);
         }
     }
 
     /**
      * When the type-hint has many different classes, then we need to try to denormalize them
      * one by one. We are happy when we dont get any exceptions thrown.
+     *
+     * @return Node\Stmt[]
      */
-    private function generateCodeToDeserializeMultiplePossibleClasses(array $targetClasses, string $printedCanBeIterable, string $tempVariableName, string $variable, string $keyName, string $classNs): string
+    private function generateCodeToDeserializeMultiplePossibleClasses(array $targetClasses, bool $canBeIterable, string $tempVariableName, Expr $variable, string $keyName, string $classNs): array
     {
-        $printedArray = str_replace(\PHP_EOL, '', var_export($targetClasses, true));
+        $arrayItems = [];
+        foreach ($targetClasses as $class) {
+            $arrayItems[] = new Node\ArrayItem(new Node\Scalar\String_($class));
+        }
 
-        return <<<PHP
-\$exceptions = [];
-{$tempVariableName}HasValue = false;
-foreach ($printedArray as \$class) {
-    try {
-        {$tempVariableName} = \$this->denormalizeChild($variable, \$class, \$format, \$context, $printedCanBeIterable);
-        {$tempVariableName}HasValue = true;
-        break;
-    } catch (\Throwable \$e) {
-        \$exceptions[] = \$e;
-    }
-}
-if (!{$tempVariableName}HasValue) {
-    throw new DenormalizingUnionFailedException('Failed to denormalize key "$keyName" of class "$classNs".', \$exceptions);
-}
+        return [
+            new Node\Stmt\Expression(
+                new Node\Expr\Assign(
+                    new Node\Expr\Variable('exceptions'),
+                    new Node\Expr\Array_()
+                )
+            ),
+            new Node\Stmt\Expression(
+                new Node\Expr\Assign(
+                    new Node\Expr\Variable($tempVariableName.'HasValue'),
+                    new Node\Expr\ConstFetch(new Node\Name('false'))
+                )
+            ),
+            new Node\Stmt\Foreach_(
+                new Node\Expr\Array_($arrayItems),
+                new Node\Expr\Variable('class'),
+                [
+                    'stmts' => [
+                        new Node\Stmt\TryCatch(
+                            // statements
+                            [
+                                new Node\Stmt\Expression(
+                                    new Node\Expr\Assign(
+                                        new Node\Expr\Variable($tempVariableName),
+                                        $this->factory->methodCall(
+                                            new Node\Expr\Variable('this'),
+                                            'denormalizeChild',
+                                            [
+                                                new Node\Arg($variable),
+                                                new Node\Arg(new Node\Expr\Variable('class')),
+                                                new Node\Arg(new Node\Expr\Variable('format')),
+                                                new Node\Arg(new Node\Expr\Variable('context')),
+                                                new Node\Arg(new Expr\ConstFetch(new Node\Name($canBeIterable ? 'true' : 'false'))),
+                                            ]
+                                        )
+                                    )
+                                ),
+                                new Node\Stmt\Expression(
+                                    new Node\Expr\Assign(
+                                        new Node\Expr\Variable($tempVariableName.'HasValue'),
+                                        new Node\Expr\ConstFetch(new Node\Name('true'))
+                                    )
+                                ),
+                                new Node\Stmt\Break_(),
+                            ],
+                            // Catches
+                            [
+                                new Node\Stmt\Catch_(
+                                    [new Node\Name\FullyQualified(\Throwable::class)],
+                                    new Node\Expr\Variable('e'),
+                                    [
+                                        new Node\Stmt\Expression(
+                                            new Node\Expr\Assign(
+                                                new Node\Expr\ArrayDimFetch(new Node\Expr\Variable('exceptions')),
+                                                new Node\Expr\Variable('e')
+                                            )
+                                        )
+                                    ]
+                                ),
+                            ],
+                        ),
+                    ],
+                ]
+            ), // end foreach
+            new Node\Stmt\If_(
+                new Node\Expr\BooleanNot(new Node\Expr\Variable($tempVariableName.'HasValue')),
+                [
+                    'stmts' => [
+                        new Node\Expr\Throw_(
+                            new Node\Expr\New_(
+                                new Node\Name\FullyQualified(DenormalizingUnionFailedException::class),
+                                [
+                                    new Node\Arg(new Node\Scalar\String_('Failed to denormalize key "'.$keyName.'" of class "'.$classNs.'".')),
+                                    new Node\Arg(new Node\Expr\Variable('exceptions')),
+                                ]
+                            )
+                        ),
+                    ],
+                ]
+            ),
+        ];
 
-
-PHP;
     }
 }

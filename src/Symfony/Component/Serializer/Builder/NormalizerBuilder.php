@@ -140,22 +140,18 @@ class NormalizerBuilder
                                     new Node\Name('array_map'),
                                     [
                                         new Node\Arg(
-                                            new Node\Expr\Closure([
+                                            new Node\Expr\ArrowFunction([
                                                 'params' => [new Node\Param(new Node\Expr\Variable('item'))],
-                                                'stmts' => [
-                                                    new Node\Stmt\Return_(
-                                                        $this->factory->methodCall(
-                                                            new Node\Expr\Variable('this'),
-                                                            'normalizeChild',
-                                                            [
-                                                                new Node\Arg(new Node\Expr\Variable('item')),
-                                                                new Node\Arg(new Node\Expr\Variable('format')),
-                                                                new Node\Arg(new Node\Expr\Variable('context')),
-                                                                new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
-                                                            ]
-                                                        )
-                                                    ),
-                                                ],
+                                                'expr' => $this->factory->methodCall(
+                                                    new Node\Expr\Variable('this'),
+                                                    'normalizeChild',
+                                                    [
+                                                        new Node\Arg(new Node\Expr\Variable('item')),
+                                                        new Node\Arg(new Node\Expr\Variable('format')),
+                                                        new Node\Arg(new Node\Expr\Variable('context')),
+                                                        new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
+                                                    ]
+                                                )
                                             ])
                                         ),
                                         new Node\Arg(new Node\Expr\Variable('object')),
@@ -251,23 +247,19 @@ class NormalizerBuilder
                                     new Node\Name('array_map'),
                                     [
                                         new Node\Arg(
-                                            new Node\Expr\Closure([
+                                            new Node\Expr\ArrowFunction([
                                                 'params' => [new Node\Param(new Node\Expr\Variable('item'))],
-                                                'stmts' => [
-                                                    new Node\Stmt\Return_(
-                                                        $this->factory->methodCall(
-                                                            new Node\Expr\Variable('this'),
-                                                            'denormalizeChild',
-                                                            [
-                                                                new Node\Arg(new Node\Expr\Variable('item')),
-                                                                new Node\Arg(new Node\Expr\Variable('type')),
-                                                                new Node\Arg(new Node\Expr\Variable('format')),
-                                                                new Node\Arg(new Node\Expr\Variable('context')),
-                                                                new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
-                                                            ]
-                                                        )
-                                                    ),
-                                                ],
+                                                'expr' => $this->factory->methodCall(
+                                                    new Node\Expr\Variable('this'),
+                                                    'denormalizeChild',
+                                                    [
+                                                        new Node\Arg(new Node\Expr\Variable('item')),
+                                                        new Node\Arg(new Node\Expr\Variable('type')),
+                                                        new Node\Arg(new Node\Expr\Variable('format')),
+                                                        new Node\Arg(new Node\Expr\Variable('context')),
+                                                        new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
+                                                    ]
+                                                )
                                             ])
                                         ),
                                         new Node\Arg(new Node\Expr\Variable('data')),
@@ -376,14 +368,23 @@ class NormalizerBuilder
                 $targetClasses = $propertyDefinition->getNonPrimitiveTypes();
                 $canBeIterable = $propertyDefinition->isCollection();
 
+                $defaultValue = $propertyDefinition->getConstructorDefaultValue();
+                if (is_object($defaultValue)) {
+                    // public function __construct($foo = new \stdClass());
+                    // There is no support for parameters to the object.
+                    $defaultValue = new Expr\New_(new Node\Name\FullyQualified(get_class($defaultValue)));
+                } else {
+                    $defaultValue = $this->factory->val($defaultValue);
+                }
+
                 if ([] === $targetClasses && $propertyDefinition->hasConstructorDefaultValue()) {
                     $constructorArguments[] = new Node\Arg(new Node\Expr\BinaryOp\Coalesce(
                         $variable,
-                        $this->factory->val($propertyDefinition->getConstructorDefaultValue())
+                        $defaultValue
                     ));
                     continue;
                 } elseif ([] === $targetClasses) {
-                    $constructorArguments[] = new Node\Arg(new Node\Expr\Variable($variable));
+                    $constructorArguments[] = new Node\Arg($variable);
                     continue;
                 }
 
@@ -402,7 +403,7 @@ class NormalizerBuilder
                                     'denormalizeChild',
                                     [
                                         new Node\Arg($variable),
-                                        new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($targetClasses[0]), 'class')),
+                                        new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name\FullyQualified($targetClasses[0]), 'class')),
                                         new Node\Arg(new Node\Expr\Variable('format')),
                                         new Node\Arg(new Node\Expr\Variable('context')),
                                         new Node\Arg(new Expr\ConstFetch(new Node\Name($canBeIterable ? 'true' : 'false'))),
@@ -423,10 +424,10 @@ class NormalizerBuilder
                         'stmts' => [
                             new Node\Stmt\Expression(new Node\Expr\Assign(
                                 new Node\Expr\Variable($tempVariableName),
-                                $this->factory->val($propertyDefinition->getConstructorDefaultValue())
+                                $defaultValue
                             )),
                         ],
-                        'else' => $variableOutput
+                        'else' => new Node\Stmt\Else_($variableOutput)
                         ]
                     )];
                 }
@@ -475,7 +476,7 @@ class NormalizerBuilder
                                     'denormalizeChild',
                                     [
                                         new Node\Arg($variable),
-                                        new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($targetClasses[0]), 'class')),
+                                        new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name\FullyQualified($targetClasses[0]), 'class')),
                                         new Node\Arg(new Node\Expr\Variable('format')),
                                         new Node\Arg(new Node\Expr\Variable('context')),
                                         new Node\Arg(new Expr\ConstFetch(new Node\Name($propertyDefinition->isCollection() ? 'true' : 'false'))),
@@ -519,7 +520,7 @@ class NormalizerBuilder
             ->addParam($this->factory->param('format')->setType('?string')->setDefault(null))
             ->addParam($this->factory->param('context')->setType('array')->setDefault([]))
             ->setReturnType('mixed')
-            ->addStmts([])
+            ->addStmts($body)
             ->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('output')))
         );
 
@@ -566,7 +567,7 @@ class NormalizerBuilder
             ->addParam($this->factory->param('format')->setType('string')->setDefault(null))
             ->addParam($this->factory->param('context')->setType('array')->setDefault([]))
             ->setReturnType('array|string|int|float|bool|\ArrayObject|null')
-            ->setDocComment(sprintf('/*'.PHP_EOL.'* @param %s $object'.PHP_EOL.'*/', $definition->getSourceClassName()))
+            ->setDocComment(sprintf('/**'.PHP_EOL.'* @param %s $object'.PHP_EOL.'*/', $definition->getSourceClassName()))
             ->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($bodyArrayItems))));
 
         if ($needsChildNormalizer) {
@@ -584,7 +585,7 @@ class NormalizerBuilder
     {
         $arrayItems = [];
         foreach ($targetClasses as $class) {
-            $arrayItems[] = new Node\ArrayItem(new Node\Scalar\String_($class));
+            $arrayItems[] = new Node\ArrayItem(new Expr\ClassConstFetch(new Node\Name\FullyQualified($class), 'class'));
         }
 
         return [
@@ -655,15 +656,17 @@ class NormalizerBuilder
                 new Node\Expr\BooleanNot(new Node\Expr\Variable($tempVariableName.'HasValue')),
                 [
                     'stmts' => [
-                        new Node\Expr\Throw_(
-                            new Node\Expr\New_(
-                                new Node\Name\FullyQualified(DenormalizingUnionFailedException::class),
-                                [
-                                    new Node\Arg(new Node\Scalar\String_('Failed to denormalize key "'.$keyName.'" of class "'.$classNs.'".')),
-                                    new Node\Arg(new Node\Expr\Variable('exceptions')),
-                                ]
-                            )
-                        ),
+                        new Node\Stmt\Expression(
+                            new Node\Expr\Throw_(
+                                new Node\Expr\New_(
+                                    new Node\Name('DenormalizingUnionFailedException'),
+                                    [
+                                        new Node\Arg(new Node\Scalar\String_('Failed to denormalize key "'.$keyName.'" of class "'.$classNs.'".')),
+                                        new Node\Arg(new Node\Expr\Variable('exceptions')),
+                                    ]
+                                )
+                            ),
+                        )
                     ],
                 ]
             ),

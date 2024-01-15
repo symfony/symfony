@@ -32,7 +32,7 @@ $builder = new NormalizerBuilder();
 
 echo \PHP_EOL;
 $i = 0;
-foreach (FixtureHelper::getFixturesAndResultFiles() as [$class => $outputFile]) {
+foreach (FixtureHelper::getFixturesAndResultFiles() as $class => $outputFile) {
     $definition = $definitionExtractor->getDefinition($class);
     $result = $builder->build($definition, $outputDir);
     $result->loadClass();

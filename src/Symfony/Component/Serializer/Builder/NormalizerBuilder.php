@@ -13,16 +13,16 @@ namespace Symfony\Component\Serializer\Builder;
 
 use PhpParser\Builder\Class_;
 use PhpParser\Builder\Namespace_;
+use PhpParser\BuilderFactory;
+use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter;
 use Symfony\Component\Serializer\Exception\DenormalizingUnionFailedException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use PhpParser\BuilderFactory;
-use PhpParser\PrettyPrinter;
-use PhpParser\Node;
 
 /**
  * The main class to create a new Normalizer from a ClassDefinition.
@@ -42,7 +42,7 @@ class NormalizerBuilder
             throw new \LogicException(sprintf('You cannot use "%s" as the "nikic/php-parser" package is not installed. Try running "composer require nikic/php-parser".', static::class));
         }
 
-        $this->factory = new BuilderFactory;
+        $this->factory = new BuilderFactory();
         $this->printer = new PrettyPrinter\Standard();
     }
 
@@ -99,7 +99,6 @@ class NormalizerBuilder
             )
         );
 
-
         // private function normalizeChild(mixed $object, ?string $format, array $context, bool $canBeIterable): mixed;
         $class->addStmt($this->factory->method('normalizeChild')
             ->makePrivate()
@@ -151,7 +150,7 @@ class NormalizerBuilder
                                                         new Node\Arg(new Node\Expr\Variable('context')),
                                                         new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
                                                     ]
-                                                )
+                                                ),
                                             ])
                                         ),
                                         new Node\Arg(new Node\Expr\Variable('object')),
@@ -204,7 +203,6 @@ class NormalizerBuilder
                 )
             )
         );
-
 
         // private function denormalizeChild(mixed $data, string $type, ?string $format, array $context, bool $canBeIterable): mixed;
         $class->addStmt($this->factory->method('denormalizeChild')
@@ -259,7 +257,7 @@ class NormalizerBuilder
                                                         new Node\Arg(new Node\Expr\Variable('context')),
                                                         new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
                                                     ]
-                                                )
+                                                ),
                                             ])
                                         ),
                                         new Node\Arg(new Node\Expr\Variable('data')),
@@ -359,7 +357,7 @@ class NormalizerBuilder
                         [new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($definition->getSourceClassName()), 'class'))]
                     ),
                     'newInstanceWithoutConstructor'
-            )));
+                )));
         } else {
             $constructorArguments = [];
 
@@ -369,10 +367,10 @@ class NormalizerBuilder
                 $canBeIterable = $propertyDefinition->isCollection();
 
                 $defaultValue = $propertyDefinition->getConstructorDefaultValue();
-                if (is_object($defaultValue)) {
+                if (\is_object($defaultValue)) {
                     // public function __construct($foo = new \stdClass());
                     // There is no support for parameters to the object.
-                    $defaultValue = new Expr\New_(new Node\Name\FullyQualified(get_class($defaultValue)));
+                    $defaultValue = new Expr\New_(new Node\Name\FullyQualified($defaultValue::class));
                 } else {
                     $defaultValue = $this->factory->val($defaultValue);
                 }
@@ -427,7 +425,7 @@ class NormalizerBuilder
                                 $defaultValue
                             )),
                         ],
-                        'else' => new Node\Stmt\Else_($variableOutput)
+                        'else' => new Node\Stmt\Else_($variableOutput),
                         ]
                     )];
                 }
@@ -486,11 +484,9 @@ class NormalizerBuilder
                         ),
                     ];
                 }
-
-
             }
 
-            $result = $tempVariableName === null ? $variable : new Node\Expr\Variable($tempVariableName);
+            $result = null === $tempVariableName ? $variable : new Node\Expr\Variable($tempVariableName);
             if (null !== $method = $propertyDefinition->getSetterName()) {
                 $variableOutput[] = new Node\Stmt\Expression(new Node\Expr\MethodCall(
                     new Node\Expr\Variable('output'),
@@ -567,7 +563,7 @@ class NormalizerBuilder
             ->addParam($this->factory->param('format')->setType('string')->setDefault(null))
             ->addParam($this->factory->param('context')->setType('array')->setDefault([]))
             ->setReturnType('array|string|int|float|bool|\ArrayObject|null')
-            ->setDocComment(sprintf('/**'.PHP_EOL.'* @param %s $object'.PHP_EOL.'*/', $definition->getSourceClassName()))
+            ->setDocComment(sprintf('/**'.\PHP_EOL.'* @param %s $object'.\PHP_EOL.'*/', $definition->getSourceClassName()))
             ->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($bodyArrayItems))));
 
         if ($needsChildNormalizer) {
@@ -644,7 +640,7 @@ class NormalizerBuilder
                                                 new Node\Expr\ArrayDimFetch(new Node\Expr\Variable('exceptions')),
                                                 new Node\Expr\Variable('e')
                                             )
-                                        )
+                                        ),
                                     ]
                                 ),
                             ],
@@ -666,11 +662,10 @@ class NormalizerBuilder
                                     ]
                                 )
                             ),
-                        )
+                        ),
                     ],
                 ]
             ),
         ];
-
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarExporter\Internal;
 
-if (\PHP_VERSION_ID >= 80300) {
+if (\PHP_VERSION_ID >= 8_03_00) {
     /**
      * @internal
      */

@@ -30,7 +30,7 @@ final class DatePoint extends \DateTimeImmutable
                 $now = static::createFromInterface($now);
             }
 
-            if (\PHP_VERSION_ID < 80300) {
+            if (\PHP_VERSION_ID < 8_03_00) {
                 try {
                     $timezone = (new parent($datetime, $timezone ?? $now->getTimezone()))->getTimezone();
                 } catch (\Exception $e) {
@@ -81,7 +81,7 @@ final class DatePoint extends \DateTimeImmutable
      */
     public function modify(string $modifier): static
     {
-        if (\PHP_VERSION_ID < 80300) {
+        if (\PHP_VERSION_ID < 8_03_00) {
             return @parent::modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? sprintf('Invalid modifier: "%s".', $modifier));
         }
 

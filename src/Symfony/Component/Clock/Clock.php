@@ -71,7 +71,7 @@ final class Clock implements ClockInterface
      */
     public function withTimeZone(\DateTimeZone|string $timezone): static
     {
-        if (\PHP_VERSION_ID >= 80300 && \is_string($timezone)) {
+        if (\PHP_VERSION_ID >= 8_03_00 && \is_string($timezone)) {
             $timezone = new \DateTimeZone($timezone);
         } elseif (\is_string($timezone)) {
             try {

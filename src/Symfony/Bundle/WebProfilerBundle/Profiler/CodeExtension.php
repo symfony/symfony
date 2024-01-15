@@ -123,7 +123,7 @@ final class CodeExtension extends AbstractExtension
             // highlight_file could throw warnings
             // see https://bugs.php.net/25725
             $code = @highlight_file($file, true);
-            if (\PHP_VERSION_ID >= 80300) {
+            if (\PHP_VERSION_ID >= 8_03_00) {
                 // remove main pre/code tags
                 $code = preg_replace('#^<pre.*?>\s*<code.*?>(.*)</code>\s*</pre>#s', '\\1', $code);
                 // split multiline code tags

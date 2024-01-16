@@ -53,7 +53,7 @@ class InputOption
     private string $name;
     private string|array|null $shortcut;
     private int $mode;
-    private string|int|bool|array|null|float $default;
+    private string|int|bool|array|float|null $default;
 
     /**
      * @param string|array|null                                                             $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts

@@ -36,7 +36,7 @@ class Question
      */
     public function __construct(
         private string $question,
-        private null|string|bool|int|float $default = null,
+        private string|bool|int|float|null $default = null,
     ) {
     }
 

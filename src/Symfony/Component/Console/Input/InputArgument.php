@@ -30,7 +30,7 @@ class InputArgument
     public const IS_ARRAY = 4;
 
     private int $mode;
-    private string|int|bool|array|null|float $default;
+    private string|int|bool|array|float|null $default;
 
     /**
      * @param string                                                                        $name            The argument name

@@ -42,7 +42,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, new Charset(encodings: $encodings));
 
         $this->buildViolation('The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.')
-            ->setParameter('{{ detected }}', mb_detect_encoding($value, $encodings, true))
+            ->setParameter('{{ detected }}', 'UTF-8')
             ->setParameter('{{ encodings }}', implode(', ', $encodings))
             ->setCode(Charset::BAD_ENCODING_ERROR)
             ->assertRaised();

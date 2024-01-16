@@ -35,9 +35,9 @@ final class CharsetValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        if (!\in_array($detected = mb_detect_encoding($value, $constraint->encodings, true), (array) $constraint->encodings, true)) {
+        if (!\in_array(mb_detect_encoding($value, $constraint->encodings, true), (array) $constraint->encodings, true)) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ detected }}', $detected)
+                ->setParameter('{{ detected }}', mb_detect_encoding($value, strict: true))
                 ->setParameter('{{ encodings }}', implode(', ', $constraint->encodings))
                 ->setCode(Charset::BAD_ENCODING_ERROR)
                 ->addViolation();

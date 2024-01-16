@@ -38,7 +38,6 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgument
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
@@ -1930,9 +1929,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testHttpClientRetry()
     {
-        if (!class_exists(RetryableHttpClient::class)) {
-            $this->expectException(LogicException::class);
-        }
         $container = $this->createContainerFromFile('http_client_retry');
 
         $this->assertSame([429, 500 => ['GET', 'HEAD']], $container->getDefinition('http_client.retry_strategy')->getArgument(0));

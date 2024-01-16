@@ -19,6 +19,8 @@ use Symfony\Component\Mailer\Bridge\Mailjet\RemoteEvent\MailjetPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailjet\Webhook\MailjetRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\RemoteEvent\PostmarkPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
+use Symfony\Component\Mailer\Bridge\Resend\RemoteEvent\ResendPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Resend\Webhook\ResendRequestParser;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
 
@@ -43,6 +45,11 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.postmark', PostmarkRequestParser::class)
             ->args([service('mailer.payload_converter.postmark')])
         ->alias(PostmarkRequestParser::class, 'mailer.webhook.request_parser.postmark')
+
+        ->set('mailer.payload_converter.resend', ResendPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.resend', ResendRequestParser::class)
+            ->args([service('mailer.payload_converter.resend')])
+        ->alias(ResendRequestParser::class, 'mailer.webhook.request_parser.resend')
 
         ->set('mailer.payload_converter.sendgrid', SendgridPayloadConverter::class)
         ->set('mailer.webhook.request_parser.sendgrid', SendgridRequestParser::class)

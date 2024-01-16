@@ -33,8 +33,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class FormDataCollector extends DataCollector implements FormDataCollectorInterface
 {
-    private FormDataExtractorInterface $dataExtractor;
-
     /**
      * Stores the collected data per {@link FormInterface} instance.
      *
@@ -62,13 +60,12 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      */
     private array $formsByView;
 
-    public function __construct(FormDataExtractorInterface $dataExtractor)
-    {
+    public function __construct(
+        private FormDataExtractorInterface $dataExtractor,
+    ) {
         if (!class_exists(ClassStub::class)) {
             throw new \LogicException(sprintf('The VarDumper component is needed for using the "%s" class. Install symfony/var-dumper version 3.4 or above.', __CLASS__));
         }
-
-        $this->dataExtractor = $dataExtractor;
 
         $this->reset();
     }

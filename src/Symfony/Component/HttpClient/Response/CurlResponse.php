@@ -32,8 +32,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
     use TransportResponseTrait;
 
-    private CurlClientState $multi;
-
     /**
      * @var resource
      */
@@ -42,10 +40,16 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     /**
      * @internal
      */
-    public function __construct(CurlClientState $multi, \CurlHandle|string $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null, int $curlVersion = null, string $originalUrl = null)
-    {
-        $this->multi = $multi;
-
+    public function __construct(
+        private CurlClientState $multi,
+        \CurlHandle|string $ch,
+        array $options = null,
+        LoggerInterface $logger = null,
+        string $method = 'GET',
+        callable $resolveRedirect = null,
+        int $curlVersion = null,
+        string $originalUrl = null,
+    ) {
         if ($ch instanceof \CurlHandle) {
             $this->handle = $ch;
             $this->debugBuffer = fopen('php://temp', 'w+');

@@ -20,18 +20,15 @@ namespace Symfony\Component\Form\ChoiceList\View;
  */
 class ChoiceGroupView implements \IteratorAggregate
 {
-    public string $label;
-    public array $choices;
-
     /**
      * Creates a new choice group view.
      *
      * @param array<ChoiceGroupView|ChoiceView> $choices the choice views in the group
      */
-    public function __construct(string $label, array $choices = [])
-    {
-        $this->label = $label;
-        $this->choices = $choices;
+    public function __construct(
+        public string $label,
+        public array $choices = [],
+    ) {
     }
 
     /**

@@ -70,7 +70,6 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
-    private FormConfigInterface $config;
     private ?FormInterface $parent = null;
 
     /**
@@ -135,8 +134,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * @throws LogicException if a data mapper is not provided for a compound form
      */
-    public function __construct(FormConfigInterface $config)
-    {
+    public function __construct(
+        private FormConfigInterface $config,
+    ) {
         // Compound forms always need a data mapper, otherwise calls to
         // `setData` and `add` will not lead to the correct population of
         // the child forms.
@@ -150,7 +150,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $this->defaultDataSet = true;
         }
 
-        $this->config = $config;
         $this->children = new OrderedHashMap();
         $this->name = $config->getName();
     }

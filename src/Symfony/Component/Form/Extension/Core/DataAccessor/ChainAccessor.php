@@ -20,14 +20,12 @@ use Symfony\Component\Form\FormInterface;
  */
 class ChainAccessor implements DataAccessorInterface
 {
-    private iterable $accessors;
-
     /**
      * @param DataAccessorInterface[]|iterable $accessors
      */
-    public function __construct(iterable $accessors)
-    {
-        $this->accessors = $accessors;
+    public function __construct(
+        private iterable $accessors,
+    ) {
     }
 
     public function getValue(object|array $data, FormInterface $form): mixed

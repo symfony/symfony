@@ -33,7 +33,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     private static NativeRequestHandler $nativeRequestHandler;
 
-    private EventDispatcherInterface $dispatcher;
     private string $name;
     private ?PropertyPathInterface $propertyPath = null;
     private bool $mapped = true;
@@ -57,7 +56,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private string $method = 'POST';
     private RequestHandlerInterface $requestHandler;
     private bool $autoInitialize = false;
-    private array $options;
     private ?\Closure $isEmptyCallback = null;
 
     /**
@@ -69,8 +67,12 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws InvalidArgumentException if the data class is not a valid class or if
      *                                  the name contains invalid characters
      */
-    public function __construct(?string $name, ?string $dataClass, EventDispatcherInterface $dispatcher, array $options = [])
-    {
+    public function __construct(
+        ?string $name,
+        ?string $dataClass,
+        private EventDispatcherInterface $dispatcher,
+        private array $options = [],
+    ) {
         self::validateName($name);
 
         if (null !== $dataClass && !class_exists($dataClass) && !interface_exists($dataClass, false)) {
@@ -79,8 +81,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
         $this->name = (string) $name;
         $this->dataClass = $dataClass;
-        $this->dispatcher = $dispatcher;
-        $this->options = $options;
     }
 
     public function addEventListener(string $eventName, callable $listener, int $priority = 0): static

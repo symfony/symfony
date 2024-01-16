@@ -40,6 +40,7 @@
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/messenger": "^6.4|^7.0",
         "symfony/process": "^6.4|^7.0",
+        "symfony/rate-limiter": "^6.4|^7.0",
         "symfony/stopwatch": "^6.4|^7.0"
     },
     "conflict": {

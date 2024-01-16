@@ -1715,17 +1715,32 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('scoped_client')
                     ->beforeNormalization()
                         ->always(function ($config) {
-                            if (empty($config['scoped_clients']) || !\is_array($config['default_options']['retry_failed'] ?? null)) {
+                            if (empty($config['scoped_clients'])) {
+                                return $config;
+                            }
+
+                            $hasDefaultRateLimiter = isset($config['default_options']['rate_limiter']);
+                            $hasDefaultRetryFailed = \is_array($config['default_options']['retry_failed'] ?? null);
+
+                            if (!$hasDefaultRateLimiter && !$hasDefaultRetryFailed) {
                                 return $config;
                             }
 
                             foreach ($config['scoped_clients'] as &$scopedConfig) {
-                                if (!isset($scopedConfig['retry_failed']) || true === $scopedConfig['retry_failed']) {
-                                    $scopedConfig['retry_failed'] = $config['default_options']['retry_failed'];
-                                    continue;
+                                if ($hasDefaultRateLimiter) {
+                                    if (!isset($scopedConfig['rate_limiter']) || true === $scopedConfig['rate_limiter']) {
+                                        $scopedConfig['rate_limiter'] = $config['default_options']['rate_limiter'];
+                                    } elseif (false === $scopedConfig['rate_limiter']) {
+                                        $scopedConfig['rate_limiter'] = null;
+                                    }
                                 }
-                                if (\is_array($scopedConfig['retry_failed'])) {
-                                    $scopedConfig['retry_failed'] += $config['default_options']['retry_failed'];
+
+                                if ($hasDefaultRetryFailed) {
+                                    if (!isset($scopedConfig['retry_failed']) || true === $scopedConfig['retry_failed']) {
+                                        $scopedConfig['retry_failed'] = $config['default_options']['retry_failed'];
+                                    } elseif (\is_array($scopedConfig['retry_failed'])) {
+                                        $scopedConfig['retry_failed'] += $config['default_options']['retry_failed'];
+                                    }
                                 }
                             }
 
@@ -1829,6 +1844,10 @@ class Configuration implements ConfigurationInterface
                                     ->info('Extra options for specific HTTP client')
                                     ->normalizeKeys(false)
                                     ->variablePrototype()->end()
+                                ->end()
+                                ->scalarNode('rate_limiter')
+                                    ->defaultNull()
+                                    ->info('Rate limiter name to use for throttling requests')
                                 ->end()
                                 ->append($this->createHttpClientRetrySection())
                             ->end()
@@ -1977,6 +1996,10 @@ class Configuration implements ConfigurationInterface
                                         ->info('Extra options for specific HTTP client')
                                         ->normalizeKeys(false)
                                         ->variablePrototype()->end()
+                                    ->end()
+                                    ->scalarNode('rate_limiter')
+                                        ->defaultNull()
+                                        ->info('Rate limiter name to use for throttling requests')
                                     ->end()
                                     ->append($this->createHttpClientRetrySection())
                                 ->end()

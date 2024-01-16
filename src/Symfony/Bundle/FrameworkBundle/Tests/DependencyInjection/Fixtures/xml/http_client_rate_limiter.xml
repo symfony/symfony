@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:framework="http://symfony.com/schema/dic/symfony"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config http-method-override="false" handle-all-throwables="true">
+        <framework:annotations enabled="false" />
+        <framework:php-errors log="true" />
+        <framework:rate-limiter>
+            <framework:limiter name="foo_limiter" lock-factory="null" policy="token_bucket" limit="10">
+                <framework:rate interval="5 seconds" amount="10" />
+            </framework:limiter>
+        </framework:rate-limiter>
+        <framework:http-client>
+            <framework:default-options rate-limiter="default_limiter" />
+            <framework:scoped-client name="foo" base-uri="http://example.com" rate-limiter="foo_limiter" />
+        </framework:http-client>
+    </framework:config>
+</container>

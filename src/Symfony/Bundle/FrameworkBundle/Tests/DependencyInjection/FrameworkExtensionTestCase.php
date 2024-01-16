@@ -38,6 +38,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgument
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
@@ -51,6 +52,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
@@ -1984,6 +1986,35 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'md5' => 'sdhtb481248721thbr=',
         ], $defaultOptions['peer_fingerprint']);
         $this->assertSame(['foo' => ['bar' => 'baz']], $defaultOptions['extra']);
+    }
+
+    public function testHttpClientRateLimiter()
+    {
+        if (!class_exists(ThrottlingHttpClient::class)) {
+            $this->expectException(LogicException::class);
+        }
+
+        $container = $this->createContainerFromFile('http_client_rate_limiter');
+
+        $this->assertTrue($container->hasDefinition('http_client.throttling'));
+        $definition = $container->getDefinition('http_client.throttling');
+        $this->assertSame(ThrottlingHttpClient::class, $definition->getClass());
+        $this->assertSame('http_client', $definition->getDecoratedService()[0]);
+        $this->assertCount(2, $arguments = $definition->getArguments());
+        $this->assertInstanceOf(Reference::class, $arguments[0]);
+        $this->assertSame('http_client.throttling.inner', (string) $arguments[0]);
+        $this->assertInstanceOf(Reference::class, $arguments[1]);
+        $this->assertSame('http_client.throttling.limiter', (string) $arguments[1]);
+
+        $this->assertTrue($container->hasDefinition('foo.throttling'));
+        $definition = $container->getDefinition('foo.throttling');
+        $this->assertSame(ThrottlingHttpClient::class, $definition->getClass());
+        $this->assertSame('foo', $definition->getDecoratedService()[0]);
+        $this->assertCount(2, $arguments = $definition->getArguments());
+        $this->assertInstanceOf(Reference::class, $arguments[0]);
+        $this->assertSame('foo.throttling.inner', (string) $arguments[0]);
+        $this->assertInstanceOf(Reference::class, $arguments[1]);
+        $this->assertSame('foo.throttling.limiter', (string) $arguments[1]);
     }
 
     public static function provideMailer(): array

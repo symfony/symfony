@@ -33,7 +33,7 @@ class PhpExecutableFinder
     {
         if ($php = getenv('PHP_BINARY')) {
             if (!is_executable($php)) {
-                $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v';
+                $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v --';
                 if (\function_exists('exec') && $php = strtok(exec($command.' '.escapeshellarg($php)), \PHP_EOL)) {
                     if (!is_executable($php)) {
                         return false;

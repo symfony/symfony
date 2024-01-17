@@ -432,11 +432,11 @@
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-review-translation">Nustatyta simbolių koduotė yra netinkama ({{ detected }}). Leidžiamos koduotės yra {{ encodings }}.</target>
+                <target>Aptikta simbolių koduotė neteisinga ({{ detected }}). Leidžiamos koduotės {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">Ši vertė nėra galiojantis MAC adresas.</target>
+                <target>Ši reikšmė nėra teisingas MAC adresas.</target>
             </trans-unit>
         </body>
     </file>

@@ -39,11 +39,7 @@ final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorIn
             throw new \LogicException(sprintf('You cannot use "%s" as the "nikic/php-parser" package is not installed. Try running "composer require nikic/php-parser".', static::class));
         }
 
-        if (method_exists(ParserFactory::class, 'createForHostVersion')) {
-            $this->parser = (new ParserFactory())->createForHostVersion();
-        } else {
-            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        }
+        $this->parser = (new ParserFactory())->createForHostVersion();
     }
 
     public function extract(iterable|string $resource, MessageCatalogue $catalogue): void

@@ -577,6 +577,10 @@ class CliDumper extends AbstractDumper
      */
     protected function dumpLine(int $depth, bool $endOfValue = false)
     {
+        if (null === $this->colors) {
+            $this->colors = $this->supportsColors();
+        }
+
         if ($this->colors) {
             $this->line = sprintf("\033[%sm%s\033[m", $this->styles['default'], $this->line);
         }

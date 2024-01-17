@@ -102,7 +102,17 @@ class RedisProxiesTest extends TestCase
                 continue;
             }
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
-            $methods[] = "\n    ".str_replace('timeout = 0.0', 'timeout = 0', ProxyHelper::exportSignature($method, false, $args))."\n".<<<EOPHP
+            $signature = ProxyHelper::exportSignature($method, false, $args);
+
+            if ('Redis' === $class && 'mget' === $method->name) {
+                $signature = str_replace(': \Redis|array|false', ': \Redis|array', $signature);
+            }
+
+            if ('RedisCluster' === $class && 'publish' === $method->name) {
+                $signature = str_replace(': \RedisCluster|bool|int', ': \RedisCluster|bool', $signature);
+            }
+
+            $methods[] = "\n    ".str_replace('timeout = 0.0', 'timeout = 0', $signature)."\n".<<<EOPHP
                 {
                     {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
                 }

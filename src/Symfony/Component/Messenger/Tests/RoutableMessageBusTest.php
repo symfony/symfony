@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -29,9 +29,8 @@ class RoutableMessageBusTest extends TestCase
         $bus1 = $this->createMock(MessageBusInterface::class);
         $bus2 = $this->createMock(MessageBusInterface::class);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->once())->method('has')->with('foo_bus')->willReturn(true);
-        $container->expects($this->once())->method('get')->willReturn($bus2);
+        $container = new Container();
+        $container->set('foo_bus', $bus2);
 
         $stamp = new DelayStamp(5);
         $bus1->expects($this->never())->method('dispatch');
@@ -49,9 +48,7 @@ class RoutableMessageBusTest extends TestCase
         $defaultBus->expects($this->once())->method('dispatch')->with($envelope, [$stamp])
             ->willReturn($envelope);
 
-        $container = $this->createMock(ContainerInterface::class);
-
-        $routableBus = new RoutableMessageBus($container, $defaultBus);
+        $routableBus = new RoutableMessageBus(new Container(), $defaultBus);
 
         $this->assertSame($envelope, $routableBus->dispatch($envelope, [$stamp]));
     }
@@ -65,8 +62,7 @@ class RoutableMessageBusTest extends TestCase
             new BusNameStamp('my_cool_bus'),
         ]);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $routableBus = new RoutableMessageBus($container);
+        $routableBus = new RoutableMessageBus(new Container());
         $routableBus->dispatch($envelope);
     }
 
@@ -77,8 +73,7 @@ class RoutableMessageBusTest extends TestCase
 
         $envelope = new Envelope(new \stdClass());
 
-        $container = $this->createMock(ContainerInterface::class);
-        $routableBus = new RoutableMessageBus($container);
+        $routableBus = new RoutableMessageBus(new Container());
         $routableBus->dispatch($envelope);
     }
 }

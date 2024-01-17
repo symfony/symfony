@@ -22,11 +22,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -241,7 +241,10 @@ class ApplicationTest extends TestCase
 
     private function getKernel(array $bundles, $useDispatcher = false)
     {
-        $container = $this->createMock(ContainerInterface::class);
+        $container = new Container(new ParameterBag([
+            'console.command.ids' => [],
+            'console.lazy_command.ids' => [],
+        ]));
 
         if ($useDispatcher) {
             $dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -250,44 +253,8 @@ class ApplicationTest extends TestCase
                 ->method('dispatch')
             ;
 
-            $container->expects($this->atLeastOnce())
-                ->method('get')
-                ->willReturnMap([
-                    ['.virtual_request_stack', 2, new RequestStack()],
-                    ['event_dispatcher', 1, $dispatcher],
-                ])
-            ;
+            $container->set('event_dispatcher', $dispatcher);
         }
-
-        $container
-            ->expects($this->exactly(2))
-            ->method('hasParameter')
-            ->willReturnCallback(function (...$args) {
-                static $series = [
-                    ['console.command.ids'],
-                    ['console.lazy_command.ids'],
-                ];
-
-                $this->assertSame(array_shift($series), $args);
-
-                return true;
-            })
-        ;
-
-        $container
-            ->expects($this->exactly(2))
-            ->method('getParameter')
-            ->willReturnCallback(function (...$args) {
-                static $series = [
-                    ['console.lazy_command.ids'],
-                    ['console.command.ids'],
-                ];
-
-                $this->assertSame(array_shift($series), $args);
-
-                return [];
-            })
-        ;
 
         $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())->method('boot');

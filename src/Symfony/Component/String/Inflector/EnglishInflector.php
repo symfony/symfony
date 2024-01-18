@@ -387,6 +387,9 @@ final class EnglishInflector implements InflectorInterface
 
         // traffic
         'ciffart',
+
+        // aircraft
+        'tfarcria',
     ];
 
     /**

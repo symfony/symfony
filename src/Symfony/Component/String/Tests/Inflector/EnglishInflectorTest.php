@@ -185,6 +185,7 @@ class EnglishInflectorTest extends TestCase
             ['arch', 'arches'],
             ['atlas', 'atlases'],
             ['axe', 'axes'],
+            ['axis', 'axes'],
             ['baby', 'babies'],
             ['bacterium', 'bacteria'],
             ['base', 'bases'],

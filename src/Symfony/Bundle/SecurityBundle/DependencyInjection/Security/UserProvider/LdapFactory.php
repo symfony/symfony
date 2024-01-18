@@ -64,7 +64,7 @@ class LdapFactory implements UserProviderFactoryInterface
                     ->prototype('scalar')->end()
                 ->end()
                 ->scalarNode('uid_key')->defaultValue('sAMAccountName')->end()
-                ->scalarNode('filter')->defaultValue('({uid_key}={username})')->end()
+                ->scalarNode('filter')->defaultValue('({uid_key}={user_identifier})')->end()
                 ->scalarNode('password_attribute')->defaultNull()->end()
             ->end()
         ;

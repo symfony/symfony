@@ -86,15 +86,31 @@ class RedisProxiesTest extends TestCase
      */
     public function testRedis6Proxy($class, $stub)
     {
-        $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
+        $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php");
+        $proxy = substr($proxy, 0, strpos($proxy, 'if '));
+
+        $proxy .= "if (version_compare(phpversion('redis'), '6.0.2', '>')) {\n";
+        $proxy .= self::dumpMethodsFromStub($class, $stub, 'develop');
+        $proxy .= "\n} else {\n";
+        $proxy .= self::dumpMethodsFromStub($class, $stub, '6.0.2');
+        $proxy .= "\n}\n";
+
+        $this->assertStringEqualsFile(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php", $proxy);
+    }
+
+    private static function dumpMethodsFromStub(string $class, string $stub, string $version): string
+    {
+        $url = sprintf('https://raw.githubusercontent.com/phpredis/phpredis/%s/%s.stub.php', $version, $stub);
+        $namespace = sprintf('%s\V%s', __NAMESPACE__, str_replace('.', '', $version));
+
+        $stub = sprintf("<?php\nnamespace %s;\n", $namespace);
+        $stub .= substr(file_get_contents($url), 5);
         $stub = preg_replace('/^class /m', 'return; \0', $stub);
         $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);
         $stub = preg_replace('/^    public const .*/m', '', $stub);
         eval(substr($stub, 5));
-        $r = new \ReflectionClass($class.'StubInterface');
+        $r = new \ReflectionClass(sprintf('%s\%sStubInterface', $namespace, $class));
 
-        $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php");
-        $proxy = substr($proxy, 0, 4 + strpos($proxy, '[];'));
         $methods = [];
 
         foreach ($r->getMethods() as $method) {
@@ -102,27 +118,31 @@ class RedisProxiesTest extends TestCase
                 continue;
             }
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
-            $signature = ProxyHelper::exportSignature($method, false, $args);
-
-            if ('Redis' === $class && 'mget' === $method->name) {
-                $signature = str_replace(': \Redis|array|false', ': \Redis|array', $signature);
-            }
-
-            if ('RedisCluster' === $class && 'publish' === $method->name) {
-                $signature = str_replace(': \RedisCluster|bool|int', ': \RedisCluster|bool', $signature);
-            }
-
-            $methods[] = "\n    ".str_replace('timeout = 0.0', 'timeout = 0', $signature)."\n".<<<EOPHP
-                {
-                    {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
-                }
+            $methods[] = "\n        ".str_replace('timeout = 0.0', 'timeout = 0', str_replace($namespace.'\\', '', ProxyHelper::exportSignature($method, false, $args)))."\n".<<<EOPHP
+                    {
+                        {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
+                    }
 
             EOPHP;
         }
 
-        uksort($methods, 'strnatcmp');
-        $proxy .= implode('', $methods)."}\n";
+        $proxy = <<<EOPHP
+                /**
+                 * @internal
+                 */
+                class {$class}6Proxy extends \\{$class} implements ResetInterface, LazyObjectInterface
+                {
+                    use LazyProxyTrait {
+                        resetLazyObject as reset;
+                    }
 
-        $this->assertStringEqualsFile(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php", $proxy);
+                    private const LAZY_OBJECT_PROPERTY_SCOPES = [];
+
+            EOPHP;
+
+        uksort($methods, 'strnatcmp');
+        $proxy .= implode('', $methods);
+
+        return $proxy.'    }';
     }
 }

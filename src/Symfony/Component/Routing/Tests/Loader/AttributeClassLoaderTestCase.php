@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Alias;
-use Symfony\Component\Routing\Loader\AttributeClassLoader;
+use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AbstractClassController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\BazClass;
@@ -41,9 +41,16 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithEnv;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithPrefixController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\Utf8ActionControllers;
 
-abstract class AttributeClassLoaderTestCase extends TestCase
+class AttributeClassLoaderTestCase extends TestCase
 {
-    protected AttributeClassLoader $loader;
+    protected TraceableAttributeClassLoader $loader;
+
+    protected function setUp(?string $env = null): void
+    {
+        parent::setUp();
+
+        $this->loader = new TraceableAttributeClassLoader($env);
+    }
 
     /**
      * @dataProvider provideTestSupportsChecksResource
@@ -101,11 +108,11 @@ abstract class AttributeClassLoaderTestCase extends TestCase
 
     public function testInvokableFQCNAliasConflictController()
     {
-        $routes = $this->loader->load($this->getNamespace().'\InvokableFQCNAliasConflictController');
+        $routes = $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController');
         $this->assertCount(1, $routes);
-        $this->assertEquals('/foobarccc', $routes->get($this->getNamespace().'\InvokableFQCNAliasConflictController')->getPath());
-        $this->assertNull($routes->getAlias($this->getNamespace().'\InvokableFQCNAliasConflictController'));
-        $this->assertEquals(new Alias($this->getNamespace().'\InvokableFQCNAliasConflictController'), $routes->getAlias($this->getNamespace().'\InvokableFQCNAliasConflictController::__invoke'));
+        $this->assertEquals('/foobarccc', $routes->get('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController')->getPath());
+        $this->assertNull($routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController'));
+        $this->assertEquals(new Alias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController::__invoke'));
     }
 
     public function testInvokableMethodControllerLoader()

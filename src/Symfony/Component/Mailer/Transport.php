@@ -20,6 +20,7 @@ use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
+use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
 use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
@@ -50,6 +51,7 @@ final class Transport
         MailerSendTransportFactory::class,
         MailgunTransportFactory::class,
         MailjetTransportFactory::class,
+        MailPaceTransportFactory::class,
         MandrillTransportFactory::class,
         OhMySmtpTransportFactory::class,
         PostmarkTransportFactory::class,

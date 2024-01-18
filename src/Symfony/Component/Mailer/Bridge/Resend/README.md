@@ -1,5 +1,5 @@
 Resend Bridge
-============
+=============
 
 Provides Resend integration for Symfony Mailer.
 

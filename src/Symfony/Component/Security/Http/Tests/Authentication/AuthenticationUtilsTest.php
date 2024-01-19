@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -23,45 +24,50 @@ class AuthenticationUtilsTest extends TestCase
 {
     public function testLastAuthenticationErrorWhenRequestHasAttribute()
     {
+        $authenticationError = new AuthenticationException();
         $request = Request::create('/');
-        $request->attributes->set(Security::AUTHENTICATION_ERROR, 'my error');
+        $request->attributes->set(Security::AUTHENTICATION_ERROR, $authenticationError);
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
         $utils = new AuthenticationUtils($requestStack);
-        $this->assertSame('my error', $utils->getLastAuthenticationError());
+        $this->assertSame($authenticationError, $utils->getLastAuthenticationError());
     }
 
     public function testLastAuthenticationErrorInSession()
     {
+        $authenticationError = new AuthenticationException();
+
         $request = Request::create('/');
 
         $session = new Session(new MockArraySessionStorage());
-        $session->set(Security::AUTHENTICATION_ERROR, 'session error');
+        $session->set(Security::AUTHENTICATION_ERROR, $authenticationError);
         $request->setSession($session);
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
         $utils = new AuthenticationUtils($requestStack);
-        $this->assertSame('session error', $utils->getLastAuthenticationError());
+        $this->assertSame($authenticationError, $utils->getLastAuthenticationError());
         $this->assertFalse($session->has(Security::AUTHENTICATION_ERROR));
     }
 
     public function testLastAuthenticationErrorInSessionWithoutClearing()
     {
+        $authenticationError = new AuthenticationException();
+
         $request = Request::create('/');
 
         $session = new Session(new MockArraySessionStorage());
-        $session->set(Security::AUTHENTICATION_ERROR, 'session error');
+        $session->set(Security::AUTHENTICATION_ERROR, $authenticationError);
         $request->setSession($session);
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
         $utils = new AuthenticationUtils($requestStack);
-        $this->assertSame('session error', $utils->getLastAuthenticationError(false));
+        $this->assertSame($authenticationError, $utils->getLastAuthenticationError(false));
         $this->assertTrue($session->has(Security::AUTHENTICATION_ERROR));
     }
 

@@ -178,6 +178,7 @@ class EnglishInflectorTest extends TestCase
             ['access', 'accesses'],
             ['address', 'addresses'],
             ['agenda', 'agendas'],
+            ['aircraft', 'aircraft'],
             ['alumnus', 'alumni'],
             ['analysis', 'analyses'],
             ['antenna', 'antennas'], // antennae

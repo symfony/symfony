@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Alias;
-use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AbstractClassController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\BazClass;
@@ -40,10 +39,18 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RequirementsWitho
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithEnv;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithPrefixController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\Utf8ActionControllers;
+use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
-abstract class AttributeClassLoaderTestCase extends TestCase
+class AttributeClassLoaderTest extends TestCase
 {
-    protected AttributeClassLoader $loader;
+    protected TraceableAttributeClassLoader $loader;
+
+    protected function setUp(string $env = null): void
+    {
+        parent::setUp();
+
+        $this->loader = new TraceableAttributeClassLoader($env);
+    }
 
     /**
      * @dataProvider provideTestSupportsChecksResource
@@ -77,7 +84,7 @@ abstract class AttributeClassLoaderTestCase extends TestCase
         $routes = $this->loader->load(ActionPathController::class);
         $this->assertCount(1, $routes);
         $this->assertEquals('/path', $routes->get('action')->getPath());
-        $this->assertEquals(new Alias('action'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures' .'\ActionPathController::action'));
+        $this->assertEquals(new Alias('action'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ActionPathController::action'));
     }
 
     public function testRequirementsWithoutPlaceholderName()
@@ -101,11 +108,11 @@ abstract class AttributeClassLoaderTestCase extends TestCase
 
     public function testInvokableFQCNAliasConflictController()
     {
-        $routes = $this->loader->load($this->getNamespace().'\InvokableFQCNAliasConflictController');
+        $routes = $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController');
         $this->assertCount(1, $routes);
-        $this->assertEquals('/foobarccc', $routes->get($this->getNamespace().'\InvokableFQCNAliasConflictController')->getPath());
-        $this->assertNull($routes->getAlias($this->getNamespace().'\InvokableFQCNAliasConflictController'));
-        $this->assertEquals(new Alias($this->getNamespace().'\InvokableFQCNAliasConflictController'), $routes->getAlias($this->getNamespace().'\InvokableFQCNAliasConflictController::__invoke'));
+        $this->assertEquals('/foobarccc', $routes->get('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController')->getPath());
+        $this->assertNull($routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController'));
+        $this->assertEquals(new Alias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController::__invoke'));
     }
 
     public function testInvokableMethodControllerLoader()
@@ -164,8 +171,8 @@ abstract class AttributeClassLoaderTestCase extends TestCase
         $this->assertSame(['put', 'post'], array_keys($routes->all()));
         $this->assertEquals('/the/path', $routes->get('put')->getPath());
         $this->assertEquals('/the/path', $routes->get('post')->getPath());
-        $this->assertEquals(new Alias('post'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures' .'\MethodActionControllers::post'));
-        $this->assertEquals(new Alias('put'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures' .'\MethodActionControllers::put'));
+        $this->assertEquals(new Alias('post'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodActionControllers::post'));
+        $this->assertEquals(new Alias('put'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodActionControllers::put'));
     }
 
     public function testInvokableClassRouteLoadWithMethodAnnotation()

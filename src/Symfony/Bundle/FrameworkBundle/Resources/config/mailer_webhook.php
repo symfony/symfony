@@ -13,6 +13,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Mailer\Bridge\Brevo\RemoteEvent\BrevoPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
+use Symfony\Component\Mailer\Bridge\MailerSend\RemoteEvent\MailerSendPayloadConverter;
+use Symfony\Component\Mailer\Bridge\MailerSend\Webhook\MailerSendRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailgun\RemoteEvent\MailgunPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailjet\RemoteEvent\MailjetPayloadConverter;
@@ -30,6 +32,11 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.brevo', BrevoRequestParser::class)
             ->args([service('mailer.payload_converter.brevo')])
         ->alias(BrevoRequestParser::class, 'mailer.webhook.request_parser.brevo')
+
+        ->set('mailer.payload_converter.mailersend', MailerSendPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.mailersend', MailerSendRequestParser::class)
+            ->args([service('mailer.payload_converter.mailersend')])
+        ->alias(MailerSendRequestParser::class, 'mailer.webhook.request_parser.mailersend')
 
         ->set('mailer.payload_converter.mailgun', MailgunPayloadConverter::class)
         ->set('mailer.webhook.request_parser.mailgun', MailgunRequestParser::class)

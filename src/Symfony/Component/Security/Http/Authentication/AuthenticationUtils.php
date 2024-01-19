@@ -53,10 +53,10 @@ class AuthenticationUtils
         $request = $this->getRequest();
 
         if ($request->attributes->has(SecurityRequestAttributes::LAST_USERNAME)) {
-            return $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME, '');
+            return $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME) ?? '';
         }
 
-        return $request->hasSession() ? $request->getSession()->get(SecurityRequestAttributes::LAST_USERNAME, '') : '';
+        return $request->hasSession() ? ($request->getSession()->get(SecurityRequestAttributes::LAST_USERNAME) ?? '') : '';
     }
 
     /**

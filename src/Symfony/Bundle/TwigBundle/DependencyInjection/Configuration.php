@@ -157,7 +157,7 @@ class Configuration implements ConfigurationInterface
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('paths')
                     ->beforeNormalization()
-                        ->always()
+                        ->ifArray()
                         ->then(function ($paths) {
                             $normalized = [];
                             foreach ($paths as $path => $namespace) {

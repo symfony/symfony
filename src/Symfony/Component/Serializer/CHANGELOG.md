@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+* Let `UnwrappingDenormalizer` implement `DenormalizerAwareInterface` instead of `SerializerAwareInterface`
+* Deprecate method `UnwrappingDenormalizer::setSerializer()`, use `UnwrappingDenormalizer::setDenormalizer()` instead
+
 7.0
 ---
 

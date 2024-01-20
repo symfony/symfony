@@ -84,6 +84,8 @@ final class NtfyTransport extends AbstractTransport
 
         if (null !== $this->user && null !== $this->password) {
             $headers['Authorization'] = 'Basic '.rtrim(base64_encode($this->user.':'.$this->password), '=');
+        } elseif (null !== $this->password) {
+            $headers['Authorization'] = 'Bearer '.$this->password;
         }
 
         $response = $this->client->request('POST', ($this->secureHttp ? 'https' : 'http').'://'.$this->getEndpoint(), [
@@ -115,8 +117,8 @@ final class NtfyTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof PushMessage &&
-            (null === $message->getOptions() || $message->getOptions() instanceof NtfyOptions);
+        return $message instanceof PushMessage
+            && (null === $message->getOptions() || $message->getOptions() instanceof NtfyOptions);
     }
 
     public function __toString(): string

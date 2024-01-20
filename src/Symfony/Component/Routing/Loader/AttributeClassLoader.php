@@ -202,7 +202,7 @@ abstract class AttributeClassLoader implements LoaderInterface
         }
 
         if (isset($paths[0])) {
-            $paths['{_locale}'] = isset($paths['{_locale}']) ? $paths['{_locale}'] : $paths[0];
+            $paths['{_locale}'] = $paths['{_locale}'] ?? $paths[0];
             unset($paths[0]);
         }
 

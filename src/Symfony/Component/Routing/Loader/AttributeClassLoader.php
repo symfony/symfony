@@ -201,8 +201,7 @@ abstract class AttributeClassLoader implements LoaderInterface
             }
         }
 
-        if (isset($paths[0]))
-        {
+        if (isset($paths[0])) {
             $paths['{_locale}'] = isset($paths['{_locale}']) ? $paths['{_locale}'] : $paths[0];
             unset($paths[0]);
         }
@@ -212,7 +211,7 @@ abstract class AttributeClassLoader implements LoaderInterface
             $this->configureRoute($route, $class, $method, $annot);
             if (\is_int($locale)) {
                 throw new \InvalidArgumentException(sprintf('Indexed locale paths in the Route paths array are not supported (%d:%s).', $locale, $path));
-            } else if ('{_locale}' === $locale) {
+            } elseif ('{_locale}' === $locale) {
                 $collection->add($name, $route, $priority);
             } else {
                 $route->setDefault('_locale', $locale);

@@ -211,7 +211,7 @@ abstract class AttributeClassLoader implements LoaderInterface
             $route = $this->createRoute($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
             $this->configureRoute($route, $class, $method, $annot);
             if (\is_int($locale)) {
-                throw new \InvalidArgumentException(sprintf('Indexed locale paths in the Route paths array are not supported (%d:%s)', $locale, $path));
+                throw new \InvalidArgumentException(sprintf('Indexed locale paths in the Route paths array are not supported (%d:%s).', $locale, $path));
             } else if ('{_locale}' === $locale) {
                 $collection->add($name, $route, $priority);
             } else {

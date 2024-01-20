@@ -253,7 +253,7 @@ class AttributeClassLoaderTest extends TestCase
     public function testLocalizedIndexedLocaleRoute()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Indexed locale paths in the Route paths array are not supported (1:/en)');
+        $this->expectExceptionMessage('Indexed locale paths in the Route paths array are not supported (1:/en).');
         $this->loader->load(LocalizedIndexedLocaleActionController::class);
     }
 

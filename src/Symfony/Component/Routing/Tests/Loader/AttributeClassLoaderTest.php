@@ -24,7 +24,9 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableControll
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableLocalizedController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableMethodController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedActionPathController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedIndexedLocaleActionController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedMethodActionControllers;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedPassthroughLocaleActionController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedPrefixLocalizedActionController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedPrefixMissingLocaleActionController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedPrefixMissingRouteLocaleActionController;
@@ -236,6 +238,23 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertCount(2, $routes);
         $this->assertEquals('/nl/actie', $routes->get('action.nl')->getPath());
         $this->assertEquals('/en/action', $routes->get('action.en')->getPath());
+    }
+
+    public function testLocalizedPassthroughLocaleRoute()
+    {
+        $routes = $this->loader->load(LocalizedPassthroughLocaleActionController::class);
+        $this->assertCount(4, $routes);
+        $this->assertEquals('/{_locale}', $routes->get('action')->getPath());
+        $this->assertEquals('/nl', $routes->get('action.nl')->getPath());
+        $this->assertEquals('/{_locale}', $routes->get('action2')->getPath());
+        $this->assertEquals('/nl', $routes->get('action2.nl')->getPath());
+    }
+
+    public function testLocalizedIndexedLocaleRoute()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Indexed locale paths in the Route paths array are not supported (1:/en)');
+        $this->loader->load(LocalizedIndexedLocaleActionController::class);
     }
 
     public function testInvokableClassMultipleRouteLoad()

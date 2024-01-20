@@ -36,6 +36,8 @@ class UserBadge implements BadgeInterface
     private UserInterface $user;
     private ?array $attributes;
 
+    private ?\Closure $identifierNormalizer = null;
+
     /**
      * Initializes the user badge.
      *
@@ -49,19 +51,30 @@ class UserBadge implements BadgeInterface
      * is thrown). If this is not set, the default user provider will be used with
      * $userIdentifier as username.
      */
-    public function __construct(string $userIdentifier, callable $userLoader = null, array $attributes = null)
+    public function __construct(string $userIdentifier, callable $userLoader = null, array $attributes = null, ?\Closure $identifierNormalizer = null)
     {
         if (\strlen($userIdentifier) > self::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Username too long.');
         }
+        if ($identifierNormalizer) {
+            $this->identifierNormalizer = static fn () => $identifierNormalizer($userIdentifier);
+        } else {
+            $this->userIdentifier = $userIdentifier;
+        }
 
-        $this->userIdentifier = $userIdentifier;
         $this->userLoader = $userLoader;
         $this->attributes = $attributes;
     }
 
     public function getUserIdentifier(): string
     {
+        if (isset($this->userIdentifier)) {
+            return $this->userIdentifier;
+        }
+
+        $this->userIdentifier = ($this->identifierNormalizer)();
+        $this->identifierNormalizer = null;
+
         return $this->userIdentifier;
     }
 
@@ -84,15 +97,15 @@ class UserBadge implements BadgeInterface
         }
 
         if (null === $this->getAttributes()) {
-            $user = ($this->userLoader)($this->userIdentifier);
+            $user = ($this->userLoader)($this->getUserIdentifier());
         } else {
-            $user = ($this->userLoader)($this->userIdentifier, $this->getAttributes());
+            $user = ($this->userLoader)($this->getUserIdentifier(), $this->getAttributes());
         }
 
         // No user has been found via the $this->userLoader callback
         if (null === $user) {
             $exception = new UserNotFoundException();
-            $exception->setUserIdentifier($this->userIdentifier);
+            $exception->setUserIdentifier($this->getUserIdentifier());
 
             throw $exception;
         }

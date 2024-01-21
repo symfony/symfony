@@ -140,7 +140,10 @@ class Message extends RawMessage
         if ($this->headers->has('Sender')) {
             $sender = $this->headers->get('Sender')->getAddress();
         } elseif ($this->headers->has('From')) {
-            $sender = $this->headers->get('From')->getAddresses()[0];
+            if (!$froms = $this->headers->get('From')->getAddresses()) {
+                throw new LogicException('A "From" header must have at least one email address.');
+            }
+            $sender = $froms[0];
         } else {
             throw new LogicException('An email must have a "From" or a "Sender" header.');
         }

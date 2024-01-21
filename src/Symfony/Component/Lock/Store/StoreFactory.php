@@ -60,9 +60,7 @@ class StoreFactory
             case 'semaphore' === $connection:
                 return new SemaphoreStore();
 
-            case str_starts_with($connection, 'redis:'):
-            case str_starts_with($connection, 'rediss:'):
-            case str_starts_with($connection, 'memcached:'):
+            case preg_match('~^(rediss?|memcached):~', $connection):
                 if (!class_exists(AbstractAdapter::class)) {
                     throw new InvalidArgumentException('Unsupported Redis or Memcached DSN. Try running "composer require symfony/cache".');
                 }
@@ -74,28 +72,13 @@ class StoreFactory
             case str_starts_with($connection, 'mongodb'):
                 return new MongoDbStore($connection);
 
-            case str_starts_with($connection, 'mssql://'):
-            case str_starts_with($connection, 'mysql://'):
-            case str_starts_with($connection, 'mysql2://'):
-            case str_starts_with($connection, 'oci8://'):
-            case str_starts_with($connection, 'pdo_oci://'):
-            case str_starts_with($connection, 'pgsql://'):
-            case str_starts_with($connection, 'postgres://'):
-            case str_starts_with($connection, 'postgresql://'):
-            case str_starts_with($connection, 'sqlite://'):
-            case str_starts_with($connection, 'sqlite3://'):
+            case preg_match('~^(mssql|mysql2?|oci8|pdo_oci|pgsql|postgres|postgresql|sqlite3?)://~', $connection):
                 return new DoctrineDbalStore($connection);
 
-            case str_starts_with($connection, 'mysql:'):
-            case str_starts_with($connection, 'oci:'):
-            case str_starts_with($connection, 'pgsql:'):
-            case str_starts_with($connection, 'sqlsrv:'):
-            case str_starts_with($connection, 'sqlite:'):
+            case preg_match('~^(mysql|oci|pgsql|sqlsrv|sqlite):~', $connection):
                 return new PdoStore($connection);
 
-            case str_starts_with($connection, 'pgsql+advisory://'):
-            case str_starts_with($connection, 'postgres+advisory://'):
-            case str_starts_with($connection, 'postgresql+advisory://'):
+            case preg_match('~^(pgsql|postgres|postgresql)\+advisory://~', $connection):
                 return new DoctrineDbalPostgreSqlStore($connection);
 
             case str_starts_with($connection, 'pgsql+advisory:'):

@@ -41,13 +41,17 @@ class StoreFactoryTest extends TestCase
         $this->assertInstanceOf(RedisStore::class, $store);
     }
 
-    public function testCreateRedisAsDsnStore()
+    /**
+     * @testWith ["redis://localhost"]
+     *           ["rediss://localhost"]
+     */
+    public function testCreateRedisAsDsnStore(string $dsn)
     {
         if (!class_exists(RedisProxy::class)) {
             $this->markTestSkipped();
         }
 
-        $store = StoreFactory::createStore('redis://localhost');
+        $store = StoreFactory::createStore($dsn);
 
         $this->assertInstanceOf(RedisStore::class, $store);
     }

@@ -111,7 +111,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
     public static function createConnection(#[\SensitiveParameter] string $dsn, array $options = []): mixed
     {
-        if (str_starts_with($dsn, 'redis:') || str_starts_with($dsn, 'rediss:')) {
+        if (preg_match('~^rediss?:~', $dsn)) {
             return RedisAdapter::createConnection($dsn, $options);
         }
         if (str_starts_with($dsn, 'memcached:')) {
@@ -124,7 +124,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
             return CouchbaseCollectionAdapter::createConnection($dsn, $options);
         }
-        if (preg_match('/^(mysql|oci|pgsql|sqlsrv|sqlite):/', $dsn)) {
+        if (preg_match('~^(mysql|oci|pgsql|sqlsrv|sqlite):~', $dsn)) {
             return PdoAdapter::createConnection($dsn, $options);
         }
 

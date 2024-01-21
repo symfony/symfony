@@ -35,8 +35,7 @@ class StoreFactory
 
             case !\is_string($connection):
                 throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection::class));
-            case str_starts_with($connection, 'redis://'):
-            case str_starts_with($connection, 'rediss://'):
+            case preg_match('~^rediss?://~', $connection):
                 if (!class_exists(AbstractAdapter::class)) {
                     throw new InvalidArgumentException('Unsupported Redis DSN. Try running "composer require symfony/cache".');
                 }

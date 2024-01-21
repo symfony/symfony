@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-17T16:53:34Z
+
+Can you please add a test to make sure that we don’t break this again.
+
+---------------------------------------------------------------------------
+
+by 0x346e3730 at 2024-01-17T17:07:24Z
+
+Done. It seems to me that the failing tests are related to cryptography errors and not my code
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-01-18T07:59:05Z
+
+What about forbidding calling `Email::from()` without any address instead?
+
+---------------------------------------------------------------------------
+
+by 0x346e3730 at 2024-01-18T08:02:23Z
+
+> What about forbidding calling `Email::from()` without any address instead?
+
+This is one of the ways I identified to fix this issue, I have no opinion on which is best for DX.
+
+I went with fixing it in the Message class because it could (I guess ?) be used by other components than Mailer so I would suggest to still fix this here even if we block this behavior in the `from` method
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-01-18T08:09:05Z
+
+I would do the fix in `Email::from()` anyway as there is no good use case for not passing anything to this method.
+
+---------------------------------------------------------------------------
+
+by 0x346e3730 at 2024-01-19T05:28:28Z
+
+I adjusted the code with your reviews and added an exception if calling Email::from() with no addres, however the `from` method just calls `setListAddressHeaderBody` that is also called by `replyTo`, `to`, `cc`, `bcc` and `addListAddressHeaderBody`. Should we implement the throw in Email::setListAddressHeaderBody() instead so that it covers all method that add email addresses to certain headers ?
+
+Plus the "add" version of those methods (`addFrom`, `addReplyTo` ect...) call `addListAddressHeaderBody` that does `$header->addAddresses(Address::createArray($addresses));`. Should we do the same throw in `MailboxListHeader::addAddresses` as well ?

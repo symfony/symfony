@@ -70,7 +70,7 @@ EOF
         $clearers = [];
 
         $poolNames = $input->getArgument('pools');
-        if ($input->getOption('all')) {
+        if ($clearAll = $input->getOption('all')) {
             if (!$this->poolNames) {
                 throw new InvalidArgumentException('Could not clear all cache pools, try specifying a specific pool or cache clearer.');
             }
@@ -84,7 +84,7 @@ EOF
         foreach ($poolNames as $id) {
             if ($this->poolClearer->hasPool($id)) {
                 $pools[$id] = $id;
-            } else {
+            } elseif (!$clearAll || $kernel->getContainer()->has($id)) {
                 $pool = $kernel->getContainer()->get($id);
 
                 if ($pool instanceof CacheItemPoolInterface) {

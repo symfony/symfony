@@ -137,6 +137,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('authentication failure handler'),
                 abstract_arg('options'),
                 service('property_accessor')->nullOnInvalid(),
+                service('logger')->nullOnInvalid(),
             ])
             ->call('setTranslator', [service('translator')->ignoreOnInvalid()])
 

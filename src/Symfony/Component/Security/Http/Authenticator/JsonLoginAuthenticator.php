@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Authenticator;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,8 +52,9 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
     private ?AuthenticationSuccessHandlerInterface $successHandler;
     private ?AuthenticationFailureHandlerInterface $failureHandler;
     private ?TranslatorInterface $translator = null;
+    private ?LoggerInterface $logger = null;
 
-    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null)
     {
         $this->options = array_merge(['username_path' => 'username', 'password_path' => 'password'], $options);
         $this->httpUtils = $httpUtils;
@@ -60,6 +62,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         $this->failureHandler = $failureHandler;
         $this->userProvider = $userProvider;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->logger = $logger;
     }
 
     public function supports(Request $request): ?bool
@@ -68,10 +71,12 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             !str_contains($request->getRequestFormat() ?? '', 'json')
             && !str_contains($request->getContentTypeFormat() ?? '', 'json')
         ) {
+            $this->errorBadFormatMessage($request);
+
             return false;
         }
 
-        if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+        if ($this->isNotLoginPath($request)) {
             return false;
         }
 
@@ -167,5 +172,40 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         }
 
         return $credentials;
+    }
+
+    private function isNotLoginPath(Request $request): bool
+    {
+        if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check is the user wants to login.
+     * It will detected by check the body content. If the array see a key called password and the type is wrong the Exception will be display.
+     * Also body is empty is.
+     */
+    private function errorBadFormatMessage($request): void
+    {
+        if ($this->isNotLoginPath($request)) {
+            return;
+        }
+        if (method_exists(Request::class, 'getContentTypeFormat')) {
+            $contentType = $request->getContentTypeFormat();
+        } else {
+            $contentType = $request->getContentType();
+        }
+        $data = json_decode($request->getContent(), true);
+        if (\is_array($data) && \array_key_exists($this->options['password_path'], $data)) {
+            $this->logger?->debug(sprintf('Skipping JSON authenticator as the request body is not JSON (got: "%s").', $contentType), ['authenticator' => static::class]);
+
+            return;
+        }
+        if (null === $data) {
+            $this->logger?->debug('Skipping json login authenticator. No content in body. May you forget to add content or you installed a custom authenticator on same path?', ['authenticator' => static::class]);
+        }
     }
 }

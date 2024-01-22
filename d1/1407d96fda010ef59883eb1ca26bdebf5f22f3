@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-01-19T15:39:21Z
+
+The right source in CssToInlineStyles is rather https://github.com/tijsverkoyen/CssToInlineStyles/issues/237, which discusses the issue you fix here.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-19T16:01:23Z
+
+I mentioned the other issue as it claimed that the initially broken fix was taken from the Symfony source code which led me to search for it.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-01-19T16:20:22Z
+
+But that does not explain why you do this change here as the issue you link does mention any issue with the code taken from Symfony...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-20T09:08:27Z
+
+fair enough, I have updated the PR description

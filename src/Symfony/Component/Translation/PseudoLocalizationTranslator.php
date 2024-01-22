@@ -123,7 +123,7 @@ final class PseudoLocalizationTranslator implements TranslatorInterface
             return [[true, true, $originalTrans]];
         }
 
-        $html = mb_encode_numericentity($originalTrans, [0x80, 0xFFFF, 0, 0xFFFF], mb_detect_encoding($originalTrans, null, true) ?: 'UTF-8');
+        $html = mb_encode_numericentity($originalTrans, [0x80, 0x10FFFF, 0, 0x1FFFFF], mb_detect_encoding($originalTrans, null, true) ?: 'UTF-8');
 
         $useInternalErrors = libxml_use_internal_errors(true);
 

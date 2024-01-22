@@ -44,6 +44,7 @@ final class PseudoLocalizationTranslatorTest extends TestCase
             ['<p data-foo="ccc&quot;&quot;">ƀåŕ</p>', '<p data-foo="ccc&quot;&quot;">bar</p>', self::getIsolatedOptions(['parse_html' => true, 'accents' => true])],
             ['<p>″≤″</p>', '<p>&quot;&lt;&quot;</p>', self::getIsolatedOptions(['parse_html' => true, 'accents' => true])],
             ['Symfony is an Open Source, community-driven project with thousands of contributors. ~~~~~~~ ~~ ~~~~ ~~~~~~~ ~~~~~~~ ~~ ~~~~ ~~~~~~~~~~~~~ ~~~~~~~~~~~~~ ~~~~~~~ ~~ ~~~', 'Symfony is an Open Source, community-driven project with thousands of contributors.', self::getIsolatedOptions(['expansion_factor' => 2.0])],
+            ['<p>👇👇👇👇👇👇👇</p>', '<p>👇👇👇👇👇👇👇</p>', self::getIsolatedOptions(['parse_html' => true])],
         ];
     }
 

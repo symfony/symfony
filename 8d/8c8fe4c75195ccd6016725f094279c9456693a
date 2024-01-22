@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-18T07:30:29Z
+
+The root cause for the observed behaviour is that the list of pool names passed to the constructor of `CachePoolClearCommand` command contains also the ids of cache pools that are later cleaned up by the `RemoveUnusedDefinitionsPass`. An alternative solution would be to collect available cache pool names at a later stage during compilation when the cleanup of unused service definitions has already happened.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-21T15:53:14Z
+
+Can't we check if the service exists before accessing it? Because this strategy is going to keep around pools that are not used, preventing them to be cleaned up by the compilation process.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-22T08:34:59Z
+
+indeed, that's a better idea
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-22T11:34:42Z
+
+Why the Validator label?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-22T12:04:00Z
+
+probably because I made a typo in the initial title and didn't remove the label when fixing that so Carson re-adds it again

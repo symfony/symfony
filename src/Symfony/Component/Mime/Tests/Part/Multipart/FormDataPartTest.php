@@ -47,6 +47,27 @@ class FormDataPartTest extends TestCase
         $this->assertEquals([$t, $b, $c], $f->getParts());
     }
 
+    public function testConstructorWithBase64Encoding()
+    {
+        $r = new \ReflectionProperty(TextPart::class, 'encoding');
+
+        $d = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif', null, null, '8bit');
+        $e = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif', null, null, 'base64');
+        $f = new FormDataPart([
+            'foo' => clone $d,
+            'bar' => clone $e
+        ]);
+        $d->setDisposition('form-data');
+        $d->setName('foo');
+        $d->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
+        $r->setValue($d, '8bit');
+        $e->setDisposition('form-data');
+        $e->setName('bar');
+        $e->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
+        $r->setValue($e, 'base64');
+        $this->assertEquals([$d, $e], $f->getParts());
+    }
+
     public function testNestedArrayParts()
     {
         $p1 = new TextPart('content', 'utf-8', 'plain', '8bit');

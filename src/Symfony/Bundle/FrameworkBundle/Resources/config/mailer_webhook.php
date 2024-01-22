@@ -35,7 +35,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('mailer.payload_converter.mailersend', MailerSendPayloadConverter::class)
         ->set('mailer.webhook.request_parser.mailersend', MailerSendRequestParser::class)
-        ->args([service('mailer.payload_converter.mailersend')])
+            ->args([service('mailer.payload_converter.mailersend')])
         ->alias(MailerSendRequestParser::class, 'mailer.webhook.request_parser.mailersend')
 
         ->set('mailer.payload_converter.mailgun', MailgunPayloadConverter::class)

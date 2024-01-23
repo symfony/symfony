@@ -50,7 +50,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * @param AbstractUid $object
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return match ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
             self::NORMALIZATION_FORMAT_CANONICAL => (string) $object,
@@ -61,12 +61,12 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
         };
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof AbstractUid;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         try {
             return $type::fromString($data);
@@ -75,7 +75,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
         }
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_subclass_of($type, AbstractUid::class, true);
     }

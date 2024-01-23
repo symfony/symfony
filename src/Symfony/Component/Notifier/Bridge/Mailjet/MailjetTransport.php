@@ -31,8 +31,8 @@ final class MailjetTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private string $authToken,
         private string $from,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

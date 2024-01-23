@@ -27,7 +27,7 @@ class SelectorNode extends AbstractNode
 
     public function __construct(
         private NodeInterface $tree,
-        string $pseudoElement = null,
+        ?string $pseudoElement = null,
     ) {
         $this->pseudoElement = $pseudoElement ? strtolower($pseudoElement) : null;
     }

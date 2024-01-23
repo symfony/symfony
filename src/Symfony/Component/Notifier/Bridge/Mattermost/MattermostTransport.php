@@ -30,8 +30,8 @@ final class MattermostTransport extends AbstractTransport
         #[\SensitiveParameter] private string $token,
         private string $channel,
         private ?string $path = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
 )
     {
         parent::__construct($client, $dispatcher);

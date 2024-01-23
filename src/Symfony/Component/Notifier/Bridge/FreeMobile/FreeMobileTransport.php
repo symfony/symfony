@@ -33,8 +33,8 @@ final class FreeMobileTransport extends AbstractTransport
         private string $login,
         #[\SensitiveParameter] private string $password,
         private string $phone,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         $this->phone = str_replace('+33', '0', $phone);
 

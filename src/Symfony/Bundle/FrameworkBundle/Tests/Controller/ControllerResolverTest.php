@@ -103,7 +103,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($controllerContainer, $controller->getContainer());
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null)
+    protected function createControllerResolver(?LoggerInterface $logger = null, ?Psr11ContainerInterface $container = null)
     {
         if (!$container) {
             $container = new Container();

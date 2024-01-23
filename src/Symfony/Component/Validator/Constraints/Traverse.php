@@ -27,7 +27,7 @@ class Traverse extends Constraint
     /**
      * @param bool|array<string,mixed>|null $traverse Whether to traverse the given object or not (defaults to true). Pass an associative array to configure the constraint's options (e.g. payload).
      */
-    public function __construct(bool|array $traverse = null)
+    public function __construct(bool|array|null $traverse = null)
     {
         if (\is_array($traverse) && \array_key_exists('groups', $traverse)) {
             throw new ConstraintDefinitionException(sprintf('The option "groups" is not supported by the constraint "%s".', __CLASS__));

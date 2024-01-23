@@ -647,6 +647,6 @@ EOTXT
     }
 }
 
-function reflectionParameterFixture(NotLoadableClass $arg1 = null, $arg2)
+function reflectionParameterFixture(?NotLoadableClass $arg1, $arg2)
 {
 }

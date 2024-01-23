@@ -75,8 +75,8 @@ final class LightSmsTransport extends AbstractTransport
         private string $login,
         #[\SensitiveParameter] private string $password,
         private string $from,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

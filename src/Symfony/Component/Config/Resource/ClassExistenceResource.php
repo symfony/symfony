@@ -35,7 +35,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      */
     public function __construct(
         private string $resource,
-        bool $exists = null,
+        ?bool $exists = null,
     ) {
         if (null !== $exists) {
             $this->exists = [$exists, null];
@@ -139,7 +139,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      *
      * @internal
      */
-    public static function throwOnRequiredClass(string $class, \Exception $previous = null): void
+    public static function throwOnRequiredClass(string $class, ?\Exception $previous = null): void
     {
         // If the passed class is the resource being checked, we shouldn't throw.
         if (null === $previous && self::$autoloadedClass === $class) {

@@ -26,5 +26,5 @@ interface WarmableInterface
      *
      * @return string[] A list of classes or files to preload
      */
-    public function warmUp(string $cacheDir, string $buildDir = null): array;
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array;
 }

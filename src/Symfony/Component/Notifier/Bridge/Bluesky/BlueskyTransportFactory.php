@@ -25,8 +25,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class BlueskyTransportFactory extends AbstractTransportFactory
 {
     public function __construct(
-        EventDispatcherInterface $dispatcher = null,
-        HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
         private ?LoggerInterface $logger = null,
     ) {
         parent::__construct($dispatcher, $client);

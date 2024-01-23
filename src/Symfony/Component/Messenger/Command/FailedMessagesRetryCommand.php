@@ -47,7 +47,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
     private bool $forceExit = false;
     private ?Worker $worker = null;
 
-    public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, PhpSerializer $phpSerializer = null, array $signals = null)
+    public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null, ?PhpSerializer $phpSerializer = null, ?array $signals = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;

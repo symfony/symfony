@@ -34,9 +34,9 @@ final class ResendApiTransport extends AbstractApiTransport
 {
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiKey,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
-        LoggerInterface $logger = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
     ) {
         parent::__construct($client, $dispatcher, $logger);
     }

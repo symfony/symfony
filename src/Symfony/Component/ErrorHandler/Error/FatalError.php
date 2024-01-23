@@ -20,9 +20,9 @@ class FatalError extends \Error
         string $message,
         int $code,
         private array $error,
-        int $traceOffset = null,
+        ?int $traceOffset = null,
         bool $traceArgs = true,
-        array $trace = null,
+        ?array $trace = null,
     ) {
         parent::__construct($message, $code);
 

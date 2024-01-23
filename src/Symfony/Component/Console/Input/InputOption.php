@@ -65,10 +65,10 @@ class InputOption
      */
     public function __construct(
         string $name,
-        string|array $shortcut = null,
-        int $mode = null,
+        string|array|null $shortcut = null,
+        ?int $mode = null,
         private string $description = '',
-        string|bool|int|float|array $default = null,
+        string|bool|int|float|array|null $default = null,
         private array|\Closure $suggestedValues = [],
     ) {
         if (str_starts_with($name, '--')) {

@@ -32,8 +32,8 @@ final class SimpleTextinTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiKey,
         private readonly ?string $from = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

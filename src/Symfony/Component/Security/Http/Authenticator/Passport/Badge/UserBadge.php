@@ -49,7 +49,7 @@ class UserBadge implements BadgeInterface
      * is thrown). If this is not set, the default user provider will be used with
      * $userIdentifier as username.
      */
-    public function __construct(string $userIdentifier, callable $userLoader = null, array $attributes = null)
+    public function __construct(string $userIdentifier, ?callable $userLoader = null, ?array $attributes = null)
     {
         if (\strlen($userIdentifier) > self::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Username too long.');

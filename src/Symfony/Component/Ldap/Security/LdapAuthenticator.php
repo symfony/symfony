@@ -79,7 +79,7 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
         return $this->authenticator->onAuthenticationFailure($request, $exception);
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if (!$this->authenticator instanceof AuthenticationEntryPointInterface) {
             throw new NotAnEntryPointException(sprintf('Decorated authenticator "%s" does not implement interface "%s".', get_debug_type($this->authenticator), AuthenticationEntryPointInterface::class));

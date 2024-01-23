@@ -28,7 +28,7 @@ class CommandNotFoundException extends \InvalidArgumentException implements Exce
         string $message,
         private array $alternatives = [],
         int $code = 0,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
     ) {
         parent::__construct($message, $code, $previous);
     }

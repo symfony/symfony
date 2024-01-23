@@ -34,9 +34,9 @@ final class MobytTransport extends AbstractTransport
         private string $accountSid,
         #[\SensitiveParameter] private string $authToken,
         private string $from,
-        string $typeQuality = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?string $typeQuality = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         $typeQuality ??= MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
         MobytOptions::validateMessageType($typeQuality);

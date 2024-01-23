@@ -31,8 +31,8 @@ class MacAddress extends Constraint
 
     public function __construct(
         public string $message = 'This value is not a valid MAC address.',
-        callable $normalizer = null,
-        array $groups = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         mixed $payload = null,
     ) {
         parent::__construct(null, $groups, $payload);

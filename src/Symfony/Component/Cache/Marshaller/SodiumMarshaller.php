@@ -30,7 +30,7 @@ class SodiumMarshaller implements MarshallerInterface
      */
     public function __construct(
         private array $decryptionKeys,
-        MarshallerInterface $marshaller = null,
+        ?MarshallerInterface $marshaller = null,
     ) {
         if (!self::isSupported()) {
             throw new CacheException('The "sodium" PHP extension is not loaded.');

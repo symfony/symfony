@@ -29,7 +29,7 @@ final class Charset extends Constraint
     public function __construct(
         public array|string $encodings = [],
         public string $message = 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.',
-        array $groups = null,
+        ?array $groups = null,
         mixed $payload = null,
     ) {
         parent::__construct(null, $groups, $payload);

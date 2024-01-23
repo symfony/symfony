@@ -32,8 +32,8 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     public function __construct(
         private ValidatorInterface $validator,
         private bool $legacyErrorMessages = true,
-        FormRendererInterface $formRenderer = null,
-        TranslatorInterface $translator = null,
+        ?FormRendererInterface $formRenderer = null,
+        ?TranslatorInterface $translator = null,
     ) {
         $this->violationMapper = new ViolationMapper($formRenderer, $translator);
     }

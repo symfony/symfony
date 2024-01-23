@@ -41,9 +41,9 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     public function __construct(
         #[\SensitiveParameter] private string $key,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
-        LoggerInterface $logger = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
     ) {
         $this->dispatcher = $dispatcher;
 

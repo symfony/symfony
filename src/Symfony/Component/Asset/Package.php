@@ -27,7 +27,7 @@ class Package implements PackageInterface
 
     public function __construct(
         private VersionStrategyInterface $versionStrategy,
-        ContextInterface $context = null,
+        ?ContextInterface $context = null,
     ) {
         $this->context = $context ?? new NullContext();
     }

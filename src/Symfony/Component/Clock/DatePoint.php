@@ -21,7 +21,7 @@ final class DatePoint extends \DateTimeImmutable
     /**
      * @throws \DateMalformedStringException When $datetime is invalid
      */
-    public function __construct(string $datetime = 'now', \DateTimeZone $timezone = null, parent $reference = null)
+    public function __construct(string $datetime = 'now', ?\DateTimeZone $timezone = null, ?parent $reference = null)
     {
         $now = $reference ?? Clock::get()->now();
 
@@ -51,7 +51,7 @@ final class DatePoint extends \DateTimeImmutable
     /**
      * @throws \DateMalformedStringException When $format or $datetime are invalid
      */
-    public static function createFromFormat(string $format, string $datetime, \DateTimeZone $timezone = null): static
+    public static function createFromFormat(string $format, string $datetime, ?\DateTimeZone $timezone = null): static
     {
         return parent::createFromFormat($format, $datetime, $timezone) ?: throw new \DateMalformedStringException(static::getLastErrors()['errors'][0] ?? 'Invalid date string or format.');
     }

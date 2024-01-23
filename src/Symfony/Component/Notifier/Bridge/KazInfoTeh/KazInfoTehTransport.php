@@ -32,8 +32,8 @@ class KazInfoTehTransport extends AbstractTransport
         private string $username,
         #[\SensitiveParameter] private string $password,
         private string $sender,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

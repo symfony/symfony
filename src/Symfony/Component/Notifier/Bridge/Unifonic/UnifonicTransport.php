@@ -31,8 +31,8 @@ final class UnifonicTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private readonly string $appSid,
         private readonly ?string $from = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

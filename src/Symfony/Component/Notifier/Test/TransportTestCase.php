@@ -27,7 +27,7 @@ abstract class TransportTestCase extends TestCase
     protected const CUSTOM_HOST = 'host.test';
     protected const CUSTOM_PORT = 42;
 
-    abstract public static function createTransport(HttpClientInterface $client = null): TransportInterface;
+    abstract public static function createTransport(?HttpClientInterface $client = null): TransportInterface;
 
     /**
      * @return iterable<array{0: string, 1: TransportInterface}>
@@ -55,7 +55,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider supportedMessagesProvider
      */
-    public function testSupportedMessages(MessageInterface $message, TransportInterface $transport = null)
+    public function testSupportedMessages(MessageInterface $message, ?TransportInterface $transport = null)
     {
         $transport ??= $this->createTransport();
 
@@ -65,7 +65,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider unsupportedMessagesProvider
      */
-    public function testUnsupportedMessages(MessageInterface $message, TransportInterface $transport = null)
+    public function testUnsupportedMessages(MessageInterface $message, ?TransportInterface $transport = null)
     {
         $transport ??= $this->createTransport();
 
@@ -75,7 +75,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider unsupportedMessagesProvider
      */
-    public function testUnsupportedMessagesTrowUnsupportedMessageTypeExceptionWhenSend(MessageInterface $message, TransportInterface $transport = null)
+    public function testUnsupportedMessagesTrowUnsupportedMessageTypeExceptionWhenSend(MessageInterface $message, ?TransportInterface $transport = null)
     {
         $transport ??= $this->createTransport();
 

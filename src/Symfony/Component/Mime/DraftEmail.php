@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Part\AbstractPart;
  */
 class DraftEmail extends Email
 {
-    public function __construct(Headers $headers = null, AbstractPart $body = null)
+    public function __construct(?Headers $headers = null, ?AbstractPart $body = null)
     {
         parent::__construct($headers, $body);
 

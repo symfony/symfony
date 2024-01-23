@@ -31,8 +31,8 @@ final class EsendexTransport extends AbstractTransport
         #[\SensitiveParameter] private string $password,
         private string $accountReference,
         private string $from,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

@@ -66,7 +66,7 @@ class CssColor extends Constraint
      * @param string[]|null                       $groups
      * @param array<string,mixed>|null            $options
      */
-    public function __construct(array|string $formats = [], string $message = null, array $groups = null, $payload = null, array $options = null)
+    public function __construct(array|string $formats = [], ?string $message = null, ?array $groups = null, $payload = null, ?array $options = null)
     {
         $validationModesAsString = implode(', ', self::$validationModes);
 

@@ -40,12 +40,12 @@ class Unique extends Constraint
      * @param string[]|string|null     $fields  Defines the key or keys in the collection that should be checked for uniqueness (defaults to null, which ensure uniqueness for all keys)
      */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         mixed $payload = null,
-        array|string $fields = null,
+        array|string|null $fields = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

@@ -53,12 +53,12 @@ class Cidr extends Constraint
      * @param string[]|null            $groups
      */
     public function __construct(
-        array $options = null,
-        string $version = null,
-        int $netmaskMin = null,
-        int $netmaskMax = null,
-        string $message = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $version = null,
+        ?int $netmaskMin = null,
+        ?int $netmaskMax = null,
+        ?string $message = null,
+        ?array $groups = null,
         $payload = null,
     ) {
         $this->version = $version ?? $options['version'] ?? $this->version;

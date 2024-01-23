@@ -19,7 +19,7 @@ final class TransitionEvent extends Event
 {
     use HasContextTrait;
 
-    public function __construct(object $subject, Marking $marking, Transition $transition = null, WorkflowInterface $workflow = null, array $context = [])
+    public function __construct(object $subject, Marking $marking, ?Transition $transition = null, ?WorkflowInterface $workflow = null, array $context = [])
     {
         parent::__construct($subject, $marking, $transition, $workflow);
 

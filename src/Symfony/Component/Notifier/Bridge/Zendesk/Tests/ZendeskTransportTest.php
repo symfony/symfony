@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class ZendeskTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): ZendeskTransport
+    public static function createTransport(?HttpClientInterface $client = null): ZendeskTransport
     {
         return (new ZendeskTransport('testEmail', 'testToken', $client ?? new MockHttpClient()))->setHost('test.zendesk.com');
     }

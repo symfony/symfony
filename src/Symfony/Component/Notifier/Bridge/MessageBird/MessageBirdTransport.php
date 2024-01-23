@@ -31,8 +31,8 @@ final class MessageBirdTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private string $token,
         private string $from,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
 )
     {
         parent::__construct($client, $dispatcher);

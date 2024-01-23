@@ -104,14 +104,14 @@ final class Transport
         Bridge\Zulip\ZulipTransportFactory::class,
     ];
 
-    public static function fromDsn(#[\SensitiveParameter] string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null): TransportInterface
     {
         $factory = new self(self::getDefaultFactories($dispatcher, $client));
 
         return $factory->fromString($dsn);
     }
 
-    public static function fromDsns(#[\SensitiveParameter] array $dsns, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
+    public static function fromDsns(#[\SensitiveParameter] array $dsns, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null): TransportInterface
     {
         $factory = new self(iterator_to_array(self::getDefaultFactories($dispatcher, $client)));
 
@@ -178,7 +178,7 @@ final class Transport
     /**
      * @return TransportFactoryInterface[]
      */
-    private static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): iterable
+    private static function getDefaultFactories(?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null): iterable
     {
         foreach (self::FACTORY_CLASSES as $factoryClass) {
             if (class_exists($factoryClass)) {

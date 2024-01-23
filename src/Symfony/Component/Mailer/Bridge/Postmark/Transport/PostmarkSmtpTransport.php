@@ -29,7 +29,7 @@ class PostmarkSmtpTransport extends EsmtpTransport
 {
     private ?string $messageStream = null;
 
-    public function __construct(#[\SensitiveParameter] string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(#[\SensitiveParameter] string $id, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         parent::__construct('smtp.postmarkapp.com', 587, false, $dispatcher, $logger);
 
@@ -37,7 +37,7 @@ class PostmarkSmtpTransport extends EsmtpTransport
         $this->setPassword($id);
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Message) {
             $this->addPostmarkHeaders($message);

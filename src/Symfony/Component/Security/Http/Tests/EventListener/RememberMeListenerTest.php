@@ -65,14 +65,14 @@ class RememberMeListenerTest extends TestCase
         $this->listener->clearCookie();
     }
 
-    private function createLoginSuccessfulEvent(Passport $passport = null)
+    private function createLoginSuccessfulEvent(?Passport $passport = null)
     {
         $passport ??= $this->createPassport();
 
         return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), $this->request, $this->response, 'main_firewall');
     }
 
-    private function createPassport(array $badges = null)
+    private function createPassport(?array $badges = null)
     {
         if (null === $badges) {
             $badge = new RememberMeBadge();

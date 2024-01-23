@@ -26,7 +26,7 @@ class StaticVersionStrategy implements VersionStrategyInterface
      */
     public function __construct(
         private string $version,
-        string $format = null,
+        ?string $format = null,
     ) {
         $this->format = $format ?: '%s?%s';
     }

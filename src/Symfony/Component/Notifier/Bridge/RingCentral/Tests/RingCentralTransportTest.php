@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class RingCentralTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): RingCentralTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'from'): RingCentralTransport
     {
         return new RingCentralTransport('apiToken', $from, $client ?? new MockHttpClient());
     }

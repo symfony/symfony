@@ -33,8 +33,8 @@ final class MessageMediaTransport extends AbstractTransport
         #[\SensitiveParameter] private string $apiKey,
         #[\SensitiveParameter] private string $apiSecret,
         private ?string $from = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

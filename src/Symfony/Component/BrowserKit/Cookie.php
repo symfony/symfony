@@ -56,8 +56,8 @@ class Cookie
     public function __construct(
         private string $name,
         ?string $value,
-        string $expires = null,
-        string $path = null,
+        ?string $expires = null,
+        ?string $path = null,
         private string $domain = '',
         private bool $secure = false,
         private bool $httponly = true,
@@ -123,7 +123,7 @@ class Cookie
      *
      * @throws InvalidArgumentException
      */
-    public static function fromString(string $cookie, string $url = null): static
+    public static function fromString(string $cookie, ?string $url = null): static
     {
         $parts = explode(';', $cookie);
 

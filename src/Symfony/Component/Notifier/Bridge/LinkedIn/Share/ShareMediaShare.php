@@ -38,7 +38,7 @@ class ShareMediaShare extends AbstractLinkedInShare
         self::REGISTER,
     ];
 
-    public function __construct(string $text, array $attributes = [], string $inferredLocale = null, bool $landingPage = false, string $landingPageTitle = null, string $landingPageUrl = null)
+    public function __construct(string $text, array $attributes = [], ?string $inferredLocale = null, bool $landingPage = false, ?string $landingPageTitle = null, ?string $landingPageUrl = null)
     {
         $this->options['description'] = [
             'text' => $text,

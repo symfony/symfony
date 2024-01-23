@@ -37,7 +37,7 @@ class ExpressionSyntax extends Constraint
      * @param string[]|null            $allowedVariables Restrict the available variables in the expression to these values (defaults to null that allows any variable)
      * @param string[]|null            $groups
      */
-    public function __construct(array $options = null, string $message = null, string $service = null, array $allowedVariables = null, array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?string $service = null, ?array $allowedVariables = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);
 

@@ -34,5 +34,5 @@ interface ConnectionInterface
      * @throws ConnectionTimeoutException  When the connection can't be created because of an LDAP_TIMEOUT error
      * @throws InvalidCredentialsException When the connection can't be created because of an LDAP_INVALID_CREDENTIALS error
      */
-    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void;
+    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null): void;
 }

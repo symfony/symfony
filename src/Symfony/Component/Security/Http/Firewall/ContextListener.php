@@ -55,7 +55,7 @@ class ContextListener extends AbstractListener
     /**
      * @param iterable<mixed, UserProviderInterface> $userProviders
      */
-    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null, callable $sessionTrackerEnabler = null)
+    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, ?LoggerInterface $logger = null, ?EventDispatcherInterface $dispatcher = null, ?AuthenticationTrustResolverInterface $trustResolver = null, ?callable $sessionTrackerEnabler = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');

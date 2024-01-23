@@ -33,8 +33,8 @@ final class ContactEveryoneTransport extends AbstractTransport
         #[\SensitiveParameter] private string $token,
         private ?string $diffusionName,
         private ?string $category,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

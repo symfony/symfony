@@ -50,9 +50,9 @@ class ProgressIndicator
      */
     public function __construct(
         private OutputInterface $output,
-        string $format = null,
+        ?string $format = null,
         private int $indicatorChangeInterval = 100,
-        array $indicatorValues = null,
+        ?array $indicatorValues = null,
     ) {
 
         $format ??= $this->determineBestFormat();

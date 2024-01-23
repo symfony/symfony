@@ -44,8 +44,8 @@ final class GoogleChatTransport extends AbstractTransport
         #[\SensitiveParameter] private string $accessKey,
         #[\SensitiveParameter] private string $accessToken,
         private ?string $threadKey = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

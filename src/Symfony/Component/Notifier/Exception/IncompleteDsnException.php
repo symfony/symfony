@@ -19,7 +19,7 @@ class IncompleteDsnException extends InvalidArgumentException
     public function __construct(
         string $message,
         private ?string $dsn = null,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
     ) {
         if ($dsn) {
             $message = sprintf('Invalid "%s" notifier DSN: %s', $dsn, $message);

@@ -54,9 +54,9 @@ class MailjetApiTransport extends AbstractApiTransport
     public function __construct(
         private string $publicKey,
         #[\SensitiveParameter] private string $privateKey,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
-        LoggerInterface $logger = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
         private bool $sandbox = false,
     ) {
         parent::__construct($client, $dispatcher, $logger);

@@ -41,8 +41,8 @@ final class TwitterTransport extends AbstractTransport
         #[\SensitiveParameter] private string $apiSecret,
         #[\SensitiveParameter] private string $accessToken,
         #[\SensitiveParameter] private string $accessSecret,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
 )
     {
         parent::__construct($client, $dispatcher);

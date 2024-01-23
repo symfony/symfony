@@ -27,7 +27,7 @@ final class NotificationDataCollector extends DataCollector
     ) {
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->data['events'] = $this->logger->getEvents();
     }

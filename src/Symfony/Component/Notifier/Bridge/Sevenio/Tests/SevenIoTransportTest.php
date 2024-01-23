@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SevenIoTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = null): SevenIoTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $from = null): SevenIoTransport
     {
         return new SevenIoTransport('apiKey', $from, $client ?? new MockHttpClient());
     }

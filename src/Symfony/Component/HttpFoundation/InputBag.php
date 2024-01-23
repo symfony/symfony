@@ -84,7 +84,7 @@ final class InputBag extends ParameterBag
      *
      * @return ?T
      */
-    public function getEnum(string $key, string $class, \BackedEnum $default = null): ?\BackedEnum
+    public function getEnum(string $key, string $class, ?\BackedEnum $default = null): ?\BackedEnum
     {
         try {
             return parent::getEnum($key, $class, $default);

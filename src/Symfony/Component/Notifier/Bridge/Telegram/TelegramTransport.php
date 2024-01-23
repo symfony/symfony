@@ -50,8 +50,8 @@ final class TelegramTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private string $token,
         private ?string $chatChannel = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
 )
     {
         parent::__construct($client, $dispatcher);

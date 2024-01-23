@@ -32,8 +32,8 @@ final class FortySixElksTransport extends AbstractTransport
         private string $apiUsername,
         #[\SensitiveParameter] private string $apiPassword,
         private string $from,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

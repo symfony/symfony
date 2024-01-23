@@ -42,7 +42,7 @@ class FormError
      */
     public function __construct(
         private string $message,
-        string $messageTemplate = null,
+        ?string $messageTemplate = null,
         protected array $messageParameters = [],
         protected ?int $messagePluralization = null,
         private mixed $cause = null,

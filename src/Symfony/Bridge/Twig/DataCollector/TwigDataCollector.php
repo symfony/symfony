@@ -32,13 +32,13 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     private ?Environment $twig;
     private array $computed;
 
-    public function __construct(Profile $profile, Environment $twig = null)
+    public function __construct(Profile $profile, ?Environment $twig = null)
     {
         $this->profile = $profile;
         $this->twig = $twig;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
     }
 

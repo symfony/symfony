@@ -103,7 +103,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function add(string|FormInterface $child, string $type = null, array $options = []): static
+    public function add(string|FormInterface $child, ?string $type = null, array $options = []): static
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -334,7 +334,7 @@ class Button implements \IteratorAggregate, FormInterface
         return null === $this->parent;
     }
 
-    public function createView(FormView $parent = null): FormView
+    public function createView(?FormView $parent = null): FormView
     {
         if (null === $parent && $this->parent) {
             $parent = $this->parent->createView();

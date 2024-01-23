@@ -25,5 +25,5 @@ interface DumperInterface
     /**
      * Dumps a workflow definition.
      */
-    public function dump(Definition $definition, Marking $marking = null, array $options = []): string;
+    public function dump(Definition $definition, ?Marking $marking = null, array $options = []): string;
 }

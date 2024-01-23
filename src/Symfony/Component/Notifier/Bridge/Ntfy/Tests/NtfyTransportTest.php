@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class NtfyTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): NtfyTransport
+    public static function createTransport(?HttpClientInterface $client = null): NtfyTransport
     {
         return new NtfyTransport('test', true, $client ?? new MockHttpClient());
     }

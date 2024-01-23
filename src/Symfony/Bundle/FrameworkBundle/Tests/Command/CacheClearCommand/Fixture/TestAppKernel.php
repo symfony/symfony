@@ -52,7 +52,7 @@ class DummyFileCacheWarmer implements CacheWarmerInterface
         return false;
     }
 
-    public function warmUp(string $cacheDir, string $buildDir = null): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         file_put_contents($cacheDir.'/dummy.txt', 'Hello');
 

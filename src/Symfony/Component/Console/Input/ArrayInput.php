@@ -27,7 +27,7 @@ class ArrayInput extends Input
 {
     public function __construct(
         private array $parameters,
-        InputDefinition $definition = null,
+        ?InputDefinition $definition = null,
     ) {
         parent::__construct($definition);
     }

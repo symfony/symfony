@@ -30,8 +30,8 @@ final class PagerDutyTransport extends AbstractTransport
 
     public function __construct(
         #[\SensitiveParameter] private readonly string $token,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
 )
     {
         parent::__construct($client, $dispatcher);
@@ -47,7 +47,7 @@ final class PagerDutyTransport extends AbstractTransport
         return $message instanceof PushMessage && (null === $message->getOptions() || $message->getOptions() instanceof PagerDutyOptions);
     }
 
-    protected function doSend(MessageInterface $message = null): SentMessage
+    protected function doSend(?MessageInterface $message = null): SentMessage
     {
         if (!$message instanceof PushMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);

@@ -38,11 +38,11 @@ class Time extends Constraint
      * @param bool|null                $withSeconds Whether to allow seconds in the given value (defaults to true)
      */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?array $groups = null,
         mixed $payload = null,
-        bool $withSeconds = null,
+        ?bool $withSeconds = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

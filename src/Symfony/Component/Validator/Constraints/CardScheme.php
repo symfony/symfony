@@ -51,7 +51,7 @@ class CardScheme extends Constraint
      * @param string[]|null                            $groups
      * @param array<string,mixed>                      $options
      */
-    public function __construct(array|string|null $schemes, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
+    public function __construct(array|string|null $schemes, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($schemes) && \is_string(key($schemes))) {
             $options = array_merge($schemes, $options);

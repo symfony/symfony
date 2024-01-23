@@ -37,7 +37,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
      *                   * RequestStack: generates a namespace using the current main request
      *                   * callable: uses the result of this callable (must return a string)
      */
-    public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null, string|RequestStack|callable $namespace = null)
+    public function __construct(?TokenGeneratorInterface $generator = null, ?TokenStorageInterface $storage = null, string|RequestStack|callable|null $namespace = null)
     {
         $this->generator = $generator ?? new UriSafeTokenGenerator();
         $this->storage = $storage ?? new NativeSessionTokenStorage();

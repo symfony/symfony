@@ -40,7 +40,7 @@ class RecursiveValidator implements ValidatorInterface
      *
      * @param ObjectInitializerInterface[] $objectInitializers The object initializers
      */
-    public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], ContainerInterface $groupProviderLocator = null)
+    public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], ?ContainerInterface $groupProviderLocator = null)
     {
         $this->contextFactory = $contextFactory;
         $this->metadataFactory = $metadataFactory;
@@ -81,21 +81,21 @@ class RecursiveValidator implements ValidatorInterface
         return $this->metadataFactory->hasMetadataFor($object);
     }
 
-    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null): ConstraintViolationListInterface
+    public function validate(mixed $value, Constraint|array|null $constraints = null, string|GroupSequence|array|null $groups = null): ConstraintViolationListInterface
     {
         return $this->startContext($value)
             ->validate($value, $constraints, $groups)
             ->getViolations();
     }
 
-    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null): ConstraintViolationListInterface
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array|null $groups = null): ConstraintViolationListInterface
     {
         return $this->startContext($object)
             ->validateProperty($object, $propertyName, $groups)
             ->getViolations();
     }
 
-    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null): ConstraintViolationListInterface
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array|null $groups = null): ConstraintViolationListInterface
     {
         // If a class name is passed, take $value as root
         return $this->startContext(\is_object($objectOrClass) ? $objectOrClass : $value)

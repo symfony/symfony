@@ -36,7 +36,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
     public function __construct(
         private SerializerInterface $serializer,
         string|callable $format,
-        ErrorRendererInterface $fallbackErrorRenderer = null,
+        ?ErrorRendererInterface $fallbackErrorRenderer = null,
         bool|callable $debug = false,
     ) {
         $this->format = \is_string($format) ? $format : $format(...);

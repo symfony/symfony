@@ -34,8 +34,8 @@ final class NtfyTransport extends AbstractTransport
     public function __construct(
         private string $topic,
         private bool $secureHttp = true,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

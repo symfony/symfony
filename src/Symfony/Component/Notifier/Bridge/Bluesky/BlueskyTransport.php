@@ -36,8 +36,8 @@ final class BlueskyTransport extends AbstractTransport
         #[\SensitiveParameter] private string $user,
         #[\SensitiveParameter] private string $password,
         private LoggerInterface $logger,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

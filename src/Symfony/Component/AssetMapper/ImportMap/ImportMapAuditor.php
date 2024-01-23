@@ -23,7 +23,7 @@ class ImportMapAuditor
 
     public function __construct(
         private readonly ImportMapConfigReader $configReader,
-        HttpClientInterface $httpClient = null,
+        ?HttpClientInterface $httpClient = null,
     ) {
         $this->httpClient = $httpClient ?? HttpClient::create();
     }

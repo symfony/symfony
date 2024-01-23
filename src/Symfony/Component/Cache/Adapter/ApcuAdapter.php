@@ -26,7 +26,7 @@ class ApcuAdapter extends AbstractAdapter
     public function __construct(
         string $namespace = '',
         int $defaultLifetime = 0,
-        string $version = null,
+        ?string $version = null,
         private ?MarshallerInterface $marshaller = null,
     ) {
         if (!static::isSupported()) {

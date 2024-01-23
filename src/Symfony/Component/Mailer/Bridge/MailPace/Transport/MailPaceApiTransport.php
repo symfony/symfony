@@ -33,9 +33,9 @@ final class MailPaceApiTransport extends AbstractApiTransport
 
     public function __construct(
         #[\SensitiveParameter] private string $key,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
-        LoggerInterface $logger = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
     ) {
         parent::__construct($client, $dispatcher, $logger);
     }

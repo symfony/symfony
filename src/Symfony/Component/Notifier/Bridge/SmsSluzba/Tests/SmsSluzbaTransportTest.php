@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmsSluzbaTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = null): SmsSluzbaTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $from = null): SmsSluzbaTransport
     {
         return new SmsSluzbaTransport('username', 'password');
     }

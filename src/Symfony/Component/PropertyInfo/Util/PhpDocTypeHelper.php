@@ -105,7 +105,7 @@ final class PhpDocTypeHelper
     /**
      * Creates a {@see Type} from a PHPDoc type.
      */
-    private function createType(DocType $type, bool $nullable, string $docType = null): ?Type
+    private function createType(DocType $type, bool $nullable, ?string $docType = null): ?Type
     {
         $docType ??= (string) $type;
 

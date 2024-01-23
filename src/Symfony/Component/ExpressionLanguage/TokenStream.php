@@ -56,7 +56,7 @@ class TokenStream
     /**
      * @param string|null $message The syntax error message
      */
-    public function expect(string $type, string $value = null, string $message = null): void
+    public function expect(string $type, ?string $value = null, ?string $message = null): void
     {
         $token = $this->current;
         if (!$token->test($type, $value)) {

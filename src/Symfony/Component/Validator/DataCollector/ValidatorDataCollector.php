@@ -37,7 +37,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         $this->reset();
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         // Everything is collected once, on kernel terminate.
     }

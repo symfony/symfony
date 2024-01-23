@@ -36,8 +36,8 @@ final class OvhCloudTransport extends AbstractTransport
         #[\SensitiveParameter] private string $applicationSecret,
         #[\SensitiveParameter] private string $consumerKey,
         private string $serviceName,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     )
     {
         parent::__construct($client, $dispatcher);

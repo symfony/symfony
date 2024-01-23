@@ -52,7 +52,7 @@ final class ShareContentShare extends AbstractLinkedInShare
         self::LIVE_VIDEO,
     ];
 
-    public function __construct(string $text, array $attributes = [], string $inferredLocale = null, ShareMediaShare $media = null, string $primaryLandingPageUrl = null, string $shareMediaCategory = self::NONE)
+    public function __construct(string $text, array $attributes = [], ?string $inferredLocale = null, ?ShareMediaShare $media = null, ?string $primaryLandingPageUrl = null, string $shareMediaCategory = self::NONE)
     {
         $this->options['shareCommentary'] = [
             'attributes' => $attributes,

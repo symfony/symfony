@@ -29,8 +29,8 @@ final class OrangeSmsTransport extends AbstractTransport
         #[\SensitiveParameter] private string $clientSecret,
         private string $from,
         private ?string $senderName = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     )
     {
         parent::__construct($client, $dispatcher);

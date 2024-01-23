@@ -23,7 +23,7 @@ class IOException extends \RuntimeException implements IOExceptionInterface
     public function __construct(
         string $message,
         int $code = 0,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
         private ?string $path = null,
     ) {
         parent::__construct($message, $code, $previous);

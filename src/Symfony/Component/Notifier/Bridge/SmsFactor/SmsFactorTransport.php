@@ -32,8 +32,8 @@ final class SmsFactorTransport extends AbstractTransport
         #[\SensitiveParameter] private string $tokenApi,
         private ?string $sender,
         private ?SmsFactorPushType $pushType,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     )
     {
         parent::__construct($client, $dispatcher);

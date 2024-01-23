@@ -42,10 +42,10 @@ class Country extends Constraint
      * @see https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3#Current_codes
      */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        bool $alpha3 = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?bool $alpha3 = null,
+        ?array $groups = null,
         mixed $payload = null,
     ) {
         if (!class_exists(Countries::class)) {

@@ -21,7 +21,7 @@ final class ZulipOptions implements MessageOptionsInterface
     private ?string $topic;
     private ?string $recipient;
 
-    public function __construct(string $topic = null, string $recipient = null)
+    public function __construct(?string $topic = null, ?string $recipient = null)
     {
         $this->topic = $topic;
         $this->recipient = $recipient;

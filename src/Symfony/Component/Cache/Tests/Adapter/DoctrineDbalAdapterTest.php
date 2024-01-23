@@ -107,7 +107,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideDsnWithSQLite
      */
-    public function testDsnWithSQLite(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
         try {
             $pool = new DoctrineDbalAdapter($dsn);

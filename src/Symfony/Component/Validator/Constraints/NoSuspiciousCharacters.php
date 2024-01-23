@@ -90,15 +90,15 @@ class NoSuspiciousCharacters extends Constraint
      * @param string[]|null                               $groups
      */
     public function __construct(
-        array $options = null,
-        string $restrictionLevelMessage = null,
-        string $invisibleMessage = null,
-        string $mixedNumbersMessage = null,
-        string $hiddenOverlayMessage = null,
-        int $checks = null,
-        int $restrictionLevel = null,
-        array $locales = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $restrictionLevelMessage = null,
+        ?string $invisibleMessage = null,
+        ?string $mixedNumbersMessage = null,
+        ?string $hiddenOverlayMessage = null,
+        ?int $checks = null,
+        ?int $restrictionLevel = null,
+        ?array $locales = null,
+        ?array $groups = null,
         mixed $payload = null,
     ) {
         if (!class_exists(\Spoofchecker::class)) {

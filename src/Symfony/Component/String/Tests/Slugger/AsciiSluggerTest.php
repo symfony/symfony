@@ -19,7 +19,7 @@ class AsciiSluggerTest extends TestCase
     /**
      * @dataProvider provideSlugTests
      */
-    public function testSlug(string $expected, string $string, string $separator = '-', string $locale = null)
+    public function testSlug(string $expected, string $string, string $separator = '-', ?string $locale = null)
     {
         $slugger = new AsciiSlugger();
 

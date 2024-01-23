@@ -34,7 +34,7 @@ class EmailChannel implements ChannelInterface
     public function __construct(
         private ?TransportInterface $transport = null,
         private ?MessageBusInterface $bus = null,
-        string $from = null,
+        ?string $from = null,
         private ?Envelope $envelope = null,
     ) {
         if (null === $transport && null === $bus) {
@@ -47,7 +47,7 @@ class EmailChannel implements ChannelInterface
     /**
      * @param EmailRecipientInterface $recipient
      */
-    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
+    public function notify(Notification $notification, RecipientInterface $recipient, ?string $transportName = null): void
     {
         $message = null;
         if ($notification instanceof EmailNotificationInterface) {

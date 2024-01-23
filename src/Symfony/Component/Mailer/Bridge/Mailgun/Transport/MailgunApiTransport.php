@@ -37,9 +37,9 @@ class MailgunApiTransport extends AbstractApiTransport
         #[\SensitiveParameter] private string $key,
         private string $domain,
         private ?string $region = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
-        LoggerInterface $logger = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
     ) {
         parent::__construct($client, $dispatcher, $logger);
     }

@@ -28,7 +28,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     /**
      * @param \Traversable<EnvVarLoaderInterface>|null $loaders
      */
-    public function __construct(ContainerInterface $container, \Traversable $loaders = null)
+    public function __construct(ContainerInterface $container, ?\Traversable $loaders = null)
     {
         $this->container = $container;
         $this->loaders = $loaders ?? new \ArrayIterator();

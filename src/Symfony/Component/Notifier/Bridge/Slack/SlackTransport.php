@@ -31,8 +31,8 @@ final class SlackTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private string $accessToken,
         private ?string $channel = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
 )
     {
         if (!preg_match('/^xox(b-|p-|a-2)/', $accessToken)) {

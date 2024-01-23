@@ -188,7 +188,7 @@ class TextDescriptor extends Descriptor
         return $options;
     }
 
-    private function formatClassLink(string $class, string $text = null): string
+    private function formatClassLink(string $class, ?string $text = null): string
     {
         $text ??= $class;
 

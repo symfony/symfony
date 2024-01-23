@@ -28,7 +28,7 @@ final class ConsoleErrorEvent extends ConsoleEvent
         InputInterface $input,
         OutputInterface $output,
         private \Throwable $error,
-        Command $command = null,
+        ?Command $command = null,
     ) {
         parent::__construct($command, $input, $output);
     }

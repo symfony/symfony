@@ -36,7 +36,7 @@ class LoginFailureEvent extends Event
     private string $firewallName;
     private ?Passport $passport;
 
-    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName, Passport $passport = null)
+    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName, ?Passport $passport = null)
     {
         $this->exception = $exception;
         $this->authenticator = $authenticator;

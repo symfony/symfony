@@ -129,7 +129,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
         }
     }
 
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         return $this->response->getInfo($type);
     }

@@ -81,7 +81,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
 
 class RemoveTestController1
 {
-    public function fooAction(\stdClass $bar, ClassNotInContainer $baz = null)
+    public function fooAction(\stdClass $bar, ?ClassNotInContainer $baz = null)
     {
     }
 }
@@ -92,7 +92,7 @@ class RemoveTestController2
     {
     }
 
-    public function fooAction(ClassNotInContainer $bar = null)
+    public function fooAction(?ClassNotInContainer $bar = null)
     {
     }
 }

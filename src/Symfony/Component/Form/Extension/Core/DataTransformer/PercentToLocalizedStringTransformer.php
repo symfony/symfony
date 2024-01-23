@@ -45,8 +45,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      * @throws UnexpectedTypeException if the given value of type is unknown
      */
     public function __construct(
-        int $scale = null,
-        string $type = null,
+        ?int $scale = null,
+        ?string $type = null,
         private int $roundingMode = \NumberFormatter::ROUND_HALFUP,
         private bool $html5Format = false,
     ) {

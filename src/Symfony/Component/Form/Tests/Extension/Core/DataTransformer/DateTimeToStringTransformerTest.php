@@ -171,7 +171,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $reverseTransformer->reverseTransform('2010-04-31');
     }
 
-    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer
     {
         return new DateTimeToStringTransformer($inputTimezone, $outputTimezone);
     }

@@ -2320,7 +2320,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $data)));
     }
 
-    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, FrameworkExtension $extension = null): ContainerBuilder
+    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, ?FrameworkExtension $extension = null): ContainerBuilder
     {
         $cacheKey = md5(static::class.$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {

@@ -43,9 +43,9 @@ class InputArgument
      */
     public function __construct(
         private string $name,
-        int $mode = null,
+        ?int $mode = null,
         private string $description = '',
-        string|bool|int|float|array $default = null,
+        string|bool|int|float|array|null $default = null,
         private \Closure|array $suggestedValues = [],
     ) {
         if (null === $mode) {

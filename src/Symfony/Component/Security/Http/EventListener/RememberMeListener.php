@@ -37,7 +37,7 @@ class RememberMeListener implements EventSubscriberInterface
     private RememberMeHandlerInterface $rememberMeHandler;
     private ?LoggerInterface $logger;
 
-    public function __construct(RememberMeHandlerInterface $rememberMeHandler, LoggerInterface $logger = null)
+    public function __construct(RememberMeHandlerInterface $rememberMeHandler, ?LoggerInterface $logger = null)
     {
         $this->rememberMeHandler = $rememberMeHandler;
         $this->logger = $logger;

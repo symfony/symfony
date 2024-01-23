@@ -40,7 +40,7 @@ class RouterController
      */
     private iterable $expressionLanguageProviders;
 
-    public function __construct(?Profiler $profiler, Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null, iterable $expressionLanguageProviders = [])
+    public function __construct(?Profiler $profiler, Environment $twig, ?UrlMatcherInterface $matcher = null, ?RouteCollection $routes = null, iterable $expressionLanguageProviders = [])
     {
         $this->profiler = $profiler;
         $this->twig = $twig;

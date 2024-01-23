@@ -45,7 +45,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     public function __construct(
         string $namespace = '',
         int $defaultLifetime = 0,
-        string $directory = null,
+        ?string $directory = null,
         private bool $appendOnly = false,
     ) {
         self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();

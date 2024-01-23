@@ -40,7 +40,7 @@ class TextDescriptor extends Descriptor
 {
     private ?FileLinkFormatter $fileLinkFormatter;
 
-    public function __construct(FileLinkFormatter $fileLinkFormatter = null)
+    public function __construct(?FileLinkFormatter $fileLinkFormatter = null)
     {
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
@@ -159,7 +159,7 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerService(object $service, array $options = [], ?ContainerBuilder $container = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -281,7 +281,7 @@ class TextDescriptor extends Descriptor
         $options['output']->table($tableHeaders, $tableRows);
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ?ContainerBuilder $container = null): void
     {
         if (isset($options['id'])) {
             $options['output']->title(sprintf('Information for Service "<info>%s</info>"', $options['id']));
@@ -420,7 +420,7 @@ class TextDescriptor extends Descriptor
         $options['output']->listing($formattedLogs);
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerAlias(Alias $alias, array $options = [], ?ContainerBuilder $container = null): void
     {
         if ($alias->isPublic() && !$alias->isPrivate()) {
             $options['output']->comment(sprintf('This service is a <info>public</info> alias for the service <info>%s</info>', (string) $alias));
@@ -579,7 +579,7 @@ class TextDescriptor extends Descriptor
         return trim($configAsString);
     }
 
-    private function formatControllerLink(mixed $controller, string $anchorText, callable $getContainer = null): string
+    private function formatControllerLink(mixed $controller, string $anchorText, ?callable $getContainer = null): string
     {
         if (null === $this->fileLinkFormatter) {
             return $anchorText;

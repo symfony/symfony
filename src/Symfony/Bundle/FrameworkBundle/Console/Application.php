@@ -149,7 +149,7 @@ class Application extends BaseApplication
         return parent::get($name);
     }
 
-    public function all(string $namespace = null): array
+    public function all(?string $namespace = null): array
     {
         $this->registerCommands();
 

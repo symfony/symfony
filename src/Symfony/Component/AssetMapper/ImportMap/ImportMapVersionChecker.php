@@ -26,7 +26,7 @@ class ImportMapVersionChecker
     public function __construct(
         private ImportMapConfigReader $importMapConfigReader,
         private RemotePackageDownloader $packageDownloader,
-        HttpClientInterface $httpClient = null,
+        ?HttpClientInterface $httpClient = null,
     ) {
         $this->httpClient = $httpClient ?? HttpClient::create();
     }

@@ -46,7 +46,7 @@ class FailureEvent
         return $this->error;
     }
 
-    public function shouldIgnore(bool $shouldIgnore = null): bool
+    public function shouldIgnore(?bool $shouldIgnore = null): bool
     {
         if (null !== $shouldIgnore) {
             $this->shouldIgnore = $shouldIgnore;

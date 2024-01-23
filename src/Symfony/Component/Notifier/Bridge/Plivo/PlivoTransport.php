@@ -34,8 +34,8 @@ final class PlivoTransport extends AbstractTransport
         private readonly string $authId,
         #[\SensitiveParameter] private readonly string $authToken,
         private readonly string $from,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

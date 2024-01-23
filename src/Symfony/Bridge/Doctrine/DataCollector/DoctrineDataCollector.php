@@ -39,7 +39,7 @@ class DoctrineDataCollector extends DataCollector
         $this->managers = $registry->getManagerNames();
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->data = [
             'queries' => $this->collectQueries(),

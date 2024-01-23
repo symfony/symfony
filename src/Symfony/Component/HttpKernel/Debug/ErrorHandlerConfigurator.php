@@ -36,7 +36,7 @@ class ErrorHandlerConfigurator
      * @param bool           $scream  Enables/disables screaming mode, where even silenced errors are logged
      * @param bool           $scope   Enables/disables scoping mode
      */
-    public function __construct(LoggerInterface $logger = null, array|int|null $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, bool $scope = true, LoggerInterface $deprecationLogger = null)
+    public function __construct(?LoggerInterface $logger = null, array|int|null $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, bool $scope = true, ?LoggerInterface $deprecationLogger = null)
     {
         $this->logger = $logger;
         $this->levels = $levels ?? \E_ALL;

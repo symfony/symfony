@@ -20,7 +20,7 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
  */
 final class ResendSmtpTransport extends EsmtpTransport
 {
-    public function __construct(#[\SensitiveParameter] string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(#[\SensitiveParameter] string $password, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         parent::__construct('smtp.resend.com', 465, true, $dispatcher, $logger);
 

@@ -32,8 +32,8 @@ final class EngagespotTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private string $apiKey,
         private string $campaignName,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

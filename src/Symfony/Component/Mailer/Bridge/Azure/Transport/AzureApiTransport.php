@@ -39,9 +39,9 @@ final class AzureApiTransport extends AbstractApiTransport
         private string $resourceName,
         private bool $disableTracking = false,
         private string $apiVersion = '2023-03-31',
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
-        LoggerInterface $logger = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
     ) {
         if (str_contains($resourceName, '.') || str_ends_with($resourceName, '.')) {
             throw new \Exception('Resource name cannot contain or end with a dot.');

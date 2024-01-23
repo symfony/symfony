@@ -20,7 +20,7 @@ use Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector;
 
 trait HttpClientAssertionsTrait
 {
-    public static function assertHttpClientRequest(string $expectedUrl, string $expectedMethod = 'GET', string|array $expectedBody = null, array $expectedHeaders = [], string $httpClientId = 'http_client'): void
+    public static function assertHttpClientRequest(string $expectedUrl, string $expectedMethod = 'GET', string|array|null $expectedBody = null, array $expectedHeaders = [], string $httpClientId = 'http_client'): void
     {
         /** @var KernelBrowser $client */
         $client = static::getClient();

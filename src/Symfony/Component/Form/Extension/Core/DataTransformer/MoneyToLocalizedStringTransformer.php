@@ -28,7 +28,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
         ?bool $grouping = true,
         ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
         ?int $divisor = 1,
-        string $locale = null,
+        ?string $locale = null,
         private string $modelType = 'float',
     ) {
         parent::__construct($scale ?? 2, $grouping ?? true, $roundingMode, $locale);

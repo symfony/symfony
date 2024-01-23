@@ -211,7 +211,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals(['_route' => 'a', 'a' => 'aaa'], $matcher->match('/fr-fr/'));
     }
 
-    protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
+    protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)
     {
         return $this->getMockForAbstractClass(RedirectableUrlMatcher::class, [$routes, $context ?? new RequestContext()]);
     }

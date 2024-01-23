@@ -317,7 +317,7 @@ TXT
         yield 'option --format' => [['--format', ''], ['text', 'json']];
     }
 
-    private function createCommandTester(array $paths = [], array $bundleMetadata = [], string $defaultPath = null, bool $useChainLoader = false, array $globals = []): CommandTester
+    private function createCommandTester(array $paths = [], array $bundleMetadata = [], ?string $defaultPath = null, bool $useChainLoader = false, array $globals = []): CommandTester
     {
         $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $loader = new FilesystemLoader([], $projectDir);

@@ -25,7 +25,7 @@ class TimeBasedUuidFactory
     ) {
     }
 
-    public function create(\DateTimeInterface $time = null): Uuid&TimeBasedUidInterface
+    public function create(?\DateTimeInterface $time = null): Uuid&TimeBasedUidInterface
     {
         $class = $this->class;
 

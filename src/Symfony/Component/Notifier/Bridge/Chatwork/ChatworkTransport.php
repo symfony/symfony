@@ -31,8 +31,8 @@ class ChatworkTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private string $apiToken,
         private string $roomId,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

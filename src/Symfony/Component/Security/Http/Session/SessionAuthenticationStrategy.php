@@ -34,7 +34,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
     private string $strategy;
     private ?ClearableTokenStorageInterface $csrfTokenStorage = null;
 
-    public function __construct(string $strategy, ClearableTokenStorageInterface $csrfTokenStorage = null)
+    public function __construct(string $strategy, ?ClearableTokenStorageInterface $csrfTokenStorage = null)
     {
         $this->strategy = $strategy;
 

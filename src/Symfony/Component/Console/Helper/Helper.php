@@ -74,7 +74,7 @@ abstract class Helper implements HelperInterface
     /**
      * Returns the subset of a string, using mb_substr if it is available.
      */
-    public static function substr(?string $string, int $from, int $length = null): string
+    public static function substr(?string $string, int $from, ?int $length = null): string
     {
         $string ??= '';
 

@@ -78,7 +78,7 @@ class UnsupportedSchemeException extends LogicException
         ],
     ];
 
-    public function __construct(Dsn $dsn, string $name = null, array $supported = [])
+    public function __construct(Dsn $dsn, ?string $name = null, array $supported = [])
     {
         $provider = $dsn->getScheme();
         if (false !== $pos = strpos($provider, '+')) {

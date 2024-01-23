@@ -24,7 +24,7 @@ class Message extends RawMessage
     private Headers $headers;
     private ?AbstractPart $body;
 
-    public function __construct(Headers $headers = null, AbstractPart $body = null)
+    public function __construct(?Headers $headers = null, ?AbstractPart $body = null)
     {
         $this->headers = $headers ? clone $headers : new Headers();
         $this->body = $body;

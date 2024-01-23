@@ -41,7 +41,7 @@ class CsrfValidationListener implements EventSubscriberInterface
         private string $errorMessage,
         private ?TranslatorInterface $translator = null,
         private ?string $translationDomain = null,
-        ServerParams $serverParams = null,
+        ?ServerParams $serverParams = null,
     )
     {
         $this->serverParams = $serverParams ?? new ServerParams();

@@ -24,7 +24,7 @@ class TransportException extends RuntimeException implements TransportExceptionI
         string $message,
         private ResponseInterface $response,
         int $code = 0,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
     ) {
         $this->debug .= $response->getInfo('debug') ?? '';
 

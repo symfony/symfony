@@ -47,8 +47,8 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      */
     public function __construct(
         bool|callable $debug = false,
-        string $charset = null,
-        string|FileLinkFormatter $fileLinkFormat = null,
+        ?string $charset = null,
+        string|FileLinkFormatter|null $fileLinkFormat = null,
         private ?string $projectDir = null,
         string|callable $outputBuffer = '',
         private ?LoggerInterface $logger = null,
@@ -217,7 +217,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      * @param int    $line The line number
      * @param string $text Use this text for the link rather than the file path
      */
-    private function formatFile(string $file, int $line, string $text = null): string
+    private function formatFile(string $file, int $line, ?string $text = null): string
     {
         $file = trim($file);
 

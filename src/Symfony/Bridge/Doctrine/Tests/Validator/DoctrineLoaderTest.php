@@ -178,7 +178,7 @@ class DoctrineLoaderTest extends TestCase
     /**
      * @dataProvider regexpProvider
      */
-    public function testClassValidator(bool $expected, string $classValidatorRegexp = null)
+    public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null)
     {
         $doctrineLoader = new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), $classValidatorRegexp, false);
 

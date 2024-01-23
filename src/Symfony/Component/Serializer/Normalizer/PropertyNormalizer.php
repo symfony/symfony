@@ -45,7 +45,7 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
      */
     public const NORMALIZE_VISIBILITY = 'normalize_visibility';
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null, ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, ?callable $objectClassResolver = null, array $defaultContext = [])
     {
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
 
@@ -59,12 +59,12 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
         return ['object' => true];
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return parent::supportsNormalization($data, $format) && $this->supports($data::class);
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
@@ -92,7 +92,7 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
         return false;
     }
 
-    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
+    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, ?string $format = null, array $context = []): bool
     {
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
             return false;
@@ -125,7 +125,7 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
         return false;
     }
 
-    protected function extractAttributes(object $object, string $format = null, array $context = []): array
+    protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
     {
         $reflectionObject = new \ReflectionObject($object);
         $attributes = [];
@@ -143,7 +143,7 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
         return array_unique($attributes);
     }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);
@@ -169,7 +169,7 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
         return $reflectionProperty->getValue($object);
     }
 
-    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);

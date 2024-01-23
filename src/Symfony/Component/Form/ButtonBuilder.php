@@ -53,7 +53,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function add(string|FormBuilderInterface $child, string $type = null, array $options = []): never
+    public function add(string|FormBuilderInterface $child, ?string $type = null, array $options = []): never
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -63,7 +63,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function create(string $name, string $type = null, array $options = []): never
+    public function create(string $name, ?string $type = null, array $options = []): never
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }

@@ -29,8 +29,8 @@ final class ZendeskTransport extends AbstractTransport
     public function __construct(
         private string $email,
         #[\SensitiveParameter] private string $token,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
 )
     {
         parent::__construct($client, $dispatcher);
@@ -46,7 +46,7 @@ final class ZendeskTransport extends AbstractTransport
         return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof ZendeskOptions);
     }
 
-    protected function doSend(MessageInterface $message = null): SentMessage
+    protected function doSend(?MessageInterface $message = null): SentMessage
     {
         if (!$message instanceof ChatMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);

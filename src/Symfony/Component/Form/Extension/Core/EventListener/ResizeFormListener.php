@@ -34,7 +34,7 @@ class ResizeFormListener implements EventSubscriberInterface
         private bool $allowAdd = false,
         private bool $allowDelete = false,
         bool|callable $deleteEmpty = false,
-        array $prototypeOptions = null,
+        ?array $prototypeOptions = null,
         private bool $keepAsList = false,
     ) {
         $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);

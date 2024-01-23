@@ -32,9 +32,9 @@ final class ScalewayApiTransport extends AbstractApiTransport
         private string $projectId,
         #[\SensitiveParameter] private string $token,
         private ?string $region = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
-        LoggerInterface $logger = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
     ) {
         parent::__construct($client, $dispatcher, $logger);
     }

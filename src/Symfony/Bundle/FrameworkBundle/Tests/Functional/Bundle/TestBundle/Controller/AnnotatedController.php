@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class AnnotatedController
 {
     #[Route('/null_request', name: 'null_request')]
-    public function requestDefaultNullAction(Request $request = null): Response
+    public function requestDefaultNullAction(?Request $request = null): Response
     {
         return new Response($request ? $request::class : null);
     }

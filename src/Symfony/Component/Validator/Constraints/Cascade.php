@@ -28,7 +28,7 @@ class Cascade extends Constraint
      * @param string[]|string|array<string,mixed>|null $exclude Properties excluded from validation
      * @param array<string,mixed>|null                 $options
      */
-    public function __construct(array|string $exclude = null, array $options = null)
+    public function __construct(array|string|null $exclude = null, ?array $options = null)
     {
         if (\is_array($exclude) && !array_is_list($exclude)) {
             $options = array_merge($exclude, $options ?? []);

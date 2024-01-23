@@ -35,7 +35,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     private HttpClientInterface $httpClient;
 
     public function __construct(
-        HttpClientInterface $httpClient = null,
+        ?HttpClientInterface $httpClient = null,
     ) {
         $this->httpClient = $httpClient ?? HttpClient::create();
     }
@@ -163,7 +163,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
      *
      * @return array<string, array{content: string, dependencies: string[], extraFiles: array<string, string>}>
      */
-    public function downloadPackages(array $importMapEntries, callable $progressCallback = null): array
+    public function downloadPackages(array $importMapEntries, ?callable $progressCallback = null): array
     {
         $responses = [];
         foreach ($importMapEntries as $package => $entry) {
@@ -336,7 +336,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     /**
      * Determine the URL pattern to be used by the HTTP Client.
      */
-    private function resolveUrlPattern(string $packageName, string $path, ImportMapType $type = null): string
+    private function resolveUrlPattern(string $packageName, string $path, ?ImportMapType $type = null): string
     {
         // The URL for the es-module-shims polyfill package uses the CSS pattern to
         // prevent a syntax error in the browser console, so check the package name

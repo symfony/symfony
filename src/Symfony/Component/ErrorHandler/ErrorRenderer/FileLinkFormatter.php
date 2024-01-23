@@ -30,7 +30,7 @@ class FileLinkFormatter
      * @param string|\Closure $urlFormat the URL format, or a closure that returns it on-demand
      */
     public function __construct(
-        string|array $fileLinkFormat = null,
+        string|array|null $fileLinkFormat = null,
         private ?RequestStack $requestStack = null,
         private ?string $baseDir = null,
         private string|\Closure|null $urlFormat = null,

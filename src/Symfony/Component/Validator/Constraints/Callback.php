@@ -30,7 +30,7 @@ class Callback extends Constraint
      * @param string|string[]|callable|array<string,mixed>|null $callback The callback definition
      * @param string[]|null                                     $groups
      */
-    public function __construct(array|string|callable $callback = null, array $groups = null, mixed $payload = null, array $options = [])
+    public function __construct(array|string|callable|null $callback = null, ?array $groups = null, mixed $payload = null, array $options = [])
     {
         // Invocation through attributes with an array parameter only
         if (\is_array($callback) && 1 === \count($callback) && isset($callback['value'])) {

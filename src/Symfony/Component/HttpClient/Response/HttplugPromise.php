@@ -28,7 +28,7 @@ final class HttplugPromise implements HttplugPromiseInterface
     ) {
     }
 
-    public function then(callable $onFulfilled = null, callable $onRejected = null): self
+    public function then(?callable $onFulfilled = null, ?callable $onRejected = null): self
     {
         return new self($this->promise->then(
             $this->wrapThenCallback($onFulfilled),

@@ -37,8 +37,8 @@ final class SmsboxTransport extends AbstractTransport
         private Mode $mode,
         private Strategy $strategy,
         private ?string $sender,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

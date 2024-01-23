@@ -52,7 +52,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
 
     public function __construct(
         AdapterInterface $itemsPool,
-        AdapterInterface $tagsPool = null,
+        ?AdapterInterface $tagsPool = null,
         private float $knownTagVersionsTtl = 0.15,
     ) {
         $this->pool = $itemsPool;

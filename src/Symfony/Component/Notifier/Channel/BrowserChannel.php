@@ -28,7 +28,7 @@ final class BrowserChannel implements ChannelInterface
     ) {
     }
 
-    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
+    public function notify(Notification $notification, RecipientInterface $recipient, ?string $transportName = null): void
     {
         if (null === $request = $this->stack->getCurrentRequest()) {
             return;

@@ -39,7 +39,7 @@ class AtLeastOneOf extends Composite
      * @param string|null                                $messageCollection       Failure message for All and Collection inner constraints
      * @param bool|null                                  $includeInternalMessages Whether to include inner constraint messages (defaults to true)
      */
-    public function __construct(mixed $constraints = null, array $groups = null, mixed $payload = null, string $message = null, string $messageCollection = null, bool $includeInternalMessages = null)
+    public function __construct(mixed $constraints = null, ?array $groups = null, mixed $payload = null, ?string $message = null, ?string $messageCollection = null, ?bool $includeInternalMessages = null)
     {
         parent::__construct($constraints ?? [], $groups, $payload);
 

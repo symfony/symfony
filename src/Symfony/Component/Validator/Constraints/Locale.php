@@ -40,10 +40,10 @@ class Locale extends Constraint
      * @param string[]|null            $groups
      */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        bool $canonicalize = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?bool $canonicalize = null,
+        ?array $groups = null,
         mixed $payload = null,
     ) {
         if (!class_exists(Locales::class)) {

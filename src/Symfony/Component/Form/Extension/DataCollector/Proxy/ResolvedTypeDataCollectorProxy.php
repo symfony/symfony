@@ -63,7 +63,7 @@ class ResolvedTypeDataCollectorProxy implements ResolvedFormTypeInterface
         return $builder;
     }
 
-    public function createView(FormInterface $form, FormView $parent = null): FormView
+    public function createView(FormInterface $form, ?FormView $parent = null): FormView
     {
         return $this->proxiedType->createView($form, $parent);
     }

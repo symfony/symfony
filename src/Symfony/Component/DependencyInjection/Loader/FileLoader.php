@@ -46,7 +46,7 @@ abstract class FileLoader extends BaseFileLoader
     protected array $aliases = [];
     protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
-    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null)
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, ?string $env = null)
     {
         $this->container = $container;
 
@@ -56,7 +56,7 @@ abstract class FileLoader extends BaseFileLoader
     /**
      * @param bool|string $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
      */
-    public function import(mixed $resource, string $type = null, bool|string $ignoreErrors = false, string $sourceResource = null, $exclude = null): mixed
+    public function import(mixed $resource, ?string $type = null, bool|string $ignoreErrors = false, ?string $sourceResource = null, $exclude = null): mixed
     {
         $args = \func_get_args();
 
@@ -96,7 +96,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
      * @param string|null          $source    The path to the file that defines the auto-discovery rule
      */
-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null, string $source = null): void
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array|null $exclude = null, ?string $source = null): void
     {
         if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));

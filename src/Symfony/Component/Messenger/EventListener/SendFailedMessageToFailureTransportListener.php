@@ -29,7 +29,7 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
     private ContainerInterface $failureSenders;
     private ?LoggerInterface $logger;
 
-    public function __construct(ContainerInterface $failureSenders, LoggerInterface $logger = null)
+    public function __construct(ContainerInterface $failureSenders, ?LoggerInterface $logger = null)
     {
         $this->failureSenders = $failureSenders;
         $this->logger = $logger;

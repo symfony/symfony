@@ -290,7 +290,7 @@ OUTPUT;
         $this->assertSame(['FOO', 'TEST'], $tester->complete(['']));
     }
 
-    private function executeCommand(string $projectDirectory, string $env, array $input = [], string $dotenvPath = null): string
+    private function executeCommand(string $projectDirectory, string $env, array $input = [], ?string $dotenvPath = null): string
     {
         $_SERVER['TEST_ENV_KEY'] = $env;
         (new Dotenv('TEST_ENV_KEY'))->bootEnv($dotenvPath ?? $projectDirectory.'/.env');

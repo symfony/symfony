@@ -31,8 +31,8 @@ final class ZulipTransport extends AbstractTransport
         private string $email,
         #[\SensitiveParameter] private string $token,
         private string $channel,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
 )
     {
 

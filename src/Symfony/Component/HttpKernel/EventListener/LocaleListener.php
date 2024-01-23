@@ -35,7 +35,7 @@ class LocaleListener implements EventSubscriberInterface
     private bool $useAcceptLanguageHeader;
     private array $enabledLocales;
 
-    public function __construct(RequestStack $requestStack, string $defaultLocale = 'en', RequestContextAwareInterface $router = null, bool $useAcceptLanguageHeader = false, array $enabledLocales = [])
+    public function __construct(RequestStack $requestStack, string $defaultLocale = 'en', ?RequestContextAwareInterface $router = null, bool $useAcceptLanguageHeader = false, array $enabledLocales = [])
     {
         $this->defaultLocale = $defaultLocale;
         $this->requestStack = $requestStack;

@@ -22,7 +22,7 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
 
     private static string $clockSeq;
 
-    public function __construct(string $uuid = null)
+    public function __construct(?string $uuid = null)
     {
         if (null === $uuid) {
             $this->uid = uuid_create(static::TYPE);
@@ -53,7 +53,7 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
         return $this->toV6()->toV7();
     }
 
-    public static function generate(\DateTimeInterface $time = null, Uuid $node = null): string
+    public static function generate(?\DateTimeInterface $time = null, ?Uuid $node = null): string
     {
         $uuid = !$time || !$node ? uuid_create(static::TYPE) : parent::NIL;
 

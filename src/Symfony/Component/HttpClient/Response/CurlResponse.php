@@ -43,12 +43,12 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     public function __construct(
         private CurlClientState $multi,
         \CurlHandle|string $ch,
-        array $options = null,
-        LoggerInterface $logger = null,
+        ?array $options = null,
+        ?LoggerInterface $logger = null,
         string $method = 'GET',
-        callable $resolveRedirect = null,
-        int $curlVersion = null,
-        string $originalUrl = null,
+        ?callable $resolveRedirect = null,
+        ?int $curlVersion = null,
+        ?string $originalUrl = null,
     ) {
         if ($ch instanceof \CurlHandle) {
             $this->handle = $ch;
@@ -197,7 +197,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         });
     }
 
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         if (!$info = $this->finalInfo) {
             $info = array_merge($this->info, curl_getinfo($this->handle));
@@ -270,7 +270,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     /**
      * @param CurlClientState $multi
      */
-    private static function perform(ClientState $multi, array &$responses = null): void
+    private static function perform(ClientState $multi, ?array &$responses = null): void
     {
         if ($multi->performing) {
             if ($responses) {

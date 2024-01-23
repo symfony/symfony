@@ -168,7 +168,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         return $tests;
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, ContainerInterface $container = null)
+    protected function createControllerResolver(?LoggerInterface $logger = null, ?ContainerInterface $container = null)
     {
         if (!$container) {
             $container = new Container();

@@ -31,11 +31,11 @@ final class AsLeaveListener extends AsEventListener
      * @param string|null $dispatcher The service id of the event dispatcher to listen to
      */
     public function __construct(
-        string $workflow = null,
-        string $place = null,
-        string $method = null,
+        ?string $workflow = null,
+        ?string $place = null,
+        ?string $method = null,
         int $priority = 0,
-        string $dispatcher = null,
+        ?string $dispatcher = null,
     ) {
         parent::__construct($this->buildEventName('leave', 'place', $workflow, $place), $method, $priority, $dispatcher);
     }

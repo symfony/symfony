@@ -34,7 +34,7 @@ class StreamedResponse extends Response
     /**
      * @param int $status The HTTP status code (200 "OK" by default)
      */
-    public function __construct(callable $callback = null, int $status = 200, array $headers = [])
+    public function __construct(?callable $callback = null, int $status = 200, array $headers = [])
     {
         parent::__construct(null, $status, $headers);
 
@@ -73,7 +73,7 @@ class StreamedResponse extends Response
      *
      * @return $this
      */
-    public function sendHeaders(int $statusCode = null): static
+    public function sendHeaders(?int $statusCode = null): static
     {
         if ($this->headersSent) {
             return $this;

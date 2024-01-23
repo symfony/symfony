@@ -32,8 +32,8 @@ class CoreExtension extends AbstractExtension
     private ChoiceListFactoryInterface $choiceListFactory;
 
     public function __construct(
-        PropertyAccessorInterface $propertyAccessor = null,
-        ChoiceListFactoryInterface $choiceListFactory = null,
+        ?PropertyAccessorInterface $propertyAccessor = null,
+        ?ChoiceListFactoryInterface $choiceListFactory = null,
         private ?TranslatorInterface $translator = null,
     ) {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();

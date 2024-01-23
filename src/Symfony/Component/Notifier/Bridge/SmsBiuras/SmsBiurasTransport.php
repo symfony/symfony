@@ -47,8 +47,8 @@ final class SmsBiurasTransport extends AbstractTransport
         #[\SensitiveParameter] private string $apiKey,
         private string $from,
         private bool $testMode,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
 )
     {
         parent::__construct($client, $dispatcher);

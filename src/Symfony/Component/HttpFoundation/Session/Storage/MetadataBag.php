@@ -75,7 +75,7 @@ class MetadataBag implements SessionBagInterface
      *                           to expire with browser session. Time is in seconds, and is
      *                           not a Unix timestamp.
      */
-    public function stampNew(int $lifetime = null): void
+    public function stampNew(?int $lifetime = null): void
     {
         $this->stampCreated($lifetime);
     }
@@ -124,7 +124,7 @@ class MetadataBag implements SessionBagInterface
         $this->name = $name;
     }
 
-    private function stampCreated(int $lifetime = null): void
+    private function stampCreated(?int $lifetime = null): void
     {
         $timeStamp = time();
         $this->meta[self::CREATED] = $this->meta[self::UPDATED] = $this->lastUsed = $timeStamp;

@@ -46,7 +46,7 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         /* voilà.css */
         body {}
 
-        EOF, $response->getContent());
+        EOF, $client->getInternalResponse()->getContent());
     }
 
     public function test404OnUnknownAsset()

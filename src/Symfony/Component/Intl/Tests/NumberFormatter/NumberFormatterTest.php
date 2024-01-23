@@ -171,7 +171,7 @@ class NumberFormatterTest extends AbstractNumberFormatterTestCase
         $formatter->setTextAttribute(NumberFormatter::NEGATIVE_PREFIX, '-');
     }
 
-    protected static function getNumberFormatter(?string $locale = 'en', string $style = null, string $pattern = null): NumberFormatter
+    protected static function getNumberFormatter(?string $locale = 'en', ?string $style = null, ?string $pattern = null): NumberFormatter
     {
         return new class($locale, $style, $pattern) extends NumberFormatter {
         };

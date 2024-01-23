@@ -28,7 +28,7 @@ final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSalti
 {
     use LegacyEncoderTrait;
 
-    public function __construct(int $opsLimit = null, int $memLimit = null)
+    public function __construct(?int $opsLimit = null, ?int $memLimit = null)
     {
         $this->hasher = new SodiumPasswordHasher($opsLimit, $memLimit);
     }

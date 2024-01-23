@@ -39,7 +39,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
     private $bucket;
     private $marshaller;
 
-    public function __construct(\CouchbaseBucket $bucket, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
+    public function __construct(\CouchbaseBucket $bucket, string $namespace = '', int $defaultLifetime = 0, ?MarshallerInterface $marshaller = null)
     {
         if (!static::isSupported()) {
             throw new CacheException('Couchbase >= 2.6.0 < 3.0.0 is required.');

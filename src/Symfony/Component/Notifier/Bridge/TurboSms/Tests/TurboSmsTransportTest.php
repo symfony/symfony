@@ -29,7 +29,7 @@ final class TurboSmsTransportTest extends TransportTestCase
     /**
      * @return TurboSmsTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new TurboSmsTransport('authToken', 'sender', $client ?? new MockHttpClient());
     }

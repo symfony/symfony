@@ -39,7 +39,7 @@ class DoctrineDataCollector extends DataCollector
      */
     private $loggers = [];
 
-    public function __construct(ManagerRegistry $registry, DebugDataHolder $debugDataHolder = null)
+    public function __construct(ManagerRegistry $registry, ?DebugDataHolder $debugDataHolder = null)
     {
         $this->registry = $registry;
         $this->connections = $registry->getConnectionNames();
@@ -58,7 +58,7 @@ class DoctrineDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         $this->data = [
             'queries' => $this->collectQueries(),

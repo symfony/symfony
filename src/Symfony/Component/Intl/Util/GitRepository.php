@@ -69,7 +69,7 @@ final class GitRepository
         return new \DateTime($this->getLastLine($this->execInPath('git log -1 --format="%ai"')));
     }
 
-    public function getLastTag(callable $filter = null): string
+    public function getLastTag(?callable $filter = null): string
     {
         $tags = $this->execInPath('git tag -l --sort=v:refname');
 
@@ -90,7 +90,7 @@ final class GitRepository
         return self::exec(sprintf('cd %s && %s', escapeshellarg($this->path), $command));
     }
 
-    private static function exec(string $command, string $customErrorMessage = null): array
+    private static function exec(string $command, ?string $customErrorMessage = null): array
     {
         exec(sprintf('%s 2>&1', $command), $output, $result);
 

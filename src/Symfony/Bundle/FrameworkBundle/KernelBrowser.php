@@ -37,7 +37,7 @@ class KernelBrowser extends HttpKernelBrowser
     /**
      * {@inheritdoc}
      */
-    public function __construct(KernelInterface $kernel, array $server = [], History $history = null, CookieJar $cookieJar = null)
+    public function __construct(KernelInterface $kernel, array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
         parent::__construct($kernel, $server, $history, $cookieJar);
     }

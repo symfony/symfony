@@ -102,7 +102,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return $this
      */
-    public function setDataMapper(DataMapperInterface $dataMapper = null);
+    public function setDataMapper(?DataMapperInterface $dataMapper = null);
 
     /**
      * Sets whether the form is disabled.

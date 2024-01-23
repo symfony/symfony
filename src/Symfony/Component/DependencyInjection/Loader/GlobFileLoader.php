@@ -21,7 +21,7 @@ class GlobFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, string $type = null)
+    public function load($resource, ?string $type = null)
     {
         foreach ($this->glob($resource, false, $globResource) as $path => $info) {
             $this->import($path);
@@ -35,7 +35,7 @@ class GlobFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string $type = null)
+    public function supports($resource, ?string $type = null)
     {
         return 'glob' === $type;
     }

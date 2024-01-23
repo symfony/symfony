@@ -25,7 +25,7 @@ final class IqsmsTransportTest extends TransportTestCase
     /**
      * @return IqsmsTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new IqsmsTransport('login', 'password', 'sender', $client ?? new MockHttpClient());
     }

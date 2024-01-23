@@ -26,7 +26,7 @@ class ElementNode extends AbstractNode
     private $namespace;
     private $element;
 
-    public function __construct(string $namespace = null, string $element = null)
+    public function __construct(?string $namespace = null, ?string $element = null)
     {
         $this->namespace = $namespace;
         $this->element = $element;

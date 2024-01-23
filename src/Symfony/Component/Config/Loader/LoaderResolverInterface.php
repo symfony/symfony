@@ -26,5 +26,5 @@ interface LoaderResolverInterface
      *
      * @return LoaderInterface|false
      */
-    public function resolve($resource, string $type = null);
+    public function resolve($resource, ?string $type = null);
 }

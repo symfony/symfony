@@ -45,7 +45,7 @@ class LoginSuccessEvent extends Event
     /**
      * @param Passport $passport
      */
-    public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName, TokenInterface $previousToken = null)
+    public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName, ?TokenInterface $previousToken = null)
     {
         if (!$passport instanceof Passport) {
             trigger_deprecation('symfony/security-http', '5.4', 'Not passing an instance of "%s" as "$passport" argument of "%s()" is deprecated, "%s" given.', Passport::class, __METHOD__, get_debug_type($passport));

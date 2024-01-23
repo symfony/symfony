@@ -34,7 +34,7 @@ final class DiscordTransport extends AbstractTransport
     private $token;
     private $webhookId;
 
-    public function __construct(string $token, string $webhookId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $webhookId, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->webhookId = $webhookId;

@@ -26,7 +26,7 @@ class AuthenticationException extends RuntimeException
 
     private $token;
 
-    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
+    public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null)
     {
         unset($this->serialized);
         parent::__construct($message, $code, $previous);

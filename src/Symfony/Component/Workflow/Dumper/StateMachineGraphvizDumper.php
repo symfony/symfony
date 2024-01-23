@@ -27,7 +27,7 @@ class StateMachineGraphvizDumper extends GraphvizDumper
      *  * node: The default options for nodes (places)
      *  * edge: The default options for edges
      */
-    public function dump(Definition $definition, Marking $marking = null, array $options = [])
+    public function dump(Definition $definition, ?Marking $marking = null, array $options = [])
     {
         $places = $this->findPlaces($definition, $marking);
         $edges = $this->findEdges($definition);

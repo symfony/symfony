@@ -43,7 +43,7 @@ class RouteCollectionBuilder
     private $methods;
     private $resources = [];
 
-    public function __construct(LoaderInterface $loader = null)
+    public function __construct(?LoaderInterface $loader = null)
     {
         $this->loader = $loader;
     }
@@ -59,7 +59,7 @@ class RouteCollectionBuilder
      *
      * @throws LoaderLoadException
      */
-    public function import($resource, string $prefix = '/', string $type = null)
+    public function import($resource, string $prefix = '/', ?string $type = null)
     {
         /** @var RouteCollection[] $collections */
         $collections = $this->load($resource, $type);
@@ -92,7 +92,7 @@ class RouteCollectionBuilder
      *
      * @return Route
      */
-    public function add(string $path, string $controller, string $name = null)
+    public function add(string $path, string $controller, ?string $name = null)
     {
         $route = new Route($path);
         $route->setDefault('_controller', $controller);
@@ -125,7 +125,7 @@ class RouteCollectionBuilder
      *
      * @return $this
      */
-    public function addRoute(Route $route, string $name = null)
+    public function addRoute(Route $route, ?string $name = null)
     {
         if (null === $name) {
             // used as a flag to know which routes will need a name later
@@ -337,7 +337,7 @@ class RouteCollectionBuilder
      *
      * @throws LoaderLoadException If no loader is found
      */
-    private function load($resource, string $type = null): array
+    private function load($resource, ?string $type = null): array
     {
         if (null === $this->loader) {
             throw new \BadMethodCallException('Cannot import other routing resources: you must pass a LoaderInterface when constructing RouteCollectionBuilder.');

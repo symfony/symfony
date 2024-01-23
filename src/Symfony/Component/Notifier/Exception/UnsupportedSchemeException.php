@@ -201,7 +201,7 @@ class UnsupportedSchemeException extends LogicException
     /**
      * @param string[] $supported
      */
-    public function __construct(Dsn $dsn, string $name = null, array $supported = [], \Throwable $previous = null)
+    public function __construct(Dsn $dsn, ?string $name = null, array $supported = [], ?\Throwable $previous = null)
     {
         $provider = $dsn->getScheme();
         if (false !== $pos = strpos($provider, '+')) {

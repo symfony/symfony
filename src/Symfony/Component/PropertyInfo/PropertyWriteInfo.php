@@ -38,7 +38,7 @@ final class PropertyWriteInfo
     private $removerInfo;
     private $errors = [];
 
-    public function __construct(string $type = self::TYPE_NONE, string $name = null, string $visibility = null, bool $static = null)
+    public function __construct(string $type = self::TYPE_NONE, ?string $name = null, ?string $visibility = null, ?bool $static = null)
     {
         $this->type = $type;
         $this->name = $name;

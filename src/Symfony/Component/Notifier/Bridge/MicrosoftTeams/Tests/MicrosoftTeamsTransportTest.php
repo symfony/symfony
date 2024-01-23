@@ -30,7 +30,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
     /**
      * @return MicrosoftTeamsTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new MicrosoftTeamsTransport('/testPath', $client ?? new MockHttpClient()))->setHost('host.test');
     }

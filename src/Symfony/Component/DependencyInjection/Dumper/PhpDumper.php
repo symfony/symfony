@@ -1031,7 +1031,7 @@ EOTXT
         return $code;
     }
 
-    private function addInlineService(string $id, Definition $definition, Definition $inlineDef = null, bool $forConstructor = true): string
+    private function addInlineService(string $id, Definition $definition, ?Definition $inlineDef = null, bool $forConstructor = true): string
     {
         $code = '';
 
@@ -1088,7 +1088,7 @@ EOTXT
         return $code;
     }
 
-    private function addServices(array &$services = null): string
+    private function addServices(?array &$services = null): string
     {
         $publicServices = $privateServices = '';
         $definitions = $this->container->getDefinitions();
@@ -1130,7 +1130,7 @@ EOTXT
         }
     }
 
-    private function addNewInstance(Definition $definition, string $return = '', string $id = null): string
+    private function addNewInstance(Definition $definition, string $return = '', ?string $id = null): string
     {
         $tail = $return ? ";\n" : '';
 
@@ -1704,7 +1704,7 @@ EOF;
         return implode(' && ', $conditions);
     }
 
-    private function getDefinitionsFromArguments(array $arguments, \SplObjectStorage $definitions = null, array &$calls = [], bool $byConstructor = null): \SplObjectStorage
+    private function getDefinitionsFromArguments(array $arguments, ?\SplObjectStorage $definitions = null, array &$calls = [], ?bool $byConstructor = null): \SplObjectStorage
     {
         if (null === $definitions) {
             $definitions = new \SplObjectStorage();
@@ -1935,7 +1935,7 @@ EOF;
         return sprintf('$this->parameters[%s]', $this->doExport($name));
     }
 
-    private function getServiceCall(string $id, Reference $reference = null): string
+    private function getServiceCall(string $id, ?Reference $reference = null): string
     {
         while ($this->container->hasAlias($id)) {
             $id = (string) $this->container->getAlias($id);

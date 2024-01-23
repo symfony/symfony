@@ -295,7 +295,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     /**
      * @param array|null $options Options for the constraint
      */
-    abstract protected static function createConstraint(array $options = null): Constraint;
+    abstract protected static function createConstraint(?array $options = null): Constraint;
 
     protected function getErrorCode(): ?string
     {

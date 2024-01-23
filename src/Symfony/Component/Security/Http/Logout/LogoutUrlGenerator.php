@@ -34,7 +34,7 @@ class LogoutUrlGenerator
     /** @var string|null */
     private $currentFirewallContext;
 
-    public function __construct(RequestStack $requestStack = null, UrlGeneratorInterface $router = null, TokenStorageInterface $tokenStorage = null)
+    public function __construct(?RequestStack $requestStack = null, ?UrlGeneratorInterface $router = null, ?TokenStorageInterface $tokenStorage = null)
     {
         $this->requestStack = $requestStack;
         $this->router = $router;
@@ -50,7 +50,7 @@ class LogoutUrlGenerator
      * @param string|null $csrfParameter The CSRF token parameter name
      * @param string|null $context       The listener context
      */
-    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null)
+    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, ?CsrfTokenManagerInterface $csrfTokenManager = null, ?string $context = null)
     {
         $this->listeners[$key] = [$logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context];
     }
@@ -60,7 +60,7 @@ class LogoutUrlGenerator
      *
      * @return string
      */
-    public function getLogoutPath(string $key = null)
+    public function getLogoutPath(?string $key = null)
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
@@ -70,12 +70,12 @@ class LogoutUrlGenerator
      *
      * @return string
      */
-    public function getLogoutUrl(string $key = null)
+    public function getLogoutUrl(?string $key = null)
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
-    public function setCurrentFirewall(?string $key, string $context = null)
+    public function setCurrentFirewall(?string $key, ?string $context = null)
     {
         $this->currentFirewallName = $key;
         $this->currentFirewallContext = $context;

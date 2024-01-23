@@ -30,6 +30,7 @@ return (new PhpCsFixer\Config())
         '@Symfony:risky' => true,
         'protected_to_private' => false,
         'native_constant_invocation' => ['strict' => false],
+        'nullable_type_declaration_for_default_null_value' => true,
         'header_comment' => ['header' => $fileHeaderComment],
     ])
     ->setRiskyAllowed(true)

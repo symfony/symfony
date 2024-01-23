@@ -28,7 +28,7 @@ abstract class AbstractHttpTransport extends AbstractTransport
     protected $port;
     protected $client;
 
-    public function __construct(HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         $this->client = $client;
         if (null === $client) {

@@ -23,7 +23,7 @@ class DefaultMarshaller implements MarshallerInterface
     private $useIgbinarySerialize = true;
     private $throwOnSerializationFailure;
 
-    public function __construct(bool $useIgbinarySerialize = null, bool $throwOnSerializationFailure = false)
+    public function __construct(?bool $useIgbinarySerialize = null, bool $throwOnSerializationFailure = false)
     {
         if (null === $useIgbinarySerialize) {
             $useIgbinarySerialize = \extension_loaded('igbinary') && (\PHP_VERSION_ID < 70400 || version_compare('3.1.6', phpversion('igbinary'), '<='));

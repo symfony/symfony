@@ -44,7 +44,7 @@ interface DenormalizerInterface
      * @throws RuntimeException         Occurs if the class cannot be instantiated
      * @throws ExceptionInterface       Occurs for all the other cases of errors
      */
-    public function denormalize($data, string $type, string $format = null, array $context = []);
+    public function denormalize($data, string $type, ?string $format = null, array $context = []);
 
     /**
      * Checks whether the given class is supported for denormalization by this normalizer.
@@ -55,5 +55,5 @@ interface DenormalizerInterface
      *
      * @return bool
      */
-    public function supportsDenormalization($data, string $type, string $format = null);
+    public function supportsDenormalization($data, string $type, ?string $format = null);
 }

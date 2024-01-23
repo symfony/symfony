@@ -32,7 +32,7 @@ final class SmsapiTransport extends AbstractTransport
     private $authToken;
     private $from;
 
-    public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $authToken, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->authToken = $authToken;
         $this->from = $from;

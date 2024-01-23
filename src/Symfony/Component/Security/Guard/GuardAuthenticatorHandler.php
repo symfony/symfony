@@ -46,7 +46,7 @@ class GuardAuthenticatorHandler
     /**
      * @param array $statelessProviderKeys An array of provider/firewall keys that are "stateless" and so do not need the session migrated on success
      */
-    public function __construct(TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher = null, array $statelessProviderKeys = [])
+    public function __construct(TokenStorageInterface $tokenStorage, ?EventDispatcherInterface $eventDispatcher = null, array $statelessProviderKeys = [])
     {
         $this->tokenStorage = $tokenStorage;
         $this->dispatcher = $eventDispatcher;
@@ -56,7 +56,7 @@ class GuardAuthenticatorHandler
     /**
      * Authenticates the given token in the system.
      */
-    public function authenticateWithToken(TokenInterface $token, Request $request, string $providerKey = null, TokenInterface $previousToken = null)
+    public function authenticateWithToken(TokenInterface $token, Request $request, ?string $providerKey = null, ?TokenInterface $previousToken = null)
     {
         $this->migrateSession($request, $token, $providerKey, 3 < \func_num_args() ? $previousToken : $this->tokenStorage->getToken());
         $this->tokenStorage->setToken($token);

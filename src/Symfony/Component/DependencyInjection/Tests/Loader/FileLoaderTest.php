@@ -299,12 +299,12 @@ class TestFileLoader extends FileLoader
 {
     public $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
-    public function load($resource, string $type = null)
+    public function load($resource, ?string $type = null)
     {
         return $resource;
     }
 
-    public function supports($resource, string $type = null): bool
+    public function supports($resource, ?string $type = null): bool
     {
         return false;
     }

@@ -29,7 +29,7 @@ class SodiumMarshaller implements MarshallerInterface
      *                                 more rotating keys can be provided to decrypt values;
      *                                 each key must be generated using sodium_crypto_box_keypair()
      */
-    public function __construct(array $decryptionKeys, MarshallerInterface $marshaller = null)
+    public function __construct(array $decryptionKeys, ?MarshallerInterface $marshaller = null)
     {
         if (!self::isSupported()) {
             throw new CacheException('The "sodium" PHP extension is not loaded.');

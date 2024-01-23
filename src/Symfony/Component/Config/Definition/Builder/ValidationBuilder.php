@@ -31,7 +31,7 @@ class ValidationBuilder
      *
      * @return ExprBuilder|$this
      */
-    public function rule(\Closure $closure = null)
+    public function rule(?\Closure $closure = null)
     {
         if (null !== $closure) {
             $this->rules[] = $closure;

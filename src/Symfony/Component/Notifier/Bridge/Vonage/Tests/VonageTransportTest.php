@@ -25,7 +25,7 @@ final class VonageTransportTest extends TransportTestCase
     /**
      * @return VonageTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new VonageTransport('apiKey', 'apiSecret', 'sender', $client ?? new MockHttpClient());
     }

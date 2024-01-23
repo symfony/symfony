@@ -21,7 +21,7 @@ final class ResponseHasCookie extends Constraint
     private $path;
     private $domain;
 
-    public function __construct(string $name, string $path = '/', string $domain = null)
+    public function __construct(string $name, string $path = '/', ?string $domain = null)
     {
         $this->name = $name;
         $this->path = $path;

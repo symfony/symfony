@@ -94,7 +94,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), $this->request, $this->response, 'main_firewall');
     }
 
-    private function createPassport(array $badges = null)
+    private function createPassport(?array $badges = null)
     {
         return new SelfValidatingPassport(new UserBadge('test', function ($username) { return new User($username, null); }), $badges ?? [new RememberMeBadge()]);
     }

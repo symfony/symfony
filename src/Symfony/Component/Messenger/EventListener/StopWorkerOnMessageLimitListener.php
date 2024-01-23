@@ -26,7 +26,7 @@ class StopWorkerOnMessageLimitListener implements EventSubscriberInterface
     private $logger;
     private $receivedMessages = 0;
 
-    public function __construct(int $maximumNumberOfMessages, LoggerInterface $logger = null)
+    public function __construct(int $maximumNumberOfMessages, ?LoggerInterface $logger = null)
     {
         $this->maximumNumberOfMessages = $maximumNumberOfMessages;
         $this->logger = $logger;

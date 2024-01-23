@@ -184,7 +184,7 @@ class UnicodeString extends AbstractUnicodeString
         return false === $i ? null : $i;
     }
 
-    public function join(array $strings, string $lastGlue = null): AbstractString
+    public function join(array $strings, ?string $lastGlue = null): AbstractString
     {
         $str = parent::join($strings, $lastGlue);
         normalizer_is_normalized($str->string) ?: $str->string = normalizer_normalize($str->string);
@@ -264,7 +264,7 @@ class UnicodeString extends AbstractUnicodeString
         return $str;
     }
 
-    public function slice(int $start = 0, int $length = null): AbstractString
+    public function slice(int $start = 0, ?int $length = null): AbstractString
     {
         $str = clone $this;
 
@@ -276,7 +276,7 @@ class UnicodeString extends AbstractUnicodeString
         return $str;
     }
 
-    public function splice(string $replacement, int $start = 0, int $length = null): AbstractString
+    public function splice(string $replacement, int $start = 0, ?int $length = null): AbstractString
     {
         $str = clone $this;
 
@@ -295,7 +295,7 @@ class UnicodeString extends AbstractUnicodeString
         return $str;
     }
 
-    public function split(string $delimiter, int $limit = null, int $flags = null): array
+    public function split(string $delimiter, ?int $limit = null, ?int $flags = null): array
     {
         if (1 > $limit = $limit ?? 2147483647) {
             throw new InvalidArgumentException('Split limit must be a positive integer.');

@@ -70,7 +70,7 @@ class PdoAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideDsnSQLite
      */
-    public function testDsnWithSQLite(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
         try {
             $pool = new PdoAdapter($dsn);

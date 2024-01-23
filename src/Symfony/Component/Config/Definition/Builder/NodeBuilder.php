@@ -39,7 +39,7 @@ class NodeBuilder implements NodeParentInterface
      *
      * @return $this
      */
-    public function setParent(ParentNodeDefinitionInterface $parent = null)
+    public function setParent(?ParentNodeDefinitionInterface $parent = null)
     {
         $this->parent = $parent;
 

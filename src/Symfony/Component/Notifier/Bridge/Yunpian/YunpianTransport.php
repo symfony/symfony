@@ -30,7 +30,7 @@ class YunpianTransport extends AbstractTransport
 
     private $apiKey;
 
-    public function __construct(string $apiKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
 

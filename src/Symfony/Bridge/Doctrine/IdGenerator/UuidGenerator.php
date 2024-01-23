@@ -23,7 +23,7 @@ final class UuidGenerator extends AbstractIdGenerator
     private $factory;
     private $entityGetter;
 
-    public function __construct(UuidFactory $factory = null)
+    public function __construct(?UuidFactory $factory = null)
     {
         $this->protoFactory = $this->factory = $factory ?? new UuidFactory();
     }

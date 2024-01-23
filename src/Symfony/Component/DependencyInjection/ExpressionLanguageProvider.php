@@ -26,7 +26,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
     private $serviceCompiler;
 
-    public function __construct(callable $serviceCompiler = null)
+    public function __construct(?callable $serviceCompiler = null)
     {
         $this->serviceCompiler = $serviceCompiler;
     }

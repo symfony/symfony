@@ -31,7 +31,7 @@ final class ClickatellTransport extends AbstractTransport
     private $authToken;
     private $from;
 
-    public function __construct(string $authToken, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $authToken, ?string $from = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->authToken = $authToken;
         $this->from = $from;

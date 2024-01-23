@@ -109,7 +109,7 @@ class DummyTransport implements Transport\TransportInterface
         $this->host = $host;
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         throw new \BadMethodCallException('This method newer should be called.');
     }

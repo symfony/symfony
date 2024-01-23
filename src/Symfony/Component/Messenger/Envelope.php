@@ -102,7 +102,7 @@ final class Envelope
     /**
      * @return StampInterface[]|StampInterface[][] The stamps for the specified FQCN, or all stamps by their class name
      */
-    public function all(string $stampFqcn = null): array
+    public function all(?string $stampFqcn = null): array
     {
         if (null !== $stampFqcn) {
             return $this->stamps[$this->resolveAlias($stampFqcn)] ?? [];

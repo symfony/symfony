@@ -32,7 +32,7 @@ class ProcessHelper extends Helper
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      */
-    public function run(OutputInterface $output, $cmd, string $error = null, callable $callback = null, int $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE): Process
+    public function run(OutputInterface $output, $cmd, ?string $error = null, ?callable $callback = null, int $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE): Process
     {
         if (!class_exists(Process::class)) {
             throw new \LogicException('The ProcessHelper cannot be run as the Process component is not installed. Try running "compose require symfony/process".');
@@ -98,7 +98,7 @@ class ProcessHelper extends Helper
      *
      * @see run()
      */
-    public function mustRun(OutputInterface $output, $cmd, string $error = null, callable $callback = null): Process
+    public function mustRun(OutputInterface $output, $cmd, ?string $error = null, ?callable $callback = null): Process
     {
         $process = $this->run($output, $cmd, $error, $callback);
 
@@ -112,7 +112,7 @@ class ProcessHelper extends Helper
     /**
      * Wraps a Process callback to add debugging output.
      */
-    public function wrapCallback(OutputInterface $output, Process $process, callable $callback = null): callable
+    public function wrapCallback(OutputInterface $output, Process $process, ?callable $callback = null): callable
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();

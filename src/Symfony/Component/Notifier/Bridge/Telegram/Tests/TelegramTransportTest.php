@@ -28,7 +28,7 @@ final class TelegramTransportTest extends TransportTestCase
     /**
      * @return TelegramTransport
      */
-    public static function createTransport(HttpClientInterface $client = null, string $channel = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null): TransportInterface
     {
         return new TelegramTransport('token', $channel, $client ?? new MockHttpClient());
     }

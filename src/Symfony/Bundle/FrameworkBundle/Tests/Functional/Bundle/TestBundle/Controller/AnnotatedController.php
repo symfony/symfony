@@ -20,7 +20,7 @@ class AnnotatedController
     /**
      * @Route("/null_request", name="null_request")
      */
-    public function requestDefaultNullAction(Request $request = null)
+    public function requestDefaultNullAction(?Request $request = null)
     {
         return new Response($request ? \get_class($request) : null);
     }

@@ -360,7 +360,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @throws NotEncodableValueException
      */
-    private function buildXml(\DOMNode $parentNode, $data, string $format, array $context, string $xmlRootNodeName = null): bool
+    private function buildXml(\DOMNode $parentNode, $data, string $format, array $context, ?string $xmlRootNodeName = null): bool
     {
         $append = true;
         $removeEmptyTags = $context[self::REMOVE_EMPTY_TAGS] ?? $this->defaultContext[self::REMOVE_EMPTY_TAGS] ?? false;
@@ -436,7 +436,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @param array|object $data
      */
-    private function appendNode(\DOMNode $parentNode, $data, string $format, array $context, string $nodeName, string $key = null): bool
+    private function appendNode(\DOMNode $parentNode, $data, string $format, array $context, string $nodeName, ?string $key = null): bool
     {
         $dom = $parentNode instanceof \DOMDocument ? $parentNode : $parentNode->ownerDocument;
         $node = $dom->createElement($nodeName);

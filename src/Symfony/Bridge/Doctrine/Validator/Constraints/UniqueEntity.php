@@ -46,14 +46,14 @@ class UniqueEntity extends Constraint
      */
     public function __construct(
         $fields,
-        string $message = null,
-        string $service = null,
-        string $em = null,
-        string $entityClass = null,
-        string $repositoryMethod = null,
-        string $errorPath = null,
-        bool $ignoreNull = null,
-        array $groups = null,
+        ?string $message = null,
+        ?string $service = null,
+        ?string $em = null,
+        ?string $entityClass = null,
+        ?string $repositoryMethod = null,
+        ?string $errorPath = null,
+        ?bool $ignoreNull = null,
+        ?array $groups = null,
         $payload = null,
         array $options = []
     ) {

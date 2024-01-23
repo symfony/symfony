@@ -61,7 +61,7 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      *
      * @return Response
      */
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, ?AuthenticationException $authException = null)
     {
         $url = $this->getLoginUrl();
 

@@ -33,7 +33,7 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
     /**
      * @param ContainerInterface $failureSenders
      */
-    public function __construct($failureSenders, LoggerInterface $logger = null)
+    public function __construct($failureSenders, ?LoggerInterface $logger = null)
     {
         if (!$failureSenders instanceof ContainerInterface) {
             trigger_deprecation('symfony/messenger', '5.3', 'Passing a SenderInterface value as 1st argument to "%s()" is deprecated, pass a ServiceLocator instead.', __METHOD__);

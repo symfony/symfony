@@ -61,7 +61,7 @@ class SymfonyStyle extends OutputStyle
      *
      * @param string|array $messages The message to write in the block
      */
-    public function block($messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
+    public function block($messages, ?string $type = null, ?string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
     {
         $messages = \is_array($messages) ? array_values($messages) : [$messages];
 
@@ -250,7 +250,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function ask(string $question, string $default = null, callable $validator = null)
+    public function ask(string $question, ?string $default = null, ?callable $validator = null)
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);
@@ -261,7 +261,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function askHidden(string $question, callable $validator = null)
+    public function askHidden(string $question, ?callable $validator = null)
     {
         $question = new Question($question);
 
@@ -338,7 +338,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * @see ProgressBar::iterate()
      */
-    public function progressIterate(iterable $iterable, int $max = null): iterable
+    public function progressIterate(iterable $iterable, ?int $max = null): iterable
     {
         yield from $this->createProgressBar()->iterate($iterable, $max);
 
@@ -463,7 +463,7 @@ class SymfonyStyle extends OutputStyle
         $this->bufferedOutput->write($message, $newLine, $type);
     }
 
-    private function createBlock(iterable $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = false): array
+    private function createBlock(iterable $messages, ?string $type = null, ?string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = false): array
     {
         $indentLength = 0;
         $prefixLength = Helper::width(Helper::removeDecoration($this->getFormatter(), $prefix));

@@ -51,11 +51,11 @@ class Email extends Constraint
     public $normalizer;
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        string $mode = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?string $mode = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         $payload = null
     ) {
         if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::$validationModes, true)) {

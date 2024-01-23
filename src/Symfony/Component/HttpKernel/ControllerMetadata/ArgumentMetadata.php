@@ -137,7 +137,7 @@ class ArgumentMetadata
     /**
      * @return object[]
      */
-    public function getAttributes(string $name = null, int $flags = 0): array
+    public function getAttributes(?string $name = null, int $flags = 0): array
     {
         if (!$name) {
             return $this->attributes;

@@ -25,7 +25,7 @@ final class SinchTransportTest extends TransportTestCase
     /**
      * @return SinchTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new SinchTransport('accountSid', 'authToken', 'sender', $client ?? new MockHttpClient());
     }

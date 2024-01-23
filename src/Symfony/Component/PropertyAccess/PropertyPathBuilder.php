@@ -136,7 +136,7 @@ class PropertyPathBuilder
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
-    public function replaceByIndex(int $offset, string $name = null)
+    public function replaceByIndex(int $offset, ?string $name = null)
     {
         if (!isset($this->elements[$offset])) {
             throw new OutOfBoundsException(sprintf('The offset "%s" is not within the property path.', $offset));
@@ -154,7 +154,7 @@ class PropertyPathBuilder
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
-    public function replaceByProperty(int $offset, string $name = null)
+    public function replaceByProperty(int $offset, ?string $name = null)
     {
         if (!isset($this->elements[$offset])) {
             throw new OutOfBoundsException(sprintf('The offset "%s" is not within the property path.', $offset));

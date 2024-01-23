@@ -32,7 +32,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
     /**
      * @param bool|callable $debug The debugging mode as a boolean or a callable that should return it
      */
-    public function __construct(Environment $twig, HtmlErrorRenderer $fallbackErrorRenderer = null, $debug = false)
+    public function __construct(Environment $twig, ?HtmlErrorRenderer $fallbackErrorRenderer = null, $debug = false)
     {
         if (!\is_bool($debug) && !\is_callable($debug)) {
             throw new \TypeError(sprintf('Argument 3 passed to "%s()" must be a boolean or a callable, "%s" given.', __METHOD__, get_debug_type($debug)));

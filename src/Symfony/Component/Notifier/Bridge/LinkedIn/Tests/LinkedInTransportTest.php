@@ -30,7 +30,7 @@ final class LinkedInTransportTest extends TransportTestCase
     /**
      * @return LinkedInTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? new MockHttpClient()))->setHost('host.test');
     }

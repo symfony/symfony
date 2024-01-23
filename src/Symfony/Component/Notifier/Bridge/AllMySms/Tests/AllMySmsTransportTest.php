@@ -25,7 +25,7 @@ final class AllMySmsTransportTest extends TransportTestCase
     /**
      * @return AllMySmsTransport
      */
-    public static function createTransport(HttpClientInterface $client = null, string $from = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $from = null): TransportInterface
     {
         return new AllMySmsTransport('login', 'apiKey', $from, $client ?? new MockHttpClient());
     }

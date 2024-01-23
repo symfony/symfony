@@ -27,7 +27,7 @@ class ConsoleApplicationRunner implements RunnerInterface
     private $input;
     private $output;
 
-    public function __construct(Application $application, ?string $defaultEnv, InputInterface $input, OutputInterface $output = null)
+    public function __construct(Application $application, ?string $defaultEnv, InputInterface $input, ?OutputInterface $output = null)
     {
         $this->application = $application;
         $this->defaultEnv = $defaultEnv;

@@ -40,7 +40,7 @@ class DiscriminatorMap
      *
      * @throws InvalidArgumentException
      */
-    public function __construct($typeProperty, array $mapping = null)
+    public function __construct($typeProperty, ?array $mapping = null)
     {
         if (\is_array($typeProperty)) {
             trigger_deprecation('symfony/serializer', '5.3', 'Passing an array as first argument to "%s" is deprecated. Use named arguments instead.', __METHOD__);

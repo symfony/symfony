@@ -46,7 +46,7 @@ abstract class MiddlewareTestCase extends TestCase
         return new StackMiddleware($nextMiddleware);
     }
 
-    protected function getThrowingStackMock(\Throwable $throwable = null)
+    protected function getThrowingStackMock(?\Throwable $throwable = null)
     {
         $nextMiddleware = $this->createMock(MiddlewareInterface::class);
         $nextMiddleware

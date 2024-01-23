@@ -30,7 +30,7 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
     protected $mailer;
     protected $logger;
 
-    public function __construct(MailerInterface $mailer, LoggerInterface $logger, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
+    public function __construct(MailerInterface $mailer, LoggerInterface $logger, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
     {
         parent::__construct($dispatcher, $client);
 

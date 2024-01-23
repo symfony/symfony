@@ -19,7 +19,7 @@ class Comparator
     private $target;
     private $operator = '==';
 
-    public function __construct(string $target = null, string $operator = '==')
+    public function __construct(?string $target = null, string $operator = '==')
     {
         if (null === $target) {
             trigger_deprecation('symfony/finder', '5.4', 'Constructing a "%s" without setting "$target" is deprecated.', __CLASS__);

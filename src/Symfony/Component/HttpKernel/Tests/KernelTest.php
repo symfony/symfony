@@ -713,7 +713,7 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
     private $buildContainer;
     private $httpKernel;
 
-    public function __construct(\Closure $buildContainer = null, HttpKernelInterface $httpKernel = null, $env = 'custom')
+    public function __construct(?\Closure $buildContainer = null, ?HttpKernelInterface $httpKernel = null, $env = 'custom')
     {
         parent::__construct($env, true);
 

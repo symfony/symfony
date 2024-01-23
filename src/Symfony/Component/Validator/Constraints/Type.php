@@ -36,7 +36,7 @@ class Type extends Constraint
      *
      * @param string|array $type One ore multiple types to validate against or a set of options
      */
-    public function __construct($type, string $message = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct($type, ?string $message = null, ?array $groups = null, $payload = null, array $options = [])
     {
         if (\is_array($type) && \is_string(key($type))) {
             $options = array_merge($type, $options);

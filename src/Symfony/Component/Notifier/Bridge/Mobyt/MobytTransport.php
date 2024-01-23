@@ -34,7 +34,7 @@ final class MobytTransport extends AbstractTransport
     private $from;
     private $typeQuality;
 
-    public function __construct(string $accountSid, string $authToken, string $from, string $typeQuality = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $accountSid, string $authToken, string $from, ?string $typeQuality = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->accountSid = $accountSid;
         $this->authToken = $authToken;

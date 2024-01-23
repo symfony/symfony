@@ -21,12 +21,12 @@ interface OutputFormatterStyleInterface
     /**
      * Sets style foreground color.
      */
-    public function setForeground(string $color = null);
+    public function setForeground(?string $color = null);
 
     /**
      * Sets style background color.
      */
-    public function setBackground(string $color = null);
+    public function setBackground(?string $color = null);
 
     /**
      * Sets some specific style option.

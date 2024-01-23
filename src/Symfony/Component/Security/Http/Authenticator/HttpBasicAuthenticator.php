@@ -38,14 +38,14 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
     private $userProvider;
     private $logger;
 
-    public function __construct(string $realmName, UserProviderInterface $userProvider, LoggerInterface $logger = null)
+    public function __construct(string $realmName, UserProviderInterface $userProvider, ?LoggerInterface $logger = null)
     {
         $this->realmName = $realmName;
         $this->userProvider = $userProvider;
         $this->logger = $logger;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         $response = new Response();
         $response->headers->set('WWW-Authenticate', sprintf('Basic realm="%s"', $this->realmName));

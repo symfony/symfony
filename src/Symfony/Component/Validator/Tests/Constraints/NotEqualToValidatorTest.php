@@ -28,7 +28,7 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return new NotEqualToValidator();
     }
 
-    protected static function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(?array $options = null): Constraint
     {
         return new NotEqualTo($options);
     }

@@ -114,7 +114,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function setParent(FormInterface $parent = null)
+    public function setParent(?FormInterface $parent = null)
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot set the parent of a submitted button.');
@@ -140,7 +140,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function add($child, string $type = null, array $options = [])
+    public function add($child, ?string $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -414,7 +414,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(FormView $parent = null)
+    public function createView(?FormView $parent = null)
     {
         if (null === $parent && $this->parent) {
             $parent = $this->parent->createView();

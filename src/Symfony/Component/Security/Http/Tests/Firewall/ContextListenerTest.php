@@ -449,7 +449,7 @@ class ContextListenerTest extends TestCase
         return $session;
     }
 
-    private function handleEventWithPreviousSession($userProviders, UserInterface $user = null, RememberMeServicesInterface $rememberMeServices = null)
+    private function handleEventWithPreviousSession($userProviders, ?UserInterface $user = null, ?RememberMeServicesInterface $rememberMeServices = null)
     {
         $tokenUser = $user ?? new InMemoryUser('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
@@ -533,7 +533,7 @@ class SupportingUserProvider implements UserProviderInterface
 {
     private $refreshedUser;
 
-    public function __construct(InMemoryUser $refreshedUser = null)
+    public function __construct(?InMemoryUser $refreshedUser = null)
     {
         $this->refreshedUser = $refreshedUser;
     }

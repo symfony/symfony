@@ -89,12 +89,12 @@ class Uuid extends Constraint
      * @param int[]|null $versions
      */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        array $versions = null,
-        bool $strict = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?array $versions = null,
+        ?bool $strict = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

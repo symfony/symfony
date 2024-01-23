@@ -26,7 +26,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
     /**
      * @return SmsBiurasTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new SmsBiurasTransport('uid', 'api_key', 'from', true, $client ?? new MockHttpClient());
     }

@@ -34,7 +34,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
      *                                                  formats not supported by Request::getMimeTypes() should be given as mime types
      * @param bool|callable                     $debug  The debugging mode as a boolean or a callable that should return it
      */
-    public function __construct(SerializerInterface $serializer, $format, ErrorRendererInterface $fallbackErrorRenderer = null, $debug = false)
+    public function __construct(SerializerInterface $serializer, $format, ?ErrorRendererInterface $fallbackErrorRenderer = null, $debug = false)
     {
         if (!\is_string($format) && !\is_callable($format)) {
             throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be a string or a callable, "%s" given.', __METHOD__, \gettype($format)));

@@ -867,7 +867,7 @@ abstract class AbstractNumberFormatterTestCase extends TestCase
     /**
      * @return NumberFormatter|\NumberFormatter
      */
-    abstract protected static function getNumberFormatter(string $locale = 'en', string $style = null, string $pattern = null);
+    abstract protected static function getNumberFormatter(string $locale = 'en', ?string $style = null, ?string $pattern = null);
 
     abstract protected function getIntlErrorMessage(): string;
 
@@ -878,7 +878,7 @@ abstract class AbstractNumberFormatterTestCase extends TestCase
      */
     abstract protected function isIntlFailure($errorCode): bool;
 
-    public static function throwOnWarning(int $errno, string $errstr, string $errfile = null, int $errline = null): bool
+    public static function throwOnWarning(int $errno, string $errstr, ?string $errfile = null, ?int $errline = null): bool
     {
         if ($errno & (\E_WARNING | \E_USER_WARNING)) {
             throw new \ErrorException($errstr, 0, $errno, $errfile ?? __FILE__, $errline ?? __LINE__);

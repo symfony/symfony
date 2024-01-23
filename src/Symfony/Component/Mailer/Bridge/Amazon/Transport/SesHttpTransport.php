@@ -37,7 +37,7 @@ class SesHttpTransport extends AbstractHttpTransport
     /**
      * @param string|null $region Amazon SES region
      */
-    public function __construct(string $accessKey, string $secretKey, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $accessKey, string $secretKey, ?string $region = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         $this->accessKey = $accessKey;
         $this->secretKey = $secretKey;

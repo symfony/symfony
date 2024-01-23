@@ -40,7 +40,7 @@ abstract class AbstractUriElement
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
-    public function __construct(\DOMElement $node, string $currentUri = null, ?string $method = 'GET')
+    public function __construct(\DOMElement $node, ?string $currentUri = null, ?string $method = 'GET')
     {
         $this->setNode($node);
         $this->method = $method ? strtoupper($method) : null;

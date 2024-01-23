@@ -71,7 +71,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function add($child, string $type = null, array $options = [])
+    public function add($child, ?string $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -81,7 +81,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function create(string $name, string $type = null, array $options = [])
+    public function create(string $name, ?string $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -221,7 +221,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function setDataMapper(DataMapperInterface $dataMapper = null)
+    public function setDataMapper(?DataMapperInterface $dataMapper = null)
     {
         throw new BadMethodCallException('Buttons do not support data mappers.');
     }

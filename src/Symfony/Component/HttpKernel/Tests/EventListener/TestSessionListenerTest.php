@@ -158,7 +158,7 @@ class TestSessionListenerTest extends TestCase
         $this->assertTrue(true);
     }
 
-    private function filterResponse(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, Response $response = null)
+    private function filterResponse(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, ?Response $response = null)
     {
         $request->setSession($this->session);
         $response = $response ?? new Response();

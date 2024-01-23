@@ -58,7 +58,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
     private $responseFactory;
     private $streamFactory;
 
-    public function __construct(HttpClientInterface $client = null, ResponseFactoryInterface $responseFactory = null, StreamFactoryInterface $streamFactory = null)
+    public function __construct(?HttpClientInterface $client = null, ?ResponseFactoryInterface $responseFactory = null, ?StreamFactoryInterface $streamFactory = null)
     {
         $this->client = $client ?? HttpClient::create();
         $this->responseFactory = $responseFactory;

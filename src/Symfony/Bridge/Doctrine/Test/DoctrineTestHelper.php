@@ -40,7 +40,7 @@ class DoctrineTestHelper
      *
      * @return EntityManager
      */
-    public static function createTestEntityManager(Configuration $config = null)
+    public static function createTestEntityManager(?Configuration $config = null)
     {
         if (!\extension_loaded('pdo_sqlite')) {
             TestCase::markTestSkipped('Extension pdo_sqlite is required.');

@@ -28,7 +28,7 @@ final class DiscordTransportTest extends TransportTestCase
     /**
      * @return DiscordTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new DiscordTransport('testToken', 'testWebhookId', $client ?? new MockHttpClient()))->setHost('host.test');
     }

@@ -28,7 +28,7 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         return new GreaterThanValidator();
     }
 
-    protected static function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(?array $options = null): Constraint
     {
         return new GreaterThan($options);
     }

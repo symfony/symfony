@@ -34,7 +34,7 @@ final class SmscTransport extends AbstractTransport
     private $password;
     private $from;
 
-    public function __construct(string $login, string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $login, string $password, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $login;
         $this->password = $password;

@@ -33,7 +33,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
     private $connection;
     private $marshaller;
 
-    public function __construct(Collection $connection, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
+    public function __construct(Collection $connection, string $namespace = '', int $defaultLifetime = 0, ?MarshallerInterface $marshaller = null)
     {
         if (!static::isSupported()) {
             throw new CacheException('Couchbase >= 3.0.0 < 4.0.0 is required.');

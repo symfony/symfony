@@ -19,7 +19,7 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class AutoconfigureTag extends Autoconfigure
 {
-    public function __construct(string $name = null, array $attributes = [])
+    public function __construct(?string $name = null, array $attributes = [])
     {
         parent::__construct(
             tags: [

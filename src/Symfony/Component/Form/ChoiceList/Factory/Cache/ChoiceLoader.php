@@ -29,7 +29,7 @@ final class ChoiceLoader extends AbstractStaticOption implements ChoiceLoaderInt
     /**
      * {@inheritdoc}
      */
-    public function loadChoiceList(callable $value = null): ChoiceListInterface
+    public function loadChoiceList(?callable $value = null): ChoiceListInterface
     {
         return $this->getOption()->loadChoiceList($value);
     }
@@ -37,7 +37,7 @@ final class ChoiceLoader extends AbstractStaticOption implements ChoiceLoaderInt
     /**
      * {@inheritdoc}
      */
-    public function loadChoicesForValues(array $values, callable $value = null): array
+    public function loadChoicesForValues(array $values, ?callable $value = null): array
     {
         return $this->getOption()->loadChoicesForValues($values, $value);
     }
@@ -45,7 +45,7 @@ final class ChoiceLoader extends AbstractStaticOption implements ChoiceLoaderInt
     /**
      * {@inheritdoc}
      */
-    public function loadValuesForChoices(array $choices, callable $value = null): array
+    public function loadValuesForChoices(array $choices, ?callable $value = null): array
     {
         return $this->getOption()->loadValuesForChoices($choices, $value);
     }

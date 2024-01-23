@@ -120,7 +120,7 @@ class CollectionTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => AuthorType::class,
             'allow_delete' => true,
-            'delete_empty' => function (Author $obj = null) {
+            'delete_empty' => function (?Author $obj = null) {
                 return null === $obj || empty($obj->firstName);
             },
         ]);

@@ -59,7 +59,7 @@ class InputOption
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function __construct(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null)
+    public function __construct(string $name, $shortcut = null, ?int $mode = null, string $description = '', $default = null)
     {
         if (str_starts_with($name, '--')) {
             $name = substr($name, 2);

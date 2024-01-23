@@ -67,25 +67,25 @@ class File extends Constraint
      * @param string[]|string|null $mimeTypes
      */
     public function __construct(
-        array $options = null,
+        ?array $options = null,
         $maxSize = null,
-        bool $binaryFormat = null,
+        ?bool $binaryFormat = null,
         $mimeTypes = null,
-        string $notFoundMessage = null,
-        string $notReadableMessage = null,
-        string $maxSizeMessage = null,
-        string $mimeTypesMessage = null,
-        string $disallowEmptyMessage = null,
+        ?string $notFoundMessage = null,
+        ?string $notReadableMessage = null,
+        ?string $maxSizeMessage = null,
+        ?string $mimeTypesMessage = null,
+        ?string $disallowEmptyMessage = null,
 
-        string $uploadIniSizeErrorMessage = null,
-        string $uploadFormSizeErrorMessage = null,
-        string $uploadPartialErrorMessage = null,
-        string $uploadNoFileErrorMessage = null,
-        string $uploadNoTmpDirErrorMessage = null,
-        string $uploadCantWriteErrorMessage = null,
-        string $uploadExtensionErrorMessage = null,
-        string $uploadErrorMessage = null,
-        array $groups = null,
+        ?string $uploadIniSizeErrorMessage = null,
+        ?string $uploadFormSizeErrorMessage = null,
+        ?string $uploadPartialErrorMessage = null,
+        ?string $uploadNoFileErrorMessage = null,
+        ?string $uploadNoTmpDirErrorMessage = null,
+        ?string $uploadCantWriteErrorMessage = null,
+        ?string $uploadExtensionErrorMessage = null,
+        ?string $uploadErrorMessage = null,
+        ?array $groups = null,
         $payload = null
     ) {
         if (null !== $maxSize && !\is_int($maxSize) && !\is_string($maxSize)) {

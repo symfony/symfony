@@ -36,7 +36,7 @@ final class Statement extends AbstractStatementMiddleware
         DebugDataHolder $debugDataHolder,
         string $connectionName,
         string $sql,
-        Stopwatch $stopwatch = null
+        ?Stopwatch $stopwatch = null
     ) {
         $this->stopwatch = $stopwatch;
         $this->connectionName = $connectionName;

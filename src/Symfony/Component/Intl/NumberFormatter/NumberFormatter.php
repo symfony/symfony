@@ -259,7 +259,7 @@ abstract class NumberFormatter
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
-    public function __construct(?string $locale = 'en', int $style = null, string $pattern = null)
+    public function __construct(?string $locale = 'en', ?int $style = null, ?string $pattern = null)
     {
         if ('en' !== $locale && null !== $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
@@ -298,7 +298,7 @@ abstract class NumberFormatter
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
-    public static function create(?string $locale = 'en', int $style = null, string $pattern = null)
+    public static function create(?string $locale = 'en', ?int $style = null, ?string $pattern = null)
     {
         return new static($locale, $style, $pattern);
     }
@@ -495,7 +495,7 @@ abstract class NumberFormatter
      *
      * @throws MethodNotImplementedException
      */
-    public function parseCurrency(string $value, string &$currency, int &$position = null)
+    public function parseCurrency(string $value, string &$currency, ?int &$position = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }

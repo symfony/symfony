@@ -35,7 +35,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         'type',
     ];
 
-    public function __construct(ServerParams $params = null)
+    public function __construct(?ServerParams $params = null)
     {
         $this->serverParams = $params ?? new ServerParams();
     }

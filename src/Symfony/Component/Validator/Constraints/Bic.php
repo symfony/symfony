@@ -52,7 +52,7 @@ class Bic extends Constraint
      *
      * @param string|PropertyPathInterface|null $ibanPropertyPath
      */
-    public function __construct(array $options = null, string $message = null, string $iban = null, $ibanPropertyPath = null, string $ibanMessage = null, array $groups = null, $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?string $iban = null, $ibanPropertyPath = null, ?string $ibanMessage = null, ?array $groups = null, $payload = null)
     {
         if (!class_exists(Countries::class)) {
             throw new LogicException('The Intl component is required to use the Bic constraint. Try running "composer require symfony/intl".');

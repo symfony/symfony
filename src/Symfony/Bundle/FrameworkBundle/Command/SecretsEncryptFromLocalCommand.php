@@ -31,7 +31,7 @@ final class SecretsEncryptFromLocalCommand extends Command
     private $vault;
     private $localVault;
 
-    public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
+    public function __construct(AbstractVault $vault, ?AbstractVault $localVault = null)
     {
         $this->vault = $vault;
         $this->localVault = $localVault;

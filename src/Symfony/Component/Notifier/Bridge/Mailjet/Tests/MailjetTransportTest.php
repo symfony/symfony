@@ -25,7 +25,7 @@ final class MailjetTransportTest extends TransportTestCase
     /**
      * @return MailjetTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new MailjetTransport('authtoken', 'Mailjet', $client ?? new MockHttpClient()))->setHost('host.test');
     }

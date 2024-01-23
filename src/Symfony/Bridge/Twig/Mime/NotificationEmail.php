@@ -40,7 +40,7 @@ class NotificationEmail extends TemplatedEmail
         'footer_text' => 'Notification e-mail sent by Symfony',
     ];
 
-    public function __construct(Headers $headers = null, AbstractPart $body = null)
+    public function __construct(?Headers $headers = null, ?AbstractPart $body = null)
     {
         $missingPackages = [];
         if (!class_exists(CssInlinerExtension::class)) {
@@ -61,7 +61,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * Creates a NotificationEmail instance that is appropriate to send to normal (non-admin) users.
      */
-    public static function asPublicEmail(Headers $headers = null, AbstractPart $body = null): self
+    public static function asPublicEmail(?Headers $headers = null, ?AbstractPart $body = null): self
     {
         $email = new static($headers, $body);
         $email->markAsPublic();

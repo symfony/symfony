@@ -25,7 +25,7 @@ final class MessageBirdTransportTest extends TransportTestCase
     /**
      * @return MessageBirdTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new MessageBirdTransport('token', 'from', $client ?? new MockHttpClient());
     }

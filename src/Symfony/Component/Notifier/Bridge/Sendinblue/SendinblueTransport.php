@@ -31,7 +31,7 @@ final class SendinblueTransport extends AbstractTransport
     private $apiKey;
     private $sender;
 
-    public function __construct(string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, string $sender, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->sender = $sender;

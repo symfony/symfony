@@ -38,7 +38,7 @@ class ContainerConfigurator extends AbstractConfigurator
     private $anonymousCount = 0;
     private $env;
 
-    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path, string $file, string $env = null)
+    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path, string $file, ?string $env = null)
     {
         $this->container = $container;
         $this->loader = $loader;
@@ -58,7 +58,7 @@ class ContainerConfigurator extends AbstractConfigurator
         $this->container->loadFromExtension($namespace, static::processValue($config));
     }
 
-    final public function import(string $resource, string $type = null, $ignoreErrors = false)
+    final public function import(string $resource, ?string $type = null, $ignoreErrors = false)
     {
         $this->loader->setCurrentDir(\dirname($this->path));
         $this->loader->import($resource, $type, $ignoreErrors, $this->file);
@@ -128,7 +128,7 @@ function service(string $serviceId): ReferenceConfigurator
  *
  * @deprecated since Symfony 5.1, use inline_service() instead.
  */
-function inline(string $class = null): InlineServiceConfigurator
+function inline(?string $class = null): InlineServiceConfigurator
 {
     trigger_deprecation('symfony/dependency-injection', '5.1', '"%s()" is deprecated, use "inline_service()" instead.', __FUNCTION__);
 
@@ -138,7 +138,7 @@ function inline(string $class = null): InlineServiceConfigurator
 /**
  * Creates an inline service.
  */
-function inline_service(string $class = null): InlineServiceConfigurator
+function inline_service(?string $class = null): InlineServiceConfigurator
 {
     return new InlineServiceConfigurator(new Definition($class));
 }
@@ -166,7 +166,7 @@ function iterator(array $values): IteratorArgument
 /**
  * Creates a lazy iterator by tag name.
  */
-function tagged_iterator(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, string $defaultPriorityMethod = null): TaggedIteratorArgument
+function tagged_iterator(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, ?string $defaultPriorityMethod = null): TaggedIteratorArgument
 {
     return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, false, $defaultPriorityMethod);
 }
@@ -174,7 +174,7 @@ function tagged_iterator(string $tag, string $indexAttribute = null, string $def
 /**
  * Creates a service locator by tag name.
  */
-function tagged_locator(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, string $defaultPriorityMethod = null): ServiceLocatorArgument
+function tagged_locator(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, ?string $defaultPriorityMethod = null): ServiceLocatorArgument
 {
     return new ServiceLocatorArgument(new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, true, $defaultPriorityMethod));
 }

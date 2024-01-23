@@ -941,7 +941,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', '_' => '/'], $matcher->match('/hello/'));
     }
 
-    protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
+    protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?? new RequestContext());
     }

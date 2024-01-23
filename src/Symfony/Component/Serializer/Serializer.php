@@ -154,7 +154,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, string $format = null, array $context = [])
+    public function normalize($data, ?string $format = null, array $context = [])
     {
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format, $context)) {
@@ -199,7 +199,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      * @throws NotNormalizableValueException
      * @throws PartialDenormalizationException Occurs when one or more properties of $type fails to denormalize
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS], $context['not_normalizable_value_exceptions'])) {
             throw new LogicException('Passing a value for "not_normalizable_value_exceptions" context key is not allowed.');
@@ -254,7 +254,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, string $format = null, array $context = [])
+    public function supportsNormalization($data, ?string $format = null, array $context = [])
     {
         return null !== $this->getNormalizer($data, $format, $context);
     }
@@ -262,7 +262,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = [])
     {
         return isset(self::SCALAR_TYPES[$type]) || null !== $this->getDenormalizer($data, $type, $format, $context);
     }

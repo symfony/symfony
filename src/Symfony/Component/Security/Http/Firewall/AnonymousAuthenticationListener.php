@@ -39,7 +39,7 @@ class AnonymousAuthenticationListener extends AbstractListener
     private $authenticationManager;
     private $logger;
 
-    public function __construct(TokenStorageInterface $tokenStorage, string $secret, LoggerInterface $logger = null, AuthenticationManagerInterface $authenticationManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, string $secret, ?LoggerInterface $logger = null, ?AuthenticationManagerInterface $authenticationManager = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->secret = $secret;

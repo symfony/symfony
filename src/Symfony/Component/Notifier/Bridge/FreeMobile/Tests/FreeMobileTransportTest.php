@@ -25,7 +25,7 @@ final class FreeMobileTransportTest extends TransportTestCase
     /**
      * @return FreeMobileTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? new MockHttpClient());
     }

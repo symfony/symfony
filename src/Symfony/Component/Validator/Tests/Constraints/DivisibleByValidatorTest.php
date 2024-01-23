@@ -26,7 +26,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         return new DivisibleByValidator();
     }
 
-    protected static function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(?array $options = null): Constraint
     {
         return new DivisibleBy($options);
     }

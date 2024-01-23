@@ -45,7 +45,7 @@ final class InputBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function all(string $key = null): array
+    public function all(?string $key = null): array
     {
         return parent::all($key);
     }

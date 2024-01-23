@@ -28,7 +28,7 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
     protected $options;
     protected $logger;
 
-    public function __construct(UserProviderInterface $userProvider, RequestStack $requestStack, array $options = [], LoggerInterface $logger = null)
+    public function __construct(UserProviderInterface $userProvider, RequestStack $requestStack, array $options = [], ?LoggerInterface $logger = null)
     {
         $this->userProvider = $userProvider;
         $this->requestStack = $requestStack;

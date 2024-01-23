@@ -31,7 +31,7 @@ final class MessageBirdTransport extends AbstractTransport
     private $token;
     private $from;
 
-    public function __construct(string $token, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->from = $from;

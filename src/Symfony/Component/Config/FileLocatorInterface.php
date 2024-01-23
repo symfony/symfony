@@ -30,5 +30,5 @@ interface FileLocatorInterface
      * @throws \InvalidArgumentException        If $name is empty
      * @throws FileLocatorFileNotFoundException If a file is not found
      */
-    public function locate(string $name, string $currentPath = null, bool $first = true);
+    public function locate(string $name, ?string $currentPath = null, bool $first = true);
 }

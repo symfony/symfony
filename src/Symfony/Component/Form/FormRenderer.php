@@ -31,7 +31,7 @@ class FormRenderer implements FormRendererInterface
     private $hierarchyLevelMap = [];
     private $variableStack = [];
 
-    public function __construct(FormRendererEngineInterface $engine, CsrfTokenManagerInterface $csrfTokenManager = null)
+    public function __construct(FormRendererEngineInterface $engine, ?CsrfTokenManagerInterface $csrfTokenManager = null)
     {
         $this->engine = $engine;
         $this->csrfTokenManager = $csrfTokenManager;

@@ -119,7 +119,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $pathInfo = $event->getRequest()->getPathInfo();
+        $pathInfo = rawurldecode($event->getRequest()->getPathInfo());
         if (!str_starts_with($pathInfo, $this->publicPrefix)) {
             return;
         }

@@ -35,6 +35,20 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $this->assertTrue($response->headers->has('X-Assets-Dev'));
     }
 
+    public function testGettingAssetWithNonAsciiFilenameWorks()
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/assets/voilà-6344422da690fcc471f23f7a8966cd1c.css');
+        $response = $client->getResponse();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(<<<EOF
+        /* voilà.css */
+        body {}
+
+        EOF, $response->getContent());
+    }
+
     public function test404OnUnknownAsset()
     {
         $client = static::createClient();

@@ -29,7 +29,7 @@ class EmailMessage implements MessageInterface, FromNotificationInterface
     private ?Envelope $envelope;
     private ?Notification $notification = null;
 
-    public function __construct(RawMessage $message, Envelope $envelope = null)
+    public function __construct(RawMessage $message, ?Envelope $envelope = null)
     {
         $this->message = $message;
         $this->envelope = $envelope;

@@ -39,7 +39,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
     private string $class;
     private ?string $property;
 
-    public function __construct(ManagerRegistry $registry, string $classOrAlias, string $property = null, string $managerName = null)
+    public function __construct(ManagerRegistry $registry, string $classOrAlias, ?string $property = null, ?string $managerName = null)
     {
         $this->registry = $registry;
         $this->managerName = $managerName;

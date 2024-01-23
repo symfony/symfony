@@ -56,7 +56,7 @@ final class CronExpressionTrigger implements TriggerInterface
         return $this->expression->getExpression();
     }
 
-    public static function fromSpec(string $expression = '* * * * *', string $context = null): self
+    public static function fromSpec(string $expression = '* * * * *', ?string $context = null): self
     {
         if (!class_exists(CronExpression::class)) {
             throw new LogicException(sprintf('You cannot use "%s" as the "cron expression" package is not installed. Try running "composer require dragonmantank/cron-expression".', __CLASS__));

@@ -59,7 +59,7 @@ class Security extends LegacySecurity
      *
      * @return Response|null The authenticator success response if any
      */
-    public function login(UserInterface $user, string $authenticatorName = null, string $firewallName = null): ?Response
+    public function login(UserInterface $user, ?string $authenticatorName = null, ?string $firewallName = null): ?Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         if (null === $request) {

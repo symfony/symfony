@@ -121,7 +121,7 @@ class Application extends BaseApplication
         return $command;
     }
 
-    public function all(string $namespace = null): array
+    public function all(?string $namespace = null): array
     {
         $this->registerCommands();
 

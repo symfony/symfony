@@ -29,7 +29,7 @@ class ImportMapRenderer
     ) {
     }
 
-    public function render(string $entryPoint = null, array $attributes = []): string
+    public function render(?string $entryPoint = null, array $attributes = []): string
     {
         $attributeString = '';
 

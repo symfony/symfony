@@ -498,7 +498,7 @@ class ImportMapManagerTest extends TestCase
         return $this->assetMapper;
     }
 
-    private static function resolvedPackage(string $packageName, string $url, bool $download = false, bool $preload = false, string $importName = null, string $content = null)
+    private static function resolvedPackage(string $packageName, string $url, bool $download = false, bool $preload = false, ?string $importName = null, ?string $content = null)
     {
         return new ResolvedImportMapPackage(
             new PackageRequireOptions($packageName, download: $download, preload: $preload, importName: $importName),

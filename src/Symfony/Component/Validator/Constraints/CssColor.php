@@ -70,7 +70,7 @@ class CssColor extends Constraint
     /**
      * @param array|string $formats The types of CSS colors allowed (e.g. hexadecimal only, RGB and HSL only, etc.).
      */
-    public function __construct($formats = [], string $message = null, array $groups = null, $payload = null, array $options = null)
+    public function __construct($formats = [], ?string $message = null, ?array $groups = null, $payload = null, ?array $options = null)
     {
         $validationModesAsString = implode(', ', self::$validationModes);
 

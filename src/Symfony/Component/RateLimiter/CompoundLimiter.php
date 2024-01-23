@@ -31,7 +31,7 @@ final class CompoundLimiter implements LimiterInterface
         $this->limiters = $limiters;
     }
 
-    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
         throw new ReserveNotSupportedException(__CLASS__);
     }

@@ -84,7 +84,7 @@ class ErrorChunk implements ChunkInterface
         return $this->errorMessage;
     }
 
-    public function didThrow(bool $didThrow = null): bool
+    public function didThrow(?bool $didThrow = null): bool
     {
         if (null !== $didThrow && $this->didThrow !== $didThrow) {
             return !$this->didThrow = $didThrow;

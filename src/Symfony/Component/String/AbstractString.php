@@ -383,7 +383,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return '' === $this->string;
     }
 
-    abstract public function join(array $strings, string $lastGlue = null): static;
+    abstract public function join(array $strings, ?string $lastGlue = null): static;
 
     public function jsonSerialize(): string
     {
@@ -429,16 +429,16 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     abstract public function reverse(): static;
 
-    abstract public function slice(int $start = 0, int $length = null): static;
+    abstract public function slice(int $start = 0, ?int $length = null): static;
 
     abstract public function snake(): static;
 
-    abstract public function splice(string $replacement, int $start = 0, int $length = null): static;
+    abstract public function splice(string $replacement, int $start = 0, ?int $length = null): static;
 
     /**
      * @return static[]
      */
-    public function split(string $delimiter, int $limit = null, int $flags = null): array
+    public function split(string $delimiter, ?int $limit = null, ?int $flags = null): array
     {
         if (null === $flags) {
             throw new \TypeError('Split behavior when $flags is null must be implemented by child classes.');
@@ -495,7 +495,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     abstract public function title(bool $allWords = false): static;
 
-    public function toByteString(string $toEncoding = null): ByteString
+    public function toByteString(?string $toEncoding = null): ByteString
     {
         $b = new ByteString();
 

@@ -69,7 +69,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
 
@@ -84,7 +84,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
 
@@ -139,12 +139,12 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $this->serializer->getSupportedTypes($format);
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $this->serializer->supportsNormalization($data, $format, $context);
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return $this->serializer->supportsDenormalization($data, $type, $format, $context);
     }

@@ -36,13 +36,13 @@ class PhpFileLoader extends FileLoader
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
     private ?ConfigBuilderGeneratorInterface $generator;
 
-    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null, ConfigBuilderGeneratorInterface $generator = null)
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, ?string $env = null, ?ConfigBuilderGeneratorInterface $generator = null)
     {
         parent::__construct($container, $locator, $env);
         $this->generator = $generator;
     }
 
-    public function load(mixed $resource, string $type = null): mixed
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         // the container and loader variables are exposed to the included file below
         $container = $this->container;
@@ -71,7 +71,7 @@ class PhpFileLoader extends FileLoader
         return null;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         if (!\is_string($resource)) {
             return false;

@@ -161,7 +161,7 @@ class AppVariable
      *  * getFlashes('notice') returns a simple array with flash messages of that type
      *  * getFlashes(['notice', 'error']) returns a nested array of type => messages.
      */
-    public function getFlashes(string|array $types = null): array
+    public function getFlashes(string|array|null $types = null): array
     {
         try {
             if (null === $session = $this->getSession()) {

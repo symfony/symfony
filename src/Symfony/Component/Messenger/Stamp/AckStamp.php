@@ -28,7 +28,7 @@ final class AckStamp implements NonSendableStampInterface
         $this->ack = $ack;
     }
 
-    public function ack(Envelope $envelope, \Throwable $e = null): void
+    public function ack(Envelope $envelope, ?\Throwable $e = null): void
     {
         ($this->ack)($envelope, $e);
     }

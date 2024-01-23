@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class GoogleChatTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $threadKey = null): GoogleChatTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $threadKey = null): GoogleChatTransport
     {
         return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $threadKey, $client ?? new MockHttpClient());
     }

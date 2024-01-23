@@ -286,7 +286,7 @@ class ErrorListenerTest extends TestCase
 
 class TestLogger extends Logger implements DebugLoggerInterface
 {
-    public function countErrors(Request $request = null): int
+    public function countErrors(?Request $request = null): int
     {
         return \count($this->logs['critical']);
     }

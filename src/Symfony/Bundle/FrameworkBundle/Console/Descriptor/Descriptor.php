@@ -94,7 +94,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param Definition|Alias|object $service
      */
-    abstract protected function describeContainerService(object $service, array $options = [], ContainerBuilder $container = null): void;
+    abstract protected function describeContainerService(object $service, array $options = [], ?ContainerBuilder $container = null): void;
 
     /**
      * Describes container services.
@@ -106,9 +106,9 @@ abstract class Descriptor implements DescriptorInterface
 
     abstract protected function describeContainerDeprecations(ContainerBuilder $container, array $options = []): void;
 
-    abstract protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void;
+    abstract protected function describeContainerDefinition(Definition $definition, array $options = [], ?ContainerBuilder $container = null): void;
 
-    abstract protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void;
+    abstract protected function describeContainerAlias(Alias $alias, array $options = [], ?ContainerBuilder $container = null): void;
 
     abstract protected function describeContainerParameter(mixed $parameter, array $options = []): void;
 
@@ -263,7 +263,7 @@ abstract class Descriptor implements DescriptorInterface
         return $tag;
     }
 
-    public static function getClassDescription(string $class, string &$resolvedClass = null): string
+    public static function getClassDescription(string $class, ?string &$resolvedClass = null): string
     {
         $resolvedClass = $class;
         try {

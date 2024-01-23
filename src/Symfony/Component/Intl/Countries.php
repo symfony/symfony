@@ -89,7 +89,7 @@ final class Countries extends ResourceBundle
      *
      * @throws MissingResourceException if the country code does not exist
      */
-    public static function getName(string $country, string $displayLocale = null): string
+    public static function getName(string $country, ?string $displayLocale = null): string
     {
         return self::readEntry(['Names', $country], $displayLocale);
     }
@@ -99,7 +99,7 @@ final class Countries extends ResourceBundle
      *
      * @throws MissingResourceException if the country code does not exist
      */
-    public static function getAlpha3Name(string $alpha3Code, string $displayLocale = null): string
+    public static function getAlpha3Name(string $alpha3Code, ?string $displayLocale = null): string
     {
         return self::getName(self::getAlpha2Code($alpha3Code), $displayLocale);
     }
@@ -109,7 +109,7 @@ final class Countries extends ResourceBundle
      *
      * @return array<string, string>
      */
-    public static function getNames(string $displayLocale = null): array
+    public static function getNames(?string $displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
     }
@@ -121,7 +121,7 @@ final class Countries extends ResourceBundle
      *
      * @return array<string, string>
      */
-    public static function getAlpha3Names(string $displayLocale = null): array
+    public static function getAlpha3Names(?string $displayLocale = null): array
     {
         $alpha2Names = self::getNames($displayLocale);
         $alpha3Names = [];

@@ -141,7 +141,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * Returns false when autodetection failed, an array of the completed information otherwise.
      */
-    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container, string $bundleDir = null): array|false
+    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container, ?string $bundleDir = null): array|false
     {
         $bundleClassDir = \dirname($bundle->getFileName());
         $bundleDir ??= $bundleClassDir;
@@ -451,7 +451,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Relative path from the bundle root to the directory where mapping files reside.
      */
-    abstract protected function getMappingResourceConfigDirectory(string $bundleDir = null): string;
+    abstract protected function getMappingResourceConfigDirectory(?string $bundleDir = null): string;
 
     /**
      * Extension used by the mapping files.

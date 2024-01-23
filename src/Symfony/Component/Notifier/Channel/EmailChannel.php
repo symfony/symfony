@@ -34,7 +34,7 @@ class EmailChannel implements ChannelInterface
     private string|Address|null $from;
     private ?Envelope $envelope;
 
-    public function __construct(TransportInterface $transport = null, MessageBusInterface $bus = null, string $from = null, Envelope $envelope = null)
+    public function __construct(?TransportInterface $transport = null, ?MessageBusInterface $bus = null, ?string $from = null, ?Envelope $envelope = null)
     {
         if (null === $transport && null === $bus) {
             throw new LogicException(sprintf('"%s" needs a Transport or a Bus but both cannot be "null".', static::class));
@@ -46,7 +46,7 @@ class EmailChannel implements ChannelInterface
         $this->envelope = $envelope;
     }
 
-    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
+    public function notify(Notification $notification, RecipientInterface $recipient, ?string $transportName = null): void
     {
         $message = null;
         if ($notification instanceof EmailNotificationInterface) {

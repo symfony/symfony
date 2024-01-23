@@ -30,7 +30,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     private HttpClientInterface $httpClient;
 
     public function __construct(
-        HttpClientInterface $httpClient = null,
+        ?HttpClientInterface $httpClient = null,
         private readonly string $versionUrlPattern = self::URL_PATTERN_VERSION,
         private readonly string $distUrlPattern = self::URL_PATTERN_DIST,
     ) {

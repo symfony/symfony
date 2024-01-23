@@ -42,7 +42,7 @@ class ByteString extends AbstractString
      * Copyright (c) 2004-2020, Facebook, Inc. (https://www.facebook.com/)
      */
 
-    public static function fromRandom(int $length = 16, string $alphabet = null): self
+    public static function fromRandom(int $length = 16, ?string $alphabet = null): self
     {
         if ($length <= 0) {
             throw new InvalidArgumentException(sprintf('A strictly positive length is expected, "%d" given.', $length));
@@ -205,7 +205,7 @@ class ByteString extends AbstractString
         return '' === $this->string || preg_match('//u', $this->string);
     }
 
-    public function join(array $strings, string $lastGlue = null): static
+    public function join(array $strings, ?string $lastGlue = null): static
     {
         $str = clone $this;
 
@@ -332,7 +332,7 @@ class ByteString extends AbstractString
         return $str;
     }
 
-    public function slice(int $start = 0, int $length = null): static
+    public function slice(int $start = 0, ?int $length = null): static
     {
         $str = clone $this;
         $str->string = (string) substr($this->string, $start, $length ?? \PHP_INT_MAX);
@@ -348,7 +348,7 @@ class ByteString extends AbstractString
         return $str;
     }
 
-    public function splice(string $replacement, int $start = 0, int $length = null): static
+    public function splice(string $replacement, int $start = 0, ?int $length = null): static
     {
         $str = clone $this;
         $str->string = substr_replace($this->string, $replacement, $start, $length ?? \PHP_INT_MAX);
@@ -356,7 +356,7 @@ class ByteString extends AbstractString
         return $str;
     }
 
-    public function split(string $delimiter, int $limit = null, int $flags = null): array
+    public function split(string $delimiter, ?int $limit = null, ?int $flags = null): array
     {
         if (1 > $limit ??= \PHP_INT_MAX) {
             throw new InvalidArgumentException('Split limit must be a positive integer.');
@@ -402,12 +402,12 @@ class ByteString extends AbstractString
         return $str;
     }
 
-    public function toUnicodeString(string $fromEncoding = null): UnicodeString
+    public function toUnicodeString(?string $fromEncoding = null): UnicodeString
     {
         return new UnicodeString($this->toCodePointString($fromEncoding)->string);
     }
 
-    public function toCodePointString(string $fromEncoding = null): CodePointString
+    public function toCodePointString(?string $fromEncoding = null): CodePointString
     {
         $u = new CodePointString();
 

@@ -111,7 +111,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * @internal Called by {@link ExecutionContextFactory}. Should not be used in user code.
      */
-    public function __construct(ValidatorInterface $validator, mixed $root, TranslatorInterface $translator, string $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, mixed $root, TranslatorInterface $translator, ?string $translationDomain = null)
     {
         $this->validator = $validator;
         $this->root = $root;
@@ -121,7 +121,7 @@ class ExecutionContext implements ExecutionContextInterface
         $this->cachedObjectsRefs = new \SplObjectStorage();
     }
 
-    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath): void
+    public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata = null, string $propertyPath): void
     {
         $this->value = $value;
         $this->object = $object;

@@ -23,5 +23,5 @@ interface ContextAwareDenormalizerInterface extends DenormalizerInterface
     /**
      * @param array $context options that denormalizers have access to
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool;
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool;
 }

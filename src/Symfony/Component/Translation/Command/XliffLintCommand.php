@@ -41,7 +41,7 @@ class XliffLintCommand extends Command
     private ?\Closure $isReadableProvider;
     private bool $requireStrictFileNames;
 
-    public function __construct(string $name = null, callable $directoryIteratorProvider = null, callable $isReadableProvider = null, bool $requireStrictFileNames = true)
+    public function __construct(?string $name = null, ?callable $directoryIteratorProvider = null, ?callable $isReadableProvider = null, bool $requireStrictFileNames = true)
     {
         parent::__construct($name);
 
@@ -109,7 +109,7 @@ EOF
         return $this->display($io, $filesInfo);
     }
 
-    private function validate(string $content, string $file = null): array
+    private function validate(string $content, ?string $file = null): array
     {
         $errors = [];
 

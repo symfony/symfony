@@ -579,11 +579,11 @@ class NonExistentClassDifferentNamespaceController
 
 class NonExistentClassOptionalController
 {
-    public function fooAction(NonExistentClass $nonExistent = null)
+    public function fooAction(?NonExistentClass $nonExistent = null)
     {
     }
 
-    public function barAction(NonExistentClass $nonExistent = null, $bar)
+    public function barAction(?NonExistentClass $nonExistent = null, $bar)
     {
     }
 }
@@ -657,7 +657,7 @@ class WithAutowireAttribute
         #[AutowireCallable(service: 'some.id', method: 'bar')]
         FooInterface $autowireCallable,
         #[Autowire(service: 'invalid.id')]
-        \stdClass $service2 = null,
+        ?\stdClass $service2 = null,
     ) {
     }
 }

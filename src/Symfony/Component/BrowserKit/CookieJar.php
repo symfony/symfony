@@ -38,7 +38,7 @@ class CookieJar
      * (this behavior ensures a BC behavior with previous versions of
      * Symfony).
      */
-    public function get(string $name, string $path = '/', string $domain = null): ?Cookie
+    public function get(string $name, string $path = '/', ?string $domain = null): ?Cookie
     {
         $this->flushExpiredCookies();
 
@@ -72,7 +72,7 @@ class CookieJar
      *
      * @return void
      */
-    public function expire(string $name, ?string $path = '/', string $domain = null)
+    public function expire(string $name, ?string $path = '/', ?string $domain = null)
     {
         $path ??= '/';
 
@@ -114,7 +114,7 @@ class CookieJar
      *
      * @return void
      */
-    public function updateFromSetCookie(array $setCookies, string $uri = null)
+    public function updateFromSetCookie(array $setCookies, ?string $uri = null)
     {
         $cookies = [];
 
@@ -142,7 +142,7 @@ class CookieJar
      *
      * @return void
      */
-    public function updateFromResponse(Response $response, string $uri = null)
+    public function updateFromResponse(Response $response, ?string $uri = null)
     {
         $this->updateFromSetCookie($response->getHeader('Set-Cookie', false), $uri);
     }

@@ -36,12 +36,12 @@ class ImpersonateUrlGenerator
         $this->firewallMap = $firewallMap;
     }
 
-    public function generateExitPath(string $targetUri = null): string
+    public function generateExitPath(?string $targetUri = null): string
     {
         return $this->buildExitPath($targetUri);
     }
 
-    public function generateExitUrl(string $targetUri = null): string
+    public function generateExitUrl(?string $targetUri = null): string
     {
         if (null === $request = $this->requestStack->getCurrentRequest()) {
             return '';
@@ -55,7 +55,7 @@ class ImpersonateUrlGenerator
         return $this->tokenStorage->getToken() instanceof SwitchUserToken;
     }
 
-    private function buildExitPath(string $targetUri = null): string
+    private function buildExitPath(?string $targetUri = null): string
     {
         if (null === ($request = $this->requestStack->getCurrentRequest()) || !$this->isImpersonatedUser()) {
             return '';

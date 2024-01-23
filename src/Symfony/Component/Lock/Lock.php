@@ -39,7 +39,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
      * @param float|null $ttl         Maximum expected lock duration in seconds
      * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      */
-    public function __construct(Key $key, PersistingStoreInterface $store, float $ttl = null, bool $autoRelease = true)
+    public function __construct(Key $key, PersistingStoreInterface $store, ?float $ttl = null, bool $autoRelease = true)
     {
         $this->store = $store;
         $this->key = $key;
@@ -182,7 +182,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    public function refresh(float $ttl = null): void
+    public function refresh(?float $ttl = null): void
     {
         if (!$ttl ??= $this->ttl) {
             throw new InvalidArgumentException('You have to define an expiration duration.');

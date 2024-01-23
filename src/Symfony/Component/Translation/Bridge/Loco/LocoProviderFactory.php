@@ -32,7 +32,7 @@ final class LocoProviderFactory extends AbstractProviderFactory
     private LoaderInterface $loader;
     private ?TranslatorBagInterface $translatorBag = null;
 
-    public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader, TranslatorBagInterface $translatorBag = null)
+    public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader, ?TranslatorBagInterface $translatorBag = null)
     {
         $this->client = $client;
         $this->logger = $logger;

@@ -42,7 +42,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 class AsRoutingConditionService extends AutoconfigureTag
 {
     public function __construct(
-        string $alias = null,
+        ?string $alias = null,
         int $priority = 0,
     ) {
         parent::__construct('routing.condition_service', ['alias' => $alias, 'priority' => $priority]);

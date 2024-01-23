@@ -23,5 +23,5 @@ interface ContextAwareNormalizerInterface extends NormalizerInterface
     /**
      * @param array $context options that normalizers have access to
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool;
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool;
 }

@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TelegramTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $channel = null): TelegramTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null): TelegramTransport
     {
         return new TelegramTransport('token', $channel, $client ?? new MockHttpClient());
     }

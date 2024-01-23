@@ -427,7 +427,7 @@ class LazyGhostTraitTest extends TestCase
      *
      * @return T
      */
-    private function createLazyGhost(string $class, \Closure|array $initializer, array $skippedProperties = null): object
+    private function createLazyGhost(string $class, \Closure|array $initializer, ?array $skippedProperties = null): object
     {
         $r = new \ReflectionClass($class);
 

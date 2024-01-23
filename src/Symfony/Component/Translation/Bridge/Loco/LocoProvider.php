@@ -38,7 +38,7 @@ final class LocoProvider implements ProviderInterface
     private string $endpoint;
     private ?TranslatorBagInterface $translatorBag = null;
 
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, TranslatorBagInterface $translatorBag = null)
+    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null)
     {
         $this->client = $client;
         $this->loader = $loader;

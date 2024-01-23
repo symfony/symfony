@@ -60,7 +60,7 @@ class TokenStream
      *
      * @return void
      */
-    public function expect(string $type, string $value = null, string $message = null)
+    public function expect(string $type, ?string $value = null, ?string $message = null)
     {
         $token = $this->current;
         if (!$token->test($type, $value)) {

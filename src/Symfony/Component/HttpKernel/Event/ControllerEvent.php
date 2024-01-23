@@ -51,7 +51,7 @@ final class ControllerEvent extends KernelEvent
     /**
      * @param array<class-string, list<object>>|null $attributes
      */
-    public function setController(callable $controller, array $attributes = null): void
+    public function setController(callable $controller, ?array $attributes = null): void
     {
         if (null !== $attributes) {
             $this->attributes = $attributes;

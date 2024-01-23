@@ -206,7 +206,7 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render([])));
     }
 
-    private function getTemplate($template, TranslatorInterface $translator = null): TemplateWrapper
+    private function getTemplate($template, ?TranslatorInterface $translator = null): TemplateWrapper
     {
         $translator ??= new Translator('en');
 

@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Route;
 
 class AnnotationClassLoaderWithAttributesTest extends AnnotationClassLoaderTestCase
 {
-    protected function setUp(string $env = null): void
+    protected function setUp(?string $env = null): void
     {
         $this->loader = new class(null, $env) extends AnnotationClassLoader {
             protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void

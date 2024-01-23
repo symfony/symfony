@@ -36,7 +36,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
 
     public function __construct(
         private readonly string $missingImportMode = self::MISSING_IMPORT_WARN,
-        LoggerInterface $logger = null,
+        ?LoggerInterface $logger = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -72,7 +72,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
         return 'css' === $asset->publicExtension;
     }
 
-    private function handleMissingImport(string $message, \Throwable $e = null): void
+    private function handleMissingImport(string $message, ?\Throwable $e = null): void
     {
         match ($this->missingImportMode) {
             AssetCompilerInterface::MISSING_IMPORT_IGNORE => null,

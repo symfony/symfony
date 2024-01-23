@@ -25,7 +25,7 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
     public const HTML5_FORMAT = 'Y-m-d\\TH:i:s';
     public const HTML5_FORMAT_NO_SECONDS = 'Y-m-d\\TH:i';
 
-    public function __construct(string $inputTimezone = null, string $outputTimezone = null, private bool $withSeconds = false)
+    public function __construct(?string $inputTimezone = null, ?string $outputTimezone = null, private bool $withSeconds = false)
     {
         parent::__construct($inputTimezone, $outputTimezone);
     }

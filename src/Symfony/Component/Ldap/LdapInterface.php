@@ -32,7 +32,7 @@ interface LdapInterface
      *
      * @return void
      */
-    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null);
+    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null);
 
     /**
      * Queries a ldap server for entries matching the given criteria.

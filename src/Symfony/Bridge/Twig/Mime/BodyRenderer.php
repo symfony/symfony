@@ -29,7 +29,7 @@ final class BodyRenderer implements BodyRendererInterface
     private array $context;
     private HtmlToTextConverterInterface $converter;
 
-    public function __construct(Environment $twig, array $context = [], HtmlToTextConverterInterface $converter = null)
+    public function __construct(Environment $twig, array $context = [], ?HtmlToTextConverterInterface $converter = null)
     {
         $this->twig = $twig;
         $this->context = $context;

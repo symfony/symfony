@@ -38,7 +38,7 @@ class Currency extends Constraint
 
     public $message = 'This value is not a valid currency.';
 
-    public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         if (!class_exists(Currencies::class)) {
             throw new LogicException('The Intl component is required to use the Currency constraint. Try running "composer require symfony/intl".');

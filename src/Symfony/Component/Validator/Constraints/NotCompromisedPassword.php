@@ -40,11 +40,11 @@ class NotCompromisedPassword extends Constraint
     public $skipOnError = false;
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        int $threshold = null,
-        bool $skipOnError = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?int $threshold = null,
+        ?bool $skipOnError = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

@@ -49,15 +49,15 @@ class Count extends Constraint
     public $divisibleBy;
 
     public function __construct(
-        int|array $exactly = null,
-        int $min = null,
-        int $max = null,
-        int $divisibleBy = null,
-        string $exactMessage = null,
-        string $minMessage = null,
-        string $maxMessage = null,
-        string $divisibleByMessage = null,
-        array $groups = null,
+        int|array|null $exactly = null,
+        ?int $min = null,
+        ?int $max = null,
+        ?int $divisibleBy = null,
+        ?string $exactMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
+        ?string $divisibleByMessage = null,
+        ?array $groups = null,
         mixed $payload = null,
         array $options = []
     ) {

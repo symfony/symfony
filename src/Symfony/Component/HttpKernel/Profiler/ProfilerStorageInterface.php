@@ -33,7 +33,7 @@ interface ProfilerStorageInterface
      * @param int|null $start The start date to search from
      * @param int|null $end   The end date to search to
      */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null): array;
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?int $start = null, ?int $end = null): array;
 
     /**
      * Reads data associated with the given token.

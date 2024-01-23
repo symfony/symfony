@@ -70,7 +70,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
 
     private HttplugWaitLoop $waitLoop;
 
-    public function __construct(HttpClientInterface $client = null, ResponseFactoryInterface $responseFactory = null, StreamFactoryInterface $streamFactory = null)
+    public function __construct(?HttpClientInterface $client = null, ?ResponseFactoryInterface $responseFactory = null, ?StreamFactoryInterface $streamFactory = null)
     {
         $this->client = $client ?? HttpClient::create();
         $streamFactory ??= $responseFactory instanceof StreamFactoryInterface ? $responseFactory : null;
@@ -144,7 +144,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
      *
      * @return int The number of remaining pending promises
      */
-    public function wait(float $maxDuration = null, float $idleTimeout = null): int
+    public function wait(?float $maxDuration = null, ?float $idleTimeout = null): int
     {
         return $this->waitLoop->wait(null, $maxDuration, $idleTimeout);
     }
@@ -268,7 +268,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
         }
     }
 
-    private function sendPsr7Request(RequestInterface $request, bool $buffer = null): ResponseInterface
+    private function sendPsr7Request(RequestInterface $request, ?bool $buffer = null): ResponseInterface
     {
         try {
             $body = $request->getBody();

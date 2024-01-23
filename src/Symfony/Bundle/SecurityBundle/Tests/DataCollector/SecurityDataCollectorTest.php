@@ -227,7 +227,7 @@ class SecurityDataCollectorTest extends TestCase
         $voter2 = new DummyVoter();
 
         $decoratedVoter1 = new TraceableVoter($voter1, new class() implements EventDispatcherInterface {
-            public function dispatch(object $event, string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 return new \stdClass();
             }
@@ -302,7 +302,7 @@ class SecurityDataCollectorTest extends TestCase
         $voter2 = new DummyVoter();
 
         $decoratedVoter1 = new TraceableVoter($voter1, new class() implements EventDispatcherInterface {
-            public function dispatch(object $event, string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 return new \stdClass();
             }

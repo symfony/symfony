@@ -24,7 +24,7 @@ class DelayedMessageHandlingException extends RuntimeException
     private array $exceptions;
     private ?Envelope $envelope;
 
-    public function __construct(array $exceptions, Envelope $envelope = null)
+    public function __construct(array $exceptions, ?Envelope $envelope = null)
     {
         $this->envelope = $envelope;
 

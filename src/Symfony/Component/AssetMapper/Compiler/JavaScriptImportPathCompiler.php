@@ -37,7 +37,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     public function __construct(
         private readonly string $missingImportMode = self::MISSING_IMPORT_WARN,
-        LoggerInterface $logger = null,
+        ?LoggerInterface $logger = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -102,7 +102,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         return './'.$path;
     }
 
-    private function handleMissingImport(string $message, \Throwable $e = null): void
+    private function handleMissingImport(string $message, ?\Throwable $e = null): void
     {
         match ($this->missingImportMode) {
             AssetCompilerInterface::MISSING_IMPORT_IGNORE => null,

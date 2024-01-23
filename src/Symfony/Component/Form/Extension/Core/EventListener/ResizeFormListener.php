@@ -32,7 +32,7 @@ class ResizeFormListener implements EventSubscriberInterface
 
     private \Closure|bool $deleteEmpty;
 
-    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, bool|callable $deleteEmpty = false, array $prototypeOptions = null)
+    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, bool|callable $deleteEmpty = false, ?array $prototypeOptions = null)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;

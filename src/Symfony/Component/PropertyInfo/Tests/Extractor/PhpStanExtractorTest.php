@@ -51,7 +51,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, array $type = null)
+    public function testExtract($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
@@ -82,7 +82,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider typesWithNoPrefixesProvider
      */
-    public function testExtractTypesWithNoPrefixes($property, array $type = null)
+    public function testExtractTypesWithNoPrefixes($property, ?array $type = null)
     {
         $noPrefixExtractor = new PhpStanExtractor([], [], []);
 
@@ -137,7 +137,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider provideCollectionTypes
      */
-    public function testExtractCollection($property, array $type = null)
+    public function testExtractCollection($property, ?array $type = null)
     {
         $this->testExtract($property, $type);
     }
@@ -193,7 +193,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider typesWithCustomPrefixesProvider
      */
-    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
+    public function testExtractTypesWithCustomPrefixes($property, ?array $type = null)
     {
         $customExtractor = new PhpStanExtractor(['add', 'remove'], ['is', 'can']);
 
@@ -351,7 +351,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider constructorTypesProvider
      */
-    public function testExtractConstructorTypes($property, array $type = null)
+    public function testExtractConstructorTypes($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }
@@ -466,7 +466,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider php80TypesProvider
      */
-    public function testExtractPhp80Type(string $class, $property, array $type = null)
+    public function testExtractPhp80Type(string $class, $property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
     }

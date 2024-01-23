@@ -40,7 +40,7 @@ final class PasswordStrength extends Constraint
 
     public int $minScore;
 
-    public function __construct(array $options = null, int $minScore = null, array $groups = null, mixed $payload = null, string $message = null)
+    public function __construct(?array $options = null, ?int $minScore = null, ?array $groups = null, mixed $payload = null, ?string $message = null)
     {
         $options['minScore'] ??= self::STRENGTH_MEDIUM;
 

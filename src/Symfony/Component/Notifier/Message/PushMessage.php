@@ -24,7 +24,7 @@ class PushMessage implements MessageInterface, FromNotificationInterface
     private $options;
     private $notification;
 
-    public function __construct(string $subject, string $content, MessageOptionsInterface $options = null)
+    public function __construct(string $subject, string $content, ?MessageOptionsInterface $options = null)
     {
         $this->subject = $subject;
         $this->content = $content;

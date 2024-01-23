@@ -72,7 +72,7 @@ class PdoStoreTest extends AbstractStoreTestCase
     /**
      * @dataProvider provideDsnWithSQLite
      */
-    public function testDsnWithSQLite(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
         $key = new Key(uniqid(__METHOD__, true));
 

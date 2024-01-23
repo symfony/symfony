@@ -23,7 +23,7 @@ class TestBrowserToken extends AbstractToken
 {
     private string $firewallName;
 
-    public function __construct(array $roles = [], UserInterface $user = null, string $firewallName = 'main')
+    public function __construct(array $roles = [], ?UserInterface $user = null, string $firewallName = 'main')
     {
         parent::__construct($roles);
 

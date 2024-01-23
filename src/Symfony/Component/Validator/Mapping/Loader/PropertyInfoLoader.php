@@ -36,7 +36,7 @@ final class PropertyInfoLoader implements LoaderInterface
     private PropertyAccessExtractorInterface $accessExtractor;
     private ?string $classValidatorRegexp;
 
-    public function __construct(PropertyListExtractorInterface $listExtractor, PropertyTypeExtractorInterface $typeExtractor, PropertyAccessExtractorInterface $accessExtractor, string $classValidatorRegexp = null)
+    public function __construct(PropertyListExtractorInterface $listExtractor, PropertyTypeExtractorInterface $typeExtractor, PropertyAccessExtractorInterface $accessExtractor, ?string $classValidatorRegexp = null)
     {
         $this->listExtractor = $listExtractor;
         $this->typeExtractor = $typeExtractor;

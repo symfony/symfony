@@ -178,7 +178,7 @@ class IsbnValidator extends ConstraintValidator
     /**
      * @return string
      */
-    protected function getMessage(Isbn $constraint, string $type = null)
+    protected function getMessage(Isbn $constraint, ?string $type = null)
     {
         if (null !== $constraint->message) {
             return $constraint->message;

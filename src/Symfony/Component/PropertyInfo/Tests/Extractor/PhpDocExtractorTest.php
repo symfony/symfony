@@ -39,7 +39,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, array $type = null, $shortDescription, $longDescription)
+    public function testExtract($property, ?array $type = null, $shortDescription, $longDescription)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
@@ -74,7 +74,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesWithNoPrefixesProvider
      */
-    public function testExtractTypesWithNoPrefixes($property, array $type = null)
+    public function testExtractTypesWithNoPrefixes($property, ?array $type = null)
     {
         $noPrefixExtractor = new PhpDocExtractor(null, [], [], []);
 
@@ -134,7 +134,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider provideCollectionTypes
      */
-    public function testExtractCollection($property, array $type = null, $shortDescription, $longDescription)
+    public function testExtractCollection($property, ?array $type = null, $shortDescription, $longDescription)
     {
         $this->testExtract($property, $type, $shortDescription, $longDescription);
     }
@@ -196,7 +196,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesWithCustomPrefixesProvider
      */
-    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
+    public function testExtractTypesWithCustomPrefixes($property, ?array $type = null)
     {
         $customExtractor = new PhpDocExtractor(null, ['add', 'remove'], ['is', 'can']);
 
@@ -395,7 +395,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider constructorTypesProvider
      */
-    public function testExtractConstructorTypes($property, array $type = null)
+    public function testExtractConstructorTypes($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }

@@ -67,7 +67,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerService(object $service, array $options = [], ?ContainerBuilder $container = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -118,12 +118,12 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ?ContainerBuilder $container = null): void
     {
         $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, $options['id'] ?? null), $options);
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerAlias(Alias $alias, array $options = [], ?ContainerBuilder $container = null): void
     {
         if (!$container) {
             $this->writeData($this->getContainerAliasData($alias), $options);
@@ -220,7 +220,7 @@ class JsonDescriptor extends Descriptor
         return $data;
     }
 
-    private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false, ContainerBuilder $container = null, string $id = null): array
+    private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false, ?ContainerBuilder $container = null, ?string $id = null): array
     {
         $data = [
             'class' => (string) $definition->getClass(),
@@ -393,7 +393,7 @@ class JsonDescriptor extends Descriptor
         throw new \InvalidArgumentException('Callable is not describable.');
     }
 
-    private function describeValue($value, bool $omitTags, bool $showArguments, ContainerBuilder $container = null, string $id = null): mixed
+    private function describeValue($value, bool $omitTags, bool $showArguments, ?ContainerBuilder $container = null, ?string $id = null): mixed
     {
         if (\is_array($value)) {
             $data = [];

@@ -112,7 +112,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertTrue($asset->isPredigested);
     }
 
-    private function createFactory(AssetCompilerInterface $extraCompiler = null): MappedAssetFactory
+    private function createFactory(?AssetCompilerInterface $extraCompiler = null): MappedAssetFactory
     {
         $compilers = [
             new JavaScriptImportPathCompiler(),

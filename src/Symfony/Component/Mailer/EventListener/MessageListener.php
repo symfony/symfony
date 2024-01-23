@@ -43,7 +43,7 @@ class MessageListener implements EventSubscriberInterface
     private array $headerRules = [];
     private ?BodyRendererInterface $renderer;
 
-    public function __construct(Headers $headers = null, BodyRendererInterface $renderer = null, array $headerRules = self::DEFAULT_RULES)
+    public function __construct(?Headers $headers = null, ?BodyRendererInterface $renderer = null, array $headerRules = self::DEFAULT_RULES)
     {
         $this->headers = $headers;
         $this->renderer = $renderer;

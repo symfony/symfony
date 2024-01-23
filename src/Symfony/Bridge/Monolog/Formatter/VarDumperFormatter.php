@@ -26,7 +26,7 @@ class VarDumperFormatter implements FormatterInterface
 
     private VarCloner $cloner;
 
-    public function __construct(VarCloner $cloner = null)
+    public function __construct(?VarCloner $cloner = null)
     {
         $this->cloner = $cloner ?? new VarCloner();
     }

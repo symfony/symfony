@@ -32,7 +32,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * @param string $phpArrayFile The PHP file where annotations are cached
      */
-    public function __construct(Reader $annotationReader, string $phpArrayFile, string $excludeRegexp = null, bool $debug = false)
+    public function __construct(Reader $annotationReader, string $phpArrayFile, ?string $excludeRegexp = null, bool $debug = false)
     {
         parent::__construct($phpArrayFile);
         $this->annotationReader = $annotationReader;

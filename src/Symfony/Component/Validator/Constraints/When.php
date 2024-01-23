@@ -26,7 +26,7 @@ class When extends Composite
     public $constraints = [];
     public $values = [];
 
-    public function __construct(string|Expression|array $expression, array $constraints = null, array $values = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct(string|Expression|array $expression, ?array $constraints = null, ?array $values = null, ?array $groups = null, $payload = null, array $options = [])
     {
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint. Try running "composer require symfony/expression-language".', __CLASS__));

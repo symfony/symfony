@@ -29,7 +29,7 @@ final class FakeSmsLoggerTransport extends AbstractTransport
 
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(LoggerInterface $logger, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->logger = $logger;
 

@@ -47,7 +47,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @param string      $format         The date format
      * @param string|null $parseFormat    The parse format when different from $format
      */
-    public function __construct(string $inputTimezone = null, string $outputTimezone = null, string $format = 'Y-m-d H:i:s', string $parseFormat = null)
+    public function __construct(?string $inputTimezone = null, ?string $outputTimezone = null, string $format = 'Y-m-d H:i:s', ?string $parseFormat = null)
     {
         parent::__construct($inputTimezone, $outputTimezone);
 

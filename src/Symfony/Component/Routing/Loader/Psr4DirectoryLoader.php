@@ -36,7 +36,7 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
     /**
      * @param array{path: string, namespace: string} $resource
      */
-    public function load(mixed $resource, string $type = null): ?RouteCollection
+    public function load(mixed $resource, ?string $type = null): ?RouteCollection
     {
         $path = $this->locator->locate($resource['path'], $this->currentDirectory);
         if (!is_dir($path)) {
@@ -46,7 +46,7 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
         return $this->loadFromDirectory($path, trim($resource['namespace'], '\\'));
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return ('attribute' === $type || 'annotation' === $type) && \is_array($resource) && isset($resource['path'], $resource['namespace']);
     }

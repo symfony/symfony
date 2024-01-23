@@ -30,7 +30,7 @@ class AccessMap implements AccessMapInterface
      *
      * @return void
      */
-    public function add(RequestMatcherInterface $requestMatcher, array $attributes = [], string $channel = null)
+    public function add(RequestMatcherInterface $requestMatcher, array $attributes = [], ?string $channel = null)
     {
         $this->map[] = [$requestMatcher, $attributes, $channel];
     }

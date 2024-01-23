@@ -40,12 +40,12 @@ class Url extends Constraint
     public $normalizer;
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        array $protocols = null,
-        bool $relativeProtocol = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?array $protocols = null,
+        ?bool $relativeProtocol = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

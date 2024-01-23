@@ -22,7 +22,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
 {
-    public function getLogs(Request $request = null): array
+    public function getLogs(?Request $request = null): array
     {
         if ($logger = $this->getDebugLogger()) {
             return $logger->getLogs($request);
@@ -31,7 +31,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
         return [];
     }
 
-    public function countErrors(Request $request = null): int
+    public function countErrors(?Request $request = null): int
     {
         if ($logger = $this->getDebugLogger()) {
             return $logger->countErrors($request);

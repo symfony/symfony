@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class RejectWebhookException extends HttpException
 {
-    public function __construct(int $statusCode = 406, string $message = '', \Throwable $previous = null, array $headers = [], int $code = 0)
+    public function __construct(int $statusCode = 406, string $message = '', ?\Throwable $previous = null, array $headers = [], int $code = 0)
     {
         parent::__construct($statusCode, $message, $previous, $headers, $code);
     }

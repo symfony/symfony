@@ -33,7 +33,7 @@ class SendMessageMiddleware implements MiddlewareInterface
     private ?EventDispatcherInterface $eventDispatcher;
     private bool $allowNoSenders;
 
-    public function __construct(SendersLocatorInterface $sendersLocator, EventDispatcherInterface $eventDispatcher = null, bool $allowNoSenders = true)
+    public function __construct(SendersLocatorInterface $sendersLocator, ?EventDispatcherInterface $eventDispatcher = null, bool $allowNoSenders = true)
     {
         $this->sendersLocator = $sendersLocator;
         $this->eventDispatcher = $eventDispatcher;

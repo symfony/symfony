@@ -20,7 +20,7 @@ final class NativeClock implements ClockInterface
 {
     private \DateTimeZone $timezone;
 
-    public function __construct(\DateTimeZone|string $timezone = null)
+    public function __construct(\DateTimeZone|string|null $timezone = null)
     {
         if (\is_string($timezone ??= date_default_timezone_get())) {
             $this->timezone = new \DateTimeZone($timezone);

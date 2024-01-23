@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeSmsLoggerTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, LoggerInterface $logger = null): FakeSmsLoggerTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?LoggerInterface $logger = null): FakeSmsLoggerTransport
     {
         $transport = (new FakeSmsLoggerTransport($logger ?? new NullLogger(), $client ?? new MockHttpClient()));
 

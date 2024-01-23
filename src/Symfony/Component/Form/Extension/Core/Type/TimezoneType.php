@@ -112,7 +112,7 @@ class TimezoneType extends AbstractType
         return $timezones;
     }
 
-    private static function getIntlTimezones(string $input, string $locale = null): array
+    private static function getIntlTimezones(string $input, ?string $locale = null): array
     {
         $timezones = array_flip(Timezones::getNames($locale));
 

@@ -153,7 +153,7 @@ class Link implements EvolvableLinkInterface
      */
     private array $attributes = [];
 
-    public function __construct(string $rel = null, string $href = '')
+    public function __construct(?string $rel = null, string $href = '')
     {
         if (null !== $rel) {
             $this->rel[$rel] = $rel;

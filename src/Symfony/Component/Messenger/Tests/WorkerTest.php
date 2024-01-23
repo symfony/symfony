@@ -596,7 +596,7 @@ class DummyBatchHandler implements BatchHandlerInterface
 
     public $processedMessages;
 
-    public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+    public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
     {
         return $this->handle($message, $ack);
     }

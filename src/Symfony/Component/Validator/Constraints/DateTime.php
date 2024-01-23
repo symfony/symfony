@@ -40,7 +40,7 @@ class DateTime extends Constraint
     public $format = 'Y-m-d H:i:s';
     public $message = 'This value is not a valid datetime.';
 
-    public function __construct(string|array $format = null, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
+    public function __construct(string|array|null $format = null, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($format)) {
             $options = array_merge($format, $options);

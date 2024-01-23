@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TwilioTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): TwilioTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'from'): TwilioTransport
     {
         return new TwilioTransport('accountSid', 'authToken', $from, $client ?? new MockHttpClient());
     }

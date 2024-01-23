@@ -38,7 +38,7 @@ class XmlFileLoader extends FileLoader
      * @throws \InvalidArgumentException when the file cannot be loaded or when the XML cannot be
      *                                   parsed because it does not validate against the scheme
      */
-    public function load(mixed $file, string $type = null): RouteCollection
+    public function load(mixed $file, ?string $type = null): RouteCollection
     {
         $path = $this->locator->locate($file);
 
@@ -94,7 +94,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return \is_string($resource) && 'xml' === pathinfo($resource, \PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
     }

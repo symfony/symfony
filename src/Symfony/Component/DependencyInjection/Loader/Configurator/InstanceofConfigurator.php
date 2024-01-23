@@ -33,7 +33,7 @@ class InstanceofConfigurator extends AbstractServiceConfigurator
 
     private ?string $path;
 
-    public function __construct(ServicesConfigurator $parent, Definition $definition, string $id, string $path = null)
+    public function __construct(ServicesConfigurator $parent, Definition $definition, string $id, ?string $path = null)
     {
         parent::__construct($parent, $definition, $id, []);
 

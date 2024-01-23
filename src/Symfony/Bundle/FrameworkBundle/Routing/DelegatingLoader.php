@@ -40,7 +40,7 @@ class DelegatingLoader extends BaseDelegatingLoader
         parent::__construct($resolver);
     }
 
-    public function load(mixed $resource, string $type = null): RouteCollection
+    public function load(mixed $resource, ?string $type = null): RouteCollection
     {
         if ($this->loading) {
             // This can happen if a fatal error occurs in parent::load().

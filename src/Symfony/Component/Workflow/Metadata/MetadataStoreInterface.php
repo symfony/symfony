@@ -37,5 +37,5 @@ interface MetadataStoreInterface
      *
      * @return mixed
      */
-    public function getMetadata(string $key, string|Transition $subject = null);
+    public function getMetadata(string $key, string|Transition|null $subject = null);
 }

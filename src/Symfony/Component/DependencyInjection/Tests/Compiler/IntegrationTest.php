@@ -244,7 +244,7 @@ class IntegrationTest extends TestCase
     /**
      * @dataProvider getYamlCompileTests
      */
-    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ContainerBuilder $mainContainer = null)
+    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ?ContainerBuilder $mainContainer = null)
     {
         // allow a container to be passed in, which might have autoconfigure settings
         $container = $mainContainer ?? new ContainerBuilder();

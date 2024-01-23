@@ -28,7 +28,7 @@ final class Target
         $this->name = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name))));
     }
 
-    public static function parseName(\ReflectionParameter $parameter, self &$attribute = null): string
+    public static function parseName(\ReflectionParameter $parameter, ?self &$attribute = null): string
     {
         $attribute = null;
         if (!$target = $parameter->getAttributes(self::class)[0] ?? null) {

@@ -38,7 +38,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     /**
      * @param callable|null $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
      */
-    public function __construct(callable $exceptionHandler = null)
+    public function __construct(?callable $exceptionHandler = null)
     {
         $handler = set_exception_handler('is_int');
         $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
@@ -50,7 +50,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     /**
      * Configures the error handler.
      */
-    public function configure(object $event = null): void
+    public function configure(?object $event = null): void
     {
         if ($event instanceof ConsoleEvent && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             return;

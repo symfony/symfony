@@ -36,7 +36,7 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
      *
      * @param string $class The class name of the loaded objects
      */
-    public function __construct(ObjectManager $manager, string $class, IdReader $idReader = null, EntityLoaderInterface $objectLoader = null)
+    public function __construct(ObjectManager $manager, string $class, ?IdReader $idReader = null, ?EntityLoaderInterface $objectLoader = null)
     {
         $classMetadata = $manager->getClassMetadata($class);
 

@@ -688,7 +688,7 @@ class AutowirePass extends AbstractRecursivePass
         }
     }
 
-    private function getCombinedAlias(string $type, string $name = null): ?string
+    private function getCombinedAlias(string $type, ?string $name = null): ?string
     {
         if (str_contains($type, '&')) {
             $types = explode('&', $type);

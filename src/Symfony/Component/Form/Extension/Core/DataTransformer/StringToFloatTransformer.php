@@ -21,7 +21,7 @@ class StringToFloatTransformer implements DataTransformerInterface
 {
     private ?int $scale;
 
-    public function __construct(int $scale = null)
+    public function __construct(?int $scale = null)
     {
         $this->scale = $scale;
     }

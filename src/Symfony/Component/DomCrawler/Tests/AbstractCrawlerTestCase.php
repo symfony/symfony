@@ -21,7 +21,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
 {
     abstract public static function getDoctype(): string;
 
-    protected function createCrawler($node = null, string $uri = null, string $baseHref = null, bool $useHtml5Parser = true)
+    protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null, bool $useHtml5Parser = true)
     {
         return new Crawler($node, $uri, $baseHref, $useHtml5Parser);
     }

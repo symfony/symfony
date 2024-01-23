@@ -32,7 +32,7 @@ final class Definition
      * @param Transition[]         $transitions
      * @param string|string[]|null $initialPlaces
      */
-    public function __construct(array $places, array $transitions, string|array $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
+    public function __construct(array $places, array $transitions, string|array|null $initialPlaces = null, ?MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -76,7 +76,7 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlaces(string|array $places = null): void
+    private function setInitialPlaces(string|array|null $places = null): void
     {
         if (1 > \func_num_args()) {
             trigger_deprecation('symfony/workflow', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);

@@ -68,7 +68,7 @@ class Connection
     private bool $deleteAfterReject;
     private bool $couldHavePendingMessages = true;
 
-    public function __construct(array $options, \Redis|Relay|\RedisCluster $redis = null)
+    public function __construct(array $options, \Redis|Relay|\RedisCluster|null $redis = null)
     {
         if (version_compare(phpversion('redis'), '4.3.0', '<')) {
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
@@ -178,7 +178,7 @@ class Connection
         return $redis;
     }
 
-    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], \Redis|Relay|\RedisCluster $redis = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], \Redis|Relay|\RedisCluster|null $redis = null): self
     {
         if (!str_contains($dsn, ',')) {
             $params = self::parseDsn($dsn, $options);

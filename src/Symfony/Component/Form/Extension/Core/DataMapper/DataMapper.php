@@ -27,7 +27,7 @@ class DataMapper implements DataMapperInterface
 {
     private DataAccessorInterface $dataAccessor;
 
-    public function __construct(DataAccessorInterface $dataAccessor = null)
+    public function __construct(?DataAccessorInterface $dataAccessor = null)
     {
         $this->dataAccessor = $dataAccessor ?? new ChainAccessor([
             new CallbackAccessor(),

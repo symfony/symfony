@@ -52,12 +52,12 @@ class FilterChoiceLoaderDecorator extends AbstractChoiceLoader
         return $choices ?? [];
     }
 
-    public function loadChoicesForValues(array $values, callable $value = null): array
+    public function loadChoicesForValues(array $values, ?callable $value = null): array
     {
         return array_filter($this->decoratedLoader->loadChoicesForValues($values, $value), $this->filter);
     }
 
-    public function loadValuesForChoices(array $choices, callable $value = null): array
+    public function loadValuesForChoices(array $choices, ?callable $value = null): array
     {
         return $this->decoratedLoader->loadValuesForChoices(array_filter($choices, $this->filter), $value);
     }

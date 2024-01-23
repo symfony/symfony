@@ -2735,7 +2735,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
     public function testHelpWithTranslatableInterface()
     {
         $message = new class() implements TranslatableInterface {
-            public function trans(TranslatorInterface $translator, string $locale = null): string
+            public function trans(TranslatorInterface $translator, ?string $locale = null): string
             {
                 return $translator->trans('foo');
             }

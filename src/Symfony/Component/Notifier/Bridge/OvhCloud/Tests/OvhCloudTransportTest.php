@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class OvhCloudTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $sender = null, bool $noStopClause = false): OvhCloudTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $sender = null, bool $noStopClause = false): OvhCloudTransport
     {
         return (new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?? new MockHttpClient()))->setSender($sender)->setNoStopClause($noStopClause);
     }

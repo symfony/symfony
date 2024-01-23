@@ -131,7 +131,7 @@ HTML;
         $this->assertEquals('Text', $email->getTextBody());
     }
 
-    private function prepareEmail(?string $text, ?string $html, array $context = [], HtmlToTextConverterInterface $converter = null): TemplatedEmail
+    private function prepareEmail(?string $text, ?string $html, array $context = [], ?HtmlToTextConverterInterface $converter = null): TemplatedEmail
     {
         $twig = new Environment(new ArrayLoader([
             'text' => $text,

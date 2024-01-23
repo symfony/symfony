@@ -27,7 +27,7 @@ final class JspmResolver implements PackageResolverInterface
     private HttpClientInterface $httpClient;
 
     public function __construct(
-        HttpClientInterface $httpClient = null,
+        ?HttpClientInterface $httpClient = null,
         private readonly string $provider = ImportMapManager::PROVIDER_JSPM,
         private readonly string $baseUri = self::BASE_URI,
     ) {

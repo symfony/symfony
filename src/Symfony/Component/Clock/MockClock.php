@@ -22,7 +22,7 @@ final class MockClock implements ClockInterface
 {
     private \DateTimeImmutable $now;
 
-    public function __construct(\DateTimeImmutable|string $now = 'now', \DateTimeZone|string $timezone = null)
+    public function __construct(\DateTimeImmutable|string $now = 'now', \DateTimeZone|string|null $timezone = null)
     {
         if (\is_string($timezone)) {
             $timezone = new \DateTimeZone($timezone);

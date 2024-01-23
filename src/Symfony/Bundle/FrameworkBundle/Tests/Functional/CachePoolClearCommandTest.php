@@ -132,7 +132,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[WARNING] Cache pool "cache.public_pool" could not be cleared.', $tester->getDisplay());
     }
 
-    private function createCommandTester(array $poolNames = null)
+    private function createCommandTester(?array $poolNames = null)
     {
         $application = new Application(static::$kernel);
         $application->add(new CachePoolClearCommand(static::getContainer()->get('cache.global_clearer'), $poolNames));

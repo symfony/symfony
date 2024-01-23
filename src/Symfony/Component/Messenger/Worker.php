@@ -150,7 +150,7 @@ class Worker
         }
 
         $acked = false;
-        $ack = function (Envelope $envelope, \Throwable $e = null) use ($transportName, &$acked) {
+        $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acked) {
             $acked = true;
             $this->acks[] = [$transportName, $envelope, $e];
         };

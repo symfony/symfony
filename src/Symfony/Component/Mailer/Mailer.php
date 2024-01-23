@@ -29,14 +29,14 @@ final class Mailer implements MailerInterface
     private ?MessageBusInterface $bus;
     private ?EventDispatcherInterface $dispatcher;
 
-    public function __construct(TransportInterface $transport, MessageBusInterface $bus = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TransportInterface $transport, ?MessageBusInterface $bus = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->transport = $transport;
         $this->bus = $bus;
         $this->dispatcher = $dispatcher;
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): void
+    public function send(RawMessage $message, ?Envelope $envelope = null): void
     {
         if (null === $this->bus) {
             $this->transport->send($message, $envelope);

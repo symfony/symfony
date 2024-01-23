@@ -43,7 +43,7 @@ final class WrappedTemplatedEmail
      * @param string|null $contentType The media type (i.e. MIME type) of the image file (e.g. 'image/png').
      *                                 Some email clients require this to display embedded images.
      */
-    public function image(string $image, string $contentType = null): string
+    public function image(string $image, ?string $contentType = null): string
     {
         $file = $this->twig->getLoader()->getSourceContext($image);
         $body = $file->getPath() ? new File($file->getPath()) : $file->getCode();
@@ -59,7 +59,7 @@ final class WrappedTemplatedEmail
      * @param string|null $contentType The media type (i.e. MIME type) of the file (e.g. 'application/pdf').
      *                                 Some email clients require this to display attached files.
      */
-    public function attach(string $file, string $name = null, string $contentType = null): void
+    public function attach(string $file, ?string $name = null, ?string $contentType = null): void
     {
         $file = $this->twig->getLoader()->getSourceContext($file);
         $body = $file->getPath() ? new File($file->getPath()) : $file->getCode();

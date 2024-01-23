@@ -44,7 +44,7 @@ trait LazyGhostTrait
      *                                                    that the initializer doesn't set when its a closure
      * @param static|null              $instance
      */
-    public static function createLazyGhost(\Closure|array $initializer, array $skippedProperties = null, object $instance = null): static
+    public static function createLazyGhost(\Closure|array $initializer, ?array $skippedProperties = null, ?object $instance = null): static
     {
         $onlyProperties = null === $skippedProperties && \is_array($initializer) ? $initializer : null;
 

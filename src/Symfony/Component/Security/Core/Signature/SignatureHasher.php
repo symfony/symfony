@@ -35,7 +35,7 @@ class SignatureHasher
      * @param ExpiredSignatureStorage|null $expiredSignaturesStorage If provided, secures a sequence of hashes that are expired
      * @param int|null                     $maxUses                  Used together with $expiredSignatureStorage to allow a maximum usage of a hash
      */
-    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, #[\SensitiveParameter] string $secret, ExpiredSignatureStorage $expiredSignaturesStorage = null, int $maxUses = null)
+    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, #[\SensitiveParameter] string $secret, ?ExpiredSignatureStorage $expiredSignaturesStorage = null, ?int $maxUses = null)
     {
         $this->propertyAccessor = $propertyAccessor;
         $this->signatureProperties = $signatureProperties;

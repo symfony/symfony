@@ -374,7 +374,7 @@ class EnvExtension extends Extension
     private $configuration;
     private $config;
 
-    public function __construct(ConfigurationInterface $configuration = null)
+    public function __construct(?ConfigurationInterface $configuration = null)
     {
         $this->configuration = $configuration ?? new EnvConfiguration();
     }

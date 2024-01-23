@@ -535,7 +535,7 @@ trait HttpClientTrait
     /**
      * @throws InvalidArgumentException When the value cannot be json-encoded
      */
-    private static function jsonEncode(mixed $value, int $flags = null, int $maxDepth = 512): string
+    private static function jsonEncode(mixed $value, ?int $flags = null, int $maxDepth = 512): string
     {
         $flags ??= \JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_PRESERVE_ZERO_FRACTION;
 

@@ -408,7 +408,7 @@ class MockPdo extends \PDO
     private $driverName;
     private $errorMode;
 
-    public function __construct(string $driverName = null, int $errorMode = null)
+    public function __construct(?string $driverName = null, ?int $errorMode = null)
     {
         $this->driverName = $driverName;
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;

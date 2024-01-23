@@ -41,7 +41,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, ?array $type = null, $shortDescription, $longDescription)
+    public function testExtract($property, ?array $type, $shortDescription, $longDescription)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));

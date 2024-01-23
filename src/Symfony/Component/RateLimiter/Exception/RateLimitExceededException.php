@@ -20,7 +20,7 @@ class RateLimitExceededException extends \RuntimeException
 {
     private $rateLimit;
 
-    public function __construct(RateLimit $rateLimit, int $code = 0, \Throwable $previous = null)
+    public function __construct(RateLimit $rateLimit, int $code = 0, ?\Throwable $previous = null)
     {
         parent::__construct('Rate Limit Exceeded', $code, $previous);
 

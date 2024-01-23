@@ -38,7 +38,7 @@ class Serializer implements SerializerInterface
     private $format;
     private $context;
 
-    public function __construct(SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
+    public function __construct(?SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
     {
         $this->serializer = $serializer ?? self::create()->serializer;
         $this->format = $format;

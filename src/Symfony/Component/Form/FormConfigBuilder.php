@@ -501,7 +501,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDataMapper(DataMapperInterface $dataMapper = null)
+    public function setDataMapper(?DataMapperInterface $dataMapper = null)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');

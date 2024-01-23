@@ -94,7 +94,7 @@ class PdoDbalStoreTest extends AbstractStoreTestCase
     /**
      * @dataProvider provideDsn
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsn(string $dsn, ?string $file = null)
     {
         $this->expectDeprecation('Since symfony/lock 5.4: Usage of a DBAL Connection with "Symfony\Component\Lock\Store\PdoStore" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Lock\Store\DoctrineDbalStore" instead.');
         $key = new Key(uniqid(__METHOD__, true));

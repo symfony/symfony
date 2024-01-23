@@ -27,7 +27,7 @@ final class OvhCloudTransportTest extends TransportTestCase
     /**
      * @return OvhCloudTransport
      */
-    public static function createTransport(HttpClientInterface $client = null, string $sender = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $sender = null): TransportInterface
     {
         return (new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?? new MockHttpClient()))->setSender($sender);
     }

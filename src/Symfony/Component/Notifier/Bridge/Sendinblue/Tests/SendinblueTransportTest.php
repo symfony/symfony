@@ -27,7 +27,7 @@ final class SendinblueTransportTest extends TransportTestCase
     /**
      * @return SendinblueTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new SendinblueTransport('api-key', '0611223344', $client ?? new MockHttpClient()))->setHost('host.test');
     }

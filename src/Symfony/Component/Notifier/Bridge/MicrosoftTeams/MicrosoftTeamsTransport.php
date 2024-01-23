@@ -32,7 +32,7 @@ final class MicrosoftTeamsTransport extends AbstractTransport
 
     private $path;
 
-    public function __construct(string $path, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $path, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->path = $path;
 

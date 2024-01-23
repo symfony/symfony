@@ -80,11 +80,11 @@ class Ip extends Constraint
      * {@inheritdoc}
      */
     public function __construct(
-        array $options = null,
-        string $version = null,
-        string $message = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $version = null,
+        ?string $message = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

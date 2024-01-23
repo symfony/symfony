@@ -160,7 +160,7 @@ class GeneratedConfigTest extends TestCase
     /**
      * Generate the ConfigBuilder or return an already generated instance.
      */
-    private function generateConfigBuilder(string $configurationClass, string $outputDir = null)
+    private function generateConfigBuilder(string $configurationClass, ?string $outputDir = null)
     {
         $outputDir ?? $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
         if (!str_contains($outputDir, __DIR__)) {

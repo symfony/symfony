@@ -48,7 +48,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     private $cspHandler;
     private $dumpDataCollector;
 
-    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null, DumpDataCollector $dumpDataCollector = null)
+    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, ?UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ?ContentSecurityPolicyHandler $cspHandler = null, ?DumpDataCollector $dumpDataCollector = null)
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;

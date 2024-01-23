@@ -121,7 +121,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideDsn
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsn(string $dsn, ?string $file = null)
     {
         $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
         try {

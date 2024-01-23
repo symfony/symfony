@@ -33,7 +33,7 @@ final class MessageMediaTransport extends AbstractTransport
     private $apiSecret;
     private $from;
 
-    public function __construct(string $apiKey, string $apiSecret, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, string $apiSecret, ?string $from = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;

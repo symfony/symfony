@@ -1145,7 +1145,7 @@ class CompoundFormTest extends TestCase
         return $builder->getForm();
     }
 
-    private function getBuilder(string $name = 'name', string $dataClass = null, array $options = []): FormBuilder
+    private function getBuilder(string $name = 'name', ?string $dataClass = null, array $options = []): FormBuilder
     {
         return new FormBuilder($name, $dataClass, new EventDispatcher(), $this->factory, $options);
     }

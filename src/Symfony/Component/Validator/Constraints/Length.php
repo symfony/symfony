@@ -53,15 +53,15 @@ class Length extends Constraint
      */
     public function __construct(
         $exactly = null,
-        int $min = null,
-        int $max = null,
-        string $charset = null,
-        callable $normalizer = null,
-        string $exactMessage = null,
-        string $minMessage = null,
-        string $maxMessage = null,
-        string $charsetMessage = null,
-        array $groups = null,
+        ?int $min = null,
+        ?int $max = null,
+        ?string $charset = null,
+        ?callable $normalizer = null,
+        ?string $exactMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
+        ?string $charsetMessage = null,
+        ?array $groups = null,
         $payload = null,
         array $options = []
     ) {

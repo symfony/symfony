@@ -29,7 +29,7 @@ final class ClickatellTransportTest extends TransportTestCase
     /**
      * @return ClickatellTransport
      */
-    public static function createTransport(HttpClientInterface $client = null, string $from = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $from = null): TransportInterface
     {
         return new ClickatellTransport('authToken', $from, $client ?? new MockHttpClient());
     }

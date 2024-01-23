@@ -36,7 +36,7 @@ class Hour2401Transformer extends HourTransformer
     /**
      * {@inheritdoc}
      */
-    public function normalizeHour(int $hour, string $marker = null): int
+    public function normalizeHour(int $hour, ?string $marker = null): int
     {
         if ((null === $marker && 24 === $hour) || 'AM' === $marker) {
             $hour = 0;

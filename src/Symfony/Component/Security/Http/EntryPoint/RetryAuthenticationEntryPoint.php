@@ -41,7 +41,7 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     /**
      * {@inheritdoc}
      */
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, ?AuthenticationException $authException = null)
     {
         $scheme = $request->isSecure() ? 'http' : 'https';
         if ('http' === $scheme && 80 != $this->httpPort) {

@@ -43,7 +43,7 @@ class DelegatingLoader extends BaseDelegatingLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, string $type = null): RouteCollection
+    public function load($resource, ?string $type = null): RouteCollection
     {
         if ($this->loading) {
             // This can happen if a fatal error occurs in parent::load().

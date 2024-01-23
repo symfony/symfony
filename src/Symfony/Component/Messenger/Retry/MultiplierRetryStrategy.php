@@ -66,7 +66,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
     /**
      * @param \Throwable|null $throwable The cause of the failed handling
      */
-    public function isRetryable(Envelope $message, \Throwable $throwable = null): bool
+    public function isRetryable(Envelope $message, ?\Throwable $throwable = null): bool
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
@@ -76,7 +76,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
     /**
      * @param \Throwable|null $throwable The cause of the failed handling
      */
-    public function getWaitingTime(Envelope $message, \Throwable $throwable = null): int
+    public function getWaitingTime(Envelope $message, ?\Throwable $throwable = null): int
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 

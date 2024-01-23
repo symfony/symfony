@@ -28,7 +28,7 @@ final class MessageMediaTransportTest extends TransportTestCase
     /**
      * @return MessageMediaTransport
      */
-    public static function createTransport(HttpClientInterface $client = null, string $from = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $from = null): TransportInterface
     {
         return new MessageMediaTransport('apiKey', 'apiSecret', $from, $client ?? new MockHttpClient());
     }

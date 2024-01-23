@@ -28,7 +28,7 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
      * @param int|null    $roundingMode One of the ROUND_ constants in this class
      * @param string|null $locale       locale used for transforming
      */
-    public function __construct(?bool $grouping = false, ?int $roundingMode = \NumberFormatter::ROUND_DOWN, string $locale = null)
+    public function __construct(?bool $grouping = false, ?int $roundingMode = \NumberFormatter::ROUND_DOWN, ?string $locale = null)
     {
         parent::__construct(0, $grouping, $roundingMode, $locale);
     }

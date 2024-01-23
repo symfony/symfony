@@ -50,7 +50,7 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
     private $cookieName;
     private $logger;
 
-    public function __construct(RememberMeHandlerInterface $rememberMeHandler, string $secret, TokenStorageInterface $tokenStorage, string $cookieName, LoggerInterface $logger = null)
+    public function __construct(RememberMeHandlerInterface $rememberMeHandler, string $secret, TokenStorageInterface $tokenStorage, string $cookieName, ?LoggerInterface $logger = null)
     {
         $this->rememberMeHandler = $rememberMeHandler;
         $this->secret = $secret;

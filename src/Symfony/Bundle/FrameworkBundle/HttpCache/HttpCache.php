@@ -37,7 +37,7 @@ class HttpCache extends BaseHttpCache
     /**
      * @param string|StoreInterface $cache The cache directory (default used if null) or the storage instance
      */
-    public function __construct(KernelInterface $kernel, $cache = null, SurrogateInterface $surrogate = null, array $options = null)
+    public function __construct(KernelInterface $kernel, $cache = null, ?SurrogateInterface $surrogate = null, ?array $options = null)
     {
         $this->kernel = $kernel;
         $this->surrogate = $surrogate;
@@ -65,7 +65,7 @@ class HttpCache extends BaseHttpCache
     /**
      * {@inheritdoc}
      */
-    protected function forward(Request $request, bool $catch = false, Response $entry = null)
+    protected function forward(Request $request, bool $catch = false, ?Response $entry = null)
     {
         $this->getKernel()->boot();
         $this->getKernel()->getContainer()->set('cache', $this);

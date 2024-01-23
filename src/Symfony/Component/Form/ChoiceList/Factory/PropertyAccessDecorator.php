@@ -41,7 +41,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     private $decoratedFactory;
     private $propertyAccessor;
 
-    public function __construct(ChoiceListFactoryInterface $decoratedFactory, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(ChoiceListFactoryInterface $decoratedFactory, ?PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->decoratedFactory = $decoratedFactory;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();

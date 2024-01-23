@@ -52,7 +52,7 @@ class Worker
     /**
      * @param ReceiverInterface[] $receivers Where the key is the transport name
      */
-    public function __construct(array $receivers, MessageBusInterface $bus, EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
+    public function __construct(array $receivers, MessageBusInterface $bus, ?EventDispatcherInterface $eventDispatcher = null, ?LoggerInterface $logger = null)
     {
         $this->receivers = $receivers;
         $this->bus = $bus;
@@ -148,7 +148,7 @@ class Worker
         }
 
         $acked = false;
-        $ack = function (Envelope $envelope, \Throwable $e = null) use ($transportName, &$acked) {
+        $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acked) {
             $acked = true;
             $this->acks[] = [$transportName, $envelope, $e];
         };

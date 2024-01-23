@@ -29,7 +29,7 @@ class DirectoryResource implements SelfCheckingResourceInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $resource, string $pattern = null)
+    public function __construct(string $resource, ?string $pattern = null)
     {
         $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
         $this->pattern = $pattern;

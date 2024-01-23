@@ -29,7 +29,7 @@ class NativeSessionStorageFactory implements SessionStorageFactoryInterface
     /**
      * @see NativeSessionStorage constructor.
      */
-    public function __construct(array $options = [], $handler = null, MetadataBag $metaBag = null, bool $secure = false)
+    public function __construct(array $options = [], $handler = null, ?MetadataBag $metaBag = null, bool $secure = false)
     {
         $this->options = $options;
         $this->handler = $handler;

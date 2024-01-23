@@ -19,5 +19,5 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 interface ChatNotificationInterface
 {
-    public function asChatMessage(RecipientInterface $recipient, string $transport = null): ?ChatMessage;
+    public function asChatMessage(RecipientInterface $recipient, ?string $transport = null): ?ChatMessage;
 }

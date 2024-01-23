@@ -21,7 +21,7 @@ class TooManyLoginAttemptsAuthenticationException extends AuthenticationExceptio
 {
     private $threshold;
 
-    public function __construct(int $threshold = null)
+    public function __construct(?int $threshold = null)
     {
         $this->threshold = $threshold;
     }

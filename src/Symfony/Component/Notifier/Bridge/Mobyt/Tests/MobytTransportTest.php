@@ -29,7 +29,7 @@ final class MobytTransportTest extends TransportTestCase
     /**
      * @return MobytTransport
      */
-    public static function createTransport(HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): TransportInterface
     {
         return (new MobytTransport('accountSid', 'authToken', 'from', $messageType, $client ?? new MockHttpClient()))->setHost('host.test');
     }

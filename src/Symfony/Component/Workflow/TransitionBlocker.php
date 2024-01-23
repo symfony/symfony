@@ -67,7 +67,7 @@ final class TransitionBlocker
      * Creates a blocker that says the transition cannot be made because of an
      * unknown reason.
      */
-    public static function createUnknown(string $message = null, int $backtraceFrame = 2): self
+    public static function createUnknown(?string $message = null, int $backtraceFrame = 2): self
     {
         if (null !== $message) {
             return new static($message, self::UNKNOWN);

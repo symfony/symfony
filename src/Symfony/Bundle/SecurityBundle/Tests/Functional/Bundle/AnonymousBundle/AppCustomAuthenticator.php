@@ -46,7 +46,7 @@ class AppCustomAuthenticator extends AbstractGuardAuthenticator
     {
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         return new Response($authException->getMessage(), Response::HTTP_UNAUTHORIZED);
     }

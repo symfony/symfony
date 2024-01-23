@@ -268,7 +268,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $translator = new class() implements TranslatorInterface, LocaleAwareInterface {
             use TranslatorTrait;
 
-            public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 if ('This value should satisfy at least one of the following constraints:' === $id) {
                     return 'Dummy translation:';

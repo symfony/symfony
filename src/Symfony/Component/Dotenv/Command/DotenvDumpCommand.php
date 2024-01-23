@@ -33,7 +33,7 @@ final class DotenvDumpCommand extends Command
     private $projectDir;
     private $defaultEnv;
 
-    public function __construct(string $projectDir, string $defaultEnv = null)
+    public function __construct(string $projectDir, ?string $defaultEnv = null)
     {
         $this->projectDir = $projectDir;
         $this->defaultEnv = $defaultEnv;

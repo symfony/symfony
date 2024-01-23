@@ -54,7 +54,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(iterable $userProviders, string $secret, string $firewallName, array $options = [], LoggerInterface $logger = null)
+    public function __construct(iterable $userProviders, string $secret, string $firewallName, array $options = [], ?LoggerInterface $logger = null)
     {
         if (empty($secret)) {
             throw new \InvalidArgumentException('$secret must not be empty.');
@@ -173,7 +173,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Implementation for RememberMeServicesInterface. Deletes the cookie when
      * an attempted authentication fails.
      */
-    final public function loginFail(Request $request, \Exception $exception = null)
+    final public function loginFail(Request $request, ?\Exception $exception = null)
     {
         $this->cancelCookie($request);
         $this->onLoginFail($request, $exception);
@@ -225,7 +225,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      */
     abstract protected function processAutoLoginCookie(array $cookieParts, Request $request);
 
-    protected function onLoginFail(Request $request, \Exception $exception = null)
+    protected function onLoginFail(Request $request, ?\Exception $exception = null)
     {
     }
 

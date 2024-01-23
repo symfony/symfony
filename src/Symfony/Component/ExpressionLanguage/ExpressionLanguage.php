@@ -34,7 +34,7 @@ class ExpressionLanguage
     /**
      * @param ExpressionFunctionProviderInterface[] $providers
      */
-    public function __construct(CacheItemPoolInterface $cache = null, array $providers = [])
+    public function __construct(?CacheItemPoolInterface $cache = null, array $providers = [])
     {
         $this->cache = $cache ?? new ArrayAdapter();
         $this->registerFunctions();

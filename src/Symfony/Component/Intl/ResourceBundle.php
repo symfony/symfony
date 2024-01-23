@@ -43,7 +43,7 @@ abstract class ResourceBundle
      * @return mixed returns an array or {@link \ArrayAccess} instance for
      *               complex data and a scalar value for simple data
      */
-    final protected static function readEntry(array $indices, string $locale = null, bool $fallback = true)
+    final protected static function readEntry(array $indices, ?string $locale = null, bool $fallback = true)
     {
         if (null === self::$entryReader) {
             self::$entryReader = new BundleEntryReader(new BufferedBundleReader(
@@ -58,7 +58,7 @@ abstract class ResourceBundle
         return self::$entryReader->readEntry(static::getPath(), $locale ?? \Locale::getDefault(), $indices, $fallback);
     }
 
-    final protected static function asort(iterable $list, string $locale = null): array
+    final protected static function asort(iterable $list, ?string $locale = null): array
     {
         if ($list instanceof \Traversable) {
             $list = iterator_to_array($list);

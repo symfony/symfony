@@ -52,7 +52,7 @@ class SwitchUserListener extends AbstractListener
     private $dispatcher;
     private $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, ?LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', ?EventDispatcherInterface $dispatcher = null, bool $stateless = false)
     {
         if ('' === $firewallName) {
             throw new \InvalidArgumentException('$firewallName must not be empty.');

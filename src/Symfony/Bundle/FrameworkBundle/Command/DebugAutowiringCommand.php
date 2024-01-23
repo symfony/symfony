@@ -37,7 +37,7 @@ class DebugAutowiringCommand extends ContainerDebugCommand
     private $supportsHref;
     private $fileLinkFormatter;
 
-    public function __construct(string $name = null, FileLinkFormatter $fileLinkFormatter = null)
+    public function __construct(?string $name = null, ?FileLinkFormatter $fileLinkFormatter = null)
     {
         $this->supportsHref = method_exists(OutputFormatterStyle::class, 'setHref');
         $this->fileLinkFormatter = $fileLinkFormatter;

@@ -23,7 +23,7 @@ final class SentStamp implements NonSendableStampInterface
     private $senderClass;
     private $senderAlias;
 
-    public function __construct(string $senderClass, string $senderAlias = null)
+    public function __construct(string $senderClass, ?string $senderAlias = null)
     {
         $this->senderAlias = $senderAlias;
         $this->senderClass = $senderClass;

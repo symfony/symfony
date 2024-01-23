@@ -28,7 +28,7 @@ final class ExpoTransportTest extends TransportTestCase
     /**
      * @return ExpoTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new ExpoTransport('token', $client ?? new MockHttpClient());
     }

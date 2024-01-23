@@ -23,7 +23,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
     private $errorCount = [];
     private $requestStack;
 
-    public function __construct(RequestStack $requestStack = null)
+    public function __construct(?RequestStack $requestStack = null)
     {
         $this->requestStack = $requestStack;
     }
@@ -68,7 +68,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogs(Request $request = null)
+    public function getLogs(?Request $request = null)
     {
         if (null !== $request) {
             return $this->records[spl_object_hash($request)] ?? [];
@@ -84,7 +84,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function countErrors(Request $request = null)
+    public function countErrors(?Request $request = null)
     {
         if (null !== $request) {
             return $this->errorCount[spl_object_hash($request)] ?? 0;

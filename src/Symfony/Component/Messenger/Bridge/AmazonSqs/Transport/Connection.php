@@ -60,7 +60,7 @@ class Connection
     /** @var string|null */
     private $queueUrl;
 
-    public function __construct(array $configuration, SqsClient $client = null, string $queueUrl = null)
+    public function __construct(array $configuration, ?SqsClient $client = null, ?string $queueUrl = null)
     {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->client = $client ?? new SqsClient([]);
@@ -101,7 +101,7 @@ class Connection
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      * * debug: Log all HTTP requests and responses as LoggerInterface::DEBUG (Default: false)
      */
-    public static function fromDsn(string $dsn, array $options = [], HttpClientInterface $client = null, LoggerInterface $logger = null): self
+    public static function fromDsn(string $dsn, array $options = [], ?HttpClientInterface $client = null, ?LoggerInterface $logger = null): self
     {
         if (false === $params = parse_url($dsn)) {
             throw new InvalidArgumentException('The given Amazon SQS DSN is invalid.');
@@ -313,7 +313,7 @@ class Connection
         return (int) ($attributes[QueueAttributeName::APPROXIMATE_NUMBER_OF_MESSAGES] ?? 0);
     }
 
-    public function send(string $body, array $headers, int $delay = 0, string $messageGroupId = null, string $messageDeduplicationId = null, string $xrayTraceId = null): void
+    public function send(string $body, array $headers, int $delay = 0, ?string $messageGroupId = null, ?string $messageDeduplicationId = null, ?string $xrayTraceId = null): void
     {
         if ($this->configuration['auto_setup']) {
             $this->setup();

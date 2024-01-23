@@ -28,7 +28,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch(object $event, string $eventName = null): object
+    public function dispatch(object $event, ?string $eventName = null): object
     {
         return $this->dispatcher->dispatch($event, $eventName);
     }
@@ -68,7 +68,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListeners(string $eventName = null)
+    public function getListeners(?string $eventName = null)
     {
         return $this->dispatcher->getListeners($eventName);
     }
@@ -84,7 +84,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function hasListeners(string $eventName = null)
+    public function hasListeners(?string $eventName = null)
     {
         return $this->dispatcher->hasListeners($eventName);
     }

@@ -32,7 +32,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
     private $notInlinableIds = [];
     private $graph;
 
-    public function __construct(AnalyzeServiceReferencesPass $analyzingPass = null)
+    public function __construct(?AnalyzeServiceReferencesPass $analyzingPass = null)
     {
         $this->analyzingPass = $analyzingPass;
     }

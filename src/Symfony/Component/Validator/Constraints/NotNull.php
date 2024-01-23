@@ -30,7 +30,7 @@ class NotNull extends Constraint
 
     public $message = 'This value should not be null.';
 
-    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, $payload = null)
     {
         parent::__construct($options ?? [], $groups, $payload);
 

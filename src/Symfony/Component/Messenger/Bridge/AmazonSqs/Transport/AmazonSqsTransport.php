@@ -33,7 +33,7 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
     private $receiver;
     private $sender;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null, ReceiverInterface $receiver = null, SenderInterface $sender = null)
+    public function __construct(Connection $connection, ?SerializerInterface $serializer = null, ?ReceiverInterface $receiver = null, ?SenderInterface $sender = null)
     {
         $this->connection = $connection;
         $this->serializer = $serializer ?? new PhpSerializer();

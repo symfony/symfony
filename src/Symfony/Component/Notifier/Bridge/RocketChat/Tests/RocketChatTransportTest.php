@@ -28,7 +28,7 @@ final class RocketChatTransportTest extends TransportTestCase
     /**
      * @return RocketChatTransport
      */
-    public static function createTransport(HttpClientInterface $client = null, string $channel = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null): TransportInterface
     {
         return new RocketChatTransport('testAccessToken', $channel, $client ?? new MockHttpClient());
     }

@@ -53,7 +53,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
         $stopwatch->expects($this->exactly(2))
             ->method('start')
-            ->willReturnCallback(function (string $name, string $category = null) use (&$series) {
+            ->willReturnCallback(function (string $name, ?string $category = null) use (&$series) {
                 [$constraint, $expectedCategory] = array_shift($series);
 
                 $constraint->evaluate($name);
@@ -195,7 +195,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         ];
         $stopwatch->expects($this->exactly(4))
             ->method('start')
-            ->willReturnCallback(function (string $name, string $category = null) use (&$startSeries) {
+            ->willReturnCallback(function (string $name, ?string $category = null) use (&$startSeries) {
                 [$constraint, $expectedCategory] = array_shift($startSeries);
 
                 $constraint->evaluate($name);

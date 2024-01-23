@@ -25,7 +25,7 @@ class ControllerResolver implements ControllerResolverInterface
 {
     private $logger;
 
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(?LoggerInterface $logger = null)
     {
         $this->logger = $logger;
     }

@@ -66,7 +66,7 @@ class MermaidDumper implements DumperInterface
         $this->transitionType = $transitionType;
     }
 
-    public function dump(Definition $definition, Marking $marking = null, array $options = []): string
+    public function dump(Definition $definition, ?Marking $marking = null, array $options = []): string
     {
         $this->linkCount = 0;
         $placeNameMap = [];

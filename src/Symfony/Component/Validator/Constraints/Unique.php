@@ -33,10 +33,10 @@ class Unique extends Constraint
     public $normalizer;
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

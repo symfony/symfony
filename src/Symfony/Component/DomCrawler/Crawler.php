@@ -81,7 +81,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A Node to use as the base for the crawling
      */
-    public function __construct($node = null, string $uri = null, string $baseHref = null)
+    public function __construct($node = null, ?string $uri = null, ?string $baseHref = null)
     {
         $this->uri = $uri;
         $this->baseHref = $baseHref ?: $uri;
@@ -153,7 +153,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * or ISO-8859-1 as a fallback, which is the default charset defined by the
      * HTTP 1.1 specification.
      */
-    public function addContent(string $content, string $type = null)
+    public function addContent(string $content, ?string $type = null)
     {
         if (empty($type)) {
             $type = str_starts_with($content, '<?xml') ? 'application/xml' : 'text/html';
@@ -366,7 +366,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @return static
      */
-    public function slice(int $offset = 0, int $length = null)
+    public function slice(int $offset = 0, ?int $length = null)
     {
         return $this->createSubCrawler(\array_slice($this->nodes, $offset, $length));
     }
@@ -546,7 +546,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * @throws \InvalidArgumentException When current node is empty
      * @throws \RuntimeException         If the CssSelector Component is not available and $selector is provided
      */
-    public function children(string $selector = null)
+    public function children(?string $selector = null)
     {
         if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
@@ -610,7 +610,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function text(string $default = null, bool $normalizeWhitespace = true)
+    public function text(?string $default = null, bool $normalizeWhitespace = true)
     {
         if (!$this->nodes) {
             if (null !== $default) {
@@ -646,7 +646,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function html(string $default = null)
+    public function html(?string $default = null)
     {
         if (!$this->nodes) {
             if (null !== $default) {
@@ -915,7 +915,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException If the current node list is empty or the selected node is not instance of DOMElement
      */
-    public function form(array $values = null, string $method = null)
+    public function form(?array $values = null, ?string $method = null)
     {
         if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');

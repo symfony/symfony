@@ -39,7 +39,7 @@ class LoginFailureEvent extends Event
     /**
      * @param Passport|null $passport
      */
-    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName, PassportInterface $passport = null)
+    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName, ?PassportInterface $passport = null)
     {
         if (null !== $passport && !$passport instanceof Passport) {
             trigger_deprecation('symfony/security-http', '5.4', 'Not passing an instance of "%s" or "null" as "$passport" argument of "%s()" is deprecated, "%s" given.', Passport::class, __METHOD__, get_debug_type($passport));

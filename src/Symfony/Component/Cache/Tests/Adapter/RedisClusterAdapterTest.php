@@ -36,7 +36,7 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTestCase
         self::$redis->setOption(\Redis::OPT_PREFIX, 'prefix_');
     }
 
-    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface
     {
         if ('testClearWithPrefix' === $testMethod && \defined('Redis::SCAN_PREFIX')) {
             self::$redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);

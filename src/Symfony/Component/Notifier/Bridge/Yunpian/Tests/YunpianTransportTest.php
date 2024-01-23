@@ -25,7 +25,7 @@ final class YunpianTransportTest extends TransportTestCase
     /**
      * @return YunpianTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new YunpianTransport('api_key', $client ?? new MockHttpClient());
     }

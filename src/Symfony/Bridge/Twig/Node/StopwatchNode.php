@@ -22,7 +22,7 @@ use Twig\Node\Node;
  */
 final class StopwatchNode extends Node
 {
-    public function __construct(Node $name, Node $body, AssignNameExpression $var, int $lineno = 0, string $tag = null)
+    public function __construct(Node $name, Node $body, AssignNameExpression $var, int $lineno = 0, ?string $tag = null)
     {
         parent::__construct(['body' => $body, 'name' => $name, 'var' => $var], [], $lineno, $tag);
     }

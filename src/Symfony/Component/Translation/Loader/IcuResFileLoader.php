@@ -75,7 +75,7 @@ class IcuResFileLoader implements LoaderInterface
      *
      * @return array
      */
-    protected function flatten(\ResourceBundle $rb, array &$messages = [], string $path = null)
+    protected function flatten(\ResourceBundle $rb, array &$messages = [], ?string $path = null)
     {
         foreach ($rb as $key => $value) {
             $nodePath = $path ? $path.'.'.$key : $key;

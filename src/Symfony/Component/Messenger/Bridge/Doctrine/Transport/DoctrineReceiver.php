@@ -33,7 +33,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
     private $connection;
     private $serializer;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
+    public function __construct(Connection $connection, ?SerializerInterface $serializer = null)
     {
         $this->connection = $connection;
         $this->serializer = $serializer ?? new PhpSerializer();
@@ -107,7 +107,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
     /**
      * {@inheritdoc}
      */
-    public function all(int $limit = null): iterable
+    public function all(?int $limit = null): iterable
     {
         try {
             $doctrineEnvelopes = $this->connection->findAll($limit);

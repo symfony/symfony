@@ -34,7 +34,7 @@ final class FixedWindowLimiter implements LimiterInterface
      */
     private $interval;
 
-    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
+    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, ?LockInterface $lock = null)
     {
         if ($limit < 1) {
             throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', __CLASS__));
@@ -47,7 +47,7 @@ final class FixedWindowLimiter implements LimiterInterface
         $this->interval = TimeUtil::dateIntervalToSeconds($interval);
     }
 
-    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
         if ($tokens > $this->limit) {
             throw new \InvalidArgumentException(sprintf('Cannot reserve more tokens (%d) than the size of the rate limiter (%d).', $tokens, $this->limit));

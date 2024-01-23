@@ -22,7 +22,7 @@ final class BrowserCookieValueSame extends Constraint
     private $path;
     private $domain;
 
-    public function __construct(string $name, string $value, bool $raw = false, string $path = '/', string $domain = null)
+    public function __construct(string $name, string $value, bool $raw = false, string $path = '/', ?string $domain = null)
     {
         $this->name = $name;
         $this->path = $path;

@@ -135,7 +135,7 @@ class Application extends BaseApplication
     /**
      * {@inheritdoc}
      */
-    public function all(string $namespace = null)
+    public function all(?string $namespace = null)
     {
         $this->registerCommands();
 

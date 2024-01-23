@@ -47,7 +47,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null): array
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?int $start = null, ?int $end = null, ?string $statusCode = null): array
     {
         $file = $this->getIndexFilename();
 
@@ -265,7 +265,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return '' === $line ? null : $line;
     }
 
-    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
+    protected function createProfileFromData(string $token, array $data, ?Profile $parent = null)
     {
         $profile = new Profile($token);
         $profile->setIp($data['ip']);
@@ -292,7 +292,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return $profile;
     }
 
-    private function doRead($token, Profile $profile = null): ?Profile
+    private function doRead($token, ?Profile $profile = null): ?Profile
     {
         if (!$token || !file_exists($file = $this->getFilename($token))) {
             return null;

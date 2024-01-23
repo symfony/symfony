@@ -32,7 +32,7 @@ class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
         self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
     }
 
-    public function createCachePool($defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
+    public function createCachePool($defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface
     {
         return new ProxyAdapter(new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), 100), 'ProxyNS', $defaultLifetime);
     }

@@ -25,7 +25,7 @@ final class SpotHitTransportTest extends TransportTestCase
     /**
      * @return SpotHitTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new SpotHitTransport('api_token', 'MyCompany', $client ?? new MockHttpClient()))->setHost('host.test');
     }

@@ -24,7 +24,7 @@ class AssetNotFoundException extends RuntimeException
      * @param int        $code         Exception code
      * @param \Throwable $previous     Previous exception used for the exception chaining
      */
-    public function __construct(string $message, array $alternatives = [], int $code = 0, \Throwable $previous = null)
+    public function __construct(string $message, array $alternatives = [], int $code = 0, ?\Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
 

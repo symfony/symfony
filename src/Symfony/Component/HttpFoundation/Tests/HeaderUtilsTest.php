@@ -149,7 +149,7 @@ class HeaderUtilsTest extends TestCase
     /**
      * @dataProvider provideParseQuery
      */
-    public function testParseQuery(string $query, string $expected = null)
+    public function testParseQuery(string $query, ?string $expected = null)
     {
         $this->assertSame($expected ?? $query, http_build_query(HeaderUtils::parseQuery($query), '', '&'));
     }

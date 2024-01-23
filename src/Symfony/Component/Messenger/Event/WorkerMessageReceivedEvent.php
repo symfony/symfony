@@ -20,7 +20,7 @@ final class WorkerMessageReceivedEvent extends AbstractWorkerMessageEvent
 {
     private $shouldHandle = true;
 
-    public function shouldHandle(bool $shouldHandle = null): bool
+    public function shouldHandle(?bool $shouldHandle = null): bool
     {
         if (null !== $shouldHandle) {
             $this->shouldHandle = $shouldHandle;

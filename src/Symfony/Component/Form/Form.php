@@ -275,7 +275,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function setParent(FormInterface $parent = null)
+    public function setParent(?FormInterface $parent = null)
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot set the parent of a submitted form.');
@@ -850,7 +850,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function add($child, string $type = null, array $options = [])
+    public function add($child, ?string $type = null, array $options = [])
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot add children to a submitted form.');
@@ -1045,7 +1045,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function createView(FormView $parent = null)
+    public function createView(?FormView $parent = null)
     {
         if (null === $parent && $this->parent) {
             $parent = $this->parent->createView();

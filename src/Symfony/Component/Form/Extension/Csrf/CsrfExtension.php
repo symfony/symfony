@@ -26,7 +26,7 @@ class CsrfExtension extends AbstractExtension
     private $translator;
     private $translationDomain;
 
-    public function __construct(CsrfTokenManagerInterface $tokenManager, TranslatorInterface $translator = null, string $translationDomain = null)
+    public function __construct(CsrfTokenManagerInterface $tokenManager, ?TranslatorInterface $translator = null, ?string $translationDomain = null)
     {
         $this->tokenManager = $tokenManager;
         $this->translator = $translator;

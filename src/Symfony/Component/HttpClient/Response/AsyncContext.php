@@ -111,7 +111,7 @@ final class AsyncContext
     /**
      * Returns the current info of the response.
      */
-    public function getInfo(string $type = null)
+    public function getInfo(?string $type = null)
     {
         if (null !== $type) {
             return $this->info[$type] ?? $this->response->getInfo($type);
@@ -184,7 +184,7 @@ final class AsyncContext
      *
      * @param ?callable(ChunkInterface, self): ?\Iterator $passthru
      */
-    public function passthru(callable $passthru = null): void
+    public function passthru(?callable $passthru = null): void
     {
         $this->passthru = $passthru ?? static function ($chunk, $context) {
             $context->passthru = null;

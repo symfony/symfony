@@ -32,7 +32,7 @@ final class FirebaseTransportTest extends TransportTestCase
     /**
      * @return FirebaseTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new FirebaseTransport('username:password', $client ?? new MockHttpClient());
     }

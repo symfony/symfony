@@ -122,7 +122,7 @@ BODY
         $this->methods[] = new Method(strtr($body, ['NAME' => $this->camelCase($name)] + $params));
     }
 
-    public function addProperty(string $name, string $classType = null, string $defaultValue = null): Property
+    public function addProperty(string $name, ?string $classType = null, ?string $defaultValue = null): Property
     {
         $property = new Property($name, '_' !== $name[0] ? $this->camelCase($name) : $name);
         if (null !== $classType) {

@@ -25,7 +25,7 @@ final class InfobipTransportTest extends TransportTestCase
     /**
      * @return InfobipTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new InfobipTransport('authtoken', '0611223344', $client ?? new MockHttpClient()))->setHost('host.test');
     }

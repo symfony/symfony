@@ -25,7 +25,7 @@ class LoaderLoadException extends \Exception
      * @param \Throwable|null $previous       A previous exception
      * @param string|null     $type           The type of resource
      */
-    public function __construct(string $resource, string $sourceResource = null, ?int $code = 0, \Throwable $previous = null, string $type = null)
+    public function __construct(string $resource, ?string $sourceResource = null, ?int $code = 0, ?\Throwable $previous = null, ?string $type = null)
     {
         if (null === $code) {
             trigger_deprecation('symfony/config', '5.3', 'Passing null as $code to "%s()" is deprecated, pass 0 instead.', __METHOD__);

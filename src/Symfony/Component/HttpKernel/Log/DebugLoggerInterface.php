@@ -29,14 +29,14 @@ interface DebugLoggerInterface
      *
      * @return array
      */
-    public function getLogs(Request $request = null);
+    public function getLogs(?Request $request = null);
 
     /**
      * Returns the number of errors.
      *
      * @return int
      */
-    public function countErrors(Request $request = null);
+    public function countErrors(?Request $request = null);
 
     /**
      * Removes all log records.

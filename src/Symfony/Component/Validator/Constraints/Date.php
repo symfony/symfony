@@ -32,7 +32,7 @@ class Date extends Constraint
 
     public $message = 'This value is not a valid date.';
 
-    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, $payload = null)
     {
         parent::__construct($options, $groups, $payload);
 

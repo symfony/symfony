@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Exception;
  */
 class FileLoaderImportCircularReferenceException extends LoaderLoadException
 {
-    public function __construct(array $resources, ?int $code = 0, \Throwable $previous = null)
+    public function __construct(array $resources, ?int $code = 0, ?\Throwable $previous = null)
     {
         if (null === $code) {
             trigger_deprecation('symfony/config', '5.3', 'Passing null as $code to "%s()" is deprecated, pass 0 instead.', __METHOD__);

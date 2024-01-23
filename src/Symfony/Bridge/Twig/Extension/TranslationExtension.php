@@ -37,7 +37,7 @@ final class TranslationExtension extends AbstractExtension
     private $translator;
     private $translationNodeVisitor;
 
-    public function __construct(TranslatorInterface $translator = null, TranslationNodeVisitor $translationNodeVisitor = null)
+    public function __construct(?TranslatorInterface $translator = null, ?TranslationNodeVisitor $translationNodeVisitor = null)
     {
         $this->translator = $translator;
         $this->translationNodeVisitor = $translationNodeVisitor;
@@ -109,7 +109,7 @@ final class TranslationExtension extends AbstractExtension
      * @param string|\Stringable|TranslatableInterface|null $message
      * @param array|string                                  $arguments Can be the locale as a string when $message is a TranslatableInterface
      */
-    public function trans($message, $arguments = [], string $domain = null, string $locale = null, int $count = null): string
+    public function trans($message, $arguments = [], ?string $domain = null, ?string $locale = null, ?int $count = null): string
     {
         if ($message instanceof TranslatableInterface) {
             if ([] !== $arguments && !\is_string($arguments)) {
@@ -138,7 +138,7 @@ final class TranslationExtension extends AbstractExtension
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
     }
 
-    public function createTranslatable(string $message, array $parameters = [], string $domain = null): TranslatableMessage
+    public function createTranslatable(string $message, array $parameters = [], ?string $domain = null): TranslatableMessage
     {
         if (!class_exists(TranslatableMessage::class)) {
             throw new \LogicException(sprintf('You cannot use the "%s" as the Translation Component is not installed. Try running "composer require symfony/translation".', __CLASS__));

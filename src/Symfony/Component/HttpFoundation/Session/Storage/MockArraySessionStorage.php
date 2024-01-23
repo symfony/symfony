@@ -62,7 +62,7 @@ class MockArraySessionStorage implements SessionStorageInterface
      */
     protected $bags = [];
 
-    public function __construct(string $name = 'MOCKSESSID', MetadataBag $metaBag = null)
+    public function __construct(string $name = 'MOCKSESSID', ?MetadataBag $metaBag = null)
     {
         $this->name = $name;
         $this->setMetadataBag($metaBag);
@@ -94,7 +94,7 @@ class MockArraySessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function regenerate(bool $destroy = false, int $lifetime = null)
+    public function regenerate(bool $destroy = false, ?int $lifetime = null)
     {
         if (!$this->started) {
             $this->start();
@@ -204,7 +204,7 @@ class MockArraySessionStorage implements SessionStorageInterface
         return $this->started;
     }
 
-    public function setMetadataBag(MetadataBag $bag = null)
+    public function setMetadataBag(?MetadataBag $bag = null)
     {
         if (null === $bag) {
             $bag = new MetadataBag();

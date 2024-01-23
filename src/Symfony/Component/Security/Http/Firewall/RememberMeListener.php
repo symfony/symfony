@@ -45,7 +45,7 @@ class RememberMeListener extends AbstractListener
     private $catchExceptions = true;
     private $sessionStrategy;
 
-    public function __construct(TokenStorageInterface $tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, bool $catchExceptions = true, SessionAuthenticationStrategyInterface $sessionStrategy = null)
+    public function __construct(TokenStorageInterface $tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, ?LoggerInterface $logger = null, ?EventDispatcherInterface $dispatcher = null, bool $catchExceptions = true, ?SessionAuthenticationStrategyInterface $sessionStrategy = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->rememberMeServices = $rememberMeServices;

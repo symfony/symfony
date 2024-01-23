@@ -62,7 +62,7 @@ interface RememberMeServicesInterface
      *
      * This method needs to take care of invalidating the cookie.
      */
-    public function loginFail(Request $request, \Exception $exception = null);
+    public function loginFail(Request $request, ?\Exception $exception = null);
 
     /**
      * Called whenever an interactive authentication attempt is successful

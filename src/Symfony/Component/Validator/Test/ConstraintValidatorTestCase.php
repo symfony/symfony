@@ -324,7 +324,7 @@ final class ConstraintViolationAssertion
     /**
      * @internal
      */
-    public function __construct(ExecutionContextInterface $context, string $message, Constraint $constraint = null, array $assertions = [])
+    public function __construct(ExecutionContextInterface $context, string $message, ?Constraint $constraint = null, array $assertions = [])
     {
         $this->context = $context;
         $this->message = $message;
@@ -575,7 +575,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         $this->expectNoValidate = true;
     }
 
-    public function expectValidation(string $call, ?string $propertyPath, $value, $group, callable $constraints, ConstraintViolationInterface $violation = null)
+    public function expectValidation(string $call, ?string $propertyPath, $value, $group, callable $constraints, ?ConstraintViolationInterface $violation = null)
     {
         if (null !== $propertyPath) {
             $this->expectedAtPath[$call] = $propertyPath;

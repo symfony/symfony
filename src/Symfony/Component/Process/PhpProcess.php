@@ -32,7 +32,7 @@ class PhpProcess extends Process
      * @param int         $timeout The timeout in seconds
      * @param array|null  $php     Path to the PHP binary to use with any additional arguments
      */
-    public function __construct(string $script, string $cwd = null, array $env = null, int $timeout = 60, array $php = null)
+    public function __construct(string $script, ?string $cwd = null, ?array $env = null, int $timeout = 60, ?array $php = null)
     {
         if (null === $php) {
             $executableFinder = new PhpExecutableFinder();
@@ -53,7 +53,7 @@ class PhpProcess extends Process
     /**
      * {@inheritdoc}
      */
-    public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
+    public static function fromShellCommandline(string $command, ?string $cwd = null, ?array $env = null, $input = null, ?float $timeout = 60)
     {
         throw new LogicException(sprintf('The "%s()" method cannot be called when using "%s".', __METHOD__, self::class));
     }
@@ -61,7 +61,7 @@ class PhpProcess extends Process
     /**
      * {@inheritdoc}
      */
-    public function start(callable $callback = null, array $env = [])
+    public function start(?callable $callback = null, array $env = [])
     {
         if (null === $this->getCommandLine()) {
             throw new RuntimeException('Unable to find the PHP executable.');

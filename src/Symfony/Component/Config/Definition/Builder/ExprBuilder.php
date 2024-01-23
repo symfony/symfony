@@ -35,7 +35,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function always(\Closure $then = null)
+    public function always(?\Closure $then = null)
     {
         $this->ifPart = function () { return true; };
 
@@ -53,7 +53,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifTrue(\Closure $closure = null)
+    public function ifTrue(?\Closure $closure = null)
     {
         if (null === $closure) {
             $closure = function ($v) { return true === $v; };

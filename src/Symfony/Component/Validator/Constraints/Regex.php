@@ -42,11 +42,11 @@ class Regex extends Constraint
      */
     public function __construct(
         $pattern,
-        string $message = null,
-        string $htmlPattern = null,
-        bool $match = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?string $message = null,
+        ?string $htmlPattern = null,
+        ?bool $match = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         $payload = null,
         array $options = []
     ) {

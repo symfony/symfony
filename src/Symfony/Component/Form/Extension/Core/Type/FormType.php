@@ -31,7 +31,7 @@ class FormType extends BaseType
 {
     private $dataMapper;
 
-    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(?PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->dataMapper = new DataMapper(new ChainAccessor([
             new CallbackAccessor(),

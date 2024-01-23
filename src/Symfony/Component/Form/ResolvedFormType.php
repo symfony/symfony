@@ -46,7 +46,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * @param FormTypeExtensionInterface[] $typeExtensions
      */
-    public function __construct(FormTypeInterface $innerType, array $typeExtensions = [], ResolvedFormTypeInterface $parent = null)
+    public function __construct(FormTypeInterface $innerType, array $typeExtensions = [], ?ResolvedFormTypeInterface $parent = null)
     {
         foreach ($typeExtensions as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
@@ -114,7 +114,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(FormInterface $form, FormView $parent = null)
+    public function createView(FormInterface $form, ?FormView $parent = null)
     {
         return $this->newView($parent);
     }
@@ -217,7 +217,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      *
      * @return FormView
      */
-    protected function newView(FormView $parent = null)
+    protected function newView(?FormView $parent = null)
     {
         return new FormView($parent);
     }

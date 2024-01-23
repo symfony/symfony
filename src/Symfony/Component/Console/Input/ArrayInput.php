@@ -27,7 +27,7 @@ class ArrayInput extends Input
 {
     private $parameters;
 
-    public function __construct(array $parameters, InputDefinition $definition = null)
+    public function __construct(array $parameters, ?InputDefinition $definition = null)
     {
         $this->parameters = $parameters;
 

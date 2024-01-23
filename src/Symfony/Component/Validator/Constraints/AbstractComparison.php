@@ -33,7 +33,7 @@ abstract class AbstractComparison extends Constraint
      *
      * @param mixed $value the value to compare or a set of options
      */
-    public function __construct($value = null, $propertyPath = null, string $message = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct($value = null, $propertyPath = null, ?string $message = null, ?array $groups = null, $payload = null, array $options = [])
     {
         if (\is_array($value)) {
             $options = array_merge($value, $options);

@@ -33,7 +33,7 @@ final class OneSignalTransportTest extends TransportTestCase
     /**
      * @return OneSignalTransport
      */
-    public static function createTransport(HttpClientInterface $client = null, string $recipientId = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $recipientId = null): TransportInterface
     {
         return new OneSignalTransport('9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'api_key', $recipientId, $client ?? new MockHttpClient());
     }

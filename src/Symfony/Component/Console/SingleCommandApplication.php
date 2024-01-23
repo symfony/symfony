@@ -46,7 +46,7 @@ class SingleCommandApplication extends Command
         return $this;
     }
 
-    public function run(InputInterface $input = null, OutputInterface $output = null): int
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
         if ($this->running) {
             return parent::run($input, $output);

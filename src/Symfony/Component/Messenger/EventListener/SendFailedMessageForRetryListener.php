@@ -39,7 +39,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
     private $eventDispatcher;
     private $historySize;
 
-    public function __construct(ContainerInterface $sendersLocator, ContainerInterface $retryStrategyLocator, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, int $historySize = 10)
+    public function __construct(ContainerInterface $sendersLocator, ContainerInterface $retryStrategyLocator, ?LoggerInterface $logger = null, ?EventDispatcherInterface $eventDispatcher = null, int $historySize = 10)
     {
         $this->sendersLocator = $sendersLocator;
         $this->retryStrategyLocator = $retryStrategyLocator;

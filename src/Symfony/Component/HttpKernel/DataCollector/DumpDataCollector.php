@@ -47,7 +47,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
      * @param string|FileLinkFormatter|null       $fileLinkFormat
      * @param DataDumperInterface|Connection|null $dumper
      */
-    public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null, string $charset = null, RequestStack $requestStack = null, $dumper = null)
+    public function __construct(?Stopwatch $stopwatch = null, $fileLinkFormat = null, ?string $charset = null, ?RequestStack $requestStack = null, $dumper = null)
     {
         $fileLinkFormat = $fileLinkFormat ?: \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->stopwatch = $stopwatch;
@@ -101,7 +101,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         if (!$this->dataCount) {
             $this->data = [];

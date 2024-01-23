@@ -56,7 +56,7 @@ class GuardAuthenticationListener extends AbstractListener
      * @param string                                      $providerKey         The provider (i.e. firewall) key
      * @param iterable<array-key, AuthenticatorInterface> $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, LoggerInterface $logger = null, bool $hideUserNotFoundExceptions = true, TokenStorageInterface $tokenStorage = null)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, ?LoggerInterface $logger = null, bool $hideUserNotFoundExceptions = true, ?TokenStorageInterface $tokenStorage = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -223,7 +223,7 @@ class GuardAuthenticationListener extends AbstractListener
      * Checks to see if remember me is supported in the authenticator and
      * on the firewall. If it is, the RememberMeServicesInterface is notified.
      */
-    private function triggerRememberMe(AuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
+    private function triggerRememberMe(AuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, ?Response $response = null)
     {
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {

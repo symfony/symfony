@@ -196,7 +196,7 @@ class XliffFileDumper extends FileDumper
         return $dom->saveXML();
     }
 
-    private function hasMetadataArrayInfo(string $key, array $metadata = null): bool
+    private function hasMetadataArrayInfo(string $key, ?array $metadata = null): bool
     {
         return is_iterable($metadata[$key] ?? null);
     }

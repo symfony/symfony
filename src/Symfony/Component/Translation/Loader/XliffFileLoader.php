@@ -194,7 +194,7 @@ class XliffFileLoader implements LoaderInterface
     /**
      * Convert a UTF8 string to the specified encoding.
      */
-    private function utf8ToCharset(string $content, string $encoding = null): string
+    private function utf8ToCharset(string $content, ?string $encoding = null): string
     {
         if ('UTF-8' !== $encoding && !empty($encoding)) {
             return mb_convert_encoding($content, $encoding, 'UTF-8');
@@ -203,7 +203,7 @@ class XliffFileLoader implements LoaderInterface
         return $content;
     }
 
-    private function parseNotesMetadata(\SimpleXMLElement $noteElement = null, string $encoding = null): array
+    private function parseNotesMetadata(?\SimpleXMLElement $noteElement = null, ?string $encoding = null): array
     {
         $notes = [];
 

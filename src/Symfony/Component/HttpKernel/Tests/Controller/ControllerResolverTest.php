@@ -187,7 +187,7 @@ class ControllerResolverTest extends TestCase
         ];
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null)
+    protected function createControllerResolver(?LoggerInterface $logger = null)
     {
         return new ControllerResolver($logger);
     }

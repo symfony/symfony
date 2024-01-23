@@ -27,5 +27,5 @@ interface EventDispatcherInterface extends PsrEventDispatcherInterface
      *
      * @return object The passed $event MUST be returned
      */
-    public function dispatch(object $event, string $eventName = null): object;
+    public function dispatch(object $event, ?string $eventName = null): object;
 }

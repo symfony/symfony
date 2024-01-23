@@ -31,7 +31,7 @@ abstract class FileLoader extends Loader
 
     private $currentDir;
 
-    public function __construct(FileLocatorInterface $locator, string $env = null)
+    public function __construct(FileLocatorInterface $locator, ?string $env = null)
     {
         $this->locator = $locator;
         parent::__construct($env);
@@ -70,7 +70,7 @@ abstract class FileLoader extends Loader
      * @throws FileLoaderImportCircularReferenceException
      * @throws FileLocatorFileNotFoundException
      */
-    public function import($resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, $exclude = null)
+    public function import($resource, ?string $type = null, bool $ignoreErrors = false, ?string $sourceResource = null, $exclude = null)
     {
         if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
             $excluded = [];
@@ -133,7 +133,7 @@ abstract class FileLoader extends Loader
         yield from $resource;
     }
 
-    private function doImport($resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null)
+    private function doImport($resource, ?string $type = null, bool $ignoreErrors = false, ?string $sourceResource = null)
     {
         try {
             $loader = $this->resolve($resource, $type);

@@ -21,7 +21,7 @@ final class UlidGenerator extends AbstractIdGenerator
 {
     private $factory;
 
-    public function __construct(UlidFactory $factory = null)
+    public function __construct(?UlidFactory $factory = null)
     {
         $this->factory = $factory;
     }

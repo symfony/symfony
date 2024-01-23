@@ -35,7 +35,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, HubInterface $hub = null, string $hubId = 'hubId', $topics = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?HubInterface $hub = null, string $hubId = 'hubId', $topics = null): TransportInterface
     {
         $hub = $hub ?? new DummyHub();
 

@@ -33,7 +33,7 @@ abstract class AbstractTransport implements TransportInterface
     private $rate = 0;
     private $lastSent = 0;
 
-    public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         $this->dispatcher = class_exists(Event::class) && $dispatcher instanceof SymfonyEventDispatcherInterface ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
         $this->logger = $logger ?? new NullLogger();
@@ -56,7 +56,7 @@ abstract class AbstractTransport implements TransportInterface
         return $this;
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         $message = clone $message;
         $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);

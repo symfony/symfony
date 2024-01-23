@@ -31,7 +31,7 @@ final class GitterTransport extends AbstractTransport
     private $token;
     private $roomId;
 
-    public function __construct(string $token, string $roomId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $roomId, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->roomId = $roomId;

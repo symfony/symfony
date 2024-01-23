@@ -30,7 +30,7 @@ final class SourceContextProvider implements ContextProviderInterface
     private $projectDir;
     private $fileLinkFormatter;
 
-    public function __construct(string $charset = null, string $projectDir = null, FileLinkFormatter $fileLinkFormatter = null, int $limit = 9)
+    public function __construct(?string $charset = null, ?string $projectDir = null, ?FileLinkFormatter $fileLinkFormatter = null, int $limit = 9)
     {
         $this->charset = $charset;
         $this->projectDir = $projectDir;

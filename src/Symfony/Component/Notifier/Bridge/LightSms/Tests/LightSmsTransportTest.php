@@ -25,7 +25,7 @@ final class LightSmsTransportTest extends TransportTestCase
     /**
      * @return LightSmsTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new LightSmsTransport('accountSid', 'authToken', 'from', $client ?? new MockHttpClient());
     }

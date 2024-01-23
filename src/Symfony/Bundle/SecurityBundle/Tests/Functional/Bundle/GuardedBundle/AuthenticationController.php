@@ -27,7 +27,7 @@ class AuthenticationController
         return new Response('Logged in.');
     }
 
-    public function profileAction(UserInterface $user = null)
+    public function profileAction(?UserInterface $user = null)
     {
         if (null === $user) {
             return new Response('Not logged in.');

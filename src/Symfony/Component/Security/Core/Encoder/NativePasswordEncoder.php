@@ -31,7 +31,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
     /**
      * @param string|null $algo An algorithm supported by password_hash() or null to use the stronger available algorithm
      */
-    public function __construct(int $opsLimit = null, int $memLimit = null, int $cost = null, string $algo = null)
+    public function __construct(?int $opsLimit = null, ?int $memLimit = null, ?int $cost = null, ?string $algo = null)
     {
         $this->hasher = new NativePasswordHasher($opsLimit, $memLimit, $cost, $algo);
     }

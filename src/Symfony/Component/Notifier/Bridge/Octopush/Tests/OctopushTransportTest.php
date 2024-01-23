@@ -25,7 +25,7 @@ final class OctopushTransportTest extends TransportTestCase
     /**
      * @return OctopushTransport
      */
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return new OctopushTransport('userLogin', 'apiKey', 'from', 'type', $client ?? new MockHttpClient());
     }

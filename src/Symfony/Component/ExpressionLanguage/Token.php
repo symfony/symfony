@@ -56,7 +56,7 @@ class Token
      *
      * @return bool
      */
-    public function test(string $type, string $value = null)
+    public function test(string $type, ?string $value = null)
     {
         return $this->type === $type && (null === $value || $this->value == $value);
     }

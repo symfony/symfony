@@ -20,12 +20,12 @@ use Symfony\Component\Mime\Test\Constraint as MimeConstraint;
 
 trait MailerAssertionsTrait
 {
-    public static function assertEmailCount(int $count, string $transport = null, string $message = ''): void
+    public static function assertEmailCount(int $count, ?string $transport = null, string $message = ''): void
     {
         self::assertThat(self::getMessageMailerEvents(), new MailerConstraint\EmailCount($count, $transport), $message);
     }
 
-    public static function assertQueuedEmailCount(int $count, string $transport = null, string $message = ''): void
+    public static function assertQueuedEmailCount(int $count, ?string $transport = null, string $message = ''): void
     {
         self::assertThat(self::getMessageMailerEvents(), new MailerConstraint\EmailCount($count, $transport, true), $message);
     }
@@ -93,12 +93,12 @@ trait MailerAssertionsTrait
     /**
      * @return MessageEvent[]
      */
-    public static function getMailerEvents(string $transport = null): array
+    public static function getMailerEvents(?string $transport = null): array
     {
         return self::getMessageMailerEvents()->getEvents($transport);
     }
 
-    public static function getMailerEvent(int $index = 0, string $transport = null): ?MessageEvent
+    public static function getMailerEvent(int $index = 0, ?string $transport = null): ?MessageEvent
     {
         return self::getMailerEvents($transport)[$index] ?? null;
     }
@@ -106,12 +106,12 @@ trait MailerAssertionsTrait
     /**
      * @return RawMessage[]
      */
-    public static function getMailerMessages(string $transport = null): array
+    public static function getMailerMessages(?string $transport = null): array
     {
         return self::getMessageMailerEvents()->getMessages($transport);
     }
 
-    public static function getMailerMessage(int $index = 0, string $transport = null): ?RawMessage
+    public static function getMailerMessage(int $index = 0, ?string $transport = null): ?RawMessage
     {
         return self::getMailerMessages($transport)[$index] ?? null;
     }

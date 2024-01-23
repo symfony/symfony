@@ -95,9 +95,9 @@ jobs:
           - 8094:8094
           - 11210:11210
       sqs:
-        image: asyncaws/testing-sqs
+        image: localstack/localstack:3.0.2
         ports:
-          - 9494:9494
+          - 4566:4566
       zookeeper:
         image: wurstmeister/zookeeper:3.4.6
       kafka:
@@ -184,8 +184,8 @@ jobs:
           REDIS_SENTINEL_SERVICE: redis_sentinel
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
-          MESSENGER_SQS_DSN: "sqs://localhost:9494/messages?sslmode=disable&poll_timeout=0.01"
-          MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:9494/messages.fifo?sslmode=disable&poll_timeout=0.01"
+          MESSENGER_SQS_DSN: "sqs://localhost:4566/messages?sslmode=disable&poll_timeout=0.01"
+          MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:4566/messages.fifo?sslmode=disable&poll_timeout=0.01"
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
 

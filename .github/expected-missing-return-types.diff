@@ -20,8 +20,8 @@ diff --git a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
 @@ -59,5 +59,5 @@ class DoctrineDataCollector extends DataCollector
       * @return void
       */
--    public function collect(Request $request, Response $response, \Throwable $exception = null)
-+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+-    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
++    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
      {
          $this->data = [
 @@ -90,5 +90,5 @@ class DoctrineDataCollector extends DataCollector
@@ -282,7 +282,7 @@ diff --git a/src/Symfony/Bridge/Doctrine/Validator/DoctrineInitializer.php b/src
 diff --git a/src/Symfony/Bridge/Monolog/Command/ServerLogCommand.php b/src/Symfony/Bridge/Monolog/Command/ServerLogCommand.php
 --- a/src/Symfony/Bridge/Monolog/Command/ServerLogCommand.php
 +++ b/src/Symfony/Bridge/Monolog/Command/ServerLogCommand.php
-@@ -54,5 +54,5 @@ class ServerLogCommand extends Command
+@@ -56,5 +56,5 @@ class ServerLogCommand extends Command
       * @return void
       */
 -    protected function configure()
@@ -653,7 +653,7 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2913,5 +2913,5 @@ class FrameworkExtension extends Extension
+@@ -2933,5 +2933,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -747,8 +747,8 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php b/src
 @@ -122,5 +122,5 @@ class Translator extends BaseTranslator implements WarmableInterface
       * @return void
       */
--    public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
-+    public function addResource(string $format, mixed $resource, string $locale, string $domain = null): void
+-    public function addResource(string $format, mixed $resource, string $locale, ?string $domain = null)
++    public function addResource(string $format, mixed $resource, string $locale, ?string $domain = null): void
      {
          if ($this->resourceFiles) {
 @@ -133,5 +133,5 @@ class Translator extends BaseTranslator implements WarmableInterface
@@ -1234,8 +1234,8 @@ diff --git a/src/Symfony/Component/BrowserKit/CookieJar.php b/src/Symfony/Compon
 @@ -73,5 +73,5 @@ class CookieJar
       * @return void
       */
--    public function expire(string $name, ?string $path = '/', string $domain = null)
-+    public function expire(string $name, ?string $path = '/', string $domain = null): void
+-    public function expire(string $name, ?string $path = '/', ?string $domain = null)
++    public function expire(string $name, ?string $path = '/', ?string $domain = null): void
      {
          $path ??= '/';
 @@ -103,5 +103,5 @@ class CookieJar
@@ -1248,15 +1248,15 @@ diff --git a/src/Symfony/Component/BrowserKit/CookieJar.php b/src/Symfony/Compon
 @@ -115,5 +115,5 @@ class CookieJar
       * @return void
       */
--    public function updateFromSetCookie(array $setCookies, string $uri = null)
-+    public function updateFromSetCookie(array $setCookies, string $uri = null): void
+-    public function updateFromSetCookie(array $setCookies, ?string $uri = null)
++    public function updateFromSetCookie(array $setCookies, ?string $uri = null): void
      {
          $cookies = [];
 @@ -143,5 +143,5 @@ class CookieJar
       * @return void
       */
--    public function updateFromResponse(Response $response, string $uri = null)
-+    public function updateFromResponse(Response $response, string $uri = null): void
+-    public function updateFromResponse(Response $response, ?string $uri = null)
++    public function updateFromResponse(Response $response, ?string $uri = null): void
      {
          $this->updateFromSetCookie($response->getHeader('Set-Cookie', false), $uri);
 @@ -217,5 +217,5 @@ class CookieJar
@@ -1447,8 +1447,8 @@ diff --git a/src/Symfony/Component/Config/ConfigCacheInterface.php b/src/Symfony
 @@ -44,4 +44,4 @@ interface ConfigCacheInterface
       * @throws \RuntimeException When the cache file cannot be written
       */
--    public function write(string $content, array $metadata = null);
-+    public function write(string $content, array $metadata = null): void;
+-    public function write(string $content, ?array $metadata = null);
++    public function write(string $content, ?array $metadata = null): void;
  }
 diff --git a/src/Symfony/Component/Config/Definition/ArrayNode.php b/src/Symfony/Component/Config/Definition/ArrayNode.php
 --- a/src/Symfony/Component/Config/Definition/ArrayNode.php
@@ -1695,15 +1695,15 @@ diff --git a/src/Symfony/Component/Config/Definition/Dumper/XmlReferenceDumper.p
 @@ -35,5 +35,5 @@ class XmlReferenceDumper
       * @return string
       */
--    public function dump(ConfigurationInterface $configuration, string $namespace = null)
-+    public function dump(ConfigurationInterface $configuration, string $namespace = null): string
+-    public function dump(ConfigurationInterface $configuration, ?string $namespace = null)
++    public function dump(ConfigurationInterface $configuration, ?string $namespace = null): string
      {
          return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree(), $namespace);
 @@ -43,5 +43,5 @@ class XmlReferenceDumper
       * @return string
       */
--    public function dumpNode(NodeInterface $node, string $namespace = null)
-+    public function dumpNode(NodeInterface $node, string $namespace = null): string
+-    public function dumpNode(NodeInterface $node, ?string $namespace = null)
++    public function dumpNode(NodeInterface $node, ?string $namespace = null): string
      {
          $this->reference = '';
 diff --git a/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php b/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php
@@ -1905,8 +1905,8 @@ diff --git a/src/Symfony/Component/Config/FileLocator.php b/src/Symfony/Componen
 @@ -34,5 +34,5 @@ class FileLocator implements FileLocatorInterface
       * @return string|array
       */
--    public function locate(string $name, string $currentPath = null, bool $first = true)
-+    public function locate(string $name, string $currentPath = null, bool $first = true): string|array
+-    public function locate(string $name, ?string $currentPath = null, bool $first = true)
++    public function locate(string $name, ?string $currentPath = null, bool $first = true): string|array
      {
          if ('' === $name) {
 diff --git a/src/Symfony/Component/Config/FileLocatorInterface.php b/src/Symfony/Component/Config/FileLocatorInterface.php
@@ -1915,8 +1915,8 @@ diff --git a/src/Symfony/Component/Config/FileLocatorInterface.php b/src/Symfony
 @@ -31,4 +31,4 @@ interface FileLocatorInterface
       * @throws FileLocatorFileNotFoundException If a file is not found
       */
--    public function locate(string $name, string $currentPath = null, bool $first = true);
-+    public function locate(string $name, string $currentPath = null, bool $first = true): string|array;
+-    public function locate(string $name, ?string $currentPath = null, bool $first = true);
++    public function locate(string $name, ?string $currentPath = null, bool $first = true): string|array;
  }
 diff --git a/src/Symfony/Component/Config/Loader/FileLoader.php b/src/Symfony/Component/Config/Loader/FileLoader.php
 --- a/src/Symfony/Component/Config/Loader/FileLoader.php
@@ -1931,8 +1931,8 @@ diff --git a/src/Symfony/Component/Config/Loader/FileLoader.php b/src/Symfony/Co
 @@ -71,5 +71,5 @@ abstract class FileLoader extends Loader
       * @throws FileLocatorFileNotFoundException
       */
--    public function import(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, string|array $exclude = null)
-+    public function import(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, string|array $exclude = null): mixed
+-    public function import(mixed $resource, ?string $type = null, bool $ignoreErrors = false, ?string $sourceResource = null, string|array|null $exclude = null)
++    public function import(mixed $resource, ?string $type = null, bool $ignoreErrors = false, ?string $sourceResource = null, string|array|null $exclude = null): mixed
      {
          if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
 diff --git a/src/Symfony/Component/Config/Loader/Loader.php b/src/Symfony/Component/Config/Loader/Loader.php
@@ -1948,8 +1948,8 @@ diff --git a/src/Symfony/Component/Config/Loader/Loader.php b/src/Symfony/Compon
 @@ -47,5 +47,5 @@ abstract class Loader implements LoaderInterface
       * @return mixed
       */
--    public function import(mixed $resource, string $type = null)
-+    public function import(mixed $resource, string $type = null): mixed
+-    public function import(mixed $resource, ?string $type = null)
++    public function import(mixed $resource, ?string $type = null): mixed
      {
          return $this->resolve($resource, $type)->load($resource, $type);
 diff --git a/src/Symfony/Component/Config/Loader/LoaderInterface.php b/src/Symfony/Component/Config/Loader/LoaderInterface.php
@@ -1958,15 +1958,15 @@ diff --git a/src/Symfony/Component/Config/Loader/LoaderInterface.php b/src/Symfo
 @@ -26,5 +26,5 @@ interface LoaderInterface
       * @throws \Exception If something went wrong
       */
--    public function load(mixed $resource, string $type = null);
-+    public function load(mixed $resource, string $type = null): mixed;
+-    public function load(mixed $resource, ?string $type = null);
++    public function load(mixed $resource, ?string $type = null): mixed;
  
      /**
 @@ -35,5 +35,5 @@ interface LoaderInterface
       * @return bool
       */
--    public function supports(mixed $resource, string $type = null);
-+    public function supports(mixed $resource, string $type = null): bool;
+-    public function supports(mixed $resource, ?string $type = null);
++    public function supports(mixed $resource, ?string $type = null): bool;
  
      /**
 @@ -42,5 +42,5 @@ interface LoaderInterface
@@ -1998,8 +1998,8 @@ diff --git a/src/Symfony/Component/Config/ResourceCheckerConfigCache.php b/src/S
 @@ -110,5 +110,5 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
       * @throws \RuntimeException When cache file can't be written
       */
--    public function write(string $content, array $metadata = null)
-+    public function write(string $content, array $metadata = null): void
+-    public function write(string $content, ?array $metadata = null)
++    public function write(string $content, ?array $metadata = null): void
      {
          $mode = 0666;
 diff --git a/src/Symfony/Component/Config/ResourceCheckerInterface.php b/src/Symfony/Component/Config/ResourceCheckerInterface.php
@@ -2139,8 +2139,8 @@ diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Compone
 @@ -784,5 +784,5 @@ class Application implements ResetInterface
       * @return Command[]
       */
--    public function all(string $namespace = null)
-+    public function all(string $namespace = null): array
+-    public function all(?string $namespace = null)
++    public function all(?string $namespace = null): array
      {
          $this->init();
 @@ -928,5 +928,5 @@ class Application implements ResetInterface
@@ -2170,8 +2170,8 @@ diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Com
 @@ -153,5 +153,5 @@ class Command
       * @return void
       */
--    public function setApplication(Application $application = null)
-+    public function setApplication(Application $application = null): void
+-    public function setApplication(?Application $application = null)
++    public function setApplication(?Application $application = null): void
      {
          if (1 > \func_num_args()) {
 @@ -171,5 +171,5 @@ class Command
@@ -2342,15 +2342,15 @@ diff --git a/src/Symfony/Component/Console/Formatter/OutputFormatterStyle.php b/
 @@ -42,5 +42,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
--    public function setForeground(string $color = null)
-+    public function setForeground(string $color = null): void
+-    public function setForeground(?string $color = null)
++    public function setForeground(?string $color = null): void
      {
          if (1 > \func_num_args()) {
 @@ -53,5 +53,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
       * @return void
       */
--    public function setBackground(string $color = null)
-+    public function setBackground(string $color = null): void
+-    public function setBackground(?string $color = null)
++    public function setBackground(?string $color = null): void
      {
          if (1 > \func_num_args()) {
 @@ -69,5 +69,5 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
@@ -2454,8 +2454,8 @@ diff --git a/src/Symfony/Component/Console/Helper/Helper.php b/src/Symfony/Compo
 @@ -27,5 +27,5 @@ abstract class Helper implements HelperInterface
       * @return void
       */
--    public function setHelperSet(HelperSet $helperSet = null)
-+    public function setHelperSet(HelperSet $helperSet = null): void
+-    public function setHelperSet(?HelperSet $helperSet = null)
++    public function setHelperSet(?HelperSet $helperSet = null): void
      {
          if (1 > \func_num_args()) {
 @@ -95,5 +95,5 @@ abstract class Helper implements HelperInterface
@@ -2501,8 +2501,8 @@ diff --git a/src/Symfony/Component/Console/Helper/HelperSet.php b/src/Symfony/Co
 @@ -39,5 +39,5 @@ class HelperSet implements \IteratorAggregate
       * @return void
       */
--    public function set(HelperInterface $helper, string $alias = null)
-+    public function set(HelperInterface $helper, string $alias = null): void
+-    public function set(HelperInterface $helper, ?string $alias = null)
++    public function set(HelperInterface $helper, ?string $alias = null): void
      {
          $this->helpers[$helper->getName()] = $helper;
 diff --git a/src/Symfony/Component/Console/Helper/InputAwareHelper.php b/src/Symfony/Component/Console/Helper/InputAwareHelper.php
@@ -2702,8 +2702,8 @@ diff --git a/src/Symfony/Component/Console/Input/InputArgument.php b/src/Symfony
 @@ -96,5 +96,5 @@ class InputArgument
       * @throws LogicException When incorrect default value is given
       */
--    public function setDefault(string|bool|int|float|array $default = null)
-+    public function setDefault(string|bool|int|float|array $default = null): void
+-    public function setDefault(string|bool|int|float|array|null $default = null)
++    public function setDefault(string|bool|int|float|array|null $default = null): void
      {
          if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/Console/Input/InputAwareInterface.php b/src/Symfony/Component/Console/Input/InputAwareInterface.php
@@ -2831,8 +2831,8 @@ diff --git a/src/Symfony/Component/Console/Input/InputOption.php b/src/Symfony/C
 @@ -182,5 +182,5 @@ class InputOption
       * @return void
       */
--    public function setDefault(string|bool|int|float|array $default = null)
-+    public function setDefault(string|bool|int|float|array $default = null): void
+-    public function setDefault(string|bool|int|float|array|null $default = null)
++    public function setDefault(string|bool|int|float|array|null $default = null): void
      {
          if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/Console/Input/StreamableInputInterface.php b/src/Symfony/Component/Console/Input/StreamableInputInterface.php
@@ -2902,8 +2902,8 @@ diff --git a/src/Symfony/Component/Console/Output/ConsoleSectionOutput.php b/src
 @@ -64,5 +64,5 @@ class ConsoleSectionOutput extends StreamOutput
       * @return void
       */
--    public function clear(int $lines = null)
-+    public function clear(int $lines = null): void
+-    public function clear(?int $lines = null)
++    public function clear(?int $lines = null): void
      {
          if (empty($this->content) || !$this->isDecorated()) {
 @@ -87,5 +87,5 @@ class ConsoleSectionOutput extends StreamOutput
@@ -3228,8 +3228,8 @@ diff --git a/src/Symfony/Component/Console/Style/SymfonyStyle.php b/src/Symfony/
 @@ -64,5 +64,5 @@ class SymfonyStyle extends OutputStyle
       * @return void
       */
--    public function block(string|array $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
-+    public function block(string|array $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true): void
+-    public function block(string|array $messages, ?string $type = null, ?string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
++    public function block(string|array $messages, ?string $type = null, ?string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true): void
      {
          $messages = \is_array($messages) ? array_values($messages) : [$messages];
 @@ -76,5 +76,5 @@ class SymfonyStyle extends OutputStyle
@@ -3917,8 +3917,8 @@ diff --git a/src/Symfony/Component/DependencyInjection/ContainerAwareTrait.php b
 @@ -27,5 +27,5 @@ trait ContainerAwareTrait
       * @return void
       */
--    public function setContainer(ContainerInterface $container = null)
-+    public function setContainer(ContainerInterface $container = null): void
+-    public function setContainer(?ContainerInterface $container = null)
++    public function setContainer(?ContainerInterface $container = null): void
      {
          if (1 > \func_num_args()) {
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
@@ -4238,8 +4238,8 @@ diff --git a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php b/s
 @@ -99,5 +99,5 @@ abstract class FileLoader extends BaseFileLoader
       * @return void
       */
--    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */)
-+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */): void
+-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array|null $exclude = null/* , string $source = null */)
++    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array|null $exclude = null/* , string $source = null */): void
      {
          if (!str_ends_with($namespace, '\\')) {
 @@ -195,5 +195,5 @@ abstract class FileLoader extends BaseFileLoader
@@ -4471,8 +4471,8 @@ diff --git a/src/Symfony/Component/DomCrawler/Crawler.php b/src/Symfony/Componen
 @@ -139,5 +139,5 @@ class Crawler implements \Countable, \IteratorAggregate
       * @return void
       */
--    public function addContent(string $content, string $type = null)
-+    public function addContent(string $content, string $type = null): void
+-    public function addContent(string $content, ?string $type = null)
++    public function addContent(string $content, ?string $type = null): void
      {
          if (empty($type)) {
 @@ -181,5 +181,5 @@ class Crawler implements \Countable, \IteratorAggregate
@@ -5061,8 +5061,8 @@ diff --git a/src/Symfony/Component/ExpressionLanguage/TokenStream.php b/src/Symf
 @@ -61,5 +61,5 @@ class TokenStream
       * @return void
       */
--    public function expect(string $type, string $value = null, string $message = null)
-+    public function expect(string $type, string $value = null, string $message = null): void
+-    public function expect(string $type, ?string $value = null, ?string $message = null)
++    public function expect(string $type, ?string $value = null, ?string $message = null): void
      {
          $token = $this->current;
 diff --git a/src/Symfony/Component/Filesystem/Filesystem.php b/src/Symfony/Component/Filesystem/Filesystem.php
@@ -5085,8 +5085,8 @@ diff --git a/src/Symfony/Component/Filesystem/Filesystem.php b/src/Symfony/Compo
 @@ -132,5 +132,5 @@ class Filesystem
       * @throws IOException When touch fails
       */
--    public function touch(string|iterable $files, int $time = null, int $atime = null)
-+    public function touch(string|iterable $files, int $time = null, int $atime = null): void
+-    public function touch(string|iterable $files, ?int $time = null, ?int $atime = null)
++    public function touch(string|iterable $files, ?int $time = null, ?int $atime = null): void
      {
          foreach ($this->toIterable($files) as $file) {
 @@ -148,5 +148,5 @@ class Filesystem
@@ -5141,8 +5141,8 @@ diff --git a/src/Symfony/Component/Filesystem/Filesystem.php b/src/Symfony/Compo
 @@ -531,5 +531,5 @@ class Filesystem
       * @throws IOException When file type is unknown
       */
--    public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = [])
-+    public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
+-    public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = [])
++    public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = []): void
      {
          $targetDir = rtrim($targetDir, '/\\');
 @@ -657,5 +657,5 @@ class Filesystem
@@ -5285,15 +5285,15 @@ diff --git a/src/Symfony/Component/Form/ButtonBuilder.php b/src/Symfony/Componen
 @@ -57,5 +57,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
--    public function add(string|FormBuilderInterface $child, string $type = null, array $options = []): static
-+    public function add(string|FormBuilderInterface $child, string $type = null, array $options = []): never
+-    public function add(string|FormBuilderInterface $child, ?string $type = null, array $options = []): static
++    public function add(string|FormBuilderInterface $child, ?string $type = null, array $options = []): never
      {
          throw new BadMethodCallException('Buttons cannot have children.');
 @@ -69,5 +69,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
--    public function create(string $name, string $type = null, array $options = []): FormBuilderInterface
-+    public function create(string $name, string $type = null, array $options = []): never
+-    public function create(string $name, ?string $type = null, array $options = []): FormBuilderInterface
++    public function create(string $name, ?string $type = null, array $options = []): never
      {
          throw new BadMethodCallException('Buttons cannot have children.');
 @@ -81,5 +81,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
@@ -5355,8 +5355,8 @@ diff --git a/src/Symfony/Component/Form/ButtonBuilder.php b/src/Symfony/Componen
 @@ -221,5 +221,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
       * @throws BadMethodCallException
       */
--    public function setDataMapper(DataMapperInterface $dataMapper = null): static
-+    public function setDataMapper(DataMapperInterface $dataMapper = null): never
+-    public function setDataMapper(?DataMapperInterface $dataMapper = null): static
++    public function setDataMapper(?DataMapperInterface $dataMapper = null): never
      {
          if (1 > \func_num_args()) {
 @@ -249,5 +249,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
@@ -6518,7 +6518,7 @@ diff --git a/src/Symfony/Component/Form/Extension/HtmlSanitizer/Type/TextTypeHtm
 diff --git a/src/Symfony/Component/Form/Extension/HttpFoundation/HttpFoundationRequestHandler.php b/src/Symfony/Component/Form/Extension/HttpFoundation/HttpFoundationRequestHandler.php
 --- a/src/Symfony/Component/Form/Extension/HttpFoundation/HttpFoundationRequestHandler.php
 +++ b/src/Symfony/Component/Form/Extension/HttpFoundation/HttpFoundationRequestHandler.php
-@@ -39,5 +39,5 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
+@@ -40,5 +40,5 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
       * @return void
       */
 -    public function handleRequest(FormInterface $form, mixed $request = null)
@@ -6868,7 +6868,7 @@ diff --git a/src/Symfony/Component/Form/FormView.php b/src/Symfony/Component/For
 diff --git a/src/Symfony/Component/Form/NativeRequestHandler.php b/src/Symfony/Component/Form/NativeRequestHandler.php
 --- a/src/Symfony/Component/Form/NativeRequestHandler.php
 +++ b/src/Symfony/Component/Form/NativeRequestHandler.php
-@@ -45,5 +45,5 @@ class NativeRequestHandler implements RequestHandlerInterface
+@@ -46,5 +46,5 @@ class NativeRequestHandler implements RequestHandlerInterface
       * @throws Exception\UnexpectedTypeException If the $request is not null
       */
 -    public function handleRequest(FormInterface $form, mixed $request = null)
@@ -7321,15 +7321,15 @@ diff --git a/src/Symfony/Component/HttpFoundation/ResponseHeaderBag.php b/src/Sy
 @@ -184,5 +184,5 @@ class ResponseHeaderBag extends HeaderBag
       * @return void
       */
--    public function removeCookie(string $name, ?string $path = '/', string $domain = null)
-+    public function removeCookie(string $name, ?string $path = '/', string $domain = null): void
+-    public function removeCookie(string $name, ?string $path = '/', ?string $domain = null)
++    public function removeCookie(string $name, ?string $path = '/', ?string $domain = null): void
      {
          $path ??= '/';
 @@ -237,5 +237,5 @@ class ResponseHeaderBag extends HeaderBag
       * @return void
       */
--    public function clearCookie(string $name, ?string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true, string $sameSite = null)
-+    public function clearCookie(string $name, ?string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true, string $sameSite = null): void
+-    public function clearCookie(string $name, ?string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true, ?string $sameSite = null)
++    public function clearCookie(string $name, ?string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true, ?string $sameSite = null): void
      {
          $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly, false, $sameSite));
 @@ -247,5 +247,5 @@ class ResponseHeaderBag extends HeaderBag
@@ -7624,8 +7624,8 @@ diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/MetadataBag.ph
 @@ -89,5 +89,5 @@ class MetadataBag implements SessionBagInterface
       * @return void
       */
--    public function stampNew(int $lifetime = null)
-+    public function stampNew(int $lifetime = null): void
+-    public function stampNew(?int $lifetime = null)
++    public function stampNew(?int $lifetime = null): void
      {
          $this->stampCreated($lifetime);
 @@ -135,5 +135,5 @@ class MetadataBag implements SessionBagInterface
@@ -7683,8 +7683,8 @@ diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/MockArraySessi
 @@ -193,5 +193,5 @@ class MockArraySessionStorage implements SessionStorageInterface
       * @return void
       */
--    public function setMetadataBag(MetadataBag $bag = null)
-+    public function setMetadataBag(MetadataBag $bag = null): void
+-    public function setMetadataBag(?MetadataBag $bag = null)
++    public function setMetadataBag(?MetadataBag $bag = null): void
      {
          if (1 > \func_num_args()) {
 @@ -223,5 +223,5 @@ class MockArraySessionStorage implements SessionStorageInterface
@@ -7745,8 +7745,8 @@ diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionS
 @@ -318,5 +318,5 @@ class NativeSessionStorage implements SessionStorageInterface
       * @return void
       */
--    public function setMetadataBag(MetadataBag $metaBag = null)
-+    public function setMetadataBag(MetadataBag $metaBag = null): void
+-    public function setMetadataBag(?MetadataBag $metaBag = null)
++    public function setMetadataBag(?MetadataBag $metaBag = null): void
      {
          if (1 > \func_num_args()) {
 @@ -351,5 +351,5 @@ class NativeSessionStorage implements SessionStorageInterface
@@ -7759,15 +7759,15 @@ diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionS
 @@ -397,5 +397,5 @@ class NativeSessionStorage implements SessionStorageInterface
       * @throws \InvalidArgumentException
       */
--    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface $saveHandler = null)
-+    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface $saveHandler = null): void
+-    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface|null $saveHandler = null)
++    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface|null $saveHandler = null): void
      {
          if (1 > \func_num_args()) {
 @@ -430,5 +430,5 @@ class NativeSessionStorage implements SessionStorageInterface
       * @return void
       */
--    protected function loadSession(array &$session = null)
-+    protected function loadSession(array &$session = null): void
+-    protected function loadSession(?array &$session = null)
++    protected function loadSession(?array &$session = null): void
      {
          if (null === $session) {
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/PhpBridgeSessionStorage.php b/src/Symfony/Component/HttpFoundation/Session/Storage/PhpBridgeSessionStorage.php
@@ -7953,8 +7953,8 @@ diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterfa
 @@ -28,5 +28,5 @@ interface DataCollectorInterface extends ResetInterface
       * @return void
       */
--    public function collect(Request $request, Response $response, \Throwable $exception = null);
-+    public function collect(Request $request, Response $response, \Throwable $exception = null): void;
+-    public function collect(Request $request, Response $response, ?\Throwable $exception = null);
++    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void;
  
      /**
 @@ -35,4 +35,4 @@ interface DataCollectorInterface extends ResetInterface
@@ -8360,8 +8360,8 @@ diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symf
 @@ -466,5 +466,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return Response
       */
--    protected function forward(Request $request, bool $catch = false, Response $entry = null)
-+    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
+-    protected function forward(Request $request, bool $catch = false, ?Response $entry = null)
++    protected function forward(Request $request, bool $catch = false, ?Response $entry = null): Response
      {
          $this->surrogate?->addSurrogateCapability($request);
 @@ -600,5 +600,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
@@ -8615,15 +8615,15 @@ diff --git a/src/Symfony/Component/HttpKernel/Log/DebugLoggerInterface.php b/src
 @@ -34,5 +34,5 @@ interface DebugLoggerInterface
       * }>
       */
--    public function getLogs(Request $request = null);
-+    public function getLogs(Request $request = null): array;
+-    public function getLogs(?Request $request = null);
++    public function getLogs(?Request $request = null): array;
  
      /**
 @@ -41,5 +41,5 @@ interface DebugLoggerInterface
       * @return int
       */
--    public function countErrors(Request $request = null);
-+    public function countErrors(Request $request = null): int;
+-    public function countErrors(?Request $request = null);
++    public function countErrors(?Request $request = null): int;
  
      /**
 @@ -48,4 +48,4 @@ interface DebugLoggerInterface
@@ -8645,8 +8645,8 @@ diff --git a/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php b
 @@ -255,5 +255,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
       * @return Profile
       */
--    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
-+    protected function createProfileFromData(string $token, array $data, Profile $parent = null): Profile
+-    protected function createProfileFromData(string $token, array $data, ?Profile $parent = null)
++    protected function createProfileFromData(string $token, array $data, ?Profile $parent = null): Profile
      {
          $profile = new Profile($token);
 diff --git a/src/Symfony/Component/HttpKernel/Profiler/Profile.php b/src/Symfony/Component/HttpKernel/Profiler/Profile.php
@@ -8825,15 +8825,15 @@ diff --git a/src/Symfony/Component/Intl/Util/IntlTestHelper.php b/src/Symfony/Co
 @@ -33,5 +33,5 @@ class IntlTestHelper
       * @return void
       */
--    public static function requireIntl(TestCase $testCase, string $minimumIcuVersion = null)
-+    public static function requireIntl(TestCase $testCase, string $minimumIcuVersion = null): void
+-    public static function requireIntl(TestCase $testCase, ?string $minimumIcuVersion = null)
++    public static function requireIntl(TestCase $testCase, ?string $minimumIcuVersion = null): void
      {
          $minimumIcuVersion ??= Intl::getIcuStubVersion();
 @@ -67,5 +67,5 @@ class IntlTestHelper
       * @return void
       */
--    public static function requireFullIntl(TestCase $testCase, string $minimumIcuVersion = null)
-+    public static function requireFullIntl(TestCase $testCase, string $minimumIcuVersion = null): void
+-    public static function requireFullIntl(TestCase $testCase, ?string $minimumIcuVersion = null)
++    public static function requireFullIntl(TestCase $testCase, ?string $minimumIcuVersion = null): void
      {
          // We only run tests if the intl extension is loaded...
 @@ -89,5 +89,5 @@ class IntlTestHelper
@@ -8866,8 +8866,8 @@ diff --git a/src/Symfony/Component/Ldap/Adapter/ConnectionInterface.php b/src/Sy
 @@ -35,4 +35,4 @@ interface ConnectionInterface
       * @return void
       */
--    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null);
-+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void;
+-    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null);
++    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null): void;
  }
 diff --git a/src/Symfony/Component/Ldap/Adapter/EntryManagerInterface.php b/src/Symfony/Component/Ldap/Adapter/EntryManagerInterface.php
 --- a/src/Symfony/Component/Ldap/Adapter/EntryManagerInterface.php
@@ -8912,8 +8912,8 @@ diff --git a/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php b/src/Sym
 @@ -67,5 +67,5 @@ class Connection extends AbstractConnection
       * @return void
       */
--    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null)
-+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void
+-    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null)
++    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null): void
      {
          if (!$this->connection) {
 @@ -102,5 +102,5 @@ class Connection extends AbstractConnection
@@ -9019,8 +9019,8 @@ diff --git a/src/Symfony/Component/Ldap/LdapInterface.php b/src/Symfony/Componen
 @@ -33,5 +33,5 @@ interface LdapInterface
       * @return void
       */
--    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null);
-+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void;
+-    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null);
++    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null): void;
  
      /**
 diff --git a/src/Symfony/Component/Ldap/Security/CheckLdapCredentialsListener.php b/src/Symfony/Component/Ldap/Security/CheckLdapCredentialsListener.php
@@ -9074,8 +9074,8 @@ diff --git a/src/Symfony/Component/Lock/LockInterface.php b/src/Symfony/Componen
 @@ -42,5 +42,5 @@ interface LockInterface
       * @throws LockAcquiringException  If the lock cannot be refreshed
       */
--    public function refresh(float $ttl = null);
-+    public function refresh(float $ttl = null): void;
+-    public function refresh(?float $ttl = null);
++    public function refresh(?float $ttl = null): void;
  
      /**
 @@ -56,5 +56,5 @@ interface LockInterface
@@ -9365,14 +9365,14 @@ diff --git a/src/Symfony/Component/Lock/Store/PdoStore.php b/src/Symfony/Compone
 +    public function save(Key $key): void
      {
          $key->reduceLifetime($this->initialTtl);
-@@ -119,5 +119,5 @@ class PdoStore implements PersistingStoreInterface
+@@ -129,5 +129,5 @@ class PdoStore implements PersistingStoreInterface
       * @return void
       */
 -    public function putOffExpiration(Key $key, float $ttl)
 +    public function putOffExpiration(Key $key, float $ttl): void
      {
          if ($ttl < 1) {
-@@ -147,5 +147,5 @@ class PdoStore implements PersistingStoreInterface
+@@ -157,5 +157,5 @@ class PdoStore implements PersistingStoreInterface
       * @return void
       */
 -    public function delete(Key $key)
@@ -9670,7 +9670,7 @@ diff --git a/src/Symfony/Component/Mime/DependencyInjection/AddMimeTypeGuesserPa
 diff --git a/src/Symfony/Component/Mime/Email.php b/src/Symfony/Component/Mime/Email.php
 --- a/src/Symfony/Component/Mime/Email.php
 +++ b/src/Symfony/Component/Mime/Email.php
-@@ -400,5 +400,5 @@ class Email extends Message
+@@ -404,5 +404,5 @@ class Email extends Message
       * @return void
       */
 -    public function ensureValidity()
@@ -9884,8 +9884,8 @@ diff --git a/src/Symfony/Component/Process/InputStream.php b/src/Symfony/Compone
 @@ -33,5 +33,5 @@ class InputStream implements \IteratorAggregate
       * @return void
       */
--    public function onEmpty(callable $onEmpty = null)
-+    public function onEmpty(callable $onEmpty = null): void
+-    public function onEmpty(?callable $onEmpty = null)
++    public function onEmpty(?callable $onEmpty = null): void
      {
          $this->onEmpty = $onEmpty;
 @@ -46,5 +46,5 @@ class InputStream implements \IteratorAggregate
@@ -9915,8 +9915,8 @@ diff --git a/src/Symfony/Component/Process/PhpProcess.php b/src/Symfony/Componen
 @@ -59,5 +59,5 @@ class PhpProcess extends Process
       * @return void
       */
--    public function start(callable $callback = null, array $env = [])
-+    public function start(callable $callback = null, array $env = []): void
+-    public function start(?callable $callback = null, array $env = [])
++    public function start(?callable $callback = null, array $env = []): void
      {
          if (null === $this->getCommandLine()) {
 diff --git a/src/Symfony/Component/Process/Process.php b/src/Symfony/Component/Process/Process.php
@@ -9925,8 +9925,8 @@ diff --git a/src/Symfony/Component/Process/Process.php b/src/Symfony/Component/P
 @@ -292,5 +292,5 @@ class Process implements \IteratorAggregate
       * @throws LogicException   In case a callback is provided and output has been disabled
       */
--    public function start(callable $callback = null, array $env = [])
-+    public function start(callable $callback = null, array $env = []): void
+-    public function start(?callable $callback = null, array $env = [])
++    public function start(?callable $callback = null, array $env = []): void
      {
          if ($this->isRunning()) {
 @@ -1147,5 +1147,5 @@ class Process implements \IteratorAggregate
@@ -10011,15 +10011,15 @@ diff --git a/src/Symfony/Component/PropertyAccess/PropertyPathBuilder.php b/src/
 @@ -135,5 +135,5 @@ class PropertyPathBuilder
       * @throws OutOfBoundsException If the offset is invalid
       */
--    public function replaceByIndex(int $offset, string $name = null)
-+    public function replaceByIndex(int $offset, string $name = null): void
+-    public function replaceByIndex(int $offset, ?string $name = null)
++    public function replaceByIndex(int $offset, ?string $name = null): void
      {
          if (!isset($this->elements[$offset])) {
 @@ -155,5 +155,5 @@ class PropertyPathBuilder
       * @throws OutOfBoundsException If the offset is invalid
       */
--    public function replaceByProperty(int $offset, string $name = null)
-+    public function replaceByProperty(int $offset, string $name = null): void
+-    public function replaceByProperty(int $offset, ?string $name = null)
++    public function replaceByProperty(int $offset, ?string $name = null): void
      {
          if (!isset($this->elements[$offset])) {
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php b/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php
@@ -10460,78 +10460,78 @@ diff --git a/src/Symfony/Component/Routing/RouteCollection.php b/src/Symfony/Com
 -    public function remove(string|array $name)
 +    public function remove(string|array $name): void
      {
-         foreach ((array) $name as $n) {
-@@ -159,5 +159,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+         $routes = [];
+@@ -174,5 +174,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addCollection(self $collection)
 +    public function addCollection(self $collection): void
      {
          // we need to remove all routes with the same names first because just replacing them
-@@ -188,5 +188,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -203,5 +203,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addPrefix(string $prefix, array $defaults = [], array $requirements = [])
 +    public function addPrefix(string $prefix, array $defaults = [], array $requirements = []): void
      {
          $prefix = trim(trim($prefix), '/');
-@@ -208,5 +208,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -223,5 +223,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addNamePrefix(string $prefix)
 +    public function addNamePrefix(string $prefix): void
      {
          $prefixedRoutes = [];
-@@ -238,5 +238,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -253,5 +253,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function setHost(?string $pattern, array $defaults = [], array $requirements = [])
 +    public function setHost(?string $pattern, array $defaults = [], array $requirements = []): void
      {
          foreach ($this->routes as $route) {
-@@ -254,5 +254,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -269,5 +269,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function setCondition(?string $condition)
 +    public function setCondition(?string $condition): void
      {
          foreach ($this->routes as $route) {
-@@ -268,5 +268,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -283,5 +283,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addDefaults(array $defaults)
 +    public function addDefaults(array $defaults): void
      {
          if ($defaults) {
-@@ -284,5 +284,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -299,5 +299,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addRequirements(array $requirements)
 +    public function addRequirements(array $requirements): void
      {
          if ($requirements) {
-@@ -300,5 +300,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -315,5 +315,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addOptions(array $options)
 +    public function addOptions(array $options): void
      {
          if ($options) {
-@@ -316,5 +316,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -331,5 +331,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function setSchemes(string|array $schemes)
 +    public function setSchemes(string|array $schemes): void
      {
          foreach ($this->routes as $route) {
-@@ -330,5 +330,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -345,5 +345,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function setMethods(string|array $methods)
 +    public function setMethods(string|array $methods): void
      {
          foreach ($this->routes as $route) {
-@@ -353,5 +353,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
+@@ -368,5 +368,5 @@ class RouteCollection implements \IteratorAggregate, \Countable
       * @return void
       */
 -    public function addResource(ResourceInterface $resource)
@@ -10714,8 +10714,8 @@ diff --git a/src/Symfony/Component/Security/Core/Authentication/Token/Storage/To
 @@ -41,5 +41,5 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
       * @return void
       */
--    public function setToken(TokenInterface $token = null)
-+    public function setToken(TokenInterface $token = null): void
+-    public function setToken(?TokenInterface $token = null)
++    public function setToken(?TokenInterface $token = null): void
      {
          if (1 > \func_num_args()) {
 @@ -64,5 +64,5 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
@@ -11024,8 +11024,8 @@ diff --git a/src/Symfony/Component/Security/Http/AccessMap.php b/src/Symfony/Com
 @@ -31,5 +31,5 @@ class AccessMap implements AccessMapInterface
       * @return void
       */
--    public function add(RequestMatcherInterface $requestMatcher, array $attributes = [], string $channel = null)
-+    public function add(RequestMatcherInterface $requestMatcher, array $attributes = [], string $channel = null): void
+-    public function add(RequestMatcherInterface $requestMatcher, array $attributes = [], ?string $channel = null)
++    public function add(RequestMatcherInterface $requestMatcher, array $attributes = [], ?string $channel = null): void
      {
          $this->map[] = [$requestMatcher, $attributes, $channel];
 diff --git a/src/Symfony/Component/Security/Http/Authentication/DefaultAuthenticationFailureHandler.php b/src/Symfony/Component/Security/Http/Authentication/DefaultAuthenticationFailureHandler.php
@@ -11064,8 +11064,8 @@ diff --git a/src/Symfony/Component/Security/Http/EntryPoint/AuthenticationEntryP
 @@ -43,4 +43,4 @@ interface AuthenticationEntryPointInterface
       * @return Response
       */
--    public function start(Request $request, AuthenticationException $authException = null);
-+    public function start(Request $request, AuthenticationException $authException = null): Response;
+-    public function start(Request $request, ?AuthenticationException $authException = null);
++    public function start(Request $request, ?AuthenticationException $authException = null): Response;
  }
 diff --git a/src/Symfony/Component/Security/Http/Event/LoginFailureEvent.php b/src/Symfony/Component/Security/Http/Event/LoginFailureEvent.php
 --- a/src/Symfony/Component/Security/Http/Event/LoginFailureEvent.php
@@ -11134,8 +11134,8 @@ diff --git a/src/Symfony/Component/Security/Http/FirewallMap.php b/src/Symfony/C
 @@ -35,5 +35,5 @@ class FirewallMap implements FirewallMapInterface
       * @return void
       */
--    public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = [], ExceptionListener $exceptionListener = null, LogoutListener $logoutListener = null)
-+    public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = [], ExceptionListener $exceptionListener = null, LogoutListener $logoutListener = null): void
+-    public function add(?RequestMatcherInterface $requestMatcher = null, array $listeners = [], ?ExceptionListener $exceptionListener = null, ?LogoutListener $logoutListener = null)
++    public function add(?RequestMatcherInterface $requestMatcher = null, array $listeners = [], ?ExceptionListener $exceptionListener = null, ?LogoutListener $logoutListener = null): void
      {
          $this->map[] = [$requestMatcher, $listeners, $exceptionListener, $logoutListener];
 diff --git a/src/Symfony/Component/Security/Http/FirewallMapInterface.php b/src/Symfony/Component/Security/Http/FirewallMapInterface.php
@@ -11153,15 +11153,15 @@ diff --git a/src/Symfony/Component/Security/Http/Logout/LogoutUrlGenerator.php b
 @@ -50,5 +50,5 @@ class LogoutUrlGenerator
       * @return void
       */
--    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null)
-+    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null): void
+-    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, ?CsrfTokenManagerInterface $csrfTokenManager = null, ?string $context = null)
++    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, ?CsrfTokenManagerInterface $csrfTokenManager = null, ?string $context = null): void
      {
          $this->listeners[$key] = [$logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context];
 @@ -74,5 +74,5 @@ class LogoutUrlGenerator
       * @return void
       */
--    public function setCurrentFirewall(?string $key, string $context = null)
-+    public function setCurrentFirewall(?string $key, string $context = null): void
+-    public function setCurrentFirewall(?string $key, ?string $context = null)
++    public function setCurrentFirewall(?string $key, ?string $context = null): void
      {
          $this->currentFirewallName = $key;
 diff --git a/src/Symfony/Component/Security/Http/RememberMe/AbstractRememberMeHandler.php b/src/Symfony/Component/Security/Http/RememberMe/AbstractRememberMeHandler.php
@@ -11222,8 +11222,8 @@ diff --git a/src/Symfony/Component/Semaphore/SemaphoreInterface.php b/src/Symfon
 @@ -38,5 +38,5 @@ interface SemaphoreInterface
       * @throws SemaphoreExpiredException If the semaphore has expired
       */
--    public function refresh(float $ttlInSecond = null);
-+    public function refresh(float $ttlInSecond = null): void;
+-    public function refresh(?float $ttlInSecond = null);
++    public function refresh(?float $ttlInSecond = null): void;
  
      /**
 @@ -52,5 +52,5 @@ interface SemaphoreInterface
@@ -11316,15 +11316,15 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php 
 @@ -271,5 +271,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
       * @return bool
       */
--    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = [])
-+    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
+-    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, ?string $format = null, array $context = [])
++    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, ?string $format = null, array $context = []): bool
      {
          $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
 @@ -322,5 +322,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
       * @throws MissingConstructorArgumentsException
       */
--    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
-+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
+-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, ?string $format = null)
++    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, ?string $format = null): object
      {
          if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
@@ -11333,57 +11333,57 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalize
 @@ -144,5 +144,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
--    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
-+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
+-    public function supportsNormalization(mixed $data, ?string $format = null /* , array $context = [] */)
++    public function supportsNormalization(mixed $data, ?string $format = null /* , array $context = [] */): bool
      {
          return \is_object($data) && !$data instanceof \Traversable;
 @@ -152,5 +152,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return array|string|int|float|bool|\ArrayObject|null
       */
--    public function normalize(mixed $object, string $format = null, array $context = [])
-+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+-    public function normalize(mixed $object, ?string $format = null, array $context = [])
++    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
      {
          if (!isset($context['cache_key'])) {
-@@ -236,5 +236,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -233,5 +233,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return object
       */
--    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
-+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
+-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, ?string $format = null)
++    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, ?string $format = null): object
      {
          if ($class !== $mappedClass = $this->getMappedClass($data, $class, $context)) {
-@@ -287,5 +287,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -284,5 +284,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return string[]
       */
--    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
-+    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
+-    abstract protected function extractAttributes(object $object, ?string $format = null, array $context = []);
++    abstract protected function extractAttributes(object $object, ?string $format = null, array $context = []): array;
  
      /**
-@@ -294,5 +294,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -291,5 +291,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
--    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
-+    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
+-    abstract protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []);
++    abstract protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed;
  
      /**
-@@ -301,5 +301,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -298,5 +298,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
--    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
-+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
+-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null /* , array $context = [] */)
++    public function supportsDenormalization(mixed $data, string $type, ?string $format = null /* , array $context = [] */): bool
      {
          return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
-@@ -309,5 +309,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -306,5 +306,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
--    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
-+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = [])
++    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
      {
          if (!isset($context['cache_key'])) {
-@@ -417,5 +417,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -422,5 +422,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return void
       */
--    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
-+    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void;
+-    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []);
++    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void;
  
      /**
 diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizableInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizableInterface.php
@@ -11392,8 +11392,8 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizableInterface
 @@ -37,4 +37,4 @@ interface DenormalizableInterface
       * @return void
       */
--    public function denormalize(DenormalizerInterface $denormalizer, array|string|int|float|bool $data, string $format = null, array $context = []);
-+    public function denormalize(DenormalizerInterface $denormalizer, array|string|int|float|bool $data, string $format = null, array $context = []): void;
+-    public function denormalize(DenormalizerInterface $denormalizer, array|string|int|float|bool $data, ?string $format = null, array $context = []);
++    public function denormalize(DenormalizerInterface $denormalizer, array|string|int|float|bool $data, ?string $format = null, array $context = []): void;
  }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerAwareInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizerAwareInterface.php
 --- a/src/Symfony/Component/Serializer/Normalizer/DenormalizerAwareInterface.php
@@ -11410,25 +11410,25 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.p
 @@ -47,5 +47,5 @@ interface DenormalizerInterface
       * @throws ExceptionInterface       Occurs for all the other cases of errors
       */
--    public function denormalize(mixed $data, string $type, string $format = null, array $context = []);
-+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed;
+-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []);
++    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed;
  
      /**
 @@ -59,5 +59,5 @@ interface DenormalizerInterface
       * @return bool
       */
--    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
-+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool;
+-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null /* , array $context = [] */);
++    public function supportsDenormalization(mixed $data, string $type, ?string $format = null /* , array $context = [] */): bool;
  
      /**
 diff --git a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-@@ -147,5 +147,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+@@ -151,5 +151,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
       * @return void
       */
--    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
-+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
+-    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
++    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
      {
          $setter = 'set'.ucfirst($attribute);
 diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php
@@ -11456,35 +11456,35 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 @@ -39,5 +39,5 @@ interface NormalizerInterface
       * @throws ExceptionInterface         Occurs for all the other cases of errors
       */
--    public function normalize(mixed $object, string $format = null, array $context = []);
-+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
+-    public function normalize(mixed $object, ?string $format = null, array $context = []);
++    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
  
      /**
 @@ -50,5 +50,5 @@ interface NormalizerInterface
       * @return bool
       */
--    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */);
-+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool;
+-    public function supportsNormalization(mixed $data, ?string $format = null /* , array $context = [] */);
++    public function supportsNormalization(mixed $data, ?string $format = null /* , array $context = [] */): bool;
  
      /**
 diff --git a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
-@@ -146,5 +146,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
+@@ -138,5 +138,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
       * @return void
       */
--    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
-+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
+-    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
++    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
      {
          try {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
-@@ -187,5 +187,5 @@ class PropertyNormalizer extends AbstractObjectNormalizer
+@@ -191,5 +191,5 @@ class PropertyNormalizer extends AbstractObjectNormalizer
       * @return void
       */
--    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
-+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []): void
+-    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
++    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
      {
          try {
 diff --git a/src/Symfony/Component/Serializer/SerializerAwareInterface.php b/src/Symfony/Component/Serializer/SerializerAwareInterface.php
@@ -11512,8 +11512,8 @@ diff --git a/src/Symfony/Component/Stopwatch/Stopwatch.php b/src/Symfony/Compone
 @@ -62,5 +62,5 @@ class Stopwatch implements ResetInterface
       * @throws \LogicException When the section to re-open is not reachable
       */
--    public function openSection(string $id = null)
-+    public function openSection(string $id = null): void
+-    public function openSection(?string $id = null)
++    public function openSection(?string $id = null): void
      {
          $current = end($this->activeSections);
 @@ -86,5 +86,5 @@ class Stopwatch implements ResetInterface
@@ -11658,8 +11658,8 @@ diff --git a/src/Symfony/Component/Templating/PhpEngine.php b/src/Symfony/Compon
 @@ -221,5 +221,5 @@ class PhpEngine implements EngineInterface, \ArrayAccess
       * @return void
       */
--    public function set(HelperInterface $helper, string $alias = null)
-+    public function set(HelperInterface $helper, string $alias = null): void
+-    public function set(HelperInterface $helper, ?string $alias = null)
++    public function set(HelperInterface $helper, ?string $alias = null): void
      {
          $this->helpers[$helper->getName()] = $helper;
 @@ -258,5 +258,5 @@ class PhpEngine implements EngineInterface, \ArrayAccess
@@ -12125,8 +12125,8 @@ diff --git a/src/Symfony/Component/Translation/Translator.php b/src/Symfony/Comp
 @@ -111,5 +111,5 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
       * @throws InvalidArgumentException If the locale contains invalid characters
       */
--    public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
-+    public function addResource(string $format, mixed $resource, string $locale, string $domain = null): void
+-    public function addResource(string $format, mixed $resource, string $locale, ?string $domain = null)
++    public function addResource(string $format, mixed $resource, string $locale, ?string $domain = null): void
      {
          $domain ??= 'messages';
 @@ -130,5 +130,5 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
@@ -12415,7 +12415,7 @@ diff --git a/src/Symfony/Component/Validator/Constraints/ChoiceValidator.php b/s
 diff --git a/src/Symfony/Component/Validator/Constraints/Collection.php b/src/Symfony/Component/Validator/Constraints/Collection.php
 --- a/src/Symfony/Component/Validator/Constraints/Collection.php
 +++ b/src/Symfony/Component/Validator/Constraints/Collection.php
-@@ -61,5 +61,5 @@ class Collection extends Composite
+@@ -60,5 +60,5 @@ class Collection extends Composite
       * @return void
       */
 -    protected function initializeNestedConstraints()
@@ -12636,8 +12636,8 @@ diff --git a/src/Symfony/Component/Validator/Constraints/IsbnValidator.php b/src
 @@ -179,5 +179,5 @@ class IsbnValidator extends ConstraintValidator
       * @return string
       */
--    protected function getMessage(Isbn $constraint, string $type = null)
-+    protected function getMessage(Isbn $constraint, string $type = null): string
+-    protected function getMessage(Isbn $constraint, ?string $type = null)
++    protected function getMessage(Isbn $constraint, ?string $type = null): string
      {
          if (null !== $constraint->message) {
 diff --git a/src/Symfony/Component/Validator/Constraints/IsinValidator.php b/src/Symfony/Component/Validator/Constraints/IsinValidator.php
@@ -12663,7 +12663,7 @@ diff --git a/src/Symfony/Component/Validator/Constraints/IssnValidator.php b/src
 diff --git a/src/Symfony/Component/Validator/Constraints/JsonValidator.php b/src/Symfony/Component/Validator/Constraints/JsonValidator.php
 --- a/src/Symfony/Component/Validator/Constraints/JsonValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/JsonValidator.php
-@@ -24,5 +24,5 @@ class JsonValidator extends ConstraintValidator
+@@ -25,5 +25,5 @@ class JsonValidator extends ConstraintValidator
       * @return void
       */
 -    public function validate(mixed $value, Constraint $constraint)
@@ -12883,8 +12883,8 @@ diff --git a/src/Symfony/Component/Validator/Context/ExecutionContextInterface.p
 @@ -127,5 +127,5 @@ interface ExecutionContextInterface
       * @return void
       */
--    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath);
-+    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath): void;
+-    public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata, string $propertyPath);
++    public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata, string $propertyPath): void;
  
      /**
 @@ -136,5 +136,5 @@ interface ExecutionContextInterface
@@ -14029,8 +14029,8 @@ diff --git a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php b/src/Symfony/
 -    protected function dumpLine(int $depth, bool $endOfValue = false)
 +    protected function dumpLine(int $depth, bool $endOfValue = false): void
      {
-         if ($this->colors) {
-@@ -586,5 +586,5 @@ class CliDumper extends AbstractDumper
+         if (null === $this->colors) {
+@@ -590,5 +590,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function endValue(Cursor $cursor)
@@ -14314,8 +14314,8 @@ diff --git a/src/Symfony/Component/Workflow/Metadata/GetMetadataTrait.php b/src/
 @@ -22,5 +22,5 @@ trait GetMetadataTrait
       * @return mixed
       */
--    public function getMetadata(string $key, string|Transition $subject = null)
-+    public function getMetadata(string $key, string|Transition $subject = null): mixed
+-    public function getMetadata(string $key, string|Transition|null $subject = null)
++    public function getMetadata(string $key, string|Transition|null $subject = null): mixed
      {
          if (null === $subject) {
 diff --git a/src/Symfony/Component/Workflow/Metadata/MetadataStoreInterface.php b/src/Symfony/Component/Workflow/Metadata/MetadataStoreInterface.php
@@ -14324,8 +14324,8 @@ diff --git a/src/Symfony/Component/Workflow/Metadata/MetadataStoreInterface.php 
 @@ -38,4 +38,4 @@ interface MetadataStoreInterface
       * @return mixed
       */
--    public function getMetadata(string $key, string|Transition $subject = null);
-+    public function getMetadata(string $key, string|Transition $subject = null): mixed;
+-    public function getMetadata(string $key, string|Transition|null $subject = null);
++    public function getMetadata(string $key, string|Transition|null $subject = null): mixed;
  }
 diff --git a/src/Symfony/Component/Workflow/Registry.php b/src/Symfony/Component/Workflow/Registry.php
 --- a/src/Symfony/Component/Workflow/Registry.php

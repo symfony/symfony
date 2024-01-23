@@ -134,7 +134,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider provideCollectionTypes
      */
-    public function testExtractCollection($property, ?array $type = null, $shortDescription, $longDescription)
+    public function testExtractCollection($property, ?array $type, $shortDescription, $longDescription)
     {
         $this->testExtract($property, $type, $shortDescription, $longDescription);
     }

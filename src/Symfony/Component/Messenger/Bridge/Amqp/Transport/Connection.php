@@ -494,7 +494,7 @@ class Connection
                 $this->amqpChannel->confirmSelect();
                 $this->amqpChannel->setConfirmCallback(
                     static fn (): bool => false,
-                    static fn () => throw new TransportException('Confirm calls back with nack.'),
+                    static fn () => throw new TransportException('Message publication failed due to a negative acknowledgment (nack) from the broker.'),
                 );
             }
 

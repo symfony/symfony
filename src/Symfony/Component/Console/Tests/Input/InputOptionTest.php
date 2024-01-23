@@ -59,6 +59,20 @@ class InputOptionTest extends TestCase
         $this->assertEquals('f|ff|fff', $option->getShortcut(), '__construct() removes the leading - of the shortcuts');
         $option = new InputOption('foo');
         $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null by default');
+        $option = new InputOption('foo', '');
+        $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null when given an empty string');
+        $option = new InputOption('foo', []);
+        $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null when given an empty array');
+        $option = new InputOption('foo', ['f', '', 'fff']);
+        $this->assertEquals('f|fff', $option->getShortcut(), '__construct() removes empty shortcuts');
+        $option = new InputOption('foo', 'f||fff');
+        $this->assertEquals('f|fff', $option->getShortcut(), '__construct() removes empty shortcuts');
+        $option = new InputOption('foo', '0');
+        $this->assertEquals('0', $option->getShortcut(), '-0 is an acceptable shortcut value');
+        $option = new InputOption('foo', ['0', 'z']);
+        $this->assertEquals('0|z', $option->getShortcut(), '-0 is an acceptable shortcut value when embedded in an array');
+        $option = new InputOption('foo', '0|z');
+        $this->assertEquals('0|z', $option->getShortcut(), '-0 is an acceptable shortcut value when embedded in a string-list');
     }
 
     public function testModes()

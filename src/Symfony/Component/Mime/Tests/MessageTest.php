@@ -13,6 +13,7 @@ namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
@@ -123,6 +124,14 @@ class MessageTest extends TestCase
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com', 'lucas@symfony.com']);
         $message->getHeaders()->addMailboxHeader('Sender', 'thomas@symfony.com');
         $this->assertEquals('thomas@symfony.com', $message->getPreparedHeaders()->get('Sender')->getAddress()->getAddress());
+    }
+
+    public function testGenerateMessageIdThrowsWhenHasFromButNoAddresses()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', []);
+        $this->expectException(LogicException::class);
+        $message->generateMessageId();
     }
 
     public function testToString()

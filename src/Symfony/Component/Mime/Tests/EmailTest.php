@@ -15,6 +15,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
@@ -61,6 +62,13 @@ class EmailTest extends TestCase
 
         $e->sender($fabien = new Address('fabien@symfony.com'));
         $this->assertSame($fabien, $e->getSender());
+    }
+
+    public function testFromWithNoAddress()
+    {
+        $e = new Email();
+        $this->expectException(LogicException::class);
+        $e->from();
     }
 
     public function testFrom()

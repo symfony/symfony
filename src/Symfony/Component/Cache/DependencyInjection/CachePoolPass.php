@@ -181,11 +181,11 @@ class CachePoolPass implements CompilerPassInterface
             $container->removeDefinition('cache.early_expiration_handler');
         }
 
-        $notAliasedCacheClearerId = $aliasedCacheClearerId = 'cache.global_clearer';
-        while ($container->hasAlias('cache.global_clearer')) {
-            $aliasedCacheClearerId = (string) $container->getAlias('cache.global_clearer');
+        $notAliasedCacheClearerId = 'cache.global_clearer';
+        while ($container->hasAlias($notAliasedCacheClearerId)) {
+            $notAliasedCacheClearerId = (string) $container->getAlias($notAliasedCacheClearerId);
         }
-        if ($container->hasDefinition($aliasedCacheClearerId)) {
+        if ($container->hasDefinition($notAliasedCacheClearerId)) {
             $clearers[$notAliasedCacheClearerId] = $allPools;
         }
 

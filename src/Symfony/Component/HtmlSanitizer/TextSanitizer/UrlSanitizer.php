@@ -29,7 +29,7 @@ final class UrlSanitizer
      *
      * It also transforms the URL to HTTPS if requested.
      */
-    public static function sanitize(?string $input, array $allowedSchemes = null, bool $forceHttps = false, array $allowedHosts = null, bool $allowRelative = false): ?string
+    public static function sanitize(?string $input, ?array $allowedSchemes = null, bool $forceHttps = false, ?array $allowedHosts = null, bool $allowRelative = false): ?string
     {
         if (!$input) {
             return null;

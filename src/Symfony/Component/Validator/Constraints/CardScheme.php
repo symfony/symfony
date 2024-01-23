@@ -46,7 +46,7 @@ class CardScheme extends Constraint
     public string $message = 'Unsupported card type or invalid card number.';
     public array|string|null $schemes = null;
 
-    public function __construct(array|string|null $schemes, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
+    public function __construct(array|string|null $schemes, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($schemes) && \is_string(key($schemes))) {
             $options = array_merge($schemes, $options);

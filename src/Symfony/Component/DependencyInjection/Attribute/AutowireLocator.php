@@ -33,9 +33,9 @@ class AutowireLocator extends Autowire
      */
     public function __construct(
         string|array $services,
-        string $indexAttribute = null,
-        string $defaultIndexMethod = null,
-        string $defaultPriorityMethod = null,
+        ?string $indexAttribute = null,
+        ?string $defaultIndexMethod = null,
+        ?string $defaultPriorityMethod = null,
         string|array $exclude = [],
         bool $excludeSelf = true,
     ) {

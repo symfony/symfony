@@ -24,9 +24,9 @@ class AutowireIterator extends Autowire
      */
     public function __construct(
         string $tag,
-        string $indexAttribute = null,
-        string $defaultIndexMethod = null,
-        string $defaultPriorityMethod = null,
+        ?string $indexAttribute = null,
+        ?string $defaultIndexMethod = null,
+        ?string $defaultPriorityMethod = null,
         string|array $exclude = [],
         bool $excludeSelf = true,
     ) {

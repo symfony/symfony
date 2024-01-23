@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ClickSendTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'test_from', string $source = 'test_source', int $listId = 99, string $fromEmail = 'foo@bar.com'): ClickSendTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'test_from', string $source = 'test_source', int $listId = 99, string $fromEmail = 'foo@bar.com'): ClickSendTransport
     {
         return new ClickSendTransport('test_username', 'test_key', $from, $source, $listId, $fromEmail, $client ?? new MockHttpClient());
     }

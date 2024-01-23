@@ -37,7 +37,7 @@ class NormalizationBuilder
      *
      * @return $this
      */
-    public function remap(string $key, string $plural = null): static
+    public function remap(string $key, ?string $plural = null): static
     {
         $this->remappings[] = [$key, null === $plural ? $key.'s' : $plural];
 
@@ -49,7 +49,7 @@ class NormalizationBuilder
      *
      * @return ExprBuilder|$this
      */
-    public function before(\Closure $closure = null): ExprBuilder|static
+    public function before(?\Closure $closure = null): ExprBuilder|static
     {
         if (null !== $closure) {
             $this->before[] = $closure;

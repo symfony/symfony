@@ -33,7 +33,7 @@ final class FreeMobileTransport extends AbstractTransport
     private string $password;
     private string $phone;
 
-    public function __construct(string $login, #[\SensitiveParameter] string $password, string $phone, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $login, #[\SensitiveParameter] string $password, string $phone, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $login;
         $this->password = $password;

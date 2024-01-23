@@ -29,7 +29,7 @@ final class DumpExtension extends AbstractExtension
     private ClonerInterface $cloner;
     private ?HtmlDumper $dumper;
 
-    public function __construct(ClonerInterface $cloner, HtmlDumper $dumper = null)
+    public function __construct(ClonerInterface $cloner, ?HtmlDumper $dumper = null)
     {
         $this->cloner = $cloner;
         $this->dumper = $dumper;

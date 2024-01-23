@@ -37,7 +37,7 @@ class VarDumper
      */
     private static $handler;
 
-    public static function dump(mixed $var, string $label = null): mixed
+    public static function dump(mixed $var, ?string $label = null): mixed
     {
         if (null === self::$handler) {
             self::register();
@@ -87,7 +87,7 @@ class VarDumper
             $dumper = new ContextualizedDumper($dumper, [new SourceContextProvider()]);
         }
 
-        self::$handler = function ($var, string $label = null) use ($cloner, $dumper) {
+        self::$handler = function ($var, ?string $label = null) use ($cloner, $dumper) {
             $var = $cloner->cloneVar($var);
 
             if (null !== $label) {

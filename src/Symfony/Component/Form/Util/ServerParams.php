@@ -20,7 +20,7 @@ class ServerParams
 {
     private ?RequestStack $requestStack;
 
-    public function __construct(RequestStack $requestStack = null)
+    public function __construct(?RequestStack $requestStack = null)
     {
         $this->requestStack = $requestStack;
     }

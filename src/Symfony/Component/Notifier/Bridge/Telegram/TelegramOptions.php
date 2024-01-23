@@ -275,7 +275,7 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function sticker(string $url, string $emoji = null): static
+    public function sticker(string $url, ?string $emoji = null): static
     {
         $this->options['sticker'] = $url;
         $this->options['emoji'] = $emoji;
@@ -286,7 +286,7 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function uploadSticker(string $path, string $emoji = null): static
+    public function uploadSticker(string $path, ?string $emoji = null): static
     {
         $this->options['upload']['sticker'] = $path;
         $this->options['emoji'] = $emoji;
@@ -297,7 +297,7 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function contact(string $phoneNumber, string $firstName, string $lastName = null, string $vCard = null): static
+    public function contact(string $phoneNumber, string $firstName, ?string $lastName = null, ?string $vCard = null): static
     {
         $this->options['contact'] = [
             'phone_number' => $phoneNumber,

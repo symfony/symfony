@@ -33,7 +33,7 @@ class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
         $this->container = $container;
     }
 
-    public function warmUp(string $cacheDir, string $buildDir = null): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $this->translator ??= $this->container->get('translator');
 

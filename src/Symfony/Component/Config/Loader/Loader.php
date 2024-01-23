@@ -23,7 +23,7 @@ abstract class Loader implements LoaderInterface
     protected LoaderResolverInterface $resolver;
     protected ?string $env;
 
-    public function __construct(string $env = null)
+    public function __construct(?string $env = null)
     {
         $this->env = $env;
     }
@@ -41,7 +41,7 @@ abstract class Loader implements LoaderInterface
     /**
      * Imports a resource.
      */
-    public function import(mixed $resource, string $type = null): mixed
+    public function import(mixed $resource, ?string $type = null): mixed
     {
         return $this->resolve($resource, $type)->load($resource, $type);
     }
@@ -51,7 +51,7 @@ abstract class Loader implements LoaderInterface
      *
      * @throws LoaderLoadException If no loader is found
      */
-    public function resolve(mixed $resource, string $type = null): LoaderInterface
+    public function resolve(mixed $resource, ?string $type = null): LoaderInterface
     {
         if ($this->supports($resource, $type)) {
             return $this;

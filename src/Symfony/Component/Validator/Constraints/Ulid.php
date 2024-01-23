@@ -34,9 +34,9 @@ class Ulid extends Constraint
     public string $message = 'This is not a valid ULID.';
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

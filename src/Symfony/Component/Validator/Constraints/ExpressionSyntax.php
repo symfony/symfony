@@ -29,7 +29,7 @@ class ExpressionSyntax extends Constraint
     public ?string $service = null;
     public ?array $allowedVariables = null;
 
-    public function __construct(array $options = null, string $message = null, string $service = null, array $allowedVariables = null, array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?string $service = null, ?array $allowedVariables = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);
 

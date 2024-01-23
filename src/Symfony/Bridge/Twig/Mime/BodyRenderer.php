@@ -31,7 +31,7 @@ final class BodyRenderer implements BodyRendererInterface
     private HtmlToTextConverterInterface $converter;
     private ?LocaleSwitcher $localeSwitcher = null;
 
-    public function __construct(Environment $twig, array $context = [], HtmlToTextConverterInterface $converter = null, LocaleSwitcher $localeSwitcher = null)
+    public function __construct(Environment $twig, array $context = [], ?HtmlToTextConverterInterface $converter = null, ?LocaleSwitcher $localeSwitcher = null)
     {
         $this->twig = $twig;
         $this->context = $context;

@@ -18,7 +18,7 @@ namespace Symfony\Component\Dotenv\Exception;
  */
 final class PathException extends \RuntimeException implements ExceptionInterface
 {
-    public function __construct(string $path, int $code = 0, \Throwable $previous = null)
+    public function __construct(string $path, int $code = 0, ?\Throwable $previous = null)
     {
         parent::__construct(sprintf('Unable to read the "%s" environment file.', $path), $code, $previous);
     }

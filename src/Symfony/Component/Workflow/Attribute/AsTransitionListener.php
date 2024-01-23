@@ -22,11 +22,11 @@ final class AsTransitionListener extends AsEventListener
     use BuildEventNameTrait;
 
     public function __construct(
-        string $workflow = null,
-        string $transition = null,
-        string $method = null,
+        ?string $workflow = null,
+        ?string $transition = null,
+        ?string $method = null,
         int $priority = 0,
-        string $dispatcher = null,
+        ?string $dispatcher = null,
     ) {
         parent::__construct($this->buildEventName('transition', 'transition', $workflow, $transition), $method, $priority, $dispatcher);
     }

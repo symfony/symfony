@@ -93,7 +93,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug'], $this->options['cache_vary']);
     }
 
-    public function warmUp(string $cacheDir, string $buildDir = null): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         // skip warmUp when translator doesn't use cache
         if (null === $this->options['cache_dir']) {
@@ -114,7 +114,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         return [];
     }
 
-    public function addResource(string $format, mixed $resource, string $locale, string $domain = null): void
+    public function addResource(string $format, mixed $resource, string $locale, ?string $domain = null): void
     {
         if ($this->resourceFiles) {
             $this->addResourceFiles();

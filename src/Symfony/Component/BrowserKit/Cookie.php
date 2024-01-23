@@ -58,7 +58,7 @@ class Cookie
      * @param bool        $encodedValue Whether the value is encoded or not
      * @param string|null $samesite     The cookie samesite attribute
      */
-    public function __construct(string $name, ?string $value, string $expires = null, string $path = null, string $domain = '', bool $secure = false, bool $httponly = true, bool $encodedValue = false, string $samesite = null)
+    public function __construct(string $name, ?string $value, ?string $expires = null, ?string $path = null, string $domain = '', bool $secure = false, bool $httponly = true, bool $encodedValue = false, ?string $samesite = null)
     {
         if ($encodedValue) {
             $this->rawValue = $value ?? '';
@@ -124,7 +124,7 @@ class Cookie
      *
      * @throws InvalidArgumentException
      */
-    public static function fromString(string $cookie, string $url = null): static
+    public static function fromString(string $cookie, ?string $url = null): static
     {
         $parts = explode(';', $cookie);
 

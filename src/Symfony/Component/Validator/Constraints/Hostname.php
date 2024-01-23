@@ -29,10 +29,10 @@ class Hostname extends Constraint
     public bool $requireTld = true;
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        bool $requireTld = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?bool $requireTld = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

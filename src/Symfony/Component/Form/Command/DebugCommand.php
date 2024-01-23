@@ -42,7 +42,7 @@ class DebugCommand extends Command
     private array $guessers;
     private ?FileLinkFormatter $fileLinkFormatter;
 
-    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [], array $extensions = [], array $guessers = [], FileLinkFormatter $fileLinkFormatter = null)
+    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [], array $extensions = [], array $guessers = [], ?FileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 

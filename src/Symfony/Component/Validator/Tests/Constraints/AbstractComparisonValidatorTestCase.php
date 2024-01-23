@@ -283,7 +283,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
     abstract public static function provideComparisonsToNullValueAtPropertyPath();
 
-    abstract protected static function createConstraint(array $options = null): Constraint;
+    abstract protected static function createConstraint(?array $options = null): Constraint;
 
     protected function getErrorCode(): ?string
     {

@@ -49,7 +49,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
      */
     protected array $loadedClasses = [];
 
-    public function __construct(LoaderInterface $loader = null, CacheItemPoolInterface $cache = null)
+    public function __construct(?LoaderInterface $loader = null, ?CacheItemPoolInterface $cache = null)
     {
         $this->loader = $loader;
         $this->cache = $cache;

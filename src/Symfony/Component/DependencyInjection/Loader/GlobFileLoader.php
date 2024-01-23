@@ -18,7 +18,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
  */
 class GlobFileLoader extends FileLoader
 {
-    public function load(mixed $resource, string $type = null): mixed
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         foreach ($this->glob($resource, false, $globResource) as $path => $info) {
             $this->import($path);
@@ -29,7 +29,7 @@ class GlobFileLoader extends FileLoader
         return null;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'glob' === $type;
     }

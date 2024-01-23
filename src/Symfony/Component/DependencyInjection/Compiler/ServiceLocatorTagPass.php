@@ -81,7 +81,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
         return new Reference($id);
     }
 
-    public static function register(ContainerBuilder $container, array $map, string $callerId = null): Reference
+    public static function register(ContainerBuilder $container, array $map, ?string $callerId = null): Reference
     {
         $locator = (new Definition(ServiceLocator::class))
             ->addArgument(self::map($map))

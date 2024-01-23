@@ -24,7 +24,7 @@ class Sequentially extends Composite
 {
     public array|Constraint $constraints = [];
 
-    public function __construct(mixed $constraints = null, array $groups = null, mixed $payload = null)
+    public function __construct(mixed $constraints = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($constraints ?? [], $groups, $payload);
     }

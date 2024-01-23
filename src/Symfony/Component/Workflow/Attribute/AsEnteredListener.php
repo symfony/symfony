@@ -22,11 +22,11 @@ final class AsEnteredListener extends AsEventListener
     use BuildEventNameTrait;
 
     public function __construct(
-        string $workflow = null,
-        string $place = null,
-        string $method = null,
+        ?string $workflow = null,
+        ?string $place = null,
+        ?string $method = null,
         int $priority = 0,
-        string $dispatcher = null,
+        ?string $dispatcher = null,
     ) {
         parent::__construct($this->buildEventName('entered', 'place', $workflow, $place), $method, $priority, $dispatcher);
     }

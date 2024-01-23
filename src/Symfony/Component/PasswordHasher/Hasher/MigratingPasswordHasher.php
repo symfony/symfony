@@ -33,12 +33,12 @@ final class MigratingPasswordHasher implements PasswordHasherInterface
         $this->extraHashers = $extraHashers;
     }
 
-    public function hash(#[\SensitiveParameter] string $plainPassword, string $salt = null): string
+    public function hash(#[\SensitiveParameter] string $plainPassword, ?string $salt = null): string
     {
         return $this->bestHasher->hash($plainPassword, $salt);
     }
 
-    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword, string $salt = null): bool
+    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword, ?string $salt = null): bool
     {
         if ($this->bestHasher->verify($hashedPassword, $plainPassword, $salt)) {
             return true;

@@ -21,5 +21,5 @@ interface WrappedExceptionsInterface
     /**
      * @return \Throwable[]
      */
-    public function getWrappedExceptions(string $class = null, bool $recursive = false): array;
+    public function getWrappedExceptions(?string $class = null, bool $recursive = false): array;
 }

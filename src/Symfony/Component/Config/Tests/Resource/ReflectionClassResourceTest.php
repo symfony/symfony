@@ -63,7 +63,7 @@ class ReflectionClassResourceTest extends TestCase
     /**
      * @dataProvider provideHashedSignature
      */
-    public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, \Closure $setContext = null)
+    public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, ?\Closure $setContext = null)
     {
         if ($setContext) {
             $setContext();

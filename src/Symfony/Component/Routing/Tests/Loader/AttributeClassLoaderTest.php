@@ -47,7 +47,7 @@ class AttributeClassLoaderTest extends TestCase
 {
     protected TraceableAttributeClassLoader $loader;
 
-    protected function setUp(string $env = null): void
+    protected function setUp(?string $env = null): void
     {
         parent::setUp();
 

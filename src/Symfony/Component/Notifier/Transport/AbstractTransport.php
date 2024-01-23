@@ -34,7 +34,7 @@ abstract class AbstractTransport implements TransportInterface
     protected ?string $host = null;
     protected ?int $port = null;
 
-    public function __construct(HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->client = $client;
         if (null === $client) {

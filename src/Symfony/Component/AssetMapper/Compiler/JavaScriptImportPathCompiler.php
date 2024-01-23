@@ -105,7 +105,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         return './'.$path;
     }
 
-    private function handleMissingImport(string $message, \Throwable $e = null): void
+    private function handleMissingImport(string $message, ?\Throwable $e = null): void
     {
         match ($this->missingImportMode) {
             AssetCompilerInterface::MISSING_IMPORT_IGNORE => null,

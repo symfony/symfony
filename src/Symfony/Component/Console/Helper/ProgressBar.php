@@ -313,7 +313,7 @@ final class ProgressBar
      *
      * @return iterable<TKey, TValue>
      */
-    public function iterate(iterable $iterable, int $max = null): iterable
+    public function iterate(iterable $iterable, ?int $max = null): iterable
     {
         $this->start($max ?? (is_countable($iterable) ? \count($iterable) : 0));
 
@@ -332,7 +332,7 @@ final class ProgressBar
      * @param int|null $max     Number of steps to complete the bar (0 if indeterminate), null to leave unchanged
      * @param int      $startAt The starting point of the bar (useful e.g. when resuming a previously started bar)
      */
-    public function start(int $max = null, int $startAt = 0): void
+    public function start(?int $max = null, int $startAt = 0): void
     {
         $this->startTime = time();
         $this->step = $startAt;

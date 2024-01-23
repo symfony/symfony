@@ -38,7 +38,7 @@ final class SpotHitTransport extends AbstractTransport
     private ?bool $smsLong = null;
     private ?int $smsLongNBr = null;
 
-    public function __construct(#[\SensitiveParameter] string $token, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, ?string $from = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->from = $from;

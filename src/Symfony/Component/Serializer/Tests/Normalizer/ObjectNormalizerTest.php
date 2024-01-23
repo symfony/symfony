@@ -86,7 +86,7 @@ class ObjectNormalizerTest extends TestCase
         $this->createNormalizer();
     }
 
-    private function createNormalizer(array $defaultContext = [], ClassMetadataFactoryInterface $classMetadataFactory = null): void
+    private function createNormalizer(array $defaultContext = [], ?ClassMetadataFactoryInterface $classMetadataFactory = null): void
     {
         $this->serializer = $this->createMock(ObjectSerializerNormalizer::class);
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, null, null, null, null, null, $defaultContext);
@@ -754,12 +754,12 @@ class ObjectNormalizerTest extends TestCase
     public function testAdvancedNameConverter()
     {
         $nameConverter = new class() implements AdvancedNameConverterInterface {
-            public function normalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
+            public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
 
-            public function denormalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
+            public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
@@ -1053,7 +1053,7 @@ class DummyWithConstructorObjectAndDefaultValue
     private $foo;
     private $inner;
 
-    public function __construct($foo = 'a', ObjectInner $inner = null)
+    public function __construct($foo = 'a', ?ObjectInner $inner = null)
     {
         $this->foo = $foo;
         $this->inner = $inner;

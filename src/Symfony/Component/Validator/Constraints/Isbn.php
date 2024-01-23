@@ -45,12 +45,12 @@ class Isbn extends Constraint
     public ?string $message = null;
 
     public function __construct(
-        string|array $type = null,
-        string $message = null,
-        string $isbn10Message = null,
-        string $isbn13Message = null,
-        string $bothIsbnMessage = null,
-        array $groups = null,
+        string|array|null $type = null,
+        ?string $message = null,
+        ?string $isbn10Message = null,
+        ?string $isbn13Message = null,
+        ?string $bothIsbnMessage = null,
+        ?array $groups = null,
         mixed $payload = null,
         array $options = []
     ) {

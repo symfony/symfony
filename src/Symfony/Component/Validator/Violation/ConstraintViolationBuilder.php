@@ -39,7 +39,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     private ?string $code = null;
     private mixed $cause = null;
 
-    public function __construct(ConstraintViolationList $violations, ?Constraint $constraint, string|\Stringable $message, array $parameters, mixed $root, ?string $propertyPath, mixed $invalidValue, TranslatorInterface $translator, string|false $translationDomain = null)
+    public function __construct(ConstraintViolationList $violations, ?Constraint $constraint, string|\Stringable $message, array $parameters, mixed $root, ?string $propertyPath, mixed $invalidValue, TranslatorInterface $translator, string|false|null $translationDomain = null)
     {
         $this->violations = $violations;
         $this->message = $message;

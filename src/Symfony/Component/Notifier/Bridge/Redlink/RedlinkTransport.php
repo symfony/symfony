@@ -35,8 +35,8 @@ final class RedlinkTransport extends AbstractTransport
         private readonly string $appToken,
         private readonly ?string $from,
         private readonly ?string $version,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }

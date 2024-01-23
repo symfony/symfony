@@ -31,10 +31,10 @@ class Country extends Constraint
     public bool $alpha3 = false;
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        bool $alpha3 = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?bool $alpha3 = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         if (!class_exists(Countries::class)) {

@@ -30,7 +30,7 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
 {
     protected SesClient $sesClient;
 
-    public function __construct(SesClient $sesClient, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(SesClient $sesClient, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         $this->sesClient = $sesClient;
 

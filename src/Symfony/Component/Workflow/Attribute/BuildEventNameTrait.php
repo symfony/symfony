@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Exception\LogicException;
  */
 trait BuildEventNameTrait
 {
-    private static function buildEventName(string $keyword, string $argument, string $workflow = null, string $node = null): string
+    private static function buildEventName(string $keyword, string $argument, ?string $workflow = null, ?string $node = null): string
     {
         if (null === $workflow) {
             if (null !== $node) {

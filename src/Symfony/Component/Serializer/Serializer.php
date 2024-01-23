@@ -143,7 +143,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return $this->denormalize($data, $type, $format, $context);
     }
 
-    public function normalize(mixed $data, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format, $context)) {
@@ -186,7 +186,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @throws NotNormalizableValueException
      * @throws PartialDenormalizationException Occurs when one or more properties of $type fails to denormalize
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS], $context['not_normalizable_value_exceptions'])) {
             throw new LogicException('Passing a value for "not_normalizable_value_exceptions" context key is not allowed.');
@@ -243,12 +243,12 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return ['*' => false];
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return null !== $this->getNormalizer($data, $format, $context);
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return isset(self::SCALAR_TYPES[$type]) || null !== $this->getDenormalizer($data, $type, $format, $context);
     }

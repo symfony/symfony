@@ -26,7 +26,7 @@ class UploadValidatorExtension extends AbstractTypeExtension
     private TranslatorInterface $translator;
     private ?string $translationDomain;
 
-    public function __construct(TranslatorInterface $translator, string $translationDomain = null)
+    public function __construct(TranslatorInterface $translator, ?string $translationDomain = null)
     {
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;

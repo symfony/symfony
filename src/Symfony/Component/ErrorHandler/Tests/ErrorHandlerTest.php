@@ -363,7 +363,7 @@ class ErrorHandlerTest extends TestCase
     /**
      * @dataProvider handleExceptionProvider
      */
-    public function testHandleException(string $expectedMessage, \Throwable $exception, string $enhancedMessage = null)
+    public function testHandleException(string $expectedMessage, \Throwable $exception, ?string $enhancedMessage = null)
     {
         try {
             $logger = $this->createMock(LoggerInterface::class);

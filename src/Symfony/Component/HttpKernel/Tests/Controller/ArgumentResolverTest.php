@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 
 class ArgumentResolverTest extends TestCase
 {
-    public static function getResolver(array $chainableResolvers = [], array $namedResolvers = null): ArgumentResolver
+    public static function getResolver(array $chainableResolvers = [], ?array $namedResolvers = null): ArgumentResolver
     {
         if (null !== $namedResolvers) {
             $namedResolvers = new ServiceLocator(array_map(fn ($resolver) => fn () => $resolver, $namedResolvers));

@@ -21,7 +21,7 @@ class PropertyPathBuilder
     private array $elements = [];
     private array $isIndex = [];
 
-    public function __construct(PropertyPathInterface|string $path = null)
+    public function __construct(PropertyPathInterface|string|null $path = null)
     {
         if (null !== $path) {
             $this->append($path);
@@ -122,7 +122,7 @@ class PropertyPathBuilder
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
-    public function replaceByIndex(int $offset, string $name = null): void
+    public function replaceByIndex(int $offset, ?string $name = null): void
     {
         if (!isset($this->elements[$offset])) {
             throw new OutOfBoundsException(sprintf('The offset "%s" is not within the property path.', $offset));
@@ -140,7 +140,7 @@ class PropertyPathBuilder
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
-    public function replaceByProperty(int $offset, string $name = null): void
+    public function replaceByProperty(int $offset, ?string $name = null): void
     {
         if (!isset($this->elements[$offset])) {
             throw new OutOfBoundsException(sprintf('The offset "%s" is not within the property path.', $offset));

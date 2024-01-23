@@ -18,7 +18,7 @@ class IncompleteDsnException extends InvalidArgumentException
 {
     private ?string $dsn;
 
-    public function __construct(string $message, string $dsn = null, \Throwable $previous = null)
+    public function __construct(string $message, ?string $dsn = null, ?\Throwable $previous = null)
     {
         $this->dsn = $dsn;
         if ($dsn) {

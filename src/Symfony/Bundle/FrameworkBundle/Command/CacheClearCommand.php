@@ -40,7 +40,7 @@ class CacheClearCommand extends Command
     private CacheClearerInterface $cacheClearer;
     private Filesystem $filesystem;
 
-    public function __construct(CacheClearerInterface $cacheClearer, Filesystem $filesystem = null)
+    public function __construct(CacheClearerInterface $cacheClearer, ?Filesystem $filesystem = null)
     {
         parent::__construct();
 

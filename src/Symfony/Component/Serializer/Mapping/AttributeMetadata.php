@@ -120,7 +120,7 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->serializedName;
     }
 
-    public function setSerializedPath(PropertyPath $serializedPath = null): void
+    public function setSerializedPath(?PropertyPath $serializedPath = null): void
     {
         $this->serializedPath = $serializedPath;
     }

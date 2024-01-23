@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class IsendproTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): IsendproTransport
+    public static function createTransport(?HttpClientInterface $client = null): IsendproTransport
     {
         return (new IsendproTransport('accound_key_id', null, false, false, $client ?? new MockHttpClient()))->setHost('host.test');
     }

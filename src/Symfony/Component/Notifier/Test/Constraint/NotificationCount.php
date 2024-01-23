@@ -23,7 +23,7 @@ final class NotificationCount extends Constraint
     private ?string $transport;
     private bool $queued;
 
-    public function __construct(int $expectedValue, string $transport = null, bool $queued = false)
+    public function __construct(int $expectedValue, ?string $transport = null, bool $queued = false)
     {
         $this->expectedValue = $expectedValue;
         $this->transport = $transport;

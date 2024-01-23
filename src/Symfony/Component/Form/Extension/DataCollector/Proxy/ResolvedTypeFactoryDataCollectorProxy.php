@@ -33,7 +33,7 @@ class ResolvedTypeFactoryDataCollectorProxy implements ResolvedFormTypeFactoryIn
         $this->dataCollector = $dataCollector;
     }
 
-    public function createResolvedType(FormTypeInterface $type, array $typeExtensions, ResolvedFormTypeInterface $parent = null): ResolvedFormTypeInterface
+    public function createResolvedType(FormTypeInterface $type, array $typeExtensions, ?ResolvedFormTypeInterface $parent = null): ResolvedFormTypeInterface
     {
         return new ResolvedTypeDataCollectorProxy(
             $this->proxiedFactory->createResolvedType($type, $typeExtensions, $parent),

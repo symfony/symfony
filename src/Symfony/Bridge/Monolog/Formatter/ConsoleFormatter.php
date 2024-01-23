@@ -176,7 +176,7 @@ final class ConsoleFormatter implements FormatterInterface
         return $record->with(message: strtr($message, $replacements));
     }
 
-    private function dumpData(mixed $data, bool $colors = null): string
+    private function dumpData(mixed $data, ?bool $colors = null): string
     {
         if (!isset($this->dumper)) {
             return '';

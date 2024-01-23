@@ -39,7 +39,7 @@ interface LockInterface
      * @throws LockConflictedException If the lock is acquired by someone else
      * @throws LockAcquiringException  If the lock cannot be refreshed
      */
-    public function refresh(float $ttl = null): void;
+    public function refresh(?float $ttl = null): void;
 
     /**
      * Returns whether or not the lock is acquired.

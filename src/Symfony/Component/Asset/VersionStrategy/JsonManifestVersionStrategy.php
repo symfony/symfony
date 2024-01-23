@@ -40,7 +40,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
      * @param string $manifestPath Absolute path to the manifest file
      * @param bool   $strictMode   Throws an exception for unknown paths
      */
-    public function __construct(string $manifestPath, HttpClientInterface $httpClient = null, bool $strictMode = false)
+    public function __construct(string $manifestPath, ?HttpClientInterface $httpClient = null, bool $strictMode = false)
     {
         $this->manifestPath = $manifestPath;
         $this->httpClient = $httpClient;

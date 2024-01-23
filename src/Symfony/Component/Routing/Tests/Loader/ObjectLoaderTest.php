@@ -98,7 +98,7 @@ class TestObjectLoader extends ObjectLoader
 {
     public array $loaderMap = [];
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'service';
     }
@@ -114,13 +114,13 @@ class TestObjectLoaderRouteService
     private RouteCollection $collection;
     private ?string $env;
 
-    public function __construct($collection, string $env = null)
+    public function __construct($collection, ?string $env = null)
     {
         $this->collection = $collection;
         $this->env = $env;
     }
 
-    public function loadRoutes(TestObjectLoader $loader, string $env = null)
+    public function loadRoutes(TestObjectLoader $loader, ?string $env = null)
     {
         if ($this->env !== $env) {
             throw new \InvalidArgumentException(sprintf('Expected env "%s", "%s" given.', $this->env, $env));

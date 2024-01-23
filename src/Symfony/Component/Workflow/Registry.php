@@ -27,7 +27,7 @@ class Registry
         $this->workflows[] = [$workflow, $supportStrategy];
     }
 
-    public function has(object $subject, string $workflowName = null): bool
+    public function has(object $subject, ?string $workflowName = null): bool
     {
         foreach ($this->workflows as [$workflow, $supportStrategy]) {
             if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
@@ -38,7 +38,7 @@ class Registry
         return false;
     }
 
-    public function get(object $subject, string $workflowName = null): WorkflowInterface
+    public function get(object $subject, ?string $workflowName = null): WorkflowInterface
     {
         $matched = [];
 

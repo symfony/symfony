@@ -32,8 +32,8 @@ final class RingCentralTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiToken,
         private readonly string $from,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null
     ) {
         parent::__construct($client, $dispatcher);
     }

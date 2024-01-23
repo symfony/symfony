@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class PagerDutyTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): PagerDutyTransport
+    public static function createTransport(?HttpClientInterface $client = null): PagerDutyTransport
     {
         return (new PagerDutyTransport('testToken', $client ?? new MockHttpClient()))->setHost('test.pagerduty.com');
     }

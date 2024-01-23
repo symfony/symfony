@@ -35,7 +35,7 @@ class CookieJar
      * (this behavior ensures a BC behavior with previous versions of
      * Symfony).
      */
-    public function get(string $name, string $path = '/', string $domain = null): ?Cookie
+    public function get(string $name, string $path = '/', ?string $domain = null): ?Cookie
     {
         $this->flushExpiredCookies();
 
@@ -67,7 +67,7 @@ class CookieJar
      * all cookies for the given name/path expire (this behavior
      * ensures a BC behavior with previous versions of Symfony).
      */
-    public function expire(string $name, ?string $path = '/', string $domain = null): void
+    public function expire(string $name, ?string $path = '/', ?string $domain = null): void
     {
         $path ??= '/';
 
@@ -105,7 +105,7 @@ class CookieJar
      *
      * @param string[] $setCookies Set-Cookie headers from an HTTP response
      */
-    public function updateFromSetCookie(array $setCookies, string $uri = null): void
+    public function updateFromSetCookie(array $setCookies, ?string $uri = null): void
     {
         $cookies = [];
 
@@ -131,7 +131,7 @@ class CookieJar
     /**
      * Updates the cookie jar from a Response object.
      */
-    public function updateFromResponse(Response $response, string $uri = null): void
+    public function updateFromResponse(Response $response, ?string $uri = null): void
     {
         $this->updateFromSetCookie($response->getHeader('Set-Cookie', false), $uri);
     }

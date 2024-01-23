@@ -59,12 +59,12 @@ final class MappedAsset
      */
     public function __construct(
         public readonly string $logicalPath,
-        string $sourcePath = null,
-        string $publicPathWithoutDigest = null,
-        string $publicPath = null,
-        string $content = null,
-        string $digest = null,
-        bool $isPredigested = null,
+        ?string $sourcePath = null,
+        ?string $publicPathWithoutDigest = null,
+        ?string $publicPath = null,
+        ?string $content = null,
+        ?string $digest = null,
+        ?bool $isPredigested = null,
         bool $isVendor = false,
         array $dependencies = [],
         array $fileDependencies = [],

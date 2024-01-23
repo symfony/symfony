@@ -29,7 +29,7 @@ final class LineNotifyTransport extends AbstractTransport
 
     private string $token;
 
-    public function __construct(#[\SensitiveParameter] string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         parent::__construct($client, $dispatcher);

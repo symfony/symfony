@@ -205,7 +205,7 @@ class ImportMapUpdateCheckerTest extends TestCase
         return $map[$url] ?? new MockResponse('Not found', ['http_code' => 404]);
     }
 
-    private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, string $packageSpecifier = null): ImportMapEntry
+    private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
         $packageSpecifier = $packageSpecifier ?? $importName;
 

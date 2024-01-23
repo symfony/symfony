@@ -32,7 +32,7 @@ final class ScalewayApiTransport extends AbstractApiTransport
     private string $token;
     private ?string $region;
 
-    public function __construct(string $projectId, string $token, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $projectId, string $token, ?string $region = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         $this->projectId = $projectId;
         $this->token = $token;

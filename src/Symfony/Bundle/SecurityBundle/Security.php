@@ -81,7 +81,7 @@ class Security implements AuthorizationCheckerInterface
      *
      * @return Response|null The authenticator success response if any
      */
-    public function login(UserInterface $user, string $authenticatorName = null, string $firewallName = null, array $badges = []): ?Response
+    public function login(UserInterface $user, ?string $authenticatorName = null, ?string $firewallName = null, array $badges = []): ?Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         if (null === $request) {

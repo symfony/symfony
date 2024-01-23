@@ -64,7 +64,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(array $defaultOptions = [], callable $clientConfigurator = null, int $maxHostConnections = 6, int $maxPendingPushes = 50)
+    public function __construct(array $defaultOptions = [], ?callable $clientConfigurator = null, int $maxHostConnections = 6, int $maxPendingPushes = 50)
     {
         $this->defaultOptions['buffer'] ??= self::shouldBuffer(...);
 
@@ -148,7 +148,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         return new AmpResponse($this->multi, $request, $options, $this->logger);
     }
 
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof AmpResponse) {
             $responses = [$responses];

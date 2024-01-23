@@ -293,7 +293,7 @@ class Connection implements ResetInterface
         return $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes())->fetchOne();
     }
 
-    public function findAll(int $limit = null): array
+    public function findAll(?int $limit = null): array
     {
         $queryBuilder = $this->createAvailableMessagesQueryBuilder();
 

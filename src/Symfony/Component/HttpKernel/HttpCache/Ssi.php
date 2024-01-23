@@ -33,7 +33,7 @@ class Ssi extends AbstractSurrogate
         }
     }
 
-    public function renderIncludeTag(string $uri, string $alt = null, bool $ignoreErrors = true, string $comment = ''): string
+    public function renderIncludeTag(string $uri, ?string $alt = null, bool $ignoreErrors = true, string $comment = ''): string
     {
         return sprintf('<!--#include virtual="%s" -->', $uri);
     }

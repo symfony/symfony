@@ -41,7 +41,7 @@ class ProfilerController
     private ?ContentSecurityPolicyHandler $cspHandler;
     private ?string $baseDir;
 
-    public function __construct(UrlGeneratorInterface $generator, ?Profiler $profiler, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, ?Profiler $profiler, Environment $twig, array $templates, ?ContentSecurityPolicyHandler $cspHandler = null, ?string $baseDir = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
@@ -127,7 +127,7 @@ class ProfilerController
      *
      * @throws NotFoundHttpException
      */
-    public function toolbarAction(Request $request, string $token = null): Response
+    public function toolbarAction(Request $request, ?string $token = null): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');

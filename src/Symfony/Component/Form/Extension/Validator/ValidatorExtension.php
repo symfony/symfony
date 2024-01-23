@@ -32,7 +32,7 @@ class ValidatorExtension extends AbstractExtension
     private ?TranslatorInterface $translator;
     private bool $legacyErrorMessages;
 
-    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
+    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, ?FormRendererInterface $formRenderer = null, ?TranslatorInterface $translator = null)
     {
         $this->legacyErrorMessages = $legacyErrorMessages;
 

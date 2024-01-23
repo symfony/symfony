@@ -50,7 +50,7 @@ final class Currencies extends ResourceBundle
     /**
      * @throws MissingResourceException if the currency code does not exist
      */
-    public static function getName(string $currency, string $displayLocale = null): string
+    public static function getName(string $currency, ?string $displayLocale = null): string
     {
         return self::readEntry(['Names', $currency, self::INDEX_NAME], $displayLocale);
     }
@@ -58,7 +58,7 @@ final class Currencies extends ResourceBundle
     /**
      * @return string[]
      */
-    public static function getNames(string $displayLocale = null): array
+    public static function getNames(?string $displayLocale = null): array
     {
         // ====================================================================
         // For reference: It is NOT possible to return names indexed by
@@ -82,7 +82,7 @@ final class Currencies extends ResourceBundle
     /**
      * @throws MissingResourceException if the currency code does not exist
      */
-    public static function getSymbol(string $currency, string $displayLocale = null): string
+    public static function getSymbol(string $currency, ?string $displayLocale = null): string
     {
         return self::readEntry(['Names', $currency, self::INDEX_SYMBOL], $displayLocale);
     }

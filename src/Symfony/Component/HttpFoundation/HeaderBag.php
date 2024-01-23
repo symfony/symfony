@@ -65,7 +65,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      *
      * @return ($key is null ? array<string, list<string|null>> : list<string|null>)
      */
-    public function all(string $key = null): array
+    public function all(?string $key = null): array
     {
         if (null !== $key) {
             return $this->headers[strtr($key, self::UPPER, self::LOWER)] ?? [];
@@ -110,7 +110,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     /**
      * Returns the first header by name or the default one.
      */
-    public function get(string $key, string $default = null): ?string
+    public function get(string $key, ?string $default = null): ?string
     {
         $headers = $this->all($key);
 
@@ -197,7 +197,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      *
      * @throws \RuntimeException When the HTTP header is not parseable
      */
-    public function getDate(string $key, \DateTimeInterface $default = null): ?\DateTimeInterface
+    public function getDate(string $key, ?\DateTimeInterface $default = null): ?\DateTimeInterface
     {
         if (null === $value = $this->get($key)) {
             return null !== $default ? \DateTimeImmutable::createFromInterface($default) : null;

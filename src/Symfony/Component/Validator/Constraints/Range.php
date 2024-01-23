@@ -54,17 +54,17 @@ class Range extends Constraint
     public $maxPropertyPath;
 
     public function __construct(
-        array $options = null,
-        string $notInRangeMessage = null,
-        string $minMessage = null,
-        string $maxMessage = null,
-        string $invalidMessage = null,
-        string $invalidDateTimeMessage = null,
+        ?array $options = null,
+        ?string $notInRangeMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
+        ?string $invalidMessage = null,
+        ?string $invalidDateTimeMessage = null,
         mixed $min = null,
-        string $minPropertyPath = null,
+        ?string $minPropertyPath = null,
         mixed $max = null,
-        string $maxPropertyPath = null,
-        array $groups = null,
+        ?string $maxPropertyPath = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

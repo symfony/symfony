@@ -347,7 +347,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @return $this
      */
-    public function setDataMapper(DataMapperInterface $dataMapper = null): static
+    public function setDataMapper(?DataMapperInterface $dataMapper = null): static
     {
         if (1 > \func_num_args()) {
             trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);

@@ -24,7 +24,7 @@ class Message extends RawMessage
     private Headers $headers;
     private ?AbstractPart $body;
 
-    public function __construct(Headers $headers = null, AbstractPart $body = null)
+    public function __construct(?Headers $headers = null, ?AbstractPart $body = null)
     {
         $this->headers = $headers ? clone $headers : new Headers();
         $this->body = $body;
@@ -42,7 +42,7 @@ class Message extends RawMessage
     /**
      * @return $this
      */
-    public function setBody(AbstractPart $body = null): static
+    public function setBody(?AbstractPart $body = null): static
     {
         if (1 > \func_num_args()) {
             trigger_deprecation('symfony/mime', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);

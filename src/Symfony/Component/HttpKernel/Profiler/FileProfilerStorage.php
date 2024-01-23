@@ -45,7 +45,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * @param \Closure|null $filter A filter to apply on the list of tokens
      */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null/* , \Closure $filter = null */): array
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?int $start = null, ?int $end = null, ?string $statusCode = null/* , \Closure $filter = null */): array
     {
         $filter = 7 < \func_num_args() ? func_get_arg(7) : null;
         $file = $this->getIndexFilename();
@@ -272,7 +272,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * @return Profile
      */
-    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
+    protected function createProfileFromData(string $token, array $data, ?Profile $parent = null)
     {
         $profile = new Profile($token);
         $profile->setIp($data['ip']);
@@ -300,7 +300,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return $profile;
     }
 
-    private function doRead($token, Profile $profile = null): ?Profile
+    private function doRead($token, ?Profile $profile = null): ?Profile
     {
         if (!$token || !file_exists($file = $this->getFilename($token))) {
             return null;

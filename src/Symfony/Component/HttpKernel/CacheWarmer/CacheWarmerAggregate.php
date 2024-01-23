@@ -31,7 +31,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     /**
      * @param iterable<mixed, CacheWarmerInterface> $warmers
      */
-    public function __construct(iterable $warmers = [], bool $debug = false, string $deprecationLogsFilepath = null)
+    public function __construct(iterable $warmers = [], bool $debug = false, ?string $deprecationLogsFilepath = null)
     {
         $this->warmers = $warmers;
         $this->debug = $debug;
@@ -51,7 +51,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     /**
      * @param string|null $buildDir
      */
-    public function warmUp(string $cacheDir, string|SymfonyStyle $buildDir = null, SymfonyStyle $io = null): array
+    public function warmUp(string $cacheDir, string|SymfonyStyle|null $buildDir = null, ?SymfonyStyle $io = null): array
     {
         if ($buildDir instanceof SymfonyStyle) {
             trigger_deprecation('symfony/http-kernel', '6.4', 'Passing a "%s" as second argument of "%s()" is deprecated, pass it as third argument instead, after the build directory.', SymfonyStyle::class, __METHOD__);

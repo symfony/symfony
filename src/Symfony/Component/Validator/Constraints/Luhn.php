@@ -42,9 +42,9 @@ class Luhn extends Constraint
     public $message = 'Invalid card number.';
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

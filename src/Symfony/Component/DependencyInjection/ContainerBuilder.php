@@ -155,7 +155,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         'mixed' => true,
     ];
 
-    public function __construct(ParameterBagInterface $parameterBag = null)
+    public function __construct(?ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
 
@@ -431,7 +431,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      * @throws \LogicException        if the extension is not registered
      */
-    public function loadFromExtension(string $extension, array $values = null): static
+    public function loadFromExtension(string $extension, ?array $values = null): static
     {
         if ($this->isCompiled()) {
             throw new BadMethodCallException('Cannot load from an extension on a compiled container.');
@@ -531,7 +531,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->doGet($id, $invalidBehavior);
     }
 
-    private function doGet(string $id, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, array &$inlineServices = null, bool $isConstructorArgument = false): mixed
+    private function doGet(string $id, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, ?array &$inlineServices = null, bool $isConstructorArgument = false): mixed
     {
         if (isset($inlineServices[$id])) {
             return $inlineServices[$id];
@@ -900,7 +900,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * This methods allows for simple registration of service definition
      * with a fluid interface.
      */
-    public function register(string $id, string $class = null): Definition
+    public function register(string $id, ?string $class = null): Definition
     {
         return $this->setDefinition($id, new Definition($class));
     }
@@ -911,7 +911,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * This method implements a shortcut for using setDefinition() with
      * an autowired definition.
      */
-    public function autowire(string $id, string $class = null): Definition
+    public function autowire(string $id, ?string $class = null): Definition
     {
         return $this->setDefinition($id, (new Definition($class))->setAutowired(true));
     }
@@ -1029,7 +1029,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws RuntimeException         When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
-    private function createService(Definition $definition, array &$inlineServices, bool $isConstructorArgument = false, string $id = null, bool|object $tryProxy = true): mixed
+    private function createService(Definition $definition, array &$inlineServices, bool $isConstructorArgument = false, ?string $id = null, bool|object $tryProxy = true): mixed
     {
         if (null === $id && isset($inlineServices[$h = spl_object_hash($definition)])) {
             return $inlineServices[$h];
@@ -1380,7 +1380,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * "$fooBar"-named arguments with $type as type-hint. Such arguments will
      * receive the service $id when autowiring is used.
      */
-    public function registerAliasForArgument(string $id, string $type, string $name = null): Alias
+    public function registerAliasForArgument(string $id, string $type, ?string $name = null): Alias
     {
         $parsedName = (new Target($name ??= $id))->getParsedName();
 
@@ -1427,7 +1427,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return mixed The value with env parameters resolved if a string or an array is passed
      */
-    public function resolveEnvPlaceholders(mixed $value, string|bool $format = null, array &$usedEnvs = null): mixed
+    public function resolveEnvPlaceholders(mixed $value, string|bool|null $format = null, ?array &$usedEnvs = null): mixed
     {
         $bag = $this->getParameterBag();
         if (true === $format ??= '%%env(%s)%%') {

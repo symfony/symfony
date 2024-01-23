@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
 class AttributeClassLoaderWithAttributesTest extends AttributeClassLoaderTestCase
 {
-    protected function setUp(string $env = null): void
+    protected function setUp(?string $env = null): void
     {
         $this->loader = new TraceableAttributeClassLoader($env);
     }

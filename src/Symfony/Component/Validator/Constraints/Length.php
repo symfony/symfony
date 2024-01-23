@@ -67,17 +67,17 @@ class Length extends Constraint
      * @param self::COUNT_*|null $countUnit
      */
     public function __construct(
-        int|array $exactly = null,
-        int $min = null,
-        int $max = null,
-        string $charset = null,
-        callable $normalizer = null,
-        string $countUnit = null,
-        string $exactMessage = null,
-        string $minMessage = null,
-        string $maxMessage = null,
-        string $charsetMessage = null,
-        array $groups = null,
+        int|array|null $exactly = null,
+        ?int $min = null,
+        ?int $max = null,
+        ?string $charset = null,
+        ?callable $normalizer = null,
+        ?string $countUnit = null,
+        ?string $exactMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
+        ?string $charsetMessage = null,
+        ?array $groups = null,
         mixed $payload = null,
         array $options = []
     ) {

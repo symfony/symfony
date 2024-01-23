@@ -21,7 +21,7 @@ trait GetMetadataTrait
     /**
      * @return mixed
      */
-    public function getMetadata(string $key, string|Transition $subject = null)
+    public function getMetadata(string $key, string|Transition|null $subject = null)
     {
         if (null === $subject) {
             return $this->getWorkflowMetadata()[$key] ?? null;

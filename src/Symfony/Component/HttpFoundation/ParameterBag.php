@@ -38,7 +38,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param string|null $key The name of the parameter to return or null to get them all
      */
-    public function all(string $key = null): array
+    public function all(?string $key = null): array
     {
         if (null === $key) {
             return $this->parameters;
@@ -174,7 +174,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return ?T
      */
-    public function getEnum(string $key, string $class, \BackedEnum $default = null): ?\BackedEnum
+    public function getEnum(string $key, string $class, ?\BackedEnum $default = null): ?\BackedEnum
     {
         $value = $this->get($key);
 

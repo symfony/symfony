@@ -33,7 +33,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * @param string|null $foreground The style foreground color name
      * @param string|null $background The style background color name
      */
-    public function __construct(string $foreground = null, string $background = null, array $options = [])
+    public function __construct(?string $foreground = null, ?string $background = null, array $options = [])
     {
         $this->color = new Color($this->foreground = $foreground ?: '', $this->background = $background ?: '', $this->options = $options);
     }
@@ -41,7 +41,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * @return void
      */
-    public function setForeground(string $color = null)
+    public function setForeground(?string $color = null)
     {
         if (1 > \func_num_args()) {
             trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
@@ -52,7 +52,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * @return void
      */
-    public function setBackground(string $color = null)
+    public function setBackground(?string $color = null)
     {
         if (1 > \func_num_args()) {
             trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);

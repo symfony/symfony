@@ -34,6 +34,7 @@ return (new PhpCsFixer\Config())
             'remove_inheritdoc' => true,
             'allow_unused_params' => true, // for future-ready params, to be replaced with https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues/7377
         ],
+        'nullable_type_declaration_for_default_null_value' => true,
         'header_comment' => ['header' => $fileHeaderComment],
         'modernize_strpos' => true,
         'get_class_to_class_keyword' => true,

@@ -33,7 +33,7 @@ final class VonageTransport extends AbstractTransport
     private string $apiSecret;
     private string $from;
 
-    public function __construct(string $apiKey, #[\SensitiveParameter] string $apiSecret, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, #[\SensitiveParameter] string $apiSecret, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;

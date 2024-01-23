@@ -24,7 +24,7 @@ class TemplateReference implements TemplateReferenceInterface
 {
     protected $parameters;
 
-    public function __construct(string $name = null, string $engine = null)
+    public function __construct(?string $name = null, ?string $engine = null)
     {
         $this->parameters = [
             'name' => $name,

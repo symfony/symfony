@@ -57,7 +57,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
         return $this->getReceiver()->getMessageCount();
     }
 
-    public function all(int $limit = null): iterable
+    public function all(?int $limit = null): iterable
     {
         return $this->getReceiver()->all($limit);
     }

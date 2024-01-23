@@ -23,7 +23,7 @@ trigger_deprecation('symfony/messenger', '6.3', '"%s" is deprecated, use the "%s
  */
 class StopWorkerOnSigtermSignalListener extends StopWorkerOnSignalsListener
 {
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(?LoggerInterface $logger = null)
     {
         parent::__construct(\extension_loaded('pcntl') ? [\SIGTERM] : [], $logger);
     }

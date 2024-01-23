@@ -40,7 +40,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
     private int $usageIndex = 0;
     private ?\Closure $usageReporter;
 
-    public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null, callable $usageReporter = null)
+    public function __construct(?SessionStorageInterface $storage = null, ?AttributeBagInterface $attributes = null, ?FlashBagInterface $flashes = null, ?callable $usageReporter = null)
     {
         $this->storage = $storage ?? new NativeSessionStorage();
         $this->usageReporter = null === $usageReporter ? null : $usageReporter(...);
@@ -151,14 +151,14 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return true;
     }
 
-    public function invalidate(int $lifetime = null): bool
+    public function invalidate(?int $lifetime = null): bool
     {
         $this->storage->clear();
 
         return $this->migrate(true, $lifetime);
     }
 
-    public function migrate(bool $destroy = false, int $lifetime = null): bool
+    public function migrate(bool $destroy = false, ?int $lifetime = null): bool
     {
         return $this->storage->regenerate($destroy, $lifetime);
     }

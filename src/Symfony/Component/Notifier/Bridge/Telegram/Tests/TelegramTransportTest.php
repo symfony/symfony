@@ -28,7 +28,7 @@ final class TelegramTransportTest extends TransportTestCase
 {
     private const FIXTURE_FILE = __DIR__.'/Fixtures/image.png';
 
-    public static function createTransport(HttpClientInterface $client = null, string $channel = null): TelegramTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null): TelegramTransport
     {
         return new TelegramTransport('token', $channel, $client ?? new MockHttpClient());
     }

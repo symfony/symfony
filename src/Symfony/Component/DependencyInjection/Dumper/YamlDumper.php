@@ -322,7 +322,7 @@ class YamlDumper extends Dumper
         return $value;
     }
 
-    private function getServiceCall(string $id, Reference $reference = null): string
+    private function getServiceCall(string $id, ?Reference $reference = null): string
     {
         if (null !== $reference) {
             switch ($reference->getInvalidBehavior()) {

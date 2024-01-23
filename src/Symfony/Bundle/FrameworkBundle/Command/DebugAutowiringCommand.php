@@ -35,7 +35,7 @@ class DebugAutowiringCommand extends ContainerDebugCommand
 {
     private ?FileLinkFormatter $fileLinkFormatter;
 
-    public function __construct(string $name = null, FileLinkFormatter $fileLinkFormatter = null)
+    public function __construct(?string $name = null, ?FileLinkFormatter $fileLinkFormatter = null)
     {
         $this->fileLinkFormatter = $fileLinkFormatter;
         parent::__construct($name);

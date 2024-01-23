@@ -32,7 +32,7 @@ class IntlTestHelper
      *
      * @return void
      */
-    public static function requireIntl(TestCase $testCase, string $minimumIcuVersion = null)
+    public static function requireIntl(TestCase $testCase, ?string $minimumIcuVersion = null)
     {
         $minimumIcuVersion ??= Intl::getIcuStubVersion();
 
@@ -66,7 +66,7 @@ class IntlTestHelper
      *
      * @return void
      */
-    public static function requireFullIntl(TestCase $testCase, string $minimumIcuVersion = null)
+    public static function requireFullIntl(TestCase $testCase, ?string $minimumIcuVersion = null)
     {
         // We only run tests if the intl extension is loaded...
         if (!Intl::isExtensionLoaded()) {

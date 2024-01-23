@@ -111,7 +111,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * @internal Called by {@link ExecutionContextFactory}. Should not be used in user code.
      */
-    public function __construct(ValidatorInterface $validator, mixed $root, TranslatorInterface $translator, string $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, mixed $root, TranslatorInterface $translator, ?string $translationDomain = null)
     {
         $this->validator = $validator;
         $this->root = $root;

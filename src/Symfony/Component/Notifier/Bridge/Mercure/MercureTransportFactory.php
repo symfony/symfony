@@ -27,7 +27,7 @@ final class MercureTransportFactory extends AbstractTransportFactory
 {
     private HubRegistry $registry;
 
-    public function __construct(HubRegistry $registry, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
+    public function __construct(HubRegistry $registry, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
     {
         parent::__construct($dispatcher, $client);
 

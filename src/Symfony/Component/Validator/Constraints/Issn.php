@@ -49,11 +49,11 @@ class Issn extends Constraint
     public $requireHyphen = false;
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        bool $caseSensitive = null,
-        bool $requireHyphen = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?bool $caseSensitive = null,
+        ?bool $requireHyphen = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

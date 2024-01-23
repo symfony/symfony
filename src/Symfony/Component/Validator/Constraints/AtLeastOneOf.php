@@ -36,7 +36,7 @@ class AtLeastOneOf extends Composite
     public $messageCollection = 'Each element of this collection should satisfy its own set of constraints.';
     public $includeInternalMessages = true;
 
-    public function __construct(mixed $constraints = null, array $groups = null, mixed $payload = null, string $message = null, string $messageCollection = null, bool $includeInternalMessages = null)
+    public function __construct(mixed $constraints = null, ?array $groups = null, mixed $payload = null, ?string $message = null, ?string $messageCollection = null, ?bool $includeInternalMessages = null)
     {
         parent::__construct($constraints ?? [], $groups, $payload);
 

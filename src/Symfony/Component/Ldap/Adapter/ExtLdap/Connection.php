@@ -67,7 +67,7 @@ class Connection extends AbstractConnection
      *
      * @return void
      */
-    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null)
+    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null)
     {
         if (!$this->connection) {
             $this->connect();

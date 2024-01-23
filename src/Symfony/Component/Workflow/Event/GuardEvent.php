@@ -25,7 +25,7 @@ final class GuardEvent extends Event
 {
     private TransitionBlockerList $transitionBlockerList;
 
-    public function __construct(object $subject, Marking $marking, Transition $transition, WorkflowInterface $workflow = null)
+    public function __construct(object $subject, Marking $marking, Transition $transition, ?WorkflowInterface $workflow = null)
     {
         parent::__construct($subject, $marking, $transition, $workflow);
 
@@ -49,7 +49,7 @@ final class GuardEvent extends Event
         return !$this->transitionBlockerList->isEmpty();
     }
 
-    public function setBlocked(bool $blocked, string $message = null): void
+    public function setBlocked(bool $blocked, ?string $message = null): void
     {
         if (!$blocked) {
             $this->transitionBlockerList->clear();

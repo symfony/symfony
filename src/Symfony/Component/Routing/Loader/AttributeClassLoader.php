@@ -111,7 +111,7 @@ abstract class AttributeClassLoader implements LoaderInterface
     /**
      * @throws \InvalidArgumentException When route can't be parsed
      */
-    public function load(mixed $class, string $type = null): RouteCollection
+    public function load(mixed $class, ?string $type = null): RouteCollection
     {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
@@ -267,7 +267,7 @@ abstract class AttributeClassLoader implements LoaderInterface
         }
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         if ('annotation' === $type) {
             trigger_deprecation('symfony/routing', '6.4', 'The "annotation" route type is deprecated, use the "attribute" route type instead.');

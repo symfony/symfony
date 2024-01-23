@@ -78,7 +78,7 @@ END'],
     /**
      * @dataProvider provideCodePointsAt
      */
-    public function testCodePointsAt(array $expected, string $string, int $offset, int $form = null)
+    public function testCodePointsAt(array $expected, string $string, int $offset, ?int $form = null)
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
             $this->markTestSkipped('Skipping due to issue ICU-21661.');

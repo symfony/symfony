@@ -41,10 +41,10 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
     private readonly ResponseFactoryInterface $responseFactory;
 
     public function __construct(
-        ServerRequestFactoryInterface $serverRequestFactory = null,
-        StreamFactoryInterface $streamFactory = null,
-        UploadedFileFactoryInterface $uploadedFileFactory = null,
-        ResponseFactoryInterface $responseFactory = null,
+        ?ServerRequestFactoryInterface $serverRequestFactory = null,
+        ?StreamFactoryInterface $streamFactory = null,
+        ?UploadedFileFactoryInterface $uploadedFileFactory = null,
+        ?ResponseFactoryInterface $responseFactory = null,
     ) {
         if (null === $serverRequestFactory || null === $streamFactory || null === $uploadedFileFactory || null === $responseFactory) {
             $psr17Factory = match (true) {

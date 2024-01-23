@@ -30,7 +30,7 @@ final class AmazonSnsTransport extends AbstractTransport
 {
     private SnsClient $snsClient;
 
-    public function __construct(SnsClient $snsClient, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(SnsClient $snsClient, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->snsClient = $snsClient;
         parent::__construct($client, $dispatcher);

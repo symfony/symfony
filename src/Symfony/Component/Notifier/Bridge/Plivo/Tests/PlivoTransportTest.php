@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class PlivoTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): PlivoTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'from'): PlivoTransport
     {
         return new PlivoTransport('authId', 'authToken', $from, $client ?? new MockHttpClient());
     }

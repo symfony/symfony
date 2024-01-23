@@ -33,7 +33,7 @@ interface ChoiceListFactoryInterface
      *
      * @param callable|null $filter The callable filtering the choices
      */
-    public function createListFromChoices(iterable $choices, callable $value = null, callable $filter = null): ChoiceListInterface;
+    public function createListFromChoices(iterable $choices, ?callable $value = null, ?callable $filter = null): ChoiceListInterface;
 
     /**
      * Creates a choice list that is loaded with the given loader.
@@ -44,7 +44,7 @@ interface ChoiceListFactoryInterface
      *
      * @param callable|null $filter The callable filtering the choices
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null, callable $filter = null): ChoiceListInterface;
+    public function createListFromLoader(ChoiceLoaderInterface $loader, ?callable $value = null, ?callable $filter = null): ChoiceListInterface;
 
     /**
      * Creates a view for the given choice list.
@@ -81,5 +81,5 @@ interface ChoiceListFactoryInterface
      *                                                        on top of the list and in their original position
      *                                                        or only in the top of the list
      */
-    public function createView(ChoiceListInterface $list, array|callable $preferredChoices = null, callable|false $label = null, callable $index = null, callable $groupBy = null, array|callable $attr = null, array|callable $labelTranslationParameters = []/* , bool $duplicatePreferredChoices = true */): ChoiceListView;
+    public function createView(ChoiceListInterface $list, array|callable|null $preferredChoices = null, callable|false|null $label = null, ?callable $index = null, ?callable $groupBy = null, array|callable|null $attr = null, array|callable $labelTranslationParameters = []/* , bool $duplicatePreferredChoices = true */): ChoiceListView;
 }

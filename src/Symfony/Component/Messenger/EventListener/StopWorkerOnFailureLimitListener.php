@@ -26,7 +26,7 @@ class StopWorkerOnFailureLimitListener implements EventSubscriberInterface
     private ?LoggerInterface $logger;
     private int $failedMessages = 0;
 
-    public function __construct(int $maximumNumberOfFailures, LoggerInterface $logger = null)
+    public function __construct(int $maximumNumberOfFailures, ?LoggerInterface $logger = null)
     {
         $this->maximumNumberOfFailures = $maximumNumberOfFailures;
         $this->logger = $logger;

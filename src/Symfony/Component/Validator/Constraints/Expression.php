@@ -44,12 +44,12 @@ class Expression extends Constraint
 
     public function __construct(
         string|ExpressionObject|array|null $expression,
-        string $message = null,
-        array $values = null,
-        array $groups = null,
+        ?string $message = null,
+        ?array $values = null,
+        ?array $groups = null,
         mixed $payload = null,
         array $options = [],
-        bool $negate = null,
+        ?bool $negate = null,
     ) {
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint. Try running "composer require symfony/expression-language".', __CLASS__));

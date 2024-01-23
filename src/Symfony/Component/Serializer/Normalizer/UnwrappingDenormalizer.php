@@ -28,7 +28,7 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
 
     private readonly PropertyAccessorInterface $propertyAccessor;
 
-    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(?PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -38,7 +38,7 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
         return ['*' => false];
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         $propertyPath = $context[self::UNWRAP_PATH];
         $context['unwrapped'] = true;
@@ -58,7 +58,7 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
         return $this->serializer->denormalize($data, $type, $format, $context);
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return \array_key_exists(self::UNWRAP_PATH, $context) && !isset($context['unwrapped']);
     }

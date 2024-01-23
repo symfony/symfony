@@ -35,8 +35,8 @@ final class GoIpTransport extends AbstractTransport
         #[\SensitiveParameter]
         private readonly string $password,
         private readonly int $simSlot,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null
     ) {
         parent::__construct($client, $dispatcher);
     }

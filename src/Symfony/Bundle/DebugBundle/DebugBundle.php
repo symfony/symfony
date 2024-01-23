@@ -35,10 +35,10 @@ class DebugBundle extends Bundle
             // The dump data collector is used by default, so dump output is sent to
             // the WDT. In a CLI context, if dump is used too soon, the data collector
             // will buffer it, and release it at the end of the script.
-            VarDumper::setHandler(function ($var, string $label = null) use ($container) {
+            VarDumper::setHandler(function ($var, ?string $label = null) use ($container) {
                 $dumper = $container->get('data_collector.dump');
                 $cloner = $container->get('var_dumper.cloner');
-                $handler = function ($var, string $label = null) use ($dumper, $cloner) {
+                $handler = function ($var, ?string $label = null) use ($dumper, $cloner) {
                     $var = $cloner->cloneVar($var);
                     if (null !== $label) {
                         $var = $var->withContext(['label' => $label]);

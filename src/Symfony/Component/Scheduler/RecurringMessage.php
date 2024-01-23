@@ -45,7 +45,7 @@ final class RecurringMessage implements MessageProviderInterface
      * @see https://en.wikipedia.org/wiki/ISO_8601#Durations
      * @see https://php.net/datetime.formats.relative
      */
-    public static function every(string|int|\DateInterval $frequency, object $message, string|\DateTimeImmutable $from = null, string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
+    public static function every(string|int|\DateInterval $frequency, object $message, string|\DateTimeImmutable|null $from = null, string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
     {
         return self::trigger(new PeriodicalTrigger($frequency, $from, $until), $message);
     }
@@ -53,7 +53,7 @@ final class RecurringMessage implements MessageProviderInterface
     /**
      * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
      */
-    public static function cron(string $expression, object $message, \DateTimeZone|string $timezone = null): self
+    public static function cron(string $expression, object $message, \DateTimeZone|string|null $timezone = null): self
     {
         if (!str_contains($expression, '#')) {
             return self::trigger(CronExpressionTrigger::fromSpec($expression, null, $timezone), $message);

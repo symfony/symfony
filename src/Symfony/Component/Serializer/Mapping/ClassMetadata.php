@@ -44,7 +44,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * Constructs a metadata for the given class.
      */
-    public function __construct(string $class, ClassDiscriminatorMapping $classDiscriminatorMapping = null)
+    public function __construct(string $class, ?ClassDiscriminatorMapping $classDiscriminatorMapping = null)
     {
         $this->name = $class;
         $this->classDiscriminatorMapping = $classDiscriminatorMapping;
@@ -90,7 +90,7 @@ class ClassMetadata implements ClassMetadataInterface
         return $this->classDiscriminatorMapping;
     }
 
-    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null): void
+    public function setClassDiscriminatorMapping(?ClassDiscriminatorMapping $mapping = null): void
     {
         if (1 > \func_num_args()) {
             trigger_deprecation('symfony/serializer', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);

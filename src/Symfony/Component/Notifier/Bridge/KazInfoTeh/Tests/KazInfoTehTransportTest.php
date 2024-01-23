@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class KazInfoTehTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new KazInfoTehTransport('username', 'password', 'sender', $client ?? new MockHttpClient()))->setHost('test.host');
     }

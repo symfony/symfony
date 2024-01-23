@@ -79,7 +79,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param int $throw        A bitwise combination of the THROW_* constants
      *                          to specify when exceptions should be thrown
      */
-    public function __construct(int $magicMethods = self::MAGIC_GET | self::MAGIC_SET, int $throw = self::THROW_ON_INVALID_PROPERTY_PATH, CacheItemPoolInterface $cacheItemPool = null, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
+    public function __construct(int $magicMethods = self::MAGIC_GET | self::MAGIC_SET, int $throw = self::THROW_ON_INVALID_PROPERTY_PATH, ?CacheItemPoolInterface $cacheItemPool = null, ?PropertyReadInfoExtractorInterface $readInfoExtractor = null, ?PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
     {
         $this->magicMethodsFlags = $magicMethods;
         $this->ignoreInvalidIndices = 0 === ($throw & self::THROW_ON_INVALID_INDEX);
@@ -187,7 +187,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
     }
 
-    private static function throwInvalidArgumentException(string $message, array $trace, int $i, string $propertyPath, \Throwable $previous = null): void
+    private static function throwInvalidArgumentException(string $message, array $trace, int $i, string $propertyPath, ?\Throwable $previous = null): void
     {
         if (!isset($trace[$i]['file']) || __FILE__ !== $trace[$i]['file']) {
             return;
@@ -662,7 +662,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws \LogicException When the Cache Component isn't available
      */
-    public static function createCache(string $namespace, int $defaultLifetime, string $version, LoggerInterface $logger = null): AdapterInterface
+    public static function createCache(string $namespace, int $defaultLifetime, string $version, ?LoggerInterface $logger = null): AdapterInterface
     {
         if (!class_exists(ApcuAdapter::class)) {
             throw new \LogicException(sprintf('The Symfony Cache component must be installed to use "%s()".', __METHOD__));

@@ -58,7 +58,7 @@ interface SurrogateInterface
      * @param string|null $alt     An alternate URI
      * @param string      $comment A comment to add as an esi:include tag
      */
-    public function renderIncludeTag(string $uri, string $alt = null, bool $ignoreErrors = true, string $comment = ''): string;
+    public function renderIncludeTag(string $uri, ?string $alt = null, bool $ignoreErrors = true, string $comment = ''): string;
 
     /**
      * Replaces a Response Surrogate tags with the included resource content.

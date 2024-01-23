@@ -192,7 +192,7 @@ class TranslationUpdateCommandTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
     {
         $translator = $this->createMock(Translator::class);
         $translator

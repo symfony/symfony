@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SimpleTextinTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'test_from'): SimpleTextinTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'test_from'): SimpleTextinTransport
     {
         return new SimpleTextinTransport('test_api_key', $from, $client ?? new MockHttpClient());
     }

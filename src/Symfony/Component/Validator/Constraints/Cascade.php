@@ -25,7 +25,7 @@ class Cascade extends Constraint
 {
     public array $exclude = [];
 
-    public function __construct(array|string $exclude = null, array $options = null)
+    public function __construct(array|string|null $exclude = null, ?array $options = null)
     {
         if (\is_array($exclude) && !array_is_list($exclude)) {
             $options = array_merge($exclude, $options ?? []);

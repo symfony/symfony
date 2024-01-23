@@ -35,7 +35,7 @@ class IsFalse extends Constraint
 
     public $message = 'This value should be false.';
 
-    public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($options ?? [], $groups, $payload);
 

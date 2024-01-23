@@ -45,7 +45,7 @@ class Iban extends Constraint
 
     public $message = 'This is not a valid International Bank Account Number (IBAN).';
 
-    public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);
 

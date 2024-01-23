@@ -26,7 +26,7 @@ final class PackageRequireOptions
          */
         public readonly string $packageModuleSpecifier,
         public readonly ?string $versionConstraint = null,
-        string $importName = null,
+        ?string $importName = null,
         public readonly ?string $path = null,
         public readonly bool $entrypoint = false,
     ) {

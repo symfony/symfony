@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
  */
 class AttributeClassLoaderWithAnnotationsTest extends AttributeClassLoaderTestCase
 {
-    protected function setUp(string $env = null): void
+    protected function setUp(?string $env = null): void
     {
         $reader = new AnnotationReader();
         $this->loader = new TraceableAttributeClassLoader($reader, $env);

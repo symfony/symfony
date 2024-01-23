@@ -31,7 +31,7 @@ class LdapBadge implements BadgeInterface
     private string $searchPassword;
     private ?string $queryString;
 
-    public function __construct(string $ldapServiceId, string $dnString = '{user_identifier}', string $searchDn = '', string $searchPassword = '', string $queryString = null)
+    public function __construct(string $ldapServiceId, string $dnString = '{user_identifier}', string $searchDn = '', string $searchPassword = '', ?string $queryString = null)
     {
         $this->ldapServiceId = $ldapServiceId;
         $dnString = str_replace('{username}', '{user_identifier}', $dnString, $replaceCount);

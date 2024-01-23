@@ -28,7 +28,7 @@ final class BoundArgument implements ArgumentInterface
     private int $type;
     private ?string $file;
 
-    public function __construct(mixed $value, bool $trackUsage = true, int $type = 0, string $file = null)
+    public function __construct(mixed $value, bool $trackUsage = true, int $type = 0, ?string $file = null)
     {
         $this->value = $value;
         if ($trackUsage) {

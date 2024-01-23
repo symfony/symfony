@@ -213,7 +213,7 @@ final class ProxyHelper
             EOPHP;
     }
 
-    public static function exportSignature(\ReflectionFunctionAbstract $function, bool $withParameterTypes = true, string &$args = null): string
+    public static function exportSignature(\ReflectionFunctionAbstract $function, bool $withParameterTypes = true, ?string &$args = null): string
     {
         $byRefIndex = 0;
         $args = '';
@@ -270,7 +270,7 @@ final class ProxyHelper
         return $signature;
     }
 
-    public static function exportType(\ReflectionFunctionAbstract|\ReflectionProperty|\ReflectionParameter $owner, bool $noBuiltin = false, \ReflectionType $type = null): ?string
+    public static function exportType(\ReflectionFunctionAbstract|\ReflectionProperty|\ReflectionParameter $owner, bool $noBuiltin = false, ?\ReflectionType $type = null): ?string
     {
         if (!$type ??= $owner instanceof \ReflectionFunctionAbstract ? $owner->getReturnType() : $owner->getType()) {
             return null;

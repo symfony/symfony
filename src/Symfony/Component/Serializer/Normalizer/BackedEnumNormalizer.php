@@ -34,7 +34,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         ];
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): int|string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): int|string
     {
         if (!$object instanceof \BackedEnum) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
@@ -43,7 +43,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         return $object->value;
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof \BackedEnum;
     }
@@ -51,7 +51,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
     /**
      * @throws NotNormalizableValueException
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!is_subclass_of($type, \BackedEnum::class)) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
@@ -84,7 +84,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         }
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_subclass_of($type, \BackedEnum::class);
     }

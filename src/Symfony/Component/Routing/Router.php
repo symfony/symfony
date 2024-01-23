@@ -91,7 +91,7 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     private static ?array $cache = [];
 
-    public function __construct(LoaderInterface $loader, mixed $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null)
+    public function __construct(LoaderInterface $loader, mixed $resource, array $options = [], ?RequestContext $context = null, ?LoggerInterface $logger = null, ?string $defaultLocale = null)
     {
         $this->loader = $loader;
         $this->resource = $resource;

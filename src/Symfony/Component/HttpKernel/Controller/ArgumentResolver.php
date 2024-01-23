@@ -39,14 +39,14 @@ final class ArgumentResolver implements ArgumentResolverInterface
     /**
      * @param iterable<mixed, ArgumentValueResolverInterface|ValueResolverInterface> $argumentValueResolvers
      */
-    public function __construct(ArgumentMetadataFactoryInterface $argumentMetadataFactory = null, iterable $argumentValueResolvers = [], ContainerInterface $namedResolvers = null)
+    public function __construct(?ArgumentMetadataFactoryInterface $argumentMetadataFactory = null, iterable $argumentValueResolvers = [], ?ContainerInterface $namedResolvers = null)
     {
         $this->argumentMetadataFactory = $argumentMetadataFactory ?? new ArgumentMetadataFactory();
         $this->argumentValueResolvers = $argumentValueResolvers ?: self::getDefaultArgumentValueResolvers();
         $this->namedResolvers = $namedResolvers;
     }
 
-    public function getArguments(Request $request, callable $controller, \ReflectionFunctionAbstract $reflector = null): array
+    public function getArguments(Request $request, callable $controller, ?\ReflectionFunctionAbstract $reflector = null): array
     {
         $arguments = [];
 

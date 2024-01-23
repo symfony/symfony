@@ -45,7 +45,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
         ];
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         if (\array_key_exists(self::PAYLOAD_FIELDS, $context)) {
             $payloadFieldsToSerialize = $context[self::PAYLOAD_FIELDS];
@@ -111,7 +111,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     /**
      * @param array $context
      */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
+    public function supportsNormalization(mixed $data, ?string $format = null /* , array $context = [] */): bool
     {
         return $data instanceof ConstraintViolationListInterface;
     }

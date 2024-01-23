@@ -696,7 +696,7 @@ class AutowirePass extends AbstractRecursivePass
         return null;
     }
 
-    private function populateAutowiringAlias(string $id, string $target = null): void
+    private function populateAutowiringAlias(string $id, ?string $target = null): void
     {
         if (!preg_match('/(?(DEFINE)(?<V>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+))^((?&V)(?:\\\\(?&V))*+)(?: \$((?&V)))?$/', $id, $m)) {
             return;
@@ -716,7 +716,7 @@ class AutowirePass extends AbstractRecursivePass
         }
     }
 
-    private function getCombinedAlias(string $type, string $name = null): ?string
+    private function getCombinedAlias(string $type, ?string $name = null): ?string
     {
         if (str_contains($type, '&')) {
             $types = explode('&', $type);

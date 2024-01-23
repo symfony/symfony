@@ -42,7 +42,7 @@ final class LogoutUrlExtension extends AbstractExtension
      *
      * @param string|null $key The firewall key or null to use the current firewall key
      */
-    public function getLogoutPath(string $key = null): string
+    public function getLogoutPath(?string $key = null): string
     {
         return $this->generator->getLogoutPath($key);
     }
@@ -52,7 +52,7 @@ final class LogoutUrlExtension extends AbstractExtension
      *
      * @param string|null $key The firewall key or null to use the current firewall key
      */
-    public function getLogoutUrl(string $key = null): string
+    public function getLogoutUrl(?string $key = null): string
     {
         return $this->generator->getLogoutUrl($key);
     }

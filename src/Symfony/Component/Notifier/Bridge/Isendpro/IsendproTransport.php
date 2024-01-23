@@ -31,8 +31,8 @@ final class IsendproTransport extends AbstractTransport
         private ?string $from = null,
         private bool $noStop = false,
         private bool $sandbox = false,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null
     ) {
         parent::__construct($client, $dispatcher);
     }

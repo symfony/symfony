@@ -35,7 +35,7 @@ final class SecretsRemoveCommand extends Command
     private AbstractVault $vault;
     private ?AbstractVault $localVault;
 
-    public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
+    public function __construct(AbstractVault $vault, ?AbstractVault $localVault = null)
     {
         $this->vault = $vault;
         $this->localVault = $localVault;

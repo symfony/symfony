@@ -43,7 +43,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         'failure_path_parameter' => '_failure_path',
     ];
 
-    public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options = [], LoggerInterface $logger = null)
+    public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options = [], ?LoggerInterface $logger = null)
     {
         $this->httpKernel = $httpKernel;
         $this->httpUtils = $httpUtils;

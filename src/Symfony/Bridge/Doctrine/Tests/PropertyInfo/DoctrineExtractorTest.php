@@ -110,7 +110,7 @@ class DoctrineExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract(string $property, array $type = null)
+    public function testExtract(string $property, ?array $type = null)
     {
         $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property, []));
     }

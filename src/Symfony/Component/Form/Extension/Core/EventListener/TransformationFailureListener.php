@@ -24,7 +24,7 @@ class TransformationFailureListener implements EventSubscriberInterface
 {
     private ?TranslatorInterface $translator;
 
-    public function __construct(TranslatorInterface $translator = null)
+    public function __construct(?TranslatorInterface $translator = null)
     {
         $this->translator = $translator;
     }

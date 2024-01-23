@@ -203,7 +203,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtractors($property, array $type = null)
+    public function testExtractors($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, []));
     }
@@ -230,7 +230,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider php7TypesProvider
      */
-    public function testExtractPhp7Type(string $class, string $property, array $type = null)
+    public function testExtractPhp7Type(string $class, string $property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
     }
@@ -251,7 +251,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider php71TypesProvider
      */
-    public function testExtractPhp71Type($property, array $type = null)
+    public function testExtractPhp71Type($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy', $property, []));
     }
@@ -270,7 +270,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider php80TypesProvider
      */
-    public function testExtractPhp80Type($property, array $type = null)
+    public function testExtractPhp80Type($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy', $property, []));
     }
@@ -292,7 +292,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider php81TypesProvider
      */
-    public function testExtractPhp81Type($property, array $type = null)
+    public function testExtractPhp81Type($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy', $property, []));
     }
@@ -315,7 +315,7 @@ class ReflectionExtractorTest extends TestCase
      *
      * @requires PHP 8.2
      */
-    public function testExtractPhp82Type($property, array $type = null)
+    public function testExtractPhp82Type($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy', $property, []));
     }
@@ -475,7 +475,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider constructorTypesProvider
      */
-    public function testExtractTypeConstructor(string $class, string $property, array $type = null)
+    public function testExtractTypeConstructor(string $class, string $property, ?array $type = null)
     {
         /* Check that constructor extractions works by default, and if passed in via context.
            Check that null is returned if constructor extraction is disabled */
@@ -634,7 +634,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider extractConstructorTypesProvider
      */
-    public function testExtractConstructorTypes(string $property, array $type = null)
+    public function testExtractConstructorTypes(string $property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }

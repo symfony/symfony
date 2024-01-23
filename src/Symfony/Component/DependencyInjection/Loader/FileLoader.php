@@ -46,7 +46,7 @@ abstract class FileLoader extends BaseFileLoader
     protected $aliases = [];
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
-    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null)
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, ?string $env = null)
     {
         $this->container = $container;
 
@@ -56,7 +56,7 @@ abstract class FileLoader extends BaseFileLoader
     /**
      * @param bool|string $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
      */
-    public function import(mixed $resource, string $type = null, bool|string $ignoreErrors = false, string $sourceResource = null, $exclude = null): mixed
+    public function import(mixed $resource, ?string $type = null, bool|string $ignoreErrors = false, ?string $sourceResource = null, $exclude = null): mixed
     {
         $args = \func_get_args();
 
@@ -98,7 +98,7 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @return void
      */
-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */)
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array|null $exclude = null/* , string $source = null */)
     {
         if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));

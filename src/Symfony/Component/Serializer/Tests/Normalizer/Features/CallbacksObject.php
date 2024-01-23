@@ -20,7 +20,7 @@ class CallbacksObject
      */
     public $foo;
 
-    public function __construct($bar = null, string $foo = null)
+    public function __construct($bar = null, ?string $foo = null)
     {
         $this->bar = $bar;
         $this->foo = $foo;

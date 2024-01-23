@@ -30,7 +30,7 @@ trigger_deprecation('symfony/oh-my-smtp-mailer', '6.2', 'The "%s" class is depre
  */
 final class OhMySmtpSmtpTransport extends EsmtpTransport
 {
-    public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $id, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         parent::__construct('smtp.ohmysmtp.com', 587, false, $dispatcher, $logger);
 
@@ -38,7 +38,7 @@ final class OhMySmtpSmtpTransport extends EsmtpTransport
         $this->setPassword($id);
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Message) {
             $this->addOhMySmtpHeaders($message);

@@ -425,7 +425,7 @@ class ImportMapManagerTest extends TestCase
         return ImportMapEntry::createLocal($importName, $type, path: $path, isEntrypoint: $isEntrypoint);
     }
 
-    private static function createRemoteEntry(string $importName, string $version, string $path = null, ImportMapType $type = ImportMapType::JS, string $packageSpecifier = null): ImportMapEntry
+    private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
         $packageSpecifier = $packageSpecifier ?? $importName;
         $path = $path ?? '/vendor/any-path.js';

@@ -37,7 +37,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
         return false;
     }
 
-    public function warmUp(string $cacheDir, string $buildDir = null): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $files = [];
         foreach ($this->registry->getManagers() as $em) {

@@ -151,7 +151,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * @throws \InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      */
-    public function __construct(#[\SensitiveParameter] \PDO|string $pdoOrDsn = null, #[\SensitiveParameter] array $options = [])
+    public function __construct(#[\SensitiveParameter] \PDO|string|null $pdoOrDsn = null, #[\SensitiveParameter] array $options = [])
     {
         if ($pdoOrDsn instanceof \PDO) {
             if (\PDO::ERRMODE_EXCEPTION !== $pdoOrDsn->getAttribute(\PDO::ATTR_ERRMODE)) {
@@ -181,7 +181,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Adds the Table to the Schema if it doesn't exist.
      */
-    public function configureSchema(Schema $schema, \Closure $isSameDatabase = null): void
+    public function configureSchema(Schema $schema, ?\Closure $isSameDatabase = null): void
     {
         if ($schema->hasTable($this->table) || ($isSameDatabase && !$isSameDatabase($this->getConnection()->exec(...)))) {
             return;

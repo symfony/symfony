@@ -28,7 +28,7 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
     private ?LoggerInterface $logger;
     private float $workerStartedAt = 0;
 
-    public function __construct(CacheItemPoolInterface $cachePool, LoggerInterface $logger = null)
+    public function __construct(CacheItemPoolInterface $cachePool, ?LoggerInterface $logger = null)
     {
         $this->cachePool = $cachePool;
         $this->logger = $logger;

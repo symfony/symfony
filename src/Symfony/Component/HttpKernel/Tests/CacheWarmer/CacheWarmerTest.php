@@ -54,7 +54,7 @@ class TestCacheWarmer extends CacheWarmer
         $this->file = $file;
     }
 
-    public function warmUp(string $cacheDir, string $buildDir = null): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $this->writeCacheFile($this->file, 'content');
 

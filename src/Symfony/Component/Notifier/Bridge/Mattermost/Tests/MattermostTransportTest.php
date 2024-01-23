@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MattermostTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): MattermostTransport
+    public static function createTransport(?HttpClientInterface $client = null): MattermostTransport
     {
         return (new MattermostTransport('testAccessToken', 'testChannel', null, $client ?? new MockHttpClient()))->setHost('host.test');
     }

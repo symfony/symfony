@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class NovuTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new NovuTransport('9c9ced75881ddc65c033273f466b42d1', $client ?? new MockHttpClient()))->setHost('host.test');
     }

@@ -27,7 +27,7 @@ class StopWorkerOnSignalsListener implements EventSubscriberInterface
     private array $signals;
     private ?LoggerInterface $logger;
 
-    public function __construct(array $signals = null, LoggerInterface $logger = null)
+    public function __construct(?array $signals = null, ?LoggerInterface $logger = null)
     {
         if (null === $signals && \extension_loaded('pcntl')) {
             $signals = [\SIGTERM, \SIGINT];

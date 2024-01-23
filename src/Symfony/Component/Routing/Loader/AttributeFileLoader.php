@@ -43,7 +43,7 @@ class AttributeFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */
-    public function load(mixed $file, string $type = null): ?RouteCollection
+    public function load(mixed $file, ?string $type = null): ?RouteCollection
     {
         $path = $this->locator->locate($file);
 
@@ -63,7 +63,7 @@ class AttributeFileLoader extends FileLoader
         return $collection;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         if ('annotation' === $type) {
             trigger_deprecation('symfony/routing', '6.4', 'The "annotation" route type is deprecated, use the "attribute" route type instead.');

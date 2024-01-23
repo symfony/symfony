@@ -28,7 +28,7 @@ class DoctrineOpenTransactionLoggerMiddleware extends AbstractDoctrineMiddleware
 
     public function __construct(
         ManagerRegistry $managerRegistry,
-        string $entityManagerName = null,
+        ?string $entityManagerName = null,
         private readonly ?LoggerInterface $logger = null,
     ) {
         parent::__construct($managerRegistry, $entityManagerName);

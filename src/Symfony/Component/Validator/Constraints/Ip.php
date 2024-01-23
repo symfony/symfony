@@ -88,11 +88,11 @@ class Ip extends Constraint
     public $normalizer;
 
     public function __construct(
-        array $options = null,
-        string $version = null,
-        string $message = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $version = null,
+        ?string $message = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

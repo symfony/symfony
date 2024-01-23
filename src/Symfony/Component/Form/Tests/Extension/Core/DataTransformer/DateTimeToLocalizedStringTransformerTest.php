@@ -371,7 +371,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $transformer->reverseTransform('12345');
     }
 
-    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer
     {
         return new DateTimeToLocalizedStringTransformer($inputTimezone, $outputTimezone);
     }

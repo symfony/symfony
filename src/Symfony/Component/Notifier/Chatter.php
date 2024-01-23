@@ -27,7 +27,7 @@ final class Chatter implements ChatterInterface
     private ?MessageBusInterface $bus;
     private ?EventDispatcherInterface $dispatcher;
 
-    public function __construct(TransportInterface $transport, MessageBusInterface $bus = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TransportInterface $transport, ?MessageBusInterface $bus = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->transport = $transport;
         $this->bus = $bus;

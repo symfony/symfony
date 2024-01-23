@@ -1119,7 +1119,7 @@ XLIFF,
         };
     }
 
-    private function createProvider(MockHttpClient $httpClient = null, string $endpoint = null, XliffFileDumper $dumper = null, bool $isFallbackLocaleEnabled = false): ProviderInterface
+    private function createProvider(?MockHttpClient $httpClient = null, ?string $endpoint = null, ?XliffFileDumper $dumper = null, bool $isFallbackLocaleEnabled = false): ProviderInterface
     {
         return new PhraseProvider(
             $httpClient ?? $this->getHttpClient(),

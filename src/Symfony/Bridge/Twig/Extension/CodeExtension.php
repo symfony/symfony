@@ -159,7 +159,7 @@ final class CodeExtension extends AbstractExtension
     /**
      * Formats a file path.
      */
-    public function formatFile(string $file, int $line, string $text = null): string
+    public function formatFile(string $file, int $line, ?string $text = null): string
     {
         $file = trim($file);
 

@@ -52,7 +52,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
     private ?AuthenticationFailureHandlerInterface $failureHandler;
     private ?TranslatorInterface $translator = null;
 
-    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, ?AuthenticationSuccessHandlerInterface $successHandler = null, ?AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], ?PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->options = array_merge(['username_path' => 'username', 'password_path' => 'password'], $options);
         $this->httpUtils = $httpUtils;

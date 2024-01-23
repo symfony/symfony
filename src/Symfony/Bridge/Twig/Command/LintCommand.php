@@ -224,7 +224,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function renderException(SymfonyStyle $output, string $template, Error $exception, string $file = null, GithubActionReporter $githubReporter = null): void
+    private function renderException(SymfonyStyle $output, string $template, Error $exception, ?string $file = null, ?GithubActionReporter $githubReporter = null): void
     {
         $line = $exception->getTemplateLine();
 

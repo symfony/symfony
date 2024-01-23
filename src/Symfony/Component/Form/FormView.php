@@ -52,7 +52,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     private bool $methodRendered = false;
 
-    public function __construct(self $parent = null)
+    public function __construct(?self $parent = null)
     {
         $this->parent = $parent;
     }

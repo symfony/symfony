@@ -42,7 +42,7 @@ class Isin extends Constraint
 
     public $message = 'This value is not a valid International Securities Identification Number (ISIN).';
 
-    public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);
 

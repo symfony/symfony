@@ -81,7 +81,7 @@ class Button implements \IteratorAggregate, FormInterface
         throw new BadMethodCallException('Buttons cannot have children.');
     }
 
-    public function setParent(FormInterface $parent = null): static
+    public function setParent(?FormInterface $parent = null): static
     {
         if (1 > \func_num_args()) {
             trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
@@ -107,7 +107,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function add(string|FormInterface $child, string $type = null, array $options = []): static
+    public function add(string|FormInterface $child, ?string $type = null, array $options = []): static
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -338,7 +338,7 @@ class Button implements \IteratorAggregate, FormInterface
         return null === $this->parent;
     }
 
-    public function createView(FormView $parent = null): FormView
+    public function createView(?FormView $parent = null): FormView
     {
         if (null === $parent && $this->parent) {
             $parent = $this->parent->createView();

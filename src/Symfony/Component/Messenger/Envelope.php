@@ -114,7 +114,7 @@ final class Envelope
      *
      * @psalm-return ($stampFqcn is string : array<class-string<StampInterface>, list<StampInterface>> ? list<TStamp>)
      */
-    public function all(string $stampFqcn = null): array
+    public function all(?string $stampFqcn = null): array
     {
         if (null !== $stampFqcn) {
             return $this->stamps[$stampFqcn] ?? [];

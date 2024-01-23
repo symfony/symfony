@@ -67,7 +67,7 @@ class Container implements ContainerInterface, ResetInterface
 
     private static \Closure $make;
 
-    public function __construct(ParameterBagInterface $parameterBag = null)
+    public function __construct(?ParameterBagInterface $parameterBag = null)
     {
         $this->parameterBag = $parameterBag ?? new EnvPlaceholderParameterBag();
     }

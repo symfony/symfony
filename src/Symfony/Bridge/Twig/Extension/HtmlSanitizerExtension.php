@@ -33,7 +33,7 @@ final class HtmlSanitizerExtension extends AbstractExtension
         ];
     }
 
-    public function sanitize(string $html, string $sanitizer = null): string
+    public function sanitize(string $html, ?string $sanitizer = null): string
     {
         return $this->sanitizers->get($sanitizer ?? $this->defaultSanitizer)->sanitize($html);
     }

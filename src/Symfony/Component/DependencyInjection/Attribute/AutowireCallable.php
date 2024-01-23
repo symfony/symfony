@@ -25,9 +25,9 @@ class AutowireCallable extends Autowire
      * @param bool|class-string $lazy Whether to use lazy-loading for this argument
      */
     public function __construct(
-        string|array $callable = null,
-        string $service = null,
-        string $method = null,
+        string|array|null $callable = null,
+        ?string $service = null,
+        ?string $method = null,
         bool|string $lazy = false,
     ) {
         if (!(null !== $callable xor null !== $service)) {

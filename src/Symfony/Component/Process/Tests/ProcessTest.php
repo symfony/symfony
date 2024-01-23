@@ -1566,7 +1566,7 @@ class ProcessTest extends TestCase
         $this->assertFalse($process->isRunning());
     }
 
-    private function getProcess(string|array $commandline, string $cwd = null, array $env = null, mixed $input = null, ?int $timeout = 60): Process
+    private function getProcess(string|array $commandline, ?string $cwd = null, ?array $env = null, mixed $input = null, ?int $timeout = 60): Process
     {
         if (\is_string($commandline)) {
             $process = Process::fromShellCommandline($commandline, $cwd, $env, $input, $timeout);
@@ -1579,7 +1579,7 @@ class ProcessTest extends TestCase
         return self::$process = $process;
     }
 
-    private function getProcessForCode(string $code, string $cwd = null, array $env = null, $input = null, ?int $timeout = 60): Process
+    private function getProcessForCode(string $code, ?string $cwd = null, ?array $env = null, $input = null, ?int $timeout = 60): Process
     {
         return $this->getProcess([self::$phpBin, '-r', $code], $cwd, $env, $input, $timeout);
     }

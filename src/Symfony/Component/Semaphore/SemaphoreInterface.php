@@ -37,7 +37,7 @@ interface SemaphoreInterface
      *
      * @throws SemaphoreExpiredException If the semaphore has expired
      */
-    public function refresh(float $ttlInSecond = null);
+    public function refresh(?float $ttlInSecond = null);
 
     /**
      * Returns whether or not the semaphore is acquired.

@@ -32,7 +32,7 @@ class QueryParameterValueResolverTest extends TestCase
     /**
      * @dataProvider provideTestResolve
      */
-    public function testResolve(Request $request, ArgumentMetadata $metadata, array $expected, string $exceptionClass = null, string $exceptionMessage = null)
+    public function testResolve(Request $request, ArgumentMetadata $metadata, array $expected, ?string $exceptionClass = null, ?string $exceptionMessage = null)
     {
         if ($exceptionMessage) {
             self::expectException($exceptionClass);

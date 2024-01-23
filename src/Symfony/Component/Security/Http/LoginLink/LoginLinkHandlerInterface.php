@@ -26,7 +26,7 @@ interface LoginLinkHandlerInterface
      *
      * @param int|null $lifetime When not null, the argument overrides any default lifetime previously set
      */
-    public function createLoginLink(UserInterface $user, Request $request = null /* , int $lifetime = null */): LoginLinkDetails;
+    public function createLoginLink(UserInterface $user, ?Request $request = null /* , int $lifetime = null */): LoginLinkDetails;
 
     /**
      * Validates if this request contains a login link and returns the associated User.

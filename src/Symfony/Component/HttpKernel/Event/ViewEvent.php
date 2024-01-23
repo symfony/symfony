@@ -28,7 +28,7 @@ final class ViewEvent extends RequestEvent
     public readonly ?ControllerArgumentsEvent $controllerArgumentsEvent;
     private mixed $controllerResult;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, mixed $controllerResult, ControllerArgumentsEvent $controllerArgumentsEvent = null)
+    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, mixed $controllerResult, ?ControllerArgumentsEvent $controllerArgumentsEvent = null)
     {
         parent::__construct($kernel, $request, $requestType);
 

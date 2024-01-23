@@ -32,7 +32,7 @@ final class BrowserChannel implements ChannelInterface
         $this->mapper = $mapper;
     }
 
-    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
+    public function notify(Notification $notification, RecipientInterface $recipient, ?string $transportName = null): void
     {
         if (null === $request = $this->stack->getCurrentRequest()) {
             return;

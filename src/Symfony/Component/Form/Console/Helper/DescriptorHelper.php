@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter as LegacyFileLinkFormat
  */
 class DescriptorHelper extends BaseDescriptorHelper
 {
-    public function __construct(FileLinkFormatter|LegacyFileLinkFormatter $fileLinkFormatter = null)
+    public function __construct(FileLinkFormatter|LegacyFileLinkFormatter|null $fileLinkFormatter = null)
     {
         $this
             ->register('txt', new TextDescriptor($fileLinkFormatter))

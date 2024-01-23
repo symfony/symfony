@@ -160,12 +160,12 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandTester(array $extractedMessages = [], array $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
+    private function createCommandTester(array $extractedMessages = [], array $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
     {
         return new CommandTester($this->createCommand($extractedMessages, $loadedMessages, $kernel, $transPaths, $codePaths));
     }
 
-    private function createCommand(array $extractedMessages = [], array $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = [], ExtractorInterface $extractor = null, array $bundles = [], array $enabledLocales = []): TranslationDebugCommand
+    private function createCommand(array $extractedMessages = [], array $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = [], ?ExtractorInterface $extractor = null, array $bundles = [], array $enabledLocales = []): TranslationDebugCommand
     {
         $translator = $this->createMock(Translator::class);
         $translator

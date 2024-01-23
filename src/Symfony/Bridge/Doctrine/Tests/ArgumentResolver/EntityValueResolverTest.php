@@ -388,12 +388,12 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
-    private function createArgument(string $class = null, MapEntity $entity = null, string $name = 'arg', bool $isNullable = false): ArgumentMetadata
+    private function createArgument(?string $class = null, ?MapEntity $entity = null, string $name = 'arg', bool $isNullable = false): ArgumentMetadata
     {
         return new ArgumentMetadata($name, $class ?? \stdClass::class, false, false, null, $isNullable, $entity ? [$entity] : []);
     }
 
-    private function createRegistry(ObjectManager $manager = null): ManagerRegistry&MockObject
+    private function createRegistry(?ObjectManager $manager = null): ManagerRegistry&MockObject
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
 

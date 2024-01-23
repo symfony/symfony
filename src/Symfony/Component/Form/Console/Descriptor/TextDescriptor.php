@@ -27,7 +27,7 @@ class TextDescriptor extends Descriptor
 {
     private FileLinkFormatter|LegacyFileLinkFormatter|null $fileLinkFormatter;
 
-    public function __construct(FileLinkFormatter|LegacyFileLinkFormatter $fileLinkFormatter = null)
+    public function __construct(FileLinkFormatter|LegacyFileLinkFormatter|null $fileLinkFormatter = null)
     {
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
@@ -191,7 +191,7 @@ class TextDescriptor extends Descriptor
         return $options;
     }
 
-    private function formatClassLink(string $class, string $text = null): string
+    private function formatClassLink(string $class, ?string $text = null): string
     {
         $text ??= $class;
 

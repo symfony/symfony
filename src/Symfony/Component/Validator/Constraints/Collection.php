@@ -42,7 +42,7 @@ class Collection extends Composite
     public $extraFieldsMessage = 'This field was not expected.';
     public $missingFieldsMessage = 'This field is missing.';
 
-    public function __construct(mixed $fields = null, array $groups = null, mixed $payload = null, bool $allowExtraFields = null, bool $allowMissingFields = null, string $extraFieldsMessage = null, string $missingFieldsMessage = null)
+    public function __construct(mixed $fields = null, ?array $groups = null, mixed $payload = null, ?bool $allowExtraFields = null, ?bool $allowMissingFields = null, ?string $extraFieldsMessage = null, ?string $missingFieldsMessage = null)
     {
         if (\is_array($fields) && ([] === $fields || ($firstField = reset($fields)) instanceof Constraint || ($firstField[0] ?? null) instanceof Constraint)) {
             $fields = ['fields' => $fields];

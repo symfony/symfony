@@ -39,7 +39,7 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
      *
      * @throws InvalidArgumentException if a timezone is not valid
      */
-    public function __construct(string $inputTimezone = null, string $outputTimezone = null)
+    public function __construct(?string $inputTimezone = null, ?string $outputTimezone = null)
     {
         $this->inputTimezone = $inputTimezone ?: date_default_timezone_get();
         $this->outputTimezone = $outputTimezone ?: date_default_timezone_get();

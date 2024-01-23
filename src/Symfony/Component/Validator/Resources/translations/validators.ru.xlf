@@ -134,8 +134,8 @@
                 <source>This file is not a valid image.</source>
                 <target>Файл не является допустимым форматом изображения.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
                 <target state="needs-review-translation">Это значение не является действительным IP-адресом.</target>
             </trans-unit>
             <trans-unit id="38">
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Файл не был загружен.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Не настроена временная директория в php.ini.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target state="needs-review-translation">В php.ini не была настроена временная папка, или настроенная папка не существует.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,8 +222,8 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Неподдерживаемый тип или неверный номер карты.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
                 <target state="needs-review-translation">Это значение не является действительным Международным банковским счетом (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
@@ -310,16 +310,16 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Значение не совпадает с ожидаемой {{ charset }} кодировкой.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
                 <target state="needs-review-translation">Это значение не является действительным Бизнес-идентификатором (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Ошибка</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
                 <target state="needs-review-translation">Это значение не является действительным UUID.</target>
             </trans-unit>
             <trans-unit id="84">

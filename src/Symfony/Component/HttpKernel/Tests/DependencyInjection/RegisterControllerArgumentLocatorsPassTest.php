@@ -583,7 +583,7 @@ class NonExistentClassOptionalController
     {
     }
 
-    public function barAction(?NonExistentClass $nonExistent = null, $bar)
+    public function barAction(?NonExistentClass $nonExistent, $bar)
     {
     }
 }

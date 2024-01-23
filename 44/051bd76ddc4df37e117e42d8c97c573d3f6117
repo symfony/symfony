@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-28T16:13:02Z
+
+Does it work fully for you after this update ? For me it still returns 404's, trying to figure why :|
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-12-28T16:13:19Z
+
+Thanks for this!
+
+> I tried renaming dir1/file1.css to dir1/file 1.css or creating a new and voilà.css but both approches affect many other tests.
+
+This is the right approach - probably adding the new `voilà.css` will cause less tests to break. So yes, do this. It will break tests because we have assertions on the number of assets and the exact assets, so we'll just need to update those, I think.
+
+You might also be able to create a new directory next to the existing fixtures directories - e.g. `non_ascii` and put the file there. Then update the kernel used by this test to map that directory - https://github.com/symfony/symfony/blob/7.1/src/Symfony/Component/AssetMapper/Tests/Fixtures/AssetMapperTestAppKernel.php#L46 - that may cause less tests to be affected :)
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2023-12-28T16:30:15Z
+
+> Does it work fully for you after this update ? For me it still returns 404's, trying to figure why :|
+
+My real use case fail with a PNG image. Looks like there something more with a file that could be imported. Let's dig into this!
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2024-01-03T16:04:47Z
+
+I created a reproducer to show the issue: https://github.com/fbourigault/asset-mapper-non-ascii/commit/0834e39d85a257039e5d4aee756e3a9ee8cda63c
+
+So the issue happens with js imports, css imports and also images.
+
+In the 3 cases, using `rawurldecode` seems to fix the issue.
+
+So, I'm now back to work on tests. and I ran into a weird issue after I added a `non_ascii/voilà.css` as suggested by @weaverryan:
+
+```diff
+--- Expected
++++ Actual
+@@ @@
+     4 => 'file4.js'
+     5 => 'subdir/file5.js'
+     6 => 'subdir/file6.js'
+-    7 => 'voilà.css'
++    7 => 'voilà.css'
+ )
+```
+
+Does anyone know why both added or removed array entries are the same?
+
+EDIT: seems to be an issue related to my machine as there are no CI failure for AssetMapper.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-04T00:53:41Z
+
+I tried you reproducer, and duplicated the symfony logo as `symfonyéé.png`
+
+Then updated the index.html file
+
+```
+<div class="example-wrapper">
+    <img src="{{ asset('images/symfony black 02.png') }}" alt="Symfony" />
+    <img src="{{ asset('images/symfonyéé.png') }}" alt="Symfony" />
+
+```
+
+It did not work for me.. what about you ?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-04T06:11:47Z
+
+After some digging, it seems to me we may need some work (unicode normalisation at several places) to handle macOS (firefox?) vs PHP encoding of accentuated characters "`é`" ...  alterning between "U+00E9" and "U+0065 U+0301" for the same character, later not passing the `===` tests
+
+Imho: this would probably require another/distinct PR (as yours already fixes spaces and biggest encoding problems with the rawurldecode) ...
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2024-01-04T07:34:58Z
+
+> After some digging, it seems to me we may need some work (unicode normalisation at several places) to handle macOS (firefox?) vs PHP encoding of accentuated characters "`é`" ... alterning between "U+00E9" and "U+0065 U+0301" for the same character, later not passing the `===` tests
+>
+> Imho: this would probably require another/distinct PR (as yours already fixes spaces and biggest encoding problems with the rawurldecode) ...
+
+Thank you for digging!!! That's right I use macOS. For now, I [copy/pasted](https://github.com/symfony/symfony/compare/3d879e8bb5ae709cd04d988575d2b1e0a0b5313e..983c5a3ce0ea41c7ce395d9160a7ede734c828b3) the `à` character to get the tests green on macOS so I can focus on writing a test dedicated to the addition of `rawurlencode`.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-04T12:44:36Z
+
+So the problem is that the AssetMapper stores/load pathes in UTF-8, [normalized](https://www.php.net/manual/fr/class.normalizer.php) in form D, and the Request gives a path in form C
+
+Just after the line where you added the rawurldecode, if you add, i think all tests will go green.
+
+```
+$pathInfo = normalizer_normalize($pathInfo, \Normalizer::FORM_D);
+```
+
+So we could use this method ... but it's in the Intl extension, and it would be weird to require an extension for such a use case.
+Maybe we could require the [polyfill-intl-normalizer](https://github.com/symfony/polyfill-intl-normalizer) then i guess ? Or trigger a warning if the pathInfo is not only in ASCII ?
+
+Let's try magic...Focusing.... Invoking the expert in encoding and unicode...... @nicolas-grekas ?  👼
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2024-01-04T14:10:28Z
+
+Tests are already green since I ensured that U+OOE0 is used everywhere.
+
+So the NFC/NFD thing remains. I've updated my reproducer (https://github.com/fbourigault/asset-mapper-non-ascii/commit/09414a8c6a73b8b41008aa3aa66b3cd6851b6b4a) to handle this case. It works fine when assets are compiled to `public` but not with the dev subscriber.
+
+I'm not sure it's something we should take care. Isn't the developer responsibility to have the file on disk using the same code points as the reference in assets/templates?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-04T14:30:41Z
+
+Agreed ! As i said this can be dealt (or not) in another PR... as yours fixes the bug you wrote it for :)
+
+(but it's not just a question of developer responsability, it's related to the browser / os.. now as it's only in dev, and no one raised this before, it's probably not something that happen too much in real world 😅 )
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2024-01-09T22:04:21Z
+
+This is ready for a review. CI failures are not related to this PR.

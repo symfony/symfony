@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-01-23T10:37:21Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "7.1 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by tjveldhuizen at 2024-01-23T11:27:25Z
+
+@nicolas-grekas Given you're not sure about the reason for this class to be final, would it be an option to target the 6.4 branch? (and see it as a bug fix instead of a new feature) Due to the nature of our project, we prefer not to update to Symfony 7 yet, but we would like to convert our annotations to attributes to remove a lot of lines from our deprecation logs. I can imagine this is the case for more developers.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-23T12:39:19Z
+
+This was done in #52544 and I think this was overzealous yes, let's target 6.4 for this one.

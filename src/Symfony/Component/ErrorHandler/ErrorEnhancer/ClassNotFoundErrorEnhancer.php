@@ -21,9 +21,6 @@ use Symfony\Component\ErrorHandler\Error\FatalError;
  */
 class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function enhance(\Throwable $error): ?\Throwable
     {
         // Some specific versions of PHP produce a fatal error when extending a not found class.
@@ -110,7 +107,8 @@ class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
 
     private function findClassInPath(string $path, string $class, string $prefix): array
     {
-        if (!$path = realpath($path.'/'.strtr($prefix, '\\_', '//')) ?: realpath($path.'/'.\dirname(strtr($prefix, '\\_', '//'))) ?: realpath($path)) {
+        $path = realpath($path.'/'.strtr($prefix, '\\_', '//')) ?: realpath($path.'/'.\dirname(strtr($prefix, '\\_', '//'))) ?: realpath($path);
+        if (!$path || !is_dir($path)) {
             return [];
         }
 

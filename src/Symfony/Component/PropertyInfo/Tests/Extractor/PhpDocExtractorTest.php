@@ -157,7 +157,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider provideCollectionTypes
      */
-    public function testExtractCollection($property, ?array $type = null, $shortDescription, $longDescription)
+    public function testExtractCollection($property, ?array $type, $shortDescription, $longDescription)
     {
         if (!class_exists(Collection::class)) {
             $this->markTestSkipped('Collections are not implemented in current phpdocumentor/type-resolver version');

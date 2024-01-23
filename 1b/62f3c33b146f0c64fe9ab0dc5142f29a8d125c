@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-20T18:15:54Z
+
+The change itself looks good. But can you please add a test case to prevent future regressions?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-20T22:34:44Z
+
+> The change itself looks good. But can you please add a test case to prevent future regressions?
+
+@xabbuh Done, but I had to make additional changes to the code. Either I misunderstood the intention, or this code is also broken on v5.4. If that's the case, please let me know, and I'll open a separate PR for v5.4, which should then be merged first.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-22T21:44:34Z
+
+Can you please send the PR you have in mind for 5.4?
+Also please target 6.3 for this one as we're going to do one more release of it as patch could be part of it.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-22T23:37:31Z
+
+@nicolas-grekas I've retargeted this PR to 5.4. A conflict is inevitable when merging with the upstream, so IMO, it would be easiest to resolve it then. Here's the resolved code:
+
+```diff
+diff --git a/src/Symfony/Component/Cache/DependencyInjection/CachePoolPass.php b/src/Symfony/Component/Cache/DependencyInjection/CachePoolPass.php
+index 5055ba9918..ab212e8ee2 100644
+--- a/src/Symfony/Component/Cache/DependencyInjection/CachePoolPass.php
++++ b/src/Symfony/Component/Cache/DependencyInjection/CachePoolPass.php
+@@ -181,11 +181,11 @@ class CachePoolPass implements CompilerPassInterface
+             $container->removeDefinition('cache.early_expiration_handler');
+         }
+
+-        $notAliasedCacheClearerId = $aliasedCacheClearerId = 'cache.global_clearer';
+-        while ($container->hasAlias('cache.global_clearer')) {
+-            $aliasedCacheClearerId = (string) $container->getAlias('cache.global_clearer');
++        $notAliasedCacheClearerId = 'cache.global_clearer';
++        while ($container->hasAlias($notAliasedCacheClearerId)) {
++            $notAliasedCacheClearerId = (string) $container->getAlias($notAliasedCacheClearerId);
+         }
+-        if ($container->hasDefinition($aliasedCacheClearerId)) {
++        if ($container->hasDefinition($notAliasedCacheClearerId)) {
+             $clearers[$notAliasedCacheClearerId] = $allPools;
+         }
+```
+
+If needed, I'll create a new PR for 6.3.

@@ -65,8 +65,6 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
 
     /**
      * Processes a value found in a definition tree.
-     *
-     * @return mixed
      */
     protected function processValue(mixed $value, bool $isRoot = false)
     {
@@ -76,9 +74,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
                     continue;
                 }
                 if ($isRoot) {
-                    if ($v->hasTag('container.excluded')) {
-                        continue;
-                    }
+                    // if ($v->hasTag('container.excluded')) {
+                    //    continue;
+                    // }
                     $this->currentId = $k;
                 }
                 if ($v !== $processedValue = $this->processValue($v, $isRoot)) {

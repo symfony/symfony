@@ -209,10 +209,10 @@ class CachePoolPass implements CompilerPassInterface
         }
 
         $notAliasedCacheClearerId = $this->cacheClearerId;
-        while ($container->hasAlias($this->cacheClearerId)) {
-            $this->cacheClearerId = (string) $container->getAlias($this->cacheClearerId);
+        while ($container->hasAlias($notAliasedCacheClearerId)) {
+            $notAliasedCacheClearerId = (string) $container->getAlias($notAliasedCacheClearerId);
         }
-        if ($container->hasDefinition($this->cacheClearerId)) {
+        if ($container->hasDefinition($notAliasedCacheClearerId)) {
             $clearers[$notAliasedCacheClearerId] = $allPools;
         }
 

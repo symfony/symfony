@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by symfonyaml at 2024-01-17T12:26:29Z
+
+I tried to apply changes [suggested by fabbot.io](https://fabbot.io/patch/symfony/symfony/53542/8ecc16e229f58cda162bffc17da2c7c5e1cca94b/cs.diff), but it [breaks PHP7.x tests](https://github.com/symfony/symfony/actions/runs/7529691115/job/20494445476), because [`str_starts_with()`](https://www.php.net/manual/en/function.str-starts-with.php) function is only for PHP8.
+
+How do we handle this case ? Is it because I should branch from `6.4` ?

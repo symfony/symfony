@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-01-02T15:57:20Z
+
+Not sure if I should fix the fail check for code I didn't touch ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-01-11T10:35:51Z
+
+@xabbuh Should I fix the CI ? The error (even from fabbot.io) seems unrelated to my changes, and I'm affraid about conflict during futur merge if I start fixing them...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-11T14:09:36Z
+
+@VincentLanglet You can safely ignore things suggested by fabbot that haven't been touched by your changes.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-01-11T14:40:19Z
+
+> @VincentLanglet You can safely ignore things suggested by fabbot that haven't been touched by your changes.
+
+Thanks ; I think it's ready then :)

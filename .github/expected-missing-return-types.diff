@@ -356,8 +356,8 @@ diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterfa
 @@ -28,5 +28,5 @@ interface DataCollectorInterface extends ResetInterface
       * @return void
       */
--    public function collect(Request $request, Response $response, \Throwable $exception = null);
-+    public function collect(Request $request, Response $response, \Throwable $exception = null): void;
+-    public function collect(Request $request, Response $response, ?\Throwable $exception = null);
++    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void;
  
      /**
 @@ -35,4 +35,4 @@ interface DataCollectorInterface extends ResetInterface

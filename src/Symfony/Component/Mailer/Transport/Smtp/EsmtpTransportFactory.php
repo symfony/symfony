@@ -23,11 +23,13 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
-        $tls = 'smtps' === $dsn->getScheme() ? true : null;
+        $autoTls = '' === $dsn->getOption('auto_tls') || filter_var($dsn->getOption('auto_tls', true), \FILTER_VALIDATE_BOOL);
+        $tls = 'smtps' === $dsn->getScheme() ? true : ($autoTls ? null : false);
         $port = $dsn->getPort(0);
         $host = $dsn->getHost();
 
         $transport = new EsmtpTransport($host, $port, $tls, $this->dispatcher, $this->logger);
+        $transport->setAutoTls($autoTls);
 
         /** @var SocketStream $stream */
         $stream = $transport->getStream();

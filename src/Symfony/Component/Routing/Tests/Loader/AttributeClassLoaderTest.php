@@ -19,6 +19,8 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\BazClass;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\DefaultValueController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\EncodingClass;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ExplicitLocalizedActionPathController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ExtendedRouteOnClassController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ExtendedRouteOnMethodController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\GlobalDefaultsClass;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableLocalizedController;
@@ -330,6 +332,22 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame(['http'], $routes->get('array_one')->getSchemes());
         $this->assertSame(['POST'], $routes->get('string')->getMethods());
         $this->assertSame(['https'], $routes->get('string')->getSchemes());
+    }
+
+    public function testLoadingExtendedRouteOnClass()
+    {
+        $routes = $this->loader->load(ExtendedRouteOnClassController::class);
+        $this->assertCount(1, $routes);
+        $this->assertSame('/{section}/class-level/method-level', $routes->get('action')->getPath());
+        $this->assertSame(['section' => 'foo'], $routes->get('action')->getDefaults());
+    }
+
+    public function testLoadingExtendedRouteOnMethod()
+    {
+        $routes = $this->loader->load(ExtendedRouteOnMethodController::class);
+        $this->assertCount(1, $routes);
+        $this->assertSame('/{section}/method-level', $routes->get('action')->getPath());
+        $this->assertSame(['section' => 'foo'], $routes->get('action')->getDefaults());
     }
 
     public function testDefaultRouteName()

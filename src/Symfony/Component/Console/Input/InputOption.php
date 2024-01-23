@@ -75,7 +75,7 @@ class InputOption
             throw new InvalidArgumentException('An option name cannot be empty.');
         }
 
-        if (empty($shortcut)) {
+        if ('' === $shortcut || [] === $shortcut) {
             $shortcut = null;
         }
 
@@ -84,10 +84,10 @@ class InputOption
                 $shortcut = implode('|', $shortcut);
             }
             $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
-            $shortcuts = array_filter($shortcuts);
+            $shortcuts = array_filter($shortcuts, 'strlen');
             $shortcut = implode('|', $shortcuts);
 
-            if (empty($shortcut)) {
+            if ('' === $shortcut) {
                 throw new InvalidArgumentException('An option shortcut cannot be empty.');
             }
         }

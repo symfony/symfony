@@ -120,6 +120,10 @@ class Email extends Message
      */
     public function from(Address|string ...$addresses): static
     {
+        if (!$addresses) {
+            throw new LogicException('"from()" must be called with at least one address.');
+        }
+
         return $this->setListAddressHeaderBody('From', $addresses);
     }
 

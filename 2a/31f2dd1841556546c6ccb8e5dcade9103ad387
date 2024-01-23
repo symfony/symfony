@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-23T14:01:04Z
+
+/cc @keradus FYI
+
+I think we should also make the null default value explicit for untyped properties. What's the fixer for that? :angel:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-01-23T14:02:26Z
+
+I really prefer this way! Thanks 👍🏼

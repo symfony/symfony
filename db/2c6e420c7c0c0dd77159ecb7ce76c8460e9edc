@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by k0d3r1s at 2024-01-11T12:41:50Z
+
+i kinda don't get this one. isn't target supposed to be somewhat exact translation of source?
+why only english can differ in this regard? doesn't this make it somewhat harder to maintain?
+also, regarding #53505, for example the one with ip address translation - source is "This value is not valid ...", rename part is "This is not valid ...". What does latvian part be? With or without "value"?
+Technically with as target is directly translating source? Or latvian part may differ from source, as "value" part is as unnecessary part of that sentence as it is in english?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-11T12:47:43Z
+
+@k0d3r1s you might want to check #53420, that should answer your concern.
+
+---------------------------------------------------------------------------
+
+by k0d3r1s at 2024-01-11T13:34:49Z
+
+@nicolas-grekas ok, read through it. now i just feel that this needs to be documented somewhere (probably in docs). as now that message in code differs from translation key, it is harder to find why.
+but again then, why is it not consistent? unit 37 (ip address one) has this new rename but unit 38, for example, does not
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-11T13:41:32Z
+
+Unit 38 already starts with "This value is not" so I just aligned unit 37. This can be documented for sure, that's what I'm trying to do here, just with a technical PoV. Docs improvement would be nice indeed! Help wanted :)
+Why isn't this consistent at the source level? History :man_shrugging: And it's hard to remember when review new messages (but we should still be more careful.)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-01-11T16:08:51Z
+
+Shouldn't this be implemented by `.github/sync-translations.php` to ensure this is kept uptodate as well ?
+
+The current typos (which are not done for all keys) tell me that this was done manually.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-12T09:08:33Z
+
+> Shouldn't this be implemented by .github/sync-translations.php to ensure this is kept uptodate as well ?
+
+yes! script updated.
+
+Status: needs review

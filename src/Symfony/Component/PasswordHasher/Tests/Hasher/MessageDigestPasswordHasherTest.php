@@ -60,4 +60,12 @@ class MessageDigestPasswordHasherTest extends TestCase
 
         $this->assertFalse($hasher->verify('encoded', str_repeat('a', 5000), 'salt'));
     }
+
+    public function testUsingBracketInSaltThrows()
+    {
+        $hasher = new MessageDigestPasswordHasher('sha256', false, 1);
+
+        $this->expectException(\LogicException::class);
+        $hasher->hash('password', '{');
+    }
 }

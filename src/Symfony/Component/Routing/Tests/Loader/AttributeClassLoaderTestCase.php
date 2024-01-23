@@ -16,6 +16,8 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Routing\Alias;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\AbstractClassController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ExtendedRouteOnClassController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ExtendedRouteOnMethodController;
 
 abstract class AttributeClassLoaderTestCase extends TestCase
 {
@@ -310,6 +312,22 @@ abstract class AttributeClassLoaderTestCase extends TestCase
         $this->assertSame(['http'], $routes->get('array_one')->getSchemes());
         $this->assertSame(['POST'], $routes->get('string')->getMethods());
         $this->assertSame(['https'], $routes->get('string')->getSchemes());
+    }
+
+    public function testLoadingExtendedRouteOnClass()
+    {
+        $routes = $this->loader->load(ExtendedRouteOnClassController::class);
+        $this->assertCount(1, $routes);
+        $this->assertSame('/{section}/class-level/method-level', $routes->get('action')->getPath());
+        $this->assertSame(['section' => 'foo'], $routes->get('action')->getDefaults());
+    }
+
+    public function testLoadingExtendedRouteOnMethod()
+    {
+        $routes = $this->loader->load(ExtendedRouteOnMethodController::class);
+        $this->assertCount(1, $routes);
+        $this->assertSame('/{section}/method-level', $routes->get('action')->getPath());
+        $this->assertSame(['section' => 'foo'], $routes->get('action')->getDefaults());
     }
 
     abstract protected function getNamespace(): string;

@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-05T21:30:51Z
+
+It sounds useful to me, but I am not sure what the spec is here (cc @stof).
+Additionally it feels more like a new feature, because applications could rely on the current behavior 🤔
+
+---------------------------------------------------------------------------
+
+by 94noni at 2024-01-05T21:43:38Z
+
+Perhaps add a deprecation layer for previous version and change for next?
+Even if it seems not a « normal behavior »
+
+---------------------------------------------------------------------------
+
+by priyadi at 2024-01-06T06:07:27Z
+
+@OskarStark @94noni
+
+I dug deeper and found that it only happens with `php-fpm` SAPI. Under `apache` and `cli-server`, it exhibits the correct behavior: both CONTENT_TYPE and CONTENT_LENGTH are unset. I did not test the other SAPIs.
+
+The result: https://github.com/priyadi/php-empty-content-type-length-test/blob/main/output.txt
+
+I believe the correct way forward is to treat this as a bug in `php-fpm`. But we'll still need the check in this PR, otherwise we need a specific PHP version requirement, which is a far larger burden for a really minor bug.
+
+We can assume an empty CONTENT_TYPE and CONTENT_LENGTH means the headers are not in the request, as the current state of this PR. Or, we can add a check for `php-fpm` SAPI, and assume the other untested SAPIs are behaving correctly.
+
+I leave the decision to the core devs.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-06T06:47:53Z
+
+Ping @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-01-06T08:04:14Z
+
+According to the CGI spec, not set and empty are equivalent and allowed:
+
+>   This specification does not distinguish between zero-length (NULL)
+>   values and missing values.  For example, a script cannot distinguish
+>   between the two requests http://host/script and http://host/script?
+>   as in both cases the QUERY_STRING meta-variable would be NULL.
+>
+>      meta-variable-value = "" | 1*<TEXT, CHAR or tokens of value>
+>
+>   An optional meta-variable may be omitted (left unset) if its value is
+>   NULL.  Meta-variable values MUST be considered case-sensitive except
+>   as noted otherwise.  The representation of the characters in the
+>   meta-variables is system-defined; the server MUST convert values to
+>   that representation.
+
+https://www.rfc-editor.org/rfc/rfc3875#section-4.1
+
+As PHP inherits from this spec, we should take empty values in consideration.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-01-06T08:05:51Z
+
+To me, it's a bug fix as we aren't currently spec-compliant.
+
+---------------------------------------------------------------------------
+
+by priyadi at 2024-01-06T10:24:40Z
+
+@dunglas Do you think we need to extend the same treatment to all headers? i.e. we unset the header if the value is an empty string.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-01-06T12:16:20Z
+
+We could apply something like `array_filter()` on the list, yes.

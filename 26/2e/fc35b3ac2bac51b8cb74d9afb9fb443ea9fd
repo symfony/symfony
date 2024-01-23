@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-11-28T12:27:25Z
+
+Agree with everything, thank you @stof, that's addressed :+1:
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-11-29T08:13:49Z
+
+Rebased on 6.4, like https://github.com/symfony/symfony/pull/52746
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-29T08:17:44Z
+
+As this PR only changes test files, I would vote to merge into `5.4`
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-01-11T12:03:23Z
+
+Hi :wave: Should this be rebased to 5.4 again or rebase to 7.1? :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-23T09:01:36Z
+
+Let's rebase for 7.1 - this will still help spot issues on 5.4 when merging up changes from there.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-01-23T09:12:41Z
+
+Here you go, that's rebased 🙂

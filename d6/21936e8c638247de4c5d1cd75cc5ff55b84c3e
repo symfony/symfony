@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-01-03T11:28:42Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-03T20:22:46Z
+
+Thank you for your contribution, can you maybe show your anonymized resource name or link to the corresponding Azure documentation? Thanks
+
+cc @hafael as you contributed the bridge
+
+---------------------------------------------------------------------------
+
+by t9toqwerty at 2024-01-04T02:34:22Z
+
+Hi @OskarStark ,
+
+**I have seen this for the new Azure Communication Resources naming where they are appending the Data Location in resource endpoint url.**
+
+For Example I have created two Azure Communication Resources (One in US and other In India) and seen the pattern repeated. Check the endpoint in the screenshots:
+
+**US:**
+<img width="1376" alt="Screenshot 2024-01-04 at 7 50 47 AM" src="https://github.com/symfony/symfony/assets/5053687/5a14752c-24f4-4bcb-a7d1-26613a329309">
+
+**India:**
+<img width="1369" alt="Screenshot 2024-01-04 at 7 51 55 AM" src="https://github.com/symfony/symfony/assets/5053687/aae7cd58-b95a-4c99-901a-b84e82c5b284">
+
+The same format for endpoint can be found in the last image attached in their [documentation](https://learn.microsoft.com/en-us/azure/communication-services/quickstarts/create-communication-resource?tabs=windows&pivots=platform-azp#access-your-connection-strings-and-service-endpoints).
+
+![](https://learn.microsoft.com/en-us/azure/communication-services/quickstarts/media/key.png)
+
+IMHO, The way we are formatting the host/endpoint,
+```
+private const HOST = '%s.communication.azure.com';
+```
+
+We should allow the resource with dots in name so the we can get the correct host/endpoint in these scenarios .
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-04T05:45:40Z
+
+Thanks for the explanation.
+
+From what I can see in your screenshots, we must change the following too, or does the bride works for you, when removing the "contain dot" part?
+
+```diff
+- private const HOST = '%s.communication.azure.com';
++ private const HOST = '%s.communications.azure.com';
+```
+
+---------------------------------------------------------------------------
+
+by t9toqwerty at 2024-01-04T07:27:21Z
+
+**I have just tested again and It is working fine for me. I am receiving email without any issue so I think we don't need to change the current host url structure.**
+
+As the same url is reflecting in my dashboard too that I have attached the first two screenshot of, I assume the documentation from I attached the third image is old.
+
+**I think we can go with current url structure i.e. . And the same is being used in their [Java SDK](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/communication/azure-communication-email/README.md) too.**
+```
+private const HOST = '%s.communication.azure.com';
+```
+
+Just to be on safe side I have tried the other url (`private const HOST = '%s.communications.azure.com';`) too but got `TransportException: Could not resolve host` Exception.
+
+<img width="1667" alt="Screenshot 2024-01-04 at 12 50 01 PM" src="https://github.com/symfony/symfony/assets/5053687/0c9f87bc-25bf-42a9-bcde-2a6fbb6b5a7e">
+
+---------------------------------------------------------------------------
+
+by webflo at 2024-01-24T14:44:01Z
+
+👍  This works as expected. communication.azure.com is correct.

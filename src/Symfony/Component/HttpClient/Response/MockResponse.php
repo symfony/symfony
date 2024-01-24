@@ -90,17 +90,11 @@ class MockResponse implements ResponseInterface, StreamableInterface
         return $this->requestMethod;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInfo(?string $type = null)
     {
         return null !== $type ? $this->info[$type] ?? null : $this->info;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function cancel(): void
     {
         $this->info['canceled'] = true;
@@ -116,9 +110,6 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $onProgress($this->offset, $dlSize, $this->info);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function close(): void
     {
         $this->inflate = null;
@@ -159,9 +150,6 @@ class MockResponse implements ResponseInterface, StreamableInterface
         return $response;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected static function schedule(self $response, array &$runningResponses): void
     {
         if (!$response->id) {
@@ -177,9 +165,6 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $runningResponses[0][1][$response->id] = $response;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected static function perform(ClientState $multi, array &$responses): void
     {
         foreach ($responses as $response) {
@@ -203,7 +188,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
                     $chunk[1]->getStatusCode();
                     $chunk[1]->getHeaders(false);
                     self::readResponse($response, $chunk[0], $chunk[1], $offset);
-                    $multi->handlesActivity[$id][] = new FirstChunk();
+                    $multi->handlesActivity[$id][] = ($response->body[0] ?? null) instanceof ErrorChunk ? $response->body[0] : new FirstChunk();
                     $buffer = $response->requestOptions['buffer'] ?? null;
 
                     if ($buffer instanceof \Closure && $response->content = $buffer($response->headers) ?: null) {
@@ -223,9 +208,6 @@ class MockResponse implements ResponseInterface, StreamableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected static function select(ClientState $multi, float $timeout): int
     {
         return 42;

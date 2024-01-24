@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\JsonException;
+use Symfony\Component\HttpClient\Exception\TimeoutException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
@@ -123,5 +124,35 @@ class MockResponseTest extends TestCase
         $mockResponse->cancel();
 
         $this->assertTrue($mockResponse->getInfo('canceled'));
+    }
+
+    public function testTimeoutHeader()
+    {
+        $response = MockResponse::fromRequest('GET', 'http://symfony.com', [], new MockResponse(['']));
+
+        try {
+            $response->getStatusCode();
+            $this->fail(TimeoutException::class.' expected');
+        } catch (TimeoutException $e) {
+        }
+
+        $this->assertSame('Idle timeout reached for "http://symfony.com".', $response->getInfo('error'));
+    }
+
+    public function testTimeoutBody()
+    {
+        $response = MockResponse::fromRequest('GET', 'http://symfony.com', [], new MockResponse(['content', '']));
+
+        try {
+            $this->assertSame(200, $response->getStatusCode());
+        } catch (TimeoutException $e) {
+            $this->fail(TimeoutException::class.' was not expected');
+        }
+
+        try {
+            $response->getContent();
+            $this->fail(TimeoutException::class.' expected');
+        } catch (TimeoutException $e) {
+        }
     }
 }

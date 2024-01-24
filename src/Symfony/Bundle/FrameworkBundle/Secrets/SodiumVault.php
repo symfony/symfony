@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Secrets;
 
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
+use Symfony\Component\String\LazyString;
 use Symfony\Component\VarExporter\VarExporter;
 
 /**
@@ -169,7 +170,14 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
     public function loadEnvVars(): array
     {
-        return $this->list(true);
+        $envs = [];
+        $reveal = $this->reveal(...);
+
+        foreach ($this->list() as $name => $value) {
+            $envs[$name] = LazyString::fromCallable($reveal, $name);
+        }
+
+        return $envs;
     }
 
     private function loadKeys(): void

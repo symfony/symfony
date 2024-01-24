@@ -46,13 +46,20 @@ final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorIn
     {
         foreach ($this->extractFiles($resource) as $file) {
             $traverser = new NodeTraverser();
+
+            $nodes = $this->parser->parse(file_get_contents($file));
+
+            // First run is needed to resolve namespaces in class methods/constants.
+            $traverser->addVisitor(new NodeVisitor\NameResolver());
+            $traverser->traverse($nodes);
+
             /** @var AbstractVisitor&NodeVisitor $visitor */
             foreach ($this->visitors as $visitor) {
                 $visitor->initialize($catalogue, $file, $this->prefix);
                 $traverser->addVisitor($visitor);
             }
 
-            $nodes = $this->parser->parse(file_get_contents($file));
+            // Second run is used for the custom visitors.
             $traverser->traverse($nodes);
         }
     }

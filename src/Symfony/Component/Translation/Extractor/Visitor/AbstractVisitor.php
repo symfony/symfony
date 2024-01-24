@@ -119,6 +119,16 @@ abstract class AbstractVisitor
             return $node->expr->value;
         }
 
+        if ($node instanceof Node\Expr\ClassConstFetch) {
+            try {
+                $reflection = new \ReflectionClass($node->class->toString());
+                $constant = $reflection->getReflectionConstant($node->name->toString());
+                if (false !== $constant && \is_string($constant->getValue())) {
+                    return $constant->getValue();
+                }
+            } catch (\ReflectionException) {}
+        }
+
         return null;
     }
 }

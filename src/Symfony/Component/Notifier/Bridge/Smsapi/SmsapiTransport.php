@@ -84,6 +84,9 @@ final class SmsapiTransport extends AbstractTransport
             throw new TransportException(sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'), $response);
         }
 
-        return new SentMessage($message, (string) $this);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($content['list'][0]['id'] ?? '');
+
+        return $sentMessage;
     }
 }

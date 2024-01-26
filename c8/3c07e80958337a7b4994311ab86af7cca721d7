@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2024-01-24T09:55:55Z
+
+@nicolas-grekas
+
+> Can this be tested somehow?
+
+It should be possible with MockHttpClient, but looks like timeout mock responses are broken. Returning MockResponse with empty string generator responds with 200 status code and empty content. ErrorChunk seems to be lost somewhere and instead FirstChunk gets created. Later on due to error chunk destructor exception is being thrown.
+I will try to dig deeper what's wrong there and fix it -> https://github.com/symfony/symfony/pull/53625
+
+> By curiosity, did you spot why GET vs POST behave differently?
+
+POST method errors is not intended to be retried by the strategy.
+So under the hood this is what happens:
+- POST request fails and is being passed through the callback (same line I fixed in PR)
+- Then the retryable client simply wipes the passthru (`$context->passthru();`) and yields the remaining chunk
+- But the error chunk with timeout still is TransportException
+
+With GET method is almost exactly the same, but on the last retry it explicitly wipes the passthru, therefore last retry does not have passthru callback and returns correct TimeoutException
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-25T10:17:47Z
+
+Got it thanks.
+For the tests, MockResponse doesn't support simulating a timeout during the request for now (see my comment in https://github.com/symfony/symfony/pull/53625).
+But we do have a real http server available in the test suite, with an endpoint that behaves as we want (`/timeout-header`) so let's use it here?
+
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2024-01-26T06:51:21Z
+
+@nicolas-grekas updated. Failing test doesn't seem to be related with my changes

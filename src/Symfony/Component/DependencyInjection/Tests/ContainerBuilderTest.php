@@ -1449,6 +1449,51 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals(A::class, (string) $container->getDefinition('b')->getArgument(0));
     }
 
+    public function testAutowiringOptionalParameters()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(A::class)->setPublic(true);
+        $bDefinition = $container->register('f', F::class);
+        $bDefinition->setAutowired(true);
+        $bDefinition->setAutowireOptionalParameters(true);
+        $bDefinition->setPublic(true);
+
+        $container->compile();
+
+        $this->assertEquals(A::class, (string) $container->getDefinition('f')->getArgument(0));
+    }
+
+    public function testAutowiringOptionalParametersDisabled()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(A::class)->setPublic(true);
+        $bDefinition = $container->register('f', F::class);
+        $bDefinition->setAutowired(true);
+        $bDefinition->setAutowireOptionalParameters(false);
+        $bDefinition->setPublic(true);
+
+        $container->compile();
+
+        $this->assertEquals([], $container->getDefinition('f')->getArguments());
+    }
+
+    public function testAutowiringDisabledAndAutowiringOptionalParametersEnabled()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(A::class)->setPublic(true);
+        $bDefinition = $container->register('f', F::class);
+        $bDefinition->setAutowired(false);
+        $bDefinition->setAutowireOptionalParameters(true);
+        $bDefinition->setPublic(true);
+
+        $container->compile();
+
+        $this->assertEquals([], $container->getDefinition('f')->getArguments());
+    }
+
     public function testClassFromId()
     {
         $container = new ContainerBuilder();
@@ -2065,5 +2110,12 @@ class E
     {
         $this->first = $first;
         $this->second = $second;
+    }
+}
+
+class F
+{
+    public function __construct(?A $a = null)
+    {
     }
 }

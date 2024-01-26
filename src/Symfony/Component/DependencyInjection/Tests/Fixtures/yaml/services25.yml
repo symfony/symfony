@@ -1,0 +1,11 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo:
+        class: Foo
+        public: true
+        autowire: true
+        autowire_optional_parameters: false

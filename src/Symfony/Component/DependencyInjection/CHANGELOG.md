@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add argument `$prepend` to `ContainerConfigurator::extension()` to prepend the configuration instead of appending it
  * Have `ServiceLocator` implement `ServiceCollectionInterface`
+ * Add new configuration `Definition::setAutowireOptionalParameters` to disable autowiring of optional arguments
 
 7.0
 ---

@@ -24,4 +24,16 @@ trait AutowireTrait
 
         return $this;
     }
+
+    /**
+     * Enables/disables autowiring of optional arguments.
+     *
+     * @return $this
+     */
+    final public function autowireOptionalParameters(bool $autowireOptionalParameters = true): static
+    {
+        $this->definition->setAutowireOptionalParameters($autowireOptionalParameters);
+
+        return $this;
+    }
 }

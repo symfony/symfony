@@ -138,6 +138,7 @@
     </xsd:choice>
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="autowire" type="boolean" />
+    <xsd:attribute name="autowire-optional-parameters" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
   </xsd:complexType>
 
@@ -168,6 +169,7 @@
     <xsd:attribute name="decoration-inner-name" type="xsd:string" />
     <xsd:attribute name="decoration-priority" type="xsd:integer" />
     <xsd:attribute name="autowire" type="boolean" />
+    <xsd:attribute name="autowire-optional-parameters" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
     <xsd:attribute name="constructor" type="xsd:string" />
   </xsd:complexType>
@@ -185,6 +187,7 @@
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
+    <xsd:attribute name="autowire-optional-parameters" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
     <xsd:attribute name="constructor" type="xsd:string" />
   </xsd:complexType>
@@ -210,6 +213,7 @@
     <xsd:attribute name="abstract" type="boolean" />
     <xsd:attribute name="parent" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
+    <xsd:attribute name="autowire-optional-parameters" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
     <xsd:attribute name="constructor" type="xsd:string" />
   </xsd:complexType>

@@ -107,6 +107,10 @@ class YamlDumper extends Dumper
             $code .= "        autowire: true\n";
         }
 
+        if (!$definition->isAutowiringOptionalParameters()) {
+            $code .= "        autowire_optional_parameters: false\n";
+        }
+
         if ($definition->isAutoconfigured()) {
             $code .= "        autoconfigure: true\n";
         }

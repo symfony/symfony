@@ -41,6 +41,7 @@ class Definition
     private bool $lazy = false;
     private ?array $decoratedService = null;
     private bool $autowired = false;
+    private bool $autowireOptionalParameters = true;
     private array $changes = [];
     private array $bindings = [];
     private array $errors = [];
@@ -736,6 +737,28 @@ class Definition
         $this->changes['autowired'] = true;
 
         $this->autowired = $autowired;
+
+        return $this;
+    }
+
+    /**
+     * Is the definition autowired?
+     */
+    public function isAutowiringOptionalParameters(): bool
+    {
+        return $this->autowireOptionalParameters;
+    }
+
+    /**
+     * Enables/disables autowiring.
+     *
+     * @return $this
+     */
+    public function setAutowireOptionalParameters(bool $autowireOptionalParameters): static
+    {
+        $this->changes['autowireOptionalParameters'] = true;
+
+        $this->autowireOptionalParameters = $autowireOptionalParameters;
 
         return $this;
     }

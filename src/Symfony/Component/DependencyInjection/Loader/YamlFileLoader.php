@@ -62,6 +62,7 @@ class YamlFileLoader extends FileLoader
         'decoration_priority' => 'decoration_priority',
         'decoration_on_invalid' => 'decoration_on_invalid',
         'autowire' => 'autowire',
+        'autowire_optional_parameters' => 'autowire_optional_parameters',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
         'constructor' => 'constructor',
@@ -84,6 +85,7 @@ class YamlFileLoader extends FileLoader
         'calls' => 'calls',
         'tags' => 'tags',
         'autowire' => 'autowire',
+        'autowire_optional_parameters' => 'autowire_optional_parameters',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
         'constructor' => 'constructor',
@@ -98,6 +100,7 @@ class YamlFileLoader extends FileLoader
         'calls' => 'calls',
         'tags' => 'tags',
         'autowire' => 'autowire',
+        'autowire_optional_parameters' => 'autowire_optional_parameters',
         'bind' => 'bind',
         'constructor' => 'constructor',
     ];
@@ -106,6 +109,7 @@ class YamlFileLoader extends FileLoader
         'public' => 'public',
         'tags' => 'tags',
         'autowire' => 'autowire',
+        'autowire_optional_parameters' => 'autowire_optional_parameters',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
     ];
@@ -469,6 +473,9 @@ class YamlFileLoader extends FileLoader
         if (isset($defaults['autowire'])) {
             $definition->setAutowired($defaults['autowire']);
         }
+        if (isset($defaults['autowire_optional_parameters'])) {
+            $definition->setAutowireOptionalParameters($defaults['autowire_optional_parameters']);
+        }
         if (isset($defaults['autoconfigure'])) {
             $definition->setAutoconfigured($defaults['autoconfigure']);
         }
@@ -655,6 +662,10 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['autowire'])) {
             $definition->setAutowired($service['autowire']);
+        }
+
+        if (isset($service['autowire_optional_parameters'])) {
+            $definition->setAutowireOptionalParameters($service['autowire_optional_parameters']);
         }
 
         if (isset($defaults['bind']) || isset($service['bind'])) {

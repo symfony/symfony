@@ -203,6 +203,10 @@ class XmlDumper extends Dumper
             $service->setAttribute('autowire', 'true');
         }
 
+        if (!$definition->isAutowiringOptionalParameters()) {
+            $service->setAttribute('autowire-optional-parameters', 'false');
+        }
+
         if ($definition->isAutoconfigured()) {
             $service->setAttribute('autoconfigure', 'true');
         }

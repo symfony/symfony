@@ -337,6 +337,18 @@ class DefinitionTest extends TestCase
         $this->assertFalse($def->isAutowired());
     }
 
+    public function testAutowiringOptionalParameters()
+    {
+        $def = new Definition('stdClass');
+        $this->assertTrue($def->isAutowiringOptionalParameters());
+
+        $def->setAutowireOptionalParameters(false);
+        $this->assertFalse($def->isAutowiringOptionalParameters());
+
+        $def->setAutowireOptionalParameters(true);
+        $this->assertTrue($def->isAutowiringOptionalParameters());
+    }
+
     public function testChangesNoChanges()
     {
         $def = new Definition();
@@ -350,6 +362,7 @@ class DefinitionTest extends TestCase
 
         $def->setAbstract(true);
         $def->setAutowired(true);
+        $def->setAutowireOptionalParameters(false);
         $def->setConfigurator('configuration_func');
         $def->setDecoratedService(null);
         $def->setDeprecated('vendor/package', '1.1', '%service_id%');
@@ -369,6 +382,7 @@ class DefinitionTest extends TestCase
         $this->assertSame([
             'class' => true,
             'autowired' => true,
+            'autowireOptionalParameters' => true,
             'configurator' => true,
             'decorated_service' => true,
             'deprecated' => true,

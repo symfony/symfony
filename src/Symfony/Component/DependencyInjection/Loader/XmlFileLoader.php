@@ -247,6 +247,7 @@ class XmlFileLoader extends FileLoader
             $definition->setPublic($defaults->isPublic());
         }
         $definition->setAutowired($defaults->isAutowired());
+        $definition->setAutowireOptionalParameters($defaults->isAutowiringOptionalParameters());
         $definition->setAutoconfigured($defaults->isAutoconfigured());
         $definition->setChanges([]);
 
@@ -266,6 +267,10 @@ class XmlFileLoader extends FileLoader
 
         if ($value = $service->getAttribute('autowire')) {
             $definition->setAutowired(XmlUtils::phpize($value));
+        }
+
+        if ($value = $service->getAttribute('autowire-optional-parameters')) {
+            $definition->setAutowireOptionalParameters(XmlUtils::phpize($value));
         }
 
         if ($value = $service->getAttribute('autoconfigure')) {

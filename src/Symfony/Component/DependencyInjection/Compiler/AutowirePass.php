@@ -283,14 +283,20 @@ class AutowirePass extends AbstractRecursivePass
             $target = null;
             $name = Target::parseName($parameter, $target);
             $target = $target ? [$target] : [];
+            $definition = $this->container->getDefinition($this->currentId);
 
-            $getValue = function () use ($type, $parameter, $class, $method, $name, $target) {
-                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $name, $target), false)) {
-                    $failureMessage = $this->createTypeNotFoundMessageCallback($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
+            $getValue = function () use ($type, $parameter, $class, $method, $name, $target, $definition) {
+                $value = null;
+                $ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $name, $target);
+                if (!$parameter->isOptional() || $definition->isAutowiringOptionalParameters()) {
+                    $value = $this->getAutowiredReference($ref, false);
+                }
 
+                if (!$value) {
                     if ($parameter->isDefaultValueAvailable()) {
                         $value = $this->defaultArgument->withValue($parameter);
                     } elseif (!$parameter->allowsNull()) {
+                        $failureMessage = $this->createTypeNotFoundMessageCallback($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
                         throw new AutowiringFailedException($this->currentId, $failureMessage);
                     }
                 }

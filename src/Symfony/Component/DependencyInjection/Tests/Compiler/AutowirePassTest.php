@@ -417,6 +417,44 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, $definition->getArgument(2));
     }
 
+    public function testAutowiringOptionalParametersDisabled()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(A::class);
+        $container->register(Foo::class);
+        $optDefinition = $container->register('opt', OptionalParameter::class);
+        $optDefinition->setAutowired(true);
+        $optDefinition->setAutowireOptionalParameters(false);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('opt');
+        $this->assertNull($definition->getArgument(0));
+        $this->assertEquals(A::class, $definition->getArgument(1));
+        $this->assertCount(2, $definition->getArguments());
+    }
+
+    public function testAutowiringOptionalParametersEnabled()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(A::class);
+        $container->register(Foo::class);
+        $optDefinition = $container->register('opt', OptionalParameter::class);
+        $optDefinition->setAutowired(true);
+        $optDefinition->setAutowireOptionalParameters(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('opt');
+        $this->assertNull($definition->getArgument(0));
+        $this->assertEquals(A::class, $definition->getArgument(1));
+        $this->assertEquals(Foo::class, $definition->getArgument(2));
+    }
+
     public function testParameterWithNullUnionIsSkipped()
     {
         $container = new ContainerBuilder();

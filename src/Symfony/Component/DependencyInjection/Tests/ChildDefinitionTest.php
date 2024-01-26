@@ -80,6 +80,16 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(['autowired' => true], $def->getChanges());
     }
 
+    public function testSetAutowireOptionalParameters()
+    {
+        $def = new ChildDefinition('foo');
+
+        $this->assertTrue($def->isAutowiringOptionalParameters());
+        $this->assertSame($def, $def->setAutowireOptionalParameters(false));
+        $this->assertFalse($def->isAutowiringOptionalParameters());
+        $this->assertSame(['autowireOptionalParameters' => true], $def->getChanges());
+    }
+
     public function testSetArgument()
     {
         $def = new ChildDefinition('foo');

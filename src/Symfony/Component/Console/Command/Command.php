@@ -54,6 +54,8 @@ class Command
     private array $usages = [];
     private ?HelperSet $helperSet = null;
 
+    protected bool $initialized = false;
+
     public static function getDefaultName(): ?string
     {
         if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
@@ -100,6 +102,7 @@ class Command
             $this->setDescription(static::getDefaultDescription() ?? '');
         }
 
+        $this->initialized = ($this instanceof LazyCommand || [] !== (new \ReflectionClass(static::class))->getAttributes(AsCommand::class));
         $this->configure();
     }
 
@@ -573,6 +576,13 @@ class Command
      */
     public function setAliases(iterable $aliases): static
     {
+        if($this->initialized) {
+            error_log(sprintf(
+                'On %s, setting aliases after initialization may lead to unexpected behavior',
+                $this->getName(),
+            ), E_USER_NOTICE);
+        }
+
         $list = [];
 
         foreach ($aliases as $alias) {

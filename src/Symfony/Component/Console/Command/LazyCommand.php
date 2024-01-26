@@ -193,6 +193,7 @@ final class LazyCommand extends Command
             $command->setHelperSet($this->getHelperSet());
         }
 
+        $command->initialized = false;
         $command->setName($this->getName())
             ->setAliases($this->getAliases())
             ->setHidden($this->isHidden())
@@ -200,7 +201,7 @@ final class LazyCommand extends Command
 
         // Will throw if the command is not correctly initialized.
         $command->getDefinition();
-
+        $command->initialized = true;
         return $command;
     }
 }

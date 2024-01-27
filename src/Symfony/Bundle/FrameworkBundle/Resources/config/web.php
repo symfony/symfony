@@ -145,4 +145,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
 
     ;
+    public function yourMethod(Request $request)
+{
+    // Handle POST requests here
+    Route::post('/password', 'YourController@yourMethod')->name('password');
+
+};
 };

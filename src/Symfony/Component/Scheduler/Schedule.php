@@ -17,6 +17,7 @@ use Symfony\Component\Scheduler\Event\FailureEvent;
 use Symfony\Component\Scheduler\Event\PostRunEvent;
 use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\Exception\LogicException;
+use Symfony\Component\Scheduler\Trigger\MessageProviderInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
 final class Schedule implements ScheduleProviderInterface
@@ -26,13 +27,13 @@ final class Schedule implements ScheduleProviderInterface
     ) {
     }
 
-    /** @var array<string,RecurringMessage> */
+    /** @var array<string,MessageProviderInterface> */
     private array $messages = [];
     private ?LockInterface $lock = null;
     private ?CacheInterface $state = null;
     private bool $shouldRestart = false;
 
-    public function with(RecurringMessage $message, RecurringMessage ...$messages): static
+    public function with(MessageProviderInterface $message, MessageProviderInterface ...$messages): static
     {
         return static::doAdd(new self($this->dispatcher), $message, ...$messages);
     }
@@ -40,14 +41,14 @@ final class Schedule implements ScheduleProviderInterface
     /**
      * @return $this
      */
-    public function add(RecurringMessage $message, RecurringMessage ...$messages): static
+    public function add(MessageProviderInterface $message, MessageProviderInterface ...$messages): static
     {
         $this->setRestart(true);
 
         return static::doAdd($this, $message, ...$messages);
     }
 
-    private static function doAdd(self $schedule, RecurringMessage $message, RecurringMessage ...$messages): static
+    private static function doAdd(self $schedule, MessageProviderInterface $message, MessageProviderInterface ...$messages): static
     {
         foreach ([$message, ...$messages] as $m) {
             if (isset($schedule->messages[$m->getId()])) {
@@ -63,7 +64,7 @@ final class Schedule implements ScheduleProviderInterface
     /**
      * @return $this
      */
-    public function remove(RecurringMessage $message): static
+    public function remove(MessageProviderInterface $message): static
     {
         unset($this->messages[$message->getId()]);
         $this->setRestart(true);
@@ -124,7 +125,7 @@ final class Schedule implements ScheduleProviderInterface
     }
 
     /**
-     * @return array<RecurringMessage>
+     * @return array<MessageProviderInterface>
      */
     public function getRecurringMessages(): array
     {

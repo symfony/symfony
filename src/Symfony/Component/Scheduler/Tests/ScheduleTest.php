@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
+use Symfony\Component\Scheduler\Trigger\CallbackMessageProvider;
 
 class ScheduleTest extends TestCase
 {
@@ -26,5 +27,15 @@ class ScheduleTest extends TestCase
         $this->expectException(LogicException::class);
 
         $schedule->add(RecurringMessage::cron('* * * * *', new \stdClass()));
+    }
+
+    public function testAddWithMessageProvider()
+    {
+        $schedule = new Schedule();
+        $schedule->add(new CallbackMessageProvider(function () {
+            // no-op
+        }));
+
+        $this->assertCount(1, $schedule->getRecurringMessages());
     }
 }

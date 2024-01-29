@@ -136,6 +136,23 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns the parameter as string or null.
+     */
+    public function getNullableString(string $key, ?string $default = null): ?string
+    {
+        $value = $this->get($key, $default);
+        if (null === $value) {
+            return null;
+        }
+
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
+            throw new UnexpectedValueException(sprintf('Parameter value "%s" cannot be converted to "string".', $key));
+        }
+
+        return (string) $value;
+    }
+
+    /**
      * Returns the parameter value converted to integer.
      */
     public function getInt(string $key, int $default = 0): int
@@ -144,11 +161,27 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns the parameter value converted to integer or null.
+     */
+    public function getNullableInt(string $key, ?int $default = null): ?int
+    {
+        return $this->filter($key, $default, \FILTER_VALIDATE_INT, ['flags' => \FILTER_REQUIRE_SCALAR], true);
+    }
+
+    /**
      * Returns the parameter value converted to boolean.
      */
     public function getBoolean(string $key, bool $default = false): bool
     {
         return $this->filter($key, $default, \FILTER_VALIDATE_BOOL, ['flags' => \FILTER_REQUIRE_SCALAR]);
+    }
+
+    /**
+     * Returns the parameter value converted to boolean or null.
+     */
+    public function getNullableBoolean(string $key, ?bool $default = null): ?bool
+    {
+        return $this->filter($key, $default, \FILTER_VALIDATE_BOOL, ['flags' => \FILTER_REQUIRE_SCALAR], true);
     }
 
     /**
@@ -184,9 +217,12 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @see https://php.net/filter-var
      */
-    public function filter(string $key, mixed $default = null, int $filter = \FILTER_DEFAULT, mixed $options = []): mixed
+    public function filter(string $key, mixed $default = null, int $filter = \FILTER_DEFAULT, mixed $options = [], bool $nullable = false): mixed
     {
         $value = $this->get($key, $default);
+        if ($nullable && null === $value) {
+            return null;
+        }
 
         // Always turn $options into an array - this allows filter_var option shortcuts.
         if (!\is_array($options) && $options) {

@@ -102,9 +102,26 @@ final class InputBag extends ParameterBag
         return (string) $this->get($key, $default);
     }
 
-    public function filter(string $key, mixed $default = null, int $filter = \FILTER_DEFAULT, mixed $options = []): mixed
+    /**
+     * Returns the parameter value converted to string or null.
+     */
+    public function getNullableString(string $key, ?string $default = null): ?string
+    {
+        // Shortcuts the parent method because the validation on scalar is already done in get().
+        $value = $this->get($key, $default);
+        if (null === $value) {
+            return null;
+        }
+
+        return (string) $value;
+    }
+
+    public function filter(string $key, mixed $default = null, int $filter = \FILTER_DEFAULT, mixed $options = [], bool $nullable = false): mixed
     {
         $value = $this->has($key) ? $this->all()[$key] : $default;
+        if ($nullable && null === $value) {
+            return null;
+        }
 
         // Always turn $options into an array - this allows filter_var option shortcuts.
         if (!\is_array($options) && $options) {

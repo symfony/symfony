@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-01-02T16:43:45Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-03T00:26:36Z
+
+This was caused by #53115, sorry about that. IMO, the best solution would be to avoid using named arguments when the function is variadic:
+
+```diff
+index 1a7c314b84..27224f5b3d 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
++++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
+@@ -372,7 +372,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+                             $variadicParameters[$parameterKey] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                         }
+
+-                        $params = array_merge($params, $variadicParameters);
++                        $params = array_merge(array_values($params), $variadicParameters);
+                         $unsetKeys[] = $key;
+                     }
+                 } elseif ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
+```
+
+---------------------------------------------------------------------------
+
+by thijsBreker at 2024-01-03T08:35:50Z
+
+No worries! This gave me the chance to contribute for the first time :)
+
+---------------------------------------------------------------------------
+
+by thijsBreker at 2024-01-03T10:56:27Z
+
+I don't understand where the code standard errors are coming from. The patch provided changes things that have been there since 2018?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-03T11:01:09Z
+
+> I don't understand where the code standard errors are coming from. The patch provided changes things that have been there since 2018?
+
+Don't worry about it, most are false positives. Just revert the coding standard changes on lines you didn't modify.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-06T10:39:28Z
+
+@thijsBreker It would be good to remove WIP from the title.

@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\Exception\TimeoutException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class RetryableHttpClientTest extends TestCase
 {
@@ -243,6 +245,35 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('Test out content', $response->getContent());
         self::assertSame('Test out content', $response->getContent(), 'Content should be buffered');
+    }
+
+    /**
+     * @testWith ["GET"]
+     *           ["POST"]
+     *           ["PUT"]
+     *           ["PATCH"]
+     *           ["DELETE"]
+     */
+    public function testRetryOnHeaderTimeout(string $method)
+    {
+        $client = HttpClient::create();
+
+        if ($client instanceof NativeHttpClient) {
+            $this->markTestSkipped('NativeHttpClient cannot timeout before receiving headers');
+        }
+
+        TestHttpServer::start();
+
+        $client = new RetryableHttpClient($client);
+        $response = $client->request($method, 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
+
+        try {
+            $response->getStatusCode();
+            $this->fail(TimeoutException::class.' expected');
+        } catch (TimeoutException $e) {
+        }
+
+        $this->assertSame('Idle timeout reached for "http://localhost:8057/timeout-header".', $response->getInfo('error'));
     }
 
     public function testRetryWithMultipleBaseUris()

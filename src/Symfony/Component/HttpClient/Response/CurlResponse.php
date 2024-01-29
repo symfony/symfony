@@ -98,7 +98,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->info['pause_handler'] = static function (float $duration) use ($ch, $multi, $execCounter) {
             if (0 < $duration) {
                 if ($execCounter === $multi->execCounter) {
-                    $multi->execCounter = !\is_float($execCounter) ? 1 + $execCounter : \PHP_INT_MIN;
                     curl_multi_remove_handle($multi->handle, $ch);
                 }
 

@@ -174,7 +174,10 @@ class NotificationEmail extends TemplatedEmail
         return '@email/'.$this->theme.'/notification/body.html.twig';
     }
 
-    public function context(array $context)
+    /**
+     * @return $this
+     */
+    public function context(array $context): static
     {
         $parentContext = [];
 

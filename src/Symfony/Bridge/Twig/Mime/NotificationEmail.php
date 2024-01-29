@@ -178,6 +178,23 @@ class NotificationEmail extends TemplatedEmail
         return '@email/'.$this->theme.'/notification/body.html.twig';
     }
 
+    public function context(array $context)
+    {
+        $parentContext = [];
+
+        foreach ($context as $key => $value) {
+            if (\array_key_exists($key, $this->context)) {
+                $this->context[$key] = $value;
+            } else {
+                $parentContext[$key] = $value;
+            }
+        }
+
+        parent::context($parentContext);
+
+        return $this;
+    }
+
     public function getContext(): array
     {
         return array_merge($this->context, parent::getContext());

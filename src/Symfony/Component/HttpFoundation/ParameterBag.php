@@ -138,7 +138,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameter as string or null.
      */
-    public function getNullableString(string $key, ?string $default = null): ?string
+    public function getStringOrNull(string $key, ?string $default = null): ?string
     {
         $value = $this->get($key, $default);
         if (null === $value) {
@@ -163,7 +163,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameter value converted to integer or null.
      */
-    public function getNullableInt(string $key, ?int $default = null): ?int
+    public function getIntOrNull(string $key, ?int $default = null): ?int
     {
         return $this->filter($key, $default, \FILTER_VALIDATE_INT, ['flags' => \FILTER_REQUIRE_SCALAR], true);
     }
@@ -179,7 +179,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameter value converted to boolean or null.
      */
-    public function getNullableBoolean(string $key, ?bool $default = null): ?bool
+    public function getBooleanOrNull(string $key, ?bool $default = null): ?bool
     {
         return $this->filter($key, $default, \FILTER_VALIDATE_BOOL, ['flags' => \FILTER_REQUIRE_SCALAR], true);
     }

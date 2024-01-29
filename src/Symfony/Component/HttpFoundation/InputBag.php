@@ -105,7 +105,7 @@ final class InputBag extends ParameterBag
     /**
      * Returns the parameter value converted to string or null.
      */
-    public function getNullableString(string $key, ?string $default = null): ?string
+    public function getStringOrNull(string $key, ?string $default = null): ?string
     {
         // Shortcuts the parent method because the validation on scalar is already done in get().
         $value = $this->get($key, $default);

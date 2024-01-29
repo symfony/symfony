@@ -204,26 +204,26 @@ class ParameterBagTest extends TestCase
         $bag->getInt('word');
     }
 
-    public function testGetNullableInt()
+    public function testGetIntOrNull()
     {
         $bag = new ParameterBag(['digits' => '123', 'nullable' => null]);
 
-        $this->assertSame(123, $bag->getNullableInt('digits'), '->getNullableInt() gets a value of parameter as integer');
-        $this->assertNull($bag->getNullableInt('unknown'), '->getNullableInt() returns default if a parameter is not defined');
-        $this->assertSame(0, $bag->getNullableInt('unknown', 0), '->getNullableInt() returns default if a parameter is not defined');
-        $this->assertSame(10, $bag->getNullableInt('unknown', 10), '->getNullableInt() returns the default if a parameter is not defined');
-        $this->assertNull($bag->getNullableInt('nullable'), '->getNullableInt() returns null if a parameter is null');
-        $this->assertNull($bag->getNullableInt('nullable', 0), '->getNullableInt() returns null if a parameter is null');
+        $this->assertSame(123, $bag->getIntOrNull('digits'), '->getIntOrNull() gets a value of parameter as integer');
+        $this->assertNull($bag->getIntOrNull('unknown'), '->getIntOrNull() returns default if a parameter is not defined');
+        $this->assertSame(0, $bag->getIntOrNull('unknown', 0), '->getIntOrNull() returns default if a parameter is not defined');
+        $this->assertSame(10, $bag->getIntOrNull('unknown', 10), '->getIntOrNull() returns the default if a parameter is not defined');
+        $this->assertNull($bag->getIntOrNull('nullable'), '->getIntOrNull() returns null if a parameter is null');
+        $this->assertNull($bag->getIntOrNull('nullable', 0), '->getIntOrNull() returns null if a parameter is null');
     }
 
-    public function testGetNullableIntExceptionWithInvalid()
+    public function testGetIntOrNullExceptionWithInvalid()
     {
         $bag = new ParameterBag(['word' => 'foo_BAR_012']);
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "word" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
 
-        $bag->getNullableInt('word');
+        $bag->getIntOrNull('word');
     }
 
     public function testGetString()
@@ -264,7 +264,7 @@ class ParameterBagTest extends TestCase
         $bag->getString('object');
     }
 
-    public function testGetNullableString()
+    public function testGetStringOrNull()
     {
         $bag = new ParameterBag(['nullable' => null, 'integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class() implements \Stringable {
             public function __toString(): string
@@ -273,15 +273,15 @@ class ParameterBagTest extends TestCase
             }
         }]);
 
-        $this->assertSame('123', $bag->getNullableString('integer'), '->getNullableString() gets a value of parameter as string');
-        $this->assertSame('abc', $bag->getNullableString('string'), '->getNullableString() gets a value of parameter as string');
-        $this->assertNull($bag->getNullableString('unknown'), '->getNullableString() returns null if a parameter is not defined');
-        $this->assertSame('foo', $bag->getNullableString('unknown', 'foo'), '->getNullableString() returns the default if a parameter is not defined');
-        $this->assertSame('1', $bag->getNullableString('bool_true'), '->getNullableString() returns "1" if a parameter is true');
-        $this->assertSame('', $bag->getNullableString('bool_false', 'foo'), '->getNullableString() returns an empty empty string if a parameter is false');
-        $this->assertSame('strval', $bag->getNullableString('stringable'), '->getNullableString() gets a value of a stringable paramater as string');
-        $this->assertNull($bag->getNullableString('nullable'), '->getNullableString() gets null if a parameter is null');
-        $this->assertNull($bag->getNullableString('nullable', ''), '->getNullableString() gets null if a parameter is null');
+        $this->assertSame('123', $bag->getStringOrNull('integer'), '->getStringOrNull() gets a value of parameter as string');
+        $this->assertSame('abc', $bag->getStringOrNull('string'), '->getStringOrNull() gets a value of parameter as string');
+        $this->assertNull($bag->getStringOrNull('unknown'), '->getStringOrNull() returns null if a parameter is not defined');
+        $this->assertSame('foo', $bag->getStringOrNull('unknown', 'foo'), '->getStringOrNull() returns the default if a parameter is not defined');
+        $this->assertSame('1', $bag->getStringOrNull('bool_true'), '->getStringOrNull() returns "1" if a parameter is true');
+        $this->assertSame('', $bag->getStringOrNull('bool_false', 'foo'), '->getStringOrNull() returns an empty empty string if a parameter is false');
+        $this->assertSame('strval', $bag->getStringOrNull('stringable'), '->getStringOrNull() gets a value of a stringable paramater as string');
+        $this->assertNull($bag->getStringOrNull('nullable'), '->getStringOrNull() gets null if a parameter is null');
+        $this->assertNull($bag->getStringOrNull('nullable', ''), '->getStringOrNull() gets null if a parameter is null');
     }
 
     public function testFilter()
@@ -379,27 +379,27 @@ class ParameterBagTest extends TestCase
         $bag->getBoolean('invalid');
     }
 
-    public function testGetNullableBoolean()
+    public function testGetBooleanOrNull()
     {
         $parameters = ['string_true' => 'true', 'string_false' => 'false', 'string' => 'abc', 'nullable' => null];
         $bag = new ParameterBag($parameters);
 
-        $this->assertTrue($bag->getNullableBoolean('string_true'), '->getNullableBoolean() gets the string true as boolean true');
-        $this->assertFalse($bag->getNullableBoolean('string_false'), '->getNullableBoolean() gets the string false as boolean false');
-        $this->assertNull($bag->getNullableBoolean('unknown'), '->getNullableBoolean() returns null if a parameter is not defined');
-        $this->assertTrue($bag->getNullableBoolean('unknown', true), '->getNullableBoolean() returns default if a parameter is not defined');
-        $this->assertNull($bag->getNullableBoolean('nullable'), '->getNullableBoolean() returns null if a parameter is null');
-        $this->assertNull($bag->getNullableBoolean('nullable', true), '->getNullableBoolean() returns null if a parameter is null');
+        $this->assertTrue($bag->getBooleanOrNull('string_true'), '->getBooleanOrNull() gets the string true as boolean true');
+        $this->assertFalse($bag->getBooleanOrNull('string_false'), '->getBooleanOrNull() gets the string false as boolean false');
+        $this->assertNull($bag->getBooleanOrNull('unknown'), '->getBooleanOrNull() returns null if a parameter is not defined');
+        $this->assertTrue($bag->getBooleanOrNull('unknown', true), '->getBooleanOrNull() returns default if a parameter is not defined');
+        $this->assertNull($bag->getBooleanOrNull('nullable'), '->getBooleanOrNull() returns null if a parameter is null');
+        $this->assertNull($bag->getBooleanOrNull('nullable', true), '->getBooleanOrNull() returns null if a parameter is null');
     }
 
-    public function testGetNullableBooleanExceptionWithInvalid()
+    public function testGetBooleanOrNullExceptionWithInvalid()
     {
         $bag = new ParameterBag(['invalid' => 'foo']);
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Parameter value "invalid" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
 
-        $bag->getNullableBoolean('invalid');
+        $bag->getBooleanOrNull('invalid');
     }
 
     public function testGetEnum()

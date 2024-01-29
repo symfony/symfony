@@ -74,7 +74,7 @@ class InputBagTest extends TestCase
         $this->assertSame('strval', $bag->getString('stringable'), '->getString() gets a value of a stringable paramater as string');
     }
 
-    public function testGetNullableString()
+    public function testGetStringOrNull()
     {
         $bag = new InputBag(['nullable' => null, 'integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class() implements \Stringable {
             public function __toString(): string
@@ -83,15 +83,15 @@ class InputBagTest extends TestCase
             }
         }]);
 
-        $this->assertSame('123', $bag->getNullableString('integer'), '->getString() gets a value of parameter as string');
-        $this->assertSame('abc', $bag->getNullableString('string'), '->getString() gets a value of parameter as string');
-        $this->assertNull($bag->getNullableString('unknown'), '->getString() returns null if a parameter is not defined');
-        $this->assertSame('foo', $bag->getNullableString('unknown', 'foo'), '->getString() returns the default if a parameter is not defined');
-        $this->assertSame('1', $bag->getNullableString('bool_true'), '->getString() returns "1" if a parameter is true');
-        $this->assertSame('', $bag->getNullableString('bool_false', 'foo'), '->getString() returns an empty empty string if a parameter is false');
-        $this->assertSame('strval', $bag->getNullableString('stringable'), '->getString() gets a value of a stringable paramater as string');
-        $this->assertNull($bag->getNullableString('nullable'), '->getNullableString() gets null if a parameter is null');
-        $this->assertNull($bag->getNullableString('nullable', ''), '->getNullableString() gets null if a parameter is null');
+        $this->assertSame('123', $bag->getStringOrNull('integer'), '->getString() gets a value of parameter as string');
+        $this->assertSame('abc', $bag->getStringOrNull('string'), '->getString() gets a value of parameter as string');
+        $this->assertNull($bag->getStringOrNull('unknown'), '->getString() returns null if a parameter is not defined');
+        $this->assertSame('foo', $bag->getStringOrNull('unknown', 'foo'), '->getString() returns the default if a parameter is not defined');
+        $this->assertSame('1', $bag->getStringOrNull('bool_true'), '->getString() returns "1" if a parameter is true');
+        $this->assertSame('', $bag->getStringOrNull('bool_false', 'foo'), '->getString() returns an empty empty string if a parameter is false');
+        $this->assertSame('strval', $bag->getStringOrNull('stringable'), '->getString() gets a value of a stringable paramater as string');
+        $this->assertNull($bag->getStringOrNull('nullable'), '->getStringOrNull() gets null if a parameter is null');
+        $this->assertNull($bag->getStringOrNull('nullable', ''), '->getStringOrNull() gets null if a parameter is null');
     }
 
     public function testGetStringExceptionWithArray()

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-01-28T15:51:52Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mpdude at 2024-01-28T16:28:37Z
+
+Appveyor test failures seem to be unrelated.
+
+What’s the problem with license headers reported by fabbot?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-29T10:06:36Z
+
+Can you please drop the code style commit? You can ignore fabbot's suggestions on these files as well as the license issues.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2024-01-29T10:35:49Z
+
+@xabbuh done

@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-28T21:36:31Z
+
+> In YAML, the 'name' argument of useAttributeAsKey() has a special meaning and refers to the key of the map (sf_connection and default in this example). If a child node was defined for the connections node with the key name, then that key of the map would be lost.
+
+See https://symfony.com/doc/current/components/config/definition.html#array-node-options
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-28T22:39:48Z
+
+@smnandre Well yes, it does make sense in the example, and in some other cases such as `scoped_clients`, but it still doesn't make sense for the `default_context`. You cannot do, for example, something like:
+
+```yaml
+framework:
+    serializer:
+        default_context:
+            -
+                name: one
+                enable_max_depth: true
+                yaml_indentation: 2
+            -
+                name: two
+                enable_max_depth: true
+                yaml_indentation: 2
+```
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-28T22:57:37Z
+
+As i read it you can do the following:
+
+```yaml
+framework:
+  serializer:
+    default_context:
+      foo: bar
+      blop: blip
+      name: name
+```
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-29T00:12:43Z
+
+@smnandre You can still do that even with this change.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-29T01:31:42Z
+
+> As of writing this, there is an inconsistency: if only one file provides the configuration in question, the keys (i.e. sf_connection and default) are not lost. But if more than one file provides the configuration, the keys are lost as described above.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-29T02:38:50Z
+
+@smnandre Sorry, I'm not sure what the point of your last response was.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-29T07:14:48Z
+
+Let's change this on 7.1, this is not a bugfix to me.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-29T09:12:37Z
+
+@nicolas-grekas Done

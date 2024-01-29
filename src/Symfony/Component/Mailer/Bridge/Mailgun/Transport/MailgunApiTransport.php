@@ -85,7 +85,7 @@ class MailgunApiTransport extends AbstractApiTransport
     private function getPayload(Email $email, Envelope $envelope): array
     {
         $headers = $email->getHeaders();
-        $headers->addHeader('h:Sender', $envelope->getSender()->toString());
+        $headers->addMailboxHeader('h:Sender', $envelope->getSender());
         $html = $email->getHtmlBody();
         if (null !== $html && \is_resource($html)) {
             if (stream_get_meta_data($html)['seekable'] ?? false) {

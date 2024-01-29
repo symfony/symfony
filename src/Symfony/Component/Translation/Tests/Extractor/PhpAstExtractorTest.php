@@ -20,6 +20,8 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 final class PhpAstExtractorTest extends TestCase
 {
+    public const OTHER_DOMAIN = 'not_messages';
+
     /**
      * @dataProvider resourcesProvider
      */
@@ -124,6 +126,7 @@ EOF;
                 'variable-assignation-inlined-with-named-arguments-in-trans-method' => 'prefixvariable-assignation-inlined-with-named-arguments-in-trans-method',
                 'mix-named-arguments-without-parameters' => 'prefixmix-named-arguments-without-parameters',
                 'mix-named-arguments-disordered' => 'prefixmix-named-arguments-disordered',
+                'const-domain' => 'prefixconst-domain',
             ],
             'validators' => [
                 'message-in-constraint-attribute' => 'prefixmessage-in-constraint-attribute',

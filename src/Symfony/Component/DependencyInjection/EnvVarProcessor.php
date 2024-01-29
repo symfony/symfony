@@ -165,10 +165,16 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         if (false !== $i || 'string' !== $prefix) {
             $env = $getEnv($name);
         } elseif ('' === ($env = $_ENV[$name] ?? (str_starts_with($name, 'HTTP_') ? null : ($_SERVER[$name] ?? null)))
-            || (false !== $env && false === ($env = $env ?? getenv($name) ?? false)) // null is a possible value because of thread safety issues
+            || (false !== $env && false === $env ??= getenv($name) ?? false) // null is a possible value because of thread safety issues
         ) {
-            foreach ($this->loadedVars as $vars) {
-                if (false !== ($env = ($vars[$name] ?? $env)) && '' !== $env) {
+            foreach ($this->loadedVars as $i => $vars) {
+                if (false === $env = $vars[$name] ?? $env) {
+                    continue;
+                }
+                if ($env instanceof \Stringable) {
+                    $this->loadedVars[$i][$name] = $env = (string) $env;
+                }
+                if ('' !== ($env ?? '')) {
                     break;
                 }
             }
@@ -186,7 +192,13 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                             continue;
                         }
                         $this->loadedVars[] = $vars = $loader->loadEnvVars();
-                        if (false !== ($env = ($vars[$name] ?? $env)) && '' !== $env) {
+                        if (false === $env = $vars[$name] ?? $env) {
+                            continue;
+                        }
+                        if ($env instanceof \Stringable) {
+                            $this->loadedVars[array_key_last($this->loadedVars)][$name] = $env = (string) $env;
+                        }
+                        if ('' !== ($env ?? '')) {
                             $ended = false;
                             break;
                         }

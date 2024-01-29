@@ -52,8 +52,6 @@ abstract class FormLayoutTestCase extends FormIntegrationTestCase
     {
         $dom = new \DOMDocument('UTF-8');
 
-        $html = preg_replace('/(<input [^>]+)(?<!\/)>/', '$1/>', $html);
-
         try {
             // Wrap in <root> node so we can load HTML with multiple tags at
             // the top level

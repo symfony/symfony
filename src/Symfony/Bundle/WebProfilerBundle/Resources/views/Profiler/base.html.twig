@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="{{ _charset }}">
-        <meta name="robots" content="noindex,nofollow">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta charset="{{ _charset }}" />
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>{% block title %}Symfony Profiler{% endblock %}</title>
 
         {% set request_collector = profile is defined ? profile.collectors.request|default(null) : null %}

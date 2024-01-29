@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-01-20T14:59:48Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-20T20:57:43Z
+
+Hi @lostfocus!
+
+With your implementation, we store two exclusive ways of authorization, that cannot be used together.
+
+The [NTFY documentation](https://docs.ntfy.sh/publish/#access-tokens) makes an interesting point: the ntfy uses/accepts access token as "user-less" Basic authorization.
+
+> Alternatively, you can use [Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) to send the access token. When sending an empty username, the basic auth password is treated by the ntfy server as an access token. This is primarily useful to make curl calls easier, e.g. curl -u:tk_AgQdq7mVBoFD37zQVN29RhuMzNIz2 ...:
+
+This would be smaller to implement while beeing easier to maintain .. what do you think ?
+
+Something _similar_ is done in the Telegram Bridge:
+
+```php
+private function getToken(Dsn $dsn): string
+{
+    if (null === $dsn->getUser() && null === $dsn->getPassword()) {
+        throw new IncompleteDsnException('Missing token.', 'telegram://'.$dsn->getHost());
+    }
+    if (null === $dsn->getPassword()) {
+        throw new IncompleteDsnException('Malformed token.', 'telegram://'.$dsn->getHost());
+    }
+    return sprintf('%s:%s', $dsn->getUser(), $dsn->getPassword());
+}
+```
+
+---------------------------------------------------------------------------
+
+by lostfocus at 2024-01-20T21:15:56Z
+
+@smnandre yeah, I was looking into that. But if we have something like `NTFY_DSN=ntfy://:[:PASSWORD]@default/TOPIC` we're already losing the password when parsing the string into a `Symfony\Component\Notifier\Transport\Dsn` in `Symfony\Component\Notifier\Transport`. And I didn't want to open the can of worms of fiddling around in that one, too.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-20T21:24:45Z
+
+> @smnandre yeah, I was looking into that. But if we have something like `NTFY_DSN=ntfy://:[:PASSWORD]@default/TOPIC` we're already losing the password when parsing the string into a `Symfony\Component\Notifier\Transport\Dsn` in `Symfony\Component\Notifier\Transport`. And I didn't want to open the can of worms of fiddling around in that one, too.
+
+I'm not sure to understand, were are you losing the password ?
+
+i think the "unified" sugegstion would be easier to develop, passing by user:password to the Basic or Bearer header with (almost) no manipulation.
+
+And it would be easier for users to switch from Token to user/password :)
+
+---------------------------------------------------------------------------
+
+by lostfocus at 2024-01-20T21:41:51Z
+
+> I'm not sure to understand, were are you losing the password ?
+
+Okay, yeah, that was a brainfart. For some reason I thought `parse_url` couldn't handle that. I'll reshuffle things tomorrow. (And maybe (_just maybe_) it could even be considered a bugfix then.)

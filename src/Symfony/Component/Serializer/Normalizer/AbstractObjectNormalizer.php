@@ -783,7 +783,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $context = parent::createChildContext($parentContext, $attribute, $format);
         if ($context['cache_key'] ?? false) {
             $context['cache_key'] .= '-'.$attribute;
-        } else {
+        } elseif (false !== ($context['cache_key'] ?? null)) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 

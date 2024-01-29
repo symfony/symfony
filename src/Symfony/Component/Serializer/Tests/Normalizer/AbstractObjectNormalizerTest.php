@@ -555,11 +555,6 @@ class AbstractObjectNormalizerTest extends TestCase
         $foobar->foo = new EmptyDummy();
         $foobar->bar = 'bar';
         $foobar->baz = 'baz';
-        $data = [
-            'foo' => [],
-            'bar' => 'bar',
-            'baz' => 'baz',
-        ];
 
         $normalizer = new class() extends AbstractObjectNormalizerDummy {
             public $childContextCacheKey;
@@ -600,11 +595,6 @@ class AbstractObjectNormalizerTest extends TestCase
         $foobar->foo = new EmptyDummy();
         $foobar->bar = 'bar';
         $foobar->baz = 'baz';
-        $data = [
-            'foo' => [],
-            'bar' => 'bar',
-            'baz' => 'baz',
-        ];
 
         $normalizer = new class() extends AbstractObjectNormalizerDummy {
             public $childContextCacheKey;
@@ -640,11 +630,6 @@ class AbstractObjectNormalizerTest extends TestCase
         $foobar->foo = new EmptyDummy();
         $foobar->bar = 'bar';
         $foobar->baz = 'baz';
-        $data = [
-            'foo' => [],
-            'bar' => 'bar',
-            'baz' => 'baz',
-        ];
 
         $normalizer = new class() extends AbstractObjectNormalizerDummy {
             public $childContextCacheKey;

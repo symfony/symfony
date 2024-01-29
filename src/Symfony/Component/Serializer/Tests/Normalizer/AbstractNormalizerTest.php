@@ -29,6 +29,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithWithVariadicParameterConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableOptionalConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
@@ -245,6 +246,25 @@ class AbstractNormalizerTest extends TestCase
         yield [new PropertyNormalizer(null, null, $extractor)];
         yield [new ObjectNormalizer()];
         yield [new ObjectNormalizer(null, null, null, $extractor)];
+    }
+
+    public function testVariadicConstructorDenormalization()
+    {
+        $data = [
+            'foo' => 'woo',
+            'baz' => [
+                ['foo' => null, 'bar' => null, 'baz' => null, 'qux' => null],
+                ['foo' => null, 'bar' => null, 'baz' => null, 'qux' => null],
+            ],
+        ];
+
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setSerializer(new Serializer([$normalizer]));
+
+        $expected = new DummyWithWithVariadicParameterConstructor('woo', 1, new Dummy(), new Dummy());
+        $actual = $normalizer->denormalize($data, DummyWithWithVariadicParameterConstructor::class);
+
+        $this->assertEquals($expected, $actual);
     }
 
     public static function getNormalizerWithCustomNameConverter()

@@ -270,4 +270,17 @@ class MailgunApiTransportTest extends TestCase
         $this->assertArrayHasKey('v:Client-ID', $payload);
         $this->assertSame('12345', $payload['v:Client-ID']);
     }
+
+    public function testEnvelopeSenderHeaderIsCorrectlyEncoded()
+    {
+        $email = new Email();
+        $envelope = new Envelope(new Address('alice@system.com', 'Žluťoučký Kůň'), [new Address('bob@system.com')]);
+
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('h:Sender', $payload);
+        $this->assertSame('=?utf-8?Q?=C5=BDlu=C5=A5ou=C4=8Dk=C3=BD_K=C5=AF=C5=88?= <alice@system.com>', $payload['h:Sender']);
+    }
 }

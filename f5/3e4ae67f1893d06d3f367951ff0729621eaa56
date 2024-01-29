@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-01-11T09:06:18Z
+
+ping @vertexvaar as this basically reverts  #39196
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-11T09:14:38Z
+
+Looks like this was fixed in xdebug 3.0.2: https://github.com/xdebug/xdebug/pull/708

@@ -12,73 +12,71 @@
 namespace Symfony\Component\FeatureFlag\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\FeatureFlag\Exception\FeatureNotFoundException;
 use Symfony\Component\FeatureFlag\FeatureChecker;
 use Symfony\Component\FeatureFlag\FeatureRegistry;
 
 class FeatureCheckerTest extends TestCase
 {
-    public function testGetValue()
+    private FeatureChecker $featureChecker;
+
+    protected function setUp(): void
     {
-        $featureChecker = new FeatureChecker(new FeatureRegistry([
+        $this->featureChecker = new FeatureChecker(new FeatureRegistry([
+            'feature_true' => fn () => true,
+            'feature_false' => fn () => false,
             'feature_integer' => fn () => 42,
             'feature_random' => fn () => random_int(1, 42),
         ]));
-
-        $this->assertSame(42, $featureChecker->getValue('feature_integer'));
-        $this->assertIsInt($value = $featureChecker->getValue('feature_random'));
-        $this->assertSame($value, $featureChecker->getValue('feature_random'));
     }
 
-    public function testGetDefaultValue()
+    public function testGetValue()
     {
-        $featureRegistry = new FeatureRegistry([
-            'existing_feature' => fn () => 1,
-        ]);
+        $this->assertSame(42, $this->featureChecker->getValue('feature_integer'));
 
-        $this->assertSame(1, (new FeatureChecker($featureRegistry))->getValue('existing_feature'));
-        $this->assertSame(1, (new FeatureChecker($featureRegistry, 42))->getValue('existing_feature'));
-
-        $this->assertFalse((new FeatureChecker($featureRegistry))->getValue('unknown_feature'));
-        $this->assertSame(42, (new FeatureChecker($featureRegistry, 42))->getValue('unknown_feature'));
+        $this->assertIsInt($value = $this->featureChecker->getValue('feature_random'));
+        $this->assertSame($value, $this->featureChecker->getValue('feature_random'));
     }
 
-    public function testIsEnabled()
+    public function testGetValueOnNotFound()
     {
-        $featureChecker = new FeatureChecker(new FeatureRegistry([
-            'feature_true' => fn () => true,
-            'feature_false' => fn () => false,
-            'feature_integer' => fn () => 1,
-        ]));
+        $this->expectException(FeatureNotFoundException::class);
+        $this->expectExceptionMessage('Feature "unknown_feature" not found.');
 
-        $this->assertTrue($featureChecker->isEnabled('feature_true'));
-        $this->assertFalse($featureChecker->isEnabled('feature_false'));
-        $this->assertFalse($featureChecker->isEnabled('feature_integer'));
-        $this->assertFalse($featureChecker->isEnabled('unknown_feature'));
-
-        $this->assertFalse($featureChecker->isDisabled('feature_true'));
-        $this->assertTrue($featureChecker->isDisabled('feature_false'));
-        $this->assertTrue($featureChecker->isDisabled('feature_integer'));
-        $this->assertTrue($featureChecker->isDisabled('unknown_feature'));
+        $this->featureChecker->getValue('unknown_feature');
     }
 
     /**
-     * @dataProvider provideIsEnabledWithExpectedValue
+     * @dataProvider provideIsEnabled
      */
-    public function testIsEnabledWithExpectedValue(string $featureName, mixed $expectedFeatureValue, bool $expectedResult)
+    public function testIsEnabled(bool $expectedResult, string $featureName)
     {
-        $featureChecker = new FeatureChecker(new FeatureRegistry([
-            'feature_true' => fn () => true,
-            'feature_integer' => fn () => 1,
-        ]));
-
-        $this->assertSame($expectedResult, $featureChecker->isEnabled($featureName, $expectedFeatureValue));
+        $this->assertSame($expectedResult, $this->featureChecker->isEnabled($featureName));
     }
 
-    public static function provideIsEnabledWithExpectedValue()
+    public static function provideIsEnabled()
     {
-        yield 'with the same boolean' => ['feature_true', true, true];
-        yield 'with the same integer' => ['feature_integer', 1, true];
-        yield 'with a different boolean' => ['feature_true', false, false];
-        yield 'with different types' => ['feature_integer', true, false];
+        yield '"true" without expected value' => [true, 'feature_true'];
+        yield '"false" without expected value' => [false, 'feature_false'];
+        yield 'an integer without expected value' => [false, 'feature_integer'];
+        yield 'an unknown feature' => [false, 'unknown_feature'];
+    }
+
+    /**
+     * @dataProvider providesEnabledComparedToAnExpectedValue
+     */
+    public function testIsEnabledComparedToAnExpectedValue(bool $expectedResult, string $featureName, mixed $expectedValue)
+    {
+        $this->assertSame($expectedResult, $this->featureChecker->isEnabled($featureName, $expectedValue));
+    }
+
+    public static function providesEnabledComparedToAnExpectedValue()
+    {
+        yield '"true" and the same expected value' => [true, 'feature_true', true];
+        yield '"true" and a different expected value' => [false, 'feature_true', false];
+        yield '"false" and the same expected value' => [false, 'feature_false', true];
+        yield '"false" and a different expected value' => [true, 'feature_false', false];
+        yield 'an integer and the same expected value' => [true, 'feature_integer', 42];
+        yield 'an integer and a different expected value' => [false, 'feature_integer', 1];
     }
 }

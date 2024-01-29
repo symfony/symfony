@@ -29,13 +29,11 @@ class TraceableFeatureCheckerTest extends TestCase
 
         $this->assertTrue($traceableFeatureChecker->isEnabled('feature_true'));
         $this->assertFalse($traceableFeatureChecker->isEnabled('feature_integer', 1));
-        $this->assertFalse($traceableFeatureChecker->isEnabled('unknown_feature'));
 
         $this->assertSame(
             [
                 'feature_true' => true,
                 'feature_integer' => false,
-                'unknown_feature' => false,
             ],
             $traceableFeatureChecker->getChecks(),
         );
@@ -43,7 +41,6 @@ class TraceableFeatureCheckerTest extends TestCase
             [
                 'feature_true' => true,
                 'feature_integer' => 42,
-                'unknown_feature' => false,
             ],
             $traceableFeatureChecker->getValues(),
         );

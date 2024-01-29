@@ -22,9 +22,14 @@ final class FeatureRegistry implements FeatureRegistryInterface
     {
     }
 
-    public function get(string $featureName): callable
+    public function has(string $id): bool
     {
-        return $this->features[$featureName] ?? throw new FeatureNotFoundException(sprintf('Feature "%s" not found.', $featureName));
+        return array_key_exists($id, $this->features);
+    }
+
+    public function get(string $id): callable
+    {
+        return $this->features[$id] ?? throw new FeatureNotFoundException(sprintf('Feature "%s" not found.', $id));
     }
 
     public function getNames(): array

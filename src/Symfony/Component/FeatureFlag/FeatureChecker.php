@@ -11,20 +11,21 @@
 
 namespace Symfony\Component\FeatureFlag;
 
-use Symfony\Component\FeatureFlag\Exception\FeatureNotFoundException;
-
 final class FeatureChecker implements FeatureCheckerInterface
 {
     private array $cache = [];
 
     public function __construct(
         private readonly FeatureRegistryInterface $featureRegistry,
-        private readonly mixed $default = false,
     ) {
     }
 
     public function isEnabled(string $featureName, mixed $expectedValue = true): bool
     {
+        if (!$this->featureRegistry->has($featureName)) {
+            return false;
+        }
+
         return $this->getValue($featureName) === $expectedValue;
     }
 
@@ -35,10 +36,6 @@ final class FeatureChecker implements FeatureCheckerInterface
 
     public function getValue(string $featureName): mixed
     {
-        try {
-            return $this->cache[$featureName] ??= $this->featureRegistry->get($featureName)();
-        } catch (FeatureNotFoundException) {
-            return $this->cache[$featureName] ??= $this->default;
-        }
+        return $this->cache[$featureName] ??= $this->featureRegistry->get($featureName)();
     }
 }

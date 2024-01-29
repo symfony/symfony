@@ -27,6 +27,13 @@ class FeatureRegistryTest extends TestCase
         ]);
     }
 
+    public function testHas()
+    {
+        $this->assertTrue($this->featureRegistry->has('first_feature'));
+        $this->assertTrue($this->featureRegistry->has('second_feature'));
+        $this->assertFalse($this->featureRegistry->has('unknown_feature'));
+    }
+
     public function testGet()
     {
         $this->assertIsCallable($this->featureRegistry->get('first_feature'));

@@ -931,7 +931,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 return array_keys((array) $object);
             }
 
-            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
             {
                 return $object->{$attribute};
             }
@@ -971,7 +971,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 return array_keys((array) $object);
             }
 
-            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
             {
                 return $object->{$attribute};
             }
@@ -1006,7 +1006,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 return array_keys((array) $object);
             }
 
-            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
             {
                 return $object->{$attribute};
             }

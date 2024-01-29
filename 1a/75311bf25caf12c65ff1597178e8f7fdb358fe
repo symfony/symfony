@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-29T07:16:26Z
+
+For 7.1 also, and let's keep only array_key_exists?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-29T09:25:04Z
+
+@nicolas-grekas Done
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-29T10:09:15Z
+
+Sorry for the subsequent push, but I've just noticed that the test name is no longer accurate.

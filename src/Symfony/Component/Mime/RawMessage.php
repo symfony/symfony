@@ -21,7 +21,7 @@ class RawMessage
     private iterable|string|null $message = null;
     private bool $isGeneratorClosed;
 
-    public function __construct(iterable|string|nullable $message)
+    public function __construct(iterable|string|null $message)
     {
         $this->message = $message;
     }

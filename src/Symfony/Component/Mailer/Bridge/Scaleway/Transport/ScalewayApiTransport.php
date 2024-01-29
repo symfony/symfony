@@ -99,7 +99,7 @@ final class ScalewayApiTransport extends AbstractApiTransport
             $payload['html'] = $email->getHtmlBody();
         }
         if ($attachements = $this->prepareAttachments($email)) {
-            $payload['attachment'] = $attachements;
+            $payload['attachments'] = $attachements;
         }
 
         return $payload;
@@ -115,7 +115,7 @@ final class ScalewayApiTransport extends AbstractApiTransport
             $attachments[] = [
                 'name' => $filename,
                 'type' => $headers->get('Content-Type')->getBody(),
-                'content' => base64_encode($attachment->bodyToString()),
+                'content' => str_replace("\r\n", '', $attachment->bodyToString()),
             ];
         }
 

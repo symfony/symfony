@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayApiTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ScalewayApiTransportTest extends TestCase
@@ -64,6 +65,10 @@ class ScalewayApiTransportTest extends TestCase
             $this->assertSame(['email' => 'saif.gmati@symfony.com', 'name' => 'Saif Eddin'], $body['to'][0]);
             $this->assertSame('Hello!', $body['subject']);
             $this->assertSame('Hello There!', $body['text']);
+            $this->assertCount(1, $body['attachments']);
+            $this->assertSame('attachment.txt', $body['attachments'][0]['name']);
+            $this->assertSame('text/plain', $body['attachments'][0]['type']);
+            $this->assertSame(base64_encode('some attachment'), $body['attachments'][0]['content']);
 
             return new JsonMockResponse(['emails' => [['message_id' => 'foobar']]], [
                 'http_code' => 200,
@@ -76,7 +81,8 @@ class ScalewayApiTransportTest extends TestCase
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
-            ->text('Hello There!');
+            ->text('Hello There!')
+            ->addPart(new DataPart('some attachment', 'attachment.txt', 'text/plain'));
 
         $message = $transport->send($mail);
 

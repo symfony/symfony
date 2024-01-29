@@ -23,6 +23,7 @@ use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\Multipart\RelatedPart;
 use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Component\Mime\Test\Constraint\EmailHeaderSame;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -569,7 +570,7 @@ class EmailTest extends TestCase
 }
 EOF;
 
-        $extractor = new ReflectionExtractor();
+        $extractor = new PhpDocExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
         $serializer = new Serializer([
             new ArrayDenormalizer(),
@@ -589,6 +590,40 @@ EOF;
         $expected->from('fabien@symfony.com');
         $this->assertEquals($expected->getHeaders(), $n->getHeaders());
         $this->assertEquals($expected->getBody(), $n->getBody());
+    }
+
+    public function testSymfonySerialize2()
+    {
+        $e = new Email();
+        $expected = clone $e;
+
+        $expectedJson = <<<EOF
+{
+    "text": null,
+    "textCharset": null,
+    "html": null,
+    "htmlCharset": null,
+    "attachments": [],
+    "headers": [],
+    "body": null,
+    "message": null
+}
+EOF;
+
+        $extractor = new ReflectionExtractor();
+        $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new MimeMessageNormalizer($propertyNormalizer),
+            new ObjectNormalizer(null, null, null, $extractor),
+            $propertyNormalizer,
+        ], [new JsonEncoder()]);
+
+        $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
+        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+
+        $n = $serializer->deserialize($serialized, Email::class, 'json');
+        $this->assertEquals($expected, $n);
     }
 
     public function testMissingHeaderDoesNotThrowError()

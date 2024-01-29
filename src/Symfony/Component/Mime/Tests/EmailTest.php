@@ -23,7 +23,7 @@ use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\Multipart\RelatedPart;
 use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Component\Mime\Test\Constraint\EmailHeaderSame;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
@@ -569,7 +569,7 @@ class EmailTest extends TestCase
 }
 EOF;
 
-        $extractor = new PhpDocExtractor();
+        $extractor = new ReflectionExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
         $serializer = new Serializer([
             new ArrayDenormalizer(),

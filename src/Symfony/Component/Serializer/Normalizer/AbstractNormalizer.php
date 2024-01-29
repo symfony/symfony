@@ -339,7 +339,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                             $variadicParameters[$parameterKey] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $attributeContext, $format);
                         }
 
-                        $params = array_merge($params, $variadicParameters);
+                        $params = array_merge(array_values($params), $variadicParameters);
                         $unsetKeys[] = $key;
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {

@@ -26,6 +26,11 @@ final class TransMethodVisitor extends AbstractVisitor implements NodeVisitor
 
     public function enterNode(Node $node): ?Node
     {
+        return null;
+    }
+
+    public function leaveNode(Node $node): ?Node
+    {
         if (!$node instanceof Node\Expr\MethodCall && !$node instanceof Node\Expr\FuncCall) {
             return null;
         }
@@ -50,11 +55,6 @@ final class TransMethodVisitor extends AbstractVisitor implements NodeVisitor
             }
         }
 
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
         return null;
     }
 

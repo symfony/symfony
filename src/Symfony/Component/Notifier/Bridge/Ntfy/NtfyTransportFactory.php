@@ -41,8 +41,11 @@ final class NtfyTransportFactory extends AbstractTransportFactory
             $transport->setPort($port);
         }
 
-        if (!empty($user = $dsn->getUser()) && !empty($password = $dsn->getPassword())) {
+        if (!empty($user = $dsn->getUser())) {
             $transport->setUser($user);
+        }
+
+        if (!empty($password = $dsn->getPassword())) {
             $transport->setPassword($password);
         }
 

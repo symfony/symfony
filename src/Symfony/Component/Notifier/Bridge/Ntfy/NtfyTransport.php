@@ -84,6 +84,8 @@ final class NtfyTransport extends AbstractTransport
 
         if (null !== $this->user && null !== $this->password) {
             $headers['Authorization'] = 'Basic '.rtrim(base64_encode($this->user.':'.$this->password), '=');
+        } elseif (null !== $this->password) {
+            $headers['Authorization'] = 'Bearer '.$this->password;
         }
 
         $response = $this->client->request('POST', ($this->secureHttp ? 'https' : 'http').'://'.$this->getEndpoint(), [

@@ -80,6 +80,6 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
 
     public function isOptional(): bool
     {
-        return true;
+        return false;
     }
 }

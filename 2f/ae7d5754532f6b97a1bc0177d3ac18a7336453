@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-12-11T13:00:57Z
+
+No description, no test… I don't really know what to do with this change. 🤷🏻‍♂️
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2023-12-11T13:20:35Z
+
+> No description, no test… I don't really know what to do with this change. 🤷🏻‍♂️
+
+As I told in [another PR](https://github.com/symfony/symfony/pull/52222), tests in this command are difficult.
+This PR fix the display of context and extra data of log with Monolog 3.
+
+I'm thinking about improving the command to integrate tests more easily.
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2024-01-17T13:49:05Z
+
+@derrabus I added a description and justify why we can't test this command in the PR summary.
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2024-01-24T21:38:37Z
+
+@derrabus PR could be reviewed with the additionals informations added in the PR description ?
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2024-01-29T09:55:12Z
+
+> LGTM. I'm just wondering: does the `--filter` option work with v3?
+
+Thanks for the approve.
+I tested on monolog/monolog:3.5.0 and the `--filter` option works.
+What is your doubt ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-29T10:29:41Z
+
+I was wondering about the call to `$this->el->evaluate($filter, $record)`, whether $record was an array at this line. Looks like yes, thanks for confirming.

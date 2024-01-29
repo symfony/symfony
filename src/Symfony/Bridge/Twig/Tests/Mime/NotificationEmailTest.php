@@ -142,7 +142,7 @@ class NotificationEmailTest extends TestCase
             'action_url' => null,
             'markdown' => false,
             'raw' => false,
-            'footer_text' => 'Notification e-mail sent by Symfony',
+            'footer_text' => 'Notification email sent by Symfony',
             'some' => 'context',
         ], $email->getContext());
 
@@ -158,7 +158,7 @@ class NotificationEmailTest extends TestCase
             'action_url' => null,
             'markdown' => false,
             'raw' => false,
-            'footer_text' => 'Notification e-mail sent by Symfony',
+            'footer_text' => 'Notification email sent by Symfony',
             'some' => 'context',
             'foo' => 'bar',
         ], $email->getContext());
@@ -173,7 +173,7 @@ class NotificationEmailTest extends TestCase
             'action_url' => 'Action URL',
             'markdown' => false,
             'raw' => false,
-            'footer_text' => 'Notification e-mail sent by Symfony',
+            'footer_text' => 'Notification email sent by Symfony',
             'some' => 'context',
             'foo' => 'bar',
         ], $email->getContext());

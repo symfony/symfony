@@ -808,6 +808,12 @@ CSV;
                     return [
                         'FOO_ENV_LOADER' => '123',
                         'BAZ_ENV_LOADER' => '',
+                        'LAZY_ENV_LOADER' => new class() {
+                            public function __toString()
+                            {
+                                return '';
+                            }
+                        },
                     ];
                 }
             };
@@ -819,6 +825,12 @@ CSV;
                         'FOO_ENV_LOADER' => '234',
                         'BAR_ENV_LOADER' => '456',
                         'BAZ_ENV_LOADER' => '567',
+                        'LAZY_ENV_LOADER' => new class() {
+                            public function __toString()
+                            {
+                                return '678';
+                            }
+                        },
                     ];
                 }
             };
@@ -840,6 +852,9 @@ CSV;
 
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
         $this->assertSame('123', $result); // check twice
+
+        $result = $processor->getEnv('string', 'LAZY_ENV_LOADER', function () {});
+        $this->assertSame('678', $result);
 
         unset($_ENV['BAZ_ENV_LOADER']);
         unset($_ENV['BUZ_ENV_LOADER']);

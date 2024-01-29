@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-01-25T13:52:26Z
+
+This is a new feature to me and must target 7.1
+
+---------------------------------------------------------------------------
+
+by tomasz-kusy at 2024-01-25T14:21:58Z
+
+This is only to fix a existing feature that does not work, and which in the implementation of other SMS operators works.

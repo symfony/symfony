@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-01-30T10:50:01Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "5.4" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by frenchcomp at 2024-01-30T10:53:22Z
+
+Thanks @GromNaN !
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-01-30T11:17:14Z
+
+> That's for 5.4, no?
+
+That's not necessary for `doctrine/mongodb-odm-bundle` since the bug is in a version that requires 6.4+.

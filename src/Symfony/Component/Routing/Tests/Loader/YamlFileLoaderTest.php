@@ -467,7 +467,7 @@ class YamlFileLoaderTest extends TestCase
     {
         new LoaderResolver([
             $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/localized')),
-            new class() extends AnnotationClassLoader {
+            new class() extends AttributeClassLoader {
                 protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());

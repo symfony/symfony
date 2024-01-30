@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Dispatch Postmark's "406 - Inactive recipient" API error code as a `PostmarkDeliveryEvent` instead of throwing an exception
+ * Add DSN param `auto_tls` to disable automatic STARTTLS
 
 7.0
 ---

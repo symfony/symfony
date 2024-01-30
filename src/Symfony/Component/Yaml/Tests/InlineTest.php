@@ -715,7 +715,7 @@ class InlineTest extends TestCase
 
     public function testDumpUnitEnum()
     {
-        $this->assertSame("!php/const Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
+        $this->assertSame("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
     }
 
     public function testParseUnitEnum()

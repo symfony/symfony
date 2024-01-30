@@ -1,0 +1,6 @@
+important_controllers:
+  resource: Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithPriorityController
+  type: annotation
+  prefix:
+    cs: /cs
+    en: /en

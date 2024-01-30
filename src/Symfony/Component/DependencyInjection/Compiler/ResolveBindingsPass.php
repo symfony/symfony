@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -185,6 +186,13 @@ class ResolveBindingsPass extends AbstractRecursivePass
                     continue;
                 }
                 if (\array_key_exists($parameter->name, $arguments) && '' !== $arguments[$parameter->name]) {
+                    continue;
+                }
+                if (
+                    $value->isAutowired()
+                    && !$value->hasTag('container.ignore_attributes')
+                    && $parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF)
+                ) {
                     continue;
                 }
 

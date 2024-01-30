@@ -94,8 +94,7 @@ class TemplatedEmailTest extends TestCase
             }
         ]
     },
-    "body": null,
-    "message": null
+    "body": null
 }
 EOF;
 

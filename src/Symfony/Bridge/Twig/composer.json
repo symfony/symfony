@@ -42,7 +42,7 @@
         "symfony/security-core": "^4.4|^5.0|^6.0",
         "symfony/security-csrf": "^4.4|^5.0|^6.0",
         "symfony/security-http": "^4.4|^5.0|^6.0",
-        "symfony/serializer": "^5.2|^6.0",
+        "symfony/serializer": "^5.4.35|~6.3.12|^6.4.3",
         "symfony/stopwatch": "^4.4|^5.0|^6.0",
         "symfony/console": "^5.3|^6.0",
         "symfony/expression-language": "^4.4|^5.0|^6.0",

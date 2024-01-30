@@ -20,9 +20,6 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class PhpSerializer implements SerializerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body'])) {
@@ -38,9 +35,6 @@ class PhpSerializer implements SerializerInterface
         return $this->safelyUnserialize($serializeEnvelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode(Envelope $envelope): array
     {
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
@@ -62,24 +56,30 @@ class PhpSerializer implements SerializerInterface
             throw new MessageDecodingFailedException('Could not decode an empty message using PHP serialization.');
         }
 
-        $signalingException = new MessageDecodingFailedException(sprintf('Could not decode message using PHP serialization: %s.', $contents));
         $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
-        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {
+        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler) {
             if (__FILE__ === $file) {
-                throw $signalingException;
+                throw new \ErrorException($msg, 0, $type, $file, $line);
             }
 
             return $prevErrorHandler ? $prevErrorHandler($type, $msg, $file, $line, $context) : false;
         });
 
         try {
-            $meta = unserialize($contents);
+            /** @var Envelope */
+            $envelope = unserialize($contents);
+        } catch (\Throwable $e) {
+            if ($e instanceof MessageDecodingFailedException) {
+                throw $e;
+            }
+
+            throw new MessageDecodingFailedException('Could not decode Envelope: '.$e->getMessage(), 0, $e);
         } finally {
             restore_error_handler();
             ini_set('unserialize_callback_func', $prevUnserializeHandler);
         }
 
-        return $meta;
+        return $envelope;
     }
 
     /**

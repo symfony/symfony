@@ -547,8 +547,7 @@ class EmailTest extends TestCase
             }
         ]
     },
-    "body": null,
-    "message": null
+    "body": null
 }
 EOF;
 

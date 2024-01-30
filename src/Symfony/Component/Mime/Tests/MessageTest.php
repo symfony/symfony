@@ -254,8 +254,7 @@ EOF;
             ]
         },
         "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\MixedPart"
-    },
-    "message": null
+    }
 }
 EOF;
 

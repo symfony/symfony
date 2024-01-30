@@ -75,16 +75,14 @@ class PhpSerializer implements SerializerInterface
             throw new MessageDecodingFailedException('Could not decode an empty message using PHP serialization.');
         }
 
-        $signalingException = new MessageDecodingFailedException(sprintf('Could not decode message using PHP serialization: %s.', $contents));
-
         if ($this->acceptPhpIncompleteClass) {
             $prevUnserializeHandler = ini_set('unserialize_callback_func', null);
         } else {
             $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
         }
-        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {
+        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler) {
             if (__FILE__ === $file) {
-                throw $signalingException;
+                throw new \ErrorException($msg, 0, $type, $file, $line);
             }
 
             return $prevErrorHandler ? $prevErrorHandler($type, $msg, $file, $line, $context) : false;
@@ -93,13 +91,19 @@ class PhpSerializer implements SerializerInterface
         try {
             /** @var Envelope */
             $envelope = unserialize($contents);
+        } catch (\Throwable $e) {
+            if ($e instanceof MessageDecodingFailedException) {
+                throw $e;
+            }
+
+            throw new MessageDecodingFailedException('Could not decode Envelope: '.$e->getMessage(), 0, $e);
         } finally {
             restore_error_handler();
             ini_set('unserialize_callback_func', $prevUnserializeHandler);
         }
 
         if (!$envelope instanceof Envelope) {
-            throw $signalingException;
+            throw new MessageDecodingFailedException('Could not decode message into an Envelope.');
         }
 
         if ($envelope->getMessage() instanceof \__PHP_Incomplete_Class) {

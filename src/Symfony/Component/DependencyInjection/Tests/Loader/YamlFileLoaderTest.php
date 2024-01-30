@@ -1020,7 +1020,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The constant "Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAZ" is not defined');
+        $this->expectExceptionMessage('The enum "Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAZ" is not defined');
         $loader->load('services_with_invalid_enumeration.yml');
     }
 

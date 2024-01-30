@@ -3,6 +3,11 @@ CHANGELOG
 
 The CHANGELOG for version 5.4 and newer can be found in the security sub-packages (e.g. `Http/`).
 
+7.2
+---
+
+* Add a request query string `_redirect_path` handled in `SwitchUserListener` to allow controlling the redirection path post switching user. It takes precedence over the `SwitchUserListener $targetRoute` configured value if any.
+
 5.3
 ---
 

@@ -369,4 +369,27 @@ class SwitchUserListenerTest extends TestCase
         $listener = new SwitchUserListener($this->tokenStorage, $userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
         $listener($this->event);
     }
+
+    public function testSwitchUserWithQueryRedirectionPath()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
+
+        $this->tokenStorage->setToken($token);
+        $this->request->query->set('_switch_user', 'kuba');
+        $this->request->query->set('_redirect_path', '/my-account/kuba');
+
+        $this->accessDecisionManager->expects($this->once())
+            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $this->callback(fn ($user) => 'kuba' === $user->getUserIdentifier()))
+            ->willReturn(true);
+
+        $this->userChecker->expects($this->once())
+            ->method('checkPostAuth')->with($this->callback(fn ($user) => 'kuba' === $user->getUserIdentifier()));
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener($this->event);
+
+        $this->assertSame([], $this->request->query->all());
+        $this->assertInstanceOf(RedirectResponse::class, $this->event->getResponse());
+        $this->assertSame('/my-account/kuba', $this->event->getResponse()->getTargetUrl());
+    }
 }

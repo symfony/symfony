@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-25T10:33:46Z
+
+I think this is a valid and working approach.
+I'm just wondering about the naming :)
+What about just `tls` instead of `auto_tls`?
+
+---------------------------------------------------------------------------
+
+by srsbiz at 2024-01-25T10:49:32Z
+
+Using simple `tls` might create confusion when using `smptps` or port `465` that should enable TLS by default. So it would require more checks and warnings about param having no effect, but adding `auto_` IMHO suggest that it appliest to automatic TLS detection.
+
+But I'm not attached to this name so it can be changed.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-01-26T11:55:59Z
+
+> Using simple `tls` might create confusion when using `smptps` or port `465` that should enable TLS by default.
+
+Indeed. If there were a setting called `tls`, my expectation would be that I either get a TLS connection or no connection at all. However, the `STARTTLS` feature is about plaintext connections that _might_ be upgraded to TLS (opportunistic TLS). `auto_tls` is a better fit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-29T14:42:36Z
+
+In #52944, there is a need to be able to disable TLS while using smtp on port 465.
+What about supporting `tls=auto|bool` here to support this use case and yours?

@@ -6,7 +6,6 @@ CHANGELOG
 
  * Mark class `ExpressionCacheWarmer` as `final`
  * Add `jwks_url` option in oidc token handler configuration
- * Support RS256 algorithm for oidc token signature
 
 7.0
 ---

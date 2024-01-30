@@ -23,9 +23,12 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
@@ -332,6 +335,34 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
+    /**
+     * @testWith [null]
+     *           [[]]
+     */
+    public function testRequestContentWithUntypedErrors(?array $types)
+    {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('This value was of an unexpected type.');
+        $serializer = $this->createMock(SerializerDenormalizer::class);
+
+        if (null === $types) {
+            $exception = new NotNormalizableValueException('Error with no types');
+        } else {
+            $exception = NotNormalizableValueException::createForUnexpectedDataType('Error with no types', '', []);
+        }
+        $serializer->method('deserialize')->willThrowException(new PartialDenormalizationException([], [$exception]));
+
+        $resolver = new RequestPayloadValueResolver($serializer, $this->createMock(ValidatorInterface::class));
+        $request = Request::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"price": 50}');
+
+        $arguments = $resolver->resolve($request, new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]));
+        $event = new ControllerArgumentsEvent($this->createMock(HttpKernelInterface::class), function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+    }
+
     public function testQueryStringValidationPassed()
     {
         $payload = new RequestPayload(50);
@@ -636,6 +667,10 @@ class RequestPayload
     public function __construct(public readonly float $price)
     {
     }
+}
+
+interface SerializerDenormalizer extends SerializerInterface, DenormalizerInterface
+{
 }
 
 class User

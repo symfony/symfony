@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by B-Galati at 2023-12-22T15:32:18Z
+
+Should it target version `5.4` actually?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-22T16:58:44Z
+
+> Should it target version 5.4 actually?
+
+Not sure, for me this is a feature and should target 7.1
+
+@nicolas-grekas @fabpot please decide
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T14:46:24Z
+
+Changing the type of thrown exceptions is not a bug fix so that's for 7.1 to me.
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2023-12-28T09:29:44Z
+
+@nicolas-grekas I think it should have been handled since the beginning because it's an unserialization issue that currently ends with generic kind of exception instead of `MessageDecodingFailedException`.
+
+I think I do not understand what's the BC break or added functionality here. For me that's a better error handling logic.
+
+Anyway I will let you know when it's ready for 7.1 👍
+
+If you can explain me further why it's not bugfix I would be glad 😊
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2024-01-03T10:02:28Z
+
+Any chance to get some new feedbacks based on my last comment before rebasing?
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2024-01-30T10:53:24Z
+
+@nicolas-grekas @OskarStark thanks for the review, It's ready for 5.4 :+1:
+
+Let me know for any other updates that should be performed.

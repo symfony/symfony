@@ -470,6 +470,25 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yaml'), $routes);
     }
 
+    public function testPriorityWithPrefix()
+    {
+        new LoaderResolver([
+            $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/localized')),
+            new class() extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+                {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $routes = $loader->load('localized-prefix.yml');
+
+        $this->assertSame(2, $routes->getPriority('important.cs'));
+        $this->assertSame(2, $routes->getPriority('important.en'));
+        $this->assertSame(1, $routes->getPriority('also_important'));
+    }
+
     /**
      * @dataProvider providePsr4ConfigFiles
      */

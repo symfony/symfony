@@ -161,6 +161,10 @@ class AssetMapperRepository
                 continue;
             }
 
+            if ('dev' !== $_ENV['APP_ENV'] && 'assets/' === $path) {
+                continue;
+            }
+
             throw new \InvalidArgumentException(sprintf('The asset mapper directory "%s" does not exist.', $path));
         }
 

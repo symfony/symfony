@@ -18,6 +18,7 @@ CHANGELOG
  * Add a `importmap:audit` command to check for security vulnerability advisories in dependencies
  * Add a `importmap:outdated` command to check for outdated packages
  * Change the polyfill used for the importmap renderer from a URL to an entry in the importmap
+ * Fix exception if assets directory is missing in production mode
 
 6.3
 ---

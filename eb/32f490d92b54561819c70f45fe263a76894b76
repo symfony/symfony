@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2023-11-30T15:19:12Z
+
+Thanks for fixing this 🙏 . Could you rebase this?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-30T15:38:11Z
+
+@nicolas-grekas is it right to have to make ResolveBindingPass aware of the Autowire attribute ? Shouldn't this be handled by the AutowirePass ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-30T15:48:51Z
+
+I agree, the bindings pass has no reasons to know about autowiring stuff.
+Can't we fix this by changing the order of the two passes?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2023-11-30T15:55:15Z
+
+@nicolas-grekas @stof My initial approach was to fix it in `AutowirePass`. I don't remember the exact reason, but I couldn't do it like that so I went with this instead.
+
+I can try to change the order of the passes, but I'm worried that might break other stuff. I'll try it sometime today or tomorrow.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-30T15:56:07Z
+
+It's also not obvious to me what we want here.
+
+What this PR achieves is this precedence, isn't it?
+
+1. autowiring by attribute
+2. binding by type+name of argument
+3. binding by type only
+4. autowiring by type+name of argument
+5. autowiring by type only
+
+Dunno if we should account for that but bindings can also be defined by explicit configuration and/or by autoconfiguration.
+
+Dunno how we can make AutowirePass achieve this ordering (or another) given that once bindings are resolved, we don't know if some argument's values came through bindings or via another path (explicit/auto config).
+
+Maybe this approach is the most pragmatic.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-22T21:00:29Z
+
+Any other opinion here? @stof?

@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpClient\HttpClient;
 
 /**
  * Configures a token handler for decoding and validating an OIDC token.
@@ -52,27 +51,13 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
 
         $tokenHandlerDefinition->replaceArgument(0, $algorithmManagerDefinition);
 
-        if (!isset($config['jwks_url']) && !isset($config['key'])) {
-            throw new LogicException('You should defined key or jwks_url parameter in configuration.');
+        if (!isset($config['key'])) {
+            throw new LogicException('You should defined key parameter in configuration.');
         }
 
-        if (isset($config['jwks_url'])) {
-            if (!class_exists(HttpClient::class)) {
-                throw new LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
-            }
-            $httpClient = HttpClient::create();
-            $response = $httpClient->request(
-                'GET',
-                $config['jwks_url']
-            );
-            $jwkDefinition = (new ChildDefinition('security.access_token_handler.oidc.jwk_set'))
-                ->replaceArgument(0, $response->getContent());
-        } elseif (isset($config['key'])) {
-            $jwkDefinition = (new ChildDefinition('security.access_token_handler.oidc.jwk'))
-                ->replaceArgument(0, $config['key']);
-        }
-
-        $tokenHandlerDefinition->replaceArgument(1, $jwkDefinition);
+        $tokenHandlerDefinition->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwk'))
+            ->replaceArgument(0, $config['key'])
+        );
     }
 
     public function getKey(): string
@@ -105,9 +90,6 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                     ->end()
                     ->scalarNode('key')
                         ->info('JSON-encoded JWK used to sign the token (must contain a "kty" key).')
-                    ->end()
-                    ->scalarNode('jwks_url')
-                        ->info('Url to retrieve JWKSet JSON-encoded (must contain a "keys" key).')
                     ->end()
                 ->end()
             ->end()

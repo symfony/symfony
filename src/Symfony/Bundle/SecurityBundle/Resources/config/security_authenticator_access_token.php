@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\Algorithm\ES384;
 use Jose\Component\Signature\Algorithm\ES512;
@@ -82,13 +81,6 @@ return static function (ContainerConfigurator $container) {
             ->factory([JWK::class, 'createFromJson'])
             ->args([
                 abstract_arg('signature key'),
-            ])
-
-        ->set('security.access_token_handler.oidc.jwk_set', JWKSet::class)
-            ->abstract()
-            ->factory([JWKSet::class, 'createFromJson'])
-            ->args([
-                abstract_arg('signature keys'),
             ])
 
         ->set('security.access_token_handler.oidc.signature', Algorithm::class)

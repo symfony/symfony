@@ -281,6 +281,7 @@ class MainConfiguration implements ConfigurationInterface
                                 ->scalarNode('domain')->defaultNull()->end()
                                 ->scalarNode('secure')->defaultFalse()->end()
                                 ->scalarNode('samesite')->defaultNull()->end()
+                                ->scalarNode('partitioned')->defaultFalse()->end()
                             ->end()
                         ->end()
                     ->end()

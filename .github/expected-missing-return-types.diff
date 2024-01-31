@@ -107,14 +107,14 @@ diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExt
 +    protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container): void
      {
          // configure metadata driver for each bundle based on the type of mapping files found
-@@ -238,5 +238,5 @@ abstract class AbstractDoctrineExtension extends Extension
+@@ -240,5 +240,5 @@ abstract class AbstractDoctrineExtension extends Extension
       * @throws \InvalidArgumentException
       */
 -    protected function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName)
 +    protected function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName): void
      {
          if (!$mappingConfig['type'] || !$mappingConfig['dir'] || !$mappingConfig['prefix']) {
-@@ -328,5 +328,5 @@ abstract class AbstractDoctrineExtension extends Extension
+@@ -330,5 +330,5 @@ abstract class AbstractDoctrineExtension extends Extension
       * @throws \InvalidArgumentException in case of unknown driver type
       */
 -    protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, string $cacheName)
@@ -1942,8 +1942,8 @@ diff --git a/src/Symfony/Component/Config/Exception/LoaderLoadException.php b/sr
 diff --git a/src/Symfony/Component/Config/FileLocator.php b/src/Symfony/Component/Config/FileLocator.php
 --- a/src/Symfony/Component/Config/FileLocator.php
 +++ b/src/Symfony/Component/Config/FileLocator.php
-@@ -34,5 +34,5 @@ class FileLocator implements FileLocatorInterface
-      * @return string|array
+@@ -36,5 +36,5 @@ class FileLocator implements FileLocatorInterface
+      * @psalm-return ($first is true ? string : string[])
       */
 -    public function locate(string $name, ?string $currentPath = null, bool $first = true)
 +    public function locate(string $name, ?string $currentPath = null, bool $first = true): string|array
@@ -1952,8 +1952,8 @@ diff --git a/src/Symfony/Component/Config/FileLocator.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Config/FileLocatorInterface.php b/src/Symfony/Component/Config/FileLocatorInterface.php
 --- a/src/Symfony/Component/Config/FileLocatorInterface.php
 +++ b/src/Symfony/Component/Config/FileLocatorInterface.php
-@@ -31,4 +31,4 @@ interface FileLocatorInterface
-      * @throws FileLocatorFileNotFoundException If a file is not found
+@@ -33,4 +33,4 @@ interface FileLocatorInterface
+      * @psalm-return ($first is true ? string : string[])
       */
 -    public function locate(string $name, ?string $currentPath = null, bool $first = true);
 +    public function locate(string $name, ?string $currentPath = null, bool $first = true): string|array;
@@ -3776,7 +3776,7 @@ diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByAc
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php
-@@ -38,5 +38,5 @@ class ResolveBindingsPass extends AbstractRecursivePass
+@@ -39,5 +39,5 @@ class ResolveBindingsPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -4088,7 +4088,7 @@ diff --git a/src/Symfony/Component/DependencyInjection/ContainerInterface.php b/
 diff --git a/src/Symfony/Component/DependencyInjection/Exception/AutowiringFailedException.php b/src/Symfony/Component/DependencyInjection/Exception/AutowiringFailedException.php
 --- a/src/Symfony/Component/DependencyInjection/Exception/AutowiringFailedException.php
 +++ b/src/Symfony/Component/DependencyInjection/Exception/AutowiringFailedException.php
-@@ -71,5 +71,5 @@ class AutowiringFailedException extends RuntimeException
+@@ -69,5 +69,5 @@ class AutowiringFailedException extends RuntimeException
       * @return string
       */
 -    public function getServiceId()
@@ -7449,14 +7449,14 @@ diff --git a/src/Symfony/Component/HttpFoundation/ResponseHeaderBag.php b/src/Sy
 +    public function removeCookie(string $name, ?string $path = '/', ?string $domain = null): void
      {
          $path ??= '/';
-@@ -237,5 +237,5 @@ class ResponseHeaderBag extends HeaderBag
+@@ -239,5 +239,5 @@ class ResponseHeaderBag extends HeaderBag
       * @return void
       */
--    public function clearCookie(string $name, ?string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true, ?string $sameSite = null)
-+    public function clearCookie(string $name, ?string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true, ?string $sameSite = null): void
+-    public function clearCookie(string $name, ?string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true, ?string $sameSite = null /* , bool $partitioned = false */)
++    public function clearCookie(string $name, ?string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true, ?string $sameSite = null /* , bool $partitioned = false */): void
      {
-         $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly, false, $sameSite));
-@@ -247,5 +247,5 @@ class ResponseHeaderBag extends HeaderBag
+         $partitioned = 6 < \func_num_args() ? \func_get_arg(6) : false;
+@@ -251,5 +251,5 @@ class ResponseHeaderBag extends HeaderBag
       * @return string
       */
 -    public function makeDisposition(string $disposition, string $filename, string $filenameFallback = '')

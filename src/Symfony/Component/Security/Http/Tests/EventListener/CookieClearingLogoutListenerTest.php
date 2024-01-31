@@ -27,7 +27,7 @@ class CookieClearingLogoutListenerTest extends TestCase
         $event = new LogoutEvent(new Request(), null);
         $event->setResponse($response);
 
-        $listener = new CookieClearingLogoutListener(['foo' => ['path' => '/foo', 'domain' => 'foo.foo', 'secure' => true, 'samesite' => Cookie::SAMESITE_STRICT], 'foo2' => ['path' => null, 'domain' => null]]);
+        $listener = new CookieClearingLogoutListener(['foo' => ['path' => '/foo', 'domain' => 'foo.foo', 'secure' => true, 'samesite' => Cookie::SAMESITE_STRICT, 'partitioned' => true], 'foo2' => ['path' => null, 'domain' => null]]);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(0, $cookies);
@@ -43,6 +43,7 @@ class CookieClearingLogoutListenerTest extends TestCase
         $this->assertEquals('foo.foo', $cookie->getDomain());
         $this->assertEquals(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
         $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isPartitioned());
         $this->assertTrue($cookie->isCleared());
 
         $cookie = $cookies['']['/']['foo2'];
@@ -51,6 +52,7 @@ class CookieClearingLogoutListenerTest extends TestCase
         $this->assertNull($cookie->getDomain());
         $this->assertNull($cookie->getSameSite());
         $this->assertFalse($cookie->isSecure());
+        $this->assertFalse($cookie->isPartitioned());
         $this->assertTrue($cookie->isCleared());
     }
 }

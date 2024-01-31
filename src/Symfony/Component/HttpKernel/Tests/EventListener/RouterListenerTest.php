@@ -178,7 +178,7 @@ class RouterListenerTest extends TestCase
 
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('matchRequest')
             ->willThrowException(new NoConfigurationException())
         ;
@@ -189,6 +189,11 @@ class RouterListenerTest extends TestCase
         $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
 
         $request = Request::create('http://localhost/');
+
+        $response = $kernel->handle($request);
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertStringContainsString('Welcome', $response->getContent());
+
         $response = $kernel->handle($request);
         $this->assertSame(404, $response->getStatusCode());
         $this->assertStringContainsString('Welcome', $response->getContent());

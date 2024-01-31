@@ -974,7 +974,7 @@ class AbstractObjectNormalizerTest extends TestCase
             }
         };
 
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer, $normalizer);
 
         $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded', 'iri' => '/dummy/1']);
         $firstChildContextCacheKey = $normalizer->childContextCacheKey;
@@ -1014,7 +1014,7 @@ class AbstractObjectNormalizerTest extends TestCase
             }
         };
 
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer, $normalizer);
         $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded', 'iri' => '/dummy/1']);
 
         $this->assertSame('hardcoded-foo', $normalizer->childContextCacheKey);
@@ -1049,7 +1049,7 @@ class AbstractObjectNormalizerTest extends TestCase
             }
         };
 
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer, $normalizer);
         $serializer->normalize($foobar, null, ['cache_key' => false]);
 
         $this->assertFalse($normalizer->childContextCacheKey);

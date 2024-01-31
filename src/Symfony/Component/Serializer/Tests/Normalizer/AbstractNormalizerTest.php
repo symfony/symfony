@@ -261,7 +261,7 @@ class AbstractNormalizerTest extends TestCase
         ];
 
         $normalizer = new ObjectNormalizer();
-        $normalizer->setSerializer(new Serializer([$normalizer]));
+        new Serializer([], [], $normalizer, $normalizer);
 
         $expected = new DummyWithWithVariadicParameterConstructor('woo', 1, new Dummy(), new Dummy());
         $actual = $normalizer->denormalize($data, DummyWithWithVariadicParameterConstructor::class);

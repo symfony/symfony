@@ -298,6 +298,8 @@ class EnglishInflectorTest extends TestCase
             ['waltz', 'waltzes'],
             ['wife', 'wives'],
             ['icon', 'icons'],
+            ['hippocampus', 'hippocampi'],
+            ['campus', 'campuses'],
 
             // test casing: if the first letter was uppercase, it should remain so
             ['Man', 'Men'],

@@ -54,7 +54,7 @@ class OidcTokenHandlerTest extends TestCase
         $loggerMock->expects($this->never())->method('error');
 
         $userBadge = (new OidcTokenHandler(
-            new ES256(),
+            new AlgorithmManager([new ES256()]),
             $jwk,
             self::AUDIENCE,
             ['https://www.example.com'],
@@ -90,7 +90,7 @@ class OidcTokenHandlerTest extends TestCase
         $this->expectExceptionMessage('Invalid credentials.');
 
         (new OidcTokenHandler(
-            new ES256(),
+            new AlgorithmManager([new ES256()]),
             $this->getJWK(),
             self::AUDIENCE,
             ['https://www.example.com'],
@@ -149,7 +149,7 @@ class OidcTokenHandlerTest extends TestCase
         $this->expectExceptionMessage('Invalid credentials.');
 
         (new OidcTokenHandler(
-            new ES256(),
+            new AlgorithmManager([new ES256()]),
             self::getJWK(),
             self::AUDIENCE,
             ['https://www.example.com'],

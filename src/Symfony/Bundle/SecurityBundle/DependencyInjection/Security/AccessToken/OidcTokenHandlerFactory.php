@@ -39,12 +39,18 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
         // @see Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SignatureAlgorithmFactory
         // for supported algorithms
         if (\in_array($config['algorithm'], ['ES256', 'ES384', 'ES512'], true)) {
-            $tokenHandlerDefinition->replaceArgument(0, new Reference('security.access_token_handler.oidc.signature.'.$config['algorithm']));
+            $algorithmDefinition = new Reference('security.access_token_handler.oidc.signature.'.$config['algorithm']);
         } else {
-            $tokenHandlerDefinition->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature'))
+            $algorithmDefinition = (new ChildDefinition('security.access_token_handler.oidc.signature'))
                 ->replaceArgument(0, $config['algorithm'])
-            );
+            ;
         }
+
+        $algorithmManagerDefinition = $container->setDefinition($id.'.algorithm_manager', (new ChildDefinition('security.access_token_handler.oidc.algorithm_manager'))
+            ->replaceArgument(0, [$algorithmDefinition])
+        );
+
+        $tokenHandlerDefinition->replaceArgument(0, $algorithmManagerDefinition);
 
         if (!isset($config['jwks_url']) && !isset($config['key'])) {
             throw new LogicException('You should defined key or jwks_url parameter in configuration.');

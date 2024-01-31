@@ -38,8 +38,10 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 {
     use OidcTrait;
 
+    private AlgorithmManager $algorithmManager;
+
     public function __construct(
-        private Algorithm $signatureAlgorithm,
+        private Algorithm|AlgorithmManager $signatureAlgorithm,
         private JWK|JWKSet $jwk,
         private string $audience,
         private array $issuers,
@@ -47,6 +49,12 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         private ?LoggerInterface $logger = null,
         private ClockInterface $clock = new Clock(),
     ) {
+        if ($this->signatureAlgorithm instanceof Algorithm) {
+            trigger_deprecation('symfony/security-http', '7.1', 'First argument must be instance of %s, %s given.', AlgorithmManager::class, Algorithm::class);
+            $this->algorithmManager = new AlgorithmManager([$this->signatureAlgorithm]);
+        } else {
+            $this->algorithmManager = $signatureAlgorithm;
+        }
     }
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
@@ -57,7 +65,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
         try {
             // Decode the token
-            $jwsVerifier = new JWSVerifier(new AlgorithmManager([$this->signatureAlgorithm]));
+            $jwsVerifier = new JWSVerifier($this->algorithmManager);
             $serializerManager = new JWSSerializerManager([new CompactSerializer()]);
             $jws = $serializerManager->unserialize($accessToken);
             $claims = json_decode($jws->getPayload(), true);
@@ -77,7 +85,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
             // Verify the headers
             $headerCheckerManager = new Checker\HeaderCheckerManager([
-                new Checker\AlgorithmChecker([$this->signatureAlgorithm->name()]),
+                new Checker\AlgorithmChecker($this->algorithmManager->list()),
             ], [
                 new JWSTokenSupport(),
             ]);

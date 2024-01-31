@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `#[IsCsrfTokenValid]` attribute
+ * Deprecate passing a Algorithm object as the 1st argument to the constructor of `Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler`
 
 7.0
 ---

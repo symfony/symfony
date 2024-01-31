@@ -160,7 +160,7 @@ final class SocketStream extends AbstractStream
         }
 
         stream_set_blocking($this->stream, true);
-        stream_set_timeout($this->stream, $timeout);
+        stream_set_timeout($this->stream, $this->getTimeoutSeconds(), $this->getTimeoutMicroseconds());
         $this->in = &$this->stream;
         $this->out = &$this->stream;
     }
@@ -189,5 +189,19 @@ final class SocketStream extends AbstractStream
     protected function getReadConnectionDescription(): string
     {
         return $this->url;
+    }
+
+    protected function getTimeoutSeconds(): int
+    {
+        return (int) $this->getTimeout();
+    }
+
+    protected function getTimeoutMicroseconds(): int
+    {
+        return (int) (
+            (
+                (int) $this->getTimeout() - $this->getTimeoutSeconds()
+            ) * 1000000
+        );
     }
 }

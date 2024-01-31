@@ -59,7 +59,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
     public static function fromString(string $ulid): static
     {
         if (36 === \strlen($ulid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $ulid)) {
-            $ulid = uuid_parse($ulid);
+            $ulid = hex2bin(str_replace('-', '', $ulid));
         } elseif (22 === \strlen($ulid) && 22 === strspn($ulid, BinaryUtil::BASE58[''])) {
             $ulid = str_pad(BinaryUtil::fromBase($ulid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
         }

@@ -38,7 +38,7 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
 
     public function getNode(): string
     {
-        return uuid_mac($this->uid);
+        return substr($this->uid, -12);
     }
 
     public function toV6(): UuidV6

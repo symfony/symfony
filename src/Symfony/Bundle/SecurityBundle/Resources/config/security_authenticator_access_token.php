@@ -20,6 +20,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\Signature
 use Symfony\Component\Security\Http\AccessToken\ChainAccessTokenExtractor;
 use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
 use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
+use Symfony\Component\Security\Http\AccessToken\OAuth2\Oauth2TokenHandler;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\QueryAccessTokenExtractor;
@@ -100,5 +101,13 @@ return static function (ContainerConfigurator $container) {
         ->set('security.access_token_handler.oidc.signature.ES512', ES512::class)
             ->parent('security.access_token_handler.oidc.signature')
             ->args(['index_0' => 'ES512'])
+
+        // OAuth2 Introspection (RFC 7662)
+        ->set('security.access_token_handler.oauth2', Oauth2TokenHandler::class)
+            ->abstract()
+            ->args([
+                abstract_arg('http client'),
+                service('logger')->nullOnInvalid(),
+            ])
     ;
 };

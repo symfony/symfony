@@ -14,6 +14,7 @@ CHANGELOG
 
  * Make `PersistentToken` immutable
  * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead
+ * Add `OAuth2User` with OAuth2 Access Token Introspection support for `OAuth2TokenHandler`
 
 6.3
 ---

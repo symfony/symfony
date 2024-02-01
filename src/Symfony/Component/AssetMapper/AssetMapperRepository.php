@@ -34,6 +34,7 @@ class AssetMapperRepository
         private readonly string $projectRootDir,
         private readonly array $excludedPathPatterns = [],
         private readonly bool $excludeDotFiles = true,
+        private readonly bool $debug = true,
     ) {
     }
 
@@ -147,7 +148,7 @@ class AssetMapperRepository
         $this->absolutePaths = [];
         foreach ($this->paths as $path => $namespace) {
             if ($filesystem->isAbsolutePath($path)) {
-                if (!file_exists($path)) {
+                if (!file_exists($path) && $this->debug) {
                     throw new \InvalidArgumentException(sprintf('The asset mapper directory "%s" does not exist.', $path));
                 }
                 $this->absolutePaths[realpath($path)] = $namespace;
@@ -161,7 +162,9 @@ class AssetMapperRepository
                 continue;
             }
 
-            throw new \InvalidArgumentException(sprintf('The asset mapper directory "%s" does not exist.', $path));
+            if ($this->debug) {
+                throw new \InvalidArgumentException(sprintf('The asset mapper directory "%s" does not exist.', $path));
+            }
         }
 
         return $this->absolutePaths;

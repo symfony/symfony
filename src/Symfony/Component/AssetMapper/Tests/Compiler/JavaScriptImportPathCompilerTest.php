@@ -67,6 +67,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('getAssetFromSourcePath')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
+                    '/project/assets/foo.js' => new MappedAsset('foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/foo.js'),
                     '/project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
                     '/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
                     '/project/assets/styles.css' => new MappedAsset('styles.css', '/can/be/anything.js', publicPathWithoutDigest: '/assets/styles.css'),
@@ -267,6 +268,63 @@ class JavaScriptImportPathCompilerTest extends TestCase
                 EOF
             ,
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'import_in_double_quoted_string_is_ignored' => [
+            'input' => <<<EOF
+                const fun;
+                console.log("import('./foo.js')");
+                EOF
+            ,
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'import_in_double_quoted_string_with_escaped_quote_is_ignored' => [
+            'input' => <<<EOF
+                const fun;
+                console.log(" foo \" import('./foo.js')");
+                EOF
+            ,
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'import_in_single_quoted_string_is_ignored' => [
+            'input' => <<<EOF
+                const fun;
+                console.log('import("./foo.js")');
+                EOF
+            ,
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'import_after_a_string_is_parsed' => [
+            'input' => <<<EOF
+                const fun;
+                console.log("import('./other.js')"); import("./foo.js");
+                EOF
+            ,
+            'expectedJavaScriptImports' => ['/assets/foo.js' => ['lazy' => true, 'asset' => 'foo.js', 'add' => true]],
+        ];
+
+        yield 'import_before_a_string_is_parsed' => [
+            'input' => <<<EOF
+                const fun;
+                import("./other.js"); console.log("import('./foo.js')");
+                EOF
+            ,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'import_before_and_after_a_string_is_parsed' => [
+            'input' => <<<EOF
+                const fun;
+                import("./other.js"); console.log("import('./foo.js')"); import("./subdir/foo.js");
+                EOF
+            ,
+            'expectedJavaScriptImports' => [
+                '/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true],
+                '/assets/subdir/foo.js' => ['lazy' => true, 'asset' => 'subdir/foo.js', 'add' => true],
+            ],
         ];
 
         yield 'bare_import_not_in_importmap' => [

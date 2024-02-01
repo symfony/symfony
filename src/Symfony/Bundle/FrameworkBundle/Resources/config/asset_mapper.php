@@ -75,6 +75,7 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.project_dir'),
                 abstract_arg('array of excluded path patterns'),
                 abstract_arg('exclude dot files'),
+                param('kernel.debug'),
             ])
 
         ->set('asset_mapper.public_assets_path_resolver', PublicAssetsPathResolver::class)

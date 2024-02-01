@@ -20,26 +20,19 @@ class ArgumentMetadata
 {
     public const IS_INSTANCEOF = 2;
 
-    private string $name;
-    private ?string $type;
-    private bool $isVariadic;
-    private bool $hasDefaultValue;
-    private mixed $defaultValue;
-    private bool $isNullable;
-    private array $attributes;
-
     /**
      * @param object[] $attributes
      */
-    public function __construct(string $name, ?string $type, bool $isVariadic, bool $hasDefaultValue, mixed $defaultValue, bool $isNullable = false, array $attributes = [])
-    {
-        $this->name = $name;
-        $this->type = $type;
-        $this->isVariadic = $isVariadic;
-        $this->hasDefaultValue = $hasDefaultValue;
-        $this->defaultValue = $defaultValue;
+    public function __construct(
+        private string $name,
+        private ?string $type,
+        private bool $isVariadic,
+        private bool $hasDefaultValue,
+        private mixed $defaultValue,
+        private bool $isNullable = false,
+        private array $attributes = [],
+    ) {
         $this->isNullable = $isNullable || null === $type || ($hasDefaultValue && null === $defaultValue);
-        $this->attributes = $attributes;
     }
 
     /**

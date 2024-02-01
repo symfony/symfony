@@ -31,10 +31,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 {
     public const BODY_EVAL_BOUNDARY_LENGTH = 24;
 
-    private HttpKernelInterface $kernel;
-    private StoreInterface $store;
     private Request $request;
-    private ?SurrogateInterface $surrogate;
     private ?ResponseCacheStrategyInterface $surrogateCacheStrategy = null;
     private array $options = [];
     private array $traces = [];
@@ -84,11 +81,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *                            This setting is overridden by the stale-if-error HTTP Cache-Control extension
      *                            (see RFC 5861).
      */
-    public function __construct(HttpKernelInterface $kernel, StoreInterface $store, ?SurrogateInterface $surrogate = null, array $options = [])
-    {
-        $this->store = $store;
-        $this->kernel = $kernel;
-        $this->surrogate = $surrogate;
+    public function __construct(
+        private HttpKernelInterface $kernel,
+        private StoreInterface $store,
+        private ?SurrogateInterface $surrogate = null,
+        array $options = [],
+    ) {
 
         // needed in case there is a fatal error because the backend is too slow to respond
         register_shutdown_function($this->store->cleanup(...));

@@ -51,20 +51,19 @@ class_exists(KernelEvents::class);
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
-    protected EventDispatcherInterface $dispatcher;
-    protected ControllerResolverInterface $resolver;
     protected RequestStack $requestStack;
     private ArgumentResolverInterface $argumentResolver;
-    private bool $handleAllThrowables;
     private bool $terminating = false;
 
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, ?RequestStack $requestStack = null, ?ArgumentResolverInterface $argumentResolver = null, bool $handleAllThrowables = false)
-    {
-        $this->dispatcher = $dispatcher;
-        $this->resolver = $resolver;
+    public function __construct(
+        protected EventDispatcherInterface $dispatcher,
+        protected ControllerResolverInterface $resolver,
+        ?RequestStack $requestStack = null,
+        ?ArgumentResolverInterface $argumentResolver = null,
+        private bool $handleAllThrowables = false,
+    ) {
         $this->requestStack = $requestStack ?? new RequestStack();
         $this->argumentResolver = $argumentResolver ?? new ArgumentResolver();
-        $this->handleAllThrowables = $handleAllThrowables;
     }
 
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response

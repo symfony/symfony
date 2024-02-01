@@ -24,11 +24,9 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 {
-    private Kernel $kernel;
-
-    public function __construct(Kernel $kernel)
-    {
-        $this->kernel = $kernel;
+    public function __construct(
+        private Kernel $kernel,
+    ) {
     }
 
     public function process(ContainerBuilder $container): void

@@ -242,7 +242,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 $dumper = new HtmlDumper('php://output', $this->charset);
                 $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             } else {
-                $dumper = new CliDumper('php://output', $this->charset);
+                $dumper = new CliDumper(null, $this->charset);
                 if (method_exists($dumper, 'setDisplayOptions')) {
                     $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
                 }

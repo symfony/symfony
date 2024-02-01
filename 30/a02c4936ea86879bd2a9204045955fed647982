@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-31T21:41:38Z
+
+With this PR, if someone runs the following command what would happen, exceptions would not be thrown if some directory is missing ?
+
+```
+APP_ENV=prod sf asset-map:compile
+```
+
+---------------------------------------------------------------------------
+
+by rynhndrcksn at 2024-02-01T00:08:43Z
+
+@smnandre I've attached 2 screenshots of what happens when the `APP_ENV=prod symfony console asset-map:compile` command is ran.
+
+__If the `assets/` directory is in place, then this is the output (as expected)__:
+
+<img width="496" alt="APP_ENV=prod symfony console asset-map:compile being ran with an assets/ directory" src="https://github.com/symfony/symfony/assets/8751750/af243b0b-97ec-4b1a-ac0b-db7a184f2742">
+
+__If the `assets/` directory is missing, then this is the output__:
+
+<img width="1348" alt="APP_ENV=prod symfony console asset-map:compile being ran with no assets/ directory" src="https://github.com/symfony/symfony/assets/8751750/caa746fa-a84b-4d53-85d1-94da87dbf32e">
+
+So during the deployment/asset compilation process people will still be notified if the `assets/` directory is missing :)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-01T00:13:52Z
+
+> @smnandre I've attached 2 screenshots of what happens when `APP_ENV=prod symfony console asset-map:compile` command is ran.
+> So during the deployment/asset compilation process people will still be notified if the `assets/` directory is missing :)
+
+Perfect for me, thank you very much 👍

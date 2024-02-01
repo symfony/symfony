@@ -75,7 +75,7 @@ final class MailgunPayloadConverter implements PayloadConverterInterface
 
     private function getReason(array $payload): string
     {
-        if ('' !== $payload['delivery-status']['description']) {
+        if ('' !== ($payload['delivery-status']['description'] ?? '')) {
             return $payload['delivery-status']['description'];
         }
         if ('' !== $payload['delivery-status']['message']) {

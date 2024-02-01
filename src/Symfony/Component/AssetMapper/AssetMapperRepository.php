@@ -34,7 +34,7 @@ class AssetMapperRepository
         private readonly string $projectRootDir,
         private readonly array $excludedPathPatterns = [],
         private readonly bool $excludeDotFiles = true,
-        private readonly bool $debug = false
+        private readonly bool $debug = true,
     ) {
     }
 

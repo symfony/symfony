@@ -150,8 +150,8 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, TranslationExtractorPass::class);
         $this->addCompilerPassIfExists($container, TranslationDumperPass::class);
         $container->addCompilerPass(new FragmentRendererPass());
-        $this->addCompilerPassIfExists($container, SerializerPass::class);
         $this->addCompilerPassIfExists($container, PropertyInfoPass::class);
+        $this->addCompilerPassIfExists($container, SerializerPass::class);
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new CachePoolPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
         $container->addCompilerPass(new CachePoolClearerPass(), PassConfig::TYPE_AFTER_REMOVING);

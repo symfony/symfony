@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorAggregate;
+use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -45,8 +47,14 @@ return static function (ContainerConfigurator $container) {
             ->tag('property_info.type_extractor', ['priority' => -1002])
             ->tag('property_info.access_extractor', ['priority' => -1000])
             ->tag('property_info.initializable_extractor', ['priority' => -1000])
+            ->tag('property_info.constructor_argument_type_extractor')
 
         ->alias(PropertyReadInfoExtractorInterface::class, 'property_info.reflection_extractor')
         ->alias(PropertyWriteInfoExtractorInterface::class, 'property_info.reflection_extractor')
+
+        ->set('property_info.constructor_argument_type_extractor_aggregate', ConstructorArgumentTypeExtractorAggregate::class)
+            ->args([tagged_iterator('property_info.constructor_argument_type_extractor')])
+        ->alias(ConstructorArgumentTypeExtractorInterface::class, 'property_info.constructor_argument_type_extractor_aggregate')
+
     ;
 };

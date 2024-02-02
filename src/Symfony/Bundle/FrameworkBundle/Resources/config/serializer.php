@@ -16,7 +16,14 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
+use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
+use Symfony\Component\Serializer\Builder\DefinitionExtractor;
+use Symfony\Component\Serializer\Builder\NormalizerBuilder;
+use Symfony\Component\Serializer\DependencyInjection\CustomNormalizerHelper;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
@@ -167,6 +174,25 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('serializer.mapping.cache_class_metadata_factory.inner'),
                 service('serializer.mapping.cache.symfony'),
+            ])
+
+        // Auto Normalizer Builder
+        ->set('serializer.auto_normalizer.builder', NormalizerBuilder::class)
+        ->set('serializer.auto_normalizer.definition_extractor', DefinitionExtractor::class)
+            ->args([
+                service(PropertyInfoExtractorInterface::class),
+                service(PropertyReadInfoExtractorInterface::class),
+                service(PropertyWriteInfoExtractorInterface::class),
+                service(ConstructorArgumentTypeExtractorInterface::class),
+            ])
+
+        ->set('serializer.custom_normalizer_helper', CustomNormalizerHelper::class)
+            ->args([
+                service('serializer.auto_normalizer.builder'),
+                service('serializer.auto_normalizer.definition_extractor'),
+                [],
+                param('kernel.project_dir'),
+                service('logger')->nullOnInvalid(),
             ])
 
         // Encoders

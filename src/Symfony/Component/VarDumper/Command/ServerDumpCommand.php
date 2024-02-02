@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Command\Descriptor\CliDescriptor;
 use Symfony\Component\VarDumper\Command\Descriptor\DumpDescriptorInterface;
 use Symfony\Component\VarDumper\Command\Descriptor\HtmlDescriptor;
@@ -85,15 +86,25 @@ EOF
 
         $errorIo = $io->getErrorStyle();
         $errorIo->title('Symfony Var Dumper Server');
-
-        $this->server->start();
-
         $errorIo->success(sprintf('Server listening on %s', $this->server->getHost()));
         $errorIo->comment('Quit the server with CONTROL-C.');
+        $this->server->listen(
+            function (int $clientId, string $message) use ($descriptor, $io) {
+                $payload = @unserialize(base64_decode($message), ['allowed_classes' => [Data::class, Stub::class]]);
 
-        $this->server->listen(function (Data $data, array $context, int $clientId) use ($descriptor, $io) {
-            $descriptor->describe($io, $data, $context, $clientId);
-        });
+                // Impossible to decode the message, give up.
+                if (false === $payload) {
+                    return;
+                }
+
+                if (!\is_array($payload) || \count($payload) < 2 || !$payload[0] instanceof Data || !\is_array($payload[1])) {
+                    return;
+                }
+                [$data, $context] = $payload;
+                $descriptor->describe($io, $data, $context, $clientId);
+            },
+            $input,
+        );
 
         return 0;
     }

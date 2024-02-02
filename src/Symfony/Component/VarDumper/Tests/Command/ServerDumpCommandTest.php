@@ -13,6 +13,8 @@ namespace Symfony\Component\VarDumper\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Command\ServerDumpCommand;
 use Symfony\Component\VarDumper\Server\DumpServer;
 
@@ -28,6 +30,24 @@ class ServerDumpCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
+    public function testServerDumpSuccess()
+    {
+        $command = $this->createCommand();
+        $commandTester = new CommandTester($command);
+
+        $data = new Data([['my dump']]);
+        $input = base64_encode(serialize([$data, ['timestamp' => time(), 'source' => ['name' => 'sourceName', 'line' => 222, 'file' => 'myFile']]]))."\n";
+
+        $commandTester->setInputs([$input]);
+
+        $commandTester->execute(['--format' => 'html']);
+
+        $commandTester->assertCommandIsSuccessful();
+
+        $output = $commandTester->getDisplay();
+        $this->assertStringContainsString('my dump', $output);
+    }
+
     public static function provideCompletionSuggestions()
     {
         yield 'option --format' => [
@@ -38,6 +58,6 @@ class ServerDumpCommandTest extends TestCase
 
     private function createCommand(): ServerDumpCommand
     {
-        return new ServerDumpCommand($this->createMock(DumpServer::class));
+        return new ServerDumpCommand(new DumpServer(''));
     }
 }

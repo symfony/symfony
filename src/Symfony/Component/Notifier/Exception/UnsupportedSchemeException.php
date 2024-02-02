@@ -252,6 +252,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Smsc\SmscTransportFactory::class,
             'package' => 'symfony/smsc-notifier',
         ],
+        'smsense' => [
+            'class' => Bridge\Smsense\SmsenseTransportFactory::class,
+            'package' => 'symfony/smsense-notifier',
+        ],
         'sms-factor' => [
             'class' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
             'package' => 'symfony/sms-factor-notifier',

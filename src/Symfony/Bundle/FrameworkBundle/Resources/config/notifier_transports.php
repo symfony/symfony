@@ -100,6 +100,7 @@ return static function (ContainerConfigurator $container) {
         'smsapi' => Bridge\Smsapi\SmsapiTransportFactory::class,
         'smsbox' => Bridge\Smsbox\SmsboxTransportFactory::class,
         'smsc' => Bridge\Smsc\SmscTransportFactory::class,
+        'smsense' => Bridge\Smsense\SmsenseTransportFactory::class,
         'smsmode' => Bridge\Smsmode\SmsmodeTransportFactory::class,
         'spot-hit' => Bridge\SpotHit\SpotHitTransportFactory::class,
         'telnyx' => Bridge\Telnyx\TelnyxTransportFactory::class,

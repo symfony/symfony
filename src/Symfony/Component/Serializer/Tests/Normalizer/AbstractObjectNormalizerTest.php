@@ -627,7 +627,10 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(AbstractDummySecondChild::class, $denormalizedData);
     }
 
-    public function testDenormalizeBasicTypePropertiesFromXml()
+    /**
+     * @dataProvider denormalizeBasicTypePropertiesConversionDataProvider
+     */
+    public function testDenormalizeBasicTypePropertiesConversion(string $format, array $context = [])
     {
         $denormalizer = $this->getDenormalizerForObjectWithBasicProperties();
 
@@ -648,7 +651,8 @@ class AbstractObjectNormalizerTest extends TestCase
                 'floatNegInf' => '-INF',
             ],
             ObjectWithBasicProperties::class,
-            'xml'
+            $format,
+            $context
         );
 
         $this->assertInstanceOf(ObjectWithBasicProperties::class, $objectWithBooleanProperties);
@@ -670,6 +674,30 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertNan($objectWithBooleanProperties->floatNaN);
         $this->assertInfinite($objectWithBooleanProperties->floatInf);
         $this->assertEquals(-\INF, $objectWithBooleanProperties->floatNegInf);
+    }
+
+    public function testDenormalizeBasicTypePropertiesThrowsWithoutTypeConversion()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessageMatches('/must be one of "bool" \("string" given\)/');
+        $denormalizer = $this->getDenormalizerForObjectWithBasicProperties();
+        $denormalizer->denormalize(
+            [
+                'boolTrue1' => 'true',
+            ],
+            ObjectWithBasicProperties::class,
+            'other',
+            [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => false]
+        );
+    }
+
+    public function denormalizeBasicTypePropertiesConversionDataProvider(): array
+    {
+        return [
+            ['xml', []],
+            ['csv', []],
+            ['other', [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]],
+        ];
     }
 
     private function getDenormalizerForObjectWithBasicProperties()

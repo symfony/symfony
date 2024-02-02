@@ -58,6 +58,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     public const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
 
     /**
+     * While denormalizing, convert scalar types to the expected type.
+     *
+     * If not defined, it will be enabled for XML and CSV format, because all basic datatypes are represented as strings.
+     */
+    public const ENABLE_TYPE_CONVERSION = 'enable_type_conversion';
+
+    /**
      * Flag to control whether fields with the value `null` should be output
      * when normalizing or omitted.
      */
@@ -294,6 +301,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return null;
         }
 
+        $context[self::ENABLE_TYPE_CONVERSION] = $context[self::ENABLE_TYPE_CONVERSION] ?? (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format);
+
         $allowedAttributes = $this->getAllowedAttributes($type, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
         $extraAttributes = [];
@@ -438,7 +447,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
                 // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
                 $builtinType = $type->getBuiltinType();
-                if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
+                if (\is_string($data) && ($context[self::ENABLE_TYPE_CONVERSION] ?? $this->defaultContext[self::ENABLE_TYPE_CONVERSION] ?? false)) {
                     if ('' === $data) {
                         if (Type::BUILTIN_TYPE_ARRAY === $builtinType) {
                             return [];

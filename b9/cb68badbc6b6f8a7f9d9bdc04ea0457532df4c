@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2023-09-05T05:59:44Z
+
+this wont be displayed in prod is it? ref #49653 + #49687
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-09-05T06:13:29Z
+
+Right, it won't. This message would be purely for development. I'm not saying, we shouldn't merge it, but I'm curious about the motivation behind this change.
+
+---------------------------------------------------------------------------
+
+by moesoha at 2023-09-05T06:27:25Z
+
+I am exposing message in NotFoundHttpException to the user for a friendly 404 message in my project. This is inspired by the parameter in [`#[IsGranted]`](https://github.com/symfony/symfony/blob/2bac801f8a4cba02e8ecc840fa7bf512034f860a/src/Symfony/Component/Security/Http/Attribute/IsGranted.php#L38).

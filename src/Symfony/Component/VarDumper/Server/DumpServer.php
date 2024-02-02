@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Server;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
@@ -32,6 +33,11 @@ class DumpServer
      */
     private $socket;
 
+    /**
+     * @var resource|null
+     */
+    private $inputStream;
+
     public function __construct(string $host, ?LoggerInterface $logger = null)
     {
         if (!str_contains($host, '://')) {
@@ -49,33 +55,18 @@ class DumpServer
         }
     }
 
-    public function listen(callable $callback): void
+    public function listen(callable $callback, ?StreamableInputInterface $streamInput): void
     {
-        if (null === $this->socket) {
+        if ($streamInput instanceof StreamableInputInterface && $stream = $streamInput->getStream()) {
+            $this->inputStream = $stream;
+        } elseif (null === $this->socket) {
             $this->start();
         }
 
         foreach ($this->getMessages() as $clientId => $message) {
             $this->logger?->info('Received a payload from client {clientId}', ['clientId' => $clientId]);
 
-            $payload = @unserialize(base64_decode($message), ['allowed_classes' => [Data::class, Stub::class]]);
-
-            // Impossible to decode the message, give up.
-            if (false === $payload) {
-                $this->logger?->warning('Unable to decode a message from {clientId} client.', ['clientId' => $clientId]);
-
-                continue;
-            }
-
-            if (!\is_array($payload) || \count($payload) < 2 || !$payload[0] instanceof Data || !\is_array($payload[1])) {
-                $this->logger?->warning('Invalid payload from {clientId} client. Expected an array of two elements (Data $data, array $context)', ['clientId' => $clientId]);
-
-                continue;
-            }
-
-            [$data, $context] = $payload;
-
-            $callback($data, $context, $clientId);
+            $callback($clientId, $message);
         }
     }
 
@@ -86,22 +77,29 @@ class DumpServer
 
     private function getMessages(): iterable
     {
-        $sockets = [(int) $this->socket => $this->socket];
-        $write = [];
+        if (null !== $inputStream = $this->inputStream) {
+            while (!feof($inputStream)) {
+                $stream = fgets($inputStream);
+                yield (int) $stream => $stream;
+            }
+        } else {
+            $sockets = [(int) $this->socket => $this->socket];
+            $write = [];
 
-        while (true) {
-            $read = $sockets;
-            stream_select($read, $write, $write, null);
+            while (true) {
+                $read = $sockets;
+                stream_select($read, $write, $write, null);
 
-            foreach ($read as $stream) {
-                if ($this->socket === $stream) {
-                    $stream = stream_socket_accept($this->socket);
-                    $sockets[(int) $stream] = $stream;
-                } elseif (feof($stream)) {
-                    unset($sockets[(int) $stream]);
-                    fclose($stream);
-                } else {
-                    yield (int) $stream => fgets($stream);
+                foreach ($read as $stream) {
+                    if ($this->socket === $stream) {
+                        $stream = stream_socket_accept($this->socket);
+                        $sockets[(int) $stream] = $stream;
+                    } elseif (feof($stream)) {
+                        unset($sockets[(int) $stream]);
+                        fclose($stream);
+                    } else {
+                        yield (int) $stream => fgets($stream);
+                    }
                 }
             }
         }

@@ -146,6 +146,12 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('amqp://host', ['exchange' => ['foo' => 'bar']]);
     }
 
+    public function testExceptionIfConfirmTimeoutAndTransactionalIsPassed()
+    {
+        $this->expectExceptionMessage('Confirm timeout cannot be used on transactional channel.');
+        Connection::fromDsn('amqp://host?confirm_timeout=0.5&transactional=1');
+    }
+
     public function testSetsParametersOnTheQueueAndExchange()
     {
         $factory = new TestAmqpFactory(
@@ -750,6 +756,63 @@ class ConnectionTest extends TestCase
         $amqpChannel->expects($this->once())->method('waitForConfirm')->with(0.5);
 
         $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+        $connection->publish('body');
+    }
+
+    public function testItPublishMessagesWithoutTransactions()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->method('getChannel')->willReturn($amqpChannel);
+
+        $amqpChannel->expects($this->never())->method('startTransaction');
+        $amqpChannel->expects($this->never())->method('commitTransaction');
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body');
+    }
+
+    public function testItPublishMessagesUsingTransactions()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->method('getChannel')->willReturn($amqpChannel);
+
+        $startedTransaction = false;
+        $amqpChannel->expects($this->once())->method('startTransaction')->willReturnCallback(
+            function () use (&$startedTransaction) {
+                $startedTransaction = true;
+            }
+        );
+
+        $published = false;
+        $amqpExchange->expects($this->once())->method('publish')->with(
+            'body',
+            null,
+            \AMQP_NOPARAM,
+            ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]
+        )->willReturnCallback(function () use (&$startedTransaction, &$published) {
+            $this->assertTrue($startedTransaction);
+            $published = true;
+        });
+
+        $amqpChannel->expects($this->once())->method('commitTransaction')->willReturnCallback(
+            function () use (&$published) {
+                $this->assertTrue($published);
+            }
+        );
+
+        $connection = Connection::fromDsn('amqp://localhost?transactional=1', [], $factory);
         $connection->publish('body');
     }
 

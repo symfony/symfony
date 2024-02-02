@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-10-15T09:30:46Z
+
+I addressed all your comments, thank you for the review
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-11-02T09:53:46Z
+
+Thanks for the review @GromNaN, I addressed your comments :+1:
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-01-05T09:08:03Z
+
+I updated with `@param` annotation and also avoid "sentences punctuation" by using `;` where possible

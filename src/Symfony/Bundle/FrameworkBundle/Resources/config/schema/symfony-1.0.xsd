@@ -691,6 +691,7 @@
         <xsd:attribute name="local-pk" type="xsd:string" />
         <xsd:attribute name="passphrase" type="xsd:string" />
         <xsd:attribute name="ciphers" type="xsd:string" />
+        <xsd:attribute name="mock_response_factory" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="fingerprint">

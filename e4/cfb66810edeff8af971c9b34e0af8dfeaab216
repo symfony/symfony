@@ -1,0 +1,170 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2023-11-09T14:07:50Z
+
+As the original author of PropertyInfo, I agree that we need a new, more powerful, TypeInfo component. PHP evolved a lot on this topic since the original release of PropertyInfo, and PropertyInfo is now too limited.
+
+One of my regrets with `PropertyInfo\Type` is that it didn't try to be in sync with the features introduced in PHP directly.
+In my opinion, TypeInfo should be a kind of "polyfill" for new and upcoming features introduced to PHP own's [`ReflectionType`](https://www.php.net/manual/en/class.reflectiontype.php) class and should inherit from it.
+
+When/if new features (e.g.: generics) are added to PHP directly, then TypeInfo should deprecate its own equivalent feature and use the builtin one. WDYT?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-09T14:46:13Z
+
+Extending the PHP classes would mean that we cannot really deprecate things in our API as it would be PHP itself doing changes as well. And it might also create confusion if we create our own subclasses of `ReflectionType` as most code expecting `ReflectionType`  will support only the classes defined in PHP.
+Thus, we cannot "polyfill" upcoming features as we have no idea how that feature will define its PHP API in the future.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-11-09T19:54:18Z
+
+@stof we can implement the methods with the names we want in our subclass and deprecate them in favor of the official ones when they will be added to PHP.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-11-10T03:14:24Z
+
+@dunglas, if I understood well, you'd love to have a type class hierarchy like the following:
+
+```mermaid
+classDiagram
+ReflectionNamedType <|-- Type
+ReflectionUnionType <|-- UnionType
+ReflectionIntersectionType <|-- IntersectionType
+Type <|-- BuiltinType
+Type <|-- ObjectType
+Type <|-- TemplateType
+Type <|-- CollectionType
+Type <|-- GenericType
+Type <|-- UnionType
+Type <|-- IntersectionType
+ObjectType <|-- EnumType
+EnumType <|-- BackedEnumType
+```
+
+By doing that way, `UnionType` and `IntersectionType` inherit from the `Type` class and, as well, from the `ReflectionUnionType` and the `ReflectionIntersectionType`. And of course, it's not possible in PHP to inherit from two classes at the same type.
+
+Plus, the `UnionType` and `IntersectionType` will be considered as a `ReflectionNamedType` which can be weird.
+
+So I see two solutions here:
+1. Do not inherit from `ReflectionUnionType` neither `ReflectionIntersectionType`, and make the `Type` inherit from the `ReflectionType`:
+```mermaid
+classDiagram
+ReflectionType <|-- Type
+Type <|-- BuiltinType
+Type <|-- ObjectType
+Type <|-- TemplateType
+Type <|-- CollectionType
+Type <|-- GenericType
+Type <|-- UnionType
+Type <|-- IntersectionType
+ObjectType <|-- EnumType
+EnumType <|-- BackedEnumType
+```
+But we won't be that precise, and we'll miss out if something is added into `ReflectionNamedType`, `ReflectionUnionType`, or `ReflectionIntersectionType`.
+
+2. Turn the `Type` class into an interface and make types inherit explicitly from the proper `ReflectionType` (`ReflectionNamedType`, `ReflectionUnionType`, and `ReflectionIntersectionType`)
+```mermaid
+classDiagram
+Type <|-- BuiltinType
+ReflectionNamedType <|-- BuiltinType
+Type <|-- ObjectType
+ReflectionNamedType <|-- ObjectType
+Type <|-- TemplateType
+ReflectionNamedType <|-- TemplateType
+Type <|-- CollectionType
+ReflectionNamedType <|-- CollectionType
+Type <|-- GenericType
+ReflectionNamedType <|-- GenericType
+Type <|-- UnionType
+ReflectionUnionType <|-- UnionType
+Type <|-- IntersectionType
+ReflectionIntersectionType <|-- IntersectionType
+ObjectType <|-- EnumType
+EnumType <|-- BackedEnumType
+<<interface>> Type
+```
+But we have no way to enforce the `Type` interface to be implemented by a `ReflectionType`
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2023-11-10T09:11:08Z
+
+About using Reflection and make the types classes extend it I'm kinda against it since it will only make the component harder to maintain with no real DX improvement. All the stuff we added are there to make types easier to manage and current Reflection isn't that easy to use.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-11-20T08:29:27Z
+
+@Korbeil Reflection is a low level API used only for advanced use cases. Type introspection as well. App developers (unlike framework and library authors) should not have to use them directly. The DX matters less than performance and maintainability for these use cases. And best perf and maintainability is always achieved by relying only on the standard library without needing extra code. Currently, the PHP stdlib doesn't expose all the features we need, but the history of PropertyInfo proved that features are being added, and it's an open goal for the PHP project to support generics and the like. In the future, this component will hopefully not be useful anymore and will be deprecated (same for PropertyInfo), which is good. IMHO TypeInfo and PropertyInfo should try to reduce the amount of work that maintainers will have to do to switch to the PHP stdlib when generics and similar features will be supported.
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2023-11-24T09:09:31Z
+
+@dunglas I don't think there is much work needed out of resolvers (which was the same in PropertyInfo extractor) for the maintainers. And if PHP starts to have a better Reflection for types will be welcome but we don't have that yet. Also about performance, extending Reflection would mean having to call Reflection everytime we use a Type class, this is clearly not something that should be done, we want this component to be the most performant possible.
+
+---------------------------------------------------------------------------
+
+by mathroc at 2023-12-09T10:59:41Z
+
+Hi! nice work there :)
+
+2 questions:
+
+* Do you think it could be useful to use generics on the classes defined here?
+* is it scope to include even more stuff found in Psalm/PHPStan? such as `int<0,max>`, `value-of<MyEnum>`, etc. ?
+
+---------------------------------------------------------------------------
+
+by root-aza at 2023-12-25T14:51:31Z
+
+Inventing new bicycles :)))
+https://github.com/typhoon-php/type
+https://github.com/typhoon-php/reflection
+
+Many more types and support for statistical analysis types.
+
+@vudaltsov cc
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-12-26T14:28:41Z
+
+Cool, thanks for sharing.
+Good luck with the PSR also! I don't know if it's something to standardize but if it happens, keep in mind it's about framework interop so don't miss taking Symfony's bicycle into account :)
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2023-12-29T13:24:31Z
+
+@kbond thanks for your feedback !
+
+Actually `accepts` and `supports` are really good ideas but we think it should be done in a future PR.
+For example for `supports`, if `$type1` and `$type2` are two objects and the first inherits the second.
+Then `supports` should return `true` but we don't have the required metadata to do so at the moment.
+I would prefer to store anything required during runtime into the `Type` object (or children classes) so it requires some changes (nothing that will break BC so should be all fine :smile:)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-12-29T14:29:37Z
+
+👍 To polish and make the component more feature-rich later, we even have time to do so before it gets released. The diff is already quite big for what's really needed in other ongoing work.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-12-29T14:53:53Z
+
+Many thanks for your accurate reviews @EmilMassey!
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-01-02T14:05:34Z
+
+> Actually accepts and supports are really good ideas but we think it should be done in a future PR.
+
+Absolutely, I just wanted to verify the idea!

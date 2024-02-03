@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Allow custom meta location in `ResourceCheckerConfigCache`
+
 7.0
 ---
 

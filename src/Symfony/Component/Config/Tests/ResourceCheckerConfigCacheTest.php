@@ -21,14 +21,17 @@ class ResourceCheckerConfigCacheTest extends TestCase
 {
     private string $cacheFile;
 
+    private string $metaFile;
+
     protected function setUp(): void
     {
         $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
+        $this->metaFile = tempnam(sys_get_temp_dir(), 'config_');
     }
 
     protected function tearDown(): void
     {
-        $files = [$this->cacheFile, "{$this->cacheFile}.meta"];
+        $files = [$this->cacheFile, "{$this->cacheFile}.meta", $this->metaFile];
 
         foreach ($files as $file) {
             if (file_exists($file)) {
@@ -147,5 +150,16 @@ class ResourceCheckerConfigCacheTest extends TestCase
         unlink($metaFile);
 
         $this->assertFalse($cache->isFresh());
+    }
+
+    public function testCacheWithCustomMetaFile()
+    {
+        $this->assertStringEqualsFile($this->metaFile, '');
+
+        $checker = $this->createMock(ResourceCheckerInterface::class);
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker], $this->metaFile);
+        $cache->write('foo', [new FileResource(__FILE__)]);
+
+        $this->assertStringNotEqualsFile($this->metaFile, '');
     }
 }

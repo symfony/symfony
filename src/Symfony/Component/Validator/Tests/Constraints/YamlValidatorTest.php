@@ -44,14 +44,13 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValues($value, $message, $line)
     {
-        $constraint = new Yaml([
-            'message' => 'myMessageTest',
-        ]);
+        $constraint = new Yaml(
+            message: 'myMessageTest',
+        );
 
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessageTest')
-            ->setParameter('{{ value }}', '"'.$value.'"')
             ->setParameter('{{ error }}', $message)
             ->setParameter('{{ line }}', $line)
             ->setCode(Yaml::INVALID_YAML_ERROR)
@@ -62,8 +61,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
     {
         $value = 'tags: [!tagged app.myclass]';
         $this->validator->validate($value, new Yaml());
-        $this->buildViolation('This value should be valid YAML.')
-            ->setParameter('{{ value }}', sprintf('"%s"', $value))
+        $this->buildViolation('This value is not valid YAML.')
             ->setParameter('{{ error }}', 'Tags support is not enabled. Enable the "Yaml::PARSE_CUSTOM_TAGS" flag to use "!tagged" at line 1 (near "tags: [!tagged app.myclass]").')
             ->setParameter('{{ line }}', 1)
             ->setCode(Yaml::INVALID_YAML_ERROR)

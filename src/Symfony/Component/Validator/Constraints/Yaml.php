@@ -22,19 +22,12 @@ class Yaml extends Constraint
         self::INVALID_YAML_ERROR => 'INVALID_YAML_ERROR',
     ];
 
-    public $message = 'This value should be valid YAML.';
-    public $flags = 0;
-
     public function __construct(
-        ?array $options = null,
-        ?string $message = null,
-        ?int $flags = null,
+        public string $message = 'This value is not valid YAML.',
+        public int $flags = 0,
         ?array $groups = null,
         mixed $payload = null,
     ) {
-        parent::__construct($options, $groups, $payload);
-
-        $this->message = $message ?? $this->message;
-        $this->flags = $flags ?? $this->flags;
+        parent::__construct(null, $groups, $payload);
     }
 }

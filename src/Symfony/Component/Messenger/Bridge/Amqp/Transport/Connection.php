@@ -511,7 +511,7 @@ class Connection
     {
         if (!isset($this->amqpQueues[$queueName])) {
             if (!\array_key_exists($queueName, $this->queuesOptions)) {
-                throw new InvalidArgumentException(sprintf('Exchange "%s" does not have a queue named "%s", known queues are "%s"', $this->exchangeOptions['name'], $queueName, implode('", "', array_keys($this->queuesOptions))));
+                throw new InvalidArgumentException(sprintf('Exchange "%s" does not have a queue named "%s", known queues are "%s".', $this->exchangeOptions['name'], $queueName, implode('", "', array_keys($this->queuesOptions))));
             }
             $queueConfig = $this->queuesOptions[$queueName];
 

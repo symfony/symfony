@@ -377,6 +377,7 @@
         <xsd:attribute name="catch-exceptions" type="xsd:boolean" />
         <xsd:attribute name="secure" type="remember_me_secure" />
         <xsd:attribute name="samesite" type="remember_me_samesite" />
+        <xsd:attribute name="partitioned" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="remember_me_token_provider">

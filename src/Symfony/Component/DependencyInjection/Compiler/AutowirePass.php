@@ -15,6 +15,7 @@ use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
+use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -299,7 +300,13 @@ class AutowirePass extends AbstractRecursivePass
             };
 
             if ($checkAttributes) {
-                foreach ($parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                $attributes = array_merge($parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF), $parameter->getAttributes(Lazy::class, \ReflectionAttribute::IS_INSTANCEOF));
+
+                if (1 < \count($attributes)) {
+                    throw new AutowiringFailedException($this->currentId, 'Using both attributes #[Lazy] and #[Autowire] on an argument is not allowed; use the "lazy" parameter of #[Autowire] instead.');
+                }
+
+                foreach ($attributes as $attribute) {
                     $attribute = $attribute->newInstance();
                     $invalidBehavior = $parameter->allowsNull() ? ContainerInterface::NULL_ON_INVALID_REFERENCE : ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE;
 

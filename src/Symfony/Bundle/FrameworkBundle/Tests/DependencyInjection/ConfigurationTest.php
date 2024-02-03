@@ -530,6 +530,46 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testScopedHttpClientsInheritRateLimiterAndRetryFailedConfiguration()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_client' => [
+                'default_options' => ['rate_limiter' => 'default_limiter', 'retry_failed' => ['max_retries' => 77]],
+                'scoped_clients' => [
+                    'foo' => ['base_uri' => 'http://example.com'],
+                    'bar' => ['base_uri' => 'http://example.com', 'rate_limiter' => true, 'retry_failed' => true],
+                    'baz' => ['base_uri' => 'http://example.com', 'rate_limiter' => false, 'retry_failed' => false],
+                    'qux' => ['base_uri' => 'http://example.com', 'rate_limiter' => 'foo_limiter', 'retry_failed' => ['max_retries' => 88, 'delay' => 999]],
+                ],
+            ],
+        ]]);
+
+        $scopedClients = $config['http_client']['scoped_clients'];
+
+        $this->assertSame('default_limiter', $scopedClients['foo']['rate_limiter']);
+        $this->assertTrue($scopedClients['foo']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['foo']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['foo']['retry_failed']['delay']);
+
+        $this->assertSame('default_limiter', $scopedClients['bar']['rate_limiter']);
+        $this->assertTrue($scopedClients['bar']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['bar']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['bar']['retry_failed']['delay']);
+
+        $this->assertNull($scopedClients['baz']['rate_limiter']);
+        $this->assertFalse($scopedClients['baz']['retry_failed']['enabled']);
+        $this->assertSame(3, $scopedClients['baz']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['baz']['retry_failed']['delay']);
+
+        $this->assertSame('foo_limiter', $scopedClients['qux']['rate_limiter']);
+        $this->assertTrue($scopedClients['qux']['retry_failed']['enabled']);
+        $this->assertSame(88, $scopedClients['qux']['retry_failed']['max_retries']);
+        $this->assertSame(999, $scopedClients['qux']['retry_failed']['delay']);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [

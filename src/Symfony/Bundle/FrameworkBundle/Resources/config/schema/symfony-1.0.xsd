@@ -661,6 +661,7 @@
         <xsd:attribute name="local-pk" type="xsd:string" />
         <xsd:attribute name="passphrase" type="xsd:string" />
         <xsd:attribute name="ciphers" type="xsd:string" />
+        <xsd:attribute name="rate-limiter" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="http_client_scope_options" mixed="true">
@@ -691,6 +692,7 @@
         <xsd:attribute name="local-pk" type="xsd:string" />
         <xsd:attribute name="passphrase" type="xsd:string" />
         <xsd:attribute name="ciphers" type="xsd:string" />
+        <xsd:attribute name="rate-limiter" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="fingerprint">

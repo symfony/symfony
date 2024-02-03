@@ -10,6 +10,7 @@ CHANGELOG
  * Deprecate the `router.cache_dir` config option
  * Add `rate_limiter` tags to rate limiter services
  * Add `secrets:reveal` command
+ * Add `rate_limiter` option to `http_client.default_options` and `http_client.scoped_clients`
 
 7.0
 ---

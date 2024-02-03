@@ -85,6 +85,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -345,6 +346,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->readConfigEnabled('http_client', $container, $config['http_client'])) {
+            $this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter']); // makes sure that isInitializedConfigEnabled() will work
             $this->registerHttpClientConfiguration($config['http_client'], $container, $loader);
         }
 
@@ -2409,6 +2411,8 @@ class FrameworkExtension extends Extension
         $loader->load('http_client.php');
 
         $options = $config['default_options'] ?? [];
+        $rateLimiter = $options['rate_limiter'] ?? null;
+        unset($options['rate_limiter']);
         $retryOptions = $options['retry_failed'] ?? ['enabled' => false];
         unset($options['retry_failed']);
         $defaultUriTemplateVars = $options['vars'] ?? [];
@@ -2428,6 +2432,10 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('httplug.http_client');
             $container->removeAlias(HttpAsyncClient::class);
             $container->removeAlias(HttpClient::class);
+        }
+
+        if (null !== $rateLimiter) {
+            $this->registerThrottlingHttpClient($rateLimiter, 'http_client', $container);
         }
 
         if ($this->readConfigEnabled('http_client.retry_failed', $container, $retryOptions)) {
@@ -2451,6 +2459,8 @@ class FrameworkExtension extends Extension
 
             $scope = $scopeConfig['scope'] ?? null;
             unset($scopeConfig['scope']);
+            $rateLimiter = $scopeConfig['rate_limiter'] ?? null;
+            unset($scopeConfig['rate_limiter']);
             $retryOptions = $scopeConfig['retry_failed'] ?? ['enabled' => false];
             unset($scopeConfig['retry_failed']);
 
@@ -2468,6 +2478,10 @@ class FrameworkExtension extends Extension
                     ->setArguments([new Reference('http_client.transport'), [$scope => $scopeConfig], $scope])
                     ->addTag('http_client.client')
                 ;
+            }
+
+            if (null !== $rateLimiter) {
+                $this->registerThrottlingHttpClient($rateLimiter, $name, $container);
             }
 
             if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'.retry_failed', $container, $retryOptions)) {
@@ -2505,6 +2519,25 @@ class FrameworkExtension extends Extension
                 ->setDecoratedService('http_client.transport', null, -10)  // lower priority than TraceableHttpClient (5)
                 ->setArguments([new Reference($responseFactoryId)]);
         }
+    }
+
+    private function registerThrottlingHttpClient(string $rateLimiter, string $name, ContainerBuilder $container): void
+    {
+        if (!class_exists(ThrottlingHttpClient::class)) {
+            throw new LogicException('Rate limiter support cannot be enabled as version 7.1+ of the HttpClient component is required.');
+        }
+
+        if (!$this->isInitializedConfigEnabled('rate_limiter')) {
+            throw new LogicException('Rate limiter cannot be used within HttpClient as the RateLimiter component is not enabled.');
+        }
+
+        $container->register($name.'.throttling.limiter', LimiterInterface::class)
+            ->setFactory([new Reference('limiter.'.$rateLimiter), 'create']);
+
+        $container
+            ->register($name.'.throttling', ThrottlingHttpClient::class)
+            ->setDecoratedService($name, null, 15) // higher priority than RetryableHttpClient (10)
+            ->setArguments([new Reference($name.'.throttling.inner'), new Reference($name.'.throttling.limiter')]);
     }
 
     private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container): void

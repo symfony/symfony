@@ -71,13 +71,23 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame($savedParsedExpression, $parsedExpression);
     }
 
-    public function testConstantFunction()
+    /**
+     * @dataProvider basicPhpFunctionProvider
+     */
+    public function testBasicPhpFunction($expression, $expected, $compiled)
     {
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals(\PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
+        $this->assertEquals($expected, $expressionLanguage->evaluate($expression));
+        $this->assertEquals($compiled, $expressionLanguage->compile($expression));
+    }
 
-        $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+    public static function basicPhpFunctionProvider()
+    {
+        return [
+            ['constant("PHP_VERSION")', \PHP_VERSION, '\constant("PHP_VERSION")'],
+            ['min(1,2,3)', 1, '\min(1, 2, 3)'],
+            ['max(1,2,3)', 3, '\max(1, 2, 3)'],
+        ];
     }
 
     public function testEnumFunctionWithConstantThrows()

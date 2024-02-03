@@ -50,7 +50,7 @@ class YamlValidator extends ConstraintValidator
         });
 
         try {
-            $parsed = $parser->parse($value, $constraint->flags);
+            $parser->parse($value, $constraint->flags);
         } catch (ParseException $e) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))

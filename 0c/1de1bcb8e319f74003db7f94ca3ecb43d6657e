@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-01-08T12:48:12Z
+
+> The implementation should be updated to forbid using both Lazy and Autowire since on the attribute is not repeatable.
+
+Going to work on this asap, thanks!

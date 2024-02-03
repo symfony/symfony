@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Make `PasswordStrengthValidator::estimateStrength()` public
+ * Add the `Yaml` constraint for validating YAML content
 
 7.1
 ---

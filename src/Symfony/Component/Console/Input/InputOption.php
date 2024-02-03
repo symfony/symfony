@@ -46,18 +46,18 @@ class InputOption
     public const VALUE_IS_ARRAY = 8;
 
     /**
-     * The option may have either positive or negative value (e.g. --ansi or --no-ansi).
+     * The option allows passing a negated variant (e.g. --ansi or --no-ansi).
      */
     public const VALUE_NEGATABLE = 16;
 
     private string $name;
-    private string|array|null $shortcut;
+    private ?string $shortcut;
     private int $mode;
     private string|int|bool|array|float|null $default;
 
     /**
      * @param string|array|null                                                             $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param int|null                                                                      $mode            The option mode: One of the VALUE_* constants
+     * @param int-mask-of<InputOption::*>|null                                              $mode            The option mode: One of the VALUE_* constants
      * @param string|bool|int|float|array|null                                              $default         The default value (must be null for self::VALUE_NONE)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
@@ -175,11 +175,19 @@ class InputOption
         return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
     }
 
+    /**
+     * Returns true if the option allows passing a negated variant.
+     *
+     * @return bool true if mode is self::VALUE_NEGATABLE, false otherwise
+     */
     public function isNegatable(): bool
     {
         return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
     }
 
+    /**
+     * Sets the default value.
+     */
     public function setDefault(string|bool|int|float|array|null $default): void
     {
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
@@ -213,13 +221,16 @@ class InputOption
         return $this->description;
     }
 
+    /**
+     * Returns true if the option has values for input completion.
+     */
     public function hasCompletion(): bool
     {
         return [] !== $this->suggestedValues;
     }
 
     /**
-     * Adds suggestions to $suggestions for the current completion input.
+     * Supplies suggestions when command resolves possible completion options for input.
      *
      * @see Command::complete()
      */

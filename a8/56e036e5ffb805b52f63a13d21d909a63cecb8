@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by dbu at 2023-11-21T08:25:21Z
+
+shall i retarget this to the 5.4 LTS branch?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-21T13:39:54Z
+
+That's an improvement so 7.1
+
+---------------------------------------------------------------------------
+
+by dbu at 2023-11-21T14:24:15Z
+
+> That's an improvement so 7.1
+
+okay then i leave it.
+
+i think the build failures are not related. tell me when i should rebase on the 7.1 branch if you want to verify build status.

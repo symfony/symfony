@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-01-31T17:36:17Z
+
+The `supports-color` npm package has [2 different kind of checks] (https://github.com/chalk/supports-color/blob/d4f413efaf8da045c5ab440ed418ef02dbb28bf1/index.js#L153-L159) for `TERM`:
+
+- whether it ends with `-256` or `-256color` (in which case it reports color support for what we call the Ansi8 mode)
+- whether it starts with a bunch of prefixes (more than just `screen-` and `xterm-`)
+
+Should we take the full list there ?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-02-02T11:53:46Z
+
+@theofidry any chance to finish this PR ?
+
+---------------------------------------------------------------------------
+
+by theofidry at 2024-02-02T13:14:49Z
+
+@stof done
+
+---------------------------------------------------------------------------
+
+by theofidry at 2024-02-02T15:55:25Z
+
+I thought I already did, I applied it again although no clue what the diff is 😅 looks like it's happy now at least
+
+---------------------------------------------------------------------------
+
+by stof at 2024-02-02T18:15:25Z
+
+@theofidry for the diff, see the diff of your force-push: https://github.com/symfony/symfony/compare/76e89cb21a56a42a95c0dbaf1b75438441ee4410..50b0051c78f853d605cbc57209e065b9a7a3e357
+
+This was about removing the `\` qualifying the `preg_match` function name.

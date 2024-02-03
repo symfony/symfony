@@ -23,7 +23,7 @@
         "symfony/var-exporter": "^6.4|^7.0"
     },
     "require-dev": {
-        "symfony/yaml": "^7.1",
+        "symfony/yaml": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0"
     },
@@ -31,7 +31,7 @@
         "ext-psr": "<1.1|>=2",
         "symfony/config": "<6.4",
         "symfony/finder": "<6.4",
-        "symfony/yaml": "<7.1"
+        "symfony/yaml": "<6.4"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",

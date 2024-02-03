@@ -62,6 +62,8 @@ class DummyStream extends AbstractStream
             $this->nextResponse = '334 UGFzc3dvcmQ6';
         } elseif (str_starts_with($bytes, 'cDRzc3cwcmQ=')) {
             $this->nextResponse = '535 5.7.139 Authentication unsuccessful';
+        } elseif (str_starts_with($bytes, 'dGltZWRvdXQ=')) {
+            throw new TransportException('Connection to "localhost" timed out.');
         } elseif (str_starts_with($bytes, 'AUTH CRAM-MD5')) {
             $this->nextResponse = '334 PDAxMjM0NTY3ODkuMDEyMzQ1NjdAc3ltZm9ueT4=';
         } elseif (str_starts_with($bytes, 'dGVzdHVzZXIgNTdlYzg2ODM5OWZhZThjY2M5OWFhZGVjZjhiZTAwNmY=')) {

@@ -43,7 +43,9 @@ class CookieClearingLogoutListenerTest extends TestCase
         $this->assertEquals('foo.foo', $cookie->getDomain());
         $this->assertEquals(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
         $this->assertTrue($cookie->isSecure());
-        $this->assertTrue($cookie->isPartitioned());
+        if (method_exists(Cookie::class, 'isPartitioned')) {
+            $this->assertTrue($cookie->isPartitioned());
+        }
         $this->assertTrue($cookie->isCleared());
 
         $cookie = $cookies['']['/']['foo2'];
@@ -52,7 +54,9 @@ class CookieClearingLogoutListenerTest extends TestCase
         $this->assertNull($cookie->getDomain());
         $this->assertNull($cookie->getSameSite());
         $this->assertFalse($cookie->isSecure());
-        $this->assertFalse($cookie->isPartitioned());
+        if (method_exists(Cookie::class, 'isPartitioned')) {
+            $this->assertFalse($cookie->isPartitioned());
+        }
         $this->assertTrue($cookie->isCleared());
     }
 }

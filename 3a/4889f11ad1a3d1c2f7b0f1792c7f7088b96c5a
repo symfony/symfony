@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-21T18:58:39Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-21T18:58:40Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by drupol at 2022-11-28T06:31:09Z
+
+Hello,
+
+How about adding proxy authentication while we are at it ?
+https://apereo.github.io/cas/6.5.x/authentication/Configuring-Proxy-Authentication.html
+
+---------------------------------------------------------------------------
+
+by nacorp at 2022-12-01T15:54:15Z
+
+> Hello,
+>
+> How about adding proxy authentication while we are at it ? https://apereo.github.io/cas/6.5.x/authentication/Configuring-Proxy-Authentication.html
+
+Hello @drupol,
+In my opinion it should be in a dedicated pr as it's a non mandatory use case
+
+---------------------------------------------------------------------------
+
+by drupol at 2022-12-01T16:04:46Z
+
+Hello,
+
+I do not agree that much. Proxy validation is part of the CAS protocol, therefore, it's better to add it in here... or else you're going to implement half of the protocol here... is this what we want?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-12-20T15:35:10Z
+
+@nacorp @drupol is the proxy authentication part avoid the actual code to work as expected? If not, we can consider to add it later in another PR. But if this proxy is mandatory to make the authentication process work, it must be provided in this PR.
+
+---------------------------------------------------------------------------
+
+by drupol at 2022-12-20T15:59:46Z
+
+Proxy authentication involves the creation of a specific endpoint on the app and therefore is not part of this PR.
+
+I would suggest to not implement the CAS protocol and discard this PR as long as the protocol is not fully implemented.
+
+---------------------------------------------------------------------------
+
+by nacorp at 2022-12-20T16:24:06Z
+
+I do confirm that the proxy authentication of the cas protocol is optional and this PR, as is, allows us to use CAS protocol with default configuration.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-21T12:55:43Z
+
+It's ok if we don't implement the full specification, as long as the design allows implementing the other missing features.
+I'm not super familiar to CAS but shouldn't we rather go with the last version of the protocol (3)?
+
+---------------------------------------------------------------------------
+
+by nacorp at 2022-12-21T14:43:38Z
+
+As « the most noticeable update between versions 2.0 and 3.0 is the ability to return the authentication/user attributes », this PR will also work for simple authentication against CAS3 server. However, the developper will not not get all the data available from the authentication server - which is not a problem, imo, since the main goal of this PR is to deal with auth.
+
+---------------------------------------------------------------------------
+
+by nacorp at 2023-01-20T18:04:09Z
+
+poke @welcoMattic  :-)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-01-21T16:42:54Z
+
+This misses some DI integration in SecurityBundle i.e. the service configuration/registration needed to allow for `authenticators: { access_token: { token_handler:  'cas' } }`.
+You could find some inspiration in #48272
+
+---------------------------------------------------------------------------
+
+by nacorp at 2023-01-23T12:26:28Z
+
+OK as #48272 will ship a brand new factory I'll do that as soon as it's merged!

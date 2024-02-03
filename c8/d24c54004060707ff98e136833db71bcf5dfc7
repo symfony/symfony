@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-01-09T14:18:50Z
+
+should the command fail when passing a name and there is no secret with that name ?
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2024-01-09T17:38:46Z
+
+> should the command fail when passing a name and there is no secret with that name ?
+
+Thats one way to do it. I just reused the current behavior when the secret store is empty.
+
+If we go your way, we should refactor a bit so that the comments about how to reference/reveal a secret are not displayed when an invalid name is passed.
+
+```php
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
+
+        $reveal = $input->getOption('reveal');
+
+        $secrets = $this->vault->list($reveal);
+
+        if (null !== $name = $input->getArgument('name')) {
+            if (!\array_key_exists($name, $secrets)) {
+                $io->error(\sprintf('The secret "%s" does not exist.', $name));
+
+                return self::INVALID;
+            }
+
+            $secrets = [$name => $secrets[$name]];
+        }
+
+        $localSecrets = $this->localVault?->list($reveal);
+
+        $io->comment('Use <info>"%env(<name>)%"</info> to reference a secret in a config file.');
+
+        if (!$reveal) {
+            $io->comment(\sprintf('To reveal the secrets run <info>php %s %s --reveal</info>', $_SERVER['PHP_SELF'], $this->getName()));
+        }
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-01-10T15:04:29Z
+
+> If we go your way, we should refactor a bit so that the comments about how to reference/reveal a secret are not displayed when an invalid name is passed.
+
+Sounds good to me
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2024-01-19T12:09:40Z
+
+> Would allowing more than one name to get a subset of the list make sense? It would be more consistent with the command name.
+
+I agree that this would fit better with the command name, but how would you handle passing a valid AND an invalid secret name? Only return an error? Return the valid secret and an error message? Would this result in exit code 0, 1 or 2?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-01-20T19:06:33Z
+
+>  It would be more consistent with the command name.
+
+Good point. Given the number of questions that supporting multiple names raise, what about adding a `secrets:show` command instead?
+Otherwise, I would just make the command fail entirely when an invalid name is passed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-01-21T09:55:34Z
+
+> > It would be more consistent with the command name.
+>
+> Good point. Given the number of questions that supporting multiple names raise, what about adding a `secrets:show` command instead? Otherwise, I would just make the command fail entirely when an invalid name is passed.
+
+That's maybe a better option indeed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-29T20:57:29Z
+
+> secrets:show
+
+Or `secrets:reveal`  to use the existing wording?
+but I agree with the proposal. That could be even more useful since this wouldn't require decorating the output with fancy layout. Instead, the result could be directly piped to another command when needed.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-01-29T22:30:19Z
+
+👍 for `reveal`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-02T06:32:22Z
+
+@danielburger1337 Are you still interested in moving this PR forward?
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2024-02-02T09:12:22Z
+
+> @danielburger1337 Are you still interested in moving this PR forward?
+
+Yes I am. Just to make sure, you guys want to add the new SecretsRevealCommand. This would entail removing the added "name" argument from the SecretsListCommand again and then the "-r" option will be deprecated?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-02T09:14:34Z
+
+I wouldn't deprecated -r, but yes for the rest
+
+---------------------------------------------------------------------------
+
+by danielburger1337 at 2024-02-02T22:21:18Z
+
+Updated title and description to match new proposed idea.

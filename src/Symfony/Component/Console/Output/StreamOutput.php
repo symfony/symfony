@@ -108,10 +108,22 @@ class StreamOutput extends Output
             return true;
         }
 
-        return 'Hyper' === getenv('TERM_PROGRAM')
+        if ('Hyper' === getenv('TERM_PROGRAM')
+            || false !== getenv('COLORTERM')
             || false !== getenv('ANSICON')
             || 'ON' === getenv('ConEmuANSI')
-            || str_starts_with((string) getenv('TERM'), 'xterm');
+        ) {
+            return true;
+        }
+
+        $term = (string) getenv('TERM');
+
+        if ('dumb' === $term) {
+            return false;
+        }
+
+        // See https://github.com/chalk/supports-color/blob/d4f413efaf8da045c5ab440ed418ef02dbb28bf1/index.js#L157
+        return 1 === @preg_match('/^((screen|xterm|vt100|vt220|putty|rxvt|ansi|cygwin|linux).*)|(.*-256(color)?(-bce)?)$/', $term);
     }
 
     /**

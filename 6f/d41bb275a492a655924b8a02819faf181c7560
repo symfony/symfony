@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by norkunas at 2023-12-15T05:56:26Z
+
+@mtarld I've updated, is this what you had in mind with deprecation?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2023-12-20T07:22:08Z
+
+Should I skip those test cases on 32bit systems when value is > PHP_INT_MAX?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-12-20T08:49:13Z
+
+> Should I skip those test cases on 32bit systems when value is > PHP_INT_MAX?
+
+Either that or skip the int cast on those systems.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2024-01-05T19:21:41Z
+
+Anybody to review?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2024-01-13T09:29:30Z
+
+> Code looks good to me. But I'm wondering that maybe we can add a check to make sure that the cast value is consistent with the format? So that it won't be possible to cast `d/m/Y` to an `int` for example. WDYT?
+
+But then we would go back to format guessing, which derrabus wanted to avoid :)
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-01-13T09:31:20Z
+
+Oh yeah, I missed that part... Thanks, LGTM then!

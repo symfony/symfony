@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-10-29T16:36:49Z
+
+Hey!
+
+I think @mamazu has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-07-07T07:45:56Z
+
+@nicolas-grekas you're right ... this is solution b, I described [here](https://github.com/symfony/symfony/pull/48022#discussion_r1102430776) ... this is not possible with the current implementation  and this would be a bigger change of the yaml component. Because for that the component needs to understand the context (this is part of a quoted multiline string) ... for now it just reads the yaml line by line at this point of the yaml parser ... I'll have a look on that and see whats possible.
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-07-07T10:26:19Z
+
+@nicolas-grekas please have a look, now your case is also supported by the solution ...
+
+**UPDATE** Does not work as expected in special cases when the text contains a single quote (for example "Une erreur s'est produite.") ... I'll investigate into that next week.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-07-10T06:05:51Z
+
+> I think we should merge this since this is YAML compliant, isn't it?
+
+Just my 2cts here: the goal of the YAML component has never been to be 100% compliant, as YAML is a weird beast. The goal has always been to cover what we need for configuration. (I'm not saying that we should not merge this PR, but I just wanted to give some historical context).
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-07-10T06:53:56Z
+
+HI @fabpot,
+thanks for the context. I'm fine with closing this PR and the related Issue with "Won't fix" (as I said already on your last comment) when we say we won't support that, because it's created to handle our configuration.
+But @nicolas-grekas came up last friday and asked to fix his use-case. Now it seems all to be fixed and to work fine.
+
+So Im fine with closing this PR, merging it into 5.4 or maybe because of BC breaks merge it to 6.4.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-07-10T07:13:08Z
+
+Let's finish the work and merge it as the work has been done.
+It's nice to support more YAML features.
+Again, I just wanted to highlight the philosophy I had we I created the component two decades ago :exploding_head:
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-07-11T05:54:14Z
+
+Added support for a colon in the unquoted key

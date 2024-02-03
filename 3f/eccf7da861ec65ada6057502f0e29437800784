@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by norkunas at 2023-08-10T12:42:26Z
+
+While writing github webhook request parser I encountered that they send signature as a header, would it make sense to also add `HeaderRequestMatcher` to core?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-08-10T13:07:35Z
+
+That would be a big yes for me, definitely! Gave a try here: https://github.com/symfony/symfony/pull/51343
+
+Thank you for the idea, it would be even more powerful with those features!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-10-02T08:43:59Z
+
+Rebased and conflicts fixed

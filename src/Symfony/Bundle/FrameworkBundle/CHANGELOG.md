@@ -9,6 +9,7 @@ CHANGELOG
  * Move the Router `cache_dir` to `kernel.build_dir`
  * Deprecate the `router.cache_dir` config option
  * Add `rate_limiter` tags to rate limiter services
+ * Add `secrets:reveal` command
 
 7.0
 ---

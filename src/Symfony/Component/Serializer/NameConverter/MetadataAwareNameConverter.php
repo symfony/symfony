@@ -128,13 +128,16 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             }
 
             $metadataGroups = $metadata->getGroups();
-            $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
 
-            if ($contextGroups && !$metadataGroups) {
+            $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
+            $contextGroupsHasBeenDefined = [] !== $contextGroups;
+            $contextGroups = array_merge($contextGroups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
+
+            if ($contextGroupsHasBeenDefined && !$metadataGroups) {
                 continue;
             }
 
-            if ($metadataGroups && !array_intersect($metadataGroups, $contextGroups) && !\in_array('*', $contextGroups, true)) {
+            if ($metadataGroups && !array_intersect(array_merge($metadataGroups, ['*']), $contextGroups)) {
                 continue;
             }
 

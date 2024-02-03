@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
  */
 class IgnorePropertyDummy
 {
-    #[Groups(['a'])]
+    #[Groups(['a', 'Default', 'IgnorePropertyDummy'])]
     public $visibleProperty;
 
     #[Groups(['a']), Ignore]

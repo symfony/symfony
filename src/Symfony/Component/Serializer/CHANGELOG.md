@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `DateTimeNormalizer::CAST_KEY` context option
+ * Add `Default` and "class name" default groups
 
 7.0
 ---

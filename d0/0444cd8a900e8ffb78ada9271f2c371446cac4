@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-10-22T17:10:43Z
+
+Please provide a meaningful PR description that explains the feature you're adding, how to use it and what's your motivation behind it. This helps us deciding whether we want to add your feature to Symfony. In addition to that, it helps the documentation team who will probably want to document your feature and announce it in our blog.
+
+---------------------------------------------------------------------------
+
+by phansys at 2023-10-22T17:34:01Z
+
+>Please provide a meaningful PR description that explains the feature you're adding, how to use it and what's your motivation behind it. This helps us deciding whether we want to add your feature to Symfony. In addition to that, it helps the documentation team who will probably want to document your feature and announce it in our blog.
+
+I've added an example with a use case. Please, let me know if more context is required.
+Thank you.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-10-23T06:12:57Z
+
+> Prior to the support for enumerations, this was allowed by array constants
+
+It is still possible to [add a constant to an enum](https://www.php.net/manual/en/language.enumerations.constants.php).
+The proposed syntax seems good and concise.

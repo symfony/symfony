@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "symfony/error-handler": "^6.4|^7.0",
-        "symfony/emoji": "^7.0",
+        "symfony/emoji": "^7.1",
         "symfony/http-client": "^6.4|^7.0",
         "symfony/intl": "^6.4|^7.0",
         "symfony/translation-contracts": "^2.5|^3.0",

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `UploadedFile::getClientOriginalPath()`
  * Add `QueryParameterRequestMatcher`
+ * Add `HeaderRequestMatcher`
 
 7.0
 ---

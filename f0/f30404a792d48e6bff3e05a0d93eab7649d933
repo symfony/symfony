@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-22T21:40:58Z
+
+Can you please help me get the steps that achieve the throttling? Which part is sleeping especially? The lock is, right?
+Do we need to play with the pause handler then? I think this can be checked by comparing how curl vs native http clients behave with the current code.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-01-23T03:45:10Z
+
+@nicolas-grekas Actually no, `$this->rateLimiter()->reserve()->getWaitDuration()` doesn't sleep, it just returns the expected delay between the requests. The pause handler is what actually sleeps. This behavior is consistent across both the curl and native http clients. Maybe I'm wrong, but if the lock was what slept, then that would mean that the creation of the response objects was delayed, but not the actual requests which are triggered afterwards.

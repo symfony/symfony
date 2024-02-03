@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 class YamlTest extends TestCase
@@ -22,6 +23,56 @@ class YamlTest extends TestCase
         $yml = Yaml::dump($data);
         $parsed = Yaml::parse($yml);
         $this->assertEquals($data, $parsed);
+    }
+
+    public function testParseWithMultilineQuotes()
+    {
+        $yaml = <<<YAML
+foo:
+  bar: 'baz
+biz
+
+'
+  baz: 'Lorem
+
+       ipsum'
+  error: Une erreur s'est produite.
+  trialMode: 'période d''essai'
+  double_line: 'Les utilisateurs sélectionnés
+n''ont pas d''email.
+
+'
+  a: 'b''
+c'
+  empty: ''
+  foo:bar: 'foobar'
+YAML;
+
+        $this->assertSame(['foo' => [
+            'bar' => "baz biz\n",
+            'baz' => "Lorem\nipsum",
+            'error' => "Une erreur s'est produite.",
+            'trialMode' => "période d'essai",
+            'double_line' => "Les utilisateurs sélectionnés n'ont pas d'email.\n",
+            'a' => "b' c",
+            'empty' => '',
+            'foo:bar' => 'foobar',
+        ]], Yaml::parse($yaml));
+    }
+
+    public function testParseWithMultilineQuotesExpectException()
+    {
+        $yaml = <<<YAML
+foo:
+  bar: 'baz
+
+'
+'
+YAML;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unable to parse at line 5 (near "\'").');
+        Yaml::parse($yaml);
     }
 
     public function testZeroIndentationThrowsException()

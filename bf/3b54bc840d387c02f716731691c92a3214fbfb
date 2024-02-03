@@ -1,0 +1,233 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-16T14:07:03Z
+
+Related
+* https://github.com/symfony/symfony/issues/49943
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-16T21:58:21Z
+
+> Related
+>
+>     * [Splitt intl packages in smaller packages #49943](https://github.com/symfony/symfony/issues/49943)
+
+I have no memory of this PR, but there is a thumbs-up from me, so... 😮‍💨
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-18T22:42:48Z
+
+Fabbot fails but i cannot fix it (as it wants to edit emoji files to add licence, fix typos, etc.)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-18T22:46:01Z
+
+In the end, i renamed IntlEmoji just Emoji, as nothing from Emoji uses/interact with the Intl component.
+
+Moreover, Emoji requires native php Intl extension.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-19T08:38:38Z
+
+My understanding of this topic:
+
+- the intl data is NOT in the base skeleton. It is in webapp-pack.
+- even if the data is not compressed in the source, it's always compressed on the network, so that uncompressed size doesn't matter when considering transfer time/overhead
+- a fresh *compressed* webapp is ~56MB
+- when we remove all intl data, the compressed size becomes ~48MB (-13%)
+- when we remove only the emoji data, the compressed size becomes ~52MB (-7%)
+
+About symfony/intl, I think it does what is should: make the intl data easily available.
+About splitting emoji data, it's worth 7% of the webapp skeleton.
+I've no strong objection to make the split (but no strong motivation either, so thanks for pushing the topic :) )
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-19T11:51:23Z
+
+> when we remove all intl data, the compressed size becomes ~48MB (-13%)
+
+There is something wrong with your computation... an **_uncompressed_** webapp without symfony/intl is only 43MB
+
+| webapp | webapp - Intl |
+| - | - |
+| <img width="420" alt="Capture d’écran 2023-12-19 à 12 46 32" src="https://github.com/symfony/symfony/assets/1359581/46ac2fd8-c37e-4133-bf94-8f13cf5c5b9c"> | <img width="424" alt="Capture d’écran 2023-12-19 à 12 47 36" src="https://github.com/symfony/symfony/assets/1359581/3fa66050-bce0-4360-9d52-e13d4f49fbca"> |
+
+---
+
+Thank you for the feedbacks, i'll fix/adapt things accordingly this afternoon  😄
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-19T12:42:15Z
+
+```sh
+symfony new test-webapp --webapp
+du -sh test-webapp
+#displays 154MB (uncompressed - 141MB just for vendor)
+rm test-webapp/vendor/symfony/intl/ -rf
+du -sh test-webapp
+#displays 109MB (still uncompressed - 96MB just for vendor)
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2023-12-19T12:57:52Z
+
+> Currently, it seems to me this component:
+>
+>     * provides a polifill-ish layer for the intl PHP extension
+
+this is not true. The polyfills are in `symfony/polyfill-intl-icu`
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-19T13:11:12Z
+
+> ```shell
+> du -sh test-webapp
+> ```
+
+That is interesting. Really. Because i have clearly not the same numbers. And i wonder why.
+
+```
+du -sh test-webapp
+105M	test-webapp
+rm test-webapp/vendor/symfony/intl/ -rf
+rm: test-webapp/vendor/symfony/intl/: is a directory
+rm: -rf: No such file or directory
+rm -rf test-webapp/vendor/symfony/intl/
+du -sh test-webapp
+ 60M	test-webapp
+```
+
+(yes i let you enjoy my `-rf` fail)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-20T11:42:12Z
+
+I'm not sure how i can fix the remaining test... if someone can help me / point me in the good direction that'd be nice :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-12-27T10:02:09Z
+
+@smnandre just a random comment related to this.
+
+In Symfony we have a config option called [enabled_locales](https://symfony.com/doc/current/reference/configuration/framework.html#enabled-locales). We could delete _(automatically or letting developers doing it explicitly via a command provided by us)_ all the data of all languages not included in that config option. We'd delete 95% of Intl data (emojis transliterators, names of coutnries/languages/currencies in other languages, etc.) without affecting to the application.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-27T10:41:03Z
+
+> @smnandre just a random comment related to this.
+>
+> In Symfony we have a config option called [enabled_locales](https://symfony.com/doc/current/reference/configuration/framework.html#enabled-locales). We could delete _(automatically or letting developers doing it explicitly via a command provided by us)_ all the data of all languages not included in that config option. We'd delete 95% of Intl data without affecting to the application.
+
+I suppose that could solve the "final deployable size" question... even more if combined with the "compress script"
+
+But... that would still download every emojis variants x every languages everytime you create a webapp, run composer install, or need the CountryValidator.
+
+I won't push too hard on this, even less if i'm far from beeing in the majority, thinking that this data should not be in the main repo. I guess my pov on this is more "philosophical" or "opiniated" than i imagined... :)
+
+As i said while investigating [this issue](https://github.com/symfony/symfony/issues/53116), i have some alternative ideas to reduce/optimise those files, it can be a step in the good* direction ! (*according to me :) )
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-30T20:44:57Z
+
+Let's continue with this approach. 7% compressed diff also means less time to uncompress the app so that can lead to a slightly better DX.
+rebase needed though :)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-31T00:05:05Z
+
+> Let's continue with this approach. 7% compressed diff also means less time to uncompress the app so that can lead to a slightly better DX. rebase needed though :)
+
+Ok will do tomorrow. I can reduce 25% of uncompressed data files... by removing all spaces (only 3/4% when compressed... as expected)
+
+Do we need to php-cs-fix those files ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-01T14:56:53Z
+
+>  I can reduce 25% of uncompressed data files... by removing all spaces (only 3/4% when compressed... as expected)
+
+not worth it to me
+
+> Do we need to php-cs-fix those files ?
+
+nope, fabbot can be ignored on those
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-01T15:07:45Z
+
+Ok !
+
+I'll fix what i can/figure out.. and probably will call for a bit of help :)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-01T16:00:41Z
+
+Failing checks:
+* fabbot: want to add LICENCE to emoji resource files
+* Unit Tests (8.2 high/low): related to Form / DateType
+* Unit Tests (8.3): related to Form / DateType
+
+So remains Psalm:
+* the Transliterator::id" **is** a readonly string inPHP 8.2+ so it should not raise alarm (?)
+* the 2 other errors concern build.php (that requires a composer install)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-01-02T18:28:21Z
+
+> Merge branch 'symfony:7.1' into feat/component-intl-emoji
+
+:boom:
+We don't merge PRs with merge commits :)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-02T19:22:59Z
+
+If possible, could you configure fabbot to ignore `src/Symfony/Component/Emoji/Resources/data/`
+
+(cf https://fabbot.io/report/symfony/symfony/53096/25c5b345a64dbce84dd180c8e8c779af5e2d8fe0 )
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-02T19:35:28Z
+
+(squashed / rebased on 7.1)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-01-27T20:40:22Z
+
+Is there something else i can do here ? :)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-02-02T18:59:27Z
+
+To make the description fairer, installing `symfony/validator` does not force installing `symfony/intl` (we don't have a composer requirement on it. We have a runtime check when using the intl-based constraint)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-03T01:11:31Z
+
+@stof I updated the description
+
+> allow usage of intl (required if your app uses those validators/form types: BIC, country, currency, language, locale, timezone) without downloading all the emoji data
+
+Feel free to rephrase or edit directly if you have another idea in mind!

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-02-03T17:05:03Z
+
+This PR uses the same approach as #53695 to decide what output we accept which makes it possible to revert the version bump done in #53683.

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-30T16:08:27Z
+
+You should rebase instead of merging 6.3
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2022-12-30T16:32:37Z
+
+My bad, I used the GitHub UI to resolve conflicts :man_facepalming:
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2023-04-27T13:44:30Z
+
+@stof Reviews have been resolved. Is there anything to change ?
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2023-07-27T14:18:41Z
+
+I rebased this PR to 6.4.
+
+Should I keep it opened ?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-07-28T05:47:33Z
+
+Friendly ping @stof @fabpot as you had some comments

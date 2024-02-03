@@ -52,7 +52,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(UnexpectedValueException::class);
 
-        $this->validator->validate(123456, new Cidr());
+        $this->validator->validate([123456], new Cidr());
     }
 
     /**
@@ -205,7 +205,6 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
         return [
             ['192.168.1.0/-1'],
             ['0.0.0.0/foobar'],
-            ['10.0.0.0/128'],
             ['123.45.67.178/aaa'],
             ['172.16.0.0//'],
             ['255.255.255.255/1/4'],
@@ -223,7 +222,6 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ['0.0.0.0/foobar'],
-            ['10.0.0.0/128'],
             ['123.45.67.178/aaa'],
             ['172.16.0.0//'],
             ['172.16.0.0/a/'],
@@ -243,6 +241,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ['10.0.0.0/24', Ip::V4, 10, 20],
+            ['10.0.0.0/128'],
             ['2001:0DB8:85A3:0000:0000:8A2E:0370:7334/24', Ip::V6, 10, 20],
         ];
     }

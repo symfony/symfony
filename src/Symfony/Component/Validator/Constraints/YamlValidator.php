@@ -23,10 +23,7 @@ use Symfony\Component\Yaml\Parser;
  */
 class YamlValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Yaml) {
             throw new UnexpectedTypeException($constraint, Yaml::class);

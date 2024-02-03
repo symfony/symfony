@@ -4,7 +4,7 @@ CHANGELOG
 7.1
 ---
 
- * Add support for php `min` and `max` functions
+ * Add support for PHP `min` and `max` functions
 
 7.0
 ---

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `DateTimeNormalizer::CAST_KEY` context option
+
 7.0
 ---
 

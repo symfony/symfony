@@ -39,6 +39,7 @@ use Twig\Source;
 #[AsCommand(name: 'lint:twig', description: 'Lint a Twig template and outputs encountered errors')]
 class LintCommand extends Command
 {
+    private array $excludes;
     private string $format;
 
     public function __construct(
@@ -54,7 +55,7 @@ class LintCommand extends Command
             ->addOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())))
             ->addOption('show-deprecations', null, InputOption::VALUE_NONE, 'Show deprecations as errors')
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
-            ->addOption('excludes', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Excluded directory', [])
+            ->addOption('excludes', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Excluded directories', [])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lints a template and outputs to STDOUT
 the first encountered syntax error.
@@ -82,7 +83,7 @@ EOF
         $io = new SymfonyStyle($input, $output);
         $filenames = $input->getArgument('filename');
         $showDeprecations = $input->getOption('show-deprecations');
-        $excludes = $input->getOption('excludes');
+        $this->excludes = $input->getOption('excludes');
         $this->format = $input->getOption('format') ?? (GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt');
 
         if (['-'] === $filenames) {
@@ -120,7 +121,7 @@ EOF
         }
 
         try {
-            $filesInfo = $this->getFilesInfo($filenames, $excludes);
+            $filesInfo = $this->getFilesInfo($filenames);
         } finally {
             if ($showDeprecations) {
                 restore_error_handler();
@@ -130,11 +131,11 @@ EOF
         return $this->display($input, $output, $io, $filesInfo);
     }
 
-    private function getFilesInfo(array $filenames, array $excludes): array
+    private function getFilesInfo(array $filenames): array
     {
         $filesInfo = [];
         foreach ($filenames as $filename) {
-            foreach ($this->findFiles($filename, $excludes) as $file) {
+            foreach ($this->findFiles($filename) as $file) {
                 $filesInfo[] = $this->validate(file_get_contents($file), $file);
             }
         }
@@ -142,12 +143,12 @@ EOF
         return $filesInfo;
     }
 
-    protected function findFiles(string $filename, array $excludes): iterable
+    protected function findFiles(string $filename): iterable
     {
         if (is_file($filename)) {
             return [$filename];
         } elseif (is_dir($filename)) {
-            return Finder::create()->files()->in($filename)->name($this->namePatterns)->exclude($excludes);
+            return Finder::create()->files()->in($filename)->name($this->namePatterns)->exclude($this->excludes);
         }
 
         throw new RuntimeException(sprintf('File or directory "%s" is not readable.', $filename));

@@ -28,6 +28,7 @@
         "symfony/cache": "^6.4|^7.0",
         "symfony/clock": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",
+        "symfony/http-client": "^6.4|^7.0",
         "symfony/http-client-contracts": "^3.0",
         "symfony/rate-limiter": "^6.4|^7.0",
         "symfony/routing": "^6.4|^7.0",

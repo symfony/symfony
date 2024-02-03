@@ -4,8 +4,8 @@ CHANGELOG
 7.1
 ---
 
-* Add support for `:is()`
-* Add support for `:where()`
+ * Add support for `:is()`
+ * Add support for `:where()`
 
 6.3
 ---

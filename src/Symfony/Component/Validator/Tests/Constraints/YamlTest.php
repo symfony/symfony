@@ -34,7 +34,7 @@ class YamlTest extends TestCase
         self::assertSame('some attached data', $cConstraint->payload);
 
         [$cConstraint] = $metadata->properties['d']->getConstraints();
-        self::assertSame(768, $cConstraint->flags);
+        self::assertSame(YamlParser::PARSE_CONSTANT | YamlParser::PARSE_CUSTOM_TAGS, $cConstraint->flags);
     }
 }
 

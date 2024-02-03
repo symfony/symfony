@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\Transliterator;
+namespace Symfony\Component\Emoji\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
 
 /**
  * @requires extension intl
@@ -95,7 +95,7 @@ class EmojiTransliteratorTest extends TestCase
     public static function provideLocaleTest(): iterable
     {
         $file = (new Finder())
-            ->in(__DIR__.'/../../Resources/data/transliterator/emoji')
+            ->in(__DIR__.'/../Resources/data')
             ->name('*.php')
             ->notName('emoji-strip.php')
             ->files()

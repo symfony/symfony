@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\String;
+namespace Symfony\Component\String\Tests\Slugger;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\Slugger\AsciiSlugger;

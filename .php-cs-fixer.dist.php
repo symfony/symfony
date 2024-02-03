@@ -56,6 +56,7 @@ return (new PhpCsFixer\Config())
                 'Symfony/Bundle/FrameworkBundle/Resources/views/Form',
                 // explicit trigger_error tests
                 'Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/',
+                'Symfony/Component/Emoji/Resources/',
                 'Symfony/Component/Intl/Resources/data/',
             ])
             // explicit tests for ommited @param type, against `no_superfluous_phpdoc_tags`

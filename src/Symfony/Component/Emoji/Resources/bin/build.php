@@ -25,7 +25,7 @@ Builder::saveRules(Builder::buildSlackRules($emojisCodePoints));
 
 final class Builder
 {
-    private const TARGET_DIR = __DIR__.'/../data/transliterator/emoji/';
+    private const TARGET_DIR = __DIR__.'/../data/';
 
     public static function getEmojisCodePoints(): array
     {
@@ -233,7 +233,7 @@ final class Builder
         sort($firstChars);
 
         $quickCheck = '"'.str_replace('%', '\\x', rawurlencode(implode('', $firstChars))).'"';
-        $file = dirname(__DIR__, 2).'/Transliterator/EmojiTransliterator.php';
+        $file = dirname(__DIR__, 2).'/EmojiTransliterator.php';
         file_put_contents($file, preg_replace('/QUICK_CHECK = .*;/m', "QUICK_CHECK = {$quickCheck};", file_get_contents($file)));
     }
 

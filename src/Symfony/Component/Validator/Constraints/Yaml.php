@@ -12,6 +12,8 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\LogicException;
+use Symfony\Component\Yaml\Parser;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Yaml extends Constraint
@@ -28,6 +30,10 @@ class Yaml extends Constraint
         ?array $groups = null,
         mixed $payload = null,
     ) {
+        if (!class_exists(Parser::class)) {
+            throw new LogicException('The Yaml component is required to use the Yaml constraint. Try running "composer require symfony/yaml".');
+        }
+
         parent::__construct(null, $groups, $payload);
     }
 }

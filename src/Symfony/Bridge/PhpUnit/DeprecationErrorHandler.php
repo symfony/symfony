@@ -40,6 +40,7 @@ class DeprecationErrorHandler
     private $deprecationGroups = [];
 
     private static $isRegistered = false;
+    private static $callPhpUnitErrorHandler;
     private static $errorHandler;
 
     public function __construct()
@@ -123,15 +124,36 @@ class DeprecationErrorHandler
         });
     }
 
+    public static function disablePhpUnitErrorHandler(): void
+    {
+        self::$callPhpUnitErrorHandler = false;
+    }
+
+    public static function enablePhpUnitErrorHandler(): void
+    {
+        self::$callPhpUnitErrorHandler = true;
+    }
+
     /**
      * @internal
      */
     public function handleError($type, $msg, $file, $line, $context = [])
     {
-        if ((\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || false === strpos($msg, '" targeting switch is equivalent to "break'))) || !$this->getConfiguration()->isEnabled()) {
+        $handled = false;
+        if ((\E_USER_DEPRECATED === $type || \E_DEPRECATED === $type || (\E_WARNING === $type && false !== strpos($msg, '" targeting switch is equivalent to "break'))) && $this->getConfiguration()->isEnabled()){
+            $this->internalHandleError($type, $msg, $file);
+            $handled = true;
+        }
+
+        if (self::$callPhpUnitErrorHandler ?? !$handled) {
             return \call_user_func(self::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
         }
 
+        return null;
+    }
+
+    private function internalHandleError($type, $msg, $file)
+    {
         $trace = debug_backtrace();
 
         if (isset($trace[1]['function'], $trace[1]['args'][0]) && ('trigger_error' === $trace[1]['function'] || 'user_error' === $trace[1]['function'])) {
@@ -140,13 +162,13 @@ class DeprecationErrorHandler
 
         $deprecation = new Deprecation($msg, $trace, $file, \E_DEPRECATED === $type);
         if ($deprecation->isMuted()) {
-            return null;
+            return;
         }
         if ($this->getConfiguration()->isIgnoredDeprecation($deprecation)) {
-            return null;
+            return;
         }
         if ($this->getConfiguration()->isBaselineDeprecation($deprecation)) {
-            return null;
+            return;
         }
 
         $msg = $deprecation->getMessage();
@@ -179,8 +201,6 @@ class DeprecationErrorHandler
         } else {
             $this->deprecationGroups[$group]->addNoticeFromProceduralCode($msg);
         }
-
-        return null;
     }
 
     /**
@@ -378,6 +398,10 @@ class DeprecationErrorHandler
             return $eh;
         }
 
+        if (ErrorHandler::class === $eh && method_exists(ErrorHandler::class, 'instance')) {
+            return self::$callPhpUnitErrorHandler ? ErrorHandler::instance() : static function () { return false; };
+        }
+
         foreach (debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
             if (isset($frame['object']) && $frame['object'] instanceof TestResult) {
                 return new $eh(
@@ -389,7 +413,7 @@ class DeprecationErrorHandler
             }
         }
 
-        return function () { return false; };
+        return static function () { return false; };
     }
 
     /**

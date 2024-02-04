@@ -13,8 +13,10 @@ namespace Symfony\Bridge\PhpUnit\TextUI;
 
 if (version_compare(\PHPUnit\Runner\Version::id(), '9.0.0', '<')) {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\CommandForV7', 'Symfony\Bridge\PhpUnit\TextUI\Command');
-} else {
+} elseif (version_compare(\PHPUnit\Runner\Version::id(), '10.0.0', '<')) {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\CommandForV9', 'Symfony\Bridge\PhpUnit\TextUI\Command');
+} else {
+    class_alias('Symfony\Bridge\PhpUnit\Legacy\CommandForV10', 'Symfony\Bridge\PhpUnit\TextUI\Command');
 }
 
 if (false) {

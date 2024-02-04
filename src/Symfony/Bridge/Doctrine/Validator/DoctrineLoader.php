@@ -140,7 +140,12 @@ final class DoctrineLoader implements LoaderInterface
         return $fields;
     }
 
-    private static function getFieldMappingValue(array|FieldMapping $mapping, string $key): mixed
+    /**
+     * @param array|FieldMapping $mapping
+     *
+     * @return mixed
+     */
+    private static function getFieldMappingValue($mapping, string $key)
     {
         if ($mapping instanceof FieldMapping) {
             return $mapping->$key;

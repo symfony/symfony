@@ -144,6 +144,42 @@ class ConfigurationTest extends TestCase
     }
 
     /**
+     * @dataProvider provideImportmapPolyfillTests
+     */
+    public function testAssetMapperPolyfillValue(mixed $polyfillValue, bool $isValid, mixed $expected)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        if (!$isValid) {
+            $this->expectException(InvalidConfigurationException::class);
+            $this->expectExceptionMessage($expected);
+        }
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'asset_mapper' => null === $polyfillValue ? [] : [
+                'importmap_polyfill' => $polyfillValue,
+            ],
+        ]]);
+
+        if ($isValid) {
+            $this->assertEquals($expected, $config['asset_mapper']['importmap_polyfill']);
+        }
+    }
+
+    public static function provideImportmapPolyfillTests()
+    {
+        yield [true, false, 'Must be either an importmap name or false.'];
+        yield [null, true, 'es-module-shims'];
+        yield ['es-module-shims', true, 'es-module-shims'];
+        yield ['foo', true, 'foo'];
+        yield [false, true, false];
+    }
+
+    /**
      * @dataProvider provideValidAssetsPackageNameConfigurationTests
      */
     public function testValidAssetsPackageNameConfiguration($packageName)

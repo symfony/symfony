@@ -175,10 +175,15 @@ class CollectionTest extends TestCase
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 
-    public function testEmptyConstraintListFor()
+    /**
+     * @testWith [[]]
+     *           [null]
+     */
+    public function testEmptyConstraintListForField(?array $fieldConstraint)
     {
-        $constraint = new Collection([
-                'foo' => [],
+        $constraint = new Collection(
+            [
+                'foo' => $fieldConstraint,
             ],
             null,
             null,
@@ -193,11 +198,15 @@ class CollectionTest extends TestCase
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 
-    public function testEmptyConstraintListForFieldInOptions()
+    /**
+     * @testWith [[]]
+     *           [null]
+     */
+    public function testEmptyConstraintListForFieldInOptions(?array $fieldConstraint)
     {
         $constraint = new Collection([
             'fields' => [
-                'foo' => [],
+                'foo' => $fieldConstraint,
             ],
             'allowExtraFields' => true,
             'extraFieldsMessage' => 'foo bar baz',

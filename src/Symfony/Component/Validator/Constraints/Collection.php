@@ -94,20 +94,20 @@ class Collection extends Composite
             return false;
         }
 
-        if ([] === $options) {
-            return true;
-        }
-
         foreach ($options as $optionOrField) {
             if ($optionOrField instanceof Constraint) {
                 return true;
+            }
+
+            if (null === $optionOrField) {
+                continue;
             }
 
             if (!\is_array($optionOrField)) {
                 return false;
             }
 
-            if ([] !== $optionOrField && !($optionOrField[0] ?? null) instanceof Constraint) {
+            if ($optionOrField && !($optionOrField[0] ?? null) instanceof Constraint) {
                 return false;
             }
         }

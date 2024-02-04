@@ -84,7 +84,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public static function getInvalidValues()
+    public static function getInvalidValues(): array
     {
         return [
             ['{:INVALID]', 'Malformed unquoted YAML string at line 1 (near "{:INVALID]").', 1],

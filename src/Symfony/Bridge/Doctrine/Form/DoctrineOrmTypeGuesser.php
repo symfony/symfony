@@ -192,12 +192,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         return substr($class, $pos + Proxy::MARKER_LENGTH + 2);
     }
 
-    /**
-     * @param array|JoinColumnMapping $mapping
-     *
-     * @return mixed
-     */
-    private static function getMappingValue($mapping, string $key)
+    private static function getMappingValue(array|JoinColumnMapping $mapping, string $key): mixed
     {
         if ($mapping instanceof JoinColumnMapping) {
             return $mapping->$key;

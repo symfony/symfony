@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-03-02T13:06:58Z
+
+Hey!
+
+I think @alli83 has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-10-11T08:11:13Z
+
+Would it be possible to add support in `BinaryFileResponse` instead?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-10-11T08:41:50Z
+
+It doesn't seem to. `BinaryFileResponse` needs a "physical" file. This would mean that the temporary file would have to be physically written to disk each time, and we'd lose the whole point of this new method I guess.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-11T08:48:36Z
+
+BinaryFileResponse accepts an SplFileInfo as argument and SplTempFileObject extends SplFileInfo, so it's already possible to pass a SplTempFileObject there. Can't we make BinaryFileResponse able to deal with such instances, skipping all the features that need a physical file when this happens?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-10-11T11:18:44Z
+
+Thank you for the hint Nicolas, I tried a implementation in `BinaryFileResponse` to add support for `\SplTempFileObject`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-03T18:05:19Z
+
+@alexandre-daubois Can you rebase on current 7.1? Thank you.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-02-05T09:51:34Z
+
+Yep of course, here you go 🙂

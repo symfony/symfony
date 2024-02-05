@@ -7,6 +7,7 @@ CHANGELOG
  * Add `UploadedFile::getClientOriginalPath()`
  * Add `QueryParameterRequestMatcher`
  * Add `HeaderRequestMatcher`
+ * Add support for `\SplTempFileObject` in `BinaryFileResponse`
 
 7.0
 ---

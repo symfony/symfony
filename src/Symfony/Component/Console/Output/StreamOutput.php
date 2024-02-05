@@ -99,10 +99,7 @@ class StreamOutput extends Output
             return false;
         }
 
-        if (\DIRECTORY_SEPARATOR === '\\'
-            && \function_exists('sapi_windows_vt100_support')
-            && @sapi_windows_vt100_support($this->stream)
-        ) {
+        if ('\\' === \DIRECTORY_SEPARATOR && @sapi_windows_vt100_support($this->stream)) {
             return true;
         }
 
@@ -114,14 +111,12 @@ class StreamOutput extends Output
             return true;
         }
 
-        $term = (string) getenv('TERM');
-
-        if ('dumb' === $term) {
+        if ('dumb' === $term = (string) getenv('TERM')) {
             return false;
         }
 
         // See https://github.com/chalk/supports-color/blob/d4f413efaf8da045c5ab440ed418ef02dbb28bf1/index.js#L157
-        return 1 === @preg_match('/^((screen|xterm|vt100|vt220|putty|rxvt|ansi|cygwin|linux).*)|(.*-256(color)?(-bce)?)$/', $term);
+        return preg_match('/^((screen|xterm|vt100|vt220|putty|rxvt|ansi|cygwin|linux).*)|(.*-256(color)?(-bce)?)$/', $term);
     }
 
     /**
@@ -138,19 +133,6 @@ class StreamOutput extends Output
             return true;
         }
 
-        // Modern cross-platform function, includes the fstat fallback so if it is present we trust it
-        if (\function_exists('stream_isatty')) {
-            return stream_isatty($this->stream);
-        }
-
-        // Only trusting this if it is positive, otherwise prefer fstat fallback.
-        if (\function_exists('posix_isatty') && posix_isatty($this->stream)) {
-            return true;
-        }
-
-        $stat = @fstat($this->stream);
-
-        // Check if formatted mode is S_IFCHR
-        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
+        return @stream_isatty($this->stream);
     }
 }

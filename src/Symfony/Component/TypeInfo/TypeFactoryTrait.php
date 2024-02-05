@@ -45,11 +45,6 @@ trait TypeFactoryTrait
         return new BuiltinType($identifier);
     }
 
-    public static function foo(): BackedEnumType
-    {
-        return new BackedEnumType(\BackedEnum::class, Type::int());
-    }
-
     /**
      * @return BuiltinType<TypeIdentifier::INT>
      */

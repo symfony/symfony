@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">Detta värde är inte en giltig IP-adress.</target>
+                <target>Värdet är inte en giltig IP-adress.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">Detta värde är inte ett giltigt Internationellt Bankkontonummer (IBAN).</target>
+                <target>Värdet är inte ett giltigt internationellt bankkontonummer (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -308,11 +308,11 @@
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>Detta värde har inte den förväntade teckenkodningen {{ charset }}.</target>
+                <target>Värdet har inte den förväntade teckenkodningen {{ charset }}.</target>
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">Detta värde är inte en giltig Företagsidentifieringskod (BIC).</target>
+                <target>Värdet är inte en giltig BIC-kod.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,11 +320,11 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">Detta värde är inte en giltig UUID.</target>
+                <target>Värdet är inte en giltig UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Detta värde ska vara en multipel av {{ compared_value }}.</target>
+                <target>Värdet ska vara en multipel av {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
@@ -332,7 +332,7 @@
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>Detta värde ska vara giltig JSON.</target>
+                <target>Värdet ska vara giltig JSON.</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
@@ -340,23 +340,23 @@
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>Detta värde bör vara positivt.</target>
+                <target>Värdet ska vara positivt.</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>Detta värde bör vara antingen positivt eller noll.</target>
+                <target>Värdet ska vara antingen positivt eller noll.</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
-                <target>Detta värde bör vara negativt.</target>
+                <target>Värdet ska vara negativt.</target>
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>Detta värde bör vara antingen negativt eller noll.</target>
+                <target>Värdet ska vara antingen negativt eller noll.</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
-                <target>Detta värde är inte en giltig tidszon.</target>
+                <target>Värdet är inte en giltig tidszon.</target>
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
@@ -364,7 +364,7 @@
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>Detta värde bör ligga mellan {{ min }} och {{ max }}.</target>
+                <target>Värdet bör ligga mellan {{ min }} och {{ max }}.</target>
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
@@ -376,7 +376,7 @@
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Det här värdet skall uppfylla minst ett av följande krav:</target>
+                <target>Värdet ska uppfylla minst ett av följande krav:</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
@@ -384,19 +384,19 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>Det här värdet är inte ett giltigt "International Securities Identification Number" (ISIN).</target>
+                <target>Värdet är inte ett giltigt "International Securities Identification Number" (ISIN).</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
-                <target>Det här värdet bör vara ett giltigt uttryck.</target>
+                <target>Värdet ska vara ett giltigt uttryck.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
-                <target>Det här värdet är inte en giltig CSS-färg.</target>
+                <target>Värdet är inte en giltig CSS-färg.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target>Det här värdet är inte en giltig CIDR-notation.</target>
+                <target>Värdet är inte en giltig CIDR-notation.</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
@@ -412,7 +412,7 @@
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target>Detta värde innehåller tecken som inte är tillåtna.</target>
+                <target>Värdet innehåller tecken som inte är tillåtna.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
@@ -436,7 +436,7 @@
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">Detta värde är inte en giltig MAC-adress.</target>
+                <target>Värdet är inte en giltig MAC-adress.</target>
             </trans-unit>
         </body>
     </file>

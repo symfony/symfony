@@ -326,7 +326,7 @@ class RedisExtIntegrationTest extends TestCase
             $failing = $connection->get();
             $connection->reject($failing['id']);
 
-            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true]);
+            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true], $redis);
             $this->assertNotNull($connection->get());
         } finally {
             $redis->unlink('messenger-rejectthenget');

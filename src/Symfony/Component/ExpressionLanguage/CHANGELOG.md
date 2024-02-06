@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add support for PHP `min` and `max` functions
+ * Add `Parser::IGNORE_UNKNOWN_VARIABLES` and `Parser::IGNORE_UNKNOWN_FUNCTIONS` flags to control whether
+   parsing and linting should check for unknown variables and functions.
 
 7.0
 ---

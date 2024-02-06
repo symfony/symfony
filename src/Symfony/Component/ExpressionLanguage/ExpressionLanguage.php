@@ -61,8 +61,10 @@ class ExpressionLanguage
 
     /**
      * Parses an expression.
+     *
+     * @param int-mask-of<Parser::IGNORE_*> $flags
      */
-    public function parse(Expression|string $expression, array $names): ParsedExpression
+    public function parse(Expression|string $expression, array $names, int $flags = 0): ParsedExpression
     {
         if ($expression instanceof ParsedExpression) {
             return $expression;
@@ -78,7 +80,7 @@ class ExpressionLanguage
         $cacheItem = $this->cache->getItem(rawurlencode($expression.'//'.implode('|', $cacheKeyItems)));
 
         if (null === $parsedExpression = $cacheItem->get()) {
-            $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names);
+            $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names, $flags);
             $parsedExpression = new ParsedExpression((string) $expression, $nodes);
 
             $cacheItem->set($parsedExpression);
@@ -91,17 +93,25 @@ class ExpressionLanguage
     /**
      * Validates the syntax of an expression.
      *
-     * @param array|null $names The list of acceptable variable names in the expression, or null to accept any names
+     * @param array|null                    $names The list of acceptable variable names in the expression
+     * @param int-mask-of<Parser::IGNORE_*> $flags
      *
      * @throws SyntaxError When the passed expression is invalid
      */
-    public function lint(Expression|string $expression, ?array $names): void
+    public function lint(Expression|string $expression, ?array $names, int $flags = 0): void
     {
+        if (null === $names) {
+            trigger_deprecation('symfony/expression-language', '7.1', 'Passing "null" as the second argument of "%s()" is deprecated, pass "self::IGNORE_UNKNOWN_VARIABLES" instead as a third argument.', __METHOD__);
+
+            $flags |= Parser::IGNORE_UNKNOWN_VARIABLES;
+            $names = [];
+        }
+
         if ($expression instanceof ParsedExpression) {
             return;
         }
 
-        $this->getParser()->lint($this->getLexer()->tokenize((string) $expression), $names);
+        $this->getParser()->lint($this->getLexer()->tokenize((string) $expression), $names, $flags);
     }
 
     /**

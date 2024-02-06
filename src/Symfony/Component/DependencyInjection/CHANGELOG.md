@@ -4,6 +4,7 @@ CHANGELOG
 7.1
 ---
 
+ * Add `CheckAliasValidityPass` to check service compatibility with aliased interface
  * Add argument `$prepend` to `ContainerConfigurator::extension()` to prepend the configuration instead of appending it
  * Have `ServiceLocator` implement `ServiceCollectionInterface`
  * Add `#[Lazy]` attribute as shortcut for `#[Autowire(lazy: [bool|string])]` and `#[Autoconfigure(lazy: [bool|string])]`

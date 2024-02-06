@@ -32,6 +32,7 @@ class DumpExtensionTest extends TestCase
             'debug' => $debug,
             'cache' => false,
             'optimizations' => 0,
+            'use_yield' => true,
         ]);
         $twig->addExtension($extension);
 
@@ -72,6 +73,7 @@ class DumpExtensionTest extends TestCase
             'debug' => $debug,
             'cache' => false,
             'optimizations' => 0,
+            'use_yield' => true,
         ]);
 
         array_unshift($args, $context);
@@ -129,6 +131,7 @@ class DumpExtensionTest extends TestCase
             'debug' => true,
             'cache' => false,
             'optimizations' => 0,
+            'use_yield' => true,
         ]);
 
         $dump = $extension->dump($twig, [], 'foo');

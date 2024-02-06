@@ -61,7 +61,7 @@ class SerializerExtensionTest extends TestCase
             ])
         ;
 
-        $twig = new Environment(new ArrayLoader(['template' => $template]));
+        $twig = new Environment(new ArrayLoader(['template' => $template, 'use_yield' => true]));
         $twig->addExtension(new SerializerExtension());
         $twig->addRuntimeLoader($mockRuntimeLoader);
 

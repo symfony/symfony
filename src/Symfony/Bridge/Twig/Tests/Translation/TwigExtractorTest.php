@@ -35,6 +35,7 @@ class TwigExtractorTest extends TestCase
             'debug' => true,
             'cache' => false,
             'autoescape' => false,
+            'use_yield' => true,
         ]);
         $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
 
@@ -100,7 +101,7 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtractSyntaxError($resources, array $messages)
     {
-        $twig = new Environment($this->createMock(LoaderInterface::class));
+        $twig = new Environment($this->createMock(LoaderInterface::class), ['use_yield' => true]);
         $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
@@ -129,6 +130,7 @@ class TwigExtractorTest extends TestCase
             'debug' => true,
             'cache' => false,
             'autoescape' => false,
+            'use_yield' => true,
         ]);
         $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
 

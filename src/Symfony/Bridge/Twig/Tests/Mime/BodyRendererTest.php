@@ -83,7 +83,7 @@ HTML;
     {
         $twig = new Environment(new ArrayLoader([
             'text' => 'Text',
-        ]));
+        ]), ['use_yield' => true]);
         $renderer = new BodyRenderer($twig);
         $email = (new TemplatedEmail())
             ->to('fabien@symfony.com')
@@ -104,7 +104,7 @@ HTML;
     {
         $twig = new Environment(new ArrayLoader([
             'text' => 'Text',
-        ]));
+        ]), ['use_yield' => true]);
         $renderer = new BodyRenderer($twig);
         $email = (new TemplatedEmail())
             ->to('fabien@symfony.com')
@@ -128,7 +128,7 @@ HTML;
             'html' => $html,
             'document.txt' => 'Some text document...',
             'image.jpg' => 'Some image data',
-        ]));
+        ]), ['use_yield' => true]);
         $renderer = new BodyRenderer($twig);
         $email = (new TemplatedEmail())
             ->to('fabien@symfony.com')

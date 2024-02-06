@@ -63,7 +63,7 @@ class TemplateControllerTest extends TestCase
         $loader = new ArrayLoader();
         $loader->setTemplate($templateName, '<h1>{{param}}</h1>');
 
-        $twig = new Environment($loader);
+        $twig = new Environment($loader, ['use_yield' => true]);
         $controller = new TemplateController($twig);
 
         $this->assertEquals($expected, $controller->templateAction($templateName, null, null, null, $context)->getContent());
@@ -78,7 +78,7 @@ class TemplateControllerTest extends TestCase
         $loader = new ArrayLoader();
         $loader->setTemplate($templateName, '<h1>{{param}}</h1>');
 
-        $twig = new Environment($loader);
+        $twig = new Environment($loader, ['use_yield' => true]);
         $controller = new TemplateController($twig);
 
         $this->assertSame(201, $controller->templateAction($templateName, null, null, null, [], $statusCode)->getStatusCode());

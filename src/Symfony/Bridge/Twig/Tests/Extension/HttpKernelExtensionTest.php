@@ -75,7 +75,7 @@ class HttpKernelExtensionTest extends TestCase
 {{ fragment_uri(controller("%s::templateAction", {template: "foo.html.twig"})) }}
 TWIG
                 , TemplateController::class), ]);
-        $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
+        $twig = new Environment($loader, ['debug' => true, 'cache' => false, 'use_yield' => true]);
         $twig->addExtension(new HttpKernelExtension());
 
         $loader = $this->createMock(RuntimeLoaderInterface::class);
@@ -103,7 +103,7 @@ TWIG
     protected function renderTemplate(FragmentHandler $renderer, $template = '{{ render("foo") }}')
     {
         $loader = new ArrayLoader(['index' => $template]);
-        $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
+        $twig = new Environment($loader, ['debug' => true, 'cache' => false, 'use_yield' => true]);
         $twig->addExtension(new HttpKernelExtension());
 
         $loader = $this->createMock(RuntimeLoaderInterface::class);

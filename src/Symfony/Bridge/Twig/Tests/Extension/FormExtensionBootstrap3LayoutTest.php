@@ -39,7 +39,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTestCase
             __DIR__.'/Fixtures/templates/form',
         ]);
 
-        $environment = new Environment($loader, ['strict_variables' => true]);
+        $environment = new Environment($loader, ['strict_variables' => true, 'use_yield' => true]);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addExtension(new FormExtension());
 
@@ -80,7 +80,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTestCase
         $environment = new Environment(new FilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
-        ]), ['strict_variables' => true]);
+        ]), ['strict_variables' => true, 'use_yield' => true]);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addExtension(new FormExtension());
         $environment->setCharset('ISO-8859-1');

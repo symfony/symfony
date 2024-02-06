@@ -116,7 +116,6 @@ HTML;
         $this->assertEquals($expected, $this->render($template, $data));
     }
 
-
     public function testFormatFileIntegration()
     {
         $template = <<<'TWIG'
@@ -156,7 +155,7 @@ HTML;
     {
         $twig = new Environment(
             new ArrayLoader(['index' => $template]),
-            ['debug' => true]
+            ['debug' => true, 'use_yield' => true]
         );
         $twig->addExtension($this->getExtension());
 

@@ -32,7 +32,7 @@ class StopwatchExtensionTest extends TestCase
      */
     public function testTiming($template, $events)
     {
-        $twig = new Environment(new ArrayLoader(['template' => $template]), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);
+        $twig = new Environment(new ArrayLoader(['template' => $template]), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0, 'use_yield' => true]);
         $twig->addExtension(new StopwatchExtension($this->getStopwatch($events)));
 
         try {

@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
 use Twig\Template;
+use Twig\YieldingTemplate;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -46,12 +47,16 @@ class TwigRendererEngine extends AbstractRendererEngine
 
         $context = $this->environment->mergeGlobals($variables);
 
-        ob_start();
-
         // By contract,This method can only be called after getting the resource
         // (which is passed to the method). Getting a resource for the first time
         // (with an empty cache) is guaranteed to invoke loadResourcesFromTheme(),
         // where the property $template is initialized.
+
+        if ($this->template instanceof YieldingTemplate) {
+            return $this->template->renderBlock($blockName, $context, $this->resources[$cacheKey]);
+        }
+
+        ob_start();
 
         // We do not call renderBlock here to avoid too many nested level calls
         // (XDebug limits the level to 100 by default)

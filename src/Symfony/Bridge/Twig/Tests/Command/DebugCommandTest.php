@@ -138,7 +138,7 @@ Configured Paths
   (None)      templates%e%A
   %A
   @Twig       templates/bundles/TwigBundle%e%A
-              vendors/twig-bundle/Resources/views%e%A 
+              vendors/twig-bundle/Resources/views%e%A
  ----------- -------------------------------------%A
 
 
@@ -305,7 +305,7 @@ TXT
 
         $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $loader = new FilesystemLoader([], $projectDir);
-        $environment = new Environment($loader);
+        $environment = new Environment($loader, ['use_yield' => true]);
 
         $application = new Application();
         $application->add(new DebugCommand($environment, $projectDir, [], null, null));
@@ -337,7 +337,7 @@ TXT
             $loader = new ChainLoader([$loader]);
         }
 
-        $environment = new Environment($loader);
+        $environment = new Environment($loader, ['use_yield' => true]);
         foreach ($globals as $name => $value) {
             $environment->addGlobal($name, $value);
         }

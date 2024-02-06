@@ -40,7 +40,7 @@ class TwigErrorRendererTest extends TestCase
     {
         $exception = new NotFoundHttpException();
 
-        $twig = new Environment(new ArrayLoader([]));
+        $twig = new Environment(new ArrayLoader([]), ['use_yield' => true]);
 
         $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
         $nativeRenderer
@@ -57,7 +57,7 @@ class TwigErrorRendererTest extends TestCase
     {
         $twig = new Environment(new ArrayLoader([
             '@Twig/Exception/error404.html.twig' => '<h1>Page Not Found</h1>',
-        ]));
+        ]), ['use_yield' => true]);
         $exception = (new TwigErrorRenderer($twig))->render(new NotFoundHttpException());
 
         $this->assertSame('<h1>Page Not Found</h1>', $exception->getAsString());

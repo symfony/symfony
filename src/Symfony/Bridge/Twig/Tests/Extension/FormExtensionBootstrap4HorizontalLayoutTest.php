@@ -45,7 +45,7 @@ class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4Hori
             __DIR__.'/Fixtures/templates/form',
         ]);
 
-        $environment = new Environment($loader, ['strict_variables' => true]);
+        $environment = new Environment($loader, ['strict_variables' => true, 'use_yield' => true]);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addExtension(new FormExtension());
 

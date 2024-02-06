@@ -29,7 +29,7 @@ class FormThemeTokenParserTest extends TestCase
      */
     public function testCompile($source, $expected)
     {
-        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0, 'use_yield' => true]);
         $env->addTokenParser(new FormThemeTokenParser());
         $source = new Source($source, '');
         $stream = $env->tokenize($source);

@@ -27,7 +27,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     /** @dataProvider getDefaultDomainAssignmentTestData */
     public function testDefaultDomainAssignment(Node $node)
     {
-        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0, 'use_yield' => true]);
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag
@@ -53,7 +53,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     /** @dataProvider getDefaultDomainAssignmentTestData */
     public function testNewModuleWithoutDefaultDomainTag(Node $node)
     {
-        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0, 'use_yield' => true]);
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag

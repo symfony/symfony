@@ -30,7 +30,7 @@ class TransNodeTest extends TestCase
         $vars = new NameExpression('foo', 0);
         $node = new TransNode($body, null, null, $vars);
 
-        $env = new Environment($this->createMock(LoaderInterface::class), ['strict_variables' => true]);
+        $env = new Environment($this->createMock(LoaderInterface::class), ['strict_variables' => true, 'use_yield' => true]);
         $compiler = new Compiler($env);
 
         $this->assertEquals(

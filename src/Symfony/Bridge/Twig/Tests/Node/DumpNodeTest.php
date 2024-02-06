@@ -25,7 +25,7 @@ class DumpNodeTest extends TestCase
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment($this->createMock(LoaderInterface::class), ['use_yield' => true]);
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -49,7 +49,7 @@ EOTXT;
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment($this->createMock(LoaderInterface::class), ['use_yield' => true]);
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -76,7 +76,7 @@ EOTXT;
         ]);
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment($this->createMock(LoaderInterface::class), ['use_yield' => true]);
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -100,7 +100,7 @@ EOTXT;
         ]);
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment($this->createMock(LoaderInterface::class), ['use_yield' => true]);
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'

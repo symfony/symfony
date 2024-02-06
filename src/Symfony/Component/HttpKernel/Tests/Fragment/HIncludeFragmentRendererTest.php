@@ -76,7 +76,7 @@ class HIncludeFragmentRendererTest extends TestCase
 
     public function testRenderWithTwigAndDefaultText()
     {
-        $twig = new Environment($loader = new ArrayLoader());
+        $twig = new Environment($loader = new ArrayLoader(), ['use_yield' => true]);
         $strategy = new HIncludeFragmentRenderer($twig);
         $this->assertEquals('<hx:include src="/foo">loading...</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'loading...'])->getContent());
     }

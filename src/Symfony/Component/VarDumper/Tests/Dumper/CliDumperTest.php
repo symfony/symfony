@@ -331,7 +331,7 @@ EOTXT
         $out = fopen('php://memory', 'r+');
 
         require_once __DIR__.'/../Fixtures/Twig.php';
-        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new Environment(new FilesystemLoader()));
+        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new Environment(new FilesystemLoader(), ['use_yield' => true]));
 
         $dumper = new CliDumper();
         $dumper->setColors(false);

@@ -37,7 +37,7 @@ class TranslationExtensionTest extends TestCase
         if ($expected != $this->getTemplate($template)->render($variables)) {
             echo $template."\n";
             $loader = new TwigArrayLoader(['index' => $template]);
-            $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
+            $twig = new Environment($loader, ['debug' => true, 'cache' => false, 'use_yield' => true]);
             $twig->addExtension(new TranslationExtension(new Translator('en')));
 
             echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSourceContext('index'))))."\n\n";
@@ -217,7 +217,7 @@ class TranslationExtensionTest extends TestCase
         } else {
             $loader = new TwigArrayLoader(['index' => $template]);
         }
-        $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
+        $twig = new Environment($loader, ['debug' => true, 'cache' => false, 'use_yield' => true]);
         $twig->addExtension(new TranslationExtension($translator));
 
         return $twig->load('index');

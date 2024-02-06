@@ -26,7 +26,7 @@ class TranslationNodeVisitorTest extends TestCase
     /** @dataProvider getMessagesExtractionTestData */
     public function testMessagesExtraction(Node $node, array $expectedMessages)
     {
-        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0, 'use_yield' => true]);
         $visitor = new TranslationNodeVisitor();
         $visitor->enable();
         $visitor->enterNode($node, $env);

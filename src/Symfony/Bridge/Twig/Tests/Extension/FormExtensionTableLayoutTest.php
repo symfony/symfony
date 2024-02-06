@@ -40,7 +40,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
             __DIR__.'/Fixtures/templates/form',
         ]);
 
-        $environment = new Environment($loader, ['strict_variables' => true]);
+        $environment = new Environment($loader, ['strict_variables' => true, 'use_yield' => true]);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addGlobal('global', '');
         $environment->addExtension(new FormExtension());

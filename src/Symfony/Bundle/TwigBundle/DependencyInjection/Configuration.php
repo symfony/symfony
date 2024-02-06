@@ -137,6 +137,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->booleanNode('strict_variables')->defaultValue('%kernel.debug%')->end()
+                ->booleanNode('use_yield')->defaultFalse()->end()
                 ->scalarNode('auto_reload')->end()
                 ->integerNode('optimizations')->min(-1)->end()
                 ->scalarNode('default_path')

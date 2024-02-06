@@ -30,16 +30,18 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HttpKernelBrowser extends AbstractBrowser
 {
-    protected HttpKernelInterface $kernel;
     private bool $catchExceptions = true;
 
     /**
      * @param array $server The server parameters (equivalent of $_SERVER)
      */
-    public function __construct(HttpKernelInterface $kernel, array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
-    {
+    public function __construct(
+        protected HttpKernelInterface $kernel,
+        array $server = [],
+        ?History $history = null,
+        ?CookieJar $cookieJar = null,
+    ) {
         // These class properties must be set before calling the parent constructor, as it may depend on it.
-        $this->kernel = $kernel;
         $this->followRedirects = false;
 
         parent::__construct($server, $history, $cookieJar);

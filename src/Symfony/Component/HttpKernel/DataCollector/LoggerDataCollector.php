@@ -27,16 +27,15 @@ use Symfony\Component\VarDumper\Cloner\Data;
 class LoggerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private ?DebugLoggerInterface $logger;
-    private ?string $containerPathPrefix;
     private ?Request $currentRequest = null;
-    private ?RequestStack $requestStack;
     private ?array $processedLogs = null;
 
-    public function __construct(?object $logger = null, ?string $containerPathPrefix = null, ?RequestStack $requestStack = null)
-    {
+    public function __construct(
+        ?object $logger = null,
+        private ?string $containerPathPrefix = null,
+        private ?RequestStack $requestStack = null,
+    ) {
         $this->logger = DebugLoggerConfigurator::getDebugLogger($logger);
-        $this->containerPathPrefix = $containerPathPrefix;
-        $this->requestStack = $requestStack;
     }
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void

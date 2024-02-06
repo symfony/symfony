@@ -37,6 +37,11 @@ PropertyInfo
 
  * Deprecate `PropertyTypeExtractorInterface::getTypes()`, use `PropertyTypeExtractorInterface::getType()` instead
 
+HttpKernel
+----------
+
+ * Deprecate `Extension::addAnnotatedClassesToCompile()` and related code infrastructure
+
 SecurityBundle
 --------------
 

@@ -9,6 +9,7 @@ CHANGELOG
  * Add `$validationFailedStatusCode` argument to `#[MapQueryParameter]` that allows setting a custom HTTP status code when validation fails
  * Add `NearMissValueResolverException` to let value resolvers report when an argument could be under their watch but failed to be resolved
  * Add `$type` argument to `#[MapRequestPayload]` that allows mapping a list of items
+ * Deprecate `Extension::addAnnotatedClassesToCompile()` and related code infrastructure
 
 7.0
 ---

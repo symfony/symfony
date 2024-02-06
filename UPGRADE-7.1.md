@@ -11,6 +11,11 @@ FrameworkBundle
 
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
 
+HttpKernel
+----------
+
+ * Deprecate `Extension::addAnnotatedClassesToCompile()` and related code infrastructure
+
 Messenger
 ---------
 

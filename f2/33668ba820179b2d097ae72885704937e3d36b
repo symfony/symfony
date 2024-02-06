@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-22T15:47:07Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-06-22T15:48:12Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by n-valverde at 2023-06-24T11:30:39Z
+
+Few more thoughts for people coming here:
+* There is the `lint:container` command which could be useful, but I think does not match exactly this use case. As far as I understand it, it only checks type compatibility of arguments, so that leaves the possibility of defining a bad service from a lib developer side, and the issue will only be spotted by end user when trying to inject the badly configured service (Which is why I came here: api-platform/core:^2.7 is severely affected by this, and running `lint:container` does not spot the issue)
+* I am also thinking that adding a flag like `--all` to the `lint:container` command, to make the `CheckTypeDeclarationPass` run before removals could be a good addition, any thought on this?
+* I understand that this proposal could be a dead end, with autoload, performance concern, or whatever, so maybe that could just be added to the `lint:container` checks
+* Failing tests are due to reflection going through the `trigger_deprecation` calls, and same happens if autoload triggers, so I'm not sure there is any way to deal with that
+
+Friendly ping @nicolas-grekas since you've worked on the initial `lint:container` command 😇
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-06-24T11:41:24Z
+
+For sure this shouldn't be part of the always-on passes but if adding this to `lint:container` helps, why not.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-03T18:15:06Z
+
+@n-valverde Can you work on the change suggested by @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by n-valverde at 2024-02-04T11:38:46Z
+
+Hello, sorry for the delay, I rebased on 7.1 and made the change so the pass is only applied to `lint:container` but I have additional questions/concerns:
+
+* I have to register this pass before removals, that makes sense for me because of the situation described above, but I'm not sure if this could trigger false positives
+* Was about to update the changelog, but I am wondering if this pass should remain in the DependencyInjection component since it is only used by the `lint:container` from FrameworkBundle (but it is the same for `CheckTypeDeclarationsPass`)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-04T16:26:13Z
+
+> Hello, sorry for the delay, I rebased on 7.1 and made the change so the pass is only applied to `lint:container` but I have additional questions/concerns:
+>
+>     * I have to register this pass before removals, that makes sense for me because of the situation described above, but I'm not sure if this could trigger false positives
+>
+>     * Was about to update the changelog, but I am wondering if this pass should remain in the DependencyInjection component since it is only used by the `lint:container` from FrameworkBundle (but it is the same for `CheckTypeDeclarationsPass`)
+
+That makes sense to me as it allows developers not using the full stack framework to still use the pass.

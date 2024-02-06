@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">Privremena mapa nije konfigurirana u php.ini, ili konfigurirana mapa ne postoji.</target>
+                <target>Privremena mapa nije konfigurirana u php.ini-u, ili konfigurirana mapa ne postoji.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>

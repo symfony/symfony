@@ -26,11 +26,14 @@ class Parser
     public const OPERATOR_LEFT = 1;
     public const OPERATOR_RIGHT = 2;
 
+    public const IGNORE_UNKNOWN_VARIABLES = 1;
+    public const IGNORE_UNKNOWN_FUNCTIONS = 2;
+
     private TokenStream $stream;
     private array $unaryOperators;
     private array $binaryOperators;
-    private ?array $names;
-    private bool $lint = false;
+    private array $names;
+    private int $flags = 0;
 
     public function __construct(
         private array $functions,
@@ -87,34 +90,45 @@ class Parser
      * variable 'container' can be used in the expression
      * but the compiled code will use 'this'.
      *
+     * @param int-mask-of<Parser::IGNORE_*> $flags
+     *
      * @throws SyntaxError
      */
-    public function parse(TokenStream $stream, array $names = []): Node\Node
+    public function parse(TokenStream $stream, array $names = [], int $flags = 0): Node\Node
     {
-        $this->lint = false;
-
-        return $this->doParse($stream, $names);
+        return $this->doParse($stream, $names, $flags);
     }
 
     /**
      * Validates the syntax of an expression.
      *
      * The syntax of the passed expression will be checked, but not parsed.
-     * If you want to skip checking dynamic variable names, pass `null` instead of the array.
+     * If you want to skip checking dynamic variable names, pass `Parser::IGNORE_UNKNOWN_VARIABLES` instead of the array.
+     *
+     * @param int-mask-of<Parser::IGNORE_*> $flags
      *
      * @throws SyntaxError When the passed expression is invalid
      */
-    public function lint(TokenStream $stream, ?array $names = []): void
+    public function lint(TokenStream $stream, ?array $names = [], int $flags = 0): void
     {
-        $this->lint = true;
-        $this->doParse($stream, $names);
+        if (null === $names) {
+            trigger_deprecation('symfony/expression-language', '7.1', 'Passing "null" as the second argument of "%s()" is deprecated, pass "self::IGNORE_UNKNOWN_VARIABLES" instead as a third argument.', __METHOD__);
+
+            $flags |= self::IGNORE_UNKNOWN_VARIABLES;
+            $names = [];
+        }
+
+        $this->doParse($stream, $names, $flags);
     }
 
     /**
+     * @param int-mask-of<Parser::IGNORE_*> $flags
+     *
      * @throws SyntaxError
      */
-    private function doParse(TokenStream $stream, ?array $names = []): Node\Node
+    private function doParse(TokenStream $stream, array $names, int $flags): Node\Node
     {
+        $this->flags = $flags;
         $this->stream = $stream;
         $this->names = $names;
 
@@ -224,13 +238,13 @@ class Parser
 
                     default:
                         if ('(' === $this->stream->current->value) {
-                            if (false === isset($this->functions[$token->value])) {
+                            if (!($this->flags & self::IGNORE_UNKNOWN_FUNCTIONS) && false === isset($this->functions[$token->value])) {
                                 throw new SyntaxError(sprintf('The function "%s" does not exist.', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, array_keys($this->functions));
                             }
 
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
-                            if (!$this->lint || \is_array($this->names)) {
+                            if (!($this->flags & self::IGNORE_UNKNOWN_VARIABLES)) {
                                 if (!\in_array($token->value, $this->names, true)) {
                                     throw new SyntaxError(sprintf('Variable "%s" is not valid.', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, $this->names);
                                 }

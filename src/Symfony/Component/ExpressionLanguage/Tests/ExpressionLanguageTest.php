@@ -461,7 +461,7 @@ class ExpressionLanguageTest extends TestCase
     public function testLintDoesntThrowOnValidExpression()
     {
         $el = new ExpressionLanguage();
-        $el->lint('1 + 1', null);
+        $el->lint('1 + 1', []);
 
         $this->expectNotToPerformAssertions();
     }

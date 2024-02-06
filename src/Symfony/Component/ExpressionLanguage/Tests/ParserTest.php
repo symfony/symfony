@@ -295,7 +295,7 @@ class ParserTest extends TestCase
     /**
      * @dataProvider getLintData
      */
-    public function testLint($expression, $names, ?string $exception = null)
+    public function testLint($expression, $names, int $checks = 0, ?string $exception = null)
     {
         if ($exception) {
             $this->expectException(SyntaxError::class);
@@ -304,7 +304,7 @@ class ParserTest extends TestCase
 
         $lexer = new Lexer();
         $parser = new Parser([]);
-        $parser->lint($lexer->tokenize($expression), $names);
+        $parser->lint($lexer->tokenize($expression), $names, $checks);
 
         // Parser does't return anything when the correct expression is passed
         $this->expectNotToPerformAssertions();
@@ -321,9 +321,20 @@ class ParserTest extends TestCase
                 'expression' => 'foo["some_key"]?.callFunction(a ? b)',
                 'names' => ['foo', 'a', 'b'],
             ],
-            'allow expression without names' => [
+            'allow expression with unknown names' => [
                 'expression' => 'foo.bar',
-                'names' => null,
+                'names' => [],
+                'checks' => Parser::IGNORE_UNKNOWN_VARIABLES,
+            ],
+            'allow expression with unknown functions' => [
+                'expression' => 'foo()',
+                'names' => [],
+                'checks' => Parser::IGNORE_UNKNOWN_FUNCTIONS,
+            ],
+            'allow expression with unknown functions and names' => [
+                'expression' => 'foo(bar)',
+                'names' => [],
+                'checks' => Parser::IGNORE_UNKNOWN_FUNCTIONS | Parser::IGNORE_UNKNOWN_VARIABLES,
             ],
             'array with trailing comma' => [
                 'expression' => '[value1, value2, value3,]',
@@ -333,10 +344,17 @@ class ParserTest extends TestCase
                 'expression' => '{val1: value1, val2: value2, val3: value3,}',
                 'names' => ['value1', 'value2', 'value3'],
             ],
-            'disallow expression without names' => [
+            'disallow expression with unknown names by default' => [
                 'expression' => 'foo.bar',
                 'names' => [],
+                'checks' => 0,
                 'exception' => 'Variable "foo" is not valid around position 1 for expression `foo.bar',
+            ],
+            'disallow expression with unknown functions by default' => [
+                'expression' => 'foo()',
+                'names' => [],
+                'checks' => 0,
+                'exception' => 'The function "foo" does not exist around position 1 for expression `foo()',
             ],
             'operator collisions' => [
                 'expression' => 'foo.not in [bar]',
@@ -345,18 +363,21 @@ class ParserTest extends TestCase
             'incorrect expression ending' => [
                 'expression' => 'foo["a"] foo["b"]',
                 'names' => ['foo'],
+                'checks' => 0,
                 'exception' => 'Unexpected token "name" of value "foo" '.
                     'around position 10 for expression `foo["a"] foo["b"]`.',
             ],
             'incorrect operator' => [
                 'expression' => 'foo["some_key"] // 2',
                 'names' => ['foo'],
+                'checks' => 0,
                 'exception' => 'Unexpected token "operator" of value "/" '.
                     'around position 18 for expression `foo["some_key"] // 2`.',
             ],
             'incorrect array' => [
                 'expression' => '[value1, value2 value3]',
                 'names' => ['value1', 'value2', 'value3'],
+                'checks' => 0,
                 'exception' => 'An array element must be followed by a comma. '.
                     'Unexpected token "name" of value "value3" ("punctuation" expected with value ",") '.
                     'around position 17 for expression `[value1, value2 value3]`.',
@@ -364,26 +385,31 @@ class ParserTest extends TestCase
             'incorrect array element' => [
                 'expression' => 'foo["some_key")',
                 'names' => ['foo'],
+                'checks' => 0,
                 'exception' => 'Unclosed "[" around position 3 for expression `foo["some_key")`.',
             ],
             'incorrect hash key' => [
                 'expression' => '{+: value1}',
                 'names' => ['value1'],
+                'checks' => 0,
                 'exception' => 'A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token "operator" of value "+" around position 2 for expression `{+: value1}`.',
             ],
             'missed array key' => [
                 'expression' => 'foo[]',
                 'names' => ['foo'],
+                'checks' => 0,
                 'exception' => 'Unexpected token "punctuation" of value "]" around position 5 for expression `foo[]`.',
             ],
             'missed closing bracket in sub expression' => [
                 'expression' => 'foo[(bar ? bar : "default"]',
                 'names' => ['foo', 'bar'],
+                'checks' => 0,
                 'exception' => 'Unclosed "(" around position 4 for expression `foo[(bar ? bar : "default"]`.',
             ],
             'incorrect hash following' => [
                 'expression' => '{key: foo key2: bar}',
                 'names' => ['foo', 'bar'],
+                'checks' => 0,
                 'exception' => 'A hash value must be followed by a comma. '.
                     'Unexpected token "name" of value "key2" ("punctuation" expected with value ",") '.
                     'around position 11 for expression `{key: foo key2: bar}`.',
@@ -391,11 +417,13 @@ class ParserTest extends TestCase
             'incorrect hash assign' => [
                 'expression' => '{key => foo}',
                 'names' => ['foo'],
+                'checks' => 0,
                 'exception' => 'Unexpected character "=" around position 5 for expression `{key => foo}`.',
             ],
             'incorrect array as hash using' => [
                 'expression' => '[foo: foo]',
                 'names' => ['foo'],
+                'checks' => 0,
                 'exception' => 'An array element must be followed by a comma. '.
                     'Unexpected token "punctuation" of value ":" ("punctuation" expected with value ",") '.
                     'around position 5 for expression `[foo: foo]`.',

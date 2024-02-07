@@ -17,6 +17,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\VarExporter\VarExporter;
 
 Builder::cleanTarget();
+Builder::buildEmojiList();
 $emojisCodePoints = Builder::getEmojisCodePoints();
 Builder::saveRules(Builder::buildRules($emojisCodePoints));
 Builder::saveRules(Builder::buildStripRules($emojisCodePoints));
@@ -27,7 +28,16 @@ final class Builder
 {
     private const TARGET_DIR = __DIR__.'/../data/';
 
-    public static function getEmojisCodePoints(): array
+    /**
+     * Fetches the emojis from the latest `emoji-test.txt` file.
+     *
+     * Per default:
+     *  - all emojis are included (including 'minimally-qualified' and 'unqualified' ones)
+     *  - every emoji containing a 'Zero Width Joiner' is also included without.
+     *
+     * When $rgiStrict is set to true, only the "Recommended for General Interchange" emojis are included.
+     */
+    public static function getEmojisCodePoints(bool $rgiStrict = false): array
     {
         $lines = file(__DIR__.'/vendor/emoji-test.txt');
 
@@ -39,13 +49,20 @@ final class Builder
             }
 
             // 263A FE0F    ; fully-qualified     # ☺️ E0.6 smiling face
-            preg_match('{^(?<codePoints>[\w ]+) +; [\w-]+ +# (?<emoji>.+) E\d+\.\d+ ?(?<name>.+)$}Uu', $line, $matches);
+            preg_match('{^(?<codePoints>[\w ]+) +; (?<status>[\w-]+) +# (?<emoji>.+) E\d+\.\d+ ?(?<name>.+)$}Uu', $line, $matches);
             if (!$matches) {
-                throw new \DomainException("Could not parse line: \"$line\".");
+                throw new DomainException("Could not parse line: \"$line\".");
+            }
+            if ($rgiStrict && 'fully-qualified' !== $matches['status']) {
+                continue;
             }
 
             $codePoints = strtolower(trim($matches['codePoints']));
             $emojisCodePoints[$codePoints] = $matches['emoji'];
+            if ($rgiStrict) {
+                continue;
+            }
+
             // We also add a version without the "Zero Width Joiner"
             $codePoints = str_replace('200d ', '', $codePoints);
             $emojisCodePoints[$codePoints] = $matches['emoji'];
@@ -209,6 +226,12 @@ final class Builder
         $fs = new Filesystem();
         $fs->remove(self::TARGET_DIR);
         $fs->mkdir(self::TARGET_DIR);
+    }
+
+    public static function buildEmojiList(): void
+    {
+        $emojis = array_values(self::getEmojisCodePoints(true,));
+        file_put_contents(self::TARGET_DIR."/emojis.php", "<?php\n\nreturn ".VarExporter::export($emojis).";\n");
     }
 
     public static function saveRules(iterable $rulesByLocale): void

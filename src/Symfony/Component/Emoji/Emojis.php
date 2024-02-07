@@ -24,30 +24,18 @@ final class Emojis
      */
     public static function exists(string $emoji): bool
     {
-        foreach (self::getEmojis() as $value) {
-            if ($emoji === $value) {
-                return true;
-            }
-        }
-
-        return false;
+        return \in_array($emoji, self::getEmojis(), true);
     }
 
     /**
      * Returns all available emojis.
      *
-     * @return iterable<string>
+     * @return array<string>
      */
-    public static function getEmojis(): iterable
+    public static function getEmojis(): array
     {
-        $dataFile = __DIR__.'/Resources/data/emoji-en.php';
-        if (!is_file($dataFile) && !is_file($dataFile.'.gz')) {
-            throw new \RuntimeException(sprintf('The emoji data file "%s" does not exist.', $dataFile));
-        }
+        $dataFile = __DIR__.'/Resources/data/emojis.php';
 
-        $emojis = is_file($dataFile) ? require $dataFile : GzipStreamWrapper::require($dataFile.'.gz');
-        foreach ($emojis as $emoji => $name) {
-            yield $emoji;
-        }
+        return is_file($dataFile) ? require $dataFile : GzipStreamWrapper::require($dataFile.'.gz');
     }
 }

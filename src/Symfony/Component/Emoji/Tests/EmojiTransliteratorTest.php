@@ -98,6 +98,7 @@ class EmojiTransliteratorTest extends TestCase
             ->in(__DIR__.'/../Resources/data')
             ->name('*.php')
             ->notName('emoji-strip.php')
+            ->notName('emojis.php')
             ->files()
         ;
 

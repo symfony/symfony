@@ -576,6 +576,7 @@ EOTXT
         ]);
 
         $dumper = new CliDumper();
+        $dumper->setColors(false);
         $dump = $dumper->dump($data, true);
 
         $this->assertSame(

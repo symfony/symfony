@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Emoji;
 
+use Symfony\Component\Emoji\Util\GzipStreamWrapper;
+
 /**
  * @author Simon André <smn.andre@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -34,15 +36,17 @@ final class Emojis
     /**
      * Returns all available emojis.
      *
-     * @return list<string>
+     * @return iterable<string>
      */
     public static function getEmojis(): iterable
     {
-        if (!is_file($dataFile = __DIR__.'/Resources/data/emoji-en.php')) {
+        $dataFile = __DIR__.'/Resources/data/emoji-en.php';
+        if (!is_file($dataFile) && !is_file($dataFile.'.gz')) {
             throw new \RuntimeException(sprintf('The emoji data file "%s" does not exist.', $dataFile));
         }
 
-        foreach (include $dataFile as $emoji => $name) {
+        $emojis = is_file($dataFile) ? require $dataFile : GzipStreamWrapper::require($dataFile.'.gz');
+        foreach ($emojis as $emoji => $name) {
             yield $emoji;
         }
     }

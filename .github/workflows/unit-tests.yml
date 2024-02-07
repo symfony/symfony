@@ -131,6 +131,7 @@ jobs:
       - name: Install dependencies
         run: |
           echo "::group::composer update"
+          php .github/twig-requirement.php
           $COMPOSER_UP
           echo "::endgroup::"
 

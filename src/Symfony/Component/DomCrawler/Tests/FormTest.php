@@ -432,6 +432,9 @@ class FormTest extends TestCase
         $form = $this->createForm('<form><template><input type="text" name="foo" value="foo" /></template><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include template fields');
         $this->assertFalse($form->has('foo'));
+
+        $form = $this->createForm('<turbo-stream><template><form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><select multiple="multiple" name="baz[]"></select><input type="submit" /></form></template></turbo-stream>');
+        $this->assertEquals(['foo[bar]' => 'foo', 'bar' => 'bar', 'baz' => []], $form->getValues(), '->getValues() returns all form field values from template field inside a turbo-stream');
     }
 
     public function testSetValues()
@@ -486,6 +489,9 @@ class FormTest extends TestCase
         $form = $this->createForm('<form method="post"><template><input type="file" name="foo"/></template><input type="text" name="bar" value="bar"/><input type="submit"/></form>');
         $this->assertEquals([], $form->getFiles(), '->getFiles() does not include template file fields');
         $this->assertFalse($form->has('foo'));
+
+        $form = $this->createForm('<turbo-stream><template><form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form></template></turbo-stream>');
+        $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() return files fields from template inside turbo-stream');
     }
 
     public function testGetPhpFiles()

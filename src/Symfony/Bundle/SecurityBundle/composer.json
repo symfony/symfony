@@ -51,7 +51,7 @@
         "symfony/twig-bridge": "^4.4|^5.0|^6.0",
         "symfony/validator": "^4.4|^5.0|^6.0",
         "symfony/yaml": "^4.4|^5.0|^6.0",
-        "twig/twig": "^2.13|^3.0.4"
+        "twig/twig": "^2.13|~3.8.0"
     },
     "conflict": {
         "symfony/browser-kit": "<4.4",

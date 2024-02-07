@@ -1291,12 +1291,10 @@ class Process implements \IteratorAggregate
         $this->processInformation = proc_get_status($this->process);
 
 	    /*
-	     * On PHP 8.2 and lower, when calling "proc_get_status" multiple times,
-	     * the only real status code is the first one. The process starts with "-1".
-         * We essentially mimick PHP 8.3 proc_get_status behavior on lower versions
-         * by caching the exit status code when the process returns it, before the
-         * process is discarded.
-	     */
+         * In PHP < 8.3, "proc_get_status" only returns the correct exit status on the first call. 
+         * Subsequent calls return -1 as the process is discarded. This workaround caches the first 
+         * retrieved exit status for consistent results in later calls, mimicking PHP 8.3 behavior.
+         */
         if (version_compare(PHP_VERSION, '8.3.0', '<')) {
             static $cachedExitCode = null;
         

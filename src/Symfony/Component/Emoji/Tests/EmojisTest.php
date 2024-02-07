@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Emoji\Tests;
 
-use Symfony\Bundle\TwigBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Emoji\Emojis;
 
 class EmojisTest extends TestCase

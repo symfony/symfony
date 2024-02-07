@@ -19,7 +19,7 @@
         "php": ">=7.2.5",
         "symfony/polyfill-php80": "^1.16",
         "symfony/translation-contracts": "^1.1|^2|^3",
-        "twig/twig": "^2.13|^3.0.4"
+        "twig/twig": "^2.13|~3.8.0"
     },
     "require-dev": {
         "doctrine/annotations": "^1.12|^2",

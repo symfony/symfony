@@ -1292,9 +1292,9 @@ class Process implements \IteratorAggregate
 
         $running = $this->processInformation['running'];
 
-         // In PHP < 8.3, "proc_get_status" only returns the correct exit status on the first call. 
-         // Subsequent calls return -1 as the process is discarded. This workaround caches the first 
-         // retrieved exit status for consistent results in later calls, mimicking PHP 8.3 behavior.
+        // In PHP < 8.3, "proc_get_status" only returns the correct exit status on the first call. 
+        // Subsequent calls return -1 as the process is discarded. This workaround caches the first 
+        // retrieved exit status for consistent results in later calls, mimicking PHP 8.3 behavior.
         if (version_compare(\PHP_VERSION, '8.3.0', '<')) {
             static $cachedExitCode = null;
 

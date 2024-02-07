@@ -263,7 +263,11 @@ class ArgvInput extends Input
         }
     }
 
+<<<<<<< HEAD
     public function getFirstArgument(): ?string
+=======
+    public function getFirstArgument()
+>>>>>>> e3850ce5d2 ([Console] Applied coding standards suggested by fabbot.io)
     {
         $isOption = false;
         foreach ($this->tokens as $i => $token) {
@@ -295,7 +299,11 @@ class ArgvInput extends Input
         return null;
     }
 
+<<<<<<< HEAD
     public function hasParameterOption(string|array $values, bool $onlyParams = false): bool
+=======
+    public function hasParameterOption($values, bool $onlyParams = false)
+>>>>>>> e3850ce5d2 ([Console] Applied coding standards suggested by fabbot.io)
     {
         $values = (array) $values;
 
@@ -317,7 +325,11 @@ class ArgvInput extends Input
         return false;
     }
 
+<<<<<<< HEAD
     public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed
+=======
+    public function getParameterOption($values, $default = false, bool $onlyParams = false)
+>>>>>>> e3850ce5d2 ([Console] Applied coding standards suggested by fabbot.io)
     {
         $values = (array) $values;
         $tokens = $this->tokens;

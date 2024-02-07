@@ -182,6 +182,7 @@ class Connection
     public function getMessageCount(): int
     {
         try {
+            $this->client->useTube($this->tube);
             $tubeStats = $this->client->statsTube($this->tube);
         } catch (Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);

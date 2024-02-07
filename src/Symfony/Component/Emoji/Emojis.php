@@ -34,11 +34,11 @@ final class Emojis
     /**
      * Returns all available emojis.
      *
-    * @return list<string>
+     * @return list<string>
      */
     public static function getEmojis(): iterable
     {
-        if (!is_file($dataFile = __DIR__ . '/Resources/data/emoji-en.php')) {
+        if (!is_file($dataFile = __DIR__.'/Resources/data/emoji-en.php')) {
             throw new \RuntimeException(sprintf('The emoji data file "%s" does not exist.', $dataFile));
         }
 

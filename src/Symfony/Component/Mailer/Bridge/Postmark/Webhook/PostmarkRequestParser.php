@@ -48,8 +48,6 @@ final class PostmarkRequestParser extends AbstractRequestParser
             !isset($payload['RecordType'])
             || !isset($payload['MessageID'])
             || !(isset($payload['Recipient']) || isset($payload['Email']))
-            || !isset($payload['Metadata'])
-            || !isset($payload['Tag'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }

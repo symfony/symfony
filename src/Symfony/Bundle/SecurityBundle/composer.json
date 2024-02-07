@@ -50,7 +50,7 @@
         "symfony/twig-bridge": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
         "symfony/yaml": "^6.4|^7.0",
-        "twig/twig": "^3.0.4|^4.0",
+        "twig/twig": "~3.8.0",
         "web-token/jwt-checker": "^3.1",
         "web-token/jwt-signature-algorithm-hmac": "^3.1",
         "web-token/jwt-signature-algorithm-ecdsa": "^3.1",

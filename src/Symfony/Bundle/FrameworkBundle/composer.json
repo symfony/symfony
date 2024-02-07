@@ -72,7 +72,7 @@
         "symfony/uid": "^6.4|^7.0",
         "symfony/web-link": "^6.4|^7.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
-        "twig/twig": "^3.0.4|^4.0"
+        "twig/twig": "~3.8.0"
     },
     "conflict": {
         "doctrine/persistence": "<1.3",

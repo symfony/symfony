@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-11T20:48:18Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-12T16:52:01Z
+
+Hey!
+
+I think @deguif has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by maryo at 2024-01-20T14:49:46Z
+
+Hello. Is someting preventing this to be merged? Is it the minor code review comment? I could change it by creating another fork but in my opinion both versions are fine.
+
+---------------------------------------------------------------------------
+
+by thomasbeaujean at 2024-02-02T14:46:39Z
+
+Hi, @maxbeckers, this PR has been opened for long time, could tell me if this is ok for you ?

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Jose\Component\Core\Algorithm;
+use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\Algorithm\ES384;
@@ -87,6 +88,12 @@ return static function (ContainerConfigurator $container) {
             ->factory([SignatureAlgorithmFactory::class, 'create'])
             ->args([
                 abstract_arg('signature algorithm'),
+            ])
+
+        ->set('security.access_token_handler.oidc.algorithm_manager', AlgorithmManager::class)
+            ->abstract()
+            ->args([
+                abstract_arg('signature algorithms'),
             ])
 
         ->set('security.access_token_handler.oidc.signature.ES256', ES256::class)

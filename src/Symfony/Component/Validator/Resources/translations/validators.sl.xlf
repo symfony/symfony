@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">Ta vrednost ni veljaven IP naslov.</target>
+                <target>Ta vrednost ni veljaven IP naslov.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">V php.ini ni bila nastavljena začasna mapa, ali nastavljena mapa ne obstaja.</target>
+                <target>V php.ini ni bila nastavljena začasna mapa, ali pa nastavljena mapa ne obstaja.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">Ta vrednost ni veljavna Mednarodna številka bančnega računa (IBAN).</target>
+                <target>Ta vrednost ni veljavna mednarodna številka bančnega računa (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">Ta vrednost ni veljavna Poslovna identifikacijska koda (BIC).</target>
+                <target>Ta vrednost ni veljavna poslovna identifikacijska koda (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">Ta vrednost ni veljaven UUID.</target>
+                <target>Ta vrednost ni veljaven UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -436,7 +436,7 @@
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">Ta vrednost ni veljaven MAC naslov.</target>
+                <target>Ta vrednost ni veljaven MAC naslov.</target>
             </trans-unit>
         </body>
     </file>

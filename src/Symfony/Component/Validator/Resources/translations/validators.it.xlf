@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">Questo valore non è un indirizzo IP valido.</target>
+                <target>Questo valore non è un indirizzo IP valido.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">Nessuna cartella temporanea è stata configurata in php.ini, o la cartella configurata non esiste.</target>
+                <target>Non è stata configurata una cartella temporanea in php.ini, o la cartella configurata non esiste.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">Questo valore non è un Numero di Conto Bancario Internazionale (IBAN) valido.</target>
+                <target>Questo valore non è un IBAN valido.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">Questo valore non è un Codice Identificativo di Business (BIC) valido.</target>
+                <target>Questo valore non è un codice identificativo bancario (BIC) valido.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">Questo valore non è un UUID valido.</target>
+                <target>Questo valore non è un UUID valido.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>

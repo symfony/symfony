@@ -52,7 +52,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(UnexpectedValueException::class);
 
-        $this->validator->validate([123456], new Cidr());
+        $this->validator->validate(123456, new Cidr());
     }
 
     /**

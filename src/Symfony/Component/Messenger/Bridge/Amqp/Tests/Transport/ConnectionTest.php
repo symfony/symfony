@@ -185,6 +185,12 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
+            'delay' => [
+                'arguments' => [
+                    'x-queue-type' => 'classic',
+                    'x-message-deduplication' => true,
+                ],
+            ],
             'exchange' => [
                 'arguments' => [
                     'alternate-exchange' => 'alternate',

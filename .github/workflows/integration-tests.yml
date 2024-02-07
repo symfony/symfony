@@ -130,6 +130,14 @@ jobs:
           sudo service redis-server restart
           echo "::endgroup::"
 
+      - name: Install pgbouncer
+        run: |
+          sudo apt-get install -y pgbouncer
+          sudo cp src/Symfony/Component/Messenger/Bridge/Doctrine/Tests/Fixtures/pgbouncer/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini
+          sudo cp src/Symfony/Component/Messenger/Bridge/Doctrine/Tests/Fixtures/pgbouncer/userlist.txt /etc/pgbouncer/userlist.txt
+          sudo service pgbouncer restart
+          sudo su - postgres -c "PGPASSWORD=password psql -Atq -h localhost -p 5432 -U postgres -d postgres -c \"SELECT usename, passwd FROM pg_shadow\""
+
       - name: Configure Couchbase
         run: |
           curl -s -u 'username=Administrator&password=111111' -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex%2Cfts'
@@ -186,6 +194,7 @@ jobs:
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:4566/messages.fifo?sslmode=disable&poll_timeout=0.01"
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
+          PGBOUNCER_HOST: localhost:6432
 
       #- name: Run HTTP push tests
       #  if: matrix.php == '8.1'

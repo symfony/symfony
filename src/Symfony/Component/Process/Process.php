@@ -1299,11 +1299,11 @@ class Process implements \IteratorAggregate
          */
         if (version_compare(\PHP_VERSION, '8.3.0', '<')) {
             static $cachedExitCode = null;
-        
+
             if (null === $cachedExitCode && !$running && $this->processInformation['exitcode'] !== -1) {
                 $cachedExitCode = $this->processInformation['exitcode'];
             }
-        
+
             if (null !== $cachedExitCode && !$running && $this->processInformation['exitcode'] === -1) {
                 $this->processInformation['exitcode'] = $cachedExitCode;
             }

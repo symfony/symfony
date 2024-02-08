@@ -13,7 +13,6 @@ namespace Symfony\Component\Yaml\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -27,7 +26,7 @@ use Symfony\Component\Yaml\Command\LintCommand;
  */
 class LintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testLintCorrectFile()
     {
@@ -68,11 +67,6 @@ bar';
 
     public function testLintIncorrectFileWithGithubFormat()
     {
-        if (!class_exists(GithubActionReporter::class)) {
-            $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage('The "github" format is only available since "symfony/console" >= 5.3.');
-        }
-
         $incorrectContent = <<<YAML
 foo:
 bar
@@ -82,20 +76,12 @@ YAML;
 
         $tester->execute(['filename' => $filename, '--format' => 'github'], ['decorated' => false]);
 
-        if (!class_exists(GithubActionReporter::class)) {
-            return;
-        }
-
         self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
         self::assertStringMatchesFormat('%A::error file=%s,line=2,col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
     }
 
     public function testLintAutodetectsGithubActionEnvironment()
     {
-        if (!class_exists(GithubActionReporter::class)) {
-            $this->markTestSkipped('The "github" format is only available since "symfony/console" >= 5.3.');
-        }
-
         $prev = getenv('GITHUB_ACTIONS');
         putenv('GITHUB_ACTIONS');
 
@@ -157,10 +143,11 @@ YAML;
 
     public function testLintFileNotReadable()
     {
-        $this->expectException(\RuntimeException::class);
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
         unlink($filename);
+
+        $this->expectException(\RuntimeException::class);
 
         $tester->execute(['filename' => $filename], ['decorated' => false]);
     }
@@ -170,10 +157,6 @@ YAML;
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $tester = new CommandCompletionTester($this->createCommand());
 
         $this->assertSame($expectedSuggestions, $tester->complete($input));

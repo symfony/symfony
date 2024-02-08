@@ -180,12 +180,9 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['Etc/UTC', \DateTimeZone::EUROPE];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidGroupedTimezoneNamed()
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Timezone(zone: \DateTimeZone::AMERICA, message: "myMessage");');
+        $constraint = new Timezone(zone: \DateTimeZone::AMERICA, message: 'myMessage');
 
         $this->validator->validate('Europe/Berlin', $constraint);
 

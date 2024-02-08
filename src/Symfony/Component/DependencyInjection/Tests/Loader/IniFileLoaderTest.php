@@ -19,8 +19,8 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 
 class IniFileLoaderTest extends TestCase
 {
-    protected $container;
-    protected $loader;
+    protected ContainerBuilder $container;
+    protected IniFileLoader $loader;
 
     protected function setUp(): void
     {
@@ -71,23 +71,25 @@ class IniFileLoaderTest extends TestCase
             ['none', false, true],
             ['null', null, true],
             ['constant', \PHP_VERSION, true],
-            ['12', 12, true],
+            ['12_int', 12, true],
             ['12_string', '12', true],
             ['12_quoted_number', 12, false], // INI_SCANNER_RAW removes the double quotes
             ['12_comment', 12, true],
             ['12_string_comment', '12', true],
             ['12_quoted_number_comment', 12, false], // INI_SCANNER_RAW removes the double quotes
-            ['-12', -12, true],
-            ['1', 1, true],
-            ['0', 0, true],
-            ['0b0110', bindec('0b0110'), false], // not supported by INI_SCANNER_TYPED
-            ['11112222333344445555', '1111,2222,3333,4444,5555', true],
-            ['0777', 0777, false], // not supported by INI_SCANNER_TYPED
-            ['255', 0xFF, false], // not supported by INI_SCANNER_TYPED
-            ['100.0', 1e2, false], // not supported by INI_SCANNER_TYPED
-            ['-120.0', -1.2E2, false], // not supported by INI_SCANNER_TYPED
-            ['-10100.1', -10100.1, false], // not supported by INI_SCANNER_TYPED
-            ['-10,100.1', '-10,100.1', true],
+            ['-12_negative', -12, true],
+            ['one', 1, true],
+            ['zero', 0, true],
+            ['0b0110_byte_string', bindec('0b0110'), false], // not supported by INI_SCANNER_TYPED
+            ['11112222333344445555_great_number', '1111,2222,3333,4444,5555', true],
+            ['0777_number_starting_with_0', 0777, false], // not supported by INI_SCANNER_TYPED
+            ['255_hexadecimal', 0xFF, false], // not supported by INI_SCANNER_TYPED
+            ['100.0_exponential', 1e2, false], // not supported by INI_SCANNER_TYPED
+            ['-120.0_exponential', -1.2E2, false], // not supported by INI_SCANNER_TYPED
+            ['-10100.1_negative_float', -10100.1, false], // not supported by INI_SCANNER_TYPED
+            ['-10,100.1_negative_float', '-10,100.1', true],
+            ['list', [1, 2], true],
+            ['map', ['one' => 1, 'two' => 2], true],
         ];
     }
 

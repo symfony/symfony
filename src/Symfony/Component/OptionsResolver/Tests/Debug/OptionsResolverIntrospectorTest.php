@@ -215,32 +215,6 @@ class OptionsResolverIntrospectorTest extends TestCase
         $debug->getNormalizers('foo');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetDeprecationMessage()
-    {
-        $resolver = new OptionsResolver();
-        $resolver->setDefined('foo');
-        $resolver->setDeprecated('foo', 'The option "foo" is deprecated.');
-
-        $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('The option "foo" is deprecated.', $debug->getDeprecationMessage('foo'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetClosureDeprecationMessage()
-    {
-        $resolver = new OptionsResolver();
-        $resolver->setDefined('foo');
-        $resolver->setDeprecated('foo', $closure = function (Options $options, $value) {});
-
-        $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame($closure, $debug->getDeprecationMessage('foo'));
-    }
-
     public function testGetDeprecation()
     {
         $resolver = new OptionsResolver();

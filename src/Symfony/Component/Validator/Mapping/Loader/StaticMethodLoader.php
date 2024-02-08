@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class StaticMethodLoader implements LoaderInterface
 {
-    protected $methodName;
+    protected string $methodName;
 
     /**
      * Creates a new loader.
@@ -33,10 +33,7 @@ class StaticMethodLoader implements LoaderInterface
         $this->methodName = $methodName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         /** @var \ReflectionClass $reflClass */
         $reflClass = $metadata->getReflectionClass();

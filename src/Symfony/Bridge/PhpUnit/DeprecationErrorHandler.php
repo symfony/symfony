@@ -142,6 +142,9 @@ class DeprecationErrorHandler
         if ($deprecation->isMuted()) {
             return null;
         }
+        if ($this->getConfiguration()->isIgnoredDeprecation($deprecation)) {
+            return null;
+        }
         if ($this->getConfiguration()->isBaselineDeprecation($deprecation)) {
             return null;
         }
@@ -275,13 +278,7 @@ class DeprecationErrorHandler
         return $this->configuration = Configuration::fromUrlEncodedString((string) $mode);
     }
 
-    /**
-     * @param string $str
-     * @param bool   $red
-     *
-     * @return string
-     */
-    private static function colorize($str, $red)
+    private static function colorize(string $str, bool $red): string
     {
         if (!self::hasColorSupport()) {
             return $str;
@@ -293,12 +290,9 @@ class DeprecationErrorHandler
     }
 
     /**
-     * @param string[]      $groups
-     * @param Configuration $configuration
-     *
-     * @throws \InvalidArgumentException
+     * @param string[] $groups
      */
-    private function displayDeprecations($groups, $configuration)
+    private function displayDeprecations(array $groups, Configuration $configuration): void
     {
         $cmp = function ($a, $b) {
             return $b->count() - $a->count();
@@ -337,9 +331,14 @@ class DeprecationErrorHandler
 
                     $countsByCaller = $notice->getCountsByCaller();
                     arsort($countsByCaller);
+                    $limit = 5;
 
                     foreach ($countsByCaller as $method => $count) {
                         if ('count' !== $method) {
+                            if (!$limit--) {
+                                fwrite($handle, "    ...\n");
+                                break;
+                            }
                             fwrite($handle, sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
                         }
                     }
@@ -352,7 +351,7 @@ class DeprecationErrorHandler
         }
     }
 
-    private static function getPhpUnitErrorHandler()
+    private static function getPhpUnitErrorHandler(): callable
     {
         if (!$eh = self::$errorHandler) {
             if (class_exists(Handler::class)) {
@@ -389,10 +388,8 @@ class DeprecationErrorHandler
      *
      * Reference: Composer\XdebugHandler\Process::supportsColor
      * https://github.com/composer/xdebug-handler
-     *
-     * @return bool
      */
-    private static function hasColorSupport()
+    private static function hasColorSupport(): bool
     {
         if (!\defined('STDOUT')) {
             return false;
@@ -403,14 +400,13 @@ class DeprecationErrorHandler
             return false;
         }
 
-        if (!self::isTty()) {
+        // Detect msysgit/mingw and assume this is a tty because detection
+        // does not work correctly, see https://github.com/composer/composer/issues/9690
+        if (!@stream_isatty(\STDOUT) && !\in_array(strtoupper((string) getenv('MSYSTEM')), ['MINGW32', 'MINGW64'], true)) {
             return true;
         }
 
-        if ('\\' === \DIRECTORY_SEPARATOR
-            && \function_exists('sapi_windows_vt100_support')
-            && @sapi_windows_vt100_support(\STDOUT)
-        ) {
+        if ('\\' === \DIRECTORY_SEPARATOR && @sapi_windows_vt100_support(\STDOUT)) {
             return true;
         }
 
@@ -428,35 +424,5 @@ class DeprecationErrorHandler
 
         // See https://github.com/chalk/supports-color/blob/d4f413efaf8da045c5ab440ed418ef02dbb28bf1/index.js#L157
         return preg_match('/^((screen|xterm|vt100|vt220|putty|rxvt|ansi|cygwin|linux).*)|(.*-256(color)?(-bce)?)$/', $term);
-    }
-
-    /**
-     * Checks if the stream is a TTY, i.e; whether the output stream is connected to a terminal.
-     *
-     * Reference: Composer\Util\Platform::isTty
-     * https://github.com/composer/composer
-     */
-    private static function isTty(): bool
-    {
-        // Detect msysgit/mingw and assume this is a tty because detection
-        // does not work correctly, see https://github.com/composer/composer/issues/9690
-        if (\in_array(strtoupper((string) getenv('MSYSTEM')), ['MINGW32', 'MINGW64'], true)) {
-            return true;
-        }
-
-        // Modern cross-platform function, includes the fstat fallback so if it is present we trust it
-        if (\function_exists('stream_isatty')) {
-            return @stream_isatty(\STDOUT);
-        }
-
-        // Only trusting this if it is positive, otherwise prefer fstat fallback.
-        if (\function_exists('posix_isatty') && @posix_isatty(\STDOUT)) {
-            return true;
-        }
-
-        $stat = @fstat(\STDOUT);
-
-        // Check if formatted mode is S_IFCHR
-        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
     }
 }

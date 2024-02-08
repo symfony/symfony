@@ -23,22 +23,22 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class StaticPrefixCollection
 {
-    private $prefix;
+    private string $prefix;
 
     /**
      * @var string[]
      */
-    private $staticPrefixes = [];
+    private array $staticPrefixes = [];
 
     /**
      * @var string[]
      */
-    private $prefixes = [];
+    private array $prefixes = [];
 
     /**
      * @var array[]|self[]
      */
-    private $items = [];
+    private array $items = [];
 
     public function __construct(string $prefix = '/')
     {
@@ -60,10 +60,8 @@ class StaticPrefixCollection
 
     /**
      * Adds a route to a group.
-     *
-     * @param array|self $route
      */
-    public function addRoute(string $prefix, $route)
+    public function addRoute(string $prefix, array|self $route): void
     {
         [$prefix, $staticPrefix] = $this->getCommonPrefix($prefix, $prefix);
 
@@ -149,12 +147,12 @@ class StaticPrefixCollection
         $baseLength = \strlen($this->prefix);
         $end = min(\strlen($prefix), \strlen($anotherPrefix));
         $staticLength = null;
-        set_error_handler([__CLASS__, 'handleError']);
+        set_error_handler(self::handleError(...));
 
         try {
             for ($i = $baseLength; $i < $end && $prefix[$i] === $anotherPrefix[$i]; ++$i) {
                 if ('(' === $prefix[$i]) {
-                    $staticLength = $staticLength ?? $i;
+                    $staticLength ??= $i;
                     for ($j = 1 + $i, $n = 1; $j < $end && 0 < $n; ++$j) {
                         if ($prefix[$j] !== $anotherPrefix[$j]) {
                             break 2;
@@ -198,7 +196,7 @@ class StaticPrefixCollection
         return [substr($prefix, 0, $i), substr($prefix, 0, $staticLength ?? $i)];
     }
 
-    public static function handleError(int $type, string $msg)
+    public static function handleError(int $type, string $msg): bool
     {
         return str_contains($msg, 'Compilation failed: lookbehind assertion is not fixed length');
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Tests\Security;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
 use Symfony\Component\Ldap\Security\LdapBadge;
@@ -30,21 +31,16 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class CheckLdapCredentialsListenerTest extends TestCase
 {
-    private $ldap;
+    private MockObject&LdapInterface $ldap;
 
     protected function setUp(): void
     {
-        if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
-        }
-
         $this->ldap = $this->createMock(LdapInterface::class);
     }
 
@@ -61,10 +57,6 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public static function provideShouldNotCheckPassport()
     {
-        if (!interface_exists(AuthenticatorInterface::class)) {
-            self::markTestSkipped('This test requires symfony/security-http:^5.1');
-        }
-
         // no LdapBadge
         yield [new TestAuthenticator(), new Passport(new UserBadge('test'), new PasswordCredentials('s3cret'))];
 
@@ -102,7 +94,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     public function testWrongPassport($passport)
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('LDAP authentication requires a passport containing a user and password credentials, authenticator "'.TestAuthenticator::class.'" does not fulfill these requirements.');
+        $this->expectExceptionMessage('LDAP authentication requires a passport containing password credentials, authenticator "'.TestAuthenticator::class.'" does not fulfill these requirements.');
 
         $listener = $this->createListener();
         $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
@@ -110,29 +102,8 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public static function provideWrongPassportData()
     {
-        if (!interface_exists(AuthenticatorInterface::class)) {
-            self::markTestSkipped('This test requires symfony/security-http:^5.1');
-        }
-
         // no password credentials
         yield [new SelfValidatingPassport(new UserBadge('test'), [new LdapBadge('app.ldap')])];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyWrongPassport()
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('LDAP authentication requires a passport containing a user and password credentials, authenticator "'.TestAuthenticator::class.'" does not fulfill these requirements.');
-
-        // no user passport
-        $passport = $this->createMock(PassportInterface::class);
-        $passport->expects($this->any())->method('hasBadge')->with(LdapBadge::class)->willReturn(true);
-        $passport->expects($this->any())->method('getBadge')->with(LdapBadge::class)->willReturn(new LdapBadge('app.ldap'));
-
-        $listener = $this->createListener();
-        $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
     }
 
     public function testEmptyPasswordShouldThrowAnException()
@@ -150,7 +121,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->expectExceptionMessage('The presented password is invalid.');
 
         $this->ldap->method('escape')->willReturnArgument(0);
-        $this->ldap->expects($this->any())->method('bind')->willThrowException(new ConnectionException());
+        $this->ldap->expects($this->any())->method('bind')->willThrowException(new InvalidCredentialsException());
 
         $listener = $this->createListener();
         $listener->onCheckPassport($this->createEvent());
@@ -180,16 +151,16 @@ class CheckLdapCredentialsListenerTest extends TestCase
             })
         ;
         $this->ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
-        $this->ldap->expects($this->once())->method('query')->with('{username}', 'wouter_test')->willReturn($query);
+        $this->ldap->expects($this->once())->method('query')->with('{user_identifier}', 'wouter_test')->willReturn($query);
 
         $listener = $this->createListener();
-        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{username}', 'elsa', 'test1234A$', '{username}_test')));
+        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{user_identifier}', 'elsa', 'test1234A$', '{user_identifier}_test')));
     }
 
     public function testEmptyQueryResultShouldThrowAnException()
     {
         $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('The presented username is invalid.');
+        $this->expectExceptionMessage('The presented user identifier is invalid.');
 
         $collection = $this->createMock(CollectionInterface::class);
 
@@ -211,22 +182,20 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->ldap->expects($this->once())->method('query')->willReturn($query);
 
         $listener = $this->createListener();
-        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{username}', 'elsa', 'test1234A$', '{username}_test')));
+        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{user_identifier}', 'elsa', 'test1234A$', '{user_identifier}_test')));
     }
 
     private function createEvent($password = 's3cr3t', $ldapBadge = null)
     {
         return new CheckPassportEvent(
             new TestAuthenticator(),
-            new Passport(new UserBadge('Wouter', function () { return new InMemoryUser('Wouter', null, ['ROLE_USER']); }), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
+            new Passport(new UserBadge('Wouter', fn () => new InMemoryUser('Wouter', null, ['ROLE_USER'])), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
         );
     }
 
     private function createListener()
     {
-        $ldapLocator = new class(['app.ldap' => function () {
-            return $this->ldap;
-        }]) implements ContainerInterface {
+        $ldapLocator = new class(['app.ldap' => fn () => $this->ldap]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
 
@@ -242,10 +211,6 @@ if (interface_exists(AuthenticatorInterface::class)) {
         }
 
         public function authenticate(Request $request): Passport
-        {
-        }
-
-        public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
         {
         }
 

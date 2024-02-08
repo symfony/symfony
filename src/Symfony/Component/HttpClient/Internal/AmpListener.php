@@ -25,13 +25,17 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  */
 class AmpListener implements EventListener
 {
-    private $info;
-    private $pinSha256;
-    private $onProgress;
-    private $handle;
+    private array $info;
 
-    public function __construct(array &$info, array $pinSha256, \Closure $onProgress, &$handle)
-    {
+    /**
+     * @param resource|null $handle
+     */
+    public function __construct(
+        array &$info,
+        private array $pinSha256,
+        private \Closure $onProgress,
+        private &$handle,
+    ) {
         $info += [
             'connect_time' => 0.0,
             'pretransfer_time' => 0.0,
@@ -43,14 +47,11 @@ class AmpListener implements EventListener
         ];
 
         $this->info = &$info;
-        $this->pinSha256 = $pinSha256;
-        $this->onProgress = $onProgress;
-        $this->handle = &$handle;
     }
 
     public function startRequest(Request $request): Promise
     {
-        $this->info['start_time'] = $this->info['start_time'] ?? microtime(true);
+        $this->info['start_time'] ??= microtime(true);
         ($this->onProgress)();
 
         return new Success();
@@ -81,7 +82,7 @@ class AmpListener implements EventListener
     {
         $host = $stream->getRemoteAddress()->getHost();
 
-        if (false !== strpos($host, ':')) {
+        if (str_contains($host, ':')) {
             $host = '['.$host.']';
         }
 

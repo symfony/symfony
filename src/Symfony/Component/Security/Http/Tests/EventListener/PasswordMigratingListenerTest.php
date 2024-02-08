@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -23,18 +24,17 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
 use Symfony\Component\Security\Http\Tests\Fixtures\DummyAuthenticator;
 
 class PasswordMigratingListenerTest extends TestCase
 {
-    private $hasherFactory;
-    private $listener;
-    private $user;
+    private MockObject&PasswordHasherFactoryInterface $hasherFactory;
+    private PasswordMigratingListener $listener;
+    private UserInterface&PasswordAuthenticatedUserInterface $user;
 
     protected function setUp(): void
     {
@@ -61,49 +61,10 @@ class PasswordMigratingListenerTest extends TestCase
     public static function provideUnsupportedEvents()
     {
         // no password upgrade badge
-        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return new DummyTestPasswordAuthenticatedUser(); })))];
+        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => new DummyTestPasswordAuthenticatedUser())))];
 
         // blank password
-        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return new DummyTestPasswordAuthenticatedUser(); }), [new PasswordUpgradeBadge('', self::createPasswordUpgrader())]))];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyUnsupportedEvents()
-    {
-        $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
-
-        $this->listener->onLoginSuccess($this->createEvent($this->createMock(PassportInterface::class)));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testUnsupportedPassport()
-    {
-        // A custom Passport, without an UserBadge
-        $passport = $this->createMock(UserPassportInterface::class);
-        $passport->method('getUser')->willReturn($this->user);
-        $passport->method('hasBadge')
-            ->willReturnCallback(function (...$args) {
-                static $series = [
-                    [[PasswordUpgradeBadge::class], true],
-                    [[UserBadge::class], false],
-                ];
-
-                [$expectedArgs, $return] = array_shift($series);
-                $this->assertSame($expectedArgs, $args);
-
-                return $return;
-            })
-        ;
-        $passport->expects($this->once())->method('getBadge')->with(PasswordUpgradeBadge::class)->willReturn(new PasswordUpgradeBadge('pa$$word'));
-        // We should never "getBadge" for "UserBadge::class"
-
-        $event = $this->createEvent($passport);
-
-        $this->listener->onLoginSuccess($event);
+        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => new DummyTestPasswordAuthenticatedUser()), [new PasswordUpgradeBadge('', self::createPasswordUpgrader())]))];
     }
 
     public function testUpgradeWithUpgrader()
@@ -114,7 +75,7 @@ class PasswordMigratingListenerTest extends TestCase
             ->with($this->user, 'new-hash')
         ;
 
-        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PasswordUpgradeBadge('pa$$word', $passwordUpgrader)]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->user), [new PasswordUpgradeBadge('pa$$word', $passwordUpgrader)]));
         $this->listener->onLoginSuccess($event);
     }
 
@@ -131,7 +92,7 @@ class PasswordMigratingListenerTest extends TestCase
         $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', [$userLoader, 'loadUserByIdentifier']), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);
 
-        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', \Closure::fromCallable([$userLoader, 'loadUserByIdentifier'])), [new PasswordUpgradeBadge('pa$$word')]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', $userLoader->loadUserByIdentifier(...)), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);
     }
 
@@ -141,7 +102,7 @@ class PasswordMigratingListenerTest extends TestCase
 
         $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
 
-        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PasswordUpgradeBadge('pa$$word')]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->user), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);
     }
 
@@ -150,7 +111,7 @@ class PasswordMigratingListenerTest extends TestCase
         return new DummyTestMigratingUserProvider();
     }
 
-    private static function createEvent(PassportInterface $passport)
+    private static function createEvent(Passport $passport)
     {
         return new LoginSuccessEvent(new DummyAuthenticator(), $passport, new NullToken(), new Request(), null, 'main');
     }
@@ -210,11 +171,7 @@ class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
         return [];
     }
 
-    public function eraseCredentials()
-    {
-    }
-
-    public function getUsername(): string
+    public function eraseCredentials(): void
     {
     }
 

@@ -22,9 +22,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 abstract class Compound extends Composite
 {
     /** @var Constraint[] */
-    public $constraints = [];
+    public array $constraints = [];
 
-    public function __construct($options = null)
+    public function __construct(mixed $options = null)
     {
         if (isset($options[$this->getCompositeOption()])) {
             throw new ConstraintDefinitionException(sprintf('You can\'t redefine the "%s" option. Use the "%s::getConstraints()" method instead.', $this->getCompositeOption(), __CLASS__));

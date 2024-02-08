@@ -23,8 +23,8 @@ use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 
-// DBAL 2 compatibility
-class_exists('Doctrine\DBAL\Platforms\PostgreSqlPlatform');
+// DBAL 3 compatibility
+class_exists('Doctrine\DBAL\Platforms\SqlitePlatform');
 
 // DBAL 3 compatibility
 class_exists('Doctrine\DBAL\Platforms\SqlitePlatform');
@@ -33,8 +33,7 @@ final class UlidTypeTest extends TestCase
 {
     private const DUMMY_ULID = '01EEDQEK6ZAZE93J8KG5B4MBJC';
 
-    /** @var UlidType */
-    private $type;
+    private UlidType $type;
 
     public static function setUpBeforeClass(): void
     {
@@ -149,10 +148,7 @@ final class UlidTypeTest extends TestCase
         yield [new PostgreSQLPlatform(), 'UUID'];
         yield [new SQLitePlatform(), 'BLOB'];
         yield [new MySQLPlatform(), 'BINARY(16)'];
-
-        if (class_exists(MariaDBPlatform::class)) {
-            yield [new MariaDBPlatform(), 'BINARY(16)'];
-        }
+        yield [new MariaDBPlatform(), 'BINARY(16)'];
     }
 
     public function testRequiresSQLCommentHint()

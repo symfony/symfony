@@ -5,6 +5,7 @@
           <exclude>../Prototype/OtherDir</exclude>
           <exclude>../Prototype/BadClasses</exclude>
           <exclude>../Prototype/SinglyImplementedInterface</exclude>
+          <exclude>../Prototype/StaticConstructor</exclude>
       </prototype>
   </services>
 </container>

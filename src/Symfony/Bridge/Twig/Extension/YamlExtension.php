@@ -22,24 +22,19 @@ use Twig\TwigFilter;
  */
 final class YamlExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFilters(): array
     {
         return [
-            new TwigFilter('yaml_encode', [$this, 'encode']),
-            new TwigFilter('yaml_dump', [$this, 'dump']),
+            new TwigFilter('yaml_encode', $this->encode(...)),
+            new TwigFilter('yaml_dump', $this->dump(...)),
         ];
     }
 
-    public function encode($input, int $inline = 0, int $dumpObjects = 0): string
+    public function encode(mixed $input, int $inline = 0, int $dumpObjects = 0): string
     {
         static $dumper;
 
-        if (null === $dumper) {
-            $dumper = new YamlDumper();
-        }
+        $dumper ??= new YamlDumper();
 
         if (\defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
             return $dumper->dump($input, $inline, 0, $dumpObjects);
@@ -48,7 +43,7 @@ final class YamlExtension extends AbstractExtension
         return $dumper->dump($input, $inline, 0, false, $dumpObjects);
     }
 
-    public function dump($value, int $inline = 0, int $dumpObjects = 0): string
+    public function dump(mixed $value, int $inline = 0, int $dumpObjects = 0): string
     {
         if (\is_resource($value)) {
             return '%Resource%';

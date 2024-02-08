@@ -6,8 +6,8 @@ The Mailer component helps sending emails.
 Getting Started
 ---------------
 
-```
-$ composer require symfony/mailer
+```bash
+composer require symfony/mailer
 ```
 
 ```php
@@ -57,7 +57,7 @@ $email = (new TemplatedEmail())
     // ...
     ->htmlTemplate('emails/signup.html.twig')
     ->context([
-        'expiration_date' => new \DateTime('+7 days'),
+        'expiration_date' => new \DateTimeImmutable('+7 days'),
         'username' => 'foo',
     ])
 ;

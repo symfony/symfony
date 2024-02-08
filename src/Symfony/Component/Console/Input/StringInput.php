@@ -24,7 +24,6 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 class StringInput extends ArgvInput
 {
-    public const REGEX_STRING = '([^\s]+?)(?:\s|(?<!\\\\)"|(?<!\\\\)\'|$)';
     public const REGEX_UNQUOTED_STRING = '([^\s\\\\]+?)';
     public const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\')';
 

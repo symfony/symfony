@@ -14,18 +14,13 @@ namespace Symfony\Component\VarDumper\Tests\Caster;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
- * @requires PHP 8.1
- */
 class FiberCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
     public function testCastFiberNotStarted()
     {
-        $fiber = new \Fiber(static function () {
-            return true;
-        });
+        $fiber = new \Fiber(static fn () => true);
 
         $expected = <<<EODUMP
 Fiber {
@@ -38,9 +33,7 @@ EODUMP;
 
     public function testCastFiberTerminated()
     {
-        $fiber = new \Fiber(static function () {
-            return true;
-        });
+        $fiber = new \Fiber(static fn () => true);
         $fiber->start();
 
         $expected = <<<EODUMP
@@ -54,9 +47,7 @@ EODUMP;
 
     public function testCastFiberSuspended()
     {
-        $fiber = new \Fiber(static function () {
-            \Fiber::suspend();
-        });
+        $fiber = new \Fiber(\Fiber::suspend(...));
         $fiber->start();
 
         $expected = <<<EODUMP

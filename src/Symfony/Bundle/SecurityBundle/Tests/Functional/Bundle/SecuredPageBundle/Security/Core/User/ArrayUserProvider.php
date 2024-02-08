@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class ArrayUserProvider implements UserProviderInterface
 {
     /** @var UserInterface[] */
-    private $users = [];
+    private array $users = [];
 
     public function addUser(UserInterface $user)
     {
@@ -64,7 +64,7 @@ class ArrayUserProvider implements UserProviderInterface
         }
 
         $storedUser = $this->getUser($user->getUserIdentifier());
-        $class = \get_class($storedUser);
+        $class = $storedUser::class;
 
         return new $class($storedUser->getUserIdentifier(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled());
     }

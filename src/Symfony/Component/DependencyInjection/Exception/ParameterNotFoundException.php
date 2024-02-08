@@ -20,11 +20,11 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class ParameterNotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
 {
-    private $key;
-    private $sourceId;
-    private $sourceKey;
-    private $alternatives;
-    private $nonNestedAlternative;
+    private string $key;
+    private ?string $sourceId;
+    private ?string $sourceKey;
+    private array $alternatives;
+    private ?string $nonNestedAlternative;
 
     /**
      * @param string          $key                  The requested parameter key
@@ -47,12 +47,14 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         $this->updateRepr();
     }
 
-    public function updateRepr()
+    public function updateRepr(): void
     {
         if (null !== $this->sourceId) {
             $this->message = sprintf('The service "%s" has a dependency on a non-existent parameter "%s".', $this->sourceId, $this->key);
         } elseif (null !== $this->sourceKey) {
             $this->message = sprintf('The parameter "%s" has a dependency on a non-existent parameter "%s".', $this->sourceKey, $this->key);
+        } elseif ('.' === ($this->key[0] ?? '')) {
+            $this->message = sprintf('Parameter "%s" not found. It was probably deleted during the compilation of the container.', $this->key);
         } else {
             $this->message = sprintf('You have requested a non-existent parameter "%s".', $this->key);
         }
@@ -69,29 +71,29 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         }
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    public function getSourceId()
+    public function getSourceId(): ?string
     {
         return $this->sourceId;
     }
 
-    public function getSourceKey()
+    public function getSourceKey(): ?string
     {
         return $this->sourceKey;
     }
 
-    public function setSourceId(?string $sourceId)
+    public function setSourceId(?string $sourceId): void
     {
         $this->sourceId = $sourceId;
 
         $this->updateRepr();
     }
 
-    public function setSourceKey(?string $sourceKey)
+    public function setSourceKey(?string $sourceKey): void
     {
         $this->sourceKey = $sourceKey;
 

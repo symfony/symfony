@@ -48,6 +48,7 @@ EOF;
                     $attributeMetadata->getGroups(),
                     $attributeMetadata->getMaxDepth(),
                     $attributeMetadata->getSerializedName(),
+                    $attributeMetadata->getSerializedPath(),
                 ];
             }
 

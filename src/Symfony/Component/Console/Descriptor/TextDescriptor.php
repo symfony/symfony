@@ -28,10 +28,7 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class TextDescriptor extends Descriptor
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeInputArgument(InputArgument $argument, array $options = [])
+    protected function describeInputArgument(InputArgument $argument, array $options = []): void
     {
         if (null !== $argument->getDefault() && (!\is_array($argument->getDefault()) || \count($argument->getDefault()))) {
             $default = sprintf('<comment> [default: %s]</comment>', $this->formatDefaultValue($argument->getDefault()));
@@ -51,10 +48,7 @@ class TextDescriptor extends Descriptor
         ), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeInputOption(InputOption $option, array $options = [])
+    protected function describeInputOption(InputOption $option, array $options = []): void
     {
         if ($option->acceptValue() && null !== $option->getDefault() && (!\is_array($option->getDefault()) || \count($option->getDefault()))) {
             $default = sprintf('<comment> [default: %s]</comment>', $this->formatDefaultValue($option->getDefault()));
@@ -89,10 +83,7 @@ class TextDescriptor extends Descriptor
         ), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeInputDefinition(InputDefinition $definition, array $options = [])
+    protected function describeInputDefinition(InputDefinition $definition, array $options = []): void
     {
         $totalWidth = $this->calculateTotalWidthForOptions($definition->getOptions());
         foreach ($definition->getArguments() as $argument) {
@@ -131,10 +122,7 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeCommand(Command $command, array $options = [])
+    protected function describeCommand(Command $command, array $options = []): void
     {
         $command->mergeApplicationDefinition(false);
 
@@ -169,10 +157,7 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeApplication(Application $application, array $options = [])
+    protected function describeApplication(Application $application, array $options = []): void
     {
         $describedNamespace = $options['namespace'] ?? null;
         $description = new ApplicationDescription($application, $describedNamespace);
@@ -208,9 +193,7 @@ class TextDescriptor extends Descriptor
             }
 
             // calculate max. width based on available commands per namespace
-            $width = $this->getColumnWidth(array_merge(...array_values(array_map(function ($namespace) use ($commands) {
-                return array_intersect($namespace['commands'], array_keys($commands));
-            }, array_values($namespaces)))));
+            $width = $this->getColumnWidth(array_merge(...array_values(array_map(fn ($namespace) => array_intersect($namespace['commands'], array_keys($commands)), array_values($namespaces)))));
 
             if ($describedNamespace) {
                 $this->writeText(sprintf('<comment>Available commands for the "%s" namespace:</comment>', $describedNamespace), $options);
@@ -219,9 +202,7 @@ class TextDescriptor extends Descriptor
             }
 
             foreach ($namespaces as $namespace) {
-                $namespace['commands'] = array_filter($namespace['commands'], function ($name) use ($commands) {
-                    return isset($commands[$name]);
-                });
+                $namespace['commands'] = array_filter($namespace['commands'], fn ($name) => isset($commands[$name]));
 
                 if (!$namespace['commands']) {
                     continue;
@@ -245,10 +226,7 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    private function writeText(string $content, array $options = [])
+    private function writeText(string $content, array $options = []): void
     {
         $this->write(
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,
@@ -273,10 +251,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * Formats input option/argument default value.
-     *
-     * @param mixed $default
      */
-    private function formatDefaultValue($default): string
+    private function formatDefaultValue(mixed $default): string
     {
         if (\INF === $default) {
             return 'INF';

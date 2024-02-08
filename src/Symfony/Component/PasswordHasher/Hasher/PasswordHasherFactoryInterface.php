@@ -25,9 +25,7 @@ interface PasswordHasherFactoryInterface
     /**
      * Returns the password hasher to use for the given user.
      *
-     * @param PasswordHasherAwareInterface|PasswordAuthenticatedUserInterface|string $user
-     *
      * @throws \RuntimeException When no password hasher could be found for the user
      */
-    public function getPasswordHasher($user): PasswordHasherInterface;
+    public function getPasswordHasher(string|PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user): PasswordHasherInterface;
 }

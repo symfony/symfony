@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\DataCollector\RouterDataCollector as BaseRouter
  */
 class RouterDataCollector extends BaseRouterDataCollector
 {
-    public function guessRoute(Request $request, $controller)
+    public function guessRoute(Request $request, mixed $controller): string
     {
         if (\is_array($controller)) {
             $controller = $controller[0];

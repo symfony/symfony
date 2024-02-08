@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class SodiumVaultTest extends TestCase
 {
-    private $secretsDir;
+    private string $secretsDir;
 
     protected function setUp(): void
     {

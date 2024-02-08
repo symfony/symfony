@@ -89,9 +89,7 @@ class ViolationPathTest extends TestCase
      */
     public function testCreatePath($string, $entries, $slicedPath = null)
     {
-        if (null === $slicedPath) {
-            $slicedPath = $string;
-        }
+        $slicedPath ??= $string;
 
         $path = new ViolationPath($string);
 

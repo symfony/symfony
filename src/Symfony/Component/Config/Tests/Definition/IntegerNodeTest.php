@@ -51,8 +51,10 @@ class IntegerNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException(InvalidTypeException::class);
         $node = new IntegerNode('test');
+
+        $this->expectException(InvalidTypeException::class);
+
         $node->normalize($value);
     }
 

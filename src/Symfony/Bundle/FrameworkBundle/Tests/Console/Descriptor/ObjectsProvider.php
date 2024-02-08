@@ -71,10 +71,6 @@ class ObjectsProvider
             'array' => [12, 'Hello world!', true],
         ]);
 
-        if (\PHP_VERSION_ID < 80100) {
-            return;
-        }
-
         yield 'parameters_enums' => new ParameterBag([
             'unit_enum' => FooUnitEnum::BAR,
             'backed_enum' => Suit::Hearts,
@@ -84,6 +80,14 @@ class ObjectsProvider
                 'single' => FooUnitEnum::BAR,
             ],
         ]);
+
+        $parameterBag = new ParameterBag([
+            'integer' => 12,
+            'string' => 'Hello world!',
+        ]);
+        $parameterBag->deprecate('string', 'symfony/framework-bundle', '6.4');
+
+        yield 'deprecated_parameters' => $parameterBag;
     }
 
     public static function getContainerParameter()
@@ -96,10 +100,13 @@ class ObjectsProvider
             'form_div_layout.html.twig',
             'form_table_layout.html.twig',
         ]);
+        $builder->setParameter('deprecated_foo', 'bar');
+        $builder->deprecateParameter('deprecated_foo', 'symfony/framework-bundle', '6.4');
 
         return [
             'parameter' => $builder,
             'array_parameter' => $builder,
+            'deprecated_parameter' => $builder,
         ];
     }
 
@@ -173,6 +180,7 @@ class ObjectsProvider
                 ->addTag('tag1', ['attr1' => 'val1', 'attr2' => 'val2'])
                 ->addTag('tag1', ['attr3' => 'val3'])
                 ->addTag('tag2')
+                ->addTag('tag3', ['array_attr' => ['foo', 'bar', [[[['ccc']]]]]])
                 ->addMethodCall('setMailer', [new Reference('mailer')])
                 ->setFactory([new Reference('factory.service'), 'get']),
             '.definition_3' => $definition3
@@ -247,7 +255,7 @@ class ObjectsProvider
         $eventDispatcher = new EventDispatcher();
 
         $eventDispatcher->addListener('event1', 'var_dump', 255);
-        $eventDispatcher->addListener('event1', function () { return 'Closure'; }, -1);
+        $eventDispatcher->addListener('event1', fn () => 'Closure', -1);
         $eventDispatcher->addListener('event2', new CallableClass());
 
         return ['event_dispatcher_1' => $eventDispatcher];
@@ -260,9 +268,9 @@ class ObjectsProvider
             'callable_2' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'],
             'callable_3' => [new CallableClass(), 'method'],
             'callable_4' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass::staticMethod',
-            'callable_6' => function () { return 'Closure'; },
+            'callable_6' => fn () => 'Closure',
             'callable_7' => new CallableClass(),
-            'callable_from_callable' => \Closure::fromCallable(new CallableClass()),
+            'callable_from_callable' => (new CallableClass())(...),
         ];
     }
 

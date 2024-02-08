@@ -17,16 +17,12 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SmsBiurasTransportTest extends TransportTestCase
 {
-    /**
-     * @return SmsBiurasTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): SmsBiurasTransport
     {
         return new SmsBiurasTransport('uid', 'api_key', 'from', true, $client ?? new MockHttpClient());
     }

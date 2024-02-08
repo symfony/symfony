@@ -14,6 +14,7 @@ namespace Symfony\Component\Translation\Bridge\Lokalise\Tests;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProvider;
 use Symfony\Component\Translation\Exception\ProviderException;
@@ -24,12 +25,13 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Test\ProviderTestCase;
 use Symfony\Component\Translation\TranslatorBag;
+use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LokaliseProviderTest extends ProviderTestCase
 {
-    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null): ProviderInterface
     {
         return new LokaliseProvider($client, $loader, $logger, $defaultLocale, $endpoint);
     }
@@ -67,7 +69,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('GET', $method);
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
-            return new MockResponse(json_encode(['languages' => []]));
+            return new JsonMockResponse(['languages' => []]);
         };
 
         $createLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -97,7 +99,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
             $this->assertSame($expectedQuery, $options['query']);
 
-            return new MockResponse(json_encode(['keys' => []]));
+            return new JsonMockResponse(['keys' => []]);
         };
 
         $getKeysIdsForValidatorsDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -112,7 +114,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
             $this->assertSame($expectedQuery, $options['query']);
 
-            return new MockResponse(json_encode(['keys' => []]));
+            return new JsonMockResponse(['keys' => []]);
         };
 
         $createKeysForMessagesDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -134,12 +136,12 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('POST', $method);
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
-            return new MockResponse(json_encode(['keys' => [
+            return new JsonMockResponse(['keys' => [
                 [
                     'key_name' => ['web' => 'young_dog'],
                     'key_id' => 29,
                 ],
-            ]]));
+            ]]);
         };
 
         $createKeysForValidatorsDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -161,12 +163,12 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('POST', $method);
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
-            return new MockResponse(json_encode(['keys' => [
+            return new JsonMockResponse(['keys' => [
                 [
                     'key_name' => ['web' => 'post.num_comments'],
                     'key_id' => 92,
                 ],
-            ]]));
+            ]]);
         };
         $updateProcessed = false;
         $updateTranslationsResponse = function (string $method, string $url, array $options = []) use (&$updateProcessed): ResponseInterface {
@@ -282,7 +284,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('GET', $method);
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
-            return new MockResponse(json_encode(['languages' => []]));
+            return new JsonMockResponse(['languages' => []]);
         };
 
         $createLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -324,7 +326,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('GET', $method);
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
-            return new MockResponse(json_encode(['languages' => []]));
+            return new JsonMockResponse(['languages' => []]);
         };
 
         $createLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -338,7 +340,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
-            return new MockResponse(json_encode(['keys' => []]));
+            return new JsonMockResponse(['keys' => []]);
         };
 
         $getKeysIdsForMessagesDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -382,7 +384,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('GET', $method);
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
-            return new MockResponse(json_encode(['languages' => []]));
+            return new JsonMockResponse(['languages' => []]);
         };
 
         $createLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -396,7 +398,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
-            return new MockResponse(json_encode(['keys' => []]));
+            return new JsonMockResponse(['keys' => []]);
         };
 
         $getKeysIdsForMessagesDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -411,7 +413,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
             $this->assertSame($expectedQuery, $options['query']);
 
-            return new MockResponse(json_encode(['keys' => []]));
+            return new JsonMockResponse(['keys' => []]);
         };
 
         $createKeysForMessagesDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -463,7 +465,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('GET', $method);
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
-            return new MockResponse(json_encode(['languages' => []]));
+            return new JsonMockResponse(['languages' => []]);
         };
 
         $createLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -477,7 +479,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
-            return new MockResponse(json_encode(['keys' => []]));
+            return new JsonMockResponse(['keys' => []]);
         };
 
         $getKeysIdsForMessagesDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -492,7 +494,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
             $this->assertSame($expectedQuery, $options['query']);
 
-            return new MockResponse(json_encode(['keys' => []]));
+            return new JsonMockResponse(['keys' => []]);
         };
 
         $createKeysForMessagesDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -514,12 +516,12 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('POST', $method);
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
-            return new MockResponse(json_encode(['keys' => [
+            return new JsonMockResponse(['keys' => [
                 [
                     'key_name' => ['web' => 'young_dog'],
                     'key_id' => 29,
                 ],
-            ]]));
+            ]]);
         };
 
         $updateTranslationsResponse = function (string $method, string $url, array $options = []) use (&$updateProcessed): ResponseInterface {
@@ -569,7 +571,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/files/export', $url);
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
-            return new MockResponse(json_encode([
+            return new JsonMockResponse([
                 'files' => [
                     $locale => [
                         $domain.'.xliff' => [
@@ -577,7 +579,7 @@ class LokaliseProviderTest extends ProviderTestCase
                         ],
                     ],
                 ],
-            ]));
+            ]);
         };
 
         $provider = self::createProvider((new MockHttpClient($response))->withOptions([
@@ -601,7 +603,7 @@ class LokaliseProviderTest extends ProviderTestCase
     {
         $consecutiveLoadArguments = [];
         $consecutiveLoadReturns = [];
-        $response = new MockResponse(json_encode([
+        $response = new JsonMockResponse([
             'files' => array_reduce($locales, function ($carry, $locale) use ($domains, $responseContents, &$consecutiveLoadArguments, &$consecutiveLoadReturns) {
                 $carry[$locale] = array_reduce($domains, function ($carry, $domain) use ($locale, $responseContents, &$consecutiveLoadArguments, &$consecutiveLoadReturns) {
                     $carry[$domain.'.xliff'] = [
@@ -616,7 +618,7 @@ class LokaliseProviderTest extends ProviderTestCase
 
                 return $carry;
             }, []),
-        ]));
+        ]);
 
         $loader = $this->getLoader();
         $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
@@ -659,12 +661,12 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
             $this->assertSame($expectedQuery, $options['query']);
 
-            return new MockResponse(json_encode(['keys' => [
+            return new JsonMockResponse(['keys' => [
                 [
                     'key_name' => ['web' => 'a'],
                     'key_id' => 29,
                 ],
-            ]]));
+            ]]);
         };
 
         $getKeysIdsForValidatorsDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -679,12 +681,12 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
             $this->assertSame($expectedQuery, $options['query']);
 
-            return new MockResponse(json_encode(['keys' => [
+            return new JsonMockResponse(['keys' => [
                 [
                     'key_name' => ['web' => 'post.num_comments'],
                     'key_id' => 92,
                 ],
-            ]]));
+            ]]);
         };
 
         $deleteResponse = function (string $method, string $url, array $options = []): MockResponse {

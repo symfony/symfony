@@ -20,39 +20,27 @@ use Symfony\Component\Config\Exception\LoaderLoadException;
  */
 abstract class Loader implements LoaderInterface
 {
-    protected $resolver;
-    protected $env;
+    protected LoaderResolverInterface $resolver;
 
-    public function __construct(?string $env = null)
-    {
-        $this->env = $env;
+    public function __construct(
+        protected ?string $env = null,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResolver()
+    public function getResolver(): LoaderResolverInterface
     {
         return $this->resolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setResolver(LoaderResolverInterface $resolver)
+    public function setResolver(LoaderResolverInterface $resolver): void
     {
         $this->resolver = $resolver;
     }
 
     /**
      * Imports a resource.
-     *
-     * @param mixed       $resource A resource
-     * @param string|null $type     The resource type or null if unknown
-     *
-     * @return mixed
      */
-    public function import($resource, ?string $type = null)
+    public function import(mixed $resource, ?string $type = null): mixed
     {
         return $this->resolve($resource, $type)->load($resource, $type);
     }
@@ -60,14 +48,9 @@ abstract class Loader implements LoaderInterface
     /**
      * Finds a loader able to load an imported resource.
      *
-     * @param mixed       $resource A resource
-     * @param string|null $type     The resource type or null if unknown
-     *
-     * @return LoaderInterface
-     *
      * @throws LoaderLoadException If no loader is found
      */
-    public function resolve($resource, ?string $type = null)
+    public function resolve(mixed $resource, ?string $type = null): LoaderInterface
     {
         if ($this->supports($resource, $type)) {
             return $this;

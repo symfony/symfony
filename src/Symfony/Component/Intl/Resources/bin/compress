@@ -1,0 +1,36 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+if ('cli' !== PHP_SAPI) {
+    throw new Exception('This script must be run from the command line.');
+}
+if (!extension_loaded('zlib')) {
+    throw new Exception('This script requires the zlib extension.');
+}
+
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator(
+        dirname(__DIR__).'/data',
+        FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::SKIP_DOTS
+    )
+);
+
+foreach ($iterator as $file) {
+    if ('php' !== $file->getExtension() || 'meta.php' === $file->getFilename()) {
+        continue;
+    }
+
+    $data = file_get_contents($file);
+    file_put_contents('compress.zlib://'.$file.'.gz', $data);
+
+    unlink($file.(filesize($file.'.gz') >= strlen($data) ? '.gz' : ''));
+}

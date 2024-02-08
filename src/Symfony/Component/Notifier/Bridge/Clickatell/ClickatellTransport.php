@@ -28,14 +28,12 @@ final class ClickatellTransport extends AbstractTransport
 {
     protected const HOST = 'api.clickatell.com';
 
-    private $authToken;
-    private $from;
-
-    public function __construct(string $authToken, ?string $from = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private ?string $from = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -45,7 +43,7 @@ final class ClickatellTransport extends AbstractTransport
             return sprintf('clickatell://%s', $this->getEndpoint());
         }
 
-        return sprintf('clickatell://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('clickatell://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -61,6 +59,11 @@ final class ClickatellTransport extends AbstractTransport
 
         $endpoint = sprintf('https://%s/rest/message', $this->getEndpoint());
 
+        $options = [];
+        $options['from'] = $message->getFrom() ?: $this->from;
+        $options['to'] = $message->getPhone();
+        $options['text'] = $message->getSubject();
+
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Accept' => 'application/json',
@@ -68,11 +71,7 @@ final class ClickatellTransport extends AbstractTransport
                 'Content-Type' => 'application/json',
                 'X-Version' => 1,
             ],
-            'json' => [
-                'from' => $this->from ?? '',
-                'to' => [$message->getPhone()],
-                'text' => $message->getSubject(),
-            ],
+            'json' => array_filter($options),
         ]);
 
         try {

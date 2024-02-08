@@ -18,7 +18,9 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class ResolveEnvPlaceholdersPass extends AbstractRecursivePass
 {
-    protected function processValue($value, bool $isRoot = false)
+    protected bool $skipScalars = false;
+
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (\is_string($value)) {
             return $this->container->resolveEnvPlaceholders($value, true);

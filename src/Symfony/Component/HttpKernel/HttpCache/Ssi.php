@@ -21,36 +21,24 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Ssi extends AbstractSurrogate
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'ssi';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addSurrogateControl(Response $response)
+    public function addSurrogateControl(Response $response): void
     {
         if (str_contains($response->getContent(), '<!--#include')) {
             $response->headers->set('Surrogate-Control', 'content="SSI/1.0"');
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function renderIncludeTag(string $uri, ?string $alt = null, bool $ignoreErrors = true, string $comment = '')
+    public function renderIncludeTag(string $uri, ?string $alt = null, bool $ignoreErrors = true, string $comment = ''): string
     {
         return sprintf('<!--#include virtual="%s" -->', $uri);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(Request $request, Response $response)
+    public function process(Request $request, Response $response): Response
     {
         $type = $response->headers->get('Content-Type');
         if (empty($type)) {
@@ -58,7 +46,7 @@ class Ssi extends AbstractSurrogate
         }
 
         $parts = explode(';', $type);
-        if (!\in_array($parts[0], $this->contentTypes)) {
+        if (!\in_array($parts[0], $this->contentTypes, true)) {
             return $response;
         }
 

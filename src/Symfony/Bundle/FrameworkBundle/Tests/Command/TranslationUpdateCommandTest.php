@@ -26,16 +26,8 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
 
 class TranslationUpdateCommandTest extends TestCase
 {
-    private $fs;
-    private $translationDir;
-
-    public function testDumpMessagesAndCleanWithDeprecatedCommandName()
-    {
-        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
-        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
-        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
-        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
-    }
+    private Filesystem $fs;
+    private string $translationDir;
 
     public function testDumpMessagesAndClean()
     {
@@ -168,7 +160,6 @@ class TranslationUpdateCommandTest extends TestCase
         $command = $this->createMock(TranslationUpdateCommand::class);
 
         $method = new \ReflectionMethod(TranslationUpdateCommand::class, 'filterDuplicateTransPaths');
-        $method->setAccessible(true);
 
         $filteredTransPaths = $method->invoke($command, $transPaths);
 

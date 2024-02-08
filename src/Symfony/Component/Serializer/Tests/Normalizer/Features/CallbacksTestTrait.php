@@ -107,8 +107,8 @@ trait CallbacksTestTrait
             }
         };
 
-        $obj = $normalizer->denormalize(['foo' => $valueBar], \get_class($objWithNoConstructorArgument), 'any', ['callbacks' => $callbacks]);
-        $this->assertInstanceof(\get_class($objWithNoConstructorArgument), $obj);
+        $obj = $normalizer->denormalize(['foo' => $valueBar], $objWithNoConstructorArgument::class, 'any', ['callbacks' => $callbacks]);
+        $this->assertInstanceof($objWithNoConstructorArgument::class, $obj);
         $this->assertEquals($result->getBar(), $obj->getBar());
     }
 
@@ -156,12 +156,12 @@ trait CallbacksTestTrait
             'Format a date' => [
                 [
                     'bar' => function ($bar) {
-                        $this->assertInstanceOf(\DateTime::class, $bar);
+                        $this->assertInstanceOf(\DateTimeImmutable::class, $bar);
 
                         return $bar->format('d-m-Y H:i:s');
                     },
                 ],
-                new \DateTime('2011-09-10 06:30:00'),
+                new \DateTimeImmutable('2011-09-10 06:30:00'),
                 ['bar' => '10-09-2011 06:30:00', 'foo' => null],
             ],
             'Collect a property' => [
@@ -180,9 +180,7 @@ trait CallbacksTestTrait
             ],
             'Count a property' => [
                 [
-                    'bar' => function (array $bars) {
-                        return \count($bars);
-                    },
+                    'bar' => fn (array $bars) => \count($bars),
                 ],
                 [new CallbacksObject(), new CallbacksObject()],
                 ['bar' => 2, 'foo' => null],
@@ -222,11 +220,11 @@ trait CallbacksTestTrait
                     'bar' => function ($bar) {
                         $this->assertIsString($bar);
 
-                        return \DateTime::createFromFormat('d-m-Y H:i:s', $bar);
+                        return \DateTimeImmutable::createFromFormat('d-m-Y H:i:s', $bar);
                     },
                 ],
                 '10-09-2011 06:30:00',
-                new CallbacksObject(new \DateTime('2011-09-10 06:30:00')),
+                new CallbacksObject(new \DateTimeImmutable('2011-09-10 06:30:00')),
             ],
             'Collect a property' => [
                 [
@@ -244,9 +242,7 @@ trait CallbacksTestTrait
             ],
             'Count a property' => [
                 [
-                    'bar' => function (array $bars) {
-                        return \count($bars);
-                    },
+                    'bar' => fn (array $bars) => \count($bars),
                 ],
                 [new CallbacksObject(), new CallbacksObject()],
                 new CallbacksObject(2),

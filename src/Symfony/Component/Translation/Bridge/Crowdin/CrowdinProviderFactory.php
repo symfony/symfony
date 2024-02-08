@@ -18,7 +18,6 @@ use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProviderFactory;
 use Symfony\Component\Translation\Provider\Dsn;
-use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -28,34 +27,16 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
 {
     private const HOST = 'api.crowdin.com';
 
-    /** @var LoaderInterface */
-    private $loader;
-
-    /** @var HttpClientInterface */
-    private $client;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var string */
-    private $defaultLocale;
-
-    /** @var XliffFileDumper */
-    private $xliffFileDumper;
-
-    public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader, XliffFileDumper $xliffFileDumper)
-    {
-        $this->client = $client;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->loader = $loader;
-        $this->xliffFileDumper = $xliffFileDumper;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private LoaderInterface $loader,
+        private XliffFileDumper $xliffFileDumper,
+    ) {
     }
 
-    /**
-     * @return CrowdinProvider
-     */
-    public function create(Dsn $dsn): ProviderInterface
+    public function create(Dsn $dsn): CrowdinProvider
     {
         if ('crowdin' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'crowdin', $this->getSupportedSchemes());

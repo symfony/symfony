@@ -19,7 +19,7 @@ class FooConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function baz($value): self
+    public function baz($value): static
     {
         $this->_usedProperties['baz'] = true;
         $this->baz = $value;
@@ -32,7 +32,7 @@ class FooConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function qux($value): self
+    public function qux($value): static
     {
         $this->_usedProperties['qux'] = true;
         $this->qux = $value;
@@ -73,9 +73,10 @@ class FooConfig
 
     /**
      * @param ParamConfigurator|mixed $value
+     *
      * @return $this
      */
-    public function set(string $key, $value): self
+    public function set(string $key, mixed $value): static
     {
         $this->_extraKeys[$key] = $value;
 

@@ -29,9 +29,10 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking->mark('first_place');
 
-        $markingStore->setMarking($subject, $marking);
+        $markingStore->setMarking($subject, $marking, ['foo' => 'bar']);
 
         $this->assertSame(['first_place' => 1], $subject->getMarking());
+        $this->assertSame(['foo' => 'bar'], $subject->getContext());
 
         $marking2 = $markingStore->getMarking($subject);
 
@@ -50,11 +51,12 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking->mark('first_place');
 
-        $markingStore->setMarking($subject, $marking);
+        $markingStore->setMarking($subject, $marking, ['foo' => 'bar']);
 
         $this->assertSame('first_place', $subject->getMarking());
 
         $marking2 = $markingStore->getMarking($subject);
+        $this->assertSame(['foo' => 'bar'], $subject->getContext());
 
         $this->assertEquals($marking, $marking2);
     }
@@ -82,9 +84,6 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertSame('first_place', (string) $subject->getMarking());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testGetMarkingWithUninitializedProperty()
     {
         $subject = new SubjectWithType();
@@ -96,9 +95,6 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertCount(0, $marking->getPlaces());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testGetMarkingWithUninitializedProperty2()
     {
         $subject = new SubjectWithType();
@@ -111,18 +107,17 @@ class MethodMarkingStoreTest extends TestCase
         $markingStore->getMarking($subject);
     }
 
-    private function createValueObject(string $markingValue)
+    private function createValueObject(string $markingValue): object
     {
         return new class($markingValue) {
-            /** @var string */
-            private $markingValue;
+            private string $markingValue;
 
             public function __construct(string $markingValue)
             {
                 $this->markingValue = $markingValue;
             }
 
-            public function __toString()
+            public function __toString(): string
             {
                 return $this->markingValue;
             }

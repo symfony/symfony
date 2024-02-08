@@ -24,26 +24,21 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
-    /**
-     * An array of YAML class descriptions.
-     *
-     * @var array
-     */
-    protected $classes = null;
+    protected array $classes;
+
+    public function __construct(string $file)
+    {
+        $this->file = $file;
+    }
 
     /**
      * Caches the used YAML parser.
-     *
-     * @var YamlParser
      */
-    private $yamlParser;
+    private YamlParser $yamlParser;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
-        if (null === $this->classes) {
+        if (!isset($this->classes)) {
             $this->loadClassesFromYaml();
         }
 
@@ -63,9 +58,9 @@ class YamlFileLoader extends FileLoader
      *
      * @return string[]
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
-        if (null === $this->classes) {
+        if (!isset($this->classes)) {
             $this->loadClassesFromYaml();
         }
 
@@ -79,7 +74,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return array<array|scalar|Constraint>
      */
-    protected function parseNodes(array $nodes)
+    protected function parseNodes(array $nodes): array
     {
         $values = [];
 
@@ -131,12 +126,11 @@ class YamlFileLoader extends FileLoader
         return $classes;
     }
 
-    private function loadClassesFromYaml()
+    private function loadClassesFromYaml(): void
     {
-        if (null === $this->yamlParser) {
-            $this->yamlParser = new YamlParser();
-        }
+        parent::__construct($this->file);
 
+        $this->yamlParser ??= new YamlParser();
         $this->classes = $this->parseFile($this->file);
 
         if (isset($this->classes['namespaces'])) {
@@ -148,9 +142,12 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function loadClassMetadataFromYaml(ClassMetadata $metadata, array $classDescription)
+    private function loadClassMetadataFromYaml(ClassMetadata $metadata, array $classDescription): void
     {
         if (isset($classDescription['group_sequence_provider'])) {
+            if (\is_string($classDescription['group_sequence_provider'])) {
+                $metadata->setGroupProvider($classDescription['group_sequence_provider']);
+            }
             $metadata->setGroupSequenceProvider(
                 (bool) $classDescription['group_sequence_provider']
             );

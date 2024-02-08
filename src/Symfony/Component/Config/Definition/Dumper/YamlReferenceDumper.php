@@ -28,14 +28,14 @@ use Symfony\Component\Yaml\Inline;
  */
 class YamlReferenceDumper
 {
-    private $reference;
+    private ?string $reference = null;
 
-    public function dump(ConfigurationInterface $configuration)
+    public function dump(ConfigurationInterface $configuration): string
     {
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree());
     }
 
-    public function dumpAtPath(ConfigurationInterface $configuration, string $path)
+    public function dumpAtPath(ConfigurationInterface $configuration, string $path): string
     {
         $rootNode = $node = $configuration->getConfigTreeBuilder()->buildTree();
 
@@ -61,7 +61,7 @@ class YamlReferenceDumper
         return $this->dumpNode($node);
     }
 
-    public function dumpNode(NodeInterface $node)
+    public function dumpNode(NodeInterface $node): string
     {
         $this->reference = '';
         $this->writeNode($node);
@@ -71,7 +71,7 @@ class YamlReferenceDumper
         return $ref;
     }
 
-    private function writeNode(NodeInterface $node, ?NodeInterface $parentNode = null, int $depth = 0, bool $prototypedArray = false)
+    private function writeNode(NodeInterface $node, ?NodeInterface $parentNode = null, int $depth = 0, bool $prototypedArray = false): void
     {
         $comments = [];
         $default = '';
@@ -98,9 +98,9 @@ class YamlReferenceDumper
                 }
             }
         } elseif ($node instanceof EnumNode) {
-            $comments[] = 'One of '.implode('; ', array_map('json_encode', $node->getValues()));
+            $comments[] = 'One of '.$node->getPermissibleValues('; ');
             $default = $node->hasDefaultValue() ? Inline::dump($node->getDefaultValue()) : '~';
-        } elseif (VariableNode::class === \get_class($node) && \is_array($example)) {
+        } elseif (VariableNode::class === $node::class && \is_array($example)) {
             // If there is an array example, we are sure we dont need to print a default value
             $default = '';
         } else {
@@ -170,7 +170,7 @@ class YamlReferenceDumper
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
-            $this->writeArray(array_map([Inline::class, 'dump'], $example), $depth + 1);
+            $this->writeArray(array_map(Inline::dump(...), $example), $depth + 1);
         }
 
         if ($children) {
@@ -183,7 +183,7 @@ class YamlReferenceDumper
     /**
      * Outputs a single config reference line.
      */
-    private function writeLine(string $text, int $indent = 0)
+    private function writeLine(string $text, int $indent = 0): void
     {
         $indent = \strlen($text) + $indent;
         $format = '%'.$indent.'s';
@@ -191,9 +191,9 @@ class YamlReferenceDumper
         $this->reference .= sprintf($format, $text)."\n";
     }
 
-    private function writeArray(array $array, int $depth)
+    private function writeArray(array $array, int $depth): void
     {
-        $isIndexed = array_values($array) === $array;
+        $isIndexed = array_is_list($array);
 
         foreach ($array as $key => $value) {
             if (\is_array($value)) {

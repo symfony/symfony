@@ -15,7 +15,7 @@ use Psr\Log\AbstractLogger;
 
 class TestLogger extends AbstractLogger
 {
-    public $logs = [];
+    public array $logs = [];
 
     public function log($level, $message, array $context = []): void
     {

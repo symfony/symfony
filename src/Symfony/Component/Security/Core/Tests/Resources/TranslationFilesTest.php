@@ -36,9 +36,6 @@ class TranslationFilesTest extends TestCase
     {
         $document = new \DOMDocument();
         $document->loadXML(file_get_contents($filePath));
-        if (\LIBXML_VERSION < 20900) {
-            libxml_disable_entity_loader(true);
-        }
 
         $errors = XliffUtils::validateSchema($document);
 
@@ -48,7 +45,7 @@ class TranslationFilesTest extends TestCase
     public static function provideTranslationFiles()
     {
         return array_map(
-            function ($filePath) { return (array) $filePath; },
+            fn ($filePath) => (array) $filePath,
             glob(\dirname(__DIR__, 2).'/Resources/translations/*.xlf')
         );
     }

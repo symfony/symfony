@@ -20,8 +20,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class HttpUtilsTest extends TestCase
 {
@@ -211,9 +211,9 @@ class HttpUtilsTest extends TestCase
     }
 
     /**
-     * @dataProvider provideSecurityContextAttributes
+     * @dataProvider provideSecurityRequestAttributes
      */
-    public function testCreateRequestPassesSecurityContextAttributesToTheNewRequest($attribute)
+    public function testCreateRequestPassesSecurityRequestAttributesToTheNewRequest($attribute)
     {
         $request = $this->getRequest();
         $request->attributes->set($attribute, 'foo');
@@ -224,12 +224,12 @@ class HttpUtilsTest extends TestCase
         $this->assertSame('foo', $subRequest->attributes->get($attribute));
     }
 
-    public static function provideSecurityContextAttributes()
+    public static function provideSecurityRequestAttributes()
     {
         return [
-            [Security::AUTHENTICATION_ERROR],
-            [Security::ACCESS_DENIED_ERROR],
-            [Security::LAST_USERNAME],
+            [SecurityRequestAttributes::AUTHENTICATION_ERROR],
+            [SecurityRequestAttributes::ACCESS_DENIED_ERROR],
+            [SecurityRequestAttributes::LAST_USERNAME],
         ];
     }
 
@@ -306,7 +306,6 @@ class HttpUtilsTest extends TestCase
 
     public function testCheckRequestPathWithUrlMatcherLoadingException()
     {
-        $this->expectException(\RuntimeException::class);
         $urlMatcher = $this->createMock(UrlMatcherInterface::class);
         $urlMatcher
             ->expects($this->any())
@@ -315,6 +314,9 @@ class HttpUtilsTest extends TestCase
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
+
+        $this->expectException(\RuntimeException::class);
+
         $utils->checkRequestPath($this->getRequest(), 'foobar');
     }
 
@@ -347,13 +349,6 @@ class HttpUtilsTest extends TestCase
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'path/index.html'));
     }
 
-    public function testUrlMatcher()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface');
-        new HttpUtils($this->getUrlGenerator(), new \stdClass());
-    }
-
     public function testGenerateUriRemovesQueryString()
     {
         $utils = new HttpUtils($this->getUrlGenerator('/foo/bar'));
@@ -376,8 +371,7 @@ class HttpUtilsTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You must provide a UrlGeneratorInterface instance to be able to use routes.');
-        $utils = new HttpUtils();
-        $utils->generateUri(new Request(), 'route_name');
+        (new HttpUtils())->generateUri(new Request(), 'route_name');
     }
 
     private function getUrlGenerator($generatedUrl = '/foo/bar')

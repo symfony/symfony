@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 
 use Symfony\Component\Validator\Constraint;
 
-/** @Annotation */
 class ConstraintWithValueAsDefault extends Constraint
 {
     public $property;
@@ -24,7 +23,7 @@ class ConstraintWithValueAsDefault extends Constraint
         return 'value';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT];
     }

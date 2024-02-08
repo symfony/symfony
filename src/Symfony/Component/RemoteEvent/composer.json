@@ -1,0 +1,29 @@
+{
+    "name": "symfony/remote-event",
+    "type": "library",
+    "description": "Eases handling remote events",
+    "keywords": ["event"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/messenger": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\RemoteEvent\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -13,26 +13,20 @@ namespace Symfony\Component\Messenger\Transport\Serialization\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * This normalizer is only used in Debug/Dev/Messenger contexts.
  *
  * @author Pascal Luna <skalpa@zetareticuli.org>
  */
-final class FlattenExceptionNormalizer implements DenormalizerInterface, ContextAwareNormalizerInterface
+final class FlattenExceptionNormalizer implements DenormalizerInterface, NormalizerInterface
 {
     use NormalizerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws InvalidArgumentException
-     */
-    public function normalize($object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $normalized = [
             'message' => $object->getMessage(),
@@ -51,18 +45,19 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
         return $normalized;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            FlattenException::class => false,
+        ];
+    }
+
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof FlattenException && ($context[Serializer::MESSENGER_SERIALIZATION_CONTEXT] ?? false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize($data, string $type, ?string $format = null, array $context = []): FlattenException
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): FlattenException
     {
         $object = new FlattenException();
 
@@ -80,20 +75,15 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
         }
 
         $property = new \ReflectionProperty(FlattenException::class, 'trace');
-        $property->setAccessible(true);
         $property->setValue($object, (array) $data['trace']);
 
         $property = new \ReflectionProperty(FlattenException::class, 'traceAsString');
-        $property->setAccessible(true);
         $property->setValue($object, $data['trace_as_string']);
 
         return $object;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return FlattenException::class === $type && ($context[Serializer::MESSENGER_SERIALIZATION_CONTEXT] ?? false);
     }

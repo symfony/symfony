@@ -16,10 +16,11 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class DummyReceiver implements ReceiverInterface
 {
-    private $deliveriesOfEnvelopes;
-    private $acknowledgedEnvelopes;
-    private $acknowledgeCount = 0;
-    private $rejectCount = 0;
+    private array $deliveriesOfEnvelopes;
+    private array $acknowledgedEnvelopes = [];
+    private array $rejectedEnvelopes = [];
+    private int $acknowledgeCount = 0;
+    private int $rejectCount = 0;
 
     /**
      * @param Envelope[][] $deliveriesOfEnvelopes
@@ -45,6 +46,7 @@ class DummyReceiver implements ReceiverInterface
     public function reject(Envelope $envelope): void
     {
         ++$this->rejectCount;
+        $this->rejectedEnvelopes[] = $envelope;
     }
 
     public function getAcknowledgeCount(): int

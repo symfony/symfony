@@ -27,7 +27,7 @@ class ValidateRequestListener implements EventSubscriberInterface
     /**
      * Performs the validation.
      */
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;
@@ -41,9 +41,6 @@ class ValidateRequestListener implements EventSubscriberInterface
         $request->getHost();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

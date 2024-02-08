@@ -25,7 +25,6 @@ class ArgvInputTest extends TestCase
         $input = new ArgvInput();
         $r = new \ReflectionObject($input);
         $p = $r->getProperty('tokens');
-        $p->setAccessible(true);
 
         $this->assertEquals(['foo'], $p->getValue($input), '__construct() automatically get its input from the argv server variable');
     }
@@ -243,8 +242,7 @@ class ArgvInputTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $input = new ArgvInput($argv);
-        $input->bind($definition);
+        (new ArgvInput($argv))->bind($definition);
     }
 
     /**
@@ -255,11 +253,10 @@ class ArgvInputTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $input = new ArgvInput($argv);
-        $input->bind($definition);
+        (new ArgvInput($argv))->bind($definition);
     }
 
-    public static function provideInvalidInput()
+    public static function provideInvalidInput(): array
     {
         return [
             [
@@ -330,7 +327,7 @@ class ArgvInputTest extends TestCase
         ];
     }
 
-    public static function provideInvalidNegatableInput()
+    public static function provideInvalidNegatableInput(): array
     {
         return [
             [

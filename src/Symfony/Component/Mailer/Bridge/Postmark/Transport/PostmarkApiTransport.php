@@ -13,6 +13,8 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\Postmark\Event\PostmarkDeliveryEventFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Event\PostmarkEvents;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -33,15 +35,29 @@ class PostmarkApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.postmarkapp.com';
 
-    private $key;
+    private ?EventDispatcherInterface $dispatcher;
 
-    private $messageStream;
+    private ?string $messageStream = null;
 
-    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->key = $key;
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
+        $this->dispatcher = $dispatcher;
 
         parent::__construct($client, $dispatcher, $logger);
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMessageStream(string $messageStream): static
+    {
+        $this->messageStream = $messageStream;
+
+        return $this;
     }
 
     public function __toString(): string
@@ -62,13 +78,25 @@ class PostmarkApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
+        } catch (DecodingExceptionInterface) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Postmark server.', $response, 0, $e);
         }
 
         if (200 !== $statusCode) {
+            $eventFactory = new PostmarkDeliveryEventFactory();
+
+            // Some delivery issues can be handled silently - route those through EventDispatcher
+            if (null !== $this->dispatcher && $eventFactory->supports($result['ErrorCode'])) {
+                $this->dispatcher->dispatch(
+                    $eventFactory->create($result['ErrorCode'], $result['Message'], $email),
+                    PostmarkEvents::DELIVERY,
+                );
+
+                return $response;
+            }
+
             throw new HttpTransportException('Unable to send an email: '.$result['Message'].sprintf(' (code %d).', $result['ErrorCode']), $response);
         }
 
@@ -159,15 +187,5 @@ class PostmarkApiTransport extends AbstractApiTransport
     private function getEndpoint(): ?string
     {
         return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
-    }
-
-    /**
-     * @return $this
-     */
-    public function setMessageStream(string $messageStream): self
-    {
-        $this->messageStream = $messageStream;
-
-        return $this;
     }
 }

@@ -19,7 +19,7 @@ class BarConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function corge($value): self
+    public function corge($value): static
     {
         $this->_usedProperties['corge'] = true;
         $this->corge = $value;
@@ -32,7 +32,7 @@ class BarConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function grault($value): self
+    public function grault($value): static
     {
         $this->_usedProperties['grault'] = true;
         $this->grault = $value;
@@ -73,9 +73,10 @@ class BarConfig
 
     /**
      * @param ParamConfigurator|mixed $value
+     *
      * @return $this
      */
-    public function set(string $key, $value): self
+    public function set(string $key, mixed $value): static
     {
         $this->_extraKeys[$key] = $value;
 

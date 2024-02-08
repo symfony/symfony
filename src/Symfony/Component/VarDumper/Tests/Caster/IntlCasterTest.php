@@ -234,7 +234,7 @@ EOTXT;
         $var = new \IntlDateFormatter('en', \IntlDateFormatter::TRADITIONAL, \IntlDateFormatter::TRADITIONAL);
 
         $expectedLocale = $var->getLocale();
-        $expectedPattern = $var->getPattern();
+        $expectedPattern = $this->normalizeNarrowNoBreakSpaceCharacter($var->getPattern());
         $expectedCalendar = $var->getCalendar();
         $expectedTimeZoneId = $var->getTimeZoneId();
         $expectedTimeType = $var->getTimeType();
@@ -293,5 +293,10 @@ IntlDateFormatter {
 }
 EOTXT;
         $this->assertDumpEquals($expected, $var);
+    }
+
+    private function normalizeNarrowNoBreakSpaceCharacter(string $input): string
+    {
+        return str_replace("\u{202F}", '\\u{202F}', $input);
     }
 }

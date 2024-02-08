@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\OvhCloud\Tests;
 
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return OvhCloudTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): OvhCloudTransportFactory
     {
         return new OvhCloudTransportFactory();
     }
@@ -56,6 +52,7 @@ final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
     public static function supportsProvider(): iterable
     {
         yield [true, 'ovhcloud://key:secret@default?consumer_key=consumerKey&service_name=serviceName&sender=sender'];
+        yield [true, 'ovhcloud://key:secret@default?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=1'];
         yield [false, 'somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName&sender=sender'];
     }
 

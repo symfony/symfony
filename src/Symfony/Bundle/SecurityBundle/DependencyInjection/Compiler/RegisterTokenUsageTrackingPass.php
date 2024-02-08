@@ -27,10 +27,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class RegisterTokenUsageTrackingPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->has('security.untracked_token_storage')) {
             return;
@@ -41,7 +38,7 @@ class RegisterTokenUsageTrackingPass implements CompilerPassInterface
             TokenStorageInterface::class => new BoundArgument(new Reference('security.untracked_token_storage'), false),
         ]);
 
-        if (!$container->has('session.factory') && !$container->has('session.storage')) {
+        if (!$container->has('session.factory')) {
             $container->setAlias('security.token_storage', 'security.untracked_token_storage')->setPublic(true);
             $container->getDefinition('security.untracked_token_storage')->addTag('kernel.reset', ['method' => 'reset']);
         } elseif ($container->hasDefinition('security.context_listener')) {

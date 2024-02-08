@@ -24,19 +24,13 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
  */
 class ResolvedTypeFactoryDataCollectorProxy implements ResolvedFormTypeFactoryInterface
 {
-    private $proxiedFactory;
-    private $dataCollector;
-
-    public function __construct(ResolvedFormTypeFactoryInterface $proxiedFactory, FormDataCollectorInterface $dataCollector)
-    {
-        $this->proxiedFactory = $proxiedFactory;
-        $this->dataCollector = $dataCollector;
+    public function __construct(
+        private ResolvedFormTypeFactoryInterface $proxiedFactory,
+        private FormDataCollectorInterface $dataCollector,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createResolvedType(FormTypeInterface $type, array $typeExtensions, ?ResolvedFormTypeInterface $parent = null)
+    public function createResolvedType(FormTypeInterface $type, array $typeExtensions, ?ResolvedFormTypeInterface $parent = null): ResolvedFormTypeInterface
     {
         return new ResolvedTypeDataCollectorProxy(
             $this->proxiedFactory->createResolvedType($type, $typeExtensions, $parent),

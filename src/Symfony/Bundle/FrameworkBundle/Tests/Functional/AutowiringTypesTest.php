@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\PsrCachedReader;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
@@ -20,22 +18,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class AutowiringTypesTest extends AbstractWebTestCase
 {
-    public function testAnnotationReaderAutowiring()
-    {
-        static::bootKernel(['root_config' => 'no_annotations_cache.yml', 'environment' => 'no_annotations_cache']);
-
-        $annotationReader = self::getContainer()->get('test.autowiring_types.autowired_services')->getAnnotationReader();
-        $this->assertInstanceOf(AnnotationReader::class, $annotationReader);
-    }
-
-    public function testCachedAnnotationReaderAutowiring()
-    {
-        static::bootKernel();
-
-        $annotationReader = self::getContainer()->get('test.autowiring_types.autowired_services')->getAnnotationReader();
-        $this->assertInstanceOf(PsrCachedReader::class, $annotationReader);
-    }
-
     public function testEventDispatcherAutowiring()
     {
         static::bootKernel(['debug' => false]);

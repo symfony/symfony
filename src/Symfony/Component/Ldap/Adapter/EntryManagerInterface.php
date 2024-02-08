@@ -25,40 +25,50 @@ interface EntryManagerInterface
     /**
      * Adds a new entry in the Ldap server.
      *
+     * @return $this
+     *
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function add(Entry $entry);
+    public function add(Entry $entry): static;
 
     /**
      * Updates an entry from the Ldap server.
      *
+     * @return $this
+     *
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function update(Entry $entry);
+    public function update(Entry $entry): static;
 
     /**
      * Moves an entry on the Ldap server.
      *
+     * @return $this
+     *
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function move(Entry $entry, string $newParent);
+    public function move(Entry $entry, string $newParent): static;
 
     /**
      * Renames an entry on the Ldap server.
      *
-     * @throws NotBoundException
-     * @throws LdapException
-     */
-    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true);
-
-    /**
-     * Removes an entry from the Ldap server.
+     * @return $this
      *
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function remove(Entry $entry);
+    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true): static;
+
+    /**
+     * Removes an entry from the Ldap server.
+     *
+     * @return $this
+     *
+     * @throws NotBoundException
+     * @throws LdapException
+     */
+    public function remove(Entry $entry): static;
 }

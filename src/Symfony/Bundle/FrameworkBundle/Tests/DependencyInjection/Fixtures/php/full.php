@@ -9,9 +9,11 @@ $container->loadFromExtension('framework', [
         'csrf_protection' => [
             'field_name' => '_csrf',
         ],
-        'legacy_error_messages' => false,
     ],
     'http_method_override' => false,
+    'handle_all_throwables' => true,
+    'php_errors' => ['log' => true],
+    'trust_x_sendfile_type_header' => true,
     'esi' => [
         'enabled' => true,
     ],
@@ -35,6 +37,7 @@ $container->loadFromExtension('framework', [
         'cookie_path' => '/',
         'cookie_domain' => 'example.com',
         'cookie_secure' => true,
+        'cookie_samesite' => 'lax',
         'cookie_httponly' => false,
         'use_cookies' => true,
         'gc_maxlifetime' => 90000,
@@ -55,21 +58,19 @@ $container->loadFromExtension('framework', [
     ],
     'validation' => [
         'enabled' => true,
+        'email_validation_mode' => 'html5',
     ],
-    'annotations' => [
-        'cache' => 'file',
-        'debug' => true,
-        'file_cache_dir' => '%kernel.cache_dir%/annotations',
-    ],
+    'annotations' => false,
     'serializer' => [
         'enabled' => true,
-        'enable_annotations' => true,
+        'enable_attributes' => true,
         'name_converter' => 'serializer.name_converter.camel_case_to_snake_case',
         'circular_reference_handler' => 'my.circular.reference.handler',
         'max_depth_handler' => 'my.max.depth.handler',
         'default_context' => ['enable_max_depth' => true],
     ],
     'property_info' => true,
+    'type_info' => true,
     'ide' => 'file%%link%%format',
     'request' => [
         'formats' => [
@@ -79,5 +80,8 @@ $container->loadFromExtension('framework', [
             ],
             'pdf' => 'application/pdf',
         ],
+    ],
+    'html_sanitizer' => [
+        'enabled' => true,
     ],
 ]);

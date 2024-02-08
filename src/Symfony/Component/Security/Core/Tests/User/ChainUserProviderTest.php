@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class ChainUserProviderTest extends TestCase
 {
-    public function testLoadUserByUsername()
+    public function testLoadUserByIdentifier()
     {
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
@@ -45,9 +45,8 @@ class ChainUserProviderTest extends TestCase
         $this->assertSame($account, $provider->loadUserByIdentifier('foo'));
     }
 
-    public function testLoadUserByUsernameThrowsUserNotFoundException()
+    public function testLoadUserByIdentifierThrowsUserNotFoundException()
     {
-        $this->expectException(UserNotFoundException::class);
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
             ->expects($this->once())
@@ -65,6 +64,9 @@ class ChainUserProviderTest extends TestCase
         ;
 
         $provider = new ChainUserProvider([$provider1, $provider2]);
+
+        $this->expectException(UserNotFoundException::class);
+
         $provider->loadUserByIdentifier('foo');
     }
 
@@ -141,7 +143,6 @@ class ChainUserProviderTest extends TestCase
 
     public function testRefreshUserThrowsUnsupportedUserException()
     {
-        $this->expectException(UnsupportedUserException::class);
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
             ->expects($this->once())
@@ -169,6 +170,9 @@ class ChainUserProviderTest extends TestCase
         ;
 
         $provider = new ChainUserProvider([$provider1, $provider2]);
+
+        $this->expectException(UnsupportedUserException::class);
+
         $provider->refreshUser($this->createMock(UserInterface::class));
     }
 

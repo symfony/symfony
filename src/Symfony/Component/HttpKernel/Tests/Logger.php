@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 
 class Logger implements LoggerInterface
 {
-    protected $logs;
+    protected array $logs;
 
     public function __construct()
     {
@@ -27,7 +27,7 @@ class Logger implements LoggerInterface
         return false === $level ? $this->logs : $this->logs[$level];
     }
 
-    public function clear()
+    public function clear(): void
     {
         $this->logs = [
             'emergency' => [],

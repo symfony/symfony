@@ -25,7 +25,7 @@ class DateCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    private $previousTimezone;
+    private string $previousTimezone;
 
     protected function setUp(): void
     {
@@ -60,11 +60,27 @@ EODUMP;
     /**
      * @dataProvider provideDateTimes
      */
+    public function testDumpDateTimeImmutable($time, $timezone, $xDate, $xTimestamp)
+    {
+        $date = new \DateTimeImmutable($time, new \DateTimeZone($timezone));
+
+        $xDump = <<<EODUMP
+DateTimeImmutable @$xTimestamp {
+  date: $xDate
+}
+EODUMP;
+
+        $this->assertDumpEquals($xDump, $date);
+    }
+
+    /**
+     * @dataProvider provideDateTimes
+     */
     public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
     {
         $stub = new Stub();
-        $date = new \DateTime($time, new \DateTimeZone($timezone));
-        $cast = DateCaster::castDateTime($date, Caster::castObject($date, \DateTime::class), $stub, false, 0);
+        $date = new \DateTimeImmutable($time, new \DateTimeZone($timezone));
+        $cast = DateCaster::castDateTime($date, Caster::castObject($date, \DateTimeImmutable::class), $stub, false, 0);
 
         $xDump = <<<EODUMP
 array:1 [
@@ -389,7 +405,7 @@ EODUMP;
      */
     public function testDumpPeriod($start, $interval, $end, $options, $expected)
     {
-        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
+        $p = new \DatePeriod(new \DateTimeImmutable($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
 
         $xDump = <<<EODUMP
 DatePeriod {
@@ -405,7 +421,7 @@ EODUMP;
      */
     public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates)
     {
-        $p = new \DatePeriod(new \DateTime($start, new \DateTimeZone('UTC')), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end, new \DateTimeZone('UTC')), $options);
+        $p = new \DatePeriod(new \DateTimeImmutable($start, new \DateTimeZone('UTC')), new \DateInterval($interval), \is_int($end) ? $end : new \DateTimeImmutable($end, new \DateTimeZone('UTC')), $options);
         $stub = new Stub();
 
         $cast = DateCaster::castPeriod($p, [], $stub, false, 0);
@@ -474,11 +490,7 @@ EODUMP;
 
 class NoTimezoneDate extends \DateTime
 {
-    /**
-     * @return \DateTimeZone|false
-     */
-    #[\ReturnTypeWillChange]
-    public function getTimezone()
+    public function getTimezone(): \DateTimeZone|false
     {
         return false;
     }

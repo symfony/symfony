@@ -30,15 +30,15 @@ use Twig\Environment;
  */
 class RouterController
 {
-    private $profiler;
-    private $twig;
-    private $matcher;
-    private $routes;
+    private ?Profiler $profiler;
+    private Environment $twig;
+    private ?UrlMatcherInterface $matcher;
+    private ?RouteCollection $routes;
 
     /**
      * @var ExpressionFunctionProviderInterface[]
      */
-    private $expressionLanguageProviders = [];
+    private iterable $expressionLanguageProviders;
 
     public function __construct(?Profiler $profiler, Environment $twig, ?UrlMatcherInterface $matcher = null, ?RouteCollection $routes = null, iterable $expressionLanguageProviders = [])
     {

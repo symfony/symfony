@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -31,7 +31,7 @@ class Dummy extends ParentDummy
     protected $baz;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeImmutable
      */
     public $bal;
 
@@ -41,9 +41,9 @@ class Dummy extends ParentDummy
     public $parent;
 
     /**
-     * @var \DateTime[]
-     * @Groups({"a", "b"})
+     * @var \DateTimeImmutable[]
      */
+    #[Groups(['a', 'b'])]
     public $collection;
 
     /**
@@ -89,7 +89,7 @@ class Dummy extends ParentDummy
     public $i;
 
     /**
-     * @var ?\DateTime
+     * @var ?\DateTimeImmutable
      */
     public $j;
 
@@ -155,6 +155,8 @@ class Dummy extends ParentDummy
      */
     public $arrayOfMixed;
 
+    public $noDocBlock;
+
     /**
      * @var list<string>
      */
@@ -176,7 +178,7 @@ class Dummy extends ParentDummy
     {
     }
 
-    public static function staticSetter(\DateTime $d)
+    public static function staticSetter(\DateTimeImmutable $d)
     {
     }
 
@@ -201,7 +203,7 @@ class Dummy extends ParentDummy
     /**
      * Date of Birth.
      *
-     * @return \DateTime
+     * @return \DateTimeImmutable
      */
     public function getDOB()
     {
@@ -246,11 +248,11 @@ class Dummy extends ParentDummy
     {
     }
 
-    public function setDate(\DateTime $date)
+    public function setDate(\DateTimeImmutable $date)
     {
     }
 
-    public function addDate(\DateTime $date)
+    public function addDate(\DateTimeImmutable $date)
     {
     }
 

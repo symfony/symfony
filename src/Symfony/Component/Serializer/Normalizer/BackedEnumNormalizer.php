@@ -20,16 +20,21 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  *
  * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
-final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return int|string
-     *
-     * @throws InvalidArgumentException
+     * If true, will denormalize any invalid value into null.
      */
-    public function normalize($object, ?string $format = null, array $context = [])
+    public const ALLOW_INVALID_VALUES = 'allow_invalid_values';
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+           \BackedEnum::class => true,
+        ];
+    }
+
+    public function normalize(mixed $object, ?string $format = null, array $context = []): int|string
     {
         if (!$object instanceof \BackedEnum) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
@@ -38,23 +43,30 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         return $object->value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, ?string $format = null): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof \BackedEnum;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!is_subclass_of($type, \BackedEnum::class)) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
+        }
+
+        if ($context[self::ALLOW_INVALID_VALUES] ?? false) {
+            if (null === $data || (!\is_int($data) && !\is_string($data))) {
+                return null;
+            }
+
+            try {
+                return $type::tryFrom($data);
+            } catch (\TypeError) {
+                return null;
+            }
         }
 
         if (!\is_int($data) && !\is_string($data)) {
@@ -72,19 +84,8 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, string $type, ?string $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_subclass_of($type, \BackedEnum::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        return true;
     }
 }

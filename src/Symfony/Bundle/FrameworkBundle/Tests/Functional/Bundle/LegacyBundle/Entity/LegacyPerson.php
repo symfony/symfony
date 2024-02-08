@@ -13,8 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\LegacyBundle\En
 
 class LegacyPerson
 {
-    public $name;
-    public $age;
+    public string $name;
+    public string $age;
 
     public function __construct(string $name, string $age)
     {

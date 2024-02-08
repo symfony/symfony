@@ -35,7 +35,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlDumperTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {
@@ -69,7 +69,7 @@ class YamlDumperTest extends TestCase
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         } catch (\Exception $e) {
             $this->assertInstanceOf(\RuntimeException::class, $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
-            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource, got "stdClass".', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         }
     }
 
@@ -116,10 +116,22 @@ class YamlDumperTest extends TestCase
     public function testTaggedArguments()
     {
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
+        $taggedIterator2 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz']);
+        $taggedIterator3 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz', 'qux'], false);
+
         $container = new ContainerBuilder();
+
         $container->register('foo_service', 'Foo')->addTag('foo');
+        $container->register('baz_service', 'Baz')->addTag('foo');
+        $container->register('qux_service', 'Qux')->addTag('foo');
+
         $container->register('foo_service_tagged_iterator', 'Bar')->addArgument($taggedIterator);
+        $container->register('foo2_service_tagged_iterator', 'Bar')->addArgument($taggedIterator2);
+        $container->register('foo3_service_tagged_iterator', 'Bar')->addArgument($taggedIterator3);
+
         $container->register('foo_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator));
+        $container->register('foo2_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator2));
+        $container->register('foo3_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator3));
         $container->register('bar_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo')));
 
         $dumper = new YamlDumper($container);
@@ -137,9 +149,6 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_service_closure.yml', $dumper->dump());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();
@@ -154,12 +163,14 @@ class YamlDumperTest extends TestCase
         $container->compile();
         $dumper = new YamlDumper($container);
 
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_enumeration.yml'), $dumper->dump());
+        if (str_starts_with(Yaml::dump(FooUnitEnum::BAR), '!php/enum')) {
+            $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_enumeration_enum_tag.yml'), $dumper->dump());
+        } else {
+            $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_enumeration.yml'), $dumper->dump());
+        }
     }
 
     /**
-     * @requires PHP 8.1
-     *
      * @dataProvider provideDefaultClasses
      */
     public function testDumpHandlesDefaultAttribute($class, $expectedFile)
@@ -194,6 +205,14 @@ class YamlDumperTest extends TestCase
 
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_abstract_argument.yml', $dumper->dump());
+    }
+
+    public function testDumpNonScalarTags()
+    {
+        $container = include self::$fixturesPath.'/containers/container_non_scalar_tags.php';
+        $dumper = new YamlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_array_tags.yml'), $dumper->dump());
     }
 
     private function assertEqualYamlStructure(string $expected, string $yaml, string $message = '')

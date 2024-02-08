@@ -1,25 +1,16 @@
 Array
 (
-    [Container%s/removed-ids.php] => <?php
-
-namespace Container%s;
-
-return [
-    'Psr\\Container\\ContainerInterface' => true,
-    'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-];
-
     [Container%s/proxy-classes.php] => <?php
 
 namespace Container%s;
 
-include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
+include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
 
-class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
+class FooClassGhost1728205 extends \Bar\FooClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 %A
 
-if (!\class_exists('FooClass_%s', false)) {
-    \class_alias(__NAMESPACE__.'\\FooClass_%s', 'FooClass_%s', false);
+if (!\class_exists('FooClassGhost1728205', false)) {
+    \class_alias(__NAMESPACE__.'\\FooClassGhost1728205', 'FooClassGhost1728205', false);
 }
 
     [Container%s/ProjectServiceContainer.php] => <?php
@@ -29,8 +20,8 @@ namespace Container%s;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -40,15 +31,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class ProjectServiceContainer extends Container
 {
-    protected $containerDir;
     protected $targetDir;
     protected $parameters = [];
-    private $buildParameters;
 
-    public function __construct(array $buildParameters = [], $containerDir = __DIR__)
+    public function __construct(private array $buildParameters = [], protected string $containerDir = __DIR__)
     {
-        $this->buildParameters = $buildParameters;
-        $this->containerDir = $containerDir;
         $this->targetDir = \dirname($containerDir);
         $this->parameters = $this->getDefaultParameters();
 
@@ -59,7 +46,7 @@ class ProjectServiceContainer extends Container
 
         $this->aliases = [];
 
-        $this->privates['service_container'] = function () {
+        $this->privates['service_container'] = static function ($container) {
             include_once __DIR__.'/proxy-classes.php';
         };
     }
@@ -74,11 +61,6 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return require $this->containerDir.\DIRECTORY_SEPARATOR.'removed-ids.php';
-    }
-
     protected function createProxy($class, \Closure $factory)
     {
         return $factory();
@@ -89,36 +71,25 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getLazyFooService($lazyLoad = true)
+    protected static function getLazyFooService($container, $lazyLoad = true)
     {
-        if ($lazyLoad) {
-            return $this->services['lazy_foo'] = $this->createProxy('FooClass_8976cfa', function () {
-                return \FooClass_8976cfa::staticProxyConstructor(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
-                    $wrappedInstance = $this->getLazyFooService(false);
-
-                    $proxy->setProxyInitializer(null);
-
-                    return true;
-                });
-            });
+        if (true === $lazyLoad) {
+            return $container->services['lazy_foo'] = $container->createProxy('FooClassGhost1728205', static fn () => \FooClassGhost1728205::createLazyGhost(static fn ($proxy) => self::getLazyFooService($container, $proxy)));
         }
 
-        include_once $this->targetDir.''.'/Fixtures/includes/foo_lazy.php';
+        include_once $container->targetDir.''.'/Fixtures/includes/foo_lazy.php';
 
-        return new \Bar\FooClass(new \Bar\FooLazyClass());
+        return ($lazyLoad->__construct(new \Bar\FooLazyClass()) && false ?: $lazyLoad);
     }
 
-    /**
-     * @return array|bool|float|int|string|\UnitEnum|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];
         }
 
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new ParameterNotFoundException($name);
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -143,7 +114,7 @@ class ProjectServiceContainer extends Container
 
     public function getParameterBag(): ParameterBagInterface
     {
-        if (null === $this->parameterBag) {
+        if (!isset($this->parameterBag)) {
             $parameters = $this->parameters;
             foreach ($this->loadedDynamicParameters as $name => $loaded) {
                 $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -162,12 +133,13 @@ class ProjectServiceContainer extends Container
 
     private function getDynamicParameter(string $name)
     {
-        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
+        throw new ParameterNotFoundException($name);
     }
 
     protected function getDefaultParameters(): array
     {
         return [
+            'lazy_foo_class' => 'Bar\\FooClass',
             'container.dumper.inline_factories' => true,
             'container.dumper.inline_class_loader' => true,
         ];
@@ -181,7 +153,7 @@ class ProjectServiceContainer extends Container
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     return;
 }
 
@@ -215,6 +187,7 @@ return new \Container%s\ProjectServiceContainer([
     'container.build_hash' => '%s',
     'container.build_id' => '%s',
     'container.build_time' => 1563381341,
+    'container.runtime_mode' => \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\DIRECTORY_SEPARATOR.'Container%s');
 
 )

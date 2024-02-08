@@ -28,9 +28,9 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInterface
 {
-    private $varDir;
-    private $testCase;
-    private $rootConfig;
+    private string $varDir;
+    private string $testCase;
+    private string $rootConfig;
 
     public function __construct($varDir, $testCase, $rootConfig, $environment, $debug)
     {
@@ -73,12 +73,12 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/logs';
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load($this->rootConfig);
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         $container->register('logger', NullLogger::class);
         $container->registerExtension(new TestDumpExtension());
@@ -89,7 +89,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return ['varDir', 'testCase', 'rootConfig', 'environment', 'debug'];
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         foreach ($this as $k => $v) {
             if (\is_object($v)) {
@@ -117,7 +117,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return $treeBuilder;
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
     }
 
@@ -126,7 +126,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return '';
     }
 
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return false;
     }

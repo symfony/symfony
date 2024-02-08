@@ -18,7 +18,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
  */
 trait CheckPasswordLengthTrait
 {
-    private function isPasswordTooLong(string $password): bool
+    private function isPasswordTooLong(#[\SensitiveParameter] string $password): bool
     {
         return PasswordHasherInterface::MAX_PASSWORD_LENGTH < \strlen($password);
     }

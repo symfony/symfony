@@ -21,27 +21,16 @@ class Section
     /**
      * @var StopwatchEvent[]
      */
-    private $events = [];
+    private array $events = [];
 
-    /**
-     * @var float|null
-     */
-    private $origin;
-
-    /**
-     * @var bool
-     */
-    private $morePrecision;
-
-    /**
-     * @var string
-     */
-    private $id;
+    private ?float $origin;
+    private bool $morePrecision;
+    private ?string $id = null;
 
     /**
      * @var Section[]
      */
-    private $children = [];
+    private array $children = [];
 
     /**
      * @param float|null $origin        Set the origin of the events in this section, use null to set their origin to their start time
@@ -55,10 +44,8 @@ class Section
 
     /**
      * Returns the child section.
-     *
-     * @return self|null
      */
-    public function get(string $id)
+    public function get(string $id): ?self
     {
         foreach ($this->children as $child) {
             if ($id === $child->getId()) {
@@ -73,10 +60,8 @@ class Section
      * Creates or re-opens a child section.
      *
      * @param string|null $id Null to create a new section, the identifier to re-open an existing one
-     *
-     * @return self
      */
-    public function open(?string $id)
+    public function open(?string $id): self
     {
         if (null === $id || null === $session = $this->get($id)) {
             $session = $this->children[] = new self(microtime(true) * 1000, $this->morePrecision);
@@ -85,10 +70,7 @@ class Section
         return $session;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -98,7 +80,7 @@ class Section
      *
      * @return $this
      */
-    public function setId(string $id)
+    public function setId(string $id): static
     {
         $this->id = $id;
 
@@ -107,10 +89,8 @@ class Section
 
     /**
      * Starts an event.
-     *
-     * @return StopwatchEvent
      */
-    public function startEvent(string $name, ?string $category)
+    public function startEvent(string $name, ?string $category): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
             $this->events[$name] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category, $this->morePrecision, $name);
@@ -121,10 +101,8 @@ class Section
 
     /**
      * Checks if the event was started.
-     *
-     * @return bool
      */
-    public function isEventStarted(string $name)
+    public function isEventStarted(string $name): bool
     {
         return isset($this->events[$name]) && $this->events[$name]->isStarted();
     }
@@ -132,11 +110,9 @@ class Section
     /**
      * Stops an event.
      *
-     * @return StopwatchEvent
-     *
      * @throws \LogicException When the event has not been started
      */
-    public function stopEvent(string $name)
+    public function stopEvent(string $name): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
             throw new \LogicException(sprintf('Event "%s" is not started.', $name));
@@ -148,11 +124,9 @@ class Section
     /**
      * Stops then restarts an event.
      *
-     * @return StopwatchEvent
-     *
      * @throws \LogicException When the event has not been started
      */
-    public function lap(string $name)
+    public function lap(string $name): StopwatchEvent
     {
         return $this->stopEvent($name)->start();
     }
@@ -160,11 +134,9 @@ class Section
     /**
      * Returns a specific event by name.
      *
-     * @return StopwatchEvent
-     *
      * @throws \LogicException When the event is not known
      */
-    public function getEvent(string $name)
+    public function getEvent(string $name): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
             throw new \LogicException(sprintf('Event "%s" is not known.', $name));
@@ -178,7 +150,7 @@ class Section
      *
      * @return StopwatchEvent[]
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         return $this->events;
     }

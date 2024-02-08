@@ -19,8 +19,8 @@ use Symfony\Component\Serializer\Serializer;
 
 class JsonEncoderTest extends TestCase
 {
-    private $encoder;
-    private $serializer;
+    private JsonEncoder $encoder;
+    private Serializer $serializer;
 
     protected function setUp(): void
     {
@@ -84,11 +84,12 @@ class JsonEncoderTest extends TestCase
 
     public function testEncodeNotUtf8WithoutPartialOnError()
     {
-        $this->expectException(UnexpectedValueException::class);
         $arr = [
             'utf8' => 'Hello World!',
             'notUtf8' => "\xb0\xd0\xb5\xd0",
         ];
+
+        $this->expectException(UnexpectedValueException::class);
 
         $this->encoder->encode($arr, 'json');
     }

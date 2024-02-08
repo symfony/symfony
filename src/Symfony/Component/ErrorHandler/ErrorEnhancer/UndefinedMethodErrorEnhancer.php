@@ -19,9 +19,6 @@ use Symfony\Component\ErrorHandler\Error\UndefinedMethodError;
  */
 class UndefinedMethodErrorEnhancer implements ErrorEnhancerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function enhance(\Throwable $error): ?\Throwable
     {
         if ($error instanceof FatalError) {
@@ -47,7 +44,7 @@ class UndefinedMethodErrorEnhancer implements ErrorEnhancerInterface
         $candidates = [];
         foreach ($methods as $definedMethodName) {
             $lev = levenshtein($methodName, $definedMethodName);
-            if ($lev <= \strlen($methodName) / 3 || false !== strpos($definedMethodName, $methodName)) {
+            if ($lev <= \strlen($methodName) / 3 || str_contains($definedMethodName, $methodName)) {
                 $candidates[] = $definedMethodName;
             }
         }

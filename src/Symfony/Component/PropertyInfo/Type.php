@@ -38,7 +38,7 @@ class Type
      *
      * @var string[]
      */
-    public static $builtinTypes = [
+    public static array $builtinTypes = [
         self::BUILTIN_TYPE_INT,
         self::BUILTIN_TYPE_FLOAT,
         self::BUILTIN_TYPE_STRING,
@@ -58,17 +58,17 @@ class Type
      *
      * @var string[]
      */
-    public static $builtinCollectionTypes = [
+    public static array $builtinCollectionTypes = [
         self::BUILTIN_TYPE_ARRAY,
         self::BUILTIN_TYPE_ITERABLE,
     ];
 
-    private $builtinType;
-    private $nullable;
-    private $class;
-    private $collection;
-    private $collectionKeyType;
-    private $collectionValueType;
+    private string $builtinType;
+    private bool $nullable;
+    private ?string $class;
+    private bool $collection;
+    private array $collectionKeyType;
+    private array $collectionValueType;
 
     /**
      * @param Type[]|Type|null $collectionKeyType
@@ -76,9 +76,9 @@ class Type
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $builtinType, bool $nullable = false, ?string $class = null, bool $collection = false, $collectionKeyType = null, $collectionValueType = null)
+    public function __construct(string $builtinType, bool $nullable = false, ?string $class = null, bool $collection = false, array|self|null $collectionKeyType = null, array|self|null $collectionValueType = null)
     {
-        if (!\in_array($builtinType, self::$builtinTypes)) {
+        if (!\in_array($builtinType, self::$builtinTypes, true)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));
         }
 
@@ -90,14 +90,10 @@ class Type
         $this->collectionValueType = $this->validateCollectionArgument($collectionValueType, 6, '$collectionValueType') ?? [];
     }
 
-    private function validateCollectionArgument($collectionArgument, int $argumentIndex, string $argumentName): ?array
+    private function validateCollectionArgument(array|self|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
     {
         if (null === $collectionArgument) {
             return null;
-        }
-
-        if (!\is_array($collectionArgument) && !$collectionArgument instanceof self) {
-            throw new \TypeError(sprintf('"%s()": Argument #%d (%s) must be of type "%s[]", "%s" or "null", "%s" given.', __METHOD__, $argumentIndex, $argumentName, self::class, self::class, get_debug_type($collectionArgument)));
         }
 
         if (\is_array($collectionArgument)) {
@@ -144,29 +140,6 @@ class Type
     }
 
     /**
-     * Gets collection key type.
-     *
-     * Only applicable for a collection type.
-     *
-     * @deprecated since Symfony 5.3, use "getCollectionKeyTypes()" instead
-     */
-    public function getCollectionKeyType(): ?self
-    {
-        trigger_deprecation('symfony/property-info', '5.3', 'The "%s()" method is deprecated, use "getCollectionKeyTypes()" instead.', __METHOD__);
-
-        $type = $this->getCollectionKeyTypes();
-        if (0 === \count($type)) {
-            return null;
-        }
-
-        if (\is_array($type)) {
-            [$type] = $type;
-        }
-
-        return $type;
-    }
-
-    /**
      * Gets collection key types.
      *
      * Only applicable for a collection type.
@@ -176,20 +149,6 @@ class Type
     public function getCollectionKeyTypes(): array
     {
         return $this->collectionKeyType;
-    }
-
-    /**
-     * Gets collection value type.
-     *
-     * Only applicable for a collection type.
-     *
-     * @deprecated since Symfony 5.3, use "getCollectionValueTypes()" instead
-     */
-    public function getCollectionValueType(): ?self
-    {
-        trigger_deprecation('symfony/property-info', '5.3', 'The "%s()" method is deprecated, use "getCollectionValueTypes()" instead.', __METHOD__);
-
-        return $this->getCollectionValueTypes()[0] ?? null;
     }
 
     /**

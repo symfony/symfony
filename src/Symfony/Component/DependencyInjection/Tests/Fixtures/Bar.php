@@ -23,4 +23,12 @@ class Bar implements BarInterface
     public static function create(\NonExistent $nonExistent = null, $factory = null)
     {
     }
+
+    public function createNonStatic()
+    {
+    }
+
+    private static function createPrivateStatic()
+    {
+    }
 }

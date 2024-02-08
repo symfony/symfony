@@ -99,7 +99,7 @@ class KernelTest extends TestCase
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr(\get_class($kernel->getContainer()), 0, 16);
+        $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr($kernel->getContainer()::class, 0, 16);
         $this->assertTrue(unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta'));
         $this->assertFileExists($containerDir);
         $this->assertFileDoesNotExist($containerDir.'.legacy');
@@ -239,107 +239,6 @@ class KernelTest extends TestCase
             ->method('boot');
 
         $kernel->handle($request, $type, $catch);
-    }
-
-    /**
-     * @dataProvider getStripCommentsCodes
-     */
-    public function testStripComments(string $source, string $expected)
-    {
-        $output = Kernel::stripComments($source);
-
-        // Heredocs are preserved, making the output mixing Unix and Windows line
-        // endings, switching to "\n" everywhere on Windows to avoid failure.
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $expected = str_replace("\r\n", "\n", $expected);
-            $output = str_replace("\r\n", "\n", $output);
-        }
-
-        $this->assertEquals($expected, $output);
-    }
-
-    public static function getStripCommentsCodes(): array
-    {
-        return [
-            ['<?php echo foo();', '<?php echo foo();'],
-            ['<?php echo/**/foo();', '<?php echo foo();'],
-            ['<?php echo/** bar */foo();', '<?php echo foo();'],
-            ['<?php /**/echo foo();', '<?php echo foo();'],
-            ['<?php echo \foo();', '<?php echo \foo();'],
-            ['<?php echo/**/\foo();', '<?php echo \foo();'],
-            ['<?php echo/** bar */\foo();', '<?php echo \foo();'],
-            ['<?php /**/echo \foo();', '<?php echo \foo();'],
-            [<<<'EOF'
-<?php
-include_once \dirname(__DIR__).'/foo.php';
-
-$string = 'string should not be   modified';
-
-$string = 'string should not be
-
-modified';
-
-
-$heredoc = <<<HD
-
-
-Heredoc should not be   modified {$a[1+$b]}
-
-
-HD;
-
-$nowdoc = <<<'ND'
-
-
-Nowdoc should not be   modified
-
-
-ND;
-
-/**
- * some class comments to strip
- */
-class TestClass
-{
-    /**
-     * some method comments to strip
-     */
-    public function doStuff()
-    {
-        // inline comment
-    }
-}
-EOF
-, <<<'EOF'
-<?php
-include_once \dirname(__DIR__).'/foo.php';
-$string = 'string should not be   modified';
-$string = 'string should not be
-
-modified';
-$heredoc = <<<HD
-
-
-Heredoc should not be   modified {$a[1+$b]}
-
-
-HD;
-$nowdoc = <<<'ND'
-
-
-Nowdoc should not be   modified
-
-
-ND;
-class TestClass
-{
-    public function doStuff()
-    {
-        }
-}
-EOF
-            ],
-        ];
     }
 
     public function testSerialize()
@@ -491,7 +390,7 @@ EOF
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerClass = \get_class($kernel->getContainer());
+        $containerClass = $kernel->getContainer()::class;
         $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
         unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
 
@@ -513,7 +412,7 @@ EOF
     public function testKernelExtension()
     {
         $kernel = new class() extends CustomProjectDirKernel implements ExtensionInterface {
-            public function load(array $configs, ContainerBuilder $container)
+            public function load(array $configs, ContainerBuilder $container): void
             {
                 $container->setParameter('test.extension-registered', true);
             }
@@ -523,10 +422,7 @@ EOF
                 return '';
             }
 
-            /**
-             * @return string|false
-             */
-            public function getXsdValidationBasePath()
+            public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }
@@ -555,6 +451,7 @@ EOF
         $kernel->boot();
 
         $this->assertTrue($kernel->warmedUp);
+        $this->assertSame($kernel->getBuildDir(), $kernel->warmedUpBuildDir);
     }
 
     public function testServicesResetter()
@@ -645,7 +542,7 @@ EOF
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->willReturn($bundleName ?? \get_class($bundle))
+            ->willReturn($bundleName ?? $bundle::class)
         ;
 
         $bundle
@@ -689,9 +586,9 @@ EOF
 
 class TestKernel implements HttpKernelInterface
 {
-    public $terminateCalled = false;
+    public bool $terminateCalled = false;
 
-    public function terminate()
+    public function terminate(): void
     {
         $this->terminateCalled = true;
     }
@@ -708,17 +605,16 @@ class TestKernel implements HttpKernelInterface
 
 class CustomProjectDirKernel extends Kernel implements WarmableInterface
 {
-    public $warmedUp = false;
-    private $baseDir;
-    private $buildContainer;
-    private $httpKernel;
+    public bool $warmedUp = false;
 
-    public function __construct(?\Closure $buildContainer = null, ?HttpKernelInterface $httpKernel = null, $env = 'custom')
-    {
+    public ?string $warmedUpBuildDir = null;
+
+    public function __construct(
+        private readonly ?\Closure $buildContainer = null,
+        private readonly ?HttpKernelInterface $httpKernel = null,
+        $env = 'custom',
+    ) {
         parent::__construct($env, true);
-
-        $this->buildContainer = $buildContainer;
-        $this->httpKernel = $httpKernel;
     }
 
     public function registerBundles(): iterable
@@ -726,7 +622,7 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return [];
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
 
@@ -735,14 +631,15 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return __DIR__.'/Fixtures';
     }
 
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $this->warmedUp = true;
+        $this->warmedUpBuildDir = $buildDir;
 
         return [];
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         if ($build = $this->buildContainer) {
             $build($container);
@@ -763,7 +660,7 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
         Kernel::__construct('pass', true);
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->setParameter('test.processed', true);
     }

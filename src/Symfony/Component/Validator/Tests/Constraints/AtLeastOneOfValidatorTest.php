@@ -47,7 +47,7 @@ use Symfony\Contracts\Translation\TranslatorTrait;
  */
 class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): AtLeastOneOfValidator
     {
         return new AtLeastOneOfValidator();
     }

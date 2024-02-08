@@ -46,6 +46,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -58,9 +59,7 @@ return static function (ContainerConfigurator $container) {
 
     $container->services()
         ->set('serializer', Serializer::class)
-            ->public()
             ->args([[], []])
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->alias(SerializerInterface::class, 'serializer')
         ->alias(NormalizerInterface::class, 'serializer')
@@ -104,7 +103,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -950])
 
         ->set('serializer.normalizer.problem', ProblemNormalizer::class)
-            ->args([param('kernel.debug')])
+            ->args([param('kernel.debug'), '$translator' => service('translator')->nullOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -890])
 
         ->set('serializer.denormalizer.unwrapping', UnwrappingDenormalizer::class)
@@ -112,6 +111,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => 1000])
 
         ->set('serializer.normalizer.uid', UidNormalizer::class)
+            ->tag('serializer.normalizer', ['priority' => -890])
+
+        ->set('serializer.normalizer.translatable', TranslatableNormalizer::class)
+            ->args(['$translator' => service('translator')])
             ->tag('serializer.normalizer', ['priority' => -890])
 
         ->set('serializer.normalizer.form_error', FormErrorNormalizer::class)
@@ -128,8 +131,6 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('serializer.normalizer', ['priority' => -1000])
 
-        ->alias(ObjectNormalizer::class, 'serializer.normalizer.object')
-
         ->set('serializer.normalizer.property', PropertyNormalizer::class)
             ->args([
                 service('serializer.mapping.class_metadata_factory'),
@@ -138,8 +139,6 @@ return static function (ContainerConfigurator $container) {
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
             ])
-
-        ->alias(PropertyNormalizer::class, 'serializer.normalizer.property')
 
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -990])
@@ -211,12 +210,8 @@ return static function (ContainerConfigurator $container) {
                     ->factory([HtmlErrorRenderer::class, 'isDebug'])
                     ->args([service('request_stack'), param('kernel.debug')]),
             ])
-    ;
 
-    if (interface_exists(\BackedEnum::class)) {
-        $container->services()
-            ->set('serializer.normalizer.backed_enum', BackedEnumNormalizer::class)
+        ->set('serializer.normalizer.backed_enum', BackedEnumNormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -915])
-        ;
-    }
+    ;
 };

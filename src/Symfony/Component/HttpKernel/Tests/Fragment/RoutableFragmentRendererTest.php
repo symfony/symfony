@@ -78,7 +78,6 @@ class RoutableFragmentRendererTest extends TestCase
         $renderer = $this->getMockForAbstractClass(RoutableFragmentRenderer::class);
         $r = new \ReflectionObject($renderer);
         $m = $r->getMethod('generateFragmentUri');
-        $m->setAccessible(true);
 
         return $m->invoke($renderer, $reference, $request, $absolute);
     }

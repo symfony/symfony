@@ -20,9 +20,6 @@ use Twig\TwigFunction;
  */
 final class CsrfExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [

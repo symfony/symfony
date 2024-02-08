@@ -1,10 +1,13 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'annotations' => false,
+    'http_method_override' => false,
+    'handle_all_throwables' => true,
+    'php_errors' => ['log' => true],
     'serializer' => true,
     'messenger' => [
         'failure_transport' => 'failed',
-        'reset_on_message' =>  true,
         'serializer' => [
             'default_serializer' => 'messenger.transport.symfony_serializer',
         ],
@@ -20,10 +23,12 @@ $container->loadFromExtension('framework', [
                     'multiplier' => 3,
                     'max_delay' => 100,
                 ],
+                'rate_limiter' => 'customised_worker'
             ],
             'failed' => 'in-memory:///',
             'redis' => 'redis://127.0.0.1:6379/messages',
             'beanstalkd' => 'beanstalkd://127.0.0.1:11300',
+            'schedule' => 'schedule://default',
         ],
     ],
 ]);

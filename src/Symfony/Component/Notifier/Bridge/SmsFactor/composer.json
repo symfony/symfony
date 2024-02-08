@@ -1,0 +1,30 @@
+{
+    "name": "symfony/sms-factor-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony SMSFactor Notifier Bridge",
+    "keywords": ["sms", "smsfactor", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\SmsFactor\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

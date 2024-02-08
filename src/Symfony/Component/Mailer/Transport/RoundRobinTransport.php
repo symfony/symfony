@@ -27,10 +27,10 @@ class RoundRobinTransport implements TransportInterface
     /**
      * @var \SplObjectStorage<TransportInterface, float>
      */
-    private $deadTransports;
-    private $transports = [];
-    private $retryPeriod;
-    private $cursor = -1;
+    private \SplObjectStorage $deadTransports;
+    private array $transports = [];
+    private int $retryPeriod;
+    private int $cursor = -1;
 
     /**
      * @param TransportInterface[] $transports
@@ -54,7 +54,7 @@ class RoundRobinTransport implements TransportInterface
             try {
                 return $transport->send($message, $envelope);
             } catch (TransportExceptionInterface $e) {
-                $exception = $exception ?? new TransportException('All transports failed.');
+                $exception ??= new TransportException('All transports failed.');
                 $exception->appendDebug(sprintf("Transport \"%s\": %s\n", $transport, $e->getDebug()));
                 $this->deadTransports[$transport] = microtime(true);
             }

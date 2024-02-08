@@ -21,7 +21,6 @@ class AddAnnotatedClassesToCachePassTest extends TestCase
         $r = new \ReflectionClass(AddAnnotatedClassesToCachePass::class);
         $pass = $r->newInstanceWithoutConstructor();
         $r = new \ReflectionMethod(AddAnnotatedClassesToCachePass::class, 'expandClasses');
-        $r->setAccessible(true);
         $expand = $r->getClosure($pass);
 
         $this->assertSame('Foo', $expand(['Foo'], [])[0]);

@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -20,32 +19,6 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class TypeTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyConstruct()
-    {
-        $this->expectDeprecation('Since symfony/property-info 5.3: The "Symfony\Component\PropertyInfo\Type::getCollectionKeyType()" method is deprecated, use "getCollectionKeyTypes()" instead.');
-        $this->expectDeprecation('Since symfony/property-info 5.3: The "Symfony\Component\PropertyInfo\Type::getCollectionValueType()" method is deprecated, use "getCollectionValueTypes()" instead.');
-
-        $type = new Type('object', true, 'ArrayObject', true, new Type('int'), new Type('string'));
-
-        $this->assertEquals(Type::BUILTIN_TYPE_OBJECT, $type->getBuiltinType());
-        $this->assertTrue($type->isNullable());
-        $this->assertEquals('ArrayObject', $type->getClassName());
-        $this->assertTrue($type->isCollection());
-
-        $collectionKeyType = $type->getCollectionKeyType();
-        $this->assertInstanceOf(Type::class, $collectionKeyType);
-        $this->assertEquals(Type::BUILTIN_TYPE_INT, $collectionKeyType->getBuiltinType());
-
-        $collectionValueType = $type->getCollectionValueType();
-        $this->assertInstanceOf(Type::class, $collectionValueType);
-        $this->assertEquals(Type::BUILTIN_TYPE_STRING, $collectionValueType->getBuiltinType());
-    }
-
     public function testConstruct()
     {
         $type = new Type('object', true, 'ArrayObject', true, new Type('int'), new Type('string'));
@@ -103,14 +76,6 @@ class TypeTest extends TestCase
         $this->assertEquals(Type::BUILTIN_TYPE_ARRAY, $secondValueType->getBuiltinType());
         $this->assertFalse($secondValueType->isNullable());
         $this->assertTrue($firstValueType->isCollection());
-    }
-
-    public function testInvalidCollectionArgument()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('"Symfony\Component\PropertyInfo\Type::validateCollectionArgument()": Argument #5 ($collectionKeyType) must be of type "Symfony\Component\PropertyInfo\Type[]", "Symfony\Component\PropertyInfo\Type" or "null", "stdClass" given.');
-
-        new Type('array', false, null, true, new \stdClass(), [new Type('string')]);
     }
 
     public function testInvalidCollectionValueArgument()

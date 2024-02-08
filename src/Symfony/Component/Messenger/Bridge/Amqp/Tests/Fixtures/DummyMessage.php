@@ -4,7 +4,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures;
 
 class DummyMessage
 {
-    private $message;
+    private string $message;
 
     public function __construct(string $message)
     {

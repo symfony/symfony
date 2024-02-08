@@ -17,15 +17,8 @@ use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 abstract class TypeTestCase extends FormIntegrationTestCase
 {
-    /**
-     * @var FormBuilder
-     */
-    protected $builder;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected FormBuilder $builder;
+    protected EventDispatcherInterface $dispatcher;
 
     protected function setUp(): void
     {
@@ -35,18 +28,11 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         $this->builder = new FormBuilder('', null, $this->dispatcher, $this->factory);
     }
 
-    protected function tearDown(): void
-    {
-        if (\in_array(ValidatorExtensionTrait::class, class_uses($this))) {
-            $this->validator = null;
-        }
-    }
-
     protected function getExtensions()
     {
         $extensions = [];
 
-        if (\in_array(ValidatorExtensionTrait::class, class_uses($this))) {
+        if (\in_array(ValidatorExtensionTrait::class, class_uses($this), true)) {
             $extensions[] = $this->getValidatorExtension();
         }
 

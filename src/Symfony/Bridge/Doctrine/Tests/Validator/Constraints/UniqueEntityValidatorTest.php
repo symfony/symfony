@@ -49,22 +49,10 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
     private const EM_NAME = 'foo';
 
-    /**
-     * @var ObjectManager
-     */
-    protected $em;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
-
-    /**
-     * @var MockObject&EntityRepository
-     */
-    protected $repository;
-
-    protected $repositoryFactory;
+    protected ?ObjectManager $em;
+    protected ManagerRegistry $registry;
+    protected MockObject&EntityRepository $repository;
+    protected TestRepositoryFactory $repositoryFactory;
 
     protected function setUp(): void
     {
@@ -137,7 +125,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         return $em;
     }
 
-    protected function createValidator()
+    protected function createValidator(): UniqueEntityValidator
     {
         return new UniqueEntityValidator($this->registry);
     }
@@ -200,9 +188,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'em' => self::EM_NAME,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo')];
     }
 
     /**
@@ -236,9 +222,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'errorPath' => 'bar',
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo", errorPath: "bar");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo', errorPath: 'bar')];
     }
 
     /**
@@ -260,8 +244,9 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @dataProvider provideConstraintsWithIgnoreNullDisabled
+     * @dataProvider provideConstraintsWithIgnoreNullEnabledOnFirstField
      */
-    public function testValidateUniquenessWithIgnoreNullDisabled(UniqueEntity $constraint)
+    public function testValidateUniquenessWithIgnoreNullDisableOnSecondField(UniqueEntity $constraint)
     {
         $entity1 = new DoubleNameEntity(1, 'Foo', null);
         $entity2 = new DoubleNameEntity(2, 'Foo', null);
@@ -297,9 +282,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'ignoreNull' => false,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name", "name2"], em: "foo", ignoreNull: false);')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: false)];
     }
 
     /**
@@ -309,12 +292,13 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     {
         $entity1 = new SingleIntIdEntity(1, null);
 
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->validator->validate($entity1, $constraint);
     }
 
     /**
      * @dataProvider provideConstraintsWithIgnoreNullEnabled
+     * @dataProvider provideConstraintsWithIgnoreNullEnabledOnFirstField
      */
     public function testNoValidationIfFirstFieldIsNullAndNullValuesAreIgnored(UniqueEntity $constraint)
     {
@@ -346,9 +330,19 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'ignoreNull' => true,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name", "name2"], em: "foo", ignoreNull: true);')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: true)];
+    }
+
+    public static function provideConstraintsWithIgnoreNullEnabledOnFirstField(): iterable
+    {
+        yield 'Doctrine style (name field)' => [new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name', 'name2'],
+            'em' => self::EM_NAME,
+            'ignoreNull' => 'name',
+        ])];
+
+        yield 'Named arguments (name field)' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: 'name')];
     }
 
     public function testValidateUniquenessWithValidCustomErrorPath()
@@ -447,9 +441,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'repositoryMethod' => 'findByCustom',
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo", repositoryMethod: "findByCustom");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo', repositoryMethod: 'findByCustom')];
     }
 
     /**
@@ -625,8 +617,6 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testDedicatedEntityManagerNullObject()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('Object manager "foo" does not exist.');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name'],
@@ -640,13 +630,14 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         $entity = new SingleIntIdEntity(1, null);
 
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('Object manager "foo" does not exist.');
+
         $this->validator->validate($entity, $constraint);
     }
 
     public function testEntityManagerNullObject()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('Unable to find the object manager associated with an entity of class "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity"');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name'],
@@ -659,6 +650,9 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->validator->initialize($this->context);
 
         $entity = new SingleIntIdEntity(1, null);
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('Unable to find the object manager associated with an entity of class "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity"');
 
         $this->validator->validate($entity, $constraint);
     }
@@ -727,8 +721,6 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidateRepositoryForInheritance()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('The "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity" entity repository does not support the "Symfony\Bridge\Doctrine\Tests\Fixtures\Person" entity. The entity should be an instance of or extend "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity".');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name'],
@@ -737,6 +729,10 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ]);
 
         $entity = new Person(1, 'Foo');
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity" entity repository does not support the "Symfony\Bridge\Doctrine\Tests\Fixtures\Person" entity. The entity should be an instance of or extend "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity".');
+
         $this->validator->validate($entity, $constraint);
     }
 
@@ -898,11 +894,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         return [
             [$entity, new class() implements \Iterator {
-                /**
-                 * @return mixed
-                 */
-                #[\ReturnTypeWillChange]
-                public function current()
+                public function current(): mixed
                 {
                     return null;
                 }
@@ -916,11 +908,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                 {
                 }
 
-                /**
-                 * @return mixed
-                 */
-                #[\ReturnTypeWillChange]
-                public function key()
+                public function key(): mixed
                 {
                     return false;
                 }
@@ -930,11 +918,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                 }
             }],
             [$entity, new class() implements \Iterator {
-                /**
-                 * @return mixed
-                 */
-                #[\ReturnTypeWillChange]
-                public function current()
+                public function current(): mixed
                 {
                     return false;
                 }
@@ -948,11 +932,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                 {
                 }
 
-                /**
-                 * @return mixed
-                 */
-                #[\ReturnTypeWillChange]
-                public function key()
+                public function key(): mixed
                 {
                     return false;
                 }

@@ -16,8 +16,10 @@ use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Dumper\YamlFileDumper;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
+use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\TranslatorBag;
@@ -28,7 +30,7 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
  */
 class TranslationPullCommandTest extends TranslationProviderTestCase
 {
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {
@@ -91,11 +93,11 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>newFoo</target>
             </trans-unit>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>NOTE</target>
             </trans-unit>
@@ -112,7 +114,7 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="1IHotcu" resname="say_hello">
+            <trans-unit id="Shv46xh" resname="say_hello">
                 <source>say_hello</source>
                 <target>Welcome, {firstname}!</target>
             </trans-unit>
@@ -129,11 +131,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>nouveauFoo</target>
             </trans-unit>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>NOTE</target>
             </trans-unit>
@@ -150,7 +152,7 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="1IHotcu" resname="say_hello">
+            <trans-unit id="Shv46xh" resname="say_hello">
                 <source>say_hello</source>
                 <target>Bonjour, {firstname}!</target>
             </trans-unit>
@@ -197,13 +199,13 @@ XLIFF
 <?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="en">
   <file id="messages.en">
-    <unit id="994ixRL" name="new.foo">
+    <unit id="5pyqChA" name="new.foo">
       <segment>
         <source>new.foo</source>
         <target>newFoo</target>
       </segment>
     </unit>
-    <unit id="7bRlYkK" name="note">
+    <unit id=".DOalbi" name="note">
       <segment>
         <source>note</source>
         <target>NOTE</target>
@@ -217,13 +219,13 @@ XLIFF
 <?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="fr">
   <file id="messages.fr">
-    <unit id="994ixRL" name="new.foo">
+    <unit id="5pyqChA" name="new.foo">
       <segment>
         <source>new.foo</source>
         <target>nouveauFoo</target>
       </segment>
     </unit>
-    <unit id="7bRlYkK" name="note">
+    <unit id=".DOalbi" name="note">
       <segment>
         <source>note</source>
         <target>NOTE</target>
@@ -233,6 +235,96 @@ XLIFF
 </xliff>
 XLIFF
             , file_get_contents($filenameFr));
+    }
+
+    public function testPullNewYamlMessagesAsInlined()
+    {
+        $arrayLoader = new ArrayLoader();
+        $filenameEn = $this->createYamlFile(['note' => 'NOTE'], 'en', 'messages.%locale%.yml');
+        $filenameFr = $this->createYamlFile(['note' => 'NOTE'], 'fr', 'messages.%locale%.yml');
+        $locales = ['en', 'fr'];
+        $domains = ['messages'];
+
+        $providerReadTranslatorBag = new TranslatorBag();
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'note' => 'NOTE',
+            'new.foo' => 'newFoo',
+        ], 'en'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'note' => 'NOTE',
+            'new.foo' => 'nouveauFoo',
+        ], 'fr'));
+
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('read')
+            ->with($domains, $locales)
+            ->willReturn($providerReadTranslatorBag);
+
+        $provider->expects($this->once())
+            ->method('__toString')
+            ->willReturn('null://default');
+
+        $tester = $this->createCommandTester($provider, $locales, $domains);
+        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--format' => 'yml']);
+
+        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertEquals(<<<YAML
+new.foo: newFoo
+note: NOTE
+
+YAML, file_get_contents($filenameEn));
+        $this->assertEquals(<<<YAML
+new.foo: nouveauFoo
+note: NOTE
+
+YAML, file_get_contents($filenameFr));
+    }
+
+    public function testPullNewYamlMessagesAsTree()
+    {
+        $arrayLoader = new ArrayLoader();
+        $filenameEn = $this->createYamlFile(['note' => 'NOTE'], 'en', 'messages.%locale%.yml');
+        $filenameFr = $this->createYamlFile(['note' => 'NOTE'], 'fr', 'messages.%locale%.yml');
+        $locales = ['en', 'fr'];
+        $domains = ['messages'];
+
+        $providerReadTranslatorBag = new TranslatorBag();
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'note' => 'NOTE',
+            'new.foo' => 'newFoo',
+        ], 'en'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'note' => 'NOTE',
+            'new.foo' => 'nouveauFoo',
+        ], 'fr'));
+
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('read')
+            ->with($domains, $locales)
+            ->willReturn($providerReadTranslatorBag);
+
+        $provider->expects($this->once())
+            ->method('__toString')
+            ->willReturn('null://default');
+
+        $tester = $this->createCommandTester($provider, $locales, $domains);
+        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--format' => 'yml', '--as-tree' => 10]);
+
+        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertEquals(<<<YAML
+new:
+    foo: newFoo
+note: NOTE
+
+YAML, file_get_contents($filenameEn));
+        $this->assertEquals(<<<YAML
+new:
+    foo: nouveauFoo
+note: NOTE
+
+YAML, file_get_contents($filenameFr));
     }
 
     public function testPullForceMessages()
@@ -285,11 +377,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>UPDATED NOTE</target>
             </trans-unit>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>newFoo</target>
             </trans-unit>
@@ -306,11 +398,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>NOTE MISE À JOUR</target>
             </trans-unit>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>nouveauFoo</target>
             </trans-unit>
@@ -328,11 +420,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="kA4akVr" resname="foo.error">
+            <trans-unit id="nYScnTy" resname="foo.error">
                 <source>foo.error</source>
                 <target>Bad value</target>
             </trans-unit>
-            <trans-unit id="OcBtn3X" resname="bar.error">
+            <trans-unit id="fe0ouWC" resname="bar.error">
                 <source>bar.error</source>
                 <target>Bar error</target>
             </trans-unit>
@@ -349,11 +441,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="kA4akVr" resname="foo.error">
+            <trans-unit id="nYScnTy" resname="foo.error">
                 <source>foo.error</source>
                 <target>Valeur invalide</target>
             </trans-unit>
-            <trans-unit id="OcBtn3X" resname="bar.error">
+            <trans-unit id="fe0ouWC" resname="bar.error">
                 <source>bar.error</source>
                 <target>Bar erreur</target>
             </trans-unit>
@@ -408,11 +500,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>UPDATED NOTE</target>
             </trans-unit>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>newFoo</target>
             </trans-unit>
@@ -429,11 +521,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>NOTE MISE À JOUR</target>
             </trans-unit>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>nouveauFoo</target>
             </trans-unit>
@@ -484,11 +576,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>newFoo</target>
             </trans-unit>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>NOTE</target>
             </trans-unit>
@@ -505,11 +597,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>nouveauFoo</target>
             </trans-unit>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>NOTE</target>
             </trans-unit>
@@ -561,11 +653,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>newFoo</target>
             </trans-unit>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>NOTE</target>
             </trans-unit>
@@ -582,11 +674,11 @@ XLIFF
             <tool tool-id="symfony" tool-name="Symfony"/>
         </header>
         <body>
-            <trans-unit id="994ixRL" resname="new.foo">
+            <trans-unit id="5pyqChA" resname="new.foo">
                 <source>new.foo</source>
                 <target>newFoo</target>
             </trans-unit>
-            <trans-unit id="7bRlYkK" resname="note">
+            <trans-unit id=".DOalbi" resname="note">
                 <source>note</source>
                 <target>NOTE</target>
             </trans-unit>
@@ -602,10 +694,6 @@ XLIFF
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $application = new Application();
         $application->add($this->createCommand($this->createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], 'en', ['loco', 'crowdin', 'lokalise']));
 
@@ -645,9 +733,11 @@ XLIFF
     {
         $writer = new TranslationWriter();
         $writer->addDumper('xlf', new XliffFileDumper());
+        $writer->addDumper('yml', new YamlFileDumper());
 
         $reader = new TranslationReader();
         $reader->addLoader('xlf', new XliffFileLoader());
+        $reader->addLoader('yml', new YamlFileLoader());
 
         return new TranslationPullCommand(
             $this->getProviderCollection($provider, $providerNames, $locales, $domains),

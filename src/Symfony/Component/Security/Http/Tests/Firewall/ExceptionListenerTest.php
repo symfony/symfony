@@ -75,20 +75,6 @@ class ExceptionListenerTest extends TestCase
         ];
     }
 
-    public function testExceptionWhenEntryPointReturnsBadValue()
-    {
-        $event = $this->createEvent(new AuthenticationException());
-
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint->expects($this->once())->method('start')->willReturn('NOT A RESPONSE');
-
-        $listener = $this->createExceptionListener(null, null, null, $entryPoint);
-        $listener->onKernelException($event);
-        // the exception has been replaced by our LogicException
-        $this->assertInstanceOf(\LogicException::class, $event->getThrowable());
-        $this->assertStringEndsWith('start()" method must return a Response object ("string" returned).', $event->getThrowable()->getMessage());
-    }
-
     /**
      * @dataProvider getAccessDeniedExceptionProvider
      */
@@ -212,9 +198,7 @@ class ExceptionListenerTest extends TestCase
 
     private function createEvent(\Exception $exception, $kernel = null)
     {
-        if (null === $kernel) {
-            $kernel = $this->createMock(HttpKernelInterface::class);
-        }
+        $kernel ??= $this->createMock(HttpKernelInterface::class);
 
         return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $exception);
     }

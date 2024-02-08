@@ -19,5 +19,5 @@ interface ExpressionFunctionProviderInterface
     /**
      * @return ExpressionFunction[]
      */
-    public function getFunctions();
+    public function getFunctions(): array;
 }

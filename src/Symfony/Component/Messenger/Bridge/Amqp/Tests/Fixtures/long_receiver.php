@@ -17,7 +17,6 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
-use Symfony\Component\Messenger\EventListener\StopWorkerOnSigtermSignalListener;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Worker;
@@ -33,13 +32,12 @@ $serializer = new Serializer(
 $connection = Connection::fromDsn(getenv('DSN'));
 $receiver = new AmqpReceiver($connection, $serializer);
 $eventDispatcher = new EventDispatcher();
-$eventDispatcher->addSubscriber(new StopWorkerOnSigtermSignalListener());
 $eventDispatcher->addSubscriber(new DispatchPcntlSignalListener());
 
 $worker = new Worker(['the_receiver' => $receiver], new class() implements MessageBusInterface {
     public function dispatch($envelope, array $stamps = []): Envelope
     {
-        echo 'Get envelope with message: '.get_class($envelope->getMessage())."\n";
+        echo 'Get envelope with message: '.$envelope->getMessage()::class."\n";
         echo sprintf("with stamps: %s\n", json_encode(array_keys($envelope->all()), \JSON_PRETTY_PRINT));
 
         sleep(30);
@@ -48,6 +46,8 @@ $worker = new Worker(['the_receiver' => $receiver], new class() implements Messa
         return $envelope;
     }
 }, $eventDispatcher);
+
+pcntl_signal(15, fn () => $worker->stop());
 
 echo "Receiving messages...\n";
 $worker->run();

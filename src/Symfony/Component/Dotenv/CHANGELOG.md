@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `SYMFONY_DOTENV_PATH` variable with the path to the `.env` file loaded by `Dotenv::loadEnv()` or `Dotenv::bootEnv()`
+
+6.2
+---
+
+ * Add a new `filter` argument to `debug:dotenv` command to filter variable names
+
 5.4
 ---
 

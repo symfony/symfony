@@ -21,12 +21,14 @@ use Twig\Error\Error;
  * Generates the Twig cache for all templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 7.1
  */
 class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private $container;
-    private $twig;
-    private $iterator;
+    private ContainerInterface $container;
+    private Environment $twig;
+    private iterable $iterator;
 
     public function __construct(ContainerInterface $container, iterable $iterator)
     {
@@ -35,27 +37,14 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
         $this->iterator = $iterator;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string[] A list of template files to preload on PHP 7.4+
-     */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
-        if (null === $this->twig) {
-            $this->twig = $this->container->get('twig');
-        }
-
-        $files = [];
+        $this->twig ??= $this->container->get('twig');
 
         foreach ($this->iterator as $template) {
             try {
-                $template = $this->twig->load($template);
-
-                if (\is_callable([$template, 'unwrap'])) {
-                    $files[] = (new \ReflectionClass($template->unwrap()))->getFileName();
-                }
-            } catch (Error $e) {
+                $this->twig->load($template);
+            } catch (Error) {
                 /*
                  * Problem during compilation, give up for this template (e.g. syntax errors).
                  * Failing silently here allows to ignore templates that rely on functions that aren't available in
@@ -67,21 +56,15 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
             }
         }
 
-        return $files;
+        return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'twig' => Environment::class,

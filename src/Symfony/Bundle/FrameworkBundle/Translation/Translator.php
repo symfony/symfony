@@ -21,13 +21,14 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 7.1
  */
 class Translator extends BaseTranslator implements WarmableInterface
 {
-    protected $container;
-    protected $loaderIds;
-
-    protected $options = [
+    protected ContainerInterface $container;
+    protected array $loaderIds;
+    protected array $options = [
         'cache_dir' => null,
         'debug' => false,
         'resource_files' => [],
@@ -38,7 +39,7 @@ class Translator extends BaseTranslator implements WarmableInterface
     /**
      * @var list<string>
      */
-    private $resourceLocales;
+    private array $resourceLocales;
 
     /**
      * Holds parameters from addResource() calls so we can defer the actual
@@ -46,22 +47,22 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * @var array[]
      */
-    private $resources = [];
+    private array $resources = [];
 
     /**
      * @var string[][]
      */
-    private $resourceFiles;
+    private array $resourceFiles;
 
     /**
      * @var string[]
      */
-    private $scannedDirectories;
+    private array $scannedDirectories;
 
     /**
      * @var string[]
      */
-    private $enabledLocales;
+    private array $enabledLocales;
 
     /**
      * Constructor.
@@ -94,12 +95,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug'], $this->options['cache_vary']);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string[]
-     */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         // skip warmUp when translator doesn't use cache
         if (null === $this->options['cache_dir']) {
@@ -120,7 +116,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         return [];
     }
 
-    public function addResource(string $format, $resource, string $locale, ?string $domain = null)
+    public function addResource(string $format, mixed $resource, string $locale, ?string $domain = null): void
     {
         if ($this->resourceFiles) {
             $this->addResourceFiles();
@@ -128,10 +124,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         $this->resources[] = [$format, $resource, $locale, $domain];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function initializeCatalogue(string $locale)
+    protected function initializeCatalogue(string $locale): void
     {
         $this->initialize();
         parent::initializeCatalogue($locale);
@@ -150,7 +143,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         }
     }
 
-    protected function initialize()
+    protected function initialize(): void
     {
         if ($this->resourceFiles) {
             $this->addResourceFiles();

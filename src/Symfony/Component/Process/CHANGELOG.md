@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `PhpSubprocess` to handle PHP subprocesses that take over the
+   configuration from their parent
+ * Add `RunProcessMessage` and `RunProcessMessageHandler`
+ * Support using `Process::findExecutable()` independently of `open_basedir`
+
 5.2.0
 -----
 

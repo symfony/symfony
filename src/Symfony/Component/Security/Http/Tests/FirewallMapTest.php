@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\FirewallMap;
 
@@ -25,7 +25,7 @@ class FirewallMapTest extends TestCase
 
         $request = new Request();
 
-        $notMatchingMatcher = $this->createMock(RequestMatcher::class);
+        $notMatchingMatcher = $this->createMock(RequestMatcherInterface::class);
         $notMatchingMatcher
             ->expects($this->once())
             ->method('matches')
@@ -35,7 +35,7 @@ class FirewallMapTest extends TestCase
 
         $map->add($notMatchingMatcher, [function () {}]);
 
-        $matchingMatcher = $this->createMock(RequestMatcher::class);
+        $matchingMatcher = $this->createMock(RequestMatcherInterface::class);
         $matchingMatcher
             ->expects($this->once())
             ->method('matches')
@@ -47,7 +47,7 @@ class FirewallMapTest extends TestCase
 
         $map->add($matchingMatcher, [$theListener], $theException);
 
-        $tooLateMatcher = $this->createMock(RequestMatcher::class);
+        $tooLateMatcher = $this->createMock(RequestMatcherInterface::class);
         $tooLateMatcher
             ->expects($this->never())
             ->method('matches')
@@ -67,7 +67,7 @@ class FirewallMapTest extends TestCase
 
         $request = new Request();
 
-        $notMatchingMatcher = $this->createMock(RequestMatcher::class);
+        $notMatchingMatcher = $this->createMock(RequestMatcherInterface::class);
         $notMatchingMatcher
             ->expects($this->once())
             ->method('matches')
@@ -82,7 +82,7 @@ class FirewallMapTest extends TestCase
 
         $map->add(null, [$theListener], $theException);
 
-        $tooLateMatcher = $this->createMock(RequestMatcher::class);
+        $tooLateMatcher = $this->createMock(RequestMatcherInterface::class);
         $tooLateMatcher
             ->expects($this->never())
             ->method('matches')
@@ -102,7 +102,7 @@ class FirewallMapTest extends TestCase
 
         $request = new Request();
 
-        $notMatchingMatcher = $this->createMock(RequestMatcher::class);
+        $notMatchingMatcher = $this->createMock(RequestMatcherInterface::class);
         $notMatchingMatcher
             ->expects($this->once())
             ->method('matches')

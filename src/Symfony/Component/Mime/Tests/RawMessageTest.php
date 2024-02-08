@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\RawMessage;
 
 class RawMessageTest extends TestCase
@@ -19,36 +20,68 @@ class RawMessageTest extends TestCase
     /**
      * @dataProvider provideMessages
      */
-    public function testToString($messageParameter)
+    public function testToString(mixed $messageParameter, bool $supportReuse)
     {
         $message = new RawMessage($messageParameter);
         $this->assertEquals('some string', $message->toString());
         $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
-        // calling methods more than once work
-        $this->assertEquals('some string', $message->toString());
+
+        if ($supportReuse) {
+            // calling methods more than once work
+            $this->assertEquals('some string', $message->toString());
+            $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+        }
+    }
+
+    /**
+     * @dataProvider provideMessages
+     */
+    public function testSerialization(mixed $messageParameter, bool $supportReuse)
+    {
+        $message = new RawMessage($messageParameter);
+        $this->assertEquals('some string', unserialize(serialize($message))->toString());
+
+        if ($supportReuse) {
+            // calling methods more than once work
+            $this->assertEquals('some string', unserialize(serialize($message))->toString());
+        }
+    }
+
+    /**
+     * @dataProvider provideMessages
+     */
+    public function testToIterable(mixed $messageParameter, bool $supportReuse)
+    {
+        $message = new RawMessage($messageParameter);
         $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+
+        if ($supportReuse) {
+            // calling methods more than once work
+            $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+        }
+    }
+
+    /**
+     * @dataProvider provideMessages
+     */
+    public function testToIterableLegacy(mixed $messageParameter, bool $supportReuse)
+    {
+        $message = new RawMessage($messageParameter);
+        $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+
+        if (!$supportReuse) {
+            $this->expectException(LogicException::class);
+            iterator_to_array($message->toIterable());
+        }
     }
 
     public static function provideMessages(): array
     {
         return [
-            'string' => ['some string'],
-            'traversable' => [new \ArrayObject(['some', ' ', 'string'])],
-            'array' => [['some', ' ', 'string']],
+            'string' => ['some string', true],
+            'traversable' => [new \ArrayObject(['some', ' ', 'string']), true],
+            'array' => [['some', ' ', 'string'], true],
+            'generator' => [(function () { yield 'some'; yield ' '; yield 'string'; })(), false],
         ];
-    }
-
-    public function testSerialization()
-    {
-        $message = new RawMessage('string');
-        $this->assertEquals('string', unserialize(serialize($message))->toString());
-        // calling methods more than once work
-        $this->assertEquals('string', unserialize(serialize($message))->toString());
-
-        $message = new RawMessage(new \ArrayObject(['some', ' ', 'string']));
-        $message = new RawMessage($message->toIterable());
-        $this->assertEquals('some string', unserialize(serialize($message))->toString());
-        // calling methods more than once work
-        $this->assertEquals('some string', unserialize(serialize($message))->toString());
     }
 }

@@ -21,16 +21,12 @@ use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 class FragmentHandlerTest extends TestCase
 {
-    private $requestStack;
+    private RequestStack $requestStack;
 
     protected function setUp(): void
     {
-        $this->requestStack = $this->createMock(RequestStack::class);
-        $this->requestStack
-            ->expects($this->any())
-            ->method('getCurrentRequest')
-            ->willReturn(Request::create('/'))
-        ;
+        $this->requestStack = new RequestStack();
+        $this->requestStack->push(Request::create('/'));
     }
 
     public function testRenderWhenRendererDoesNotExist()

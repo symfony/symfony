@@ -13,18 +13,13 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Fixtures;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
-use Symfony\Component\ExpressionLanguage\ExpressionPhpFunction;
 
 class TestProvider implements ExpressionFunctionProviderInterface
 {
     public function getFunctions(): array
     {
         return [
-            new ExpressionFunction('identity', function ($input) {
-                return $input;
-            }, function (array $values, $input) {
-                return $input;
-            }),
+            new ExpressionFunction('identity', fn ($input) => $input, fn (array $values, $input) => $input),
 
             ExpressionFunction::fromPhp('strtoupper'),
 

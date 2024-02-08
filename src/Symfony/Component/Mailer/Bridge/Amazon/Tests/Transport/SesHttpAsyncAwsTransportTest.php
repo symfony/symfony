@@ -19,6 +19,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesHttpAsyncAwsTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -86,6 +87,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             $this->assertStringContainsString('Hello There!', $content);
             $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
             $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
+            $this->assertSame([['Name' => 'tagName1', 'Value' => 'tag Value1'], ['Name' => 'tagName2', 'Value' => 'tag Value2']], $body['EmailTags']);
 
             $json = '{"MessageId": "foobar"}';
 
@@ -104,6 +106,8 @@ class SesHttpAsyncAwsTransportTest extends TestCase
 
         $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
         $mail->getHeaders()->addTextHeader('X-SES-SOURCE-ARN', 'aws-source-arn');
+        $mail->getHeaders()->add(new MetadataHeader('tagName1', 'tag Value1'));
+        $mail->getHeaders()->add(new MetadataHeader('tagName2', 'tag Value2'));
 
         $message = $transport->send($mail);
 

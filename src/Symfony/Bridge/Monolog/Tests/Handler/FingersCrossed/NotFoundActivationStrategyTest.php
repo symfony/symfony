@@ -12,9 +12,11 @@
 namespace Symfony\Bridge\Monolog\Tests\Handler\FingersCrossed;
 
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -23,28 +25,13 @@ class NotFoundActivationStrategyTest extends TestCase
 {
     /**
      * @dataProvider isActivatedProvider
-     *
-     * @group legacy
      */
-    public function testIsActivatedLegacy(string $url, array $record, bool $expected)
+    public function testIsActivated(string $url, array|LogRecord $record, bool $expected)
     {
         $requestStack = new RequestStack();
         $requestStack->push(Request::create($url));
 
-        $strategy = new NotFoundActivationStrategy($requestStack, ['^/foo', 'bar'], Logger::WARNING);
-
-        self::assertEquals($expected, $strategy->isHandlerActivated($record));
-    }
-
-    /**
-     * @dataProvider isActivatedProvider
-     */
-    public function testIsActivated(string $url, array $record, bool $expected)
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push(Request::create($url));
-
-        $strategy = new NotFoundActivationStrategy($requestStack, ['^/foo', 'bar'], new ErrorLevelActivationStrategy(Logger::WARNING));
+        $strategy = new NotFoundActivationStrategy($requestStack, ['^/foo', 'bar'], new ErrorLevelActivationStrategy(Level::Warning));
 
         self::assertEquals($expected, $strategy->isHandlerActivated($record));
     }
@@ -52,15 +39,15 @@ class NotFoundActivationStrategyTest extends TestCase
     public static function isActivatedProvider(): array
     {
         return [
-            ['/test',      ['level' => Logger::DEBUG], false],
-            ['/foo',       ['level' => Logger::DEBUG, 'context' => self::getContextException(404)], false],
-            ['/baz/bar',   ['level' => Logger::ERROR, 'context' => self::getContextException(404)], false],
-            ['/foo',       ['level' => Logger::ERROR, 'context' => self::getContextException(404)], false],
-            ['/foo',       ['level' => Logger::ERROR, 'context' => self::getContextException(500)], true],
+            ['/test',      RecordFactory::create(Level::Debug), false],
+            ['/foo',       RecordFactory::create(Level::Debug, context: self::getContextException(404)), false],
+            ['/baz/bar',   RecordFactory::create(Level::Error, context: self::getContextException(404)), false],
+            ['/foo',       RecordFactory::create(Level::Error, context: self::getContextException(404)), false],
+            ['/foo',       RecordFactory::create(Level::Error, context: self::getContextException(500)), true],
 
-            ['/test',      ['level' => Logger::ERROR], true],
-            ['/baz',       ['level' => Logger::ERROR, 'context' => self::getContextException(404)], true],
-            ['/baz',       ['level' => Logger::ERROR, 'context' => self::getContextException(500)], true],
+            ['/test',      RecordFactory::create(Level::Error), true],
+            ['/baz',       RecordFactory::create(Level::Error, context: self::getContextException(404)), true],
+            ['/baz',       RecordFactory::create(Level::Error, context: self::getContextException(500)), true],
         ];
     }
 

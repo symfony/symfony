@@ -21,9 +21,9 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class EmailValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): EmailValidator
     {
-        return new EmailValidator(Email::VALIDATION_MODE_LOOSE);
+        return new EmailValidator(Email::VALIDATION_MODE_HTML5);
     }
 
     public function testUnknownDefaultModeTriggerException()
@@ -76,11 +76,6 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ['fabien@symfony.com'],
             ['example@example.co.uk'],
             ['fabien_potencier@example.fr'],
-            ['example@example.co..uk'],
-            ['{}~!@!@£$%%^&*().!@£$%^&*()'],
-            ['example@example.co..uk'],
-            ['example@-example.com'],
-            [sprintf('example@%s.com', str_repeat('a', 64))],
         ];
     }
 
@@ -98,10 +93,6 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ["\x20example@example.co.uk\x20"],
-            ["\x09\x09example@example.co..uk\x09\x09"],
-            ["\x0A{}~!@!@£$%%^&*().!@£$%^&*()\x0A"],
-            ["\x0D\x0Dexample@example.co..uk\x0D\x0D"],
-            ["\x00example@-example.com"],
             ["example@example.com\x0B\x0B"],
         ];
     }
@@ -193,6 +184,35 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    /**
+     * @dataProvider getInvalidAllowNoTldEmails
+     */
+    public function testInvalidAllowNoTldEmails($email)
+    {
+        $constraint = new Email([
+            'message' => 'myMessage',
+            'mode' => Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD,
+        ]);
+
+        $this->validator->validate($email, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$email.'"')
+            ->setCode(Email::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getInvalidAllowNoTldEmails()
+    {
+        return [
+            ['example bar'],
+            ['example@'],
+            ['example@ bar'],
+            ['example@localhost bar'],
+            ['foo@example.com bar'],
+        ];
+    }
+
     public function testModeStrict()
     {
         $constraint = new Email(['mode' => Email::VALIDATION_MODE_STRICT]);
@@ -214,21 +234,22 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
              ->assertRaised();
     }
 
-    public function testModeLoose()
+    public function testModeHtml5AllowNoTld()
     {
-        $constraint = new Email(['mode' => Email::VALIDATION_MODE_LOOSE]);
+        $constraint = new Email(['mode' => Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD]);
 
-        $this->validator->validate('example@example..com', $constraint);
+        $this->validator->validate('example@example', $constraint);
 
         $this->assertNoViolation();
     }
 
     public function testUnknownModesOnValidateTriggerException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\Email::$mode" parameter value is not valid.');
         $constraint = new Email();
         $constraint->mode = 'Unknown Mode';
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\Email::$mode" parameter value is not valid.');
 
         $this->validator->validate('example@example..com', $constraint);
     }
@@ -311,7 +332,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
 class EmptyEmailObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }

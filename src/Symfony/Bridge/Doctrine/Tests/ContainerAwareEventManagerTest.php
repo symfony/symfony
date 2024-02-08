@@ -18,8 +18,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 class ContainerAwareEventManagerTest extends TestCase
 {
-    private $container;
-    private $evm;
+    private Container $container;
+    private ContainerAwareEventManager $evm;
 
     protected function setUp(): void
     {
@@ -29,22 +29,25 @@ class ContainerAwareEventManagerTest extends TestCase
 
     public function testDispatchEventRespectOrder()
     {
-        $this->evm = new ContainerAwareEventManager($this->container, ['sub1', [['foo'], 'list1'], 'sub2']);
+        $this->evm = new ContainerAwareEventManager($this->container, [[['foo'], 'list1'], [['foo'], 'list2']]);
 
         $this->container->set('list1', $listener1 = new MyListener());
-        $this->container->set('sub1', $subscriber1 = new MySubscriber(['foo']));
-        $this->container->set('sub2', $subscriber2 = new MySubscriber(['foo']));
+        $this->container->set('list2', $listener2 = new MyListener());
 
-        $this->assertSame([$subscriber1, $listener1, $subscriber2], array_values($this->evm->getListeners('foo')));
+        $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners('foo')));
+    }
+
+    public function testUsingDoctrineSubscribersThrows()
+    {
+        $this->evm = new ContainerAwareEventManager($this->container, [new MySubscriber(['foo'])]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Using Doctrine subscriber "Symfony\Bridge\Doctrine\Tests\MySubscriber" is not allowed. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.');
+        $this->evm->getListeners('foo');
     }
 
     public function testDispatchEvent()
     {
-        $this->evm = new ContainerAwareEventManager($this->container, ['lazy4']);
-
-        $this->container->set('lazy4', $subscriber1 = new MySubscriber(['foo']));
-        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
-
         $this->container->set('lazy1', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy1');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
@@ -54,15 +57,9 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->container->set('lazy3', $listener5 = new MyListener());
         $this->evm->addEventListener('foo', $listener5 = new MyListener());
         $this->evm->addEventListener('bar', $listener5);
-        $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
-
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
         $this->evm->dispatchEvent('foo');
         $this->evm->dispatchEvent('bar');
-
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
         $this->assertSame(0, $listener1->calledByInvokeCount);
         $this->assertSame(1, $listener1->calledByEventNameCount);
@@ -74,23 +71,12 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(0, $listener4->calledByEventNameCount);
         $this->assertSame(1, $listener5->calledByInvokeCount);
         $this->assertSame(1, $listener5->calledByEventNameCount);
-        $this->assertSame(0, $subscriber1->calledByInvokeCount);
-        $this->assertSame(1, $subscriber1->calledByEventNameCount);
-        $this->assertSame(1, $subscriber2->calledByInvokeCount);
-        $this->assertSame(0, $subscriber2->calledByEventNameCount);
     }
 
-    public function testAddEventListenerAndSubscriberAfterDispatchEvent()
+    public function testAddEventListenerAfterDispatchEvent()
     {
-        $this->evm = new ContainerAwareEventManager($this->container, ['lazy7']);
-
-        $this->container->set('lazy7', $subscriber1 = new MySubscriber(['foo']));
-        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
-
         $this->container->set('lazy1', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy1');
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
         $this->container->set('lazy2', $listener3 = new MyListener());
         $this->evm->addEventListener('bar', 'lazy2');
@@ -98,15 +84,9 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->container->set('lazy3', $listener5 = new MyListener());
         $this->evm->addEventListener('foo', $listener5 = new MyListener());
         $this->evm->addEventListener('bar', $listener5);
-        $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
-
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
         $this->evm->dispatchEvent('foo');
         $this->evm->dispatchEvent('bar');
-
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
         $this->container->set('lazy4', $listener6 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy4');
@@ -117,18 +97,9 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->container->set('lazy6', $listener10 = new MyListener());
         $this->evm->addEventListener('foo', $listener10 = new MyListener());
         $this->evm->addEventListener('bar', $listener10);
-        $this->evm->addEventSubscriber($subscriber3 = new MySubscriber(['bar']));
-
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber3->calledSubscribedEventsCount);
 
         $this->evm->dispatchEvent('foo');
         $this->evm->dispatchEvent('bar');
-
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber3->calledSubscribedEventsCount);
 
         $this->assertSame(0, $listener1->calledByInvokeCount);
         $this->assertSame(2, $listener1->calledByEventNameCount);
@@ -140,10 +111,6 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(0, $listener4->calledByEventNameCount);
         $this->assertSame(2, $listener5->calledByInvokeCount);
         $this->assertSame(2, $listener5->calledByEventNameCount);
-        $this->assertSame(0, $subscriber1->calledByInvokeCount);
-        $this->assertSame(2, $subscriber1->calledByEventNameCount);
-        $this->assertSame(2, $subscriber2->calledByInvokeCount);
-        $this->assertSame(0, $subscriber2->calledByEventNameCount);
 
         $this->assertSame(0, $listener6->calledByInvokeCount);
         $this->assertSame(1, $listener6->calledByEventNameCount);
@@ -155,29 +122,15 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(0, $listener9->calledByEventNameCount);
         $this->assertSame(1, $listener10->calledByInvokeCount);
         $this->assertSame(1, $listener10->calledByEventNameCount);
-        $this->assertSame(1, $subscriber3->calledByInvokeCount);
-        $this->assertSame(0, $subscriber3->calledByEventNameCount);
     }
 
     public function testGetListenersForEvent()
     {
-        $this->evm = new ContainerAwareEventManager($this->container, ['lazy2']);
-
-        $this->container->set('lazy', $listener1 = new MyListener());
-        $this->container->set('lazy2', $subscriber1 = new MySubscriber(['foo']));
-        $this->evm->addEventListener('foo', 'lazy');
-        $this->evm->addEventListener('foo', $listener2 = new MyListener());
-
-        $this->assertSame([$subscriber1, $listener1, $listener2], array_values($this->evm->getListeners('foo')));
-    }
-
-    public function testGetListeners()
-    {
         $this->container->set('lazy', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
-        $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners()['foo']));
+        $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners('foo')));
     }
 
     public function testGetAllListeners()
@@ -235,15 +188,15 @@ class ContainerAwareEventManagerTest extends TestCase
 
 class MyListener
 {
-    public $calledByInvokeCount = 0;
-    public $calledByEventNameCount = 0;
+    public int $calledByInvokeCount = 0;
+    public int $calledByEventNameCount = 0;
 
-    public function __invoke()
+    public function __invoke(): void
     {
         ++$this->calledByInvokeCount;
     }
 
-    public function foo()
+    public function foo(): void
     {
         ++$this->calledByEventNameCount;
     }
@@ -251,8 +204,8 @@ class MyListener
 
 class MySubscriber extends MyListener implements EventSubscriber
 {
-    public $calledSubscribedEventsCount = 0;
-    private $listenedEvents;
+    public int $calledSubscribedEventsCount = 0;
+    private array $listenedEvents;
 
     public function __construct(array $listenedEvents)
     {

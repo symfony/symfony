@@ -20,19 +20,11 @@ class BooleanToStringTransformerTest extends TestCase
 {
     private const TRUE_VALUE = '1';
 
-    /**
-     * @var BooleanToStringTransformer
-     */
-    protected $transformer;
+    protected BooleanToStringTransformer $transformer;
 
     protected function setUp(): void
     {
         $this->transformer = new BooleanToStringTransformer(self::TRUE_VALUE);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->transformer = null;
     }
 
     public function testTransform()

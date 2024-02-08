@@ -16,7 +16,6 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormRegistry;
-use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
@@ -31,25 +30,10 @@ use Symfony\Component\Form\Tests\Fixtures\ConfigurableFormType;
  */
 class FormFactoryTest extends TestCase
 {
-    /**
-     * @var ConfigurableFormTypeGuesser
-     */
-    private $guesser1;
-
-    /**
-     * @var ConfigurableFormTypeGuesser
-     */
-    private $guesser2;
-
-    /**
-     * @var FormRegistryInterface
-     */
-    private $registry;
-
-    /**
-     * @var FormFactory
-     */
-    private $factory;
+    private ConfigurableFormTypeGuesser $guesser1;
+    private ConfigurableFormTypeGuesser $guesser2;
+    private FormRegistry $registry;
+    private FormFactory $factory;
 
     protected function setUp(): void
     {
@@ -189,10 +173,10 @@ class FormFactoryTest extends TestCase
 
 class ConfigurableFormTypeGuesser implements FormTypeGuesserInterface
 {
-    private $typeGuess;
-    private $requiredGuess;
-    private $maxLengthGuess;
-    private $patternGuess;
+    private ?\Symfony\Component\Form\Guess\TypeGuess $typeGuess = null;
+    private ?\Symfony\Component\Form\Guess\ValueGuess $requiredGuess = null;
+    private ?\Symfony\Component\Form\Guess\ValueGuess $maxLengthGuess = null;
+    private ?\Symfony\Component\Form\Guess\ValueGuess $patternGuess = null;
 
     public function guessType($class, $property): ?TypeGuess
     {

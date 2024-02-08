@@ -20,17 +20,9 @@ use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
  */
 class JsonBundleWriterTest extends TestCase
 {
-    /**
-     * @var JsonBundleWriter
-     */
-    private $writer;
-
-    private $directory;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private JsonBundleWriter $writer;
+    private string $directory;
+    private Filesystem $filesystem;
 
     protected function setUp(): void
     {

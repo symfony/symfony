@@ -26,32 +26,25 @@ class FormRegistry implements FormRegistryInterface
     /**
      * @var FormExtensionInterface[]
      */
-    private $extensions = [];
+    private array $extensions = [];
 
     /**
      * @var ResolvedFormTypeInterface[]
      */
-    private $types = [];
+    private array $types = [];
 
-    /**
-     * @var FormTypeGuesserInterface|false|null
-     */
-    private $guesser = false;
-
-    /**
-     * @var ResolvedFormTypeFactoryInterface
-     */
-    private $resolvedTypeFactory;
-
-    private $checkedTypes = [];
+    private FormTypeGuesserInterface|false|null $guesser = false;
+    private array $checkedTypes = [];
 
     /**
      * @param FormExtensionInterface[] $extensions
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
      */
-    public function __construct(array $extensions, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
-    {
+    public function __construct(
+        array $extensions,
+        private ResolvedFormTypeFactoryInterface $resolvedTypeFactory,
+    ) {
         foreach ($extensions as $extension) {
             if (!$extension instanceof FormExtensionInterface) {
                 throw new UnexpectedTypeException($extension, FormExtensionInterface::class);
@@ -59,13 +52,9 @@ class FormRegistry implements FormRegistryInterface
         }
 
         $this->extensions = $extensions;
-        $this->resolvedTypeFactory = $resolvedTypeFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType(string $name)
+    public function getType(string $name): ResolvedFormTypeInterface
     {
         if (!isset($this->types[$name])) {
             $type = null;
@@ -101,7 +90,7 @@ class FormRegistry implements FormRegistryInterface
     private function resolveType(FormTypeInterface $type): ResolvedFormTypeInterface
     {
         $parentType = $type->getParent();
-        $fqcn = \get_class($type);
+        $fqcn = $type::class;
 
         if (isset($this->checkedTypes[$fqcn])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
@@ -126,10 +115,7 @@ class FormRegistry implements FormRegistryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasType(string $name)
+    public function hasType(string $name): bool
     {
         if (isset($this->types[$name])) {
             return true;
@@ -137,17 +123,14 @@ class FormRegistry implements FormRegistryInterface
 
         try {
             $this->getType($name);
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
             return false;
         }
 
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTypeGuesser()
+    public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         if (false === $this->guesser) {
             $guessers = [];
@@ -160,16 +143,13 @@ class FormRegistry implements FormRegistryInterface
                 }
             }
 
-            $this->guesser = !empty($guessers) ? new FormTypeGuesserChain($guessers) : null;
+            $this->guesser = $guessers ? new FormTypeGuesserChain($guessers) : null;
         }
 
         return $this->guesser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtensions()
+    public function getExtensions(): array
     {
         return $this->extensions;
     }

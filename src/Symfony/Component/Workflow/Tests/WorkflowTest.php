@@ -21,7 +21,6 @@ use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
@@ -31,16 +30,6 @@ use Symfony\Component\Workflow\WorkflowEvents;
 class WorkflowTest extends TestCase
 {
     use WorkflowBuilderTrait;
-
-    public function testGetMarkingWithInvalidStoreReturn()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".');
-        $subject = new Subject();
-        $workflow = new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class));
-
-        $workflow->getMarking($subject);
-    }
 
     public function testGetMarkingWithEmptyDefinition()
     {
@@ -438,14 +427,16 @@ class WorkflowTest extends TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
-    public static function provideApplyWithEventDispatcherForAnnounceTests()
+    public static function provideApplyWithEventDispatcherForAnnounceTests(): \Generator
     {
         yield [false, [Workflow::DISABLE_ANNOUNCE_EVENT => true]];
         yield [true, [Workflow::DISABLE_ANNOUNCE_EVENT => false]];
         yield [true, []];
     }
 
-    /** @dataProvider provideApplyWithEventDispatcherForAnnounceTests */
+    /**
+     * @dataProvider provideApplyWithEventDispatcherForAnnounceTests
+     */
     public function testApplyWithEventDispatcherForAnnounce(bool $fired, array $context)
     {
         $definition = $this->createComplexWorkflowDefinition();
@@ -789,7 +780,7 @@ class WorkflowTest extends TestCase
 
 class EventDispatcherMock implements \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
 {
-    public $dispatchedEvents = [];
+    public array $dispatchedEvents = [];
 
     public function dispatch($event, ?string $eventName = null): object
     {

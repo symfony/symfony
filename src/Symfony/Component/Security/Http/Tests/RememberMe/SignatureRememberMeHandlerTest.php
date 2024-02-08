@@ -26,11 +26,11 @@ use Symfony\Component\Security\Http\RememberMe\SignatureRememberMeHandler;
 
 class SignatureRememberMeHandlerTest extends TestCase
 {
-    private $signatureHasher;
-    private $userProvider;
-    private $request;
-    private $requestStack;
-    private $handler;
+    private SignatureHasher $signatureHasher;
+    private InMemoryUserProvider $userProvider;
+    private Request $request;
+    private RequestStack $requestStack;
+    private SignatureRememberMeHandler $handler;
 
     protected function setUp(): void
     {

@@ -20,8 +20,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class InteractiveLoginEvent extends Event
 {
-    private $request;
-    private $authenticationToken;
+    private Request $request;
+    private TokenInterface $authenticationToken;
 
     public function __construct(Request $request, TokenInterface $authenticationToken)
     {

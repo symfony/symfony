@@ -31,21 +31,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class CrowdinProvider implements ProviderInterface
 {
-    private $client;
-    private $loader;
-    private $logger;
-    private $xliffFileDumper;
-    private $defaultLocale;
-    private $endpoint;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, XliffFileDumper $xliffFileDumper, string $defaultLocale, string $endpoint)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->xliffFileDumper = $xliffFileDumper;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private XliffFileDumper $xliffFileDumper,
+        private string $defaultLocale,
+        private string $endpoint,
+    ) {
     }
 
     public function __toString(): string
@@ -53,16 +46,16 @@ final class CrowdinProvider implements ProviderInterface
         return sprintf('crowdin://%s', $this->endpoint);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $fileList = $this->getFileList();
+        $languageMapping = $this->getLanguageMapping();
 
         $responses = [];
 
         foreach ($translatorBag->getCatalogues() as $catalogue) {
+            $locale = $catalogue->getLocale();
+
             foreach ($catalogue->getDomains() as $domain) {
                 if (0 === \count($catalogue->all($domain))) {
                     continue;
@@ -89,7 +82,7 @@ final class CrowdinProvider implements ProviderInterface
                         continue;
                     }
 
-                    $responses[] = $this->uploadTranslations($fileId, $domain, $content, $catalogue->getLocale());
+                    $responses[] = $this->uploadTranslations($fileId, $domain, $content, $languageMapping[$locale] ?? $locale);
                 }
             }
         }
@@ -108,6 +101,7 @@ final class CrowdinProvider implements ProviderInterface
     public function read(array $domains, array $locales): TranslatorBag
     {
         $fileList = $this->getFileList();
+        $languageMapping = $this->getLanguageMapping();
 
         $translatorBag = new TranslatorBag();
         $responses = [];
@@ -121,7 +115,7 @@ final class CrowdinProvider implements ProviderInterface
 
             foreach ($locales as $locale) {
                 if ($locale !== $this->defaultLocale) {
-                    $response = $this->exportProjectTranslations($locale, $fileId);
+                    $response = $this->exportProjectTranslations($languageMapping[$locale] ?? $locale, $fileId);
                 } else {
                     $response = $this->downloadSourceFile($fileId);
                 }
@@ -176,10 +170,6 @@ final class CrowdinProvider implements ProviderInterface
         $responses = [];
 
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$defaultCatalogue) {
-            $defaultCatalogue = $translatorBag->getCatalogues()[0];
-        }
 
         foreach ($defaultCatalogue->all() as $domain => $messages) {
             $fileId = $this->getFileIdByDomain($fileList, $domain);
@@ -405,5 +395,26 @@ final class CrowdinProvider implements ProviderInterface
         }
 
         return $result;
+    }
+
+    private function getLanguageMapping(): array
+    {
+        /**
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.get (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.get (Crowdin Enterprise API)
+         */
+        $response = $this->client->request('GET', '');
+
+        if (200 !== $response->getStatusCode()) {
+            throw new ProviderException('Unable to get project info.', $response);
+        }
+
+        $projectInfo = $response->toArray()['data'];
+        $mapping = [];
+        foreach ($projectInfo['languageMapping'] ?? [] as $key => $value) {
+            $mapping[$value['locale']] = $key;
+        }
+
+        return $mapping;
     }
 }

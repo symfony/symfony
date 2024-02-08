@@ -14,10 +14,10 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_74;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
 
 class PropertyMetadataTest extends TestCase
 {
@@ -60,9 +60,6 @@ class PropertyMetadataTest extends TestCase
         $metadata->getPropertyValue($entity);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testGetPropertyValueFromUninitializedProperty()
     {
         $entity = new Entity_74();
@@ -71,9 +68,6 @@ class PropertyMetadataTest extends TestCase
         $this->assertNull($metadata->getPropertyValue($entity));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testGetPropertyValueFromUninitializedPropertyShouldNotReturnNullIfMagicGetIsPresent()
     {
         $entity = new Entity_74_Proxy();

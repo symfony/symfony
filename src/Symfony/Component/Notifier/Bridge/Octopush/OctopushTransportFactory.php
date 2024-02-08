@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Octopush;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Aurélien Martin <pro@aurelienmartin.com>
  */
 final class OctopushTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return OctopushTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): OctopushTransport
     {
         $scheme = $dsn->getScheme();
 

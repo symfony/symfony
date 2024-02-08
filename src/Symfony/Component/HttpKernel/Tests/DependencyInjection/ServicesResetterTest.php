@@ -14,8 +14,10 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ClearableService;
+use Symfony\Component\HttpKernel\Tests\Fixtures\LazyResettableService;
 use Symfony\Component\HttpKernel\Tests\Fixtures\MultiResettableService;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
+use Symfony\Component\VarExporter\ProxyHelper;
 
 class ServicesResetterTest extends TestCase
 {
@@ -45,5 +47,30 @@ class ServicesResetterTest extends TestCase
         $this->assertSame(1, ClearableService::$counter);
         $this->assertSame(1, MultiResettableService::$resetFirstCounter);
         $this->assertSame(1, MultiResettableService::$resetSecondCounter);
+    }
+
+    public function testResetLazyServices()
+    {
+        $proxyCode = ProxyHelper::generateLazyProxy(new \ReflectionClass(LazyResettableService::class));
+        eval('class LazyResettableServiceProxy'.$proxyCode);
+
+        $lazyService = \LazyResettableServiceProxy::createLazyProxy(fn (): LazyResettableService => new LazyResettableService());
+
+        $resetter = new ServicesResetter(new \ArrayIterator([
+            'lazy' => $lazyService,
+        ]), [
+            'lazy' => ['reset'],
+        ]);
+
+        $resetter->reset();
+        $this->assertSame(0, LazyResettableService::$counter);
+
+        $resetter->reset();
+        $this->assertSame(0, LazyResettableService::$counter);
+
+        $this->assertTrue($lazyService->foo());
+
+        $resetter->reset();
+        $this->assertSame(1, LazyResettableService::$counter);
     }
 }

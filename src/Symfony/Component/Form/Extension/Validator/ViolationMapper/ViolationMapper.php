@@ -28,20 +28,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ViolationMapper implements ViolationMapperInterface
 {
-    private $formRenderer;
-    private $translator;
-    private $allowNonSynchronized = false;
+    private bool $allowNonSynchronized = false;
 
-    public function __construct(?FormRendererInterface $formRenderer = null, ?TranslatorInterface $translator = null)
-    {
-        $this->formRenderer = $formRenderer;
-        $this->translator = $translator;
+    public function __construct(
+        private ?FormRendererInterface $formRenderer = null,
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false)
+    public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false): void
     {
         $this->allowNonSynchronized = $allowNonSynchronized;
 
@@ -153,7 +148,7 @@ class ViolationMapper implements ViolationMapperInterface
             $message = $violation->getMessage();
             $messageTemplate = $violation->getMessageTemplate();
 
-            if (false !== strpos($message, '{{ label }}') || false !== strpos($messageTemplate, '{{ label }}')) {
+            if (str_contains($message, '{{ label }}') || str_contains($messageTemplate, '{{ label }}')) {
                 $form = $scope;
 
                 do {
@@ -179,8 +174,8 @@ class ViolationMapper implements ViolationMapperInterface
                 if (false !== $label) {
                     if (null === $label && null !== $this->formRenderer) {
                         $label = $this->formRenderer->humanize($scope->getName());
-                    } elseif (null === $label) {
-                        $label = $scope->getName();
+                    } else {
+                        $label ??= $scope->getName();
                     }
 
                     if (null !== $this->translator) {

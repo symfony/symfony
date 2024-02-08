@@ -23,15 +23,10 @@ class UriSafeTokenGeneratorTest extends TestCase
 
     /**
      * A non alpha-numeric byte string.
-     *
-     * @var string
      */
-    private static $bytes;
+    private static string $bytes;
 
-    /**
-     * @var UriSafeTokenGenerator
-     */
-    private $generator;
+    private UriSafeTokenGenerator $generator;
 
     public static function setUpBeforeClass(): void
     {
@@ -41,11 +36,6 @@ class UriSafeTokenGeneratorTest extends TestCase
     protected function setUp(): void
     {
         $this->generator = new UriSafeTokenGenerator(self::ENTROPY);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->generator = null;
     }
 
     public function testGenerateToken()

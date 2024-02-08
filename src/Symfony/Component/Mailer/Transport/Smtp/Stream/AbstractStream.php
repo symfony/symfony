@@ -24,17 +24,21 @@ use Symfony\Component\Mailer\Exception\TransportException;
  */
 abstract class AbstractStream
 {
+    /** @var resource|null */
     protected $stream;
+    /** @var resource|null */
     protected $in;
+    /** @var resource|null */
     protected $out;
 
-    private $debug = '';
+    private string $debug = '';
 
     public function write(string $bytes, bool $debug = true): void
     {
         if ($debug) {
+            $timestamp = date('c');
             foreach (explode("\n", trim($bytes)) as $line) {
-                $this->debug .= sprintf("> %s\n", $line);
+                $this->debug .= sprintf("[%s] > %s\n", $timestamp, $line);
             }
         }
 
@@ -88,7 +92,7 @@ abstract class AbstractStream
             }
         }
 
-        $this->debug .= sprintf('< %s', $line);
+        $this->debug .= sprintf('[%s] < %s', date('c'), $line);
 
         return $line;
     }

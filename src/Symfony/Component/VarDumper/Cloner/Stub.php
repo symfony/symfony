@@ -23,6 +23,7 @@ class Stub
     public const TYPE_ARRAY = 3;
     public const TYPE_OBJECT = 4;
     public const TYPE_RESOURCE = 5;
+    public const TYPE_SCALAR = 6;
 
     public const STRING_BINARY = 1;
     public const STRING_UTF8 = 2;
@@ -30,16 +31,16 @@ class Stub
     public const ARRAY_ASSOC = 1;
     public const ARRAY_INDEXED = 2;
 
-    public $type = self::TYPE_REF;
-    public $class = '';
-    public $value;
-    public $cut = 0;
-    public $handle = 0;
-    public $refCount = 0;
-    public $position = 0;
-    public $attr = [];
+    public int $type = self::TYPE_REF;
+    public string|int|null $class = '';
+    public mixed $value;
+    public int $cut = 0;
+    public int $handle = 0;
+    public int $refCount = 0;
+    public int $position = 0;
+    public array $attr = [];
 
-    private static $defaultProperties = [];
+    private static array $defaultProperties = [];
 
     /**
      * @internal

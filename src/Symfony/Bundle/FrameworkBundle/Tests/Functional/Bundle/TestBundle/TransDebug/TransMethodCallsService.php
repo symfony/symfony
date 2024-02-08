@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TransMethodCallsService
 {
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function setTranslator(TranslatorInterface $translator): void
     {

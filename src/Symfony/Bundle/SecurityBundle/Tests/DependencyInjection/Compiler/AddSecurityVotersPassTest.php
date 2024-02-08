@@ -24,8 +24,6 @@ class AddSecurityVotersPassTest extends TestCase
 {
     public function testNoVoters()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('No security voters found. You need to tag at least one with "security.voter".');
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
@@ -33,6 +31,10 @@ class AddSecurityVotersPassTest extends TestCase
         ;
 
         $compilerPass = new AddSecurityVotersPass();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('No security voters found. You need to tag at least one with "security.voter".');
+
         $compilerPass->process($container);
     }
 
@@ -91,11 +93,11 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
 
-        $def1 = $container->getDefinition('debug.security.voter.voter1');
+        $def1 = $container->getDefinition('.debug.security.voter.voter1');
         $this->assertNull($def1->getDecoratedService(), 'voter1: should not be decorated');
         $this->assertEquals(new Reference('voter1'), $def1->getArgument(0), 'voter1: wrong argument');
 
-        $def2 = $container->getDefinition('debug.security.voter.voter2');
+        $def2 = $container->getDefinition('.debug.security.voter.voter2');
         $this->assertNull($def2->getDecoratedService(), 'voter2: should not be decorated');
         $this->assertEquals(new Reference('voter2'), $def2->getArgument(0), 'voter2: wrong argument');
 

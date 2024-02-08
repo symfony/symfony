@@ -12,12 +12,14 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
@@ -27,13 +29,11 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
+#[AsCommand(name: 'cache:pool:clear', description: 'Clear cache pools')]
 final class CachePoolClearCommand extends Command
 {
-    protected static $defaultName = 'cache:pool:clear';
-    protected static $defaultDescription = 'Clear cache pools';
-
-    private $poolClearer;
-    private $poolNames;
+    private Psr6CacheClearer $poolClearer;
+    private ?array $poolNames;
 
     /**
      * @param string[]|null $poolNames
@@ -46,16 +46,14 @@ final class CachePoolClearCommand extends Command
         $this->poolNames = $poolNames;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
-                new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools or cache pool clearers'),
+                new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'A list of cache pools or cache pool clearers'),
             ])
-            ->setDescription(self::$defaultDescription)
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Clear all cache pools')
+            ->addOption('exclude', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'A list of cache pools or cache pool clearers to exclude')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
 
@@ -65,9 +63,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -75,10 +70,28 @@ EOF
         $pools = [];
         $clearers = [];
 
-        foreach ($input->getArgument('pools') as $id) {
+        $poolNames = $input->getArgument('pools');
+        $excludedPoolNames = $input->getOption('exclude');
+        if ($clearAll = $input->getOption('all')) {
+            if (!$this->poolNames) {
+                throw new InvalidArgumentException('Could not clear all cache pools, try specifying a specific pool or cache clearer.');
+            }
+
+            if (!$excludedPoolNames) {
+                $io->comment('Clearing all cache pools...');
+            }
+
+            $poolNames = $this->poolNames;
+        } elseif (!$poolNames) {
+            throw new InvalidArgumentException('Either specify at least one pool name, or provide the --all option to clear all pools.');
+        }
+
+        $poolNames = array_diff($poolNames, $excludedPoolNames);
+
+        foreach ($poolNames as $id) {
             if ($this->poolClearer->hasPool($id)) {
                 $pools[$id] = $id;
-            } else {
+            } elseif (!$clearAll || $kernel->getContainer()->has($id)) {
                 $pool = $kernel->getContainer()->get($id);
 
                 if ($pool instanceof CacheItemPoolInterface) {

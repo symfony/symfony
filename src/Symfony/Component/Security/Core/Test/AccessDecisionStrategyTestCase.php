@@ -64,7 +64,7 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
     final protected static function getVoter(int $vote): VoterInterface
     {
         return new class($vote) implements VoterInterface {
-            private $vote;
+            private int $vote;
 
             public function __construct(int $vote)
             {

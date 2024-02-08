@@ -18,7 +18,7 @@ use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ConfigCacheTest extends TestCase
 {
-    private $cacheFile = null;
+    private string $cacheFile;
 
     protected function setUp(): void
     {
@@ -71,7 +71,6 @@ class ConfigCacheTest extends TestCase
     public function testFreshResourceInDebug()
     {
         $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
-        $p->setAccessible(true);
         $p->setValue(null, []);
 
         $freshResource = new ResourceStub();
@@ -86,7 +85,6 @@ class ConfigCacheTest extends TestCase
     public function testStaleResourceInDebug()
     {
         $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
-        $p->setAccessible(true);
         $p->setValue(null, []);
 
         $staleResource = new ResourceStub();

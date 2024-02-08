@@ -21,20 +21,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UrlType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (null !== $options['default_protocol']) {
             $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if ($options['default_protocol']) {
             $view->vars['attr']['inputmode'] = 'url';
@@ -42,35 +36,26 @@ class UrlType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'default_protocol' => 'http',
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter a valid URL.';
+            'default_protocol' => static function (Options $options) {
+                trigger_deprecation('symfony/form', '7.1', 'Not configuring the "default_protocol" option when using the UrlType is deprecated. It will default to "null" in 8.0.');
+
+                return 'http';
             },
+            'invalid_message' => 'Please enter a valid URL.',
         ]);
 
         $resolver->setAllowedTypes('default_protocol', ['null', 'string']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'url';
     }

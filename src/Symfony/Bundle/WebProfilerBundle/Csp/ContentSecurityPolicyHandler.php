@@ -23,8 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ContentSecurityPolicyHandler
 {
-    private $nonceGenerator;
-    private $cspDisabled = false;
+    private NonceGenerator $nonceGenerator;
+    private bool $cspDisabled = false;
 
     public function __construct(NonceGenerator $nonceGenerator)
     {
@@ -71,7 +71,7 @@ class ContentSecurityPolicyHandler
      *
      * All related headers will be removed.
      */
-    public function disableCsp()
+    public function disableCsp(): void
     {
         $this->cspDisabled = true;
     }
@@ -96,13 +96,13 @@ class ContentSecurityPolicyHandler
         return $nonces;
     }
 
-    private function cleanHeaders(Response $response)
+    private function cleanHeaders(Response $response): void
     {
         $response->headers->remove('X-SymfonyProfiler-Script-Nonce');
         $response->headers->remove('X-SymfonyProfiler-Style-Nonce');
     }
 
-    private function removeCspHeaders(Response $response)
+    private function removeCspHeaders(Response $response): void
     {
         $response->headers->remove('X-Content-Security-Policy');
         $response->headers->remove('Content-Security-Policy');
@@ -180,9 +180,7 @@ class ContentSecurityPolicyHandler
      */
     private function generateCspHeader(array $directives): string
     {
-        return array_reduce(array_keys($directives), function ($res, $name) use ($directives) {
-            return ('' !== $res ? $res.'; ' : '').sprintf('%s %s', $name, implode(' ', $directives[$name]));
-        }, '');
+        return array_reduce(array_keys($directives), fn ($res, $name) => ('' !== $res ? $res.'; ' : '').sprintf('%s %s', $name, implode(' ', $directives[$name])), '');
     }
 
     /**
@@ -224,7 +222,7 @@ class ContentSecurityPolicyHandler
             if (!str_ends_with($directive, '\'')) {
                 continue;
             }
-            if ('\'nonce-' === substr($directive, 0, 7)) {
+            if (str_starts_with($directive, '\'nonce-')) {
                 return true;
             }
             if (\in_array(substr($directive, 0, 8), ['\'sha256-', '\'sha384-', '\'sha512-'], true)) {
@@ -235,7 +233,7 @@ class ContentSecurityPolicyHandler
         return false;
     }
 
-    private function getDirectiveFallback(array $directiveSet, string $type)
+    private function getDirectiveFallback(array $directiveSet, string $type): ?array
     {
         if (\in_array($type, ['script-src-elem', 'style-src-elem'], true) || !isset($directiveSet['default-src'])) {
             // Let the browser fallback on it's own

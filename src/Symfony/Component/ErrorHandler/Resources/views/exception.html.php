@@ -13,7 +13,6 @@
             </h2>
         </div>
     </div>
-
     <div class="exception-message-wrapper">
         <div class="container">
             <h1 class="break-long-words exception-message<?= mb_strlen($exceptionMessage) > 180 ? ' long' : ''; ?>"><?= $this->formatFileFromText(nl2br($exceptionMessage)); ?></h1>
@@ -35,7 +34,7 @@
             $last = $exceptionAsArrayCount - 1;
             foreach ($exceptionAsArray as $i => $e) {
                 foreach ($e['trace'] as $trace) {
-                    if ($trace['file'] && false === mb_strpos($trace['file'], '/vendor/') && false === mb_strpos($trace['file'], '/var/cache/') && $i < $last) {
+                    if ($trace['file'] && !str_contains($trace['file'], '/vendor/') && !str_contains($trace['file'], '/var/cache/') && $i < $last) {
                         $exceptionWithUserCode[] = $i;
                     }
                 }

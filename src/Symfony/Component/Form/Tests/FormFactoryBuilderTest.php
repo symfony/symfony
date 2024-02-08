@@ -19,14 +19,13 @@ use Symfony\Component\Form\Tests\Fixtures\NullFormTypeGuesser;
 
 class FormFactoryBuilderTest extends TestCase
 {
-    private $registry;
-    private $type;
+    private \ReflectionProperty $registry;
+    private FooType $type;
 
     protected function setUp(): void
     {
         $factory = new \ReflectionClass(FormFactory::class);
         $this->registry = $factory->getProperty('registry');
-        $this->registry->setAccessible(true);
 
         $this->type = new FooType();
     }
@@ -41,7 +40,7 @@ class FormFactoryBuilderTest extends TestCase
         $extensions = $registry->getExtensions();
 
         $this->assertCount(1, $extensions);
-        $this->assertTrue($extensions[0]->hasType(\get_class($this->type)));
+        $this->assertTrue($extensions[0]->hasType($this->type::class));
         $this->assertNull($extensions[0]->getTypeGuesser());
     }
 

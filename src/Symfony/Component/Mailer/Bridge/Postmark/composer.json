@@ -16,12 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.2",
         "psr/event-dispatcher": "^1",
-        "symfony/mailer": "^5.4.21|^6.2.7"
+        "symfony/mailer": "^6.4|^7.0"
     },
     "require-dev": {
-        "symfony/http-client": "^4.4|^5.0|^6.0"
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/webhook": "^6.4|^7.0"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Postmark\\": "" },

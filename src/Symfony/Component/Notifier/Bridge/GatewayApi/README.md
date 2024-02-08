@@ -16,6 +16,31 @@ where:
 
 See your account info at https://gatewayapi.com
 
+Adding Options to a Message
+---------------------------
+
+With a GatewayApi Message, you can use the `GatewayApiOptions` class to add
+[message options](https://gatewayapi.com/docs/apis/rest/).
+
+```php
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiOptions;
+
+$sms = new SmsMessage('+1411111111', 'My message');
+
+$options = (new GatewayApiOptions())
+    ->class('standard')
+    ->callbackUrl('https://my-callback-url')
+    ->userRef('user_ref')
+    // ...
+    ;
+
+// Add the custom options to the sms message and send the message
+$sms->options($options);
+
+$texter->send($sms);
+```
+
 Resources
 ---------
 

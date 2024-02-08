@@ -12,23 +12,19 @@
 namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\Esendex\EsendexOptions;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
-use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class EsendexTransportTest extends TransportTestCase
 {
-    /**
-     * @return EsendexTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): EsendexTransport
     {
         return (new EsendexTransport('email', 'password', 'testAccountReference', 'testFrom', $client ?? new MockHttpClient()))->setHost('host.test');
     }
@@ -41,6 +37,7 @@ final class EsendexTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new SmsMessage('0611223344', 'Hello!', 'from', new EsendexOptions(['from' => 'foo']))];
     }
 
     public static function unsupportedMessagesProvider(): iterable
@@ -56,9 +53,7 @@ final class EsendexTransportTest extends TransportTestCase
             ->method('getStatusCode')
             ->willReturn(500);
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -78,9 +73,7 @@ final class EsendexTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['errors' => [['code' => 'accountreference_invalid', 'description' => 'Invalid Account Reference EX0000000']]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -92,7 +85,7 @@ final class EsendexTransportTest extends TransportTestCase
 
     public function testSendWithSuccessfulResponseDispatchesMessageEvent()
     {
-        $messageId = Uuid::v4()->toRfc4122();
+        $messageId = bin2hex(random_bytes(7));
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
             ->method('getStatusCode')
@@ -101,14 +94,42 @@ final class EsendexTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
         $sentMessage = $transport->send(new SmsMessage('phone', 'testMessage'));
 
         $this->assertSame($messageId, $sentMessage->getMessageId());
+    }
+
+    public function testSentMessageContainsAnArrayOfMessages()
+    {
+        $messageId = bin2hex(random_bytes(7));
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]]));
+
+        $requestOptions = [];
+        $client = new MockHttpClient(static function ($method, $url, $options) use (&$requestOptions, $response): ResponseInterface {
+            $requestOptions = $options;
+
+            return $response;
+        });
+
+        $transport = self::createTransport($client);
+
+        $transport->send(new SmsMessage('phone', 'testMessage'));
+
+        $body = json_decode($requestOptions['body'] ?? '');
+
+        $this->assertIsArray($body->messages);
+        $this->assertCount(1, $body->messages);
+        $this->assertSame('phone', $body->messages[0]->to);
+        $this->assertSame('testMessage', $body->messages[0]->body);
     }
 }

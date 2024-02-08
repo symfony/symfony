@@ -95,7 +95,9 @@ class StreamOutput extends Output
             return false;
         }
 
-        if (!$this->isTty()) {
+        // Detect msysgit/mingw and assume this is a tty because detection
+        // does not work correctly, see https://github.com/composer/composer/issues/9690
+        if (!@stream_isatty($this->stream) && !\in_array(strtoupper((string) getenv('MSYSTEM')), ['MINGW32', 'MINGW64'], true)) {
             return false;
         }
 
@@ -117,22 +119,5 @@ class StreamOutput extends Output
 
         // See https://github.com/chalk/supports-color/blob/d4f413efaf8da045c5ab440ed418ef02dbb28bf1/index.js#L157
         return preg_match('/^((screen|xterm|vt100|vt220|putty|rxvt|ansi|cygwin|linux).*)|(.*-256(color)?(-bce)?)$/', $term);
-    }
-
-    /**
-     * Checks if the stream is a TTY, i.e; whether the output stream is connected to a terminal.
-     *
-     * Reference: Composer\Util\Platform::isTty
-     * https://github.com/composer/composer
-     */
-    private function isTty(): bool
-    {
-        // Detect msysgit/mingw and assume this is a tty because detection
-        // does not work correctly, see https://github.com/composer/composer/issues/9690
-        if (\in_array(strtoupper((string) getenv('MSYSTEM')), ['MINGW32', 'MINGW64'], true)) {
-            return true;
-        }
-
-        return @stream_isatty($this->stream);
     }
 }

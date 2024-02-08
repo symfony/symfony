@@ -404,13 +404,10 @@ class DeprecationErrorHandler
         }
 
         if (!self::isTty()) {
-            return true;
+            return false;
         }
 
-        if ('\\' === \DIRECTORY_SEPARATOR
-            && \function_exists('sapi_windows_vt100_support')
-            && @sapi_windows_vt100_support(\STDOUT)
-        ) {
+        if ('\\' === \DIRECTORY_SEPARATOR && \function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support(\STDOUT)) {
             return true;
         }
 

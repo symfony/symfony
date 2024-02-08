@@ -486,8 +486,6 @@ class Configuration implements ConfigurationInterface
                                                 return array_values($places);
                                             })
                                         ->end()
-                                        ->isRequired()
-                                        ->requiresAtLeastOneElement()
                                         ->prototype('array')
                                             ->children()
                                                 ->scalarNode('name')

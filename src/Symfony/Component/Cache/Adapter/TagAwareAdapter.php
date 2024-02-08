@@ -171,7 +171,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             $bufferedItems[$key] = $item;
 
             if (null === $tags) {
-                $key = static::TAGS_PREFIX.$key;
+                $key = "\0tags\0".$key;
                 $tagKeys[$key] = $key; // BC with pools populated before v6.1
             }
         }
@@ -179,7 +179,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         if ($tagKeys) {
             foreach ($this->pool->getItems($tagKeys) as $key => $item) {
                 if ($item->isHit()) {
-                    $itemTags[substr($key, \strlen(static::TAGS_PREFIX))] = $item->get() ?: [];
+                    $itemTags[substr($key, \strlen("\0tags\0"))] = $item->get() ?: [];
                 }
             }
         }
@@ -226,7 +226,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     {
         foreach ($keys as $key) {
             if ('' !== $key && \is_string($key)) {
-                $keys[] = static::TAGS_PREFIX.$key; // BC with pools populated before v6.1
+                $keys[] = "\0tags\0".$key; // BC with pools populated before v6.1
             }
         }
 

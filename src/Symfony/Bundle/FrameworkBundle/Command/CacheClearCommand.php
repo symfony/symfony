@@ -37,14 +37,14 @@ use Symfony\Component\HttpKernel\RebootableInterface;
 #[AsCommand(name: 'cache:clear', description: 'Clear the cache')]
 class CacheClearCommand extends Command
 {
-    private CacheClearerInterface $cacheClearer;
     private Filesystem $filesystem;
 
-    public function __construct(CacheClearerInterface $cacheClearer, ?Filesystem $filesystem = null)
-    {
+    public function __construct(
+        private CacheClearerInterface $cacheClearer,
+        ?Filesystem $filesystem = null,
+    ) {
         parent::__construct();
 
-        $this->cacheClearer = $cacheClearer;
         $this->filesystem = $filesystem ?? new Filesystem();
     }
 

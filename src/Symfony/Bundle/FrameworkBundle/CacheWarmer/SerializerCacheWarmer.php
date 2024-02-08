@@ -28,16 +28,15 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
  */
 class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
 {
-    private array $loaders;
-
     /**
      * @param LoaderInterface[] $loaders      The serializer metadata loaders
      * @param string            $phpArrayFile The PHP file where metadata are cached
      */
-    public function __construct(array $loaders, string $phpArrayFile)
-    {
+    public function __construct(
+        private array $loaders,
+        string $phpArrayFile,
+    ) {
         parent::__construct($phpArrayFile);
-        $this->loaders = $loaders;
     }
 
     protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool

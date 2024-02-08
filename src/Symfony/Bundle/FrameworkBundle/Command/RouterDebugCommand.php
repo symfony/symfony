@@ -39,15 +39,11 @@ class RouterDebugCommand extends Command
 {
     use BuildDebugContainerTrait;
 
-    private RouterInterface $router;
-    private ?FileLinkFormatter $fileLinkFormatter;
-
-    public function __construct(RouterInterface $router, ?FileLinkFormatter $fileLinkFormatter = null)
-    {
+    public function __construct(
+        private RouterInterface $router,
+        private ?FileLinkFormatter $fileLinkFormatter = null,
+    ) {
         parent::__construct();
-
-        $this->router = $router;
-        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     protected function configure(): void

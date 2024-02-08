@@ -28,19 +28,19 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class HttpCache extends BaseHttpCache
 {
     protected ?string $cacheDir = null;
-    protected KernelInterface $kernel;
 
     private ?StoreInterface $store = null;
-    private ?SurrogateInterface $surrogate;
     private array $options;
 
     /**
      * @param $cache The cache directory (default used if null) or the storage instance
      */
-    public function __construct(KernelInterface $kernel, string|StoreInterface|null $cache = null, ?SurrogateInterface $surrogate = null, ?array $options = null)
-    {
-        $this->kernel = $kernel;
-        $this->surrogate = $surrogate;
+    public function __construct(
+        protected KernelInterface $kernel,
+        string|StoreInterface|null $cache = null,
+        private ?SurrogateInterface $surrogate = null,
+        ?array $options = null,
+    ) {
         $this->options = $options ?? [];
 
         if ($cache instanceof StoreInterface) {

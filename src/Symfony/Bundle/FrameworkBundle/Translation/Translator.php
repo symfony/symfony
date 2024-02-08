@@ -26,8 +26,6 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
  */
 class Translator extends BaseTranslator implements WarmableInterface
 {
-    protected ContainerInterface $container;
-    protected array $loaderIds;
     protected array $options = [
         'cache_dir' => null,
         'debug' => false,
@@ -60,11 +58,6 @@ class Translator extends BaseTranslator implements WarmableInterface
     private array $scannedDirectories;
 
     /**
-     * @var string[]
-     */
-    private array $enabledLocales;
-
-    /**
      * Constructor.
      *
      * Available options:
@@ -74,14 +67,18 @@ class Translator extends BaseTranslator implements WarmableInterface
      *   * resource_files: List of translation resources available grouped by locale.
      *   * cache_vary:     An array of data that is serialized to generate the cached catalogue name.
      *
+     * @param string[] $enabledLocales
+     *
      * @throws InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageFormatterInterface $formatter, string $defaultLocale, array $loaderIds = [], array $options = [], array $enabledLocales = [])
-    {
-        $this->container = $container;
-        $this->loaderIds = $loaderIds;
-        $this->enabledLocales = $enabledLocales;
-
+    public function __construct(
+        protected ContainerInterface $container,
+        MessageFormatterInterface $formatter,
+        string $defaultLocale,
+        protected array $loaderIds = [],
+        array $options = [],
+        private array $enabledLocales = [],
+    ) {
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
             throw new InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));

@@ -52,8 +52,13 @@ final class PostmarkPayloadConverter implements PayloadConverterInterface
         }
         $event->setDate($date);
         $event->setRecipientEmail($payload['Recipient'] ?? $payload['Email']);
-        $event->setMetadata($payload['Metadata']);
-        $event->setTags([$payload['Tag']]);
+
+        if (isset($payload['Metadata'])) {
+            $event->setMetadata($payload['Metadata']);
+        }
+        if (isset($payload['Tag'])) {
+            $event->setTags([$payload['Tag']]);
+        }
 
         return $event;
     }

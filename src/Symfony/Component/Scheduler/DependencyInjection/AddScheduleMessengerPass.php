@@ -35,8 +35,11 @@ class AddScheduleMessengerPass implements CompilerPassInterface
         }
 
         $receivers = [];
-        foreach ($container->findTaggedServiceIds('messenger.receiver') as $tags) {
-            $receivers[$tags[0]['alias']] = true;
+        foreach ($container->findTaggedServiceIds('messenger.receiver') as $serviceId => $tags) {
+            $receivers[$serviceId] = true;
+            if (isset($tags[0]['alias'])) {
+                $receivers[$tags[0]['alias']] = true;
+            }
         }
 
         $scheduleProviderIds = [];

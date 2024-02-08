@@ -12,7 +12,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 require __DIR__.'/../vendor/autoload.php';
 
-function dumpXliff1(string $defaultLocale, MessageCatalogue $messages, string $domain)
+function dumpXliff1(string $defaultLocale, MessageCatalogue $messages, string $domain, ?\DOMElement $header = null)
 {
     $dom = new \DOMDocument('1.0', 'utf-8');
     $dom->formatOutput = true;
@@ -26,6 +26,10 @@ function dumpXliff1(string $defaultLocale, MessageCatalogue $messages, string $d
     $xliffFile->setAttribute('target-language', 'no' === $messages->getLocale() ? 'nb' : str_replace('_', '-', $messages->getLocale()));
     $xliffFile->setAttribute('datatype', 'plaintext');
     $xliffFile->setAttribute('original', 'file.ext');
+
+    if (null !== $header) {
+        mergeDom($dom, $xliffFile, $header);
+    }
 
     $xliffBody = $xliffFile->appendChild($dom->createElement('body'));
     foreach ($messages->all($domain) as $source => $target) {
@@ -62,6 +66,24 @@ function dumpXliff1(string $defaultLocale, MessageCatalogue $messages, string $d
     return preg_replace('/^ +/m', '$0$0', $dom->saveXML());
 }
 
+function mergeDom(\DOMDocument $dom, \DOMNode $tree, \DOMNode $input)
+{
+    $new = $dom->createElement($input->tagName);
+    foreach ($input->attributes as $key => $value) {
+        $new->setAttribute($key, $value);
+    }
+    $tree->appendChild($new);
+    foreach ($input->childNodes as $child) {
+        if ($child instanceof \DOMText) {
+            $new->appendChild($dom->createTextNode(str_replace('  ', ' ', $child->textContent)));
+        } elseif ($child instanceof \DOMNode) {
+            mergeDom($dom, $new, $child);
+        } else {
+            // We just need to update our script to handle this node types
+            throw new \LogicException('Unsupported node type: '.get_class($child));
+        }
+    }
+}
 
 foreach (['Security/Core' => 'security', 'Form' => 'validators', 'Validator' => 'validators'] as $component => $domain) {
     $dir = __DIR__.'/../src/Symfony/Component/'.$component.'/Resources/translations';
@@ -95,6 +117,13 @@ foreach (['Security/Core' => 'security', 'Form' => 'validators', 'Validator' => 
             $localeCatalogue->setMetadata($source, $metadata, $domain);
         }
 
-        file_put_contents($file, dumpXliff1('en', $localeCatalogue, $domain));
+        $inputDom = new \DOMDocument();
+        $inputDom->loadXML(file_get_contents($file->getRealPath()));
+        $header = null;
+        if (1 === $inputDom->getElementsByTagName('header')->count()) {
+            $header = $inputDom->getElementsByTagName('header')->item(0);
+        }
+
+        file_put_contents($file, dumpXliff1('en', $localeCatalogue, $domain, $header));
     }
 }

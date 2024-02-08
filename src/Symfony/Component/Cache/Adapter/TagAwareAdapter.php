@@ -147,8 +147,6 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         foreach ($keys as $key) {
             if ('' !== $key && \is_string($key)) {
                 $commit = $commit || isset($this->deferred[$key]);
-                $key = static::TAGS_PREFIX.$key;
-                $tagKeys[$key] = $key; // BC with pools populated before v6.1
             }
         }
 
@@ -157,7 +155,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         }
 
         try {
-            $items = $this->pool->getItems($tagKeys + $keys);
+            $items = $this->pool->getItems($keys);
         } catch (InvalidArgumentException $e) {
             $this->pool->getItems($keys); // Should throw an exception
 
@@ -167,18 +165,24 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $bufferedItems = $itemTags = [];
 
         foreach ($items as $key => $item) {
-            if (isset($tagKeys[$key])) { // BC with pools populated before v6.1
-                if ($item->isHit()) {
-                    $itemTags[substr($key, \strlen(static::TAGS_PREFIX))] = $item->get() ?: [];
-                }
-                continue;
-            }
-
             if (null !== $tags = $item->getMetadata()[CacheItem::METADATA_TAGS] ?? null) {
                 $itemTags[$key] = $tags;
             }
 
             $bufferedItems[$key] = $item;
+
+            if (null === $tags) {
+                $key = "\0tags\0".$key;
+                $tagKeys[$key] = $key; // BC with pools populated before v6.1
+            }
+        }
+
+        if ($tagKeys) {
+            foreach ($this->pool->getItems($tagKeys) as $key => $item) {
+                if ($item->isHit()) {
+                    $itemTags[substr($key, \strlen("\0tags\0"))] = $item->get() ?: [];
+                }
+            }
         }
 
         $tagVersions = $this->getTagVersions($itemTags, false);
@@ -223,7 +227,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     {
         foreach ($keys as $key) {
             if ('' !== $key && \is_string($key)) {
-                $keys[] = static::TAGS_PREFIX.$key; // BC with pools populated before v6.1
+                $keys[] = "\0tags\0".$key; // BC with pools populated before v6.1
             }
         }
 

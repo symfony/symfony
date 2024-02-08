@@ -110,6 +110,16 @@ jobs:
           KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
           KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
           KAFKA_ADVERTISED_PORT: 9092
+      frankenphp:
+        image: dunglas/frankenphp:1.1.0
+        ports:
+          - 80:80
+        volumes:
+          - ${{ github.workspace }}:/symfony
+        env:
+          SERVER_NAME: 'http://localhost'
+          CADDY_SERVER_EXTRA_DIRECTIVES: |
+            root * /symfony/src/Symfony/Component/HttpFoundation/Tests/Fixtures/response-functional/
 
     steps:
       - name: Checkout

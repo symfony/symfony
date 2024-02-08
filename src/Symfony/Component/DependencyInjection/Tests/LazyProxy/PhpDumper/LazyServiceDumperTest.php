@@ -52,6 +52,15 @@ class LazyServiceDumperTest extends TestCase
         $this->expectExceptionMessage('Invalid "proxy" tag for service "stdClass": class "stdClass" doesn\'t implement "Psr\Container\ContainerInterface".');
         $dumper->getProxyCode($definition);
     }
+
+    public function testReadonlyClass()
+    {
+        $dumper = new LazyServiceDumper();
+        $definition = (new Definition(ReadonlyTest::class))->setLazy(true);
+
+        $this->assertTrue($dumper->isProxyCandidate($definition));
+        $this->assertStringContainsString('readonly class ReadonlyTestGhost', $dumper->getProxyCode($definition));
+    }
 }
 
 final class TestContainer implements ContainerInterface
@@ -64,5 +73,13 @@ final class TestContainer implements ContainerInterface
     public function get(string $key): string
     {
         return $key;
+    }
+}
+
+readonly class ReadonlyTest
+{
+    public function say(): string
+    {
+        return 'hello';
     }
 }

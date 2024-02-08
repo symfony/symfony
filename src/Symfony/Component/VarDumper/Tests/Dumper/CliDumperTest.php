@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
@@ -479,7 +480,7 @@ EOTXT
             ],
             [
                 'bar' => 123,
-            ]
+            ],
         ]);
 
         $dumper = new CliDumper();
@@ -498,5 +499,31 @@ EOTXT
             ,
             $dump
         );
+    }
+
+    public function testFileLinkFormat()
+    {
+        $data = new Data([
+            [
+                new ClassStub(self::class),
+            ],
+        ]);
+
+        $ide = $_ENV['SYMFONY_IDE'] ?? null;
+        $_ENV['SYMFONY_IDE'] = 'vscode';
+
+        try {
+            $dumper = new CliDumper();
+            $dumper->setColors(true);
+            $dump = $dumper->dump($data, true);
+
+            $this->assertStringMatchesFormat('%svscode:%sCliDumperTest%s', $dump);
+        } finally {
+            if (null === $ide) {
+                unset($_ENV['SYMFONY_IDE']);
+            } else {
+                $_ENV['SYMFONY_IDE'] = $ide;
+            }
+        }
     }
 }

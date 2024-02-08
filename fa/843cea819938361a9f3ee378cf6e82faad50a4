@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-05T15:43:25Z
+
+Can this be covered by a test case?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-02-06T09:16:27Z
+
+@nicolas-grekas the only way I can think of to test this is to add FrankenPHP to the CI to do an integration test, or to override the built-in `header()` function. What would be your preferred approach?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-02-06T12:45:06Z
+
+Integration test added.

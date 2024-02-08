@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-02-07T20:40:49Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2024-02-07T20:53:53Z
+
+I added a workflow to carsonbot to open this PR. I see that I have to modify the `.github/sync-translations.php` to allow header notes.
+
+FYI @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2024-02-07T23:07:42Z
+
+Blocked by https://github.com/symfony/symfony/pull/53853
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2024-02-08T07:37:44Z
+
+Now when https://github.com/symfony/symfony/pull/53853 is merged, this PR will shorty be updated (in 5h). The diff will be a minor indentation fix.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2024-02-08T08:17:58Z
+
+> Hey!
+> I see that this is your first PR. That is great! Welcome!
+
+<img width="488" alt="Capture d’écran 2024-02-08 à 09 15 20" src="https://github.com/symfony/symfony/assets/1358361/0e1df048-0514-4743-9ea5-b69c38274664">
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2024-02-08T21:06:02Z
+
+Thank you @carsonbot.

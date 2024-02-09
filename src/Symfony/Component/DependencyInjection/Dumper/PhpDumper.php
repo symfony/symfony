@@ -624,7 +624,9 @@ EOF;
                 $proxyCode = substr(self::stripComments($proxyCode), 5);
             }
 
-            $proxyClass = explode(' ', $this->inlineRequires ? substr($proxyCode, \strlen($code)) : $proxyCode, 3)[1];
+            $proxyClass = $this->inlineRequires ? substr($proxyCode, \strlen($code)) : $proxyCode;
+            $i = strpos($proxyClass, 'class');
+            $proxyClass = substr($proxyClass, 6 + $i, strpos($proxyClass, ' ', 7 + $i) - $i - 6);
 
             if ($this->asFiles || $this->namespace) {
                 $proxyCode .= "\nif (!\\class_exists('$proxyClass', false)) {\n    \\class_alias(__NAMESPACE__.'\\\\$proxyClass', '$proxyClass', false);\n}\n";

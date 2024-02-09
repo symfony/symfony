@@ -105,7 +105,7 @@ final class LazyServiceDumper implements DumperInterface
 
         if ($asGhostObject) {
             try {
-                return 'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
+                return (\PHP_VERSION_ID >= 80200 && $class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
             } catch (LogicException $e) {
                 throw new InvalidArgumentException(sprintf('Cannot generate lazy ghost for service "%s".', $id ?? $definition->getClass()), 0, $e);
             }

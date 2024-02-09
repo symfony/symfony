@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by aleho at 2024-02-08T17:35:22Z
+
+@nicolas-grekas I replaced all the custom formats in the tests with PHP's "official" ISO 8601 format. I guess it's supposed to be compatible with the standard and if not, Postmark is sending broken webhooks anyway. Is that OK?

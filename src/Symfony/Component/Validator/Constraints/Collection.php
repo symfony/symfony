@@ -42,7 +42,7 @@ class Collection extends Composite
      */
     public function __construct($fields = null, ?array $groups = null, $payload = null, ?bool $allowExtraFields = null, ?bool $allowMissingFields = null, ?string $extraFieldsMessage = null, ?string $missingFieldsMessage = null)
     {
-        if (\is_array($fields) && ([] === $fields || ($firstField = reset($fields)) instanceof Constraint || ($firstField[0] ?? null) instanceof Constraint)) {
+        if (self::isFieldsOption($fields)) {
             $fields = ['fields' => $fields];
         }
 
@@ -86,5 +86,32 @@ class Collection extends Composite
     protected function getCompositeOption()
     {
         return 'fields';
+    }
+
+    private static function isFieldsOption($options): bool
+    {
+        if (!\is_array($options)) {
+            return false;
+        }
+
+        foreach ($options as $optionOrField) {
+            if ($optionOrField instanceof Constraint) {
+                return true;
+            }
+
+            if (null === $optionOrField) {
+                continue;
+            }
+
+            if (!\is_array($optionOrField)) {
+                return false;
+            }
+
+            if ($optionOrField && !($optionOrField[0] ?? null) instanceof Constraint) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

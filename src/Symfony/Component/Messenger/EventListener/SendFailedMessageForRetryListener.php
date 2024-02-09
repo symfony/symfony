@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
@@ -57,6 +58,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
         $message = $envelope->getMessage();
         $context = [
             'class' => $message::class,
+            'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
         ];
 
         $shouldRetry = $retryStrategy && $this->shouldRetry($throwable, $envelope, $retryStrategy);

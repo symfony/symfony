@@ -31,6 +31,7 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -213,6 +214,7 @@ class Worker
                 $message = $envelope->getMessage();
                 $context = [
                     'class' => $message::class,
+                    'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
                 ];
                 $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
             }

@@ -124,10 +124,10 @@ class SwitchUserListener extends AbstractListener
         if (!$this->stateless) {
             $request->query->remove($this->usernameParameter);
             $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
-            
+
             if (self::EXIT_VALUE === $username) {
                 // Redirect to the via "impersonation_exit_url(exitTo = null)" defined url if given
-                $response = new RedirectResponse($this->urlGenerator && $request->attributes->get('_route') ? $this->urlGenerator->generate($request->attributes->get('_route')) : $request->getUri(), 302);    
+                $response = new RedirectResponse($this->urlGenerator && $request->attributes->get('_route') ? $this->urlGenerator->generate($request->attributes->get('_route')) : $request->getUri(), 302);
             } else {
                 $response = new RedirectResponse($this->urlGenerator && $this->targetRoute ? $this->urlGenerator->generate($this->targetRoute) : $request->getUri(), 302);
             }

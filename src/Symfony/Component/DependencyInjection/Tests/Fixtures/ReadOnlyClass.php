@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-readonly class ReadonlyTest
+readonly class ReadOnlyClass
 {
     public function say(): string
     {

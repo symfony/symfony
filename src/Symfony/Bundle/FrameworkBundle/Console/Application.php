@@ -30,14 +30,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class Application extends BaseApplication
 {
-    private KernelInterface $kernel;
     private bool $commandsRegistered = false;
     private array $registrationErrors = [];
 
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-
+    public function __construct(
+        private KernelInterface $kernel,
+    ) {
         parent::__construct('Symfony', Kernel::VERSION);
 
         $inputDefinition = $this->getDefinition();

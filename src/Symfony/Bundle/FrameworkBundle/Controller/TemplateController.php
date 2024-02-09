@@ -23,11 +23,9 @@ use Twig\Environment;
  */
 class TemplateController
 {
-    private ?Environment $twig;
-
-    public function __construct(?Environment $twig = null)
-    {
-        $this->twig = $twig;
+    public function __construct(
+        private ?Environment $twig = null,
+    ) {
     }
 
     /**

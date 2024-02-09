@@ -19,14 +19,12 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 {
-    private string $phpArrayFile;
-
     /**
      * @param string $phpArrayFile The PHP file where metadata are cached
      */
-    public function __construct(string $phpArrayFile)
-    {
-        $this->phpArrayFile = $phpArrayFile;
+    public function __construct(
+        private string $phpArrayFile,
+    ) {
     }
 
     public function isOptional(): bool

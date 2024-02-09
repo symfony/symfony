@@ -50,29 +50,18 @@ class TranslationUpdateCommand extends Command
         'xlf20' => ['xlf', '2.0'],
     ];
 
-    private TranslationWriterInterface $writer;
-    private TranslationReaderInterface $reader;
-    private ExtractorInterface $extractor;
-    private string $defaultLocale;
-    private ?string $defaultTransPath;
-    private ?string $defaultViewsPath;
-    private array $transPaths;
-    private array $codePaths;
-    private array $enabledLocales;
-
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, ?string $defaultTransPath = null, ?string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
-    {
+    public function __construct(
+        private TranslationWriterInterface $writer,
+        private TranslationReaderInterface $reader,
+        private ExtractorInterface $extractor,
+        private string $defaultLocale,
+        private ?string $defaultTransPath = null,
+        private ?string $defaultViewsPath = null,
+        private array $transPaths = [],
+        private array $codePaths = [],
+        private array $enabledLocales = [],
+    ) {
         parent::__construct();
-
-        $this->writer = $writer;
-        $this->reader = $reader;
-        $this->extractor = $extractor;
-        $this->defaultLocale = $defaultLocale;
-        $this->defaultTransPath = $defaultTransPath;
-        $this->defaultViewsPath = $defaultViewsPath;
-        $this->transPaths = $transPaths;
-        $this->codePaths = $codePaths;
-        $this->enabledLocales = $enabledLocales;
     }
 
     protected function configure(): void

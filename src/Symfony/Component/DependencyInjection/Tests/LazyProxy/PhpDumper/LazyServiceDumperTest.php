@@ -16,7 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\LazyServiceDumper;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\ReadonlyTest;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ReadOnlyClass;
 
 class LazyServiceDumperTest extends TestCase
 {
@@ -55,15 +55,15 @@ class LazyServiceDumperTest extends TestCase
     }
 
     /**
-     * @requires PHP 8.2
+     * @requires PHP 8.3
      */
     public function testReadonlyClass()
     {
         $dumper = new LazyServiceDumper();
-        $definition = (new Definition(ReadonlyTest::class))->setLazy(true);
+        $definition = (new Definition(ReadOnlyClass::class))->setLazy(true);
 
         $this->assertTrue($dumper->isProxyCandidate($definition));
-        $this->assertStringContainsString('readonly class ReadonlyTestGhost', $dumper->getProxyCode($definition));
+        $this->assertStringContainsString('readonly class ReadOnlyClassGhost', $dumper->getProxyCode($definition));
     }
 }
 

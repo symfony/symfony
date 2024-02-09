@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -503,6 +504,10 @@ EOTXT
 
     public function testFileLinkFormat()
     {
+        if (!class_exists(FileLinkFormatter::class)) {
+            $this->markTestSkipped(sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
+        }
+
         $data = new Data([
             [
                 new ClassStub(self::class),

@@ -67,12 +67,19 @@ class AzureApiTransportTest extends TestCase
 
             $message = $body['content'];
             $this->assertSame('normal', $body['importance']);
-            // $this->assertSame('Fabien', $message['from_name']);
             $this->assertSame('fabpot@symfony.com', $body['senderAddress']);
             $this->assertSame('Saif Eddin', $body['recipients']['to'][0]['displayName']);
             $this->assertSame('saif.gmati@symfony.com', $body['recipients']['to'][0]['address']);
             $this->assertSame('Hello!', $message['subject']);
             $this->assertSame('Hello There!', $message['plainText']);
+
+            $this->assertSame([
+                [
+                    'name' => 'Hello There!',
+                    'contentInBase64' => base64_encode('content'),
+                    'contentType' => 'text/plain',
+                ],
+            ], $body['attachments']);
 
             return new JsonMockResponse([
                 'id' => 'foobar',
@@ -87,7 +94,8 @@ class AzureApiTransportTest extends TestCase
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
-            ->text('Hello There!');
+            ->text('Hello There!')
+            ->attach('content', 'Hello There!', 'text/plain');
 
         $message = $transport->send($mail);
 

@@ -148,7 +148,7 @@ final class AzureApiTransport extends AbstractApiTransport
 
             $att = [
                 'name' => $filename,
-                'contentInBase64' => base64_encode(str_replace("\r\n", '', $attachment->bodyToString())),
+                'contentInBase64' => base64_encode($attachment->getBody()),
                 'contentType' => $headers->get('Content-Type')->getBody(),
             ];
 

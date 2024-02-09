@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `#[IsCsrfTokenValid]` attribute
+ * Add CAS 2.0 access token handler
 
 7.0
 ---
@@ -18,7 +19,6 @@ CHANGELOG
 
  * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
  * Deprecate calling the constructor of `DefaultLoginRateLimiter` with an empty secret
- * Add CAS 2.0 access token handler
 
 6.3
 ---

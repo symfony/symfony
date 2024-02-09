@@ -41,6 +41,11 @@ final class GenericType extends Type
         $this->variableTypes = $variableTypes;
     }
 
+    public function getBaseType(): BuiltinType|ObjectType
+    {
+        return $this->getType();
+    }
+
     /**
      * @return T
      */

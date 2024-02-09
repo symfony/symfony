@@ -30,6 +30,11 @@ class ObjectType extends Type
     ) {
     }
 
+    public function getBaseType(): BuiltinType|self
+    {
+        return $this;
+    }
+
     public function getTypeIdentifier(): TypeIdentifier
     {
         return TypeIdentifier::OBJECT;

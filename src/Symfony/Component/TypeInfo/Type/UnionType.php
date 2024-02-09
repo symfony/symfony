@@ -27,6 +27,11 @@ final class UnionType extends Type
      */
     use CompositeTypeTrait;
 
+    public function is(callable $callable): bool
+    {
+        return $this->atLeastOneTypeIs($callable);
+    }
+
     public function asNonNullable(): Type
     {
         $nonNullableTypes = [];

@@ -6,6 +6,12 @@ Cache
 
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter` instead
 
+ExpressionLanguage
+------------------
+
+ * Deprecate passing `null` as the allowed variable names to `ExpressionLanguage::lint()` and `Parser::lint()`,
+   pass the `IGNORE_UNKNOWN_VARIABLES` flag instead to ignore unknown variables during linting
+
 FrameworkBundle
 ---------------
 

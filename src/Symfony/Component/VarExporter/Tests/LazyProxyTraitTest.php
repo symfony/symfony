@@ -254,7 +254,7 @@ class LazyProxyTraitTest extends TestCase
     {
         if (\PHP_VERSION_ID < 80300) {
             $this->expectException(LogicException::class);
-            $this->expectExceptionMessage('Cannot generate lazy proxy: class "Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\ReadOnlyClass" is readonly.');
+            $this->expectExceptionMessage('Cannot generate lazy proxy with PHP < 8.3: class "Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\ReadOnlyClass" is readonly.');
         }
 
         $proxy = $this->createLazyProxy(ReadOnlyClass::class, fn () => new ReadOnlyClass(123));

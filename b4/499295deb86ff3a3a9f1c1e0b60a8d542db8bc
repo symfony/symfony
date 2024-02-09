@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-09T08:44:08Z
+
+But readonly classes are supported since 8.2, no?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-02-09T08:48:09Z
+
+They are, but the VarExporter component doesn't on 8.2 (probably because of https://wiki.php.net/rfc/readonly_amendments, see #49282).

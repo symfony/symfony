@@ -29,18 +29,14 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    private Key $key;
-    private PersistingStoreInterface $store;
-    private float $ttlInSecond;
-    private bool $autoRelease;
     private bool $dirty = false;
 
-    public function __construct(Key $key, PersistingStoreInterface $store, float $ttlInSecond = 300.0, bool $autoRelease = true)
-    {
-        $this->store = $store;
-        $this->key = $key;
-        $this->ttlInSecond = $ttlInSecond;
-        $this->autoRelease = $autoRelease;
+    public function __construct(
+        private Key $key,
+        private PersistingStoreInterface $store,
+        private float $ttlInSecond = 300.0,
+        private bool $autoRelease = true,
+    ) {
     }
 
     public function __sleep(): array

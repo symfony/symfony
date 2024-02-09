@@ -23,8 +23,6 @@ class_exists(Section::class);
  */
 class Stopwatch implements ResetInterface
 {
-    private bool $morePrecision;
-
     /**
      * @var Section[]
      */
@@ -38,9 +36,9 @@ class Stopwatch implements ResetInterface
     /**
      * @param bool $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
-    public function __construct(bool $morePrecision = false)
-    {
-        $this->morePrecision = $morePrecision;
+    public function __construct(
+        private bool $morePrecision = false,
+    ) {
         $this->reset();
     }
 

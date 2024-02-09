@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-02-07T03:44:49Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "5.4" but it seems your PR description refers to branch "5.4, 6.4, 7.0".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-07T08:07:35Z
+
+Reading now your full description... I'd still be great to figure out a test case :)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-02-07T12:12:37Z
+
+A first testcase could be one running your reproducer (even if it does not fail 100% of the time due to relying on a race condition, it would still be likely to fail _sometimes_ if we reintroduce the issue in the future)
+
+---------------------------------------------------------------------------
+
+by Luc45 at 2024-02-07T14:24:45Z
+
+I've added a test that reproduces the bug, it fails on `7.1` tag and passes on this branch.
+
+---------------------------------------------------------------------------
+
+by Luc45 at 2024-02-07T14:43:53Z
+
+If I remove the fix, you can see the racing condition factor in the tests causing the tests to fail erratically on the longRunning process test.
+
+![image](https://github.com/symfony/symfony/assets/9341686/0ce40884-db76-4a63-a537-257a189a5728)
+
+---------------------------------------------------------------------------
+
+by Luc45 at 2024-02-07T14:45:05Z
+
+My tests uses `sleep` to mimick racing condition scenarios, which adds a total of 4 seconds to the Process test suite, which is not ideal. I've grouped them in `time-sensitive`, and I'm open to ideas. Maybe we could reduce the sleep from 2 to 1 second. [Done]
+
+---------------------------------------------------------------------------
+
+by Luc45 at 2024-02-07T17:43:54Z
+
+I don't know why `CliDumperTest::testCollapse` is failing, as it doesn't seem to use `Process` at all.
+
+---------------------------------------------------------------------------
+
+by Luc45 at 2024-02-08T14:31:37Z
+
+7.2 tests fail because of the short closure syntax, want me to keep it @nicolas-grekas?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-08T14:38:01Z
+
+nope, indeed
+
+---------------------------------------------------------------------------
+
+by Luc45 at 2024-02-08T15:16:11Z
+
+Tests in Windows is failing because it doesn't have `sleep`. I've tweaked it to use inline PHP with `sleep` instead, and I can confirm it works by prepending `time` to the command, adjusting the sleep in the spawning process and re-running the test.
+
+- Sleep 5: `php ./phpunit symfony src/Symfony/Component/Process  83,90s user 59,06s system 688% cpu 20,776 total`
+- Sleep 1: `php ./phpunit symfony src/Symfony/Component/Process  80,13s user 58,70s system 1094% cpu 12,684 total`
+
+Since it runs a bunch of tests in parallel, we have to ignore 80s and 59s because that's CPU time, and look at "actual time" which is the last one: 20s and 12s respectively, which sounds about right. Re-running.
+
+---------------------------------------------------------------------------
+
+by Luc45 at 2024-02-08T16:19:32Z
+
+The remaining Windows failures seems unrelated

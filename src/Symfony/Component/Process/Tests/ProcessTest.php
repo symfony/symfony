@@ -1541,6 +1541,60 @@ class ProcessTest extends TestCase
         }
     }
 
+    public function testMultipleCallsToProcGetStatus()
+    {
+        $process = $this->getProcess('echo foo');
+        $process->start(static function () use ($process) {
+            return $process->isRunning();
+        });
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+        $this->assertSame(0, $process->getExitCode());
+    }
+
+    public function testFailingProcessWithMultipleCallsToProcGetStatus()
+    {
+        $process = $this->getProcess('exit 123');
+        $process->start(static function () use ($process) {
+            return $process->isRunning();
+        });
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+        $this->assertSame(123, $process->getExitCode());
+    }
+
+    /**
+     * @group slow
+     */
+    public function testLongRunningProcessWithMultipleCallsToProcGetStatus()
+    {
+        $process = $this->getProcess('php -r "sleep(1); echo \'done\';"');
+        $process->start(static function () use ($process) {
+            return $process->isRunning();
+        });
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+        $this->assertSame(0, $process->getExitCode());
+    }
+
+    /**
+     * @group slow
+     */
+    public function testLongRunningProcessWithMultipleCallsToProcGetStatusError()
+    {
+        $process = $this->getProcess('php -r "sleep(1); echo \'failure\'; exit(123);"');
+        $process->start(static function () use ($process) {
+            return $process->isRunning();
+        });
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+        $this->assertSame(123, $process->getExitCode());
+    }
+
     /**
      * @group transient-on-windows
      */
@@ -1556,7 +1610,6 @@ class ProcessTest extends TestCase
 
     /**
      * @param string|array $commandline
-     * @param mixed        $input
      */
     private function getProcess($commandline, ?string $cwd = null, ?array $env = null, $input = null, ?int $timeout = 60): Process
     {

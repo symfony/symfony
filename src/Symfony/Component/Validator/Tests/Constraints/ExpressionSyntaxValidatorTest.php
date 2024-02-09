@@ -62,7 +62,7 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate('1 + 1', new ExpressionSyntax([
             'message' => 'myMessage',
-        ]));
+        ], null, null, []));
 
         $this->assertNoViolation();
     }

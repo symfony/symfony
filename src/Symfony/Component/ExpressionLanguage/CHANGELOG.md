@@ -7,6 +7,8 @@ CHANGELOG
  * Add support for PHP `min` and `max` functions
  * Add `Parser::IGNORE_UNKNOWN_VARIABLES` and `Parser::IGNORE_UNKNOWN_FUNCTIONS` flags to control whether
    parsing and linting should check for unknown variables and functions.
+ * Deprecate passing `null` as the allowed variable names to `ExpressionLanguage::lint()` and `Parser::lint()`,
+   pass the `IGNORE_UNKNOWN_VARIABLES` flag instead to ignore unknown variables during linting
 
 7.0
 ---

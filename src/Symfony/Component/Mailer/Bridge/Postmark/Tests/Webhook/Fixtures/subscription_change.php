@@ -6,6 +6,6 @@ $wh = new MailerEngagementEvent(MailerEngagementEvent::UNSUBSCRIBE, '00000000-00
 $wh->setRecipientEmail('john@example.com');
 $wh->setTags(['welcome-email']);
 $wh->setMetadata(['example' => 'value', 'example_2' => 'value']);
-$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:sT', '2022-09-02T14:32:30Z'));
+$wh->setDate(\DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, '2022-09-02T14:32:30Z'));
 
 return $wh;

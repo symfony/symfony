@@ -20,7 +20,6 @@ use Symfony\Component\Config\Tests\Resource\ResourceStub;
 class ResourceCheckerConfigCacheTest extends TestCase
 {
     private string $cacheFile;
-
     private string $metaFile;
 
     protected function setUp(): void

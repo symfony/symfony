@@ -329,7 +329,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">Kjo vlerë nuk është një UUID e vlefshme.</target>
+                <target>Kjo vlerë nuk është një UUID e vlefshme.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>

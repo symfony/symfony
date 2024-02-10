@@ -395,6 +395,54 @@ class DateTypeTest extends BaseTypeTestCase
         $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
+    public function testSubmitWithCalendarOption()
+    {
+        // we test against "en_US", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('en_US');
+        
+        $format = "y-MM-dd y'w'w";
+
+        $output = [
+            'day' => '31',
+            'month' => '3',
+            'year' => '2024',
+        ];
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'format' => $format,
+            'html5' => false,
+            'widget' => 'single_text',
+            'input' => 'array',
+        ]);
+
+        $form->submit('2024-03-31 2024w14');
+
+        $this->assertEquals($output, $form->getData());
+        $this->assertEquals('2024-03-31 2024w14', $form->getViewData());
+    
+        // ISO 8601
+        $calendar = \IntlCalendar::createInstance();
+        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+        $calendar->setMinimalDaysInFirstWeek(4);
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'format' => $format,
+            'html5' => false,
+            'widget' => 'single_text',
+            'input' => 'array',
+            'calendar' => $calendar,
+        ]);
+
+        $form->submit('2024-03-31 2024w13');
+
+        $this->assertEquals($output, $form->getData());
+        $this->assertEquals('2024-03-31 2024w13', $form->getViewData());
+    }
+
     /**
      * @dataProvider provideDateFormats
      */
@@ -521,6 +569,45 @@ class DateTypeTest extends BaseTypeTestCase
         // 2010-06-02 00:00:00 UTC
         // 2010-06-01 20:00:00 UTC-4
         $this->assertEquals('01.06.2010', $form->getViewData());
+    }
+
+    public function testSetDataWithCalendarInput()
+    {
+        // we test against "en_US", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('en_US');
+
+        $format = "y-MM-dd Y'w'w";
+        $date = '2024-03-31';
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'format' => $format,
+            'html5' => false,
+            'input' => 'string',
+            'widget' => 'single_text',
+        ]);
+
+        $form->setData($date);
+
+        $this->assertEquals('2024-03-31 2024w14', $form->getViewData());
+
+        // ISO 8601
+        $calendar = \IntlCalendar::createInstance(null);
+        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+        $calendar->setMinimalDaysInFirstWeek(4);
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'format' => $format,
+            'html5' => false,
+            'input' => 'string',
+            'widget' => 'single_text',
+            'calendar' => $calendar,
+        ]);
+
+        $form->setData($date);
+
+        $this->assertEquals('2024-03-31 2024w13', $form->getViewData());
     }
 
     public function testSetDataWithNegativeTimezoneOffsetDateTimeInput()

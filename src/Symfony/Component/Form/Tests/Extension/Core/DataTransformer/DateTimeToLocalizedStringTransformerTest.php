@@ -180,6 +180,44 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $this->assertEquals($dateTime->format('d.m.Y, H:i'), $transformer->transform($input));
     }
 
+    public function testTransformDateTimeWithCalendar()
+    {
+        $locale = \Locale::getDefault();
+        \Locale::setDefault('en_US');
+
+        $pattern = "y-MM-dd Y'w'w";
+        $dateTime = new \DateTimeImmutable('2024-03-31');
+
+        $transformer = new DateTimeToLocalizedStringTransformer(
+            null,
+            null,
+            null,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            $pattern,
+        );
+
+        $this->assertEquals('2024-03-31 2024w14', $transformer->transform($dateTime));
+
+        // ISO 8601
+        $calendar = \IntlCalendar::createInstance(null);
+        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+        $calendar->setMinimalDaysInFirstWeek(4);
+
+        $transformer = new DateTimeToLocalizedStringTransformer(
+            null,
+            null,
+            null,
+            null,
+            $calendar,
+            $pattern,
+        );
+
+        $this->assertEquals('2024-03-31 2024w13', $transformer->transform($dateTime));
+
+        \Locale::setDefault($locale);
+    }
+
     public function testTransformRequiresValidDateTime()
     {
         $this->expectException(TransformationFailedException::class);
@@ -252,6 +290,45 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $dateTime = new \DateTime('2017-01-10 11:00', new \DateTimeZone('Europe/Berlin'));
 
         $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('2017-01-10'));
+    }
+
+    public function testReverseTransformDateTimeWithCalendar()
+    {
+        $locale = \Locale::getDefault();
+        \Locale::setDefault('en_US');
+
+        $pattern = "y-MM-dd Y'w'w";
+
+        $transformer = new DateTimeToLocalizedStringTransformer(
+            null,
+            null,
+            null,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            $pattern,
+        );
+
+        $dateTime = new \DateTime('2024-03-31');
+        $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('2024-03-31 2024w14'));
+
+        // ISO 8601
+        $calendar = \IntlCalendar::createInstance(null);
+        $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+        $calendar->setMinimalDaysInFirstWeek(4);
+
+        $transformer = new DateTimeToLocalizedStringTransformer(
+            null,
+            null,
+            null,
+            null,
+            $calendar,
+            $pattern,
+        );
+
+        $dateTime = new \DateTime('2024-03-31');
+        $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('2024-03-31 2024w13'));
+
+        \Locale::setDefault($locale);
     }
 
     public function testReverseTransformWithDifferentPatterns()

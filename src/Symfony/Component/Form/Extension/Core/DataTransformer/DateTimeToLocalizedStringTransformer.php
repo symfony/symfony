@@ -44,7 +44,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         ?string $outputTimezone = null,
         ?int $dateFormat = null,
         ?int $timeFormat = null,
-        private int $calendar = \IntlDateFormatter::GREGORIAN,
+        private int|\IntlCalendar $calendar = \IntlDateFormatter::GREGORIAN,
         private ?string $pattern = null,
     ) {
         parent::__construct($inputTimezone, $outputTimezone);

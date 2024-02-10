@@ -49,7 +49,7 @@ class DateType extends AbstractType
     {
         $dateFormat = \is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
         $timeFormat = \IntlDateFormatter::NONE;
-        $calendar = \IntlDateFormatter::GREGORIAN;
+        $calendar = $options['calendar'] !== null ? $options['calendar'] : \IntlDateFormatter::GREGORIAN;
         $pattern = \is_string($options['format']) ? $options['format'] : '';
 
         if (!\in_array($dateFormat, self::ACCEPTED_FORMATS, true)) {
@@ -281,6 +281,7 @@ class DateType extends AbstractType
             'format' => $format,
             'model_timezone' => null,
             'view_timezone' => null,
+            'calendar' => null,
             'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
@@ -320,6 +321,7 @@ class DateType extends AbstractType
         $resolver->setAllowedTypes('months', 'array');
         $resolver->setAllowedTypes('days', 'array');
         $resolver->setAllowedTypes('input_format', 'string');
+        $resolver->setAllowedTypes('calendar', ['null', \IntlCalendar::class]);
 
         $resolver->setNormalizer('html5', static function (Options $options, $html5) {
             if ($html5 && 'single_text' === $options['widget'] && self::HTML5_FORMAT !== $options['format']) {

@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
+use Symfony\Component\Serializer\Exception\UnexpectedPropertyException;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -197,6 +198,8 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             throw new UnsupportedMediaTypeHttpException(sprintf('Unsupported format: "%s".', $format), $e);
         } catch (NotEncodableValueException $e) {
             throw new BadRequestHttpException(sprintf('Request payload contains invalid "%s" data.', $format), $e);
+        } catch (UnexpectedPropertyException $e) {
+            throw new BadRequestHttpException(sprintf('Request payload contains invalid "%s" property.', $e->property), $e);
         }
     }
 }

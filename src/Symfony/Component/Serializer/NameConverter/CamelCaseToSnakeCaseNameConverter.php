@@ -11,13 +11,21 @@
 
 namespace Symfony\Component\Serializer\NameConverter;
 
+use Symfony\Component\Serializer\Exception\UnexpectedPropertyException;
+
 /**
  * CamelCase to Underscore name converter.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Aurélien Pillevesse <aurelienpillevesse@hotmail.fr>
  */
-class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
+class CamelCaseToSnakeCaseNameConverter implements AdvancedNameConverterInterface
 {
+    /**
+     * Require all properties to be written in snake_case.
+     */
+    public const REQUIRE_SNAKE_CASE_PROPERTIES = 'require_snake_case_properties';
+
     /**
      * @param array|null $attributes     The list of attributes to rename or null for all attributes
      * @param bool       $lowerCamelCase Use lowerCamelCase style
@@ -28,7 +36,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     ) {
     }
 
-    public function normalize(string $propertyName): string
+    public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         if (null === $this->attributes || \in_array($propertyName, $this->attributes, true)) {
             return strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($propertyName)));
@@ -37,8 +45,12 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
         return $propertyName;
     }
 
-    public function denormalize(string $propertyName): string
+    public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
+        if (($context[self::REQUIRE_SNAKE_CASE_PROPERTIES] ?? false) && $propertyName !== $this->normalize($propertyName, $class, $format, $context)) {
+            throw new UnexpectedPropertyException($propertyName);
+        }
+
         $camelCasedName = preg_replace_callback('/(^|_|\.)+(.)/', fn ($match) => ('.' === $match[1] ? '_' : '').strtoupper($match[2]), $propertyName);
 
         if ($this->lowerCamelCase) {

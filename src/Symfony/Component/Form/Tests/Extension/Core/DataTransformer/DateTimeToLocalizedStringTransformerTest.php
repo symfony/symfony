@@ -185,7 +185,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $locale = \Locale::getDefault();
         \Locale::setDefault('en_US');
 
-        $pattern = "y-MM-dd Y'w'w";
+        $pattern = "y-MM-dd y'w'w";
         $dateTime = new \DateTimeImmutable('2024-03-31');
 
         $transformer = new DateTimeToLocalizedStringTransformer(
@@ -297,7 +297,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $locale = \Locale::getDefault();
         \Locale::setDefault('en_US');
 
-        $pattern = "y-MM-dd Y'w'w";
+        $pattern = "y-MM-dd y'w'w";
 
         $transformer = new DateTimeToLocalizedStringTransformer(
             null,

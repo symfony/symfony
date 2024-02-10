@@ -37,8 +37,10 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyGetterOnOb
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularAndPluralProps;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
+use Symfony\Component\VarExporter\ProxyHelper;
 
 class PropertyAccessorTest extends TestCase
 {
@@ -146,7 +148,8 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The method "class@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
-        $object = new class() {
+        $object = new class()
+        {
             private $uninitialized;
 
             public function getUninitialized(): array
@@ -163,7 +166,8 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The property "class@anonymous::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
 
-        $object = new class() {
+        $object = new class()
+        {
             private string $uninitialized;
 
             public function getUninitialized(): string
@@ -180,7 +184,8 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The property "class@anonymous::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
 
-        $object = new class() {
+        $object = new class()
+        {
             public string $uninitialized;
         };
 
@@ -208,7 +213,8 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The method "stdClass@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
-        $object = new class() extends \stdClass {
+        $object = new class() extends \stdClass
+        {
             private $uninitialized;
 
             public function getUninitialized(): array
@@ -225,7 +231,9 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The method "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
-        $object = new class() extends \Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty {};
+        $object = new class() extends \Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty
+        {
+        };
 
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
@@ -762,7 +770,8 @@ class PropertyAccessorTest extends TestCase
 
     private function generateAnonymousClass($value)
     {
-        return new class($value) {
+        return new class($value)
+        {
             private $foo;
 
             public function __construct($foo)
@@ -957,5 +966,55 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'date_mutable', new \DateTimeImmutable());
 
         $this->assertInstanceOf(\DateTime::class, $object->getDate());
+    }
+
+    public function testGetValuePropertyThrowsExceptionIfUninitializedWithoutLazyGhost()
+    {
+        $this->expectException(UninitializedPropertyException::class);
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty::$uninitialized" is not readable because it is typed "DateTimeInterface". You should initialize it or declare a default value instead.');
+
+        $this->propertyAccessor->getValue(new UninitializedObjectProperty, 'uninitialized');
+    }
+
+    public function testGetValueGetterThrowsExceptionIfUninitializedWithoutLazyGhost()
+    {
+        $this->expectException(UninitializedPropertyException::class);
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty::$privateUninitialized" is not readable because it is typed "DateTimeInterface". You should initialize it or declare a default value instead.');
+
+        $this->propertyAccessor->getValue(new UninitializedObjectProperty, 'privateUninitialized');
+    }
+
+    private function createUninitializedObjectPropertyGhost(): UninitializedObjectProperty
+    {
+        $class = 'UninitializedObjectPropertyGhost';
+
+        if (!class_exists($class)) {
+            eval('class ' . $class . ProxyHelper::generateLazyGhost(new \ReflectionClass(UninitializedObjectProperty::class)));
+        }
+
+        $this->assertTrue(class_exists($class));
+
+        return $class::createLazyGhost(initializer: function ($instance) {
+        });
+    }
+
+    public function testGetValuePropertyThrowsExceptionIfUninitializedWithLazyGhost()
+    {
+        $this->expectException(UninitializedPropertyException::class);
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty::$uninitialized" is not readable because it is typed "DateTimeInterface". You should initialize it or declare a default value instead.');
+
+        $lazyGhost = $this->createUninitializedObjectPropertyGhost();
+
+        $this->propertyAccessor->getValue($lazyGhost, 'uninitialized');
+    }
+
+    public function testGetValueGetterThrowsExceptionIfUninitializedWithLazyGhost()
+    {
+        $this->expectException(UninitializedPropertyException::class);
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty::$privateUninitialized" is not readable because it is typed "DateTimeInterface". You should initialize it or declare a default value instead.');
+
+        $lazyGhost = $this->createUninitializedObjectPropertyGhost();
+
+        $this->propertyAccessor->getValue($lazyGhost, 'privateUninitialized');
     }
 }

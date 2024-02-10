@@ -182,6 +182,9 @@ jobs:
           ./phpunit install
           echo "::endgroup::"
 
+      - name: Start MySQL
+        run: sudo systemctl start mysql.service
+
       - name: Run tests
         run: ./phpunit --group integration -v
         env:
@@ -196,6 +199,9 @@ jobs:
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:4566/messages.fifo?sslmode=disable&poll_timeout=0.01"
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
+          MYSQL_DSN: mysql:host=localhost # ubuntu-20.04 mysql defaults
+          MYSQL_USERNAME: root
+          MYSQL_PASSWORD: root
 
       #- name: Run HTTP push tests
       #  if: matrix.php == '8.2'

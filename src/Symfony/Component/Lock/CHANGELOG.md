@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+6.2
+---
+* Add `MysqlStore` based on MySQL `GET_LOCK()` functionality
 
 7.0
 ---

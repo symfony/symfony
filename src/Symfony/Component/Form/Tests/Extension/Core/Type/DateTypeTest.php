@@ -401,7 +401,7 @@ class DateTypeTest extends BaseTypeTestCase
         IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('en_US');
-        
+
         $format = "y-MM-dd y'w'w";
 
         $output = [
@@ -423,7 +423,7 @@ class DateTypeTest extends BaseTypeTestCase
 
         $this->assertEquals($output, $form->getData());
         $this->assertEquals('2024-03-31 2024w14', $form->getViewData());
-    
+
         // ISO 8601
         $calendar = \IntlCalendar::createInstance();
         $calendar->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);

@@ -49,7 +49,7 @@ class DateType extends AbstractType
     {
         $dateFormat = \is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
         $timeFormat = \IntlDateFormatter::NONE;
-        $calendar = $options['calendar'] !== null ? $options['calendar'] : \IntlDateFormatter::GREGORIAN;
+        $calendar = null !== $options['calendar'] ? $options['calendar'] : \IntlDateFormatter::GREGORIAN;
         $pattern = \is_string($options['format']) ? $options['format'] : '';
 
         if (!\in_array($dateFormat, self::ACCEPTED_FORMATS, true)) {

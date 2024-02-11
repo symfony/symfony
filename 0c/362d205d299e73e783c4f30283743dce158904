@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-09T09:27:32Z
+
+What about throwing if at least one place is defined?
+The behavior would be:
+- if you don't define any place => auto-guessed from transitions
+- if you define at least one place => require them all to be listed (allowing some sort of strict mode definitions to be typo-safe)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-02-09T09:36:27Z
+
+The issues comes from the framework bundle. I want people to be able to
+
+* not define dumb places
+* define places with some metadata
+
+```yaml
+framework:
+    workflows:
+        blog_publishing:
+            metadata:
+                title: 'Blog Publishing Workflow'
+            places:
+                draft:
+                    metadata:
+                        max_num_of_words: 500
+
+            transitions:
+                to_review:
+                    from: draft
+                    to:   review
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-02-09T14:27:26Z
+
+(fixed fabbot, phpunit failures seems not related)

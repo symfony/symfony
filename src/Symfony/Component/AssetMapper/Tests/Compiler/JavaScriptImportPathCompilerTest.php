@@ -177,6 +177,16 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
+        yield 'commented_import_on_one_line_then_module_name_on_next_is_not_ok' => [
+            'input' => "// import \n    './other.js';",
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'commented_import_on_one_line_then_import_on_next_is_ok' => [
+            'input' => "// import\nimport { Foo } from './other.js';",
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
         yield 'importing_a_css_file_is_included' => [
             'input' => "import './styles.css';",
             'expectedJavaScriptImports' => ['/assets/styles.css' => ['lazy' => false, 'asset' => 'styles.css', 'add' => true]],

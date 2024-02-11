@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add method `getEnabledTransition()` to `WorkflowInterface`
+ * Automatically register places from transitions
 
 7.0
 ---

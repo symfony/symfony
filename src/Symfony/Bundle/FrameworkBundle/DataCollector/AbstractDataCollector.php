@@ -18,6 +18,9 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 abstract class AbstractDataCollector extends DataCollector implements TemplateAwareDataCollectorInterface
 {
+    /**
+     * @final since Symfony 7.1
+     */
     public function getName(): string
     {
         return static::class;

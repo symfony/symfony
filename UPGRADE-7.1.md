@@ -16,6 +16,7 @@ FrameworkBundle
 ---------------
 
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
+ * Subclasses of `AbstractDataCollector` should not override `getName`
 
 Messenger
 ---------

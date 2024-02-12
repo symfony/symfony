@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-12T15:05:33Z
+
+This won't work on windows. Hybrid mode ?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-02-12T15:13:50Z
+
+I'm having a look
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-02-12T15:59:03Z
+
+AppVeyor's green on these tests, red is unrelated

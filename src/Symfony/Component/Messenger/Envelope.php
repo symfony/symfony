@@ -21,9 +21,7 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 final class Envelope
 {
     /**
-     * @template TStamp of StampInterface
-     *
-     * @var array<class-string<TStamp>, list<TStamp>>
+     * @var array<class-string<StampInterface>, list<StampInterface>>
      */
     private array $stamps = [];
     private object $message;

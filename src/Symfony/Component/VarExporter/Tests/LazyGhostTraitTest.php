@@ -16,6 +16,7 @@ use Symfony\Component\VarExporter\ProxyHelper;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildMagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildStdClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildTestClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ClassWithUninitializedObjectProperty;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\LazyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\MagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ReadOnlyClass;
@@ -238,6 +239,28 @@ class LazyGhostTraitTest extends TestCase
         $proxy = $this->createLazyGhost(ReadOnlyClass::class, fn ($proxy) => $proxy->__construct(123));
 
         $this->assertSame(123, $proxy->foo);
+    }
+
+    public function testAccessingUninializedPropertyWithoutLazyGhost()
+    {
+        $object = new ClassWithUninitializedObjectProperty();
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage('Typed property Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ClassWithUninitializedObjectProperty::$property must not be accessed before initialization');
+
+        $object->property;
+    }
+
+    public function testAccessingUninializedPropertyWithLazyGhost()
+    {
+        $object = $this->createLazyGhost(ClassWithUninitializedObjectProperty::class, function ($instance) {});
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage('Typed property Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ClassWithUninitializedObjectProperty::$property must not be accessed before initialization');
+
+        $object->property;
     }
 
     /**

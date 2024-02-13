@@ -1625,7 +1625,7 @@ class ProcessTest extends TestCase
      */
     public function testLongRunningProcessWithMultipleCallsToProcGetStatus()
     {
-        $process = $this->getProcess('php -r "sleep(1); echo \'done\';"');
+        $process = $this->getProcess('sleep 1 && echo "done" && php -r "exit(0);"');
         $process->start(static function () use ($process) {
             return $process->isRunning();
         });
@@ -1640,7 +1640,7 @@ class ProcessTest extends TestCase
      */
     public function testLongRunningProcessWithMultipleCallsToProcGetStatusError()
     {
-        $process = $this->getProcess('php -r "sleep(1); echo \'failure\'; exit(123);"');
+        $process = $this->getProcess('sleep 1 && echo "failure" && php -r "exit(123);"');
         $process->start(static function () use ($process) {
             return $process->isRunning();
         });

@@ -56,6 +56,23 @@ class ArgumentResolverTest extends TestCase
         $this->assertEquals(['foo'], self::getResolver()->getArguments($request, $controller), '->getArguments() returns an array of arguments for the controller method');
     }
 
+    public function testResolvedValueIsAddedToRequestAttributes()
+    {
+        $request = Request::create('/');
+        $controller = [new ArgumentResolverTestController(), 'controllerWithFoo'];
+
+        $customResolver = new class() implements ValueResolverInterface {
+            public function resolve(Request $request, ArgumentMetadata $argument): iterable
+            {
+                return ['some_value'];
+            }
+        };
+        $output = self::getResolver([$customResolver])->getArguments($request, $controller);
+        $this->assertEquals(['some_value'], $output);
+        $this->assertTrue($request->attributes->has('foo'), 'Resolved value is added to request attributes');
+        $this->assertEquals('some_value', $request->attributes->get('foo'), 'Resolved value is added to request attributes');
+    }
+
     public function testGetArgumentsReturnsEmptyArrayWhenNoArguments()
     {
         $request = Request::create('/');

@@ -87,6 +87,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 foreach ($resolver->resolve($request, $metadata) as $argument) {
                     ++$count;
                     $arguments[] = $argument;
+                    $request->attributes->set($metadata->getName(), $argument);
                 }
 
                 if (1 < $count && !$metadata->isVariadic()) {

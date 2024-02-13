@@ -87,6 +87,7 @@ return static function (ContainerConfigurator $container) {
         'ovh-cloud' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
         'plivo' => Bridge\Plivo\PlivoTransportFactory::class,
         'pushover' => Bridge\Pushover\PushoverTransportFactory::class,
+        'pushy' => Bridge\Pushy\PushyTransportFactory::class,
         'redlink' => Bridge\Redlink\RedlinkTransportFactory::class,
         'ring-central' => Bridge\RingCentral\RingCentralTransportFactory::class,
         'sendberry' => Bridge\Sendberry\SendberryTransportFactory::class,

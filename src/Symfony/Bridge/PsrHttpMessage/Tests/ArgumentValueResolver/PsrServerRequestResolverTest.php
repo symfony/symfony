@@ -17,6 +17,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\ArgumentValueResolver\PsrServerRequestResolver;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
@@ -28,6 +29,7 @@ final class PsrServerRequestResolverTest extends TestCase
     public function testServerRequest()
     {
         $symfonyRequest = $this->createMock(Request::class);
+        $symfonyRequest->attributes = new ParameterBag();
         $psrRequest = $this->createMock(ServerRequestInterface::class);
 
         $resolver = $this->bootstrapResolver($symfonyRequest, $psrRequest);
@@ -38,6 +40,8 @@ final class PsrServerRequestResolverTest extends TestCase
     public function testRequest()
     {
         $symfonyRequest = $this->createMock(Request::class);
+
+        $symfonyRequest->attributes = new ParameterBag();
         $psrRequest = $this->createMock(ServerRequestInterface::class);
 
         $resolver = $this->bootstrapResolver($symfonyRequest, $psrRequest);
@@ -48,6 +52,8 @@ final class PsrServerRequestResolverTest extends TestCase
     public function testMessage()
     {
         $symfonyRequest = $this->createMock(Request::class);
+
+        $symfonyRequest->attributes = new ParameterBag();
         $psrRequest = $this->createMock(ServerRequestInterface::class);
 
         $resolver = $this->bootstrapResolver($symfonyRequest, $psrRequest);

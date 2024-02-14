@@ -379,7 +379,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
                     $constructorParameterType = 'unknown';
                     $reflectionType = $constructorParameter->getType();
-                    if (null !== $reflectionType && method_exists($reflectionType, 'getName')) {
+                    if ($reflectionType instanceof \ReflectionNamedType) {
                         $constructorParameterType = $reflectionType->getName();
                     }
 

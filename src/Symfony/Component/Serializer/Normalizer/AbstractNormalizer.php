@@ -376,6 +376,9 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         $missingConstructorArguments[] = $constructorParameter->name;
                         continue;
                     }
+                    if ($constructorParameter->isPromoted()) {
+                        continue;
+                    }
 
                     $exception = NotNormalizableValueException::createForUnexpectedDataType(
                         sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name),

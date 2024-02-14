@@ -377,10 +377,16 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         continue;
                     }
 
+                    $constructorParameterType = 'unknown';
+                    $reflectionType = $constructorParameter->getType();
+                    if (null !== $reflectionType && method_exists($reflectionType, 'getName')) {
+                        $constructorParameterType = $reflectionType->getName();
+                    }
+
                     $exception = NotNormalizableValueException::createForUnexpectedDataType(
                         sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name),
                         $data,
-                        [$constructorParameter->getType()?->getName() ?? 'unknown'],
+                        [$constructorParameterType],
                         $attributeContext['deserialization_path'] ?? null,
                         true
                     );

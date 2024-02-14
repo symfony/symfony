@@ -57,4 +57,20 @@ class DatePointTest extends TestCase
         $this->expectExceptionMessage('Failed to parse time string (Bad Date)');
         $date->modify('Bad Date');
     }
+
+    public function testMicroseconds()
+    {
+        $date = new DatePoint('2010-01-28 15:00:00.123456');
+
+        $this->assertSame('2010-01-28 15:00:00.123456', $date->format('Y-m-d H:i:s.u'));
+
+        $date = $date->setMicroseconds(789);
+
+        $this->assertSame('2010-01-28 15:00:00.000789', $date->format('Y-m-d H:i:s.u'));
+        $this->assertSame(789, $date->getMicroseconds());
+
+        $this->expectException(\DateRangeError::class);
+        $this->expectExceptionMessage('DatePoint::setMicroseconds(): Argument #1 ($microseconds) must be between 0 and 999999, 1000000 given');
+        $date->setMicroseconds(1000000);
+    }
 }

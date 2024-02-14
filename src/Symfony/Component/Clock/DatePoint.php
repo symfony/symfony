@@ -117,4 +117,26 @@ final class DatePoint extends \DateTimeImmutable
     {
         return parent::getTimezone() ?: throw new \DateInvalidTimeZoneException('The DatePoint object has no timezone.');
     }
+
+    public function setMicroseconds(int $microseconds): static
+    {
+        if ($microseconds < 0 || $microseconds > 999999) {
+            throw new \DateRangeError('DatePoint::setMicroseconds(): Argument #1 ($microseconds) must be between 0 and 999999, '.$microseconds.' given');
+        }
+
+        if (\PHP_VERSION_ID < 80400) {
+            return $this->setTime(...explode('.', $this->format('H.i.s.'.$microseconds)));
+        }
+
+        return parent::setMicroseconds($microseconds);
+    }
+
+    public function getMicroseconds(): int
+    {
+        if (\PHP_VERSION_ID >= 80400) {
+            return parent::getMicroseconds();
+        }
+
+        return $this->format('u');
+    }
 }

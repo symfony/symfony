@@ -121,14 +121,35 @@
                                                 <h3 class="tab-title">Headers</h3>
                                                 <div class="tab-content">
                                                     <span class="label">Subject</span>
-                                                    <h2 class="m-t-10">{{ message.getSubject() ?? '(empty)' }}</h2>
+                                                    {% if message.subject is defined %}
+                                                        {# Email instance #}
+                                                        <h2 class="m-t-10">{{ message.getSubject() ?? '(empty)' }}</h2>
+                                                    {% elseif message.headers.has('subject') %}
+                                                        <h2 class="m-t-10">{{ message.headers.get('subject').toString()|split(': ', 2)[1]|default('(empty)') }}</h2>
+                                                    {% else %}
+                                                        <h2 class="m-t-10">(empty)</h2>
+                                                    {% endif %}
                                                     <div class="row">
                                                         <div class="col col-4">
                                                             <span class="label">From</span>
-                                                            <pre class="prewrap">{{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
+                                                            {% if message.from is defined %}
+                                                                {# Email instance #}
+                                                                <pre class="prewrap">{{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
+                                                            {% elseif message.headers.has('from') %}
+                                                                <pre class="prewrap">{{ message.headers.get('from').toString()|split(': ', 2)[1]|default('(empty)') }}</pre>
+                                                            {% else %}
+                                                                <pre class="prewrap">(empty)</pre>
+                                                            {% endif %}
 
                                                             <span class="label">To</span>
-                                                            <pre class="prewrap">{{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
+                                                            {% if message.to is defined %}
+                                                                {# Email instance #}
+                                                                <pre class="prewrap">{{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
+                                                            {% elseif message.headers.has('to') %}
+                                                                <pre class="prewrap">{{ message.headers.get('to').toString()|split(': ', 2)[1]|default('(empty)') }}</pre>
+                                                            {% else %}
+                                                                <pre class="prewrap">(empty)</pre>
+                                                            {% endif %}
                                                         </div>
                                                         <div class="col">
                                                             <span class="label">Headers</span>
@@ -191,6 +212,13 @@
                                                         </div>
                                                     </div>
                                                 {% endfor %}
+                                            {% else %}
+                                                <div class="tab">
+                                                    <h3 class="tab-title">Content</h3>
+                                                    <div class="tab-content">
+                                                        <pre class="prewrap" style="max-height: 600px">{{ message.body().toString() }}</pre>
+                                                    </div>
+                                                </div>
                                             {% endif %}
                                             <div class="tab">
                                                 <h3 class="tab-title">Parts Hierarchy</h3>

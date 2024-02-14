@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2024-02-11T00:06:35Z
+
+Sorry, I could not find a fix for you @rmikalkenas. I only found "hacky" solutions..
+
+I still suggest merging this and then reopen https://github.com/symfony/symfony/issues/52587
+
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2024-02-12T06:17:10Z
+
+IMO it could be easily fixed by adjusting logic at https://github.com/symfony/symfony/blob/6986ab80d9885ee1448ffe6d58eaa00fc573422b/src/Symfony/Component/HttpClient/RetryableHttpClient.php#L63
+
+With mine introduced fix `isTimeout` method will no longer throw a `TransportExceptionInterface`, therefore retry mechanism wont be called (looks like this part wasn't covered by tests and I didn't check it as well).
+
+~~Removing previously mentioned `$chunk->isTimeout()` call from if block solves both issues - yours and mine.~~ Edit: it needs more changes, as we cannot blindly allow to retry all timeouts (idempotent methods etc)
+
+In addition to that, `Symfony\Contracts\HttpClient\ChunkInterface::isTimeout` contract should be adjusted as well, since this method will never throw TransportException.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2024-02-13T03:25:03Z
+
+>  it needs more changes, as we cannot blindly allow to retry all timeouts (idempotent methods etc)
+
+Yeah. Im afraid so..
+
+> looks like this part wasn't covered by tests and I didn't check it as well
+
+Correct. That is the biggest issue.
+Since I am not 100% sure what changes needs to be done to fix both issues. I suggest to do a quick merge on this one so it can be released in next patch version. Then reopen and try to fix https://github.com/symfony/symfony/issues/52587

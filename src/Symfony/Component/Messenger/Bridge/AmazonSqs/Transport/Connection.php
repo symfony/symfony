@@ -131,7 +131,7 @@ class Connection
             'buffer_size' => (int) $options['buffer_size'],
             'wait_time' => (int) $options['wait_time'],
             'poll_timeout' => $options['poll_timeout'],
-            'visibility_timeout' => $options['visibility_timeout'],
+            'visibility_timeout' => null !== $options['visibility_timeout'] ? (int) $options['visibility_timeout'] : null,
             'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOL),
             'queue_name' => (string) $options['queue_name'],
         ];

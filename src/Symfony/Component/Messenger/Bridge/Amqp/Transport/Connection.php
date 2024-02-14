@@ -510,7 +510,7 @@ class Connection
     public function queue(string $queueName): \AMQPQueue
     {
         if (!isset($this->amqpQueues[$queueName])) {
-            $queueConfig = $this->queuesOptions[$queueName];
+            $queueConfig = $this->queuesOptions[$queueName] ?? [];
 
             $amqpQueue = $this->amqpFactory->createQueue($this->channel());
             $amqpQueue->setName($queueName);

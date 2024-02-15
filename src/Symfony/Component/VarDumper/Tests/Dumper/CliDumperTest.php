@@ -370,9 +370,7 @@ stream resource {@{$ref}
         ›   twig source
         › 
       }
-      %s%eTemplate.php:%d { …}
-      %s%eTemplate.php:%d { …}
-      %s%eTemplate.php:%d { …}
+      %A%eTemplate.php:%d { …}
       %s%eTests%eDumper%eCliDumperTest.php:%d { …}
 %A  }
   }
@@ -572,7 +570,7 @@ EOTXT
             ],
             [
                 'bar' => 123,
-            ]
+            ],
         ]);
 
         $dumper = new CliDumper();

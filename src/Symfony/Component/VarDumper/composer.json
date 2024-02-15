@@ -27,7 +27,7 @@
         "symfony/http-kernel": "^5.4|^6.0|^7.0",
         "symfony/process": "^5.4|^6.0|^7.0",
         "symfony/uid": "^5.4|^6.0|^7.0",
-        "twig/twig": "^2.13|~3.8.0"
+        "twig/twig": "^2.13|^3.0.4"
     },
     "conflict": {
         "symfony/console": "<5.4"

@@ -282,7 +282,7 @@
                                         {% if event.message.subject is defined %}
                                             {{ event.message.getSubject() ?? '(No subject)' }}
                                         {% elseif event.message.headers.has('subject') %}
-                                            {{ event.message.headers.get('subject').toString()|split(': ', 2)[1]|default('(No subject)') }}
+                                            {{ event.message.headers.get('subject').bodyAsString()|default('(No subject)') }}
                                         {% else %}
                                             (No subject)
                                         {% endif %}
@@ -291,7 +291,7 @@
                                         {% if event.message.to is defined %}
                                             {{ event.message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
                                         {% elseif event.message.headers.has('to') %}
-                                            {{ event.message.headers.get('to').toString()|split(': ', 2)[1]|default('(empty)') }}
+                                            {{ event.message.headers.get('to').bodyAsString()|default('(empty)') }}
                                         {% else %}
                                             (empty)
                                         {% endif %}
@@ -342,7 +342,7 @@
                                 {% if message.subject is defined %}
                                     {{ message.getSubject() ?? '(No subject)' }}
                                 {% elseif message.headers.has('subject') %}
-                                    {{ message.headers.get('subject').toString()|split(': ', 2)[1]|default('(No subject)') }}
+                                    {{ message.headers.get('subject').bodyAsString()|default('(No subject)') }}
                                 {% else %}
                                     (No subject)
                                 {% endif %}
@@ -353,7 +353,7 @@
                                     {% if message.from is defined %}
                                         {{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
                                     {% elseif message.headers.has('from') %}
-                                        {{ message.headers.get('from').toString()|split(': ', 2)[1]|default('(empty)') }}
+                                        {{ message.headers.get('from').bodyAsString()|default('(empty)') }}
                                     {% else %}
                                         (empty)
                                     {% endif %}
@@ -363,7 +363,7 @@
                                     {% if message.to is defined %}
                                         {{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
                                     {% elseif message.headers.has('to') %}
-                                        {{ message.headers.get('to').toString()|split(': ', 2)[1]|default('(empty)') }}
+                                        {{ message.headers.get('to').bodyAsString()|default('(empty)') }}
                                     {% else %}
                                         (empty)
                                     {% endif %}

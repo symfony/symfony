@@ -11,12 +11,14 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Node;
 
 /**
  * @author Julien Galenski <julien.galenski@gmail.com>
  */
+#[YieldReady]
 final class DumpNode extends Node
 {
     private string $varPrefix;

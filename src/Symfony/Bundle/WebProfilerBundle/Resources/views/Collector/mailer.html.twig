@@ -125,7 +125,7 @@
                                                         {# Email instance #}
                                                         <h2 class="m-t-10">{{ message.getSubject() ?? '(empty)' }}</h2>
                                                     {% elseif message.headers.has('subject') %}
-                                                        <h2 class="m-t-10">{{ message.headers.get('subject').toString()|split(': ', 2)[1]|default('(empty)') }}</h2>
+                                                        <h2 class="m-t-10">{{ message.headers.get('subject').bodyAsString()|default('(empty)') }}</h2>
                                                     {% else %}
                                                         <h2 class="m-t-10">(empty)</h2>
                                                     {% endif %}
@@ -136,7 +136,7 @@
                                                                 {# Email instance #}
                                                                 <pre class="prewrap">{{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
                                                             {% elseif message.headers.has('from') %}
-                                                                <pre class="prewrap">{{ message.headers.get('from').toString()|split(': ', 2)[1]|default('(empty)') }}</pre>
+                                                                <pre class="prewrap">{{ message.headers.get('from').bodyAsString()|default('(empty)') }}</pre>
                                                             {% else %}
                                                                 <pre class="prewrap">(empty)</pre>
                                                             {% endif %}
@@ -146,7 +146,7 @@
                                                                 {# Email instance #}
                                                                 <pre class="prewrap">{{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
                                                             {% elseif message.headers.has('to') %}
-                                                                <pre class="prewrap">{{ message.headers.get('to').toString()|split(': ', 2)[1]|default('(empty)') }}</pre>
+                                                                <pre class="prewrap">{{ message.headers.get('to').bodyAsString()|default('(empty)') }}</pre>
                                                             {% else %}
                                                                 <pre class="prewrap">(empty)</pre>
                                                             {% endif %}

@@ -119,6 +119,104 @@ class ConnectionTest extends TestCase
         $connection->reject('dummy_id');
     }
 
+    public function testSend()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('insert')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('values')
+            ->with([
+                'body' => '?',
+                'headers' => '?',
+                'queue_name' => '?',
+                'created_at' => '?',
+                'available_at' => '?',
+            ])
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('INSERT');
+
+        $driverConnection->expects($this->once())
+            ->method('beginTransaction');
+
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->with('INSERT')
+            ->willReturn(1);
+
+        $driverConnection->expects($this->once())
+            ->method('lastInsertId')
+            ->willReturn('1');
+
+        $driverConnection->expects($this->once())
+            ->method('commit');
+
+        $connection = new Connection([], $driverConnection);
+        $id = $connection->send('test', []);
+
+        self::assertSame('1', $id);
+    }
+
+    public function testSendLastInsertIdReturnsInteger()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('insert')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('values')
+            ->with([
+                'body' => '?',
+                'headers' => '?',
+                'queue_name' => '?',
+                'created_at' => '?',
+                'available_at' => '?',
+            ])
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('INSERT');
+
+        $driverConnection->expects($this->once())
+            ->method('beginTransaction');
+
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->with('INSERT')
+            ->willReturn(1);
+
+        $driverConnection->expects($this->once())
+            ->method('lastInsertId')
+            ->willReturn(1);
+
+        $driverConnection->expects($this->once())
+            ->method('commit');
+
+        $connection = new Connection([], $driverConnection);
+        $id = $connection->send('test', []);
+
+        self::assertSame('1', $id);
+    }
+
     private function getDBALConnectionMock()
     {
         $driverConnection = $this->createMock(DBALConnection::class);

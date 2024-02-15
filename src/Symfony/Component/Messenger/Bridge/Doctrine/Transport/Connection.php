@@ -18,6 +18,7 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
@@ -131,7 +132,7 @@ class Connection implements ResetInterface
                 'available_at' => '?',
             ]);
 
-        $this->executeStatement($queryBuilder->getSQL(), [
+        return $this->executeInsert($queryBuilder->getSQL(), [
             $body,
             json_encode($headers),
             $this->configuration['queue_name'],
@@ -144,8 +145,6 @@ class Connection implements ResetInterface
             Types::DATETIME_IMMUTABLE,
             Types::DATETIME_IMMUTABLE,
         ]);
-
-        return $this->driverConnection->lastInsertId();
     }
 
     public function get(): ?array
@@ -387,15 +386,12 @@ class Connection implements ResetInterface
         try {
             return $this->driverConnection->executeQuery($sql, $parameters, $types);
         } catch (TableNotFoundException $e) {
-            if ($this->driverConnection->isTransactionActive()) {
+            if (!$this->autoSetup || $this->driverConnection->isTransactionActive()) {
                 throw $e;
             }
         }
 
-        // create table
-        if ($this->autoSetup) {
-            $this->setup();
-        }
+        $this->setup();
 
         return $this->driverConnection->executeQuery($sql, $parameters, $types);
     }
@@ -405,17 +401,58 @@ class Connection implements ResetInterface
         try {
             return $this->driverConnection->executeStatement($sql, $parameters, $types);
         } catch (TableNotFoundException $e) {
-            if ($this->driverConnection->isTransactionActive()) {
+            if (!$this->autoSetup || $this->driverConnection->isTransactionActive()) {
                 throw $e;
             }
         }
 
-        // create table
-        if ($this->autoSetup) {
-            $this->setup();
-        }
+        $this->setup();
 
         return $this->driverConnection->executeStatement($sql, $parameters, $types);
+    }
+
+    private function executeInsert(string $sql, array $parameters = [], array $types = []): string
+    {
+        // Use PostgreSQL RETURNING clause instead of lastInsertId() to get the
+        // inserted id in one operation instead of two.
+        if ($this->driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $sql .= ' RETURNING id';
+        }
+
+        insert:
+        $this->driverConnection->beginTransaction();
+
+        try {
+            if ($this->driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+                $first = $this->driverConnection->fetchFirstColumn($sql, $parameters, $types);
+
+                $id = $first[0] ?? null;
+
+                if (!$id) {
+                    throw new TransportException('no id was returned by PostgreSQL from RETURNING clause.');
+                }
+            } else {
+                $this->driverConnection->executeStatement($sql, $parameters, $types);
+
+                if (!$id = $this->driverConnection->lastInsertId()) {
+                    throw new TransportException('lastInsertId() returned false, no id was returned.');
+                }
+            }
+
+            $this->driverConnection->commit();
+        } catch (\Throwable $e) {
+            $this->driverConnection->rollBack();
+
+            // handle setup after transaction is no longer open
+            if ($this->autoSetup && $e instanceof TableNotFoundException) {
+                $this->setup();
+                goto insert;
+            }
+
+            throw $e;
+        }
+
+        return $id;
     }
 
     private function getSchema(): Schema

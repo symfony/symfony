@@ -43,7 +43,7 @@ final class RecurringMessage implements MessageProviderInterface
      * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
      *
      * @see https://en.wikipedia.org/wiki/ISO_8601#Durations
-     * @see https://php.net/datetime.formats.relative
+     * @see https://php.net/datetime.formats#datetime.formats.relative
      */
     public static function every(string|int|\DateInterval $frequency, object $message, string|\DateTimeImmutable|null $from = null, string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
     {

@@ -72,6 +72,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\PagerDuty\PagerDutyTransportFactory::class => false,
             Bridge\Plivo\PlivoTransportFactory::class => false,
             Bridge\Pushover\PushoverTransportFactory::class => false,
+            Bridge\Pushy\PushyTransportFactory::class => false,
             Bridge\Redlink\RedlinkTransportFactory::class => false,
             Bridge\RingCentral\RingCentralTransportFactory::class => false,
             Bridge\RocketChat\RocketChatTransportFactory::class => false,

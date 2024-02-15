@@ -200,6 +200,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Pushover\PushoverTransportFactory::class,
             'package' => 'symfony/pushover-notifier',
         ],
+        'pushy' => [
+            'class' => Bridge\Pushy\PushyTransportFactory::class,
+            'package' => 'symfony/pushy-notifier',
+        ],
         'redlink' => [
             'class' => Bridge\Redlink\RedlinkTransportFactory::class,
             'package' => 'symfony/redlink-notifier',

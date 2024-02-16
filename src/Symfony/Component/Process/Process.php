@@ -77,6 +77,7 @@ class Process implements \IteratorAggregate
     private bool $tty = false;
     private bool $pty;
     private array $options = ['suppress_errors' => true, 'bypass_shell' => true];
+    private array $ignoredSignals = [];
 
     private WindowsPipes|UnixPipes $processPipes;
 
@@ -346,9 +347,23 @@ class Process implements \IteratorAggregate
 
             return true;
         });
+
+        $oldMask = [];
+
+        if (\function_exists('pcntl_sigprocmask')) {
+            // we block signals we want to ignore, as proc_open will use fork / posix_spawn which will copy the signal mask this allow to block
+            // signals in the child process
+            pcntl_sigprocmask(\SIG_BLOCK, $this->ignoredSignals, $oldMask);
+        }
+
         try {
             $process = @proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
         } finally {
+            if (\function_exists('pcntl_sigprocmask')) {
+                // we restore the signal mask here to avoid any side effects
+                pcntl_sigprocmask(\SIG_SETMASK, $oldMask);
+            }
+
             restore_error_handler();
         }
 
@@ -1207,6 +1222,20 @@ class Process implements \IteratorAggregate
     }
 
     /**
+     * Defines a list of posix signals that will not be propagated to the process.
+     *
+     * @param list<\SIG*> $signals
+     */
+    public function setIgnoredSignals(array $signals): void
+    {
+        if ($this->isRunning()) {
+            throw new RuntimeException('Setting ignored signals while the process is running is not possible.');
+        }
+
+        $this->ignoredSignals = $signals;
+    }
+
+    /**
      * Returns whether TTY is supported on the current operating system.
      */
     public static function isTtySupported(): bool
@@ -1455,6 +1484,11 @@ class Process implements \IteratorAggregate
      */
     private function doSignal(int $signal, bool $throwException): bool
     {
+        // Signal seems to be send when sigchild is enable, this allow blocking the signal correctly in this case
+        if ($this->isSigchildEnabled() && \in_array($signal, $this->ignoredSignals)) {
+            return false;
+        }
+
         if (null === $pid = $this->getPid()) {
             if ($throwException) {
                 throw new LogicException('Cannot send signal on a non running process.');

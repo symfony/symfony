@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `Process::setIgnoredSignals()` to disable signal propagation to the child process
+
 6.4
 ---
 

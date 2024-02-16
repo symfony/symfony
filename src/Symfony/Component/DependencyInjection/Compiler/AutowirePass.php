@@ -306,6 +306,17 @@ class AutowirePass extends AbstractRecursivePass
 
                 foreach ($attributes as $attribute) {
                     $attribute = $attribute->newInstance();
+                    $value = $attribute instanceof Autowire ? $attribute->value : null;
+
+                    if (\is_string($value) && str_starts_with($value, '%env(') && str_ends_with($value, ')%')) {
+                        if ($parameter->getType() instanceof \ReflectionNamedType && 'bool' === $parameter->getType()->getName() && !str_starts_with($value, '%env(bool:')) {
+                            $attribute = new Autowire(substr_replace($value, 'bool:', 5, 0));
+                        }
+                        if ($parameter->isDefaultValueAvailable() && $parameter->allowsNull() && null === $parameter->getDefaultValue() && !preg_match('/(^|:)default:/', $value)) {
+                            $attribute = new Autowire(substr_replace($value, 'default::', 5, 0));
+                        }
+                    }
+
                     $invalidBehavior = $parameter->allowsNull() ? ContainerInterface::NULL_ON_INVALID_REFERENCE : ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE;
 
                     try {

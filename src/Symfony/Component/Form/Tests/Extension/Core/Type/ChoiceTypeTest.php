@@ -2084,12 +2084,12 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertEquals('name', $view->vars['full_name']);
     }
 
-    public function testStripLeadingUnderscoresAndDigitsFromId()
+    public function testAllowLeadingUnderscoreAndDigitsFromId()
     {
         $view = $this->factory->createNamed('_09name', static::TESTED_TYPE, null)
             ->createView();
 
-        $this->assertEquals('name', $view->vars['id']);
+        $this->assertEquals('_09name', $view->vars['id']);
         $this->assertEquals('_09name', $view->vars['name']);
         $this->assertEquals('_09name', $view->vars['full_name']);
     }

@@ -557,6 +557,30 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertTrue($argLocator->has('foo'));
         $this->assertSame('bar', $argLocator->get('foo'));
     }
+
+    public function testTaggedControllersAreRegisteredInControllerResolver()
+    {
+        $container = new ContainerBuilder();
+        $container->register('argument_resolver.service')->addArgument([]);
+        $controllerResolver = $container->register('controller_resolver');
+
+        $container->register('foo', RegisterTestController::class)
+            ->addTag('controller.service_arguments')
+        ;
+
+        // duplicates should be removed
+        $container->register('bar', RegisterTestController::class)
+            ->addTag('controller.service_arguments')
+        ;
+
+        // services with no tag should be ignored
+        $container->register('baz', ControllerDummy::class);
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $this->assertSame([['allowControllers', [[RegisterTestController::class]]]], $controllerResolver->getMethodCalls());
+    }
 }
 
 class RegisterTestController

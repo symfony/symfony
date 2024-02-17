@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Attribute\Route as RouteAnnotation;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
+use function Symfony\Component\String\u;
+
 /**
  * AttributeClassLoader loads routing information from a PHP class and its methods.
  *
@@ -236,7 +238,7 @@ abstract class AttributeClassLoader implements LoaderInterface
     protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
     {
         $name = str_replace('\\', '_', $class->name).'_'.$method->name;
-        $name = \function_exists('mb_strtolower') && preg_match('//u', $name) ? mb_strtolower($name, 'UTF-8') : strtolower($name);
+        $name = u($name)->snake();
         if ($this->defaultRouteIndex > 0) {
             $name .= '_'.$this->defaultRouteIndex;
         }

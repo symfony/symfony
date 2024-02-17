@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\NativeRequestHandler;
 
@@ -21,56 +22,78 @@ use Symfony\Component\Form\NativeRequestHandler;
  */
 class FormConfigTest extends TestCase
 {
-    public static function getHtml4Ids()
+    public static function provideInvalidFormInputName(): iterable
     {
-        return [
-            ['z0'],
-            ['A0'],
-            ['A9'],
-            ['Z0'],
-            ['#', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ['a#', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ['a$', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ['a%', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ['a ', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ["a\t", 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ["a\n", 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ['a-'],
-            ['a_'],
-            ['a:'],
-            // Periods are allowed by the HTML4 spec, but disallowed by us
-            // because they break the generated property paths
-            ['a.', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            // Contrary to the HTML4 spec, we allow names starting with a
-            // number, otherwise naming fields by collection indices is not
-            // possible.
-            // For root forms, leading digits will be stripped from the
-            // "id" attribute to produce valid HTML4.
-            ['0'],
-            ['9'],
-            // Contrary to the HTML4 spec, we allow names starting with an
-            // underscore, since this is already a widely used practice in
-            // Symfony.
-            // For root forms, leading underscores will be stripped from the
-            // "id" attribute to produce valid HTML4.
-            ['_'],
-            // Integers are allowed
-            [0],
-            [123],
-            // NULL is allowed
-            [null],
-        ];
+        yield ['isindex'];
+
+        yield ['#'];
+        yield ['a#'];
+        yield ['a$'];
+        yield ['a%'];
+        yield ['a '];
+        yield ["a\t"];
+        yield ["a\n"];
+        // Periods are allowed by the HTML4 spec, but disallowed by us
+        // because they break the generated property paths
+        yield ['a.'];
     }
 
     /**
-     * @dataProvider getHtml4Ids
+     * @dataProvider provideInvalidFormInputName
      */
-    public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $expectedException = null)
+    public function testInvalidFormInputName(string $name)
     {
-        if (null !== $expectedException) {
-            $this->expectException($expectedException);
-        }
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The name "%s" contains illegal characters or equals to "isindex". Names should only contain letters, digits, underscores ("_"), hyphens ("-") and colons (":").', $name));
 
+        new FormConfigBuilder($name, null, new EventDispatcher());
+    }
+
+    public static function provideValidFormInputName(): iterable
+    {
+        yield ['z0'];
+        yield ['A0'];
+        yield ['A9'];
+        yield ['Z0'];
+        yield ['a-'];
+        yield ['a_'];
+        yield ['a:'];
+        // Contrary to the HTML4 spec, we allow names starting with a
+        // number, otherwise naming fields by collection indices is not
+        // possible.
+        // For root forms, leading digits will be stripped from the
+        // "id" attribute to produce valid HTML4.
+        yield ['0'];
+        yield ['9'];
+        // Contrary to the HTML4 spec, we allow names starting with an
+        // underscore, since this is already a widely used practice in
+        // Symfony.
+        // For root forms, leading underscores will be stripped from the
+        // "id" attribute to produce valid HTML4.
+        yield ['_'];
+        // Integers are allowed
+        yield [0];
+        yield [123];
+        // NULL is allowed
+        yield [null];
+
+        // Allowed in HTML 5 specification
+        // See: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fe-name
+        yield ['_charset_'];
+        yield ['-x'];
+        yield [':x'];
+        yield ['isINDEX'];
+
+        // This value shouldn't be allowed.
+        // However, many tests in Form component require empty name
+        yield [''];
+    }
+
+    /**
+     * @dataProvider provideValidFormInputName
+     */
+    public function testValidFormInputName(string|int|null $name)
+    {
         $formConfigBuilder = new FormConfigBuilder($name, null, new EventDispatcher());
 
         $this->assertSame((string) $name, $formConfigBuilder->getName());

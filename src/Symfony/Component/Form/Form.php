@@ -36,15 +36,15 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * representations:
  *
  *   (1) the "model" format required by the form's object
- *   (2) the "normalized" format for internal processing
+ *   (2) the "denormalized" format for internal processing
  *   (3) the "view" format used for display simple fields
  *       or map children model data for compound fields
  *
  * A date field, for example, may store a date as "Y-m-d" string (1) in the
- * object. To facilitate processing in the field, this value is normalized
+ * object. To facilitate processing in the field, this value is denormalized
  * to a DateTime object (2). In the HTML representation of your form, a
- * localized string (3) may be presented to and modified by the user, or it could be an array of values
- * to be mapped to choices fields.
+ * localized string (3) may be presented to and modified by the user, or it could 
+ * be an array of values to be mapped to choices fields.
  *
  * In most cases, format (1) and format (2) will be the same. For example,
  * a checkbox field uses a Boolean value for both internal processing and
@@ -55,9 +55,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * In some cases though it makes sense to make format (1) configurable. To
  * demonstrate this, let's extend our above date field to store the value
  * either as "Y-m-d" string or as timestamp. Internally we still want to
- * use a DateTime object for processing. To convert the data from string/integer
- * to DateTime you can set a model transformer by calling
- * addModelTransformer(). The normalized data is then converted to the displayed
+ * use a DateTime object for processing. To denormalized the data from string/integer
+ * to DateTime object you can set a model transformer by calling
+ * addModelTransformer(). The denormalized data are then converted to the displayed
  * data as described before.
  *
  * The conversions (1) -> (2) -> (3) use the transform methods of the transformers.
@@ -110,7 +110,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * When the data is initialized with its default value, that default value
      * is passed through the transformer chain in order to synchronize the
-     * model, normalized and view format for the first time. This is done
+     * model, denormalized and view format for the first time. This is done
      * lazily in order to save performance when {@link setData()} is called
      * manually, making the initialization with the configured default value
      * superfluous.

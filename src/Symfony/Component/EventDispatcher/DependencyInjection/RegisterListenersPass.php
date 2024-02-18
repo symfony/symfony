@@ -204,7 +204,7 @@ class ExtractingEventDispatcher extends EventDispatcher implements EventSubscrib
     {
         $events = [];
 
-        foreach ([self::$subscriber, 'getSubscribedEvents']() as $eventName => $params) {
+        foreach (self::$subscriber::getSubscribedEvents() as $eventName => $params) {
             $events[self::$aliases[$eventName] ?? $eventName] = $params;
         }
 

@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\AsLockedCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
@@ -26,6 +27,8 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Base class for all commands.
@@ -53,6 +56,8 @@ class Command
     private array $synopsis = [];
     private array $usages = [];
     private ?HelperSet $helperSet = null;
+    private ?LockFactory $lockFactory = null;
+    private ?LockInterface $lock = null;
 
     public static function getDefaultName(): ?string
     {
@@ -136,6 +141,14 @@ class Command
     public function getHelperSet(): ?HelperSet
     {
         return $this->helperSet;
+    }
+
+    /**
+     * Sets the lock factory.
+     */
+    public function setLockFactory(LockFactory $lockFactory): void
+    {
+        $this->lockFactory = $lockFactory;
     }
 
     /**
@@ -273,11 +286,17 @@ class Command
 
         $input->validate();
 
+        if (false === $this->createLock($input)) {
+            return self::FAILURE;
+        }
+
         if ($this->code) {
             $statusCode = ($this->code)($input, $output);
         } else {
             $statusCode = $this->execute($input, $output);
         }
+
+        $this->releaseLock();
 
         return is_numeric($statusCode) ? (int) $statusCode : 0;
     }
@@ -660,5 +679,97 @@ class Command
         if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }
+    }
+
+    /**
+     * Create a lock for the current command.
+     */
+    protected function createLock(InputInterface $input): bool
+    {
+        $key = $this->resolveLockKey($input);
+
+        if (null === $key) {
+            return true;
+        }
+
+        if (!class_exists(LockFactory::class)) {
+            throw new LogicException('To enable the locking feature you must install the symfony/lock component. Try running "composer require symfony/lock".');
+        }
+
+        if (null === $this->lockFactory) {
+            throw new LogicException('Lock factory is not available. You probably forgot to call setLockFactory method on your command.');
+        }
+
+        if (null !== $this->lock) {
+            throw new LogicException('A lock is already in place.');
+        }
+
+        $this->lock = $this->lockFactory->createLock($key);
+
+        if (!$this->lock->acquire(self::isBlockingLock())) {
+            $this->lock = null;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Release the lock for the current command.
+     */
+    protected function releaseLock(): void
+    {
+        if (null === $this->lock) {
+            return;
+        }
+
+        if (!class_exists(LockFactory::class)) {
+            throw new LogicException('To enable the locking feature you must install the symfony/lock component. Try running "composer require symfony/lock".');
+        }
+
+        if (null === $this->lockFactory) {
+            throw new LogicException('Lock factory is not available. You probably forgot to call setLockFactory method on your command.');
+        }
+
+        $this->lock->release();
+        $this->lock = null;
+    }
+
+    /**
+     * Resolve and returns the lock name depending on how it is configured in the AsLockedCommand attribute:
+     * - if lock is a string, it will be used as the lock key
+     * - if lock is a bool, it will use the default command name as a lock key
+     * - if lock is a callable, the result of it will be used as a lock key
+     */
+    private function resolveLockKey(InputInterface $input): ?string
+    {
+        if (!$attribute = (new \ReflectionClass(static::class))->getAttributes(AsLockedCommand::class)) {
+            return null;
+        }
+
+        $lockProperty = $attribute[0]->newInstance()->lock;
+
+        if (\is_callable($lockProperty)) {
+            return \call_user_func_array($lockProperty, [$input]);
+        }
+
+        if (\is_bool($lockProperty)) {
+            return $lockProperty ? $this->getName() : null;
+        }
+
+        return \is_string($lockProperty) ? $lockProperty : null;
+    }
+
+    /**
+     * Returns the blocking property from the AsLockedCommand attribute.
+     */
+    public static function isBlockingLock(): ?bool
+    {
+        if (!$attribute = (new \ReflectionClass(static::class))->getAttributes(AsLockedCommand::class)) {
+            return null;
+        }
+
+        return $attribute[0]->newInstance()->blocking;
     }
 }

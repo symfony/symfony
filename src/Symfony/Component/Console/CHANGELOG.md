@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `ArgvInput::getRawTokens()`
+ * Add `#[AsLockedCommand]` attribute to automatically lock commands
 
 7.0
 ---

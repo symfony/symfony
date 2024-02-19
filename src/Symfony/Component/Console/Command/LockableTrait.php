@@ -25,7 +25,6 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 trait LockableTrait
 {
     private ?LockInterface $lock = null;
-
     private ?LockFactory $lockFactory = null;
 
     /**
@@ -52,6 +51,7 @@ trait LockableTrait
         }
 
         $this->lock = $this->lockFactory->createLock($name ?: $this->getName());
+
         if (!$this->lock->acquire($blocking)) {
             $this->lock = null;
 

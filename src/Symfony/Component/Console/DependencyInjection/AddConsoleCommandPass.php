@@ -118,6 +118,10 @@ class AddConsoleCommandPass implements CompilerPassInterface
 
                 $lazyCommandRefs[$id] = new Reference('.'.$id.'.lazy');
             }
+
+            if ($container->hasDefinition('lock.default.factory')) {
+                $definition->addMethodCall('setLockFactory', [$container->getDefinition('lock.default.factory')]);
+            }
         }
 
         $container

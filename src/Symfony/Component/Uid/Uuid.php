@@ -149,7 +149,7 @@ class Uuid extends AbstractUid
 
     public function toBinary(): string
     {
-        return uuid_parse($this->uid);
+        return hex2bin(str_replace('-', '', $this->uid));
     }
 
     /**

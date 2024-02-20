@@ -24,13 +24,6 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 /**
  * Lock when fetching tokens.
  *
- * There are two possible combinations:
- *   - For performance, put the lock after the cache, it will reduce lock time.
- *   - For consistency, decorate the cache with lock, it will prevent concurrent
- *     cache accesses.
- *
- * Per default lock will decorate cache.
- *
  * @author Pierre Rineau <pierre.rineau@processus.org>
  */
 class LockAccessTokenManagerDecorator implements AccessTokenManagerInterface

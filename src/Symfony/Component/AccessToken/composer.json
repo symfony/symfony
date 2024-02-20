@@ -24,9 +24,9 @@
         ]
     },
     "require" : {
-        "php" : ">=8.2"
-    },
-    "require-dev" : {
-        "symfony/http-client": "^6.4|^7.0"
+        "php" : ">=8.2",
+        "symfony/cache": "6.4|7.1",
+        "symfony/http-client": "^6.4|^7.1",
+        "symfony/lock": "6.4|7.1"
     }
 }

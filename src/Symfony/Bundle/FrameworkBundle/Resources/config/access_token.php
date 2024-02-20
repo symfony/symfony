@@ -16,11 +16,6 @@ use Symfony\Component\AccessToken\AccessTokenManagerInterface;
 use Symfony\Component\AccessToken\Manager\CacheAccessTokenManagerDecorator;
 
 return static function (ContainerConfigurator $container) {
-    $container->parameters()
-        ->set('asset.request_context.base_path', null)
-        ->set('asset.request_context.secure', null)
-    ;
-
     $container->services()
         ->set('access_token.manager')
             ->class(AccessTokenManager::class)

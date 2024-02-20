@@ -128,8 +128,11 @@ public function NAME(): string
 
         $hasNormalizationClosures = $this->hasNormalizationClosures($node);
         $comment = $this->getComment($node);
+        $nodeTypes = $this->getParameterTypes($node);
+        $paramTypes = \in_array('mixed', $nodeTypes, true) ? 'mixed' : implode('|', $nodeTypes);
+
         if ($hasNormalizationClosures) {
-            $comment = sprintf(" * @template TValue\n * @param TValue \$value\n%s", $comment);
+            $comment = sprintf(" * @template TValue of %s\n * @param TValue \$value\n%s", $paramTypes, $comment);
             $comment .= sprintf(' * @return %s|$this'."\n", $childClass->getFqcn());
             $comment .= sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
         }
@@ -141,7 +144,7 @@ public function NAME(): string
             $node->getName(),
             $this->getType($childClass->getFqcn(), $hasNormalizationClosures)
         );
-        $nodeTypes = $this->getParameterTypes($node);
+
         $body = $hasNormalizationClosures ? '
 COMMENTpublic function NAME(PARAM_TYPE $value = []): CLASS|static
 {
@@ -177,7 +180,7 @@ COMMENTpublic function NAME(array $value = []): CLASS
             'COMMENT' => $comment,
             'PROPERTY' => $property->getName(),
             'CLASS' => $childClass->getFqcn(),
-            'PARAM_TYPE' => \in_array('mixed', $nodeTypes, true) ? 'mixed' : implode('|', $nodeTypes),
+            'PARAM_TYPE' => $paramTypes,
         ]);
 
         $this->buildNode($node, $childClass, $this->getSubNamespace($childClass));
@@ -280,8 +283,11 @@ public function NAME(string $VAR, TYPE $VALUE): static
         );
 
         $comment = $this->getComment($node);
+        $resolvedParamTypes = null === $node->getKeyAttribute() ? $nodeParameterTypes : $prototypeParameterTypes;
+        $paramTypes = \in_array('mixed', $resolvedParamTypes, true) ? 'mixed' : implode('|', $resolvedParamTypes);
+
         if ($hasNormalizationClosures) {
-            $comment = sprintf(" * @template TValue\n * @param TValue \$value\n%s", $comment);
+            $comment = sprintf(" * @template TValue of %s\n * @param TValue \$value\n%s", $paramTypes, $comment);
             $comment .= sprintf(' * @return %s|$this'."\n", $childClass->getFqcn());
             $comment .= sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
         }
@@ -312,7 +318,7 @@ COMMENTpublic function NAME(array $value = []): CLASS
                 'COMMENT' => $comment,
                 'PROPERTY' => $property->getName(),
                 'CLASS' => $childClass->getFqcn(),
-                'PARAM_TYPE' => \in_array('mixed', $nodeParameterTypes, true) ? 'mixed' : implode('|', $nodeParameterTypes),
+                'PARAM_TYPE' => $paramTypes,
             ]);
         } else {
             $body = $hasNormalizationClosures ? '
@@ -351,7 +357,7 @@ COMMENTpublic function NAME(string $VAR, array $VALUE = []): CLASS
                 'CLASS' => $childClass->getFqcn(),
                 'VAR' => '' === $key ? 'key' : $key,
                 'VALUE' => 'value' === $key ? 'data' : 'value',
-                'PARAM_TYPE' => \in_array('mixed', $prototypeParameterTypes, true) ? 'mixed' : implode('|', $prototypeParameterTypes),
+                'PARAM_TYPE' => $paramTypes,
             ]);
         }
 

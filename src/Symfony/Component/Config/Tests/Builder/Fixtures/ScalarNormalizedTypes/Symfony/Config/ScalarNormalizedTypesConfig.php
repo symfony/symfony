@@ -48,7 +48,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
-     * @template TValue
+     * @template TValue of mixed
      * @param TValue $value
      * @default {"enabled":null}
      * @return \Symfony\Config\ScalarNormalizedTypes\ObjectConfig|$this
@@ -74,7 +74,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
-     * @template TValue
+     * @template TValue of mixed
      * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig|$this
      * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig : static)
@@ -92,7 +92,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
-     * @template TValue
+     * @template TValue of mixed
      * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig|$this
      * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig : static)

@@ -365,7 +365,8 @@ class Table
                 for ($i = 0; $i < $maxRows; ++$i) {
                     $cell = (string) ($row[$i] ?? '');
 
-                    $parts = explode("\n", $cell);
+                    $eol = str_contains($cell, "\r\n") ? "\r\n" : "\n";
+                    $parts = explode($eol, $cell);
                     foreach ($parts as $idx => $part) {
                         if ($headers && !$containsColspan) {
                             if (0 === $idx) {

@@ -27,31 +27,8 @@ use Symfony\Component\Filesystem\Path;
  */
 final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 {
-    /**
-     * @see https://regex101.com/r/1iBAIb/1
-     */
-    private const IMPORT_PATTERN = '/
-        ^
-            (?:\/\/.*)                     # Lines that start with comments
-        |
-            (?:
-                \'(?:[^\'\\\\]|\\\\.)*\'   # Strings enclosed in single quotes
-            |
-                "(?:[^"\\\\]|\\\\.)*"      # Strings enclosed in double quotes
-            )
-        |
-            (?:                            # Import statements (script captured)
-                import\s*
-                    (?:
-                        (?:\*\s*as\s+\w+|\s+[\w\s{},*]+)
-                        \s*from\s*
-                    )?
-            |
-                \bimport\(
-            )
-            \s*[\'"`](\.\/[^\'"`]+|(\.\.\/)*[^\'"`]+)[\'"`]\s*[;\)]
-        ?
-    /mx';
+    // https://regex101.com/r/fquriB/1
+    private const IMPORT_PATTERN = '/(?:import\s*(?:(?:\*\s*as\s+\w+|[\w\s{},*]+)\s*from\s*)?|\bimport\()\s*[\'"`](\.\/[^\'"`]+|(\.\.\/)*[^\'"`]+)[\'"`]\s*[;\)]?/m';
 
     public function __construct(
         private readonly ImportMapConfigReader $importMapConfigReader,
@@ -64,11 +41,6 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
     {
         return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper, $content) {
             $fullImportString = $matches[0][0];
-
-            // Ignore matches that did not capture import statements
-            if (!isset($matches[1][0])) {
-                return $fullImportString;
-            }
 
             if ($this->isCommentedOut($matches[0][1], $content)) {
                 return $fullImportString;

@@ -29,6 +29,10 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
         foreach ($controllers as $controller => $argumentRef) {
             $argumentLocator = $container->getDefinition((string) $argumentRef->getValues()[0]);
 
+            if ($argumentLocator->getFactory()) {
+                $argumentLocator = $container->getDefinition($argumentLocator->getFactory()[0]);
+            }
+
             if (!$argumentLocator->getArgument(0)) {
                 // remove empty argument locators
                 $reason = sprintf('Removing service-argument resolver for controller "%s": no corresponding services exist for the referenced types.', $controller);

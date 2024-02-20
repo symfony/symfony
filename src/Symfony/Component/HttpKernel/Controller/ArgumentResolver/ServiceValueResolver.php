@@ -55,8 +55,10 @@ final class ServiceValueResolver implements ValueResolverInterface
         try {
             return [$this->container->get($controller)->get($argument->getName())];
         } catch (RuntimeException $e) {
-            $what = sprintf('argument $%s of "%s()"', $argument->getName(), $controller);
-            $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $e->getMessage());
+            $what = 'argument $'.$argument->getName();
+            $message = str_replace(sprintf('service "%s"', $argument->getName()), $what, $e->getMessage());
+            $what .= sprintf(' of "%s()"', $controller);
+            $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $message);
 
             if ($e->getMessage() === $message) {
                 $message = sprintf('Cannot resolve %s: %s', $what, $message);

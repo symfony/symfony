@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken\Bridge\OAuth;
 
 use Symfony\Component\AccessToken\Credentials\AbstractCredentials;
@@ -25,18 +23,19 @@ use Symfony\Component\AccessToken\Credentials\AbstractCredentials;
 abstract class AbstractOAuthCredentials extends AbstractCredentials
 {
     /**
-     * @param null|string $tenant   Tenant name or identifier
-     * @param null|string $endpoint Authorization endpoint URL, for generic usage you must provide one
+     * @param string|null $tenant   Tenant name or identifier
+     * @param string|null $endpoint Authorization endpoint URL, for generic usage you must provide one
      */
     public function __construct(
         #[\SensitiveParameter] protected readonly ?string $tenant = null,
         protected readonly ?string $endpoint = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Get grant type.
      */
-    public abstract function getGrantType(): string;
+    abstract public function getGrantType(): string;
 
     /**
      * Get tenant name or identifier.

@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken;
 
 use Symfony\Component\AccessToken\Exception\FactoryNotFoundException;
@@ -26,21 +24,21 @@ interface AccessTokenManagerInterface
     /**
      * Create credentials from URI.
      *
-     * @throws FactoryNotFoundException In case the credentials factory is not found.
+     * @throws FactoryNotFoundException in case the credentials factory is not found
      */
     public function createCredentials(string $uri): CredentialsInterface;
 
     /**
      * Get access token for credentials.
      *
-     * @throws ProviderNotFoundException    In case no provider match these credentials.
+     * @throws ProviderNotFoundException in case no provider match these credentials
      */
     public function getAccessToken(CredentialsInterface $credentials): AccessTokenInterface;
 
     /**
      * Force refresh access token for credentials, delete current one if exists.
      *
-     * @throws ProviderNotFoundException    In case no provider match these credentials.
+     * @throws ProviderNotFoundException in case no provider match these credentials
      */
     public function refreshAccessToken(CredentialsInterface $credentials): AccessTokenInterface;
 

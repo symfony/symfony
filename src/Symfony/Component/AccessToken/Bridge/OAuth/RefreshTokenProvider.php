@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken\Bridge\OAuth;
 
 use Symfony\Component\AccessToken\AccessToken;
@@ -59,7 +57,7 @@ class RefreshTokenProvider extends AbstractProvider
         \assert($credentials instanceof RefreshTokenCredentials);
 
         if (!$endpointUrl = ($credentials->getEndpoint() ?? $this->getDefaultEndpointUrl($credentials))) {
-            throw new ProviderFetchException("OAuth2 credentials are missing the endpoint URL");
+            throw new ProviderFetchException('OAuth2 credentials are missing the endpoint URL.');
         }
 
         $response = $this->httpClient->request('POST', $endpointUrl, [
@@ -69,7 +67,7 @@ class RefreshTokenProvider extends AbstractProvider
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderFetchException(\sprintf("OAuth2 token could not be fetched from '%s': %s", $endpointUrl, $response->getContent(false)));
+            throw new ProviderFetchException(sprintf('OAuth2 token could not be fetched from "%s": "%s".', $endpointUrl, $response->getContent(false)));
         }
 
         return $this->parseResponse($credentials, $response->getContent());
@@ -114,7 +112,7 @@ class RefreshTokenProvider extends AbstractProvider
      */
     protected function getBody(RefreshTokenCredentials $credentials): array
     {
-        return \array_filter([
+        return array_filter([
             'refresh_token' => $credentials->getRefreshToken(),
             'client_id' => $credentials->getClientId(),
             'client_secret' => $credentials->getClientSecret(),
@@ -131,19 +129,19 @@ class RefreshTokenProvider extends AbstractProvider
     protected function parseResponse(RefreshTokenCredentials $credentials, string $body): AccessTokenInterface
     {
         try {
-            $data = \json_decode($body, true, 512, \JSON_THROW_ON_ERROR);
+            $data = json_decode($body, true, 512, \JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new ProviderFetchException(\sprintf("OAuth2 token response is not JSON: %s", $body), 0, $e);
+            throw new ProviderFetchException(sprintf('OAuth2 token response is not JSON: "%s".', $body), 0, $e);
         }
 
         if (!isset($data['access_token'])) {
-            throw new ProviderFetchException(\sprintf("OAuth2 token is missing from response: %s", $body));
+            throw new ProviderFetchException(sprintf('OAuth2 token is missing from response: "%s".', $body));
         }
 
         return new AccessToken(
             value: $data['access_token'],
             type: $data['token_type'] ?? 'Bearer',
-            expiresIn: (int)($data['expires_in'] ?? 600),
+            expiresIn: (int) ($data['expires_in'] ?? 600),
             id: $credentials->getId(),
         );
     }

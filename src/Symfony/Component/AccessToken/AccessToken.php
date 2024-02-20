@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken;
 
 /**
@@ -35,7 +33,8 @@ class AccessToken implements AccessTokenInterface
         protected readonly int $expiresIn = 600,
         protected readonly \DateTimeImmutable $issuedAt = new \DateTimeImmutable(),
         protected readonly string $id = self::IN_MEMORY,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function getType(): string
@@ -64,7 +63,7 @@ class AccessToken implements AccessTokenInterface
     #[\Override]
     public function getExpiresAt(): \DateTimeImmutable
     {
-        return $this->expiresAt ??= $this->issuedAt->add(new \DateInterval(\sprintf("PT%dS", $this->expiresIn)));
+        return $this->expiresAt ??= $this->issuedAt->add(new \DateInterval(sprintf('PT%dS', $this->expiresIn)));
     }
 
     #[\Override]

@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken\Tests\Unit\Bridge\OAuth;
 
 use PHPUnit\Framework\TestCase;
@@ -46,10 +44,10 @@ class RefreshTokenProviderTest extends TestCase
         $instance = new RefreshTokenProvider($httpClient);
 
         $requestCatcher = function (string $method, string $uri, array $options): ResponseInterface {
-            $this->assertSame('post', \strtolower($method));
+            $this->assertSame('post', strtolower($method));
             $this->assertSame('https://example.tld/?unexpected=value', $uri);
 
-            return new MockResponse(\json_encode([
+            return new MockResponse(json_encode([
                 'access_token' => 'some_value',
                 'token_type' => 'some_type',
             ]));

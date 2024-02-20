@@ -344,7 +344,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->readConfigEnabled('access_token', $container, $config['access_token'])) {
-            if (!\interface_exists(\Symfony\Component\AccessToken\CredentialsInterface::class)) {
+            if (!interface_exists(CredentialsInterface::class)) {
                 throw new LogicException('Access token support cannot be enabled as the AccessToken component is not installed. Try running "composer require symfony/access-token".');
             }
 
@@ -1289,8 +1289,8 @@ class FrameworkExtension extends Extension
 
         // Register static user configurations.
         foreach (($config['credentials'] ?? []) as $name => $data) {
-            $id = 'access_token.fetcher.' . $name;
-            $credentialsId = $id . '.credentials';
+            $id = 'access_token.fetcher.'.$name;
+            $credentialsId = $id.'.credentials';
 
             $container->setDefinition(
                 $credentialsId,

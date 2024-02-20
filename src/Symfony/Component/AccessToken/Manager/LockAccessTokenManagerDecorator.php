@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken\Manager;
 
 use Symfony\Component\AccessToken\AccessTokenInterface;
@@ -67,7 +65,7 @@ class LockAccessTokenManagerDecorator implements AccessTokenManagerInterface
             }
         } while (--$retries);
 
-        throw new RuntimeException("Could not acquire lock while fetching access token.");
+        throw new RuntimeException('Could not acquire lock while fetching access token.');
     }
 
     #[\Override]

@@ -9,13 +9,11 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken\Bridge\OAuth;
 
-use Symfony\Component\AccessToken\CredentialsInterface;
 use Symfony\Component\AccessToken\Credentials\Dsn;
 use Symfony\Component\AccessToken\Credentials\FactoryInterface;
+use Symfony\Component\AccessToken\CredentialsInterface;
 use Symfony\Component\AccessToken\Exception\InvalidArgumentException;
 
 /**
@@ -32,10 +30,10 @@ class OAuthFactory implements FactoryInterface
 
         if ('client_credentials' === $grantType) {
             if (!$clientId = $dsn->getOption('client_id')) {
-                $clientId = $dsn->getUser() ?? throw new InvalidArgumentException('"user" or "client_id" parameter is missing for OAuth "client_credentials" grant type access token URL');
+                $clientId = $dsn->getUser() ?? throw new InvalidArgumentException('"user" or "client_id" parameter is missing for OAuth "client_credentials" grant type access token URL.');
             }
             if (!$clientSecret = $dsn->getOption('client_secret')) {
-                $clientSecret = $dsn->getPassword() ?? throw new InvalidArgumentException('"password" or "client_secret" parameter is missing for OAuth "client_credentials" grant type access token URL');
+                $clientSecret = $dsn->getPassword() ?? throw new InvalidArgumentException('"password" or "client_secret" parameter is missing for OAuth "client_credentials" grant type access token URL.');
             }
 
             return new ClientCredentials(
@@ -49,7 +47,7 @@ class OAuthFactory implements FactoryInterface
 
         if ('refresh_token' === $grantType) {
             if (!$refreshToken = $dsn->getOption('refresh_token')) {
-                throw new InvalidArgumentException('"refresh_token" parameter is missing for OAuth "refresh_token" grant type access token URL');
+                throw new InvalidArgumentException('"refresh_token" parameter is missing for OAuth "refresh_token" grant type access token URL.');
             }
             if (!$clientId = $dsn->getOption('client_id')) {
                 $clientId = $dsn->getUser();
@@ -68,6 +66,6 @@ class OAuthFactory implements FactoryInterface
             );
         }
 
-        throw new InvalidArgumentException(\sprintf('"%s" grant type is unsupported for OAuth access token URL', $grantType));
+        throw new InvalidArgumentException(sprintf('"%s" grant type is unsupported for OAuth access token URL.', $grantType));
     }
 }

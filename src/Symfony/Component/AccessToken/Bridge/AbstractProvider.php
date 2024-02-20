@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken\Bridge;
 
 use Symfony\Component\AccessToken\AccessTokenInterface;
@@ -25,7 +23,7 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * Really fetch token, no cache, nothing, simply fetch it.
      */
-    protected abstract function fetchToken(CredentialsInterface $credentials): AccessTokenInterface;
+    abstract protected function fetchToken(CredentialsInterface $credentials): AccessTokenInterface;
 
     #[\Override]
     public function getAccessToken(CredentialsInterface $credentials): AccessTokenInterface

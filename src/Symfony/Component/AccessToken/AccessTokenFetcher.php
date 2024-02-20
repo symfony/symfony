@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken;
 
 /**
@@ -21,10 +19,11 @@ class AccessTokenFetcher
     public function __construct(
         private readonly AccessTokenManagerInterface $accessTokenManager,
         private readonly CredentialsInterface $credentials,
-    ) {}
+    ) {
+    }
 
     /**
-     * Create instance using given URI
+     * Create instance using given URI.
      */
     public static function createWithUri(AccessTokenManagerInterface $accessTokenManager, #[\SensitiveParameter] string $uri): self
     {

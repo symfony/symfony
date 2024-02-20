@@ -32,7 +32,7 @@ final class Dsn
 
     public static function fromString(#[\SensitiveParameter] string $dsn): self
     {
-        if (false === $params = \parse_url($dsn)) {
+        if (false === $params = parse_url($dsn)) {
             throw new InvalidArgumentException('The access token DSN is invalid.');
         }
 
@@ -45,10 +45,10 @@ final class Dsn
         }
 
         $path = '' !== ($params['path'] ?? '') ? $params['path'] : null;
-        $user = '' !== ($params['user'] ?? '') ? \rawurldecode($params['user']) : null;
-        $password = '' !== ($params['pass'] ?? '') ? \rawurldecode($params['pass']) : null;
+        $user = '' !== ($params['user'] ?? '') ? rawurldecode($params['user']) : null;
+        $password = '' !== ($params['pass'] ?? '') ? rawurldecode($params['pass']) : null;
         $port = $params['port'] ?? null;
-        \parse_str($params['query'] ?? '', $query);
+        parse_str($params['query'] ?? '', $query);
 
         return new self(
             scheme: $params['scheme'],
@@ -101,10 +101,10 @@ final class Dsn
         $path = $this->path ?? '';
 
         $queryString = '';
-        if ($this->query && $values = \array_diff_key($this->query, \array_flip($excludeParams))) {
-            $queryString = (\str_contains($path, '?') ? '&' : '?') . \http_build_query($values);
+        if ($this->query && $values = array_diff_key($this->query, array_flip($excludeParams))) {
+            $queryString = (str_contains($path, '?') ? '&' : '?') . http_build_query($values);
         }
 
-        return 'https://' . $this->host . ($this->port ? ':' . $this->port : '') . '/' . \ltrim($path, '/') . $queryString;
+        return 'https://' . $this->host . ($this->port ? ':' . $this->port : '') . '/' . ltrim($path, '/') . $queryString;
     }
 }

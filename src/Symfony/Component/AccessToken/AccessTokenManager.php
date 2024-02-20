@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken;
 
 use Symfony\Component\AccessToken\Bridge\OAuth\ClientCredentialsProvider;
@@ -28,18 +26,19 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class AccessTokenManager implements AccessTokenManagerInterface
 {
-    private null|array $providers;
-    private null|array $factories;
+    private array $providers;
+    private array $factories;
 
     /**
-     * @param array<ProviderInterface> $providers
+     * @param iterable<ProviderInterface>       $providers
+     * @param iterable<string,FactoryInterface> $factories
      */
-    public function __construct(null|iterable $providers = null, null|iterable $factories = null, ?HttpClientInterface $httpClient = null)
+    public function __construct(?iterable $providers = null, ?iterable $factories = null, ?HttpClientInterface $httpClient = null)
     {
         $this->factories = $this->createDefaultFactories();
         if (null !== $factories) {
-            foreach ($factories as $factory) {
-                $this->factories[] = $factory;
+            foreach ($factories as $scheme => $factory) {
+                $this->factories[$scheme] = $factory;
             }
         }
 
@@ -83,7 +82,7 @@ class AccessTokenManager implements AccessTokenManagerInterface
      */
     protected function getFactory(Dsn $dsn): FactoryInterface
     {
-        return $this->factories[$dsn->getScheme()] ?? throw new FactoryNotFoundException(\sprintf("Credentials factory for scheme '%s' was not found.", $dsn->getScheme()));
+        return $this->factories[$dsn->getScheme()] ?? throw new FactoryNotFoundException(sprintf('Credentials factory for scheme "%s" was not found.', $dsn->getScheme()));
     }
 
     /**
@@ -99,17 +98,19 @@ class AccessTokenManager implements AccessTokenManagerInterface
             }
         }
 
-        throw new ProviderNotFoundException(\sprintf("Access token provider for credentials '%s' with class '%s' was not found.", $credentials->getId(), \get_class($credentials)));
+        throw new ProviderNotFoundException(sprintf('Access token provider for credentials "%s" with class "%s" was not found.', $credentials->getId(), $credentials::class));
     }
 
-    protected function createDefaultFactories(): iterable
+    /** @return array<string,FactoryInterface> */
+    protected function createDefaultFactories(): array
     {
         return [
             'oauth' => new OAuthFactory(),
         ];
     }
 
-    protected function createDefaultProviders(HttpClientInterface $httpClient): iterable
+    /** @return array<ProviderInterface> */
+    protected function createDefaultProviders(HttpClientInterface $httpClient): array
     {
         return [
             new ClientCredentialsProvider($httpClient),
@@ -117,4 +118,3 @@ class AccessTokenManager implements AccessTokenManagerInterface
         ];
     }
 }
-

@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken\Bridge\OAuth;
 
 /**
@@ -28,6 +26,6 @@ trait WithScopeTrait
 
     public function getScopeAsString(): ?string
     {
-        return $this->scope ? \implode(' ', $this->scope) : null;
+        return $this->scope ? implode(' ', $this->scope) : null;
     }
 }

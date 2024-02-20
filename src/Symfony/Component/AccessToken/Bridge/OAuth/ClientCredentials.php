@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare (strict_types=1);
-
 namespace Symfony\Component\AccessToken\Bridge\OAuth;
 
 /**
@@ -25,17 +23,17 @@ class ClientCredentials extends AbstractOAuthCredentials
     use WithScopeTrait;
 
     /**
-     * @param string $clientId                  Client ID.
-     * @param string $clientSecret              Client secret.
-     * @param null|string $tenant               Tenant name or identifier.
-     * @param null|string|array<string> $scope  Requested scopes, either as a whitespace separated list or an array of strings.
-     * @param null|string $endpoint             Authorization endpoint URL, for generic usage you must provide one.
+     * @param string                    $clientId     client ID
+     * @param string                    $clientSecret client secret
+     * @param string|null               $tenant       tenant name or identifier
+     * @param string|array<string>|null $scope        requested scopes, either as a whitespace separated list or an array of strings
+     * @param string|null               $endpoint     authorization endpoint URL, for generic usage you must provide one
      */
     public function __construct(
         #[\SensitiveParameter] private readonly string $clientId,
         #[\SensitiveParameter] private readonly string $clientSecret,
         #[\SensitiveParameter] ?string $tenant = null,
-        null|string|array $scope = null,
+        string|array|null $scope = null,
         ?string $endpoint = null,
     ) {
         parent::__construct(
@@ -43,7 +41,7 @@ class ClientCredentials extends AbstractOAuthCredentials
             endpoint: $endpoint,
         );
 
-        $this->scope = is_string($scope) ? array_filter(explode(' ', $scope)) : $scope;
+        $this->scope = \is_string($scope) ? array_filter(explode(' ', $scope)) : $scope;
     }
 
     #[\Override]
@@ -65,7 +63,7 @@ class ClientCredentials extends AbstractOAuthCredentials
     /**
      * Convert to refresh token.
      *
-     * @param string $refreshToken  Token previously issued by the authorization endpoint.
+     * @param string $refreshToken token previously issued by the authorization endpoint
      */
     public function createRefreshToken(string $refreshToken): RefreshTokenCredentials
     {
@@ -82,6 +80,6 @@ class ClientCredentials extends AbstractOAuthCredentials
     #[\Override]
     protected function computeId(): string
     {
-        return md5($this->getEndpoint() . $this->clientId . $this->getTenant() . $this->getScopeAsString());
+        return md5($this->getEndpoint().$this->clientId.$this->getTenant().$this->getScopeAsString());
     }
 }

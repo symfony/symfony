@@ -29,6 +29,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\MercureBundle\MercureBundle;
+use Symfony\Component\AccessToken\AccessTokenFetcher;
+use Symfony\Component\AccessToken\CredentialsInterface;
+use Symfony\Component\AccessToken\Manager\LockAccessTokenManagerDecorator;
+use Symfony\Component\AccessToken\ProviderInterface;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
@@ -337,6 +341,14 @@ class FrameworkExtension extends Extension
 
         if ($this->readConfigEnabled('request', $container, $config['request'])) {
             $this->registerRequestConfiguration($config['request'], $container, $loader);
+        }
+
+        if ($this->readConfigEnabled('access_token', $container, $config['access_token'])) {
+            if (!\interface_exists(\Symfony\Component\AccessToken\CredentialsInterface::class)) {
+                throw new LogicException('Access token support cannot be enabled as the AccessToken component is not installed. Try running "composer require symfony/access-token".');
+            }
+
+            $this->registerAccessTokenConfiguration($config['access_token'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('assets', $container, $config['assets'])) {
@@ -1255,6 +1267,48 @@ class FrameworkExtension extends Extension
 
             $listener = $container->getDefinition('request.add_request_formats_listener');
             $listener->replaceArgument(0, $config['formats']);
+        }
+    }
+
+    private function registerAccessTokenConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        $loader->load('access_token.php');
+
+        $container->registerForAutoconfiguration(ProviderInterface::class)
+            ->addTag('access_token.provider');
+
+        if ($config['lock']['enabled']) {
+            $container->setDefinition(
+                'access_token.manager.lock',
+                (new Definition())
+                    ->setClass(LockAccessTokenManagerDecorator::class)
+                    ->setDecoratedService('access_token.manager')
+                    ->setArguments([new Reference('.inner'), new Reference('lock.factory'), $config['lock']['ttl']])
+            );
+        }
+
+        // Register static user configurations.
+        foreach (($config['credentials'] ?? []) as $name => $data) {
+            $id = 'access_token.fetcher.' . $name;
+            $credentialsId = $id . '.credentials';
+
+            $container->setDefinition(
+                $credentialsId,
+                (new Definition())
+                    ->setClass(CredentialsInterface::class)
+                    ->setFactory([AccessTokenFetcher::class, 'createCredentialsWithUri'])
+                    ->setArguments([new Reference('access_token.manager'), $data['url']])
+            );
+
+            $container->setDefinition(
+                $id,
+                (new Definition())
+                    ->setClass(AccessTokenFetcher::class)
+                    ->setArguments([new Reference('access_token.manager'), new Reference($credentialsId)])
+            );
+
+            $container->registerAliasForArgument($id, AccessTokenFetcher::class, $name);
+            $container->registerAliasForArgument($credentialsId, CredentialsInterface::class, $name);
         }
     }
 

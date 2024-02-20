@@ -58,6 +58,7 @@
         "symfony/polyfill-uuid": "^1.15"
     },
     "replace": {
+        "symfony/access-token": "self.version",
         "symfony/asset": "self.version",
         "symfony/asset-mapper": "self.version",
         "symfony/browser-kit": "self.version",

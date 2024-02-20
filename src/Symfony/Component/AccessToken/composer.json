@@ -1,0 +1,32 @@
+{
+    "name" : "symfony/access-token",
+    "type": "library",
+    "description": "Manage access tokens from various sources.",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "minimum-stability" : "dev",
+    "prefer-stable" : true,
+    "autoload" : {
+        "psr-4": { "Symfony\\Component\\AccessToken\\" : "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "require" : {
+        "php" : ">=8.2"
+    },
+    "require-dev" : {
+        "symfony/http-client": "^6.4|^7.0"
+    }
+}

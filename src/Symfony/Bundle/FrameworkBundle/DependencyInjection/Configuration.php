@@ -153,6 +153,7 @@ class Configuration implements ConfigurationInterface
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
+        $this->addAccessTokenSection($rootNode);
         $this->addAssetsSection($rootNode, $enableIfStandalone);
         $this->addAssetMapperSection($rootNode, $enableIfStandalone);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
@@ -713,6 +714,39 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->beforeNormalization()->castToArray()->end()
                                 ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addAccessTokenSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('access_token')
+                    ->info('access token manager configuration')
+                    ->canBeEnabled()
+                    ->children()
+                        ->arrayNode('lock')
+                            ->canBeDisabled()
+                            ->children()
+                                ->scalarNode('ttl')
+                                    ->info('The lock TTL value in seconds')
+                                    ->defaultValue(5)
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('credentials')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('url')
+                                        ->info('The URL of the credentials, scheme will determine which implementation to use')
+                                    ->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()

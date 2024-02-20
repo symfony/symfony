@@ -91,6 +91,29 @@ class ConfigurationTest extends TestCase
         ];
     }
 
+    public function testAccessTokenLockCanBeDisabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'access_token' => null,
+        ]]);
+
+        $defaultConfig = [
+            'enabled' => true,
+            'lock' => [
+                'enabled' => true,
+                'ttl' => 5,
+            ],
+            'credentials' => [],
+        ];
+
+        $this->assertEquals($defaultConfig, $config['access_token']);
+    }
+
     public function testAssetsCanBeEnabled()
     {
         $processor = new Processor();

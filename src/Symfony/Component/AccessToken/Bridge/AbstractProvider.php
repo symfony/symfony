@@ -1,0 +1,41 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare (strict_types=1);
+
+namespace Symfony\Component\AccessToken\Bridge;
+
+use Symfony\Component\AccessToken\AccessTokenInterface;
+use Symfony\Component\AccessToken\CredentialsInterface;
+use Symfony\Component\AccessToken\ProviderInterface;
+
+/**
+ * @author Pierre Rineau <pierre.rineau@processus.org>
+ */
+abstract class AbstractProvider implements ProviderInterface
+{
+    /**
+     * Really fetch token, no cache, nothing, simply fetch it.
+     */
+    protected abstract function fetchToken(CredentialsInterface $credentials): AccessTokenInterface;
+
+    #[\Override]
+    public function getAccessToken(CredentialsInterface $credentials): AccessTokenInterface
+    {
+        return $this->fetchToken($credentials);
+    }
+
+    #[\Override]
+    public function refreshAccessToken(CredentialsInterface $credentials): AccessTokenInterface
+    {
+        return $this->fetchToken($credentials);
+    }
+}

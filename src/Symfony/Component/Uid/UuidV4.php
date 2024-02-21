@@ -34,7 +34,7 @@ class UuidV4 extends Uuid
             $uuid[14] = '4';
             // Set the UUID variant: the 19th char must be in [8, 9, a, b]
             // xxxxxxxx-xxxx-4xxx-?xxx-xxxxxxxxxxxx
-            $uuid[19] = ['8','9','a','b'][ord($uuid[19]) & 0x3];
+            $uuid[19] = ['8','9','a','b'][getmypid() % 4];
             $this->uid = $uuid;
         } else {
             parent::__construct($uuid, true);

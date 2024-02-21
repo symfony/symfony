@@ -23,14 +23,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  */
 class PasswordHasherFactory implements PasswordHasherFactoryInterface
 {
-    private array $passwordHashers;
-
     /**
      * @param array<string, PasswordHasherInterface|array> $passwordHashers
      */
-    public function __construct(array $passwordHashers)
-    {
-        $this->passwordHashers = $passwordHashers;
+    public function __construct(
+        private array $passwordHashers,
+    ) {
     }
 
     public function getPasswordHasher(string|PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user): PasswordHasherInterface

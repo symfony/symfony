@@ -406,6 +406,7 @@ class ErrorHandler
      */
     public function handleError(int $type, string $message, string $file, int $line): bool
     {
+        var_dump(__METHOD__);
         if (\PHP_VERSION_ID >= 70300 && \E_WARNING === $type && '"' === $message[0] && false !== strpos($message, '" targeting switch is equivalent to "break')) {
             $type = \E_DEPRECATED;
         }
@@ -431,9 +432,11 @@ class ErrorHandler
         $logMessage = $this->levels[$type].': '.$message;
 
         if (null !== self::$toStringException) {
+            var_dump(__LINE__);
             $errorAsException = self::$toStringException;
             self::$toStringException = null;
         } elseif (!$throw && !($type & $level)) {
+            var_dump(__LINE__);
             if (!isset(self::$silencedErrorCache[$id = $file.':'.$line])) {
                 $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 5), $type, $file, $line, false) : [];
                 $errorAsException = new SilencedErrorContext($type, $file, $line, isset($lightTrace[1]) ? [$lightTrace[0]] : $lightTrace);
@@ -464,6 +467,9 @@ class ErrorHandler
                     if (isset($backtrace[$i]['function'], $backtrace[$i]['args'][0])
                         && ('trigger_error' === $backtrace[$i]['function'] || 'user_error' === $backtrace[$i]['function'])
                     ) {
+                        var_dump($backtrace[$i]['args'][0]);
+                        var_dump($message);
+                        var_dump($backtrace[$i]['args'][0] !== $message);
                         if ($backtrace[$i]['args'][0] !== $message) {
                             $message = $this->parseAnonymousClass($backtrace[$i]['args'][0]);
                             $logMessage = $this->levels[$type].': '.$message;
@@ -791,8 +797,16 @@ class ErrorHandler
      */
     private function parseAnonymousClass(string $message): string
     {
-        return preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', static function ($m) {
+//        var_dump(preg_match('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', $message, $matches));
+//        var_dump($matches);
+//        var_dump($message);
+        $message = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', static function ($m) {
+//            var_dump('callback');
+//            var_dump($m);
             return class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0];
         }, $message);
+//        var_dump($message);
+
+        return $message;
     }
 }

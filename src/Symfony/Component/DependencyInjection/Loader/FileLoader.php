@@ -294,6 +294,10 @@ abstract class FileLoader extends BaseFileLoader
 
             if ($r->isInstantiable() || $r->isInterface()) {
                 $classes[$class] = null;
+            } elseif (!$r->isInstantiable() && !$this->container->has($class)) {
+                $this->container->register($class, $class)
+                    ->setAutoconfigured(true)
+                    ->addTag('container.excluded');
             }
 
             if ($autoconfigureAttributes && !$r->isInstantiable()) {

@@ -35,9 +35,9 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             (?:\/\/.*)                     # Lines that start with comments
         |
             (?:
-                \'(?:[^\'\\\\]|\\\\.)*\'   # Strings enclosed in single quotes
+                \'(?:[^\'\\\\\n]|\\\\.)*\'   # Strings enclosed in single quotes
             |
-                "(?:[^"\\\\]|\\\\.)*"      # Strings enclosed in double quotes
+                "(?:[^"\\\\\n]|\\\\.)*"      # Strings enclosed in double quotes
             )
         |
             (?:                            # Import statements (script captured)
@@ -49,7 +49,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             |
                 \bimport\(
             )
-            \s*[\'"`](\.\/[^\'"`]+|(\.\.\/)*[^\'"`]+)[\'"`]\s*[;\)]
+            \s*[\'"`](\.\/[^\'"`\n]+|(\.\.\/)*[^\'"`\n]+)[\'"`]\s*[;\)]
         ?
     /mx';
 

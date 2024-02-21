@@ -19,6 +19,8 @@ namespace Symfony\Component\Uid;
 class UuidV4 extends Uuid
 {
     protected const TYPE = 4;
+
+    /** @var int<0, max> */
     private static ?int $PID = null;
 
     public function __construct(?string $uuid = null)

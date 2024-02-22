@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -53,12 +54,27 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
 
         $generator = new ConfigBuilderGenerator($buildDir);
 
-        foreach ($this->kernel->getBundles() as $bundle) {
-            $extension = $bundle->getContainerExtension();
-            if (null === $extension) {
-                continue;
-            }
+        if ($this->kernel instanceof Kernel) {
+            /** @var ContainerBuilder $container */
+            $container = \Closure::bind(function (Kernel $kernel) {
+                $containerBuilder = $kernel->getContainerBuilder();
+                $kernel->prepareContainer($containerBuilder);
 
+                return $containerBuilder;
+            }, null, $this->kernel)($this->kernel);
+
+            $extensions = $container->getExtensions();
+        } else {
+            $extensions = [];
+            foreach ($this->kernel->getBundles() as $bundle) {
+                $extension = $bundle->getContainerExtension();
+                if (null !== $extension) {
+                    $extensions[] = $extension;
+                }
+            }
+        }
+
+        foreach ($extensions as $extension) {
             try {
                 $this->dumpExtension($extension, $generator);
             } catch (\Exception $e) {

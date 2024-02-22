@@ -16,6 +16,8 @@ use Doctrine\DBAL\Schema\Table;
 /**
  * Uses PostgreSQL LISTEN/NOTIFY to push messages to workers.
  *
+ * If you do not want to use the LISTEN mechanism, set the `use_notify` option to `false` when calling DoctrineTransportFactory::createTransport.
+ *
  * @internal
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -23,12 +25,10 @@ use Doctrine\DBAL\Schema\Table;
 final class PostgreSqlConnection extends Connection
 {
     /**
-     * * use_notify: Set to false to disable the use of LISTEN/NOTIFY. Default: true
      * * check_delayed_interval: The interval to check for delayed messages, in milliseconds. Set to 0 to disable checks. Default: 60000 (1 minute)
      * * get_notify_timeout: The length of time to wait for a response when calling PDO::pgsqlGetNotify, in milliseconds. Default: 0.
      */
     protected const DEFAULT_OPTIONS = parent::DEFAULT_OPTIONS + [
-        'use_notify' => true,
         'check_delayed_interval' => 60000,
         'get_notify_timeout' => 0,
     ];

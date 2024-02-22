@@ -32,6 +32,9 @@ class DoctrineTransportFactory implements TransportFactoryInterface
         $this->registry = $registry;
     }
 
+    /**
+     * @param array $options You can set 'use_notify' to false to not use LISTEN/NOTIFY with postgresql
+     */
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         $useNotify = ($options['use_notify'] ?? true);

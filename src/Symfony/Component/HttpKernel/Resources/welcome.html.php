@@ -178,7 +178,7 @@ SVG;
 
         @media (min-width: 768px) {
             @keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
-            .sf-toolbar { opacity: 0; animation: fade-in 1s .2s forwards; z-index: 99999; }
+            .sf-toolbar { opacity: 0; animation: fade-in 1s .2s forwards; position: relative; z-index: 99999; }
             @media (prefers-reduced-motion) {
                 .sf-toolbar { animation: none !important; opacity: 1; }
             }

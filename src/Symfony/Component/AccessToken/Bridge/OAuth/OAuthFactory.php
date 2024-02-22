@@ -23,7 +23,6 @@ use Symfony\Component\AccessToken\Exception\InvalidArgumentException;
  */
 class OAuthFactory implements FactoryInterface
 {
-    #[\Override]
     public function createCredentials(Dsn $dsn): CredentialsInterface
     {
         $grantType = $dsn->getOption('grant_type') ?? 'client_credentials';

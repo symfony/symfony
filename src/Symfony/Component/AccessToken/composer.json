@@ -25,7 +25,7 @@
     },
     "require" : {
         "php" : ">=8.2",
-        "symfony/cache": "7.1",
+        "symfony/cache": "^7.1",
         "symfony/http-client": "^7.1",
         "symfony/lock": "^7.1"
     }

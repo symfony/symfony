@@ -22,13 +22,11 @@ use Symfony\Component\AccessToken\Credentials\BasicAuthCredentials;
  */
 class MockBasicAuthProvider implements ProviderInterface
 {
-    #[\Override]
     public function supports(CredentialsInterface $credentials): bool
     {
         return $credentials instanceof BasicAuthCredentials;
     }
 
-    #[\Override]
     public function getAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         \assert($credentials instanceof BasicAuthCredentials);
@@ -36,7 +34,6 @@ class MockBasicAuthProvider implements ProviderInterface
         return new AccessToken('get' . $credentials->getUsername());
     }
 
-    #[\Override]
     public function refreshAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         \assert($credentials instanceof BasicAuthCredentials);

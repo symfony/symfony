@@ -24,8 +24,7 @@ final class Dsn
         private readonly string $host,
         private readonly ?string $path = null,
         private readonly ?string $user = null,
-        #[\SensitiveParameter]
-        private readonly ?string $password = null,
+        #[\SensitiveParameter] private readonly ?string $password = null,
         private readonly ?int $port = null,
         private readonly array $query = [],
     ) {}

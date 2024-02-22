@@ -32,13 +32,11 @@ class LockAccessTokenManagerDecorator implements AccessTokenManagerInterface
         private int $lockTtl = 5,
     ) {}
 
-    #[\Override]
     public function createCredentials(string $uri): CredentialsInterface
     {
         return $this->decorated->createCredentials($uri);
     }
 
-    #[\Override]
     public function getAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         $id = $this->getLockId($credentials);
@@ -68,7 +66,6 @@ class LockAccessTokenManagerDecorator implements AccessTokenManagerInterface
         throw new RuntimeException('Could not acquire lock while fetching access token.');
     }
 
-    #[\Override]
     public function refreshAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         $id = $this->getLockId($credentials);
@@ -94,7 +91,6 @@ class LockAccessTokenManagerDecorator implements AccessTokenManagerInterface
         }
     }
 
-    #[\Override]
     public function deleteAccessToken(CredentialsInterface $credentials): void
     {
         $id = $this->getLockId($credentials);

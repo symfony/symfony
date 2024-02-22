@@ -25,7 +25,6 @@ abstract class AbstractCredentials implements CredentialsInterface
      */
     protected abstract function computeId(): string;
 
-    #[\Override]
     public function getId(): string
     {
         return $this->id ??= $this->computeId();

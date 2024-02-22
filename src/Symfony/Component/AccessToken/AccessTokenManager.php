@@ -50,7 +50,6 @@ class AccessTokenManager implements AccessTokenManagerInterface
         }
     }
 
-    #[\Override]
     public function createCredentials(string $uri): CredentialsInterface
     {
         $dsn = Dsn::fromString($uri);
@@ -58,7 +57,6 @@ class AccessTokenManager implements AccessTokenManagerInterface
         return $this->getFactory($dsn)->createCredentials($dsn);
     }
 
-    #[\Override]
     public function getAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         $token = $this->getProvider($credentials)->getAccessToken($credentials);
@@ -66,13 +64,11 @@ class AccessTokenManager implements AccessTokenManagerInterface
         return $token->hasExpired() ? $this->refreshAccessToken($credentials) : $token;
     }
 
-    #[\Override]
     public function refreshAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         return $this->getProvider($credentials)->refreshAccessToken($credentials);
     }
 
-    #[\Override]
     public function deleteAccessToken(CredentialsInterface $credentials): void
     {
     }

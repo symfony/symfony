@@ -36,55 +36,46 @@ class AccessToken implements AccessTokenInterface
     ) {
     }
 
-    #[\Override]
     public function getType(): string
     {
         return $this->type;
     }
 
-    #[\Override]
     public function getValue(): string
     {
         return $this->value;
     }
 
-    #[\Override]
     public function getExpiresIn(): int
     {
         return $this->expiresIn;
     }
 
-    #[\Override]
     public function getIssuedAt(): \DateTimeImmutable
     {
         return $this->issuedAt;
     }
 
-    #[\Override]
     public function getExpiresAt(): \DateTimeImmutable
     {
         return $this->expiresAt ??= $this->issuedAt->add(new \DateInterval(sprintf('PT%dS', $this->expiresIn)));
     }
 
-    #[\Override]
     public function hasExpired(): bool
     {
         return $this->hasExpired ??= $this->hasExpiredAt(new \DateTimeImmutable());
     }
 
-    #[\Override]
     public function hasExpiredAt(\DateTimeInterface $date): bool
     {
         return $this->getExpiresAt() <= $date;
     }
 
-    #[\Override]
     public function getCredentialsId(): string
     {
         return $this->id;
     }
 
-    #[\Override]
     public function __toString(): string
     {
         return $this->value;

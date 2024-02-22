@@ -25,13 +25,11 @@ abstract class AbstractProvider implements ProviderInterface
      */
     abstract protected function fetchToken(CredentialsInterface $credentials): AccessTokenInterface;
 
-    #[\Override]
     public function getAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         return $this->fetchToken($credentials);
     }
 
-    #[\Override]
     public function refreshAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         return $this->fetchToken($credentials);

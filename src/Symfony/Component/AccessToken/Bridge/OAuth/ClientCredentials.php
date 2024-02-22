@@ -36,15 +36,11 @@ class ClientCredentials extends AbstractOAuthCredentials
         string|array|null $scope = null,
         ?string $endpoint = null,
     ) {
-        parent::__construct(
-            tenant: $tenant,
-            endpoint: $endpoint,
-        );
+        parent::__construct($tenant, $endpoint);
 
         $this->scope = \is_string($scope) ? array_filter(explode(' ', $scope)) : $scope;
     }
 
-    #[\Override]
     public function getGrantType(): string
     {
         return 'client_credentials';
@@ -77,7 +73,6 @@ class ClientCredentials extends AbstractOAuthCredentials
         );
     }
 
-    #[\Override]
     protected function computeId(): string
     {
         return md5($this->getEndpoint().$this->clientId.$this->getTenant().$this->getScopeAsString());

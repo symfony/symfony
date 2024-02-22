@@ -44,13 +44,11 @@ class ClientCredentialsProvider extends AbstractProvider
     ) {
     }
 
-    #[\Override]
     public function supports(CredentialsInterface $credentials): bool
     {
         return $credentials instanceof ClientCredentials;
     }
 
-    #[\Override]
     protected function fetchToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         \assert($credentials instanceof ClientCredentials);

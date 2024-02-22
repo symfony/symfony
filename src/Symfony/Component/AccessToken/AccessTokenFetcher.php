@@ -39,7 +39,9 @@ class AccessTokenFetcher
     }
 
     /**
-     * Get access token.
+     * Get access token using the user configured credentials.
+     *
+     * If a valid cached version exists, use it, otherwise fetch it from the remote service.
      */
     public function getAccessToken(): AccessTokenInterface
     {

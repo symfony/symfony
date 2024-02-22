@@ -33,7 +33,6 @@ class BasicAuthCredentials extends AbstractCredentials
         return $this->password;
     }
 
-    #[\Override]
     protected function computeId(): string
     {
         return $this->username;

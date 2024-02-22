@@ -45,13 +45,11 @@ class RefreshTokenProvider extends AbstractProvider
         private readonly HttpClientInterface $httpClient,
     ) {}
 
-    #[\Override]
     public function supports(CredentialsInterface $credentials): bool
     {
         return $credentials instanceof RefreshTokenCredentials;
     }
 
-    #[\Override]
     protected function fetchToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         \assert($credentials instanceof RefreshTokenCredentials);

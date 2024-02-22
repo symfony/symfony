@@ -29,13 +29,11 @@ class CacheAccessTokenManagerDecorator implements AccessTokenManagerInterface
         private readonly CacheInterface $cache,
     ) {}
 
-    #[\Override]
     public function createCredentials(string $uri): CredentialsInterface
     {
         return $this->decorated->createCredentials($uri);
     }
 
-    #[\Override]
     public function getAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         $id = $this->getCacheKey($credentials);
@@ -51,12 +49,11 @@ class CacheAccessTokenManagerDecorator implements AccessTokenManagerInterface
         );
     }
 
-    #[\Override]
     public function refreshAccessToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         $id = $this->getCacheKey($credentials);
 
-        $this->cache->delete($id); // Should be usless thanks to INF below.
+        $this->cache->delete($id); // Should be useless thanks to INF below.
 
         return $this->cache->get(
             $id,
@@ -70,7 +67,6 @@ class CacheAccessTokenManagerDecorator implements AccessTokenManagerInterface
         );
     }
 
-    #[\Override]
     public function deleteAccessToken(CredentialsInterface $credentials): void
     {
         $id = $this->getCacheKey($credentials);

@@ -68,8 +68,11 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->willReturnCallback(function ($path) {
                 return match ($path) {
                     '/project/assets/foo.js' => new MappedAsset('foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/foo.js'),
+                    '/project/assets/bootstrap.js' => new MappedAsset('bootstrap.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/bootstrap.js'),
                     '/project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
                     '/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
+                    '/project/assets/styles/app.css' => new MappedAsset('styles/app.css', '/can/be/anything.js', publicPathWithoutDigest: '/assets/styles/app.css'),
+                    '/project/assets/styles/app.scss' => new MappedAsset('styles/app.scss', '/can/be/anything.js', publicPathWithoutDigest: '/assets/styles/app.scss'),
                     '/project/assets/styles.css' => new MappedAsset('styles.css', '/can/be/anything.js', publicPathWithoutDigest: '/assets/styles.css'),
                     '/project/assets/vendor/module_in_importmap_remote.js' => new MappedAsset('module_in_importmap_remote.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/module_in_importmap_remote.js'),
                     '/project/assets/vendor/@popperjs/core.js' => new MappedAsset('assets/vendor/@popperjs/core.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/@popperjs/core.js'),
@@ -90,6 +93,26 @@ class JavaScriptImportPathCompilerTest extends TestCase
 
     public static function provideCompileTests(): iterable
     {
+        yield 'standard_symfony_app_js' => [
+            'input' => <<<EOF
+            import './bootstrap.js';
+
+            /*
+             * Welcome to your app's main JavaScript file!
+             *
+             * This file will be included onto the page via the importmap() Twig function,
+             * which should already be in your base.html.twig.
+             */
+            import './styles/app.css';
+
+            console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+            EOF,
+            'expectedJavaScriptImports' => [
+                '/assets/bootstrap.js' => ['lazy' => false, 'asset' => 'bootstrap.js', 'add' => true],
+                '/assets/styles/app.css' => ['lazy' => false, 'asset' => 'styles/app.css', 'add' => true],
+            ],
+        ];
+
         yield 'dynamic_simple_double_quotes' => [
             'input' => 'import("./other.js");',
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],

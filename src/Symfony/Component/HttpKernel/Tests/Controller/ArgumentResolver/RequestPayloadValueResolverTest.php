@@ -284,7 +284,7 @@ class RequestPayloadValueResolverTest extends TestCase
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
-            $this->assertSame('This value should be of type unknown.', $validationFailedException->getViolations()[0]->getMessage());
+            $this->assertSame('This value should be of type string.', $validationFailedException->getViolations()[0]->getMessage());
         }
     }
 

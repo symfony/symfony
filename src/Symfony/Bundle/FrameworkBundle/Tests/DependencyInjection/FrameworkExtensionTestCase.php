@@ -714,6 +714,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testAccessToken()
     {
+        if (!interface_exists(CredentialsInterface::class)) {
+            $this->markTestSkipped('AccessToken not available.');
+        }
+
         $container = $this->createContainerFromFile('access_token');
 
         $this->assertTrue($container->hasDefinition('access_token.manager'));
@@ -730,6 +734,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testAccessTokenDisabled()
     {
+        if (!interface_exists(CredentialsInterface::class)) {
+            $this->markTestSkipped('AccessToken not available.');
+        }
+
         $container = $this->createContainerFromFile('access_token_disabled');
 
         $this->assertFalse($container->hasDefinition('access_token.manager'));
@@ -737,6 +745,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testAccessTokenNoLock()
     {
+        if (!interface_exists(CredentialsInterface::class)) {
+            $this->markTestSkipped('AccessToken not available.');
+        }
+
         $container = $this->createContainerFromFile('access_token_no_lock');
 
         $this->assertTrue($container->hasDefinition('access_token.manager'));

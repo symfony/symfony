@@ -88,6 +88,7 @@ final class Transport
         Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
         Bridge\Smsbox\SmsboxTransportFactory::class,
         Bridge\Smsc\SmscTransportFactory::class,
+        Bridge\Smsense\SmsenseTransportFactory::class,
         Bridge\SmsFactor\SmsFactorTransportFactory::class,
         Bridge\Smsmode\SmsmodeTransportFactory::class,
         Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,

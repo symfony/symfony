@@ -69,7 +69,16 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
         $value = parent::reverseTransform($value);
         if (null !== $value && 1 !== $this->divisor) {
             $value = (string) ($value * $this->divisor);
-            $value = 'integer' === $this->modelType ? (int) $value : (float) $value;
+
+            if ('float' === $this->modelType) {
+                return (float) $value;
+            }
+
+            if ($value > \PHP_INT_MAX || $value < \PHP_INT_MIN) {
+                throw new TransformationFailedException(sprintf("The value '%d' is too large you should pass the 'model_type' to 'float'.", $value));
+            }
+
+            $value = (int) $value;
         }
 
         return $value;

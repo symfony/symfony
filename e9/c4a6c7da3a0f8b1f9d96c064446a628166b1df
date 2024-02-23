@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-02-14T14:28:55Z
+
+One question here: how confident are we that the new PHP method won't be changed between now and the PHP 8.4 feature freeze in a way that would break our child method ? Symfony 7.1 will be released 6 months before PHP 8.4.
+If we are not 100% confident, we should delay that to Symfony 7.2 to avoid making it impossible to make the component compatible with PHP 8.4 without BC break.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-14T14:51:52Z
+
+The only thing that could change is the return type of the native methods, which we already set (they're tentative-return-types in the engine for now). I'm 99.9% confident this is going to be compatible with 8.4 :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-02-22T22:00:03Z
+
+Just in case would it be possible to mark the methods experimental?

@@ -194,13 +194,13 @@ class ErrorHandlerTest extends TestCase
             $loggers = [
                 \E_DEPRECATED => [null, LogLevel::INFO],
                 \E_USER_DEPRECATED => [null, LogLevel::INFO],
-                \E_NOTICE => [$logger, LogLevel::WARNING],
+                \E_NOTICE => [$logger, LogLevel::ERROR],
                 \E_USER_NOTICE => [$logger, LogLevel::CRITICAL],
-                \E_STRICT => [null, LogLevel::WARNING],
-                \E_WARNING => [null, LogLevel::WARNING],
-                \E_USER_WARNING => [null, LogLevel::WARNING],
-                \E_COMPILE_WARNING => [null, LogLevel::WARNING],
-                \E_CORE_WARNING => [null, LogLevel::WARNING],
+                \E_STRICT => [null, LogLevel::ERROR],
+                \E_WARNING => [null, LogLevel::ERROR],
+                \E_USER_WARNING => [null, LogLevel::ERROR],
+                \E_COMPILE_WARNING => [null, LogLevel::ERROR],
+                \E_CORE_WARNING => [null, LogLevel::ERROR],
                 \E_USER_ERROR => [null, LogLevel::CRITICAL],
                 \E_RECOVERABLE_ERROR => [null, LogLevel::CRITICAL],
                 \E_COMPILE_ERROR => [null, LogLevel::CRITICAL],
@@ -431,13 +431,13 @@ class ErrorHandlerTest extends TestCase
         $loggers = [
             \E_DEPRECATED => [$bootLogger, LogLevel::INFO],
             \E_USER_DEPRECATED => [$bootLogger, LogLevel::INFO],
-            \E_NOTICE => [$bootLogger, LogLevel::WARNING],
-            \E_USER_NOTICE => [$bootLogger, LogLevel::WARNING],
-            \E_STRICT => [$bootLogger, LogLevel::WARNING],
-            \E_WARNING => [$bootLogger, LogLevel::WARNING],
-            \E_USER_WARNING => [$bootLogger, LogLevel::WARNING],
-            \E_COMPILE_WARNING => [$bootLogger, LogLevel::WARNING],
-            \E_CORE_WARNING => [$bootLogger, LogLevel::WARNING],
+            \E_NOTICE => [$bootLogger, LogLevel::ERROR],
+            \E_USER_NOTICE => [$bootLogger, LogLevel::ERROR],
+            \E_STRICT => [$bootLogger, LogLevel::ERROR],
+            \E_WARNING => [$bootLogger, LogLevel::ERROR],
+            \E_USER_WARNING => [$bootLogger, LogLevel::ERROR],
+            \E_COMPILE_WARNING => [$bootLogger, LogLevel::ERROR],
+            \E_CORE_WARNING => [$bootLogger, LogLevel::ERROR],
             \E_USER_ERROR => [$bootLogger, LogLevel::CRITICAL],
             \E_RECOVERABLE_ERROR => [$bootLogger, LogLevel::CRITICAL],
             \E_COMPILE_ERROR => [$bootLogger, LogLevel::CRITICAL],
@@ -658,7 +658,7 @@ class ErrorHandlerTest extends TestCase
 
         $logs = $logger->cleanLogs();
 
-        $this->assertSame('warning', $logs[0][0]);
+        $this->assertSame('error', $logs[0][0]);
         $this->assertSame('Warning: assert(): assert(false) failed', $logs[0][1]);
     }
 

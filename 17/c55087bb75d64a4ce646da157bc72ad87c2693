@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-02-02T16:27:46Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by jimiero at 2024-02-16T06:24:12Z
+
+> The class prefix should be `Smsense` to avoid having a package named `s-m-ense-notifier`
+
+Made the changes
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-16T06:35:12Z
+
+@jimiero Can you have a look at the tests, some are broken for this new notifier.
+
+---------------------------------------------------------------------------
+
+by jimiero at 2024-02-16T12:34:53Z
+
+> @jimiero Can you have a look at the tests, some are broken for this new notifier.
+
+Changed them and now the tests are not failing anymore.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-19T07:06:31Z
+
+@jimiero Tests are still broken apparently, see https://github.com/symfony/symfony/actions/runs/7955729597/job/21715188628?pr=53734#step:8:126
+
+---------------------------------------------------------------------------
+
+by jimiero at 2024-02-19T07:19:58Z
+
+> @jimiero Tests are still broken apparently, see https://github.com/symfony/symfony/actions/runs/7955729597/job/21715188628?pr=53734#step:8:126
+
+Works just fine if I do this instead
+
+`$response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $response->method('getContent')->willReturn(file_get_contents(__DIR__.'/Fixtures/success-response.json'));
+        $client = new MockHttpClient($response);
+        $transport = $this->createTransport($client);
+        $sentMessage = $transport->send(new SmsMessage('+40701111111', 'Hello!'));
+
+        $this->assertInstanceOf(SentMessage::class, $sentMessage);
+        $this->assertSame('63444830-5857-50da-d5f6-69f3719aa916', $sentMessage->getMessageId());`
+
+if I do:
+
+`$response = new JsonMockResponse(file_get_contents(__DIR__.'/Fixtures/success-response.json'));`
+
+it fails seems, any suggestions?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2024-02-19T08:48:54Z
+
+My bad with suggestion to use that version of mock, you put encoded body into json mock which expects to get php array instead.
+
+Either you can remove the fixture file and inject the php array into json mock or use again interface mock again.
+
+---------------------------------------------------------------------------
+
+by jimiero at 2024-02-19T08:54:48Z
+
+> My bad with suggestion to use that version of mock, you put encoded body into json mock which expects to get php array instead.
+>
+> Either you can remove the fixture file and inject the php array into json mock or use again interface mock again.
+
+Yep that was it, pushed changes by removing fixtures file and replaced JsonMockResponse input with a php array instead.

@@ -16,15 +16,15 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
+class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
 
@@ -73,6 +73,15 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             $this->connection->delete($this->findSqsReceivedStamp($envelope)->getId());
+        } catch (HttpException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        try {
+            $this->connection->keepalive($this->findSqsReceivedStamp($envelope)->getId(), $seconds);
         } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }

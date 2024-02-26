@@ -29,17 +29,8 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'protected_to_private' => false,
-        'native_constant_invocation' => ['strict' => false],
-        'no_superfluous_phpdoc_tags' => [
-            'remove_inheritdoc' => true,
-            'allow_unused_params' => true, // for future-ready params, to be replaced with https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues/7377
-        ],
-        'nullable_type_declaration_for_default_null_value' => true,
         'header_comment' => ['header' => $fileHeaderComment],
-        'modernize_strpos' => true,
-        'get_class_to_class_keyword' => true,
         'nullable_type_declaration' => true,
-        'ordered_types' => ['null_adjustment' => 'always_last', 'sort_algorithm' => 'none'],
         'trailing_comma_in_multiline' => ['elements' => ['arrays', 'match', 'parameters']],
     ])
     ->setRiskyAllowed(true)

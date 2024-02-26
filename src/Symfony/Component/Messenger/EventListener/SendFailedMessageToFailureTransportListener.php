@@ -49,6 +49,11 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
 
         $envelope = $event->getEnvelope();
 
+        // avoid re-sending to the failed sender
+        if (null !== $envelope->last(SentToFailureTransportStamp::class)) {
+            return;
+        }
+
         $envelope = $envelope->with(
             new SentToFailureTransportStamp($event->getReceiverName()),
             new DelayStamp(0),

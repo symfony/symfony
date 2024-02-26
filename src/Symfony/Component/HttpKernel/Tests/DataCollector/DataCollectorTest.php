@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\DataCollector\CloneVarDataCollector;
+use Symfony\Component\HttpKernel\Tests\Fixtures\UsePropertyInDestruct;
+use Symfony\Component\HttpKernel\Tests\Fixtures\WithPublicObjectProperty;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class DataCollectorTest extends TestCase
@@ -34,5 +36,57 @@ class DataCollectorTest extends TestCase
         $c->collect(new Request(), new Response());
 
         $this->assertSame($filePath, $c->getData()[0]);
+    }
+
+    public function testClassPublicObjectProperty()
+    {
+        $parent = new WithPublicObjectProperty();
+        $child = new WithPublicObjectProperty();
+
+        $child->parent = $parent;
+
+        $c = new CloneVarDataCollector($child);
+        $c->collect(new Request(), new Response());
+
+        $this->assertNotNull($c->getData()->parent);
+    }
+
+    public function testClassPublicObjectPropertyAsReference()
+    {
+        $parent = new WithPublicObjectProperty();
+        $child = new WithPublicObjectProperty();
+
+        $child->parent = &$parent;
+
+        $c = new CloneVarDataCollector($child);
+        $c->collect(new Request(), new Response());
+
+        $this->assertNotNull($c->getData()->parent);
+    }
+
+    public function testClassUsePropertyInDestruct()
+    {
+        $parent = new UsePropertyInDestruct();
+        $child = new UsePropertyInDestruct();
+
+        $child->parent = $parent;
+
+        $c = new CloneVarDataCollector($child);
+        $c->collect(new Request(), new Response());
+
+        $this->assertNotNull($c->getData()->parent);
+    }
+
+    public function testClassUsePropertyAsReferenceInDestruct()
+    {
+        $parent = new UsePropertyInDestruct();
+        $child = new UsePropertyInDestruct();
+
+        $child->parent = &$parent;
+
+        $c = new CloneVarDataCollector($child);
+        $c->collect(new Request(), new Response());
+
+        $this->assertNotNull($c->getData()->parent);
     }
 }

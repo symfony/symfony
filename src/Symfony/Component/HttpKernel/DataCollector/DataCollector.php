@@ -71,8 +71,15 @@ abstract class DataCollector implements DataCollectorInterface
             '*' => function ($v, array $a, Stub $s, $isNested) {
                 if (!$v instanceof Stub) {
                     foreach ($a as $k => $v) {
-                        if (\is_object($v) && !$v instanceof \DateTimeInterface && !$v instanceof Stub) {
+                        if (!\is_object($v) || $v instanceof \DateTimeInterface || $v instanceof Stub) {
+                            continue;
+                        }
+
+                        try {
                             $a[$k] = new CutStub($v);
+                        } catch (\TypeError) {
+                            $a[$k] = &$v;
+                            unset($v);
                         }
                     }
                 }

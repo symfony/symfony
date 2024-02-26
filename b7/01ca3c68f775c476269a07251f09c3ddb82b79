@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-02-17T13:12:24Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-19T12:44:06Z
+
+Thanks for the PR. Did you consider adding the logic to RegisterControllerArgumentLocatorsPass instead of adding a new pass?
+
+---------------------------------------------------------------------------
+
+by marein at 2024-02-19T19:36:59Z
+
+Yes, but since `RegisterControllerArgumentLocatorsPass` is already quite complex, its functionality seems independent and there's no performance penalty, I moved it to a new class. But I just took another look at it and saw that a few cases are missing in the new pass, e.g. `$class = $parameterBag->resolveValue($class);`. I don't have a strong opinion, so I'd roll with your suggestion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-20T13:03:46Z
+
+I'm for moving this into RegisterControllerArgumentLocatorsPass and adding tests only to the HttpKernel components, so that we don't have cross-packages issues in the CI. Works for you?
+
+---------------------------------------------------------------------------
+
+by marein at 2024-02-20T18:28:34Z
+
+Done. Failing `8.3` test shouldn't be related. I'd suggest adding a functional test, like in the first commit, to `FrameworkBundle` in `7.1` as this would have caught the bug. Let me know if I should open a pull request once everything is merged.
+
+Should I fix the `fabbot.io` suggestion? It's unrelated to the changes. Guess it's safe to do so.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-20T18:32:53Z
+
+Let's ignore fabbot indeed here. Can you please rebase for 6.4? Then OK for me for the integration tests. You'll then need to bump http-kernel to ^6.4.4 in the composer.json of framework-bundle

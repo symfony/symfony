@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-25T21:37:39Z
+
+Thanks for this! Did you report the issue to php-src? It should be fixed there ideally, and VarExporter could be showcased as the reproducer for them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-25T21:38:20Z
+
+I'm now seeing https://github.com/php/php-src/issues/13508 so I have my answer :)
+
+---------------------------------------------------------------------------
+
+by verfriemelt-dot-org at 2024-02-25T21:40:39Z
+
+i did :)
+maybe i am to tired after figuring all this out, but i really do not understand how i broke the test in the pipeline here? :thinking:

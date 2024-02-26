@@ -21,6 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ExtendedUninitializedProperty;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\LazyObject;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidMethods;
@@ -463,6 +464,14 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_CALL);
 
         $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
+    }
+
+    public function testIsReadableReturnsFalseIfInitializedLazyObjectPropertyDoesNotExist()
+    {
+        $object = new LazyObject();
+        $object->initializeLazyObject();
+
+        $this->assertFalse($this->propertyAccessor->isReadable($object, 'nonExistentProperty'));
     }
 
     /**

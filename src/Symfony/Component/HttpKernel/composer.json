@@ -38,7 +38,7 @@
         "symfony/process": "^5.4|^6.0|^7.0",
         "symfony/property-access": "^5.4.5|^6.0.5|^7.0",
         "symfony/routing": "^5.4|^6.0|^7.0",
-        "symfony/serializer": "^6.3|^7.0",
+        "symfony/serializer": "^6.4.4|^7.0.4",
         "symfony/stopwatch": "^5.4|^6.0|^7.0",
         "symfony/translation": "^5.4|^6.0|^7.0",
         "symfony/translation-contracts": "^2.5|^3",

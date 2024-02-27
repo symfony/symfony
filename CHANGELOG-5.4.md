@@ -7,6 +7,35 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.36 (2024-02-27)
+
+ * bug #54045 [Config][Messenger][Security] Don't turn deprecations into exceptions  when unserializing (nicolas-grekas)
+ * bug #54035 [DependencyInjection] Fix computing error messages involving service locators (nicolas-grekas)
+ * bug #53959 [Serializer] Fix unknown types normalization type when know type (Myks92)
+ * bug #53960 [Messenger] the 'use_notify' option is on the factory, not on the postgres connection (dbu)
+ * bug #54031 [ErrorHandler] Fix parsing messages that contain anonymous classes on PHP >= 8.3.3 (nicolas-grekas)
+ * bug #53967 [ErrorHandler] return the unchanged text if preg_replace_callback() fails (xabbuh)
+ * bug #54001 [Console] Fix display of Table on Windows OS  (VincentLanglet)
+ * bug #53989 [FrameworkBundle] Fix config builder with extensions extended in `build()` (HypeMC)
+ * bug #54004 [WebProfilerBundle] disable turbo in web profiler toolbar to avoid link prefetching (davidgorges)
+ * bug #53975 [Cache] explicitly cast boolean SSL stream options (xabbuh)
+ * bug #53913 [TwigBridge] Fix compat with Twig v3.9 (nicolas-grekas)
+ * bug #53944 [Messenger] Gracefully fallback to empty queue config (Wirone)
+ * bug #53934 [Mailer] Fix signed emails breaking the profiler (HypeMC)
+ * bug #53924 [FrameworkBundle] Check if the _route attribute exists on the request (xvilo)
+ * bug #53910 [Messenger] Fix SQS visibility_timeout type (valtzu)
+ * bug #53889 [HttpClient] Make retry strategy work again (Nyholm)
+ * bug #53755 [Validator] Fix fields without constraints in `Collection` (xabbuh, HypeMC)
+ * bug #53821 [Process] Fix Inconsistent Exit Status in proc_get_status for PHP Versions Below 8.3 (Luc45)
+ * bug #53792 [FrameworkBundle] Fix eager-loading of env vars in ConfigBuilderCacheWarmer (nicolas-grekas)
+ * bug #53785 [FrameworkBundle] Prevent silenced warning by checking if /proc/mount exists (shyim)
+ * bug #53730 [Messenger] [Beanstalkd] fix tube stats when it's empty (eminjk)
+ * bug #53754 [DoctrineBridge] forward-compatibility with field mappings in Doctrine ORM 4 (xabbuh)
+ * bug #53707 [Console] Fix color support for TTY output (theofidry)
+ * bug #53712 [Mailer] Fix usage of stream_set_timeout in case of microseconds (aleksejs1)
+ * bug #53715 [String] Fix plural of word ending by pus (Fan2Shrek)
+ * bug #53711 [Console] Allow false as a $shortcut in InputOption (jayminsilicon)
+
 * 5.4.35 (2024-01-30)
 
  * bug #52913 [Routing] Fixed priority getting lost when setting localized prefix (pritasil)

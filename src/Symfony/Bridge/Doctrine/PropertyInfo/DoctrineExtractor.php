@@ -279,7 +279,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     private static function getMappingValue(array|AssociationMapping|EmbeddedClassMapping|FieldMapping|JoinColumnMapping $mapping, string $key): mixed
     {
         if ($mapping instanceof AssociationMapping || $mapping instanceof EmbeddedClassMapping || $mapping instanceof FieldMapping || $mapping instanceof JoinColumnMapping) {
-            return $mapping->$key;
+            return $mapping->$key ?? null;
         }
 
         return $mapping[$key] ?? null;

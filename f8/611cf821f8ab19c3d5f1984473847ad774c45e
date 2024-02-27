@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-02-27T11:31:49Z
+
+I forgot the case where many checks fail at once; adding a test. This will also solve https://github.com/symfony/symfony/pull/54062#discussion_r1504022018.

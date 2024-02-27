@@ -239,7 +239,7 @@ class PdoStore implements PersistingStoreInterface
             'sqlite' => str_contains($exception->getMessage(), 'no such table:'),
             'oci' => 942 === $code,
             'sqlsrv' => 208 === $code,
-            'mysql' => 1146 === $code,
+            'mysql' => '42S02' === $code,
             default => false,
         };
     }

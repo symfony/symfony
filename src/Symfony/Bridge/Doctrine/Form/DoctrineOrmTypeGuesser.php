@@ -208,7 +208,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     private static function getMappingValue($mapping, string $key)
     {
         if ($mapping instanceof JoinColumnMapping) {
-            return $mapping->$key;
+            return $mapping->$key ?? null;
         }
 
         return $mapping[$key] ?? null;

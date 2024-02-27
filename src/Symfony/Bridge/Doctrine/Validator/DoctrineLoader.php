@@ -148,7 +148,7 @@ final class DoctrineLoader implements LoaderInterface
     private static function getFieldMappingValue($mapping, string $key)
     {
         if ($mapping instanceof FieldMapping) {
-            return $mapping->$key;
+            return $mapping->$key ?? null;
         }
 
         return $mapping[$key] ?? null;

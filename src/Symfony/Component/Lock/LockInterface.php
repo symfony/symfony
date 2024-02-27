@@ -23,12 +23,13 @@ use Symfony\Component\Lock\Exception\LockReleasingException;
 interface LockInterface
 {
     /**
-     * Acquires the lock. If the lock is acquired by someone else, the parameter `blocking` determines whether or not
+     * Acquires the lock. If the lock is acquired by someone else, the parameter `blocking` determines whether
      * the call should block until the release of the lock.
      *
      * @return bool
      *
-     * @throws LockConflictedException If the lock is acquired by someone else in blocking mode
+     * @throws LockConflictedException If the lock is acquired by someone else or if the underlying blocking lock
+     *                                 store couldn't acquire the lock in blocking mode
      * @throws LockAcquiringException  If the lock cannot be acquired
      */
     public function acquire(bool $blocking = false);
@@ -44,7 +45,7 @@ interface LockInterface
     public function refresh(?float $ttl = null);
 
     /**
-     * Returns whether or not the lock is acquired.
+     * Returns whether the lock is acquired.
      *
      * @return bool
      */

@@ -37,7 +37,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCachePass;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 
 // Help opcache.preload discover always-needed symbols
@@ -278,9 +277,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * @internal
+     *
+     * @deprecated since Symfony 7.1, to be removed in 8.0
      */
     public function setAnnotatedClassCache(array $annotatedClasses): void
     {
+        trigger_deprecation('symfony/http-kernel', '7.1', 'The "%s()" method is deprecated since Symfony 7.1 and will be removed in 8.0.', __METHOD__);
+
         file_put_contents(($this->warmupDir ?: $this->getBuildDir()).'/annotations.map', sprintf('<?php return %s;', var_export($annotatedClasses, true)));
     }
 
@@ -314,9 +317,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * Gets the patterns defining the classes to parse and cache for annotations.
      *
      * @return string[]
+     *
+     * @deprecated since Symfony 7.1, to be removed in 8.0
      */
     public function getAnnotatedClassesToCompile(): array
     {
+        trigger_deprecation('symfony/http-kernel', '7.1', 'The "%s()" method is deprecated since Symfony 7.1 and will be removed in 8.0.', __METHOD__);
+
         return [];
     }
 
@@ -590,8 +597,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $container->addObjectResource($this);
         $this->prepareContainer($container);
         $this->registerContainerConfiguration($this->getContainerLoader($container));
-
-        $container->addCompilerPass(new AddAnnotatedClassesToCachePass($this));
 
         return $container;
     }

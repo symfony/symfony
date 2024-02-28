@@ -49,6 +49,7 @@ class Connection implements ResetInterface
         'queue_name' => 'default',
         'redeliver_timeout' => 3600,
         'auto_setup' => true,
+        'skip_locked' => false,
     ];
 
     /**
@@ -61,6 +62,7 @@ class Connection implements ResetInterface
      * * queue_name: name of the queue
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default: 3600
      * * auto_setup: Whether the table should be created automatically during send / get. Default: true
+     * * skip_locked: Whether to add SKIP LOCKED clause to FOR UPDATE when receiving. Default: false
      */
     protected array $configuration;
     protected DBALConnection $driverConnection;
@@ -208,6 +210,11 @@ class Connection implements ResetInterface
             // use SELECT ... FOR UPDATE to lock table
             if (!method_exists(QueryBuilder::class, 'forUpdate')) {
                 $sql .= ' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL();
+            }
+
+            if ($this->configuration['skip_locked']) {
+                // TODO add exception for drivers that do not support SKIP LOCKED
+                $sql .= ' SKIP LOCKED';
             }
 
             $stmt = $this->executeQuery(

@@ -99,6 +99,38 @@ class ConnectionTest extends TestCase
         $this->assertNull($doctrineEnvelope);
     }
 
+    public function testGetWithSkipLocked()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+        $stmt = $this->getResultMock(false);
+
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('SELECT');
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $driverConnection->expects($this->never())
+            ->method('update');
+        $driverConnection
+            ->method('executeQuery')
+            ->with($this->callback(function ($sql) {
+                return strpos($sql, 'SKIP LOCKED') !== false;
+            }))
+            ->willReturn($stmt);
+
+        $connection = new Connection(['skip_locked' => true], $driverConnection);
+        $doctrineEnvelope = $connection->get();
+        $this->assertNull($doctrineEnvelope);
+    }
+
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
         $this->expectException(TransportException::class);
@@ -362,14 +394,14 @@ class ConnectionTest extends TestCase
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
+        $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup, skip_locked]');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
+        $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup, skip_locked]');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
 

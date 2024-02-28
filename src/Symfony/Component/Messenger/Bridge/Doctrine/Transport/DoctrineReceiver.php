@@ -67,8 +67,17 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
 
     public function ack(Envelope $envelope): void
     {
+        $retries = 0;
+
+        ack:
         try {
             $this->connection->ack($this->findDoctrineReceivedStamp($envelope)->getId());
+        } catch (RetryableException $exception) {
+            if (++$retries <= self::MAX_RETRIES) {
+                goto ack;
+            }
+
+            throw $exception;
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -76,8 +85,17 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
 
     public function reject(Envelope $envelope): void
     {
+        $retries = 0;
+
+        reject:
         try {
             $this->connection->reject($this->findDoctrineReceivedStamp($envelope)->getId());
+        } catch (RetryableException $exception) {
+            if (++$retries <= self::MAX_RETRIES) {
+                goto reject;
+            }
+
+            throw $exception;
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

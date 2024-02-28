@@ -1296,8 +1296,8 @@ class FrameworkExtension extends Extension
                 $credentialsId,
                 (new Definition())
                     ->setClass(CredentialsInterface::class)
-                    ->setFactory([AccessTokenFetcher::class, 'createCredentialsWithUri'])
-                    ->setArguments([new Reference('access_token.manager'), $data['url']])
+                    ->setFactory([new Reference('access_token.manager'), 'createCredentials'])
+                    ->setArguments([$data['url']])
             );
 
             $container->setDefinition(

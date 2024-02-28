@@ -99,6 +99,6 @@ class ClientCredentialsProviderTest extends TestCase
 
         self::expectException(ProviderFetchException::class);
         self::expectExceptionMessageMatches('/provider expects .* credentials instances/');
-        $instance->getAccessToken(new BasicAuthCredentials($username));
+        $instance->getAccessToken(new BasicAuthCredentials('foo'));
     }
 }

@@ -23,22 +23,6 @@ class AccessTokenFetcher
     }
 
     /**
-     * Create instance using given URI.
-     */
-    public static function createWithUri(AccessTokenManagerInterface $accessTokenManager, #[\SensitiveParameter] string $uri): self
-    {
-        return new self($accessTokenManager, $accessTokenManager->createCredentials($uri));
-    }
-
-    /**
-     * Create credentials interface with given URI.
-     */
-    public static function createCredentialsWithUri(AccessTokenManagerInterface $accessTokenManager, #[\SensitiveParameter] string $uri): CredentialsInterface
-    {
-        return $accessTokenManager->createCredentials($uri);
-    }
-
-    /**
      * Get access token using the user configured credentials.
      *
      * If a valid cached version exists, use it, otherwise fetch it from the remote service.

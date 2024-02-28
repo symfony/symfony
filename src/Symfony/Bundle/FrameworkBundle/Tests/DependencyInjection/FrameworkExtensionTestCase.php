@@ -725,7 +725,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $credentialsDef = $container->getDefinition('access_token.fetcher.my_test_provider.credentials');
         $this->assertSame(CredentialsInterface::class, $credentialsDef->getClass());
-        $this->assertSame('oauth://user123:pass123@example.tld?scope=DoThis', $credentialsDef->getArgument(1));
+        $this->assertSame('oauth://user123:pass123@example.tld?scope=DoThis', $credentialsDef->getArgument(0));
 
         $fetcherDef = $container->getDefinition('access_token.fetcher.my_test_provider');
         $this->assertSame(AccessTokenFetcher::class, $fetcherDef->getClass());

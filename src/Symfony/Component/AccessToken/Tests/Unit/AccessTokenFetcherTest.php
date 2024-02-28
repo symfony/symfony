@@ -58,26 +58,4 @@ class AccessTokenFetcherTest extends TestCase
         $fetcher = new AccessTokenFetcher($manager, new BasicAuthCredentials('foo'));
         $fetcher->deleteAccessToken();
     }
-
-    public function testCreateWithUri(): void
-    {
-        $manager = $this->createMock(AccessTokenManagerInterface::class);
-        $manager->expects($this->never())->method('getAccessToken');
-        $manager->expects($this->never())->method('refreshAccessToken');
-
-        $fetcher = AccessTokenFetcher::createWithUri($manager, 'oauth://example.tld');
-        self::assertInstanceOf(AccessTokenFetcher::class, $fetcher);
-    }
-
-    public function testCreateCredentialsWithUri(): void
-    {
-        $manager = $this->createMock(AccessTokenManagerInterface::class);
-        $manager->expects($this->never())->method('getAccessToken');
-        $manager->expects($this->never())->method('refreshAccessToken');
-        $manager->expects($this->once())->method('createCredentials')->willReturn(new BasicAuthCredentials('some_user'));
-
-        $credentials = AccessTokenFetcher::createCredentialsWithUri($manager, 'oauth://example.tld');
-        self::assertInstanceOf(BasicAuthCredentials::class, $credentials);
-        self::assertSame('some_user', $credentials->getUsername());
-    }
 }

@@ -51,7 +51,9 @@ class ClientCredentialsProvider extends AbstractProvider
 
     protected function fetchToken(CredentialsInterface $credentials): AccessTokenInterface
     {
-        \assert($credentials instanceof ClientCredentials);
+        if (!$credentials instanceof ClientCredentials) {
+            throw new ProviderFetchException(sprintf('"%s" provider expects "%s" credentials instances.', self::class, ClientCredentials::class));
+        }
 
         if (!$endpointUrl = ($credentials->getEndpoint() ?? $this->getDefaultEndpointUrl($credentials))) {
             throw new ProviderFetchException('OAuth2 credentials are missing the endpoint URL.');

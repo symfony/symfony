@@ -91,4 +91,14 @@ class ClientCredentialsProviderTest extends TestCase
         self::expectExceptionMessageMatches('/OAuth2 token is missing from response/');
         $instance->getAccessToken((new OAuthFactory())->createCredentials(Dsn::fromString($dsn)));
     }
+
+    public function testRaiseErrorWhenNotClientCredentials(): void
+    {
+        $httpClient = new MockHttpClient();
+        $instance = new ClientCredentialsProvider($httpClient);
+
+        self::expectException(ProviderFetchException::class);
+        self::expectExceptionMessageMatches('/provider expects .* credentials instances/');
+        $instance->getAccessToken(new BasicAuthCredentials($username));
+    }
 }

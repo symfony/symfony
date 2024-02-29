@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 
 /**
  * Yields a service keyed by _controller and argument name.
@@ -61,10 +62,7 @@ final class ServiceValueResolver implements ValueResolverInterface
                 $message = sprintf('Cannot resolve %s: %s', $what, $message);
             }
 
-            $r = new \ReflectionProperty($e, 'message');
-            $r->setValue($e, $message);
-
-            throw $e;
+            throw new NearMissValueResolverException($message, $e->getCode(), $e);
         }
     }
 }

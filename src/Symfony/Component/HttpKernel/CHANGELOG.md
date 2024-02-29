@@ -7,6 +7,7 @@ CHANGELOG
  * Add method `isKernelTerminating()` to `ExceptionEvent` that allows to check if an exception was thrown while the kernel is being terminated
  * Add `HttpException::fromStatusCode()`
  * Add `$validationFailedStatusCode` argument to `#[MapQueryParameter]` that allows setting a custom HTTP status code when validation fails
+ * `NearMissValueResolverException` is introduced that lets value resolvers tell when an argument could be under their watch but failed to be resolved
 
 7.0
 ---

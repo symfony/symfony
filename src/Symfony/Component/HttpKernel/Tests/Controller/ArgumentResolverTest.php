@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeVal
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\ResolverNotFoundException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingSession;
@@ -179,10 +180,11 @@ class ArgumentResolverTest extends TestCase
 
     public function testIfExceptionIsThrownWhenMissingAnArgument()
     {
-        $this->expectException(\RuntimeException::class);
         $request = Request::create('/');
         $controller = (new ArgumentResolverTestController())->controllerWithFoo(...);
 
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Controller "Closure" requires the "$foo" argument that could not be resolved. Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.');
         self::getResolver()->getArguments($request, $controller);
     }
 
@@ -343,6 +345,68 @@ class ArgumentResolverTest extends TestCase
         $controller = (new ArgumentResolverTestController())->controllerTargetingUnknownResolver(...);
 
         $this->expectException(ResolverNotFoundException::class);
+        $resolver->getArguments($request, $controller);
+    }
+
+    public function testResolversChainCompletionWhenResolverThrowsSpecialException()
+    {
+        $failingValueResolver = new class() implements ValueResolverInterface {
+            public function resolve(Request $request, ArgumentMetadata $argument): iterable
+            {
+                throw new NearMissValueResolverException('This resolver throws an exception');
+            }
+        };
+        // Put failing value resolver in the beginning
+        $expectedToCallValueResolver = $this->createMock(ValueResolverInterface::class);
+        $expectedToCallValueResolver->expects($this->once())->method('resolve')->willReturn([123]);
+
+        $resolver = self::getResolver([$failingValueResolver, ...ArgumentResolver::getDefaultArgumentValueResolvers(), $expectedToCallValueResolver]);
+        $request = Request::create('/');
+        $controller = [new ArgumentResolverTestController(), 'controllerWithFoo'];
+
+        $actualArguments = $resolver->getArguments($request, $controller);
+        self::assertEquals([123], $actualArguments);
+    }
+
+    public function testExceptionListSingle()
+    {
+        $failingValueResolverOne = new class() implements ValueResolverInterface {
+            public function resolve(Request $request, ArgumentMetadata $argument): iterable
+            {
+                throw new NearMissValueResolverException('Some reason why value could not be resolved.');
+            }
+        };
+
+        $resolver = self::getResolver([$failingValueResolverOne]);
+        $request = Request::create('/');
+        $controller = [new ArgumentResolverTestController(), 'controllerWithFoo'];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolverTestController::controllerWithFoo" requires the "$foo" argument that could not be resolved. Some reason why value could not be resolved.');
+        $resolver->getArguments($request, $controller);
+    }
+
+    public function testExceptionListMultiple()
+    {
+        $failingValueResolverOne = new class() implements ValueResolverInterface {
+            public function resolve(Request $request, ArgumentMetadata $argument): iterable
+            {
+                throw new NearMissValueResolverException('Some reason why value could not be resolved.');
+            }
+        };
+        $failingValueResolverTwo = new class() implements ValueResolverInterface {
+            public function resolve(Request $request, ArgumentMetadata $argument): iterable
+            {
+                throw new NearMissValueResolverException('Another reason why value could not be resolved.');
+            }
+        };
+
+        $resolver = self::getResolver([$failingValueResolverOne, $failingValueResolverTwo]);
+        $request = Request::create('/');
+        $controller = [new ArgumentResolverTestController(), 'controllerWithFoo'];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolverTestController::controllerWithFoo" requires the "$foo" argument that could not be resolved. Possible reasons: 1) Some reason why value could not be resolved. 2) Another reason why value could not be resolved.');
         $resolver->getArguments($request, $controller);
     }
 }

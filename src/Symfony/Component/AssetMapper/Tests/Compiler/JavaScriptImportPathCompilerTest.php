@@ -641,4 +641,23 @@ class JavaScriptImportPathCompilerTest extends TestCase
         // should not be caught.
         $this->assertSame($content, $compiled);
     }
+
+    public function testCompilerThrowsExceptionOnPcreError()
+    {
+        $compiler = new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class));
+        $content = str_repeat('foo "import *  ', 50);
+        $javascriptAsset = new MappedAsset('app.js', '/project/assets/app.js', publicPathWithoutDigest: '/assets/app.js');
+        $assetMapper = $this->createMock(AssetMapperInterface::class);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to compile JavaScript import paths in "/project/assets/app.js". Error: "Backtrack limit exhausted".');
+
+        $limit = \ini_get('pcre.backtrack_limit');
+        ini_set('pcre.backtrack_limit', 10);
+        try {
+            $compiler->compile($content, $javascriptAsset, $assetMapper);
+        } finally {
+            ini_set('pcre.backtrack_limit', $limit);
+        }
+    }
 }

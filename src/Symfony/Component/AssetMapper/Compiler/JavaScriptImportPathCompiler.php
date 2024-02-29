@@ -115,7 +115,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);
 
             return str_replace($importedModule, $relativeImportPath, $fullImportString);
-        }, $content, -1, $count, \PREG_OFFSET_CAPTURE);
+        }, $content, -1, $count, \PREG_OFFSET_CAPTURE) ?? throw new RuntimeException(sprintf('Failed to compile JavaScript import paths in "%s". Error: "%s".', $asset->sourcePath, preg_last_error_msg()));
     }
 
     public function supports(MappedAsset $asset): bool

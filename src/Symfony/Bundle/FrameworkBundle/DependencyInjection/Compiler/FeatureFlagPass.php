@@ -37,7 +37,7 @@ class FeatureFlagPass implements CompilerPassInterface
 
             foreach ($tags as $tag) {
                 $featureName = ($tag['feature'] ?? '') ?: $className;
-                if (array_key_exists($featureName, $features)) {
+                if (\array_key_exists($featureName, $features)) {
                     throw new \RuntimeException(sprintf('Feature "%s" already defined.', $featureName));
                 }
 
@@ -47,7 +47,7 @@ class FeatureFlagPass implements CompilerPassInterface
                 }
 
                 $features[$featureName] = $container->setDefinition(
-                    ".feature_flag.feature",
+                    '.feature_flag.feature',
                     (new Definition(\Closure::class))
                         ->setLazy(true)
                         ->setFactory([\Closure::class, 'fromCallable'])
@@ -74,7 +74,8 @@ class FeatureFlagPass implements CompilerPassInterface
             ;
         }
     }
-    private function getServiceClass(ContainerBuilder $container, string $serviceId): string|null
+
+    private function getServiceClass(ContainerBuilder $container, string $serviceId): ?string
     {
         while (true) {
             $definition = $container->findDefinition($serviceId);

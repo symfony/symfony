@@ -26,7 +26,7 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
     ) {
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
     }
 

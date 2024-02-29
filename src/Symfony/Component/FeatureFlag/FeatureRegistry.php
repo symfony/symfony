@@ -24,7 +24,7 @@ final class FeatureRegistry implements FeatureRegistryInterface
 
     public function has(string $id): bool
     {
-        return array_key_exists($id, $this->features);
+        return \array_key_exists($id, $this->features);
     }
 
     public function get(string $id): callable

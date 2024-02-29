@@ -21,7 +21,6 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('routing.expression_language_function', ['function' => 'is_feature_enabled'])
 
-
         ->set('feature_flag.routing_expression_language_function.get_value', \Closure::class)
             ->factory([\Closure::class, 'fromCallable'])
             ->args([

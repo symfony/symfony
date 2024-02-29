@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-02-27T09:54:02Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.4,".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2024-02-27T09:58:52Z
+
+I have also updated the https://regex101.com/r/1iBAIb/1 to https://regex101.com/r/1iBAIb/2 by adding the same change there.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2024-02-27T20:17:41Z
+
+Thanks for this :). Do we know if there is a test case that could be created to show the problem? Due to the complexity of this regex, we rely heavily on the tests to avoid regressions like this.
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2024-02-27T20:18:51Z
+
+@weaverryan The reproducer I created was in the linked issue https://github.com/symfony/symfony/issues/54078
+
+```
+symfony new . --version="6.4.*" --webapp
+php bin/console importmap:req @yaireo/tagify
+php bin/console importmap:update
+```
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2024-02-27T20:50:27Z
+
+If Im honest I dont really know what the root problem is enough to create some regression unit tests sorry. I just stumbled on and reported the issue first once I had a reproducer, and used @nicolas-grekas provided solution as a PR when requested.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-27T20:56:21Z
+
+This happens because of big js files to parse with some content that trigger deep backtracking. Not easy to reliably test I fear...
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-29T04:27:43Z
+
+Thank you @PhilETaylor for this fix.
+We're trying to handle so many cases with a single regexp...
+
+Hopefully this one would bring us near the 99% we target, without having to implement a real JS parser (that would slow things down **a lot** for everyone)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-29T13:03:41Z
+
+> This happens because of big js files to parse with some content that trigger deep backtracking. Not easy to reliably test I fear...
+
+I experienced the bug right now, while updating a branch i was working on the ux website... Fixed locally with a dirty patch...
+
+```diff
+            $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);
+
+            return str_replace($importedModule, $relativeImportPath, $fullImportString);
+-        }, $content, -1, $count, \PREG_OFFSET_CAPTURE);
++        }, $content, -1, $count, \PREG_OFFSET_CAPTURE) ?? $content;
+    }
+```
+
+With your example i think i see the problem here ...  https://regex101.com/r/WueQkU/1
+
+<img width="300" alt="Capture d’écran 2024-02-29 à 14 00 57" src="https://github.com/symfony/symfony/assets/1359581/ebce55a8-986f-4b91-a263-6e7871d62941">
+
+.. and this file does not contains a single "`import`" 😭
+
+So what about we also add a pre-check and ignore files that do not contain "`import`" ?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-02-29T13:30:08Z
+
+@smnandre A `str_contains` check for `import` might indeed help for the case of files without any imports to exclude them faster. But I think we could still have such nasty backtracking for big JS files containing. So we need this PR.
+
+Btw, I just thought about a case not covered by the current regex. But I'll wait for this PR to be merged before doing my PR as they would conflict.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-29T14:08:04Z
+
+> So we need this PR.
+
+Of course! I just suggested an _additional_ check :)
+
+I'll open another one to throw an expression instead of returning null.

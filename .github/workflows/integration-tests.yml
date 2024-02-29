@@ -198,10 +198,14 @@ jobs:
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
 
-      - uses: marceloprado/has-changed-path@v1.0.1
+      - name: Check for changes in translation files
         id: changed-translation-files
-        with:
-          paths: src/**/Resources/translations/*.xlf
+        run: |
+          if git diff --quiet HEAD~1 HEAD -- 'src/**/Resources/translations/*.xlf'; then
+            echo "{changed}={true}" >> $GITHUB_OUTPUT
+          else
+            echo "{changed}={false}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Check Translation Status
         if: steps.changed-translation-files.outputs.changed == 'true'

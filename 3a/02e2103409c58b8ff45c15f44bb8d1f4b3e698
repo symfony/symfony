@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-02-27T09:07:04Z
+
+The settings that you've removed are all part of the `@Symfony` sets now?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-27T09:23:34Z
+
+I've just updated fabbot to use version 3.50.
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-02-27T22:17:39Z
+
+@derrabus yes, that's why it requires 3.50+

@@ -1040,7 +1040,7 @@ class OptionsResolver implements Options
             $invalidTypes = [];
 
             foreach ($this->allowedTypes[$option] as $type) {
-                if ($valid = is_scalar($type) && $this->verifyTypes($type, $value, $invalidTypes)) {
+                if ($valid = \is_scalar($type) && $this->verifyTypes($type, $value, $invalidTypes)) {
                     break;
                 }
             }
@@ -1050,7 +1050,7 @@ class OptionsResolver implements Options
                 if (!$fmtProvidedTypes) {
                     $invalidTypes = $this->allowedTypes[$option];
                     array_walk($invalidTypes, static function (&$item) {
-                        $item = is_scalar($item) ? null : gettype($item);
+                        $item = \is_scalar($item) ? null : \gettype($item);
                     });
                     throw new InvalidOptionsException(sprintf('The option "%s" contains invalid non-scalar type definitions : %s.', $this->formatOptions([$option]), implode(', ', array_unique($invalidTypes))));
                 }

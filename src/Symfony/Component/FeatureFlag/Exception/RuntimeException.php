@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\FeatureFlag\Exception;
 
-use Symfony\Component\Workflow\Exception\ExceptionInterface;
-
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

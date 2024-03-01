@@ -40,4 +40,22 @@ class AssetMapperRequireCommandTest extends TestCase
         $output = $commandTester->getDisplay();
         $this->assertStringContainsString('lodash', $output);
     }
+
+    public function testRequireWithInvalidResolverCommand()
+    {
+        $this->kernel->boot();
+        $application = new Application($this->kernel);
+        $command = $application->find('importmap:require');
+        $commandTester = new CommandTester($command);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The resolver "invalid" does not exist.');
+
+        $commandTester->execute([
+            'packages' => ['lodash'],
+            '--resolver' => 'invalid',
+        ]);
+
+        $this->assertSame(1, $commandTester->getStatusCode());
+    }
 }

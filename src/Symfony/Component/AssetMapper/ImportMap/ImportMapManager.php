@@ -192,6 +192,7 @@ class ImportMapManager
                 $resolvedPackage->version,
                 $resolvedPackage->requireOptions->packageModuleSpecifier,
                 $resolvedPackage->requireOptions->entrypoint,
+                $this->resolver->getAlias()
             );
             $importMapEntries->add($newEntry);
             $addedEntries[] = $newEntry;

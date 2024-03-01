@@ -17,8 +17,8 @@ class PackageResolverRegistry
 
     public function __construct(private ?PackageResolverInterface $defaultResolver = null, iterable $resolvers = [])
     {
-        foreach ($resolvers as $name => $resolver) {
-            $this->addResolver($name, $resolver);
+        foreach ($resolvers as $resolver) {
+            $this->addResolver($resolver);
         }
     }
 
@@ -27,9 +27,9 @@ class PackageResolverRegistry
         $this->defaultResolver = $defaultResolver;
     }
 
-    public function addResolver(string $name, PackageResolverInterface $resolver): void
+    public function addResolver(PackageResolverInterface $resolver): void
     {
-        $this->resolvers[$name] = $resolver;
+        $this->resolvers[$resolver->getAlias()] = $resolver;
     }
 
     public function getResolver(?string $name = null): PackageResolverInterface

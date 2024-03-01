@@ -32,9 +32,11 @@ class PackageResolverRegistryTest extends TestCase
     public function testCanAddAndRetrieveResolver(): void
     {
         $resolver = $this->createMock(PackageResolverInterface::class);
+        $resolver->expects($this->once())->method('getAlias')->willReturn('custom');
+
         $registry = new PackageResolverRegistry();
 
-        $registry->addResolver('custom', $resolver);
+        $registry->addResolver($resolver);
 
         $this->assertSame($resolver, $registry->getResolver('custom'));
     }

@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+        "psr/container": "^1.1|^2.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\FeatureFlag\\": "" },

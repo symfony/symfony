@@ -22,6 +22,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverRegistry;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\ResolvedImportMapPackage;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\Filesystem\Filesystem;
@@ -30,6 +31,7 @@ class ImportMapManagerTest extends TestCase
 {
     private AssetMapperInterface&MockObject $assetMapper;
     private PackageResolverInterface&MockObject $packageResolver;
+    private PackageResolverRegistry&MockObject $packageResolverRegistry;
     private ImportMapConfigReader&MockObject $configReader;
     private RemotePackageDownloader&MockObject $remotePackageDownloader;
     private ImportMapManager $importMapManager;
@@ -375,6 +377,11 @@ class ImportMapManagerTest extends TestCase
         $this->assetMapper = $this->createMock(AssetMapperInterface::class);
         $this->configReader = $this->createMock(ImportMapConfigReader::class);
         $this->packageResolver = $this->createMock(PackageResolverInterface::class);
+        $this->packageResolverRegistry = $this->createMock(PackageResolverRegistry::class);
+        $this->packageResolverRegistry->expects($this->any())
+            ->method('getResolver')
+            ->willReturn($this->packageResolver)
+        ;
         $this->remotePackageDownloader = $this->createMock(RemotePackageDownloader::class);
 
         // mock this to behave like normal
@@ -390,7 +397,7 @@ class ImportMapManagerTest extends TestCase
             $this->assetMapper,
             $this->configReader,
             $this->remotePackageDownloader,
-            $this->packageResolver,
+            $this->packageResolverRegistry,
         );
     }
 

@@ -15,7 +15,6 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,7 +34,6 @@ final class ImportMapRequireCommand extends Command
     public function __construct(
         private readonly ImportMapManager $importMapManager,
         private readonly ImportMapVersionChecker $importMapVersionChecker,
-        private readonly PackageResolverRegistry $resolverRegistry,
     ) {
         parent::__construct();
     }
@@ -46,7 +44,7 @@ final class ImportMapRequireCommand extends Command
             ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to add')
             ->addOption('entrypoint', null, InputOption::VALUE_NONE, 'Make the package(s) an entrypoint?')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The local path where the package lives relative to the project root')
-            ->addOption('resolver', null, InputOption::VALUE_REQUIRED, 'The alias of the package resolver to use', 'jsdelivr')
+            ->addOption('resolver', null, InputOption::VALUE_REQUIRED, 'The alias of the package resolver to use')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command adds packages to <comment>importmap.php</comment> usually
 by finding a CDN URL for the given package and version.
@@ -109,15 +107,11 @@ EOT
                 $parts['version'] ?? null,
                 $parts['alias'] ?? null,
                 $path,
+                $input->getOption('resolver'),
                 $input->getOption('entrypoint'),
             );
         }
 
-        $this->importMapManager->setResolver(
-            $this->resolverRegistry->getResolver(
-                $input->getOption('resolver')
-            )
-        );
         $newPackages = $this->importMapManager->require($packages);
 
         $this->renderVersionProblems($this->importMapVersionChecker, $output);

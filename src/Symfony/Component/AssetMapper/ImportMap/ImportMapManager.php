@@ -12,7 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\AssetMapperInterface;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverRegistry;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 /**
@@ -27,19 +27,8 @@ class ImportMapManager
         private readonly AssetMapperInterface $assetMapper,
         private readonly ImportMapConfigReader $importMapConfigReader,
         private readonly RemotePackageDownloader $packageDownloader,
-        private ?PackageResolverInterface $resolver = null,
+        private readonly PackageResolverRegistry $resolverRegistry,
     ) {
-    }
-
-    /**
-     * Sets the package resolver.
-     * This is useful when you want to customize the package resolution process.
-     *
-     * @param PackageResolverInterface $resolver
-     */
-    public function setResolver(PackageResolverInterface $resolver): void
-    {
-        $this->resolver = $resolver;
     }
 
     /**
@@ -123,6 +112,7 @@ class ImportMapManager
                     $entry->packageModuleSpecifier,
                     null,
                     $importName,
+                    resolver: $entry->resolverAlias,
                 );
 
                 // remove it: then it will be re-added
@@ -184,18 +174,28 @@ class ImportMapManager
             return $addedEntries;
         }
 
-        $resolvedPackages = $this->resolver->resolvePackages($packagesToRequire);
-        foreach ($resolvedPackages as $resolvedPackage) {
-            $newEntry = $this->importMapConfigReader->createRemoteEntry(
-                $resolvedPackage->requireOptions->importName,
-                $resolvedPackage->type,
-                $resolvedPackage->version,
-                $resolvedPackage->requireOptions->packageModuleSpecifier,
-                $resolvedPackage->requireOptions->entrypoint,
-                $this->resolver->getAlias()
-            );
-            $importMapEntries->add($newEntry);
-            $addedEntries[] = $newEntry;
+        // handle remote packages
+        $packages = [];
+        foreach ($packagesToRequire as $packageRequireOptions) {
+            $packages[$packageRequireOptions->resolver ?? 'default'][] = $packageRequireOptions;
+        }
+
+        foreach ($packages as $resolverAlias => $packagesToRequire) {
+            $resolver = $this->resolverRegistry->getResolver('default' === $resolverAlias ? null : $resolverAlias);
+            $resolvedPackages = $resolver->resolvePackages($packagesToRequire);
+
+            foreach ($resolvedPackages as $resolvedPackage) {
+                $newEntry = $this->importMapConfigReader->createRemoteEntry(
+                    $resolvedPackage->requireOptions->importName,
+                    $resolvedPackage->type,
+                    $resolvedPackage->version,
+                    $resolvedPackage->requireOptions->packageModuleSpecifier,
+                    $resolvedPackage->requireOptions->entrypoint,
+                    $resolver->getAlias()
+                );
+                $importMapEntries->add($newEntry);
+                $addedEntries[] = $newEntry;
+            }
         }
 
         return $addedEntries;

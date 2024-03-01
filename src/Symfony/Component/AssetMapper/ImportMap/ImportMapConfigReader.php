@@ -64,7 +64,8 @@ class ImportMapConfigReader
 
             $version = $data['version'] ?? null;
 
-            if (null === $version && null === $path) {
+            // At this point, the path is not set, so we must have a version
+            if (null === $version) {
                 throw new RuntimeException(sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
             }
 
@@ -98,8 +99,8 @@ class ImportMapConfigReader
                 $config['entrypoint'] = true;
             }
 
-            if ($entry->resolver) {
-                $config['resolver'] = $entry->resolver;
+            if ($entry->resolverAlias) {
+                $config['resolver'] = $entry->resolverAlias;
             }
 
             $importMapConfig[$entry->importName] = $config;

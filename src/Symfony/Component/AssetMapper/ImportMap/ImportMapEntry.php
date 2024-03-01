@@ -26,7 +26,7 @@ final class ImportMapEntry
          */
         public readonly string $path,
         public readonly bool $isEntrypoint,
-        public readonly ?string $resolver,
+        public readonly ?string $resolverAlias,
         /**
          * The version of the package (remote only).
          */

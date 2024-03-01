@@ -169,7 +169,7 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper'),
                 service('asset_mapper.importmap.config_reader'),
                 service('asset_mapper.importmap.remote_package_downloader'),
-                service('asset_mapper.importmap.resolver'),
+                service('asset_mapper.importmap.resolver_registry'),
             ])
         ->alias(ImportMapManager::class, 'asset_mapper.importmap.manager')
 
@@ -235,7 +235,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('asset_mapper.importmap.manager'),
                 service('asset_mapper.importmap.version_checker'),
-                service('asset_mapper.importmap.resolver_registry'),
             ])
             ->tag('console.command')
 

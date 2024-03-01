@@ -28,6 +28,7 @@ final class PackageRequireOptions
         public readonly ?string $versionConstraint = null,
         ?string $importName = null,
         public readonly ?string $path = null,
+        public readonly ?string $resolver = null,
         public readonly bool $entrypoint = false,
     ) {
         $this->importName = $importName ?: $packageModuleSpecifier;

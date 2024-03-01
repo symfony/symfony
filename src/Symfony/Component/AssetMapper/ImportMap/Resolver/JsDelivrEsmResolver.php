@@ -40,7 +40,6 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         $this->httpClient = $httpClient ?? HttpClient::create();
     }
 
-
     public function getAlias(): string
     {
         return 'jsdelivr';

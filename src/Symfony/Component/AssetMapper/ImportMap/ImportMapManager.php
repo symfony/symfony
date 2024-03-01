@@ -27,8 +27,19 @@ class ImportMapManager
         private readonly AssetMapperInterface $assetMapper,
         private readonly ImportMapConfigReader $importMapConfigReader,
         private readonly RemotePackageDownloader $packageDownloader,
-        private readonly PackageResolverInterface $resolver,
+        private ?PackageResolverInterface $resolver = null,
     ) {
+    }
+
+    /**
+     * Sets the package resolver.
+     * This is useful when you want to customize the package resolution process.
+     *
+     * @param PackageResolverInterface $resolver
+     */
+    public function setResolver(PackageResolverInterface $resolver): void
+    {
+        $this->resolver = $resolver;
     }
 
     /**

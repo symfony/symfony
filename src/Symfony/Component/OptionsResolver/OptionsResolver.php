@@ -431,9 +431,7 @@ class OptionsResolver implements Options
      * passed to the closure is the value of the option after validating it
      * and before normalizing it.
      *
-     * @param string          $package The name of the composer package that is triggering the deprecation
-     * @param string          $version The version of the package that introduced the deprecation
-     * @param string|\Closure $message The deprecation message to use
+     * @param string $package The name of the composer package that is triggering the deprecation
      *
      * @return $this
      */
@@ -932,8 +930,6 @@ class OptionsResolver implements Options
      *
      * @param bool $triggerDeprecation Whether to trigger the deprecation or not (true by default)
      *
-     * @return mixed
-     *
      * @throws AccessException           If accessing this method outside of
      *                                   {@link resolve()}
      * @throws NoSuchOptionException     If the option is not set
@@ -1040,7 +1036,7 @@ class OptionsResolver implements Options
             $invalidTypes = [];
 
             foreach ($this->allowedTypes[$option] as $type) {
-                if ($valid = is_scalar($type) && $this->verifyTypes($type, $value, $invalidTypes)) {
+                if ($valid = \is_scalar($type) && $this->verifyTypes($type, $value, $invalidTypes)) {
                     break;
                 }
             }
@@ -1050,7 +1046,7 @@ class OptionsResolver implements Options
                 if (!$fmtProvidedTypes) {
                     $invalidTypes = $this->allowedTypes[$option];
                     array_walk($invalidTypes, static function (&$item) {
-                        $item = is_scalar($item) ? null : gettype($item);
+                        $item = \is_scalar($item) ? null : \gettype($item);
                     });
                     throw new InvalidOptionsException(sprintf('The option "%s" contains invalid non-scalar type definitions : "%s".', $this->formatOptions([$option]), implode(', ', array_unique($invalidTypes))));
                 }
@@ -1276,7 +1272,7 @@ class OptionsResolver implements Options
     private function formatValue($value): string
     {
         if (\is_object($value)) {
-            return \get_class($value);
+            return $value::class;
         }
 
         if (\is_array($value)) {

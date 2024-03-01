@@ -17,7 +17,7 @@ use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverRegistry;
 
 class PackageResolverRegistryTest extends TestCase
 {
-    public function testCanSetDefaultResolver(): void
+    public function testCanSetDefaultResolver()
     {
         $defaultResolver = $this->createMock(PackageResolverInterface::class);
         $registry = new PackageResolverRegistry();
@@ -27,7 +27,7 @@ class PackageResolverRegistryTest extends TestCase
         $this->assertSame($defaultResolver, $registry->getResolver());
     }
 
-    public function testThrowsExceptionWhenNoDefaultResolverIsDefined(): void
+    public function testThrowsExceptionWhenNoDefaultResolverIsDefined()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('No default resolver is defined.');
@@ -36,7 +36,7 @@ class PackageResolverRegistryTest extends TestCase
         $registry->getResolver();
     }
 
-    public function testCanAddAndRetrieveResolver(): void
+    public function testCanAddAndRetrieveResolver()
     {
         $resolver = $this->createMock(PackageResolverInterface::class);
         $resolver->expects($this->once())->method('getAlias')->willReturn('custom');
@@ -48,7 +48,7 @@ class PackageResolverRegistryTest extends TestCase
         $this->assertSame($resolver, $registry->getResolver('custom'));
     }
 
-    public function testThrowsExceptionWhenResolverDoesNotExist(): void
+    public function testThrowsExceptionWhenResolverDoesNotExist()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The resolver "nonexistent" does not exist.');

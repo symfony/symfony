@@ -40,7 +40,6 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageStorage;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverRegistry;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\AssetMapper\Path\LocalPublicAssetsFilesystem;

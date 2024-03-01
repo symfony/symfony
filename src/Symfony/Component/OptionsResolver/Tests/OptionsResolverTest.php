@@ -2593,4 +2593,13 @@ class OptionsResolverTest extends TestCase
 
         $this->assertSame($expectedOptions, $actualOptions);
     }
+
+    public function testInvalidOptionsExceptionOnNonScalarAllowedTypesDefinitions()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('The option "foo" contains invalid non-scalar type definitions : array, object, NULL.');
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setAllowedTypes('foo', [[], $this, null]);
+        $this->resolver->resolve([]);
+    }
 }

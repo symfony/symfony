@@ -1040,15 +1040,22 @@ class OptionsResolver implements Options
             $invalidTypes = [];
 
             foreach ($this->allowedTypes[$option] as $type) {
-                if ($valid = $this->verifyTypes($type, $value, $invalidTypes)) {
+                if ($valid = is_scalar($type) && $this->verifyTypes($type, $value, $invalidTypes)) {
                     break;
                 }
             }
 
             if (!$valid) {
+                $fmtProvidedTypes = implode('|', array_keys($invalidTypes));
+                if (!$fmtProvidedTypes) {
+                    $invalidTypes = $this->allowedTypes[$option];
+                    array_walk($invalidTypes, static function (&$item) {
+                        $item = is_scalar($item) ? null : gettype($item);
+                    });
+                    throw new InvalidOptionsException(sprintf('The option "%s" contains invalid non-scalar type definitions : %s.', $this->formatOptions([$option]), implode(', ', array_unique($invalidTypes))));
+                }
                 $fmtActualValue = $this->formatValue($value);
                 $fmtAllowedTypes = implode('" or "', $this->allowedTypes[$option]);
-                $fmtProvidedTypes = implode('|', array_keys($invalidTypes));
                 $allowedContainsArrayType = \count(array_filter($this->allowedTypes[$option], static function ($item) {
                     return str_ends_with($item, '[]');
                 })) > 0;

@@ -172,8 +172,13 @@ class ImportMapConfigReader
         return \dirname($this->importMapConfigPath);
     }
 
+    /**
+     * @deprecated since Symfony 7.1, use ImportMapEntry::splitPackageNameAndFilePath() instead
+     */
     public static function splitPackageNameAndFilePath(string $packageName): array
     {
+        trigger_deprecation('symfony/asset-mapper', '7.1', 'The method "%s()" is deprecated and will be removed in 8.0. Use ImportMapEntry::splitPackageNameAndFilePath() instead.', __METHOD__);
+
         $filePath = '';
         $i = strpos($packageName, '/');
 

@@ -20,7 +20,8 @@
         "psr/container": "^1.1|^2.0"
     },
     "require-dev": {
-        "symfony/http-kernel": "^7.1"
+        "symfony/http-kernel": "^7.1",
+        "symfony/service-contracts": "^2.5|^3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\FeatureFlag\\": "" },

@@ -73,6 +73,13 @@ To add an importmap entry pointing to a local file, use the <info>path</info> op
 
     <info>php %command.full_name% "any_module_name" --path=./assets/some_file.js</info>
 
+To add an importmap entry pointing to a different resolver, use the <info>resolver</info> option:
+
+    <info>php %command.full_name% "any_module_name" --resolver=unpkg</info>
+
+The default resolver is <comment>jsdelivr</comment>. You can also set a different resolver
+in the <comment>importmap.php</comment> file.
+
 EOT
             );
     }

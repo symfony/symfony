@@ -973,7 +973,7 @@ class OptionsResolver implements Options
             }
 
             if (!\is_array($value)) {
-                throw new InvalidOptionsException(sprintf('The nested option "%s" with value "%s" is expected to be of type array, but is of type "%s".', $this->formatOptions([$option]), $this->formatValue($value), get_debug_type($value)));
+                throw new InvalidOptionsException(sprintf('The nested option "%s" with value %s is expected to be of type array, but is of type "%s".', $this->formatOptions([$option]), $this->formatValue($value), get_debug_type($value)));
             }
 
             // The following section must be protected from cyclic calls.
@@ -1048,7 +1048,7 @@ class OptionsResolver implements Options
                     array_walk($invalidTypes, static function (&$item) {
                         $item = \is_scalar($item) ? null : \gettype($item);
                     });
-                    throw new InvalidOptionsException(sprintf('The option "%s" contains invalid non-scalar type definitions : "%s".', $this->formatOptions([$option]), implode(', ', array_unique($invalidTypes))));
+                    throw new InvalidOptionsException(sprintf('The option "%s" contains invalid non-scalar type definitions : %s.', $this->formatOptions([$option]), implode(', ', array_unique($invalidTypes))));
                 }
                 $fmtActualValue = $this->formatValue($value);
                 $fmtAllowedTypes = implode('" or "', $this->allowedTypes[$option]);
@@ -1057,10 +1057,10 @@ class OptionsResolver implements Options
                 })) > 0;
 
                 if (\is_array($value) && $allowedContainsArrayType) {
-                    throw new InvalidOptionsException(sprintf('The option "%s" with value "%s" is expected to be of type "%s", but one of the elements is of type "%s".', $this->formatOptions([$option]), $fmtActualValue, $fmtAllowedTypes, $fmtProvidedTypes));
+                    throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but one of the elements is of type "%s".', $this->formatOptions([$option]), $fmtActualValue, $fmtAllowedTypes, $fmtProvidedTypes));
                 }
 
-                throw new InvalidOptionsException(sprintf('The option "%s" with value "%s" is expected to be of type "%s", but is of type "%s".', $this->formatOptions([$option]), $fmtActualValue, $fmtAllowedTypes, $fmtProvidedTypes));
+                throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but is of type "%s".', $this->formatOptions([$option]), $fmtActualValue, $fmtAllowedTypes, $fmtProvidedTypes));
             }
         }
 

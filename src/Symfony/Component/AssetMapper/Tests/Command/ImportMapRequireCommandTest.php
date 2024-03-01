@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\AssetMapper\Tests\Command;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 
-class AssetMapperRequireCommandTest extends TestCase
+class ImportMapRequireCommandTest extends TestCase
 {
     private AssetMapperTestAppKernel $kernel;
     private Filesystem $filesystem;

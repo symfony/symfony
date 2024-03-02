@@ -49,7 +49,6 @@ final class BrevoRequestParser extends AbstractRequestParser
             || !isset($content['email'])
             || !isset($content['message-id'])
             || !isset($content['ts_event'])
-            || !isset($content['tags'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }

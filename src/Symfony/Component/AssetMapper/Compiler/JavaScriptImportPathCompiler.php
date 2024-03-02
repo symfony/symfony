@@ -28,16 +28,15 @@ use Symfony\Component\Filesystem\Path;
 final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 {
     /**
-     * @see https://regex101.com/r/1iBAIb/1
+     * @see https://regex101.com/r/1iBAIb/2
      */
     private const IMPORT_PATTERN = '/
-        ^
-            (?:\/\/.*)                     # Lines that start with comments
+            ^(?:\/\/.*)                     # Lines that start with comments
         |
             (?:
-                \'(?:[^\'\\\\\n]|\\\\.)*\'   # Strings enclosed in single quotes
+                \'(?:[^\'\\\\\n]|\\\\.)*+\'   # Strings enclosed in single quotes
             |
-                "(?:[^"\\\\\n]|\\\\.)*"      # Strings enclosed in double quotes
+                "(?:[^"\\\\\n]|\\\\.)*+"      # Strings enclosed in double quotes
             )
         |
             (?:                            # Import statements (script captured)
@@ -49,7 +48,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             |
                 \bimport\(
             )
-            \s*[\'"`](\.\/[^\'"`\n]+|(\.\.\/)*[^\'"`\n]+)[\'"`]\s*[;\)]
+            \s*[\'"`](\.\/[^\'"`\n]++|(\.\.\/)*+[^\'"`\n]++)[\'"`]\s*[;\)]
         ?
     /mx';
 

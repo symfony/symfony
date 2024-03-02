@@ -404,7 +404,11 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                     $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], $filterContentHeaders);
                     $redirectHeaders['with_auth'] = array_filter($redirectHeaders['with_auth'], $filterContentHeaders);
 
-                    stream_context_set_option($context, ['http' => $options]);
+                    if (\PHP_VERSION_ID >= 80300) {
+                        stream_context_set_options($context, ['http' => $options]);
+                    } else {
+                        stream_context_set_option($context, ['http' => $options]);
+                    }
                 }
             }
 

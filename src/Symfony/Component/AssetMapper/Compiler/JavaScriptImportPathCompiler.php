@@ -58,7 +58,6 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         $jsParser = JavascriptParser::create($content);
 
         return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper, $jsParser) {
-
             $fullImportString = $matches[0][0];
 
             $jsParser->parseUntil($matches[0][1]);

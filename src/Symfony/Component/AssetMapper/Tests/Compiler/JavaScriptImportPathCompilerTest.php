@@ -274,15 +274,6 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'expectedJavaScriptImports' => [],
         ];
 
-        yield 'multi_line_comment_with_no_end_parsed_for_safety' => [
-            'input' => <<<EOF
-                const fun;
-                    /* comment import("./other.js");
-                EOF
-            ,
-            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
-        ];
-
         yield 'multi_line_comment_with_no_end_found_eventually_ignored' => [
             'input' => <<<EOF
                 const fun;

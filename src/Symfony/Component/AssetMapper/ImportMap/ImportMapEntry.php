@@ -26,6 +26,7 @@ final class ImportMapEntry
          */
         public readonly string $path,
         public readonly bool $isEntrypoint,
+        public readonly ?string $resolverAlias,
         /**
          * The version of the package (remote only).
          */
@@ -39,12 +40,12 @@ final class ImportMapEntry
 
     public static function createLocal(string $importName, ImportMapType $importMapType, string $path, bool $isEntrypoint): self
     {
-        return new self($importName, $importMapType, $path, $isEntrypoint, null, null);
+        return new self($importName, $importMapType, $path, $isEntrypoint, null, null, null);
     }
 
-    public static function createRemote(string $importName, ImportMapType $importMapType, string $path, string $version, string $packageModuleSpecifier, bool $isEntrypoint): self
+    public static function createRemote(string $importName, ImportMapType $importMapType, string $path, string $version, string $packageModuleSpecifier, bool $isEntrypoint, ?string $resolver = null): self
     {
-        return new self($importName, $importMapType, $path, $isEntrypoint, $version, $packageModuleSpecifier);
+        return new self($importName, $importMapType, $path, $isEntrypoint, $resolver, $version, $packageModuleSpecifier);
     }
 
     public function getPackageName(): string

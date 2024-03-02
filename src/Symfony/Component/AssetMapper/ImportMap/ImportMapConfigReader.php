@@ -41,7 +41,7 @@ class ImportMapConfigReader
 
         $entries = new ImportMapEntries();
         foreach ($importMapConfig ?? [] as $importName => $data) {
-            $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
+            $validKeys = ['path', 'version', 'type', 'resolver', 'entrypoint', 'package_specifier'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
             }
@@ -64,12 +64,14 @@ class ImportMapConfigReader
 
             $version = $data['version'] ?? null;
 
-            if (null === $version && null === $path) {
+            // At this point, the path is not set, so we must have a version
+            if (null === $version) {
                 throw new RuntimeException(sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
             }
 
             $packageModuleSpecifier = $data['package_specifier'] ?? $importName;
-            $entries->add($this->createRemoteEntry($importName, $type, $version, $packageModuleSpecifier, $isEntrypoint));
+            $resolverAlias = $data['resolver'] ?? null;
+            $entries->add($this->createRemoteEntry($importName, $type, $version, $packageModuleSpecifier, $isEntrypoint, $resolverAlias));
         }
 
         return $this->rootImportMapEntries = $entries;
@@ -95,6 +97,10 @@ class ImportMapConfigReader
             }
             if ($entry->isEntrypoint) {
                 $config['entrypoint'] = true;
+            }
+
+            if ($entry->resolverAlias) {
+                $config['resolver'] = $entry->resolverAlias;
             }
 
             $importMapConfig[$entry->importName] = $config;
@@ -127,11 +133,11 @@ class ImportMapConfigReader
         return $entries->has($moduleName) ? $entries->get($moduleName) : null;
     }
 
-    public function createRemoteEntry(string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint): ImportMapEntry
+    public function createRemoteEntry(string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint, ?string $resolver): ImportMapEntry
     {
         $path = $this->remotePackageStorage->getDownloadPath($packageModuleSpecifier, $type);
 
-        return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
+        return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint, $resolver);
     }
 
     /**

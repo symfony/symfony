@@ -44,6 +44,7 @@ final class ImportMapRequireCommand extends Command
             ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to add')
             ->addOption('entrypoint', null, InputOption::VALUE_NONE, 'Make the package(s) an entrypoint?')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The local path where the package lives relative to the project root')
+            ->addOption('resolver', null, InputOption::VALUE_REQUIRED, 'The alias of the package resolver to use')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command adds packages to <comment>importmap.php</comment> usually
 by finding a CDN URL for the given package and version.
@@ -71,6 +72,13 @@ You can also require multiple packages at once:
 To add an importmap entry pointing to a local file, use the <info>path</info> option:
 
     <info>php %command.full_name% "any_module_name" --path=./assets/some_file.js</info>
+
+To add an importmap entry pointing to a different resolver, use the <info>resolver</info> option:
+
+    <info>php %command.full_name% "any_module_name" --resolver=unpkg</info>
+
+The default resolver is <comment>jsdelivr</comment>. You can also set a different resolver
+in the <comment>importmap.php</comment> file.
 
 EOT
             );
@@ -106,6 +114,7 @@ EOT
                 $parts['version'] ?? null,
                 $parts['alias'] ?? null,
                 $path,
+                $input->getOption('resolver'),
                 $input->getOption('entrypoint'),
             );
         }

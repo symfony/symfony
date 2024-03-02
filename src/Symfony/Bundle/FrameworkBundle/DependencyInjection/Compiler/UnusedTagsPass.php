@@ -23,6 +23,7 @@ class UnusedTagsPass implements CompilerPassInterface
 {
     private const KNOWN_TAGS = [
         'asset_mapper.compiler',
+        'asset_mapper.importmap.resolver',
         'assets.package',
         'auto_alias',
         'cache.pool',

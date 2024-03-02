@@ -40,6 +40,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageStorage;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
+use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverRegistry;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\AssetMapper\Path\LocalPublicAssetsFilesystem;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
@@ -167,7 +168,7 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper'),
                 service('asset_mapper.importmap.config_reader'),
                 service('asset_mapper.importmap.remote_package_downloader'),
-                service('asset_mapper.importmap.resolver'),
+                service('asset_mapper.importmap.resolver_registry'),
             ])
         ->alias(ImportMapManager::class, 'asset_mapper.importmap.manager')
 
@@ -196,8 +197,17 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper.importmap.remote_package_downloader'),
             ])
 
-        ->set('asset_mapper.importmap.resolver', JsDelivrEsmResolver::class)
+        ->set('asset_mapper.importmap.resolver.jsdelivr', JsDelivrEsmResolver::class)
             ->args([service('http_client')])
+            ->tag('asset_mapper.importmap.resolver', ['alias' => 'jsdelivr'])
+
+        ->alias('asset_mapper.importmap.resolver', 'asset_mapper.importmap.resolver.jsdelivr')
+
+        ->set('asset_mapper.importmap.resolver_registry', PackageResolverRegistry::class)
+            ->args([
+                service('asset_mapper.importmap.resolver'),
+                tagged_iterator('asset_mapper.importmap.resolver', 'alias'),
+            ])
 
         ->set('asset_mapper.importmap.renderer', ImportMapRenderer::class)
             ->args([

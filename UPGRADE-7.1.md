@@ -1,6 +1,11 @@
 UPGRADE FROM 7.0 to 7.1
 =======================
 
+AssetMapper
+-----------
+
+ * Deprecate `ImportMapConfigReader::splitPackageNameAndFilePath()`, use `ImportMapEntry::splitPackageNameAndFilePath()` instead
+
 Cache
 -----
 

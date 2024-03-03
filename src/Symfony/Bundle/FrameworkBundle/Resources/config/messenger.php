@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\LockMiddleware;
 use Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
@@ -85,6 +86,11 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('monolog.logger', ['channel' => 'messenger'])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
+
+        ->set('messenger.middleware.lock_middleware', LockMiddleware::class)
+            ->args([
+                service('lock.factory')->nullOnInvalid(),
+            ])
 
         ->set('messenger.middleware.add_bus_name_stamp_middleware', AddBusNameStampMiddleware::class)
             ->abstract()

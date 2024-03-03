@@ -2168,6 +2168,7 @@ class FrameworkExtension extends Extension
                 ['id' => 'reject_redelivered_message_middleware'],
                 ['id' => 'dispatch_after_current_bus'],
                 ['id' => 'failed_message_processing_middleware'],
+                ['id' => 'lock_middleware'],
             ],
             'after' => [
                 ['id' => 'send_message'],

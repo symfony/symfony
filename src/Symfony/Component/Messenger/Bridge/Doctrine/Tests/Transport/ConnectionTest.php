@@ -100,9 +100,9 @@ class ConnectionTest extends TestCase
         $this->assertNull($doctrineEnvelope);
     }
 
-    public function testGetWithSkipLockedWithForUpdateMethod(): void
+    public function testGetWithSkipLockedWithForUpdateMethod()
     {
-        if (! method_exists(QueryBuilder::class, 'forUpdate')) {
+        if (!method_exists(QueryBuilder::class, 'forUpdate')) {
             $this->markTestSkipped('This test is for when forUpdate method exists.');
         }
 
@@ -131,7 +131,7 @@ class ConnectionTest extends TestCase
         $driverConnection
             ->method('executeQuery')
             ->with($this->callback(function ($sql) {
-                return strpos($sql, 'SKIP LOCKED') !== false;
+                return str_contains($sql, 'SKIP LOCKED');
             }))
             ->willReturn($stmt);
 
@@ -167,7 +167,7 @@ class ConnectionTest extends TestCase
         $driverConnection
             ->method('executeQuery')
             ->with($this->callback(function ($sql) {
-                return strpos($sql, 'SKIP LOCKED') !== false;
+                return str_contains($sql, 'SKIP LOCKED');
             }))
             ->willReturn($stmt);
 

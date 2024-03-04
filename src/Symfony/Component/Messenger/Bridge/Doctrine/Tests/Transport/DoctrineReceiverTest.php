@@ -219,7 +219,6 @@ class DoctrineReceiverTest extends TestCase
         $receiver->ack($envelope);
     }
 
-
     public function testReject()
     {
         $serializer = $this->createSerializer();

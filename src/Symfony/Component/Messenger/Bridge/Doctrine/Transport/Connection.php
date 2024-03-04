@@ -21,6 +21,7 @@ use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -188,12 +189,18 @@ class Connection implements ResetInterface
                     ->setParameters($query->getParameters(), $query->getParameterTypes());
 
                 if (method_exists(QueryBuilder::class, 'forUpdate')) {
-                    $query->forUpdate();
+                    $query->forUpdate($this->configuration['skip_locked']
+                        ? ConflictResolutionMode::SKIP_LOCKED
+                        : ConflictResolutionMode::ORDINARY
+                    );
                 }
 
                 $sql = $query->getSQL();
             } elseif (method_exists(QueryBuilder::class, 'forUpdate')) {
-                $query->forUpdate();
+                $query->forUpdate($this->configuration['skip_locked']
+                    ? ConflictResolutionMode::SKIP_LOCKED
+                    : ConflictResolutionMode::ORDINARY
+                );
                 try {
                     $sql = $query->getSQL();
                 } catch (DBALException $e) {
@@ -210,11 +217,10 @@ class Connection implements ResetInterface
             // use SELECT ... FOR UPDATE to lock table
             if (!method_exists(QueryBuilder::class, 'forUpdate')) {
                 $sql .= ' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL();
-            }
 
-            if ($this->configuration['skip_locked']) {
-                // TODO add exception for drivers that do not support SKIP LOCKED
-                $sql .= ' SKIP LOCKED';
+                if ($this->configuration['skip_locked']) {
+                    $sql .= ' SKIP LOCKED';
+                }
             }
 
             $stmt = $this->executeQuery(

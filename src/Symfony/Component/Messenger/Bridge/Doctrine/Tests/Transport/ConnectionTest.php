@@ -21,6 +21,7 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
+use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -99,8 +100,52 @@ class ConnectionTest extends TestCase
         $this->assertNull($doctrineEnvelope);
     }
 
-    public function testGetWithSkipLocked()
+    public function testGetWithSkipLockedWithForUpdateMethod(): void
     {
+        if (! method_exists(QueryBuilder::class, 'forUpdate')) {
+            $this->markTestSkipped('This test is for when forUpdate method exists.');
+        }
+
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+        $stmt = $this->getResultMock(false);
+
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('forUpdate')
+            ->with(ConflictResolutionMode::SKIP_LOCKED)
+            ->willReturn($queryBuilder);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('SELECT FOR UPDATE SKIP LOCKED');
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $driverConnection->expects($this->never())
+            ->method('update');
+        $driverConnection
+            ->method('executeQuery')
+            ->with($this->callback(function ($sql) {
+                return strpos($sql, 'SKIP LOCKED') !== false;
+            }))
+            ->willReturn($stmt);
+
+        $connection = new Connection(['skip_locked' => true], $driverConnection);
+        $doctrineEnvelope = $connection->get();
+        $this->assertNull($doctrineEnvelope);
+    }
+
+    public function testGetWithSkipLockedWithoutForUpdateMethod()
+    {
+        if (method_exists(QueryBuilder::class, 'forUpdate')) {
+            $this->markTestSkipped('This test is for when forUpdate method does not exist.');
+        }
+
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
         $stmt = $this->getResultMock(false);

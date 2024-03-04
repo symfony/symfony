@@ -7,6 +7,12 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.37 (2024-03-04)
+
+ * bug #54102 [HttpClient] Fix deprecation on PHP 8.3 (nicolas-grekas)
+ * bug #54081 [DoctrineBridge] Safeguard dynamic access to Doctrine metadata properties (derrabus)
+ * bug #54080 [Routing] Enhance error handling in StaticPrefixCollection for compatibility with libpcre2-10.43 (Lustmored)
+
 * 5.4.36 (2024-02-27)
 
  * bug #54045 [Config][Messenger][Security] Don't turn deprecations into exceptions  when unserializing (nicolas-grekas)

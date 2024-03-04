@@ -19,8 +19,9 @@ use Symfony\Component\Process\ExecutableFinder;
  */
 class ExecutableFinderTest extends TestCase
 {
-    protected function tearDown(): void {
-        putenv('PATH=' . ($_SERVER['PATH'] ?? $_SERVER['Path']));
+    protected function tearDown(): void
+    {
+        putenv('PATH='.($_SERVER['PATH'] ?? $_SERVER['Path']));
     }
 
     public function testFind()

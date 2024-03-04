@@ -64,7 +64,7 @@ class ImportMapConfigReader
 
             $version = $data['version'] ?? null;
 
-            if (null === $version && null === $path) {
+            if (null === $version) {
                 throw new RuntimeException(sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
             }
 

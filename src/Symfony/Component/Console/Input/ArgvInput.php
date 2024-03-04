@@ -47,6 +47,10 @@ class ArgvInput extends Input
     {
         $argv = $argv ?? $_SERVER['argv'] ?? [];
 
+        if (array_filter($argv, 'is_array')) {
+            throw new RuntimeException('Argument values expected to be all scalars, got array.');
+        }
+
         // strip the application name
         array_shift($argv);
 

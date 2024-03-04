@@ -327,6 +327,11 @@ class ArgvInputTest extends TestCase
                 new InputDefinition([new InputArgument('name', InputArgument::REQUIRED)]),
                 'Too many arguments, expected arguments "name".',
             ],
+            [
+                ['cli.php', ['array']],
+                new InputDefinition(),
+                'Argument values expected to be all scalars, got array.',
+            ],
         ];
     }
 

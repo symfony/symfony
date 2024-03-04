@@ -106,7 +106,7 @@ class AnnotationLoader implements LoaderInterface
 
             $accessorOrMutator = preg_match('/^(get|is|has|set)(.+)$/i', $method->name, $matches);
             if ($accessorOrMutator) {
-                $attributeName = lcfirst($matches[2]);
+                $attributeName = $reflectionClass->hasProperty($method->name) ? $method->name : lcfirst($matches[2]);
 
                 if (isset($attributesMetadata[$attributeName])) {
                     $attributeMetadata = $attributesMetadata[$attributeName];

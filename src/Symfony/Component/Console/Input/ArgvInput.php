@@ -40,9 +40,11 @@ use Symfony\Component\Console\Exception\RuntimeException;
  */
 class ArgvInput extends Input
 {
+    /** @var list<string> */
     private array $tokens;
     private array $parsed;
 
+    /** @param list<string>|null $argv */
     public function __construct(?array $argv = null, ?InputDefinition $definition = null)
     {
         $argv ??= $_SERVER['argv'] ?? [];
@@ -55,6 +57,7 @@ class ArgvInput extends Input
         parent::__construct($definition);
     }
 
+    /** @param list<string> $tokens */
     protected function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;

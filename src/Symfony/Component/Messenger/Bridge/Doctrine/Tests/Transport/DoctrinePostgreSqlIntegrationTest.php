@@ -66,6 +66,19 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->assertNull($this->connection->get());
     }
 
+    public function testSkipLocked()
+    {
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table', 'skip_locked' => true], $this->driverConnection);
+
+        $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+
+        $encoded = $connection->get();
+        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+
+        $this->assertNull($connection->get());
+    }
+
     private function createSchemaManager(): AbstractSchemaManager
     {
         return method_exists($this->driverConnection, 'createSchemaManager')

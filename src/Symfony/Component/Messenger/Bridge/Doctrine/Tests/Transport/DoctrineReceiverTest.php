@@ -195,7 +195,7 @@ class DoctrineReceiverTest extends TestCase
             ->with('1')
             ->willThrowException($deadlockException);
 
-        self::expectException($deadlockException::class);
+        self::expectException(TransportException::class);
         $receiver->ack($envelope);
     }
 
@@ -286,7 +286,7 @@ class DoctrineReceiverTest extends TestCase
             ->with('1')
             ->willThrowException($deadlockException);
 
-        self::expectException($deadlockException::class);
+        self::expectException(TransportException::class);
         $receiver->reject($envelope);
     }
 

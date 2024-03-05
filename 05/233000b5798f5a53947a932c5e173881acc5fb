@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2024-03-04T14:09:08Z
+
+As this changes default settings and will change output then it's BC break unfortunately IMO.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-03-04T14:20:18Z
+
+> As this changes default settings and will change output then it's BC break unfortunately IMO.
+
+I agree. We can't make that change on 6.4. And if we want to implement it in 7.1, the new behavior must be opt-in.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-04T20:06:40Z
+
+On my side I think we should consider this as a bugfix. The "BC break" aspect shouldn't impact production since the class is for mocks, so the risk is minimal IMHO. Also, this would fix the inconsistency with the "json" option, which does set the flag.

@@ -59,6 +59,22 @@ final class JsonMockResponseTest extends TestCase
         $this->assertSame('application/json', $response->getHeaders()['content-type'][0]);
     }
 
+    public function testJsonEncodeFloat()
+    {
+        $client = new MockHttpClient(new JsonMockResponse([
+            'foo' => 1.23,
+            'ccc' => 1.0,
+            'baz' => 10.,
+        ]));
+        $response = $client->request('GET', 'https://symfony.com');
+
+        $this->assertSame([
+            'foo' => 1.23,
+            'ccc' => 1.,
+            'baz' => 10.,
+        ], $response->toArray());
+    }
+
     /**
      * @dataProvider responseHeadersProvider
      */

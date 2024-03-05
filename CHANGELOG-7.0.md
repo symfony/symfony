@@ -7,6 +7,16 @@ in 7.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.0.0...v7.0.1
 
+* 7.0.5 (2024-03-04)
+
+ * bug #54113 [AssetMapper] Throw exception in Javascript compiler when PCRE error (smnandre)
+ * bug #54129 [Clock] Add attributes to support PHPUnit 10 + 11 (ruudk)
+ * bug #54079 [AssetMapper] Fix `JavaScriptImportPathCompiler` regression in regex (PhilETaylor)
+ * bug #54102 [HttpClient] Fix deprecation on PHP 8.3 (nicolas-grekas)
+ * bug #54089 [Mailer] [Brevo] Remove tags from mandatory event arguments (palgalik)
+ * bug #54081 [DoctrineBridge] Safeguard dynamic access to Doctrine metadata properties (derrabus)
+ * bug #54080 [Routing] Enhance error handling in StaticPrefixCollection for compatibility with libpcre2-10.43 (Lustmored)
+
 * 7.0.4 (2024-02-27)
 
  * bug #53985 [HttpKernel] Allow tagged controllers in ControllerResolver (marein)

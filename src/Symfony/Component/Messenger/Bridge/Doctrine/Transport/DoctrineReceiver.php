@@ -169,7 +169,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
                 goto retry;
             }
 
-            throw $exception;
+            throw new TransportException($exception->getMessage(), 0, $exception);
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

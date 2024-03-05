@@ -75,7 +75,7 @@ final class SlidingWindowLimiter implements LimiterInterface
                 $window->add($tokens);
 
                 if ($availableTokens === $tokens) {
-                    $resetDuration = $window->calculateTimeForTokens($this->limit, $tokens);
+                    $resetDuration = $window->calculateTimeForTokens($this->limit, $window->getHitCount());
                     $retryAfter = $now + $resetDuration;
                 } else {
                     $retryAfter = $now;

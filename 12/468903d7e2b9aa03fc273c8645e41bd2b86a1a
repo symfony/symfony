@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-07T21:25:41Z
+
+Could we leverage [ParameterBag::getString()](https://github.com/symfony/symfony/blob/87186b2c6956d9985c97a1004012ba477a4f72ea/src/Symfony/Component/HttpFoundation/ParameterBag.php#L128) that already do the following checks ?
+
+```php
+ if (!\is_scalar($value) && !$value instanceof \Stringable) {
+ // throws
+ ```
+
+---------------------------------------------------------------------------
+
+by stof at 2024-02-07T21:27:25Z
+
+@smnandre no, because this only allows getting a top-level key, while this code supports accessing a nested key.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-02-07T21:28:04Z
+
+btw, the new logic added in this PR is not the type check (this was already present). It is the check for the empty string.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-07T21:44:16Z
+
+> @smnandre no, because this only allows getting a top-level key, while this code supports accessing a nested key.
+
+Well this is a new discovery for me... :))
+
+@stof WDYT: should this be mentionned in the documentation or is this is too "niche" usage ?
+
+---------------------------------------------------------------------------
+
+by llupa at 2024-02-10T18:10:59Z
+
+> Except from the one minor comment, this looks good to me!
+>
+> Maybe this deserve a note in the `UPGRADE-7.1.md` file and the `CHANGELOG` file of the Security Http component? (or do we consider this too minor to mention?)
+
+I have to update some of the functional tests anyway. I can just add them 👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-02-11T14:03:53Z
+
+> Maybe this deserve a note in the UPGRADE-7.1.md file and the CHANGELOG file of the Security Http component? (or do we consider this too minor to mention?)
+
+Given the broken high-deps build, I wonder if this shouldn't even be done with a deprecation notice before making it throw in 8.0?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-02-12T09:16:11Z
+
+> Given the broken high-deps build, I wonder if this shouldn't even be done with a deprecation notice before making it throw in 8.0?
+
+These are 3 tests submitting an empty login form to trigger a CSRF token error. This new condition now takes precedence, meaning it returns the wrong error.
+I don't think that is something we have to worry about (in both situations, login errors), it rather reveals a bad test in our codebase. I can't think of a use-case that would result in success and will become a failure after this merge.
+
+Besides, it's impossible to write a deprecation for this. We can only trigger the notice when someone actually logins in with an empty username/password. There is a very high likelihood that such deprecation will never be seen.
+
+---------------------------------------------------------------------------
+
+by llupa at 2024-02-12T12:24:05Z
+
+@wouterj Does your last comment mean that I can look into the CSRF test so it tests CSRF or wait first what is the consensus on this?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-02-12T12:34:10Z
+
+@llupa let's fix the CSRF test (I hope it's just a matter of filling in a username and password).
+
+I think we need consensus on whether we find this a hard BC break that deserves a smooth upgrade path, but the test need to be fixed whatever the conclusion (if we deprecate instead of throwing an error, we still need to fix the deprecation in that test),
+
+---------------------------------------------------------------------------
+
+by llupa at 2024-03-04T19:27:56Z
+
+> Worth a CHANGELOG entry to me
+
+I added one and I think it is the correct place. If not, would you kindly me point where should it go?

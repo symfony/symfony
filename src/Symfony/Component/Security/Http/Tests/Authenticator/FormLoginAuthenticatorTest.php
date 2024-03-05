@@ -42,6 +42,30 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
     }
 
+    public function testHandleWhenUsernameEmpty()
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_username" must be a non-empty string.');
+
+        $request = Request::create('/login_check', 'POST', ['_username' => '', '_password' => 's$cr$t']);
+        $request->setSession($this->createSession());
+
+        $this->setUpAuthenticator();
+        $this->authenticator->authenticate($request);
+    }
+
+    public function testHandleWhenPasswordEmpty()
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_password" must be a non-empty string.');
+
+        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => '']);
+        $request->setSession($this->createSession());
+
+        $this->setUpAuthenticator();
+        $this->authenticator->authenticate($request);
+    }
+
     /**
      * @dataProvider provideUsernamesForLength
      */

@@ -129,10 +129,18 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 
         $credentials['username'] = trim($credentials['username']);
 
+        if ('' === $credentials['username']) {
+            throw new BadRequestHttpException(sprintf('The key "%s" must be a non-empty string.', $this->options['username_parameter']));
+        }
+
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $credentials['username']);
 
         if (!\is_string($credentials['password']) && (!\is_object($credentials['password']) || !method_exists($credentials['password'], '__toString'))) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['password_parameter'], \gettype($credentials['password'])));
+        }
+
+        if ('' === (string) $credentials['password']) {
+            throw new BadRequestHttpException(sprintf('The key "%s" must be a non-empty string.', $this->options['password_parameter']));
         }
 
         return $credentials;

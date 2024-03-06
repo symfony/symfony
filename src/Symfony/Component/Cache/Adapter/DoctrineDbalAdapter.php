@@ -269,7 +269,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         $platformName = $this->getPlatformName();
-        $insertSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (?, ?, ?, ?)";
+        $insertSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES  (:idCol, :dataCol, :lifetimeCol, :timeCol)";
 
         switch (true) {
             case 'mysql' === $platformName:
@@ -277,16 +277,16 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
                 break;
             case 'oci' === $platformName:
                 // DUAL is Oracle specific dummy table
-                $sql = "MERGE INTO $this->table USING DUAL ON ($this->idCol = ?) ".
-                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (?, ?, ?, ?) ".
-                    "WHEN MATCHED THEN UPDATE SET $this->dataCol = ?, $this->lifetimeCol = ?, $this->timeCol = ?";
+                $sql = "MERGE INTO $this->table USING DUAL ON ($this->idCol = :idCol) ".
+                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:idCol, :dataCol, :lifetimeCol, :timeCol) ".
+                    "WHEN MATCHED THEN UPDATE SET $this->dataCol = :dataCol, $this->lifetimeCol = :lifetimeCol, $this->timeCol = :timeCol";
                 break;
             case 'sqlsrv' === $platformName && version_compare($this->getServerVersion(), '10', '>='):
                 // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
                 // It also requires HOLDLOCK according to http://weblogs.sqlteam.com/dang/archive/2009/01/31/UPSERT-Race-Condition-With-MERGE.aspx
-                $sql = "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = ?) ".
-                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (?, ?, ?, ?) ".
-                    "WHEN MATCHED THEN UPDATE SET $this->dataCol = ?, $this->lifetimeCol = ?, $this->timeCol = ?;";
+                $sql = "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = :idCol) ".
+                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:idCol, :dataCol, :lifetimeCol, :timeCol) ".
+                    "WHEN MATCHED THEN UPDATE SET $this->dataCol = :dataCol, $this->lifetimeCol = :lifetimeCol, $this->timeCol = :timeCol";
                 break;
             case 'sqlite' === $platformName:
                 $sql = 'INSERT OR REPLACE'.substr($insertSql, 6);
@@ -296,7 +296,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
                 break;
             default:
                 $platformName = null;
-                $sql = "UPDATE $this->table SET $this->dataCol = ?, $this->lifetimeCol = ?, $this->timeCol = ? WHERE $this->idCol = ?";
+                $sql = "UPDATE $this->table SET $this->dataCol = :dataCol, $this->lifetimeCol = :lifetimeCol, $this->timeCol = :timeCol WHERE $this->idCol = :idCol";
                 break;
         }
 
@@ -313,35 +313,35 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         if ('sqlsrv' === $platformName || 'oci' === $platformName) {
             $bind = static function ($id, $data) use ($stmt) {
-                $stmt->bindValue(1, $id);
-                $stmt->bindValue(2, $id);
-                $stmt->bindValue(3, $data, ParameterType::LARGE_OBJECT);
-                $stmt->bindValue(6, $data, ParameterType::LARGE_OBJECT);
+                $stmt->bindValue('idCol', $id);
+                $stmt->bindValue('idCol', $id);
+                $stmt->bindValue('dataCol', $data, ParameterType::LARGE_OBJECT);
+                $stmt->bindValue('dataCol', $data, ParameterType::LARGE_OBJECT);
             };
-            $stmt->bindValue(4, $lifetime, ParameterType::INTEGER);
-            $stmt->bindValue(5, $now, ParameterType::INTEGER);
-            $stmt->bindValue(7, $lifetime, ParameterType::INTEGER);
-            $stmt->bindValue(8, $now, ParameterType::INTEGER);
+            $stmt->bindValue('lifetimeCol', $lifetime, ParameterType::INTEGER);
+            $stmt->bindValue('timeCol', $now, ParameterType::INTEGER);
+            $stmt->bindValue('lifetimeCol', $lifetime, ParameterType::INTEGER);
+            $stmt->bindValue('timeCol', $now, ParameterType::INTEGER);
         } elseif (null !== $platformName) {
             $bind = static function ($id, $data) use ($stmt) {
-                $stmt->bindValue(1, $id);
-                $stmt->bindValue(2, $data, ParameterType::LARGE_OBJECT);
+                $stmt->bindValue('idCol', $id);
+                $stmt->bindValue('dataCol', $data, ParameterType::LARGE_OBJECT);
             };
-            $stmt->bindValue(3, $lifetime, ParameterType::INTEGER);
-            $stmt->bindValue(4, $now, ParameterType::INTEGER);
+            $stmt->bindValue('lifetimeCol', $lifetime, ParameterType::INTEGER);
+            $stmt->bindValue('timeCol', $now, ParameterType::INTEGER);
         } else {
-            $stmt->bindValue(2, $lifetime, ParameterType::INTEGER);
-            $stmt->bindValue(3, $now, ParameterType::INTEGER);
+            $stmt->bindValue('lifetimeCol', $lifetime, ParameterType::INTEGER);
+            $stmt->bindValue('timeCol', $now, ParameterType::INTEGER);
 
             $insertStmt = $this->conn->prepare($insertSql);
-            $insertStmt->bindValue(3, $lifetime, ParameterType::INTEGER);
-            $insertStmt->bindValue(4, $now, ParameterType::INTEGER);
+            $insertStmt->bindValue('lifetimeCol', $lifetime, ParameterType::INTEGER);
+            $insertStmt->bindValue('timeCol', $now, ParameterType::INTEGER);
 
             $bind = static function ($id, $data) use ($stmt, $insertStmt) {
-                $stmt->bindValue(1, $data, ParameterType::LARGE_OBJECT);
-                $stmt->bindValue(4, $id);
-                $insertStmt->bindValue(1, $id);
-                $insertStmt->bindValue(2, $data, ParameterType::LARGE_OBJECT);
+                $stmt->bindValue('dataCol', $data, ParameterType::LARGE_OBJECT);
+                $stmt->bindValue('idCol', $id);
+                $insertStmt->bindValue('idCol', $id);
+                $insertStmt->bindValue('dataCol', $data, ParameterType::LARGE_OBJECT);
             };
         }
 

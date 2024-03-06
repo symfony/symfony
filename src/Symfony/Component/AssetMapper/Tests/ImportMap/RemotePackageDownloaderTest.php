@@ -79,12 +79,12 @@ class RemotePackageDownloaderTest extends TestCase
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo/foo.index.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/bar.js/file.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/baz/baz.index.css');
-        $this->assertEquals('foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
+        $this->assertEquals('foo content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo/path/to/extra-file.woff');
-        $this->assertEquals('extra file contents', file_get_contents(self::$writableRoot.'/assets/vendor/foo/path/to/extra-file.woff'));
-        $this->assertEquals('bar content', file_get_contents(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
-        $this->assertEquals('baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
-        $this->assertEquals('different content', file_get_contents(self::$writableRoot.'/assets/vendor/custom_specifier/custom_specifier.index.js'));
+        $this->assertEquals('extra file contents', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/foo/path/to/extra-file.woff'));
+        $this->assertEquals('bar content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
+        $this->assertEquals('baz content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
+        $this->assertEquals('different content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/custom_specifier/custom_specifier.index.js'));
 
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';
         $this->assertEquals(
@@ -150,9 +150,9 @@ class RemotePackageDownloaderTest extends TestCase
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo/foo.index.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/bar.js/file.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/baz/baz.index.css');
-        $this->assertEquals('original foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
-        $this->assertEquals('new bar content', file_get_contents(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
-        $this->assertEquals('new baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
+        $this->assertEquals('original foo content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
+        $this->assertEquals('new bar content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
+        $this->assertEquals('new baz content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/has-missing-extra/has-missing-extra.index.js');
 
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';

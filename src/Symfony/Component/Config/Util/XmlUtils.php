@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Util;
 
 use Symfony\Component\Config\Util\Exception\InvalidXmlException;
 use Symfony\Component\Config\Util\Exception\XmlParsingException;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * XMLUtils is a bunch of utility methods to XML operations.
@@ -79,7 +80,7 @@ class XmlUtils
                     $valid = false;
                 }
             } elseif (is_file($schemaOrCallable)) {
-                $schemaSource = file_get_contents((string) $schemaOrCallable);
+                $schemaSource = (new Filesystem())->readFile((string) $schemaOrCallable);
                 $valid = @$dom->schemaValidateSource($schemaSource);
             } else {
                 libxml_use_internal_errors($internalErrors);
@@ -122,7 +123,7 @@ class XmlUtils
             throw new \InvalidArgumentException(sprintf('File "%s" is not readable.', $file));
         }
 
-        $content = @file_get_contents($file);
+        $content = (new Filesystem())->readFile($file);
 
         if ('' === trim($content)) {
             throw new \InvalidArgumentException(sprintf('File "%s" does not contain valid XML, it is empty.', $file));

@@ -260,7 +260,7 @@ EOT
             return $defaultPublicDir;
         }
 
-        $composerConfig = json_decode(file_get_contents($composerFilePath), true);
+        $composerConfig = json_decode($this->filesystem->readFile($composerFilePath), true, flags: \JSON_THROW_ON_ERROR);
 
         return $composerConfig['extra']['public-dir'] ?? $defaultPublicDir;
     }

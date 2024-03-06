@@ -48,10 +48,9 @@ class AssetMapperCompileCommandTest extends TestCase
             $this->filesystem->remove($targetBuildDir);
         }
         // put old "built" versions to make sure the system skips using these
-        $this->filesystem->mkdir($targetBuildDir);
-        file_put_contents($targetBuildDir.'/manifest.json', '{}');
-        file_put_contents($targetBuildDir.'/importmap.json', '{}');
-        file_put_contents($targetBuildDir.'/entrypoint.file6.json', '[]');
+        $this->filesystem->dumpFile($targetBuildDir.'/manifest.json', '{}');
+        $this->filesystem->dumpFile($targetBuildDir.'/importmap.json', '{}');
+        $this->filesystem->dumpFile($targetBuildDir.'/entrypoint.file6.json', '[]');
 
         $command = $application->find('asset-map:compile');
         $tester = new CommandTester($command);
@@ -65,7 +64,7 @@ class AssetMapperCompileCommandTest extends TestCase
         import '../file4.js';
         console.log('file5.js');
 
-        EOF, file_get_contents($targetBuildDir.'/subdir/file5-f4fdc37375c7f5f2629c5659a0579967.js'));
+        EOF, $this->filesystem->readFile($targetBuildDir.'/subdir/file5-f4fdc37375c7f5f2629c5659a0579967.js'));
 
         $finder = new Finder();
         $finder->in($targetBuildDir)->files();
@@ -83,10 +82,10 @@ class AssetMapperCompileCommandTest extends TestCase
             'vendor/@hotwired/stimulus/stimulus.index.js',
             'vendor/lodash/lodash.index.js',
             'voilà.css',
-        ], array_keys(json_decode(file_get_contents($targetBuildDir.'/manifest.json'), true)));
+        ], array_keys(json_decode($this->filesystem->readFile($targetBuildDir.'/manifest.json'), true)));
 
         $this->assertFileExists($targetBuildDir.'/importmap.json');
-        $actualImportMap = json_decode(file_get_contents($targetBuildDir.'/importmap.json'), true);
+        $actualImportMap = json_decode($this->filesystem->readFile($targetBuildDir.'/importmap.json'), true);
         $this->assertSame([
             '@hotwired/stimulus', // in importmap
             'lodash', // in importmap
@@ -102,7 +101,7 @@ class AssetMapperCompileCommandTest extends TestCase
         $this->assertSame('js', $actualImportMap['@hotwired/stimulus']['type']);
 
         $this->assertFileExists($targetBuildDir.'/entrypoint.file6.json');
-        $entrypointData = json_decode(file_get_contents($targetBuildDir.'/entrypoint.file6.json'), true);
+        $entrypointData = json_decode($this->filesystem->readFile($targetBuildDir.'/entrypoint.file6.json'), true);
         $this->assertSame([
             '/assets/subdir/file5.js',
             '/assets/file4.js',

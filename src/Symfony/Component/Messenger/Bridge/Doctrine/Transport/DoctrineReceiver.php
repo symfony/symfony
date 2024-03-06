@@ -159,7 +159,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
             $callable();
         } catch (RetryableException $exception) {
             if (++$retries <= self::MAX_RETRIES) {
-                $delay = $delay * $multiplier;
+                $delay *=  $multiplier;
 
                 $randomness = (int) ($delay * $jitter);
                 $delay += random_int(-$randomness, +$randomness);

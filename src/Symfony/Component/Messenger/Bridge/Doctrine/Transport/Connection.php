@@ -127,32 +127,52 @@ class Connection implements ResetInterface
      */
     public function send(string $body, array $headers, int $delay = 0): string
     {
+
         $now = new \DateTimeImmutable('UTC');
-        $availableAt = $now->modify(sprintf('%+d seconds', $delay / 1000));
+        $availableAt = $now->modify(sprintf('+%d seconds', $delay / 1000));
 
-        $queryBuilder = $this->driverConnection->createQueryBuilder()
-            ->insert($this->configuration['table_name'])
-            ->values([
-                'body' => '?',
-                'headers' => '?',
-                'queue_name' => '?',
-                'created_at' => '?',
-                'available_at' => '?',
-            ]);
+        $values = [
+            'body' => '?',
+            'headers' => '?',
+            'queue_name' => '?',
+            'created_at' => '?',
+            'available_at' => '?',
+        ];
 
-        return $this->executeInsert($queryBuilder->getSQL(), [
+        $parameters = [
             $body,
             json_encode($headers),
             $this->configuration['queue_name'],
             $now,
             $availableAt,
-        ], [
+        ];
+
+        $types = [
             Types::STRING,
             Types::STRING,
             Types::STRING,
             Types::DATETIME_IMMUTABLE,
             Types::DATETIME_IMMUTABLE,
-        ]);
+        ];
+
+        $id = null;
+
+        if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+            $sequence_name = $this->driverConnection->getDatabasePlatform()->getIdentitySequenceName($this->configuration['table_name'], 'id');
+            $values['id'] = '?';
+            $sql = $this->driverConnection->getDatabasePlatform()->getSequenceNextValSQL($sequence_name);
+            $id = (int) $this->driverConnection->fetchOne($sql);
+            $parameters[] = $id;
+            $types[] = Types::INTEGER;
+        }
+
+        $queryBuilder = $this->driverConnection->createQueryBuilder()
+            ->insert($this->configuration['table_name'])
+            ->values($values);
+
+        $this->executeStatement($queryBuilder->getSQL(), $parameters, $types);
+
+        return $id ?? $this->driverConnection->lastInsertId();
     }
 
     public function get(): ?array

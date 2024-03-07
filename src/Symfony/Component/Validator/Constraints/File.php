@@ -41,6 +41,7 @@ class File extends Constraint
         self::EMPTY_ERROR => 'EMPTY_ERROR',
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
         self::INVALID_MIME_TYPE_ERROR => 'INVALID_MIME_TYPE_ERROR',
+        self::INVALID_EXTENSION_ERROR => 'INVALID_EXTENSION_ERROR',
         self::FILENAME_TOO_LONG => 'FILENAME_TOO_LONG',
     ];
 

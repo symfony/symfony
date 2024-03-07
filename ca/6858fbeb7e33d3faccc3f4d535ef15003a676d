@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-07T11:05:24Z
+
+IIRC, for PHP 8.3, we went with non-experimental immediately (or almost), and this worked really well.
+I'd be in favor of doing the same for 8.4. This means of course fixing deprecations first and @alexandre-daubois is on it apparently ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-03-07T11:14:41Z
+
+We should remove the experimental flag as soon as we have a green testsuite (even months before the 8.4 release). But having a CI job running while the work is done on deprecations is easier (and allows actually checking that the PR solves those)

@@ -1043,6 +1043,11 @@ class LazyObjectInner extends ObjectInner
             return $this->foo = 123;
         }
     }
+
+    public function __isset($name)
+    {
+        return 'foo' === $name;
+    }
 }
 
 class FormatAndContextAwareNormalizer extends ObjectNormalizer

@@ -532,8 +532,10 @@ class EmailTest extends TestCase
 {
     "text": "Text content",
     "textCharset": "utf-8",
+    "textEncoding": null,
     "html": "HTML <b>content</b>",
     "htmlCharset": "utf-8",
+    "htmlEncoding": null,
     "attachments": [
         {
             "filename": "test.txt",

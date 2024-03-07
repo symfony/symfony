@@ -75,8 +75,10 @@ class TemplatedEmailTest extends TestCase
     },
     "text": null,
     "textCharset": null,
+    "textEncoding": null,
     "html": null,
     "htmlCharset": null,
+    "htmlEncoding": null,
     "attachments": [
         {%A
             "body": "Some Text file",%A

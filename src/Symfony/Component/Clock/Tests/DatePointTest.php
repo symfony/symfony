@@ -58,19 +58,19 @@ class DatePointTest extends TestCase
         $date->modify('Bad Date');
     }
 
-    public function testMicroseconds()
+    public function testMicrosecond()
     {
         $date = new DatePoint('2010-01-28 15:00:00.123456');
 
         $this->assertSame('2010-01-28 15:00:00.123456', $date->format('Y-m-d H:i:s.u'));
 
-        $date = $date->setMicroseconds(789);
+        $date = $date->setMicrosecond(789);
 
         $this->assertSame('2010-01-28 15:00:00.000789', $date->format('Y-m-d H:i:s.u'));
-        $this->assertSame(789, $date->getMicroseconds());
+        $this->assertSame(789, $date->getMicrosecond());
 
         $this->expectException(\DateRangeError::class);
-        $this->expectExceptionMessage('DatePoint::setMicroseconds(): Argument #1 ($microseconds) must be between 0 and 999999, 1000000 given');
-        $date->setMicroseconds(1000000);
+        $this->expectExceptionMessage('DatePoint::setMicrosecond(): Argument #1 ($microsecond) must be between 0 and 999999, 1000000 given');
+        $date->setMicrosecond(1000000);
     }
 }

@@ -4,7 +4,7 @@ CHANGELOG
 7.1
 ---
 
- * Add `DatePoint::get/setMicroseconds()`
+ * Add `DatePoint::get/setMicrosecond()`
 
 6.4
 ---

@@ -278,7 +278,7 @@ class Email extends Message
         $this->cachedBody = null;
         $this->text = $body;
         $this->textCharset = $charset;
-        $this->textEncoding = $encoding;
+        $this->textEncoding = $encoding ?? $this->textEncoding;
 
         return $this;
     }
@@ -296,6 +296,22 @@ class Email extends Message
         return $this->textCharset;
     }
 
+    public function getTextEncoding(): ?string
+    {
+        return $this->textEncoding;
+    }
+
+    /**
+     * @param string|null $encoding
+     *
+     * @return $this
+     */
+    public function textEncoding(?string $encoding = null): static
+    {
+        $this->textEncoding = $encoding;
+        return $this;
+    }
+
     /**
      * @param resource|string|null $body
      *
@@ -310,7 +326,7 @@ class Email extends Message
         $this->cachedBody = null;
         $this->html = $body;
         $this->htmlCharset = $charset;
-        $this->htmlEncoding = $encoding;
+        $this->htmlEncoding = $encoding ?? $this->htmlEncoding;
 
         return $this;
     }
@@ -326,6 +342,22 @@ class Email extends Message
     public function getHtmlCharset(): ?string
     {
         return $this->htmlCharset;
+    }
+
+    public function getHtmlEncoding(): ?string
+    {
+        return $this->htmlEncoding;
+    }
+
+    /**
+     * @param string|null $encoding
+     *
+     * @return $this
+     */
+    public function htmlEncoding(?string $encoding = null): static
+    {
+        $this->htmlEncoding = $encoding;
+        return $this;
     }
 
     /**

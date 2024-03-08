@@ -126,4 +126,17 @@ EOF;
         $this->assertEquals($expected->getHeaders(), $n->getHeaders());
         $this->assertEquals($expected->getBody(), $n->getBody());
     }
+
+    public function testHtmlEncoding()
+    {
+        $email = new TemplatedEmail();
+
+        $email
+            ->htmlTemplate('text.html.twig')
+            ->context(['a' => 'b']);
+        $this->assertNull($email->getHtmlEncoding());
+
+        $email->htmlEncoding('base64');
+        $this->assertSame('base64', $email->getHtmlEncoding());
+    }
 }

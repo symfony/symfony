@@ -697,4 +697,48 @@ EOF;
         $this->assertCount(1, $attachments);
         $this->assertStringContainsString('foo_bar_xyz_123', $attachments[0]->getBody());
     }
+
+    public function testTextEncoding()
+    {
+        $email = new Email();
+
+        $email->text('foo');
+        $this->assertNull($email->getTextEncoding());
+
+        $email->textEncoding('base64');
+        $this->assertSame('base64', $email->getTextEncoding());
+
+        $email->textEncoding(null);
+        $this->assertNull($email->getTextEncoding());
+
+        $email->text('foo', 'utf-8', 'base64');
+        $this->assertSame('base64', $email->getTextEncoding());
+
+        $email = new Email();
+        $email->assertNull('base64');
+        $email->text('foo');
+        $this->assertSame('base64', $email->getTextEncoding());
+    }
+
+    public function testHtmlEncoding()
+    {
+        $email = new Email();
+
+        $email->html('foo');
+        $this->assertNull($email->getHtmlEncoding());
+
+        $email->htmlEncoding('base64');
+        $this->assertSame('base64', $email->getHtmlEncoding());
+
+        $email->htmlEncoding(null);
+        $this->assertNull($email->getHtmlEncoding());
+
+        $email->html('foo', 'utf-8', 'base64');
+        $this->assertSame('base64', $email->getHtmlEncoding());
+
+        $email = new Email();
+        $email->htmlEncoding('base64');
+        $email->html('foo');
+        $this->assertSame('base64', $email->getHtmlEncoding());
+    }
 }

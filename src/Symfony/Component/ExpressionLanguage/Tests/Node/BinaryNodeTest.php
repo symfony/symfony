@@ -116,7 +116,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
 
             ['range(1, 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 
-            ['(static function ($regexp, $str) { set_error_handler(function ($t, $m) use ($regexp, $str) { throw new \Symfony\Component\ExpressionLanguage\SyntaxError(sprintf(\'Regexp "%s" passed to "matches" is not valid\', $regexp).substr($m, 12)); }); try { return preg_match($regexp, (string) $str); } finally { restore_error_handler(); } })("/^[a-z]+\$/", "abc")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
+            ['(static function ($regexp, $str) { set_error_handler(function ($t, $m) use ($regexp, $str) { throw new \Symfony\Component\ExpressionLanguage\SyntaxError(sprintf(\'Regexp "%s" passed to "matches" is not valid\', $regexp).substr(strstr($m, "preg_match()"), 12)); }); try { return preg_match($regexp, (string) $str); } finally { restore_error_handler(); } })("/^[a-z]+\$/", "abc")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
         ];
     }
 

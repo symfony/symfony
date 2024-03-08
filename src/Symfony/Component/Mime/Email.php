@@ -302,13 +302,12 @@ class Email extends Message
     }
 
     /**
-     * @param string|null $encoding
-     *
      * @return $this
      */
     public function textEncoding(?string $encoding = null): static
     {
         $this->textEncoding = $encoding;
+
         return $this;
     }
 
@@ -350,13 +349,12 @@ class Email extends Message
     }
 
     /**
-     * @param string|null $encoding
-     *
      * @return $this
      */
     public function htmlEncoding(?string $encoding = null): static
     {
         $this->htmlEncoding = $encoding;
+
         return $this;
     }
 

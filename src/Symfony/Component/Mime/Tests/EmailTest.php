@@ -715,7 +715,7 @@ EOF;
         $this->assertSame('base64', $email->getTextEncoding());
 
         $email = new Email();
-        $email->assertNull('base64');
+        $email->textEncoding('base64');
         $email->text('foo');
         $this->assertSame('base64', $email->getTextEncoding());
     }

@@ -288,19 +288,21 @@ class Connection
             $this->setupExchangeAndQueues(); // also setup normal exchange for delayed messages so delay queue can DLX messages to it
         }
 
-        if (0 !== $delayInMs) {
-            $this->publishWithDelay($body, $headers, $delayInMs, $amqpStamp);
+        $this->withConnectionExceptionRetry(function () use ($body, $headers, $delayInMs, $amqpStamp) {
+            if (0 !== $delayInMs) {
+                $this->publishWithDelay($body, $headers, $delayInMs, $amqpStamp);
 
-            return;
-        }
+                return;
+            }
 
-        $this->publishOnExchange(
-            $this->exchange(),
-            $body,
-            $this->getRoutingKeyForMessage($amqpStamp),
-            $headers,
-            $amqpStamp
-        );
+            $this->publishOnExchange(
+                $this->exchange(),
+                $body,
+                $this->getRoutingKeyForMessage($amqpStamp),
+                $headers,
+                $amqpStamp
+            );
+        });
     }
 
     /**
@@ -546,9 +548,14 @@ class Connection
     private function clearWhenDisconnected(): void
     {
         if (!$this->channel()->isConnected()) {
-            unset($this->amqpChannel, $this->amqpExchange, $this->amqpDelayExchange);
-            $this->amqpQueues = [];
+            $this->clear();
         }
+    }
+
+    private function clear(): void
+    {
+        unset($this->amqpChannel, $this->amqpExchange, $this->amqpDelayExchange);
+        $this->amqpQueues = [];
     }
 
     private function getDefaultPublishRoutingKey(): ?string
@@ -566,5 +573,24 @@ class Connection
     private function getRoutingKeyForMessage(?AmqpStamp $amqpStamp): ?string
     {
         return $amqpStamp?->getRoutingKey() ?? $this->getDefaultPublishRoutingKey();
+    }
+
+    private function withConnectionExceptionRetry(callable $callable): void
+    {
+        $maxRetries = 3;
+        $retries = 0;
+
+        retry:
+        try {
+            $callable();
+        } catch (\AMQPConnectionException $e) {
+            if (++$retries <= $maxRetries) {
+                $this->clear();
+
+                goto retry;
+            }
+
+            throw $e;
+        }
     }
 }

@@ -780,6 +780,73 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testItCanRetryPublishWhenAMQPConnectionExceptionIsThrown()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->exactly(2))
+            ->method('publish')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new \AMQPConnectionException('a socket error occurred')),
+                null
+            );
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body');
+    }
+
+    public function testItCanRetryPublishWithDelayWhenAMQPConnectionExceptionIsThrown()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->exactly(2))
+            ->method('publish')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new \AMQPConnectionException('a socket error occurred')),
+                null
+            );
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body', [], 5000);
+    }
+
+    public function testItWillRetryMaxThreeTimesWhenAMQPConnectionExceptionIsThrown()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $exception = new \AMQPConnectionException('a socket error occurred');
+
+        $amqpExchange->expects($this->exactly(4))
+            ->method('publish')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException($exception),
+                $this->throwException($exception),
+                $this->throwException($exception),
+                $this->throwException($exception),
+            );
+
+        self::expectException($exception::class);
+        self::expectExceptionMessage($exception->getMessage());
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body');
+    }
+
     private function createDelayOrRetryConnection(\AMQPExchange $delayExchange, string $deadLetterExchangeName, string $delayQueueName): Connection
     {
         $amqpConnection = $this->createMock(\AMQPConnection::class);

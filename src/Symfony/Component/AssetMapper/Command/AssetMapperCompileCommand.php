@@ -62,7 +62,7 @@ EOT
     {
         $io = new SymfonyStyle($input, $output);
 
-        $this->eventDispatcher?->dispatch(new PreAssetsCompileEvent($output));
+        $this->eventDispatcher?->dispatch(new PreAssetsCompileEvent($io));
 
         // remove existing config files
         $this->compiledConfigReader->removeConfig(AssetMapper::MANIFEST_FILE_NAME);

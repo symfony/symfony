@@ -31,6 +31,7 @@ use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsDecryptToLocalCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsEncryptFromLocalCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsGenerateKeysCommand;
+use Symfony\Bundle\FrameworkBundle\Command\SecretsImportEnvFileCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsListCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsRemoveCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsRevealCommand;

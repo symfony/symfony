@@ -69,7 +69,7 @@ EOF
                 continue;
             }
             $exploded = explode('=', $line, 2);
-            if(count($exploded) < 2){
+            if('' === ($exploded[1]?? '')){
                 continue;
             }
             [$name, $value] = $exploded;

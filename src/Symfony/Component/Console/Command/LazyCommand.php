@@ -127,9 +127,9 @@ final class LazyCommand extends Command
     /**
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      */
-    public function addOption(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
+    public function addOption(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = [], bool $isHidden = false, bool $isDeprecated = false): static
     {
-        $this->getCommand()->addOption($name, $shortcut, $mode, $description, $default, $suggestedValues);
+        $this->getCommand()->addOption($name, $shortcut, $mode, $description, $default, $suggestedValues, $isHidden, $isDeprecated);
 
         return $this;
     }

@@ -216,9 +216,9 @@ final class TraceableCommand extends Command implements SignalableCommandInterfa
         return $this;
     }
 
-    public function addOption(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
+    public function addOption(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = [], bool $isHidden = false, bool $isDeprecated = false): static
     {
-        $this->command->addOption($name, $shortcut, $mode, $description, $default, $suggestedValues);
+        $this->command->addOption($name, $shortcut, $mode, $description, $default, $suggestedValues, $isHidden, $isDeprecated);
 
         return $this;
     }

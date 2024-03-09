@@ -70,6 +70,8 @@ class InputOption
         private string $description = '',
         string|bool|int|float|array|null $default = null,
         private array|\Closure $suggestedValues = [],
+        private bool $hidden = false,
+        private bool $deprecated = false,
     ) {
         if (str_starts_with($name, '--')) {
             $name = substr($name, 2);
@@ -183,6 +185,22 @@ class InputOption
     public function isNegatable(): bool
     {
         return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
+    }
+
+    /**
+     * Returns true if the option should be hidden..
+     */
+    public function isHidden(): bool
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * Returns true if the option is marked as deprecated.
+     */
+    public function isDeprecated(): bool
+    {
+        return $this->deprecated;
     }
 
     /**

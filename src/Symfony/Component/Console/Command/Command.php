@@ -429,10 +429,10 @@ class Command
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function addOption(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
+    public function addOption(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = [], bool $isHidden = false, bool $isDeprecated = false): static
     {
-        $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default, $suggestedValues));
-        $this->fullDefinition?->addOption(new InputOption($name, $shortcut, $mode, $description, $default, $suggestedValues));
+        $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default, $suggestedValues, $isHidden, $isDeprecated));
+        $this->fullDefinition?->addOption(new InputOption($name, $shortcut, $mode, $description, $default, $suggestedValues, $isHidden, $isDeprecated));
 
         return $this;
     }

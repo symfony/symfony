@@ -56,14 +56,26 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider provideSuspiciousStrings
      */
-    public function testSuspiciousStrings(string $string, array $options, string $errorCode, string $errorMessage)
+    public function testSuspiciousStrings(string $string, array $options, array $errors)
     {
         $this->validator->validate($string, new NoSuspiciousCharacters($options));
 
-        $this->buildViolation($errorMessage)
-            ->setCode($errorCode)
-            ->setParameter('{{ value }}', '"'.$string.'"')
-            ->assertRaised();
+        $violations = null;
+
+        foreach ($errors as $code => $message) {
+            if (null === $violations) {
+                $violations = $this->buildViolation($message);
+            } else {
+                $violations = $violations->buildNextViolation($message);
+            }
+
+            $violations = $violations
+                ->setCode($code)
+                ->setParameter('{{ value }}', '"'.$string.'"')
+            ;
+        }
+
+        $violations->assertRaised();
     }
 
     public static function provideSuspiciousStrings(): iterable
@@ -71,8 +83,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
         yield 'Fails RESTRICTION_LEVEL check because of character outside ASCII range' => [
             'à',
             ['restrictionLevel' => NoSuspiciousCharacters::RESTRICTION_LEVEL_ASCII],
-            NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR,
-            'This value contains characters that are not allowed by the current restriction-level.',
+            [NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR => 'This value contains characters that are not allowed by the current restriction-level.'],
         ];
 
         yield 'Fails RESTRICTION_LEVEL check because of mixed-script string' => [
@@ -81,8 +92,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
                 'restrictionLevel' => NoSuspiciousCharacters::RESTRICTION_LEVEL_SINGLE_SCRIPT,
                 'locales' => ['en', 'zh_Hant_TW'],
             ],
-            NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR,
-            'This value contains characters that are not allowed by the current restriction-level.',
+            [NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR => 'This value contains characters that are not allowed by the current restriction-level.'],
         ];
 
         yield 'Fails RESTRICTION_LEVEL check because RESTRICTION_LEVEL_HIGH disallows Armenian script' => [
@@ -91,8 +101,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
                 'restrictionLevel' => NoSuspiciousCharacters::RESTRICTION_LEVEL_HIGH,
                 'locales' => ['en', 'hy_AM'],
             ],
-            NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR,
-            'This value contains characters that are not allowed by the current restriction-level.',
+            [NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR => 'This value contains characters that are not allowed by the current restriction-level.'],
         ];
 
         yield 'Fails RESTRICTION_LEVEL check because RESTRICTION_LEVEL_MODERATE disallows Greek script' => [
@@ -101,8 +110,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
                 'restrictionLevel' => NoSuspiciousCharacters::RESTRICTION_LEVEL_MODERATE,
                 'locales' => ['en', 'el_GR'],
             ],
-            NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR,
-            'This value contains characters that are not allowed by the current restriction-level.',
+            [NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR => 'This value contains characters that are not allowed by the current restriction-level.'],
         ];
 
         yield 'Fails RESTRICTION_LEVEL check because of characters missing from the configured locales’ scripts' => [
@@ -111,8 +119,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
                 'restrictionLevel' => NoSuspiciousCharacters::RESTRICTION_LEVEL_MINIMAL,
                 'locales' => ['en'],
             ],
-            NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR,
-            'This value contains characters that are not allowed by the current restriction-level.',
+            [NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR => 'This value contains characters that are not allowed by the current restriction-level.'],
         ];
 
         yield 'Fails INVISIBLE check because of duplicated non-spacing mark' => [
@@ -120,8 +127,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
             [
                 'checks' => NoSuspiciousCharacters::CHECK_INVISIBLE,
             ],
-            NoSuspiciousCharacters::INVISIBLE_ERROR,
-            'Using invisible characters is not allowed.',
+            [NoSuspiciousCharacters::INVISIBLE_ERROR => 'Using invisible characters is not allowed.'],
         ];
 
         yield 'Fails MIXED_NUMBERS check because of different numbering systems' => [
@@ -129,8 +135,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
             [
                 'checks' => NoSuspiciousCharacters::CHECK_MIXED_NUMBERS,
             ],
-            NoSuspiciousCharacters::MIXED_NUMBERS_ERROR,
-            'Mixing numbers from different scripts is not allowed.',
+            [NoSuspiciousCharacters::MIXED_NUMBERS_ERROR => 'Mixing numbers from different scripts is not allowed.'],
         ];
 
         yield 'Fails HIDDEN_OVERLAY check because of hidden combining character' => [
@@ -138,8 +143,19 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
             [
                 'checks' => NoSuspiciousCharacters::CHECK_HIDDEN_OVERLAY,
             ],
-            NoSuspiciousCharacters::HIDDEN_OVERLAY_ERROR,
-            'Using hidden overlay characters is not allowed.',
+            [NoSuspiciousCharacters::HIDDEN_OVERLAY_ERROR => 'Using hidden overlay characters is not allowed.'],
+        ];
+
+        yield 'Fails both HIDDEN_OVERLAY and RESTRICTION_LEVEL checks' => [
+            'i̇',
+            [
+                'checks' => NoSuspiciousCharacters::CHECK_HIDDEN_OVERLAY,
+                'restrictionLevel' => NoSuspiciousCharacters::RESTRICTION_LEVEL_ASCII,
+            ],
+            [
+                NoSuspiciousCharacters::RESTRICTION_LEVEL_ERROR => 'This value contains characters that are not allowed by the current restriction-level.',
+                NoSuspiciousCharacters::HIDDEN_OVERLAY_ERROR => 'Using hidden overlay characters is not allowed.',
+            ],
         ];
     }
 

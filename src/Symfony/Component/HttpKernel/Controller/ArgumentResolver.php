@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolve
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactoryInterface;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\ResolverNotFoundException;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
@@ -78,15 +79,20 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 }
             }
 
+            $valueResolverExceptions = [];
             foreach ($argumentValueResolvers as $name => $resolver) {
                 if (isset($disabledResolvers[\is_int($name) ? $resolver::class : $name])) {
                     continue;
                 }
 
-                $count = 0;
-                foreach ($resolver->resolve($request, $metadata) as $argument) {
-                    ++$count;
-                    $arguments[] = $argument;
+                try {
+                    $count = 0;
+                    foreach ($resolver->resolve($request, $metadata) as $argument) {
+                        ++$count;
+                        $arguments[] = $argument;
+                    }
+                } catch (NearMissValueResolverException $e) {
+                    $valueResolverExceptions[] = $e;
                 }
 
                 if (1 < $count && !$metadata->isVariadic()) {
@@ -99,7 +105,20 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 }
             }
 
-            throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument. Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.', $this->getPrettyName($controller), $metadata->getName()));
+            $reasons = array_map(static fn (NearMissValueResolverException $e) => $e->getMessage(), $valueResolverExceptions);
+            if (!$reasons) {
+                $reasons[] = 'Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.';
+            }
+
+            $reasonCounter = 1;
+            if (\count($reasons) > 1) {
+                foreach ($reasons as $i => $reason) {
+                    $reasons[$i] = $reasonCounter.') '.$reason;
+                    ++$reasonCounter;
+                }
+            }
+
+            throw new \RuntimeException(sprintf('Controller "%s" requires the "$%s" argument that could not be resolved. '.($reasonCounter > 1 ? 'Possible reasons: ' : '').'%s', $this->getPrettyName($controller), $metadata->getName(), implode(' ', $reasons)));
         }
 
         return $arguments;

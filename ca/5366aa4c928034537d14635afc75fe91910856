@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-08T14:48:43Z
+
+~When i played with UuidV4, i tried RandomString but found the instanciation time a bit long... could it be kept statically or is this not worth the short ?~
+
+Update: i made some benchs (should have started with that, sorry)  locally, and the difference after ten million call is about 4% .... in favor of Randomizer.
+
+/me --> 🚪
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-03-08T20:03:26Z
+
+> Update: i made some benchs (should have started with that, sorry) locally, and the difference after ten million call is about 4% .... in favor of Randomizer.
+
+Thank you very much for this benchmark!

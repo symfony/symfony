@@ -335,6 +335,12 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('console.command')
 
+        ->set('console.command.secrets_import_from_env_file', SecretsImportEnvFileCommand::class)
+            ->args([
+                service('secrets.vault'),
+            ])
+            ->tag('console.command')
+    
         ->set('console.command.secrets_remove', SecretsRemoveCommand::class)
             ->args([
                 service('secrets.vault'),

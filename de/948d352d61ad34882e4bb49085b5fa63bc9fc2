@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by ilyachase at 2024-02-29T11:54:21Z
+
+Not sure what to do with failed checks - errors seem irrelevant to my changes. Please help.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-02-29T12:48:57Z
+
+Please find a meaningful title for your PR. We use PR titles to compose the change log.
+
+> Not sure what to do with failed checks
+
+If you didn't cause them, ignore them.
+
+---------------------------------------------------------------------------
+
+by ilyachase at 2024-02-29T13:12:48Z
+
+> Please find a meaningful title for your PR. We use PR titles to compose the change log.
+
+Done.
+
+> If you didn't cause them, ignore them.
+
+👌
+
+---------------------------------------------------------------------------
+
+by ilyachase at 2024-03-05T15:44:58Z
+
+@stof @nicolas-grekas hey folks, let's get this PR moving? 🙂 I believe I addressed everything

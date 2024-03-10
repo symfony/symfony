@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Event\ConsoleAlarmEvent;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleSignalEvent;
@@ -41,6 +42,14 @@ final class ConsoleEvents
     public const SIGNAL = 'console.signal';
 
     /**
+     * The ALARM event allows you to perform some actions
+     * after the command received a SIGALRM signal.
+     *
+     * @Event("Symfony\Component\Console\Event\ConsoleAlarmEvent")
+     */
+    public const ALARM = 'console.alarm';
+
+    /**
      * The TERMINATE event allows you to attach listeners after a command is
      * executed by the console.
      *
@@ -67,6 +76,7 @@ final class ConsoleEvents
         ConsoleCommandEvent::class => self::COMMAND,
         ConsoleErrorEvent::class => self::ERROR,
         ConsoleSignalEvent::class => self::SIGNAL,
+        ConsoleAlarmEvent::class => self::ALARM,
         ConsoleTerminateEvent::class => self::TERMINATE,
     ];
 }

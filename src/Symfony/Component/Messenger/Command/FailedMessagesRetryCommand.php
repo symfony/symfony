@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Command;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\AlarmableCommandInterface;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -37,8 +38,10 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 #[AsCommand(name: 'messenger:failed:retry', description: 'Retry one or more messages from the failure transport')]
-class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implements SignalableCommandInterface
+class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implements SignalableCommandInterface, AlarmableCommandInterface
 {
+    private const DEFAULT_KEEPALIVE_INTERVAL = 5;
+
     private EventDispatcherInterface $eventDispatcher;
     private MessageBusInterface $messageBus;
     private ?LoggerInterface $logger;
@@ -46,6 +49,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
     private bool $shouldStop = false;
     private bool $forceExit = false;
     private ?Worker $worker = null;
+    private ?int $keepaliveInterval = null;
 
     public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null, ?PhpSerializer $phpSerializer = null, ?array $signals = null)
     {
@@ -64,6 +68,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
                 new InputArgument('id', InputArgument::IS_ARRAY, 'Specific message id(s) to retry'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
                 new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
+                new InputOption('keepalive', null, InputOption::VALUE_OPTIONAL, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> retries message in the failure transport.
@@ -149,6 +154,25 @@ EOF
         $this->shouldStop = true;
 
         return $this->forceExit ? 0 : false;
+    }
+
+    public function getAlarmTime(InputInterface $input): int
+    {
+        return $this->keepaliveInterval ??= $input->hasParameterOption('--keepalive')
+            ? (int) ($input->getOption('keepalive') ?? self::DEFAULT_KEEPALIVE_INTERVAL) : 0;
+    }
+
+    public function handleAlarm(false|int $previousExitCode = 0): int|false
+    {
+        if (!$this->worker) {
+            return false;
+        }
+
+        $this->logger?->info('Sending keepalive request.', ['transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+        $this->worker->keepalive();
+
+        return false;
     }
 
     private function runInteractive(string $failureTransportName, SymfonyStyle $io, bool $shouldForce): void

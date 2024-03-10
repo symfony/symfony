@@ -14,7 +14,7 @@
     "require": {
         "php": ">=8.2",
         "pda/pheanstalk": "^4.0",
-        "symfony/messenger": "^6.4|^7.0"
+        "symfony/messenger": "^7.1"
     },
     "require-dev": {
         "symfony/property-access": "^6.4|^7.0",

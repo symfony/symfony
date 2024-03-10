@@ -32,6 +32,7 @@ use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -48,6 +49,10 @@ class Worker
     private WorkerMetadata $metadata;
     private array $acks = [];
     private \SplObjectStorage $unacks;
+    /**
+     * @var \SplObjectStorage<object, array{0: string, 1: Envelope}>
+     */
+    private \SplObjectStorage $keepalives;
 
     /**
      * @param ReceiverInterface[] $receivers Where the key is the transport name
@@ -64,6 +69,7 @@ class Worker
             'transportNames' => array_keys($receivers),
         ]);
         $this->unacks = new \SplObjectStorage();
+        $this->keepalives = new \SplObjectStorage();
     }
 
     /**
@@ -105,6 +111,10 @@ class Worker
 
                 foreach ($envelopes as $envelope) {
                     $envelopeHandled = true;
+
+                    if ($receiver instanceof KeepaliveReceiverInterface) {
+                        $this->keepalives[$envelope->getMessage()] = [$transportName, $envelope];
+                    }
 
                     $this->rateLimit($transportName);
                     $this->handleMessage($envelope, $transportName);
@@ -187,6 +197,7 @@ class Worker
                 if ($rejectFirst = $e instanceof RejectRedeliveredMessageException) {
                     // redelivered messages are rejected first so that continuous failures in an event listener or while
                     // publishing for retry does not cause infinite redelivery loops
+                    unset($this->keepalives[$envelope->getMessage()]);
                     $receiver->reject($envelope);
                 }
 
@@ -200,6 +211,7 @@ class Worker
                 $envelope = $failedEvent->getEnvelope();
 
                 if (!$rejectFirst) {
+                    unset($this->keepalives[$envelope->getMessage()]);
                     $receiver->reject($envelope);
                 }
 
@@ -219,6 +231,7 @@ class Worker
                 $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
             }
 
+            unset($this->keepalives[$envelope->getMessage()]);
             $receiver->ack($envelope);
         }
 
@@ -276,6 +289,20 @@ class Worker
         $this->logger?->info('Stopping worker.', ['transport_names' => $this->metadata->getTransportNames()]);
 
         $this->shouldStop = true;
+    }
+
+    public function keepalive(): void
+    {
+        foreach ($this->keepalives as $message) {
+            [$transportName, $envelope] = $this->keepalives[$message];
+
+            if (!$this->receivers[$transportName] instanceof KeepaliveReceiverInterface) {
+                throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, KeepaliveReceiverInterface::class));
+            }
+
+            $this->logger?->info('Sending keepalive request.', ['transport' => $transportName]);
+            $this->receivers[$transportName]->keepalive($envelope);
+        }
     }
 
     public function getMetadata(): WorkerMetadata

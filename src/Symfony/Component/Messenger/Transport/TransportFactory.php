@@ -21,14 +21,12 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class TransportFactory implements TransportFactoryInterface
 {
-    private iterable $factories;
-
     /**
      * @param iterable<mixed, TransportFactoryInterface> $factories
      */
-    public function __construct(iterable $factories)
-    {
-        $this->factories = $factories;
+    public function __construct(
+        private iterable $factories,
+    ) {
     }
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface

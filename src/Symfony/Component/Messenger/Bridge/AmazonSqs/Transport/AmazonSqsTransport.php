@@ -29,19 +29,14 @@ use Symfony\Contracts\Service\ResetInterface;
 class AmazonSqsTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ResetInterface
 {
     private SerializerInterface $serializer;
-    private Connection $connection;
-    private ?ReceiverInterface $receiver;
-    private ?SenderInterface $sender;
 
-    /**
-     * @param (MessageCountAwareInterface&ReceiverInterface)|null $receiver
-     */
-    public function __construct(Connection $connection, ?SerializerInterface $serializer = null, ?ReceiverInterface $receiver = null, ?SenderInterface $sender = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+        private (ReceiverInterface&MessageCountAwareInterface)|null $receiver = null,
+        private ?SenderInterface $sender = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
-        $this->receiver = $receiver;
-        $this->sender = $sender;
     }
 
     public function get(): iterable

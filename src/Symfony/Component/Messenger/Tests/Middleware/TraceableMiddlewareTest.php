@@ -119,11 +119,10 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
         $middleware = new class($stopwatch) implements MiddlewareInterface {
             public int $calls = 0;
-            private Stopwatch $stopwatch;
 
-            public function __construct(Stopwatch $stopwatch)
-            {
-                $this->stopwatch = $stopwatch;
+            public function __construct(
+                private Stopwatch $stopwatch,
+            ) {
             }
 
             public function handle(Envelope $envelope, StackInterface $stack): Envelope

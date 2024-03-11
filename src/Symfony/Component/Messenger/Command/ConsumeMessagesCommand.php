@@ -43,29 +43,19 @@ use Symfony\Component\Messenger\Worker;
 #[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
 class ConsumeMessagesCommand extends Command implements SignalableCommandInterface
 {
-    private RoutableMessageBus $routableBus;
-    private ContainerInterface $receiverLocator;
-    private EventDispatcherInterface $eventDispatcher;
-    private ?LoggerInterface $logger;
-    private array $receiverNames;
-    private ?ResetServicesListener $resetServicesListener;
-    private array $busIds;
-    private ?ContainerInterface $rateLimiterLocator;
-    private ?array $signals;
     private ?Worker $worker = null;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null, array $receiverNames = [], ?ResetServicesListener $resetServicesListener = null, array $busIds = [], ?ContainerInterface $rateLimiterLocator = null, ?array $signals = null)
-    {
-        $this->routableBus = $routableBus;
-        $this->receiverLocator = $receiverLocator;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->logger = $logger;
-        $this->receiverNames = $receiverNames;
-        $this->resetServicesListener = $resetServicesListener;
-        $this->busIds = $busIds;
-        $this->rateLimiterLocator = $rateLimiterLocator;
-        $this->signals = $signals;
-
+    public function __construct(
+        private RoutableMessageBus $routableBus,
+        private ContainerInterface $receiverLocator,
+        private EventDispatcherInterface $eventDispatcher,
+        private ?LoggerInterface $logger = null,
+        private array $receiverNames = [],
+        private ?ResetServicesListener $resetServicesListener = null,
+        private array $busIds = [],
+        private ?ContainerInterface $rateLimiterLocator = null,
+        private ?array $signals = null,
+    ) {
         parent::__construct();
     }
 

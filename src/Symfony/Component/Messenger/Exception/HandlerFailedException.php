@@ -17,13 +17,13 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
 {
     use WrappedExceptionsTrait;
 
-    private Envelope $envelope;
-
     /**
      * @param \Throwable[] $exceptions The name of the handler should be given as key
      */
-    public function __construct(Envelope $envelope, array $exceptions)
-    {
+    public function __construct(
+        private Envelope $envelope,
+        array $exceptions,
+    ) {
         $firstFailure = current($exceptions);
 
         $message = sprintf('Handling "%s" failed: ', $envelope->getMessage()::class);
@@ -37,7 +37,6 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
             $firstFailure
         );
 
-        $this->envelope = $envelope;
         $this->exceptions = $exceptions;
     }
 

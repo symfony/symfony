@@ -27,6 +27,7 @@ abstract class AbstractStream
     protected $stream;
     protected $in;
     protected $out;
+    protected $err;
 
     private $debug = '';
 
@@ -65,7 +66,7 @@ abstract class AbstractStream
 
     public function terminate(): void
     {
-        $this->stream = $this->out = $this->in = null;
+        $this->stream = $this->err = $this->out = $this->in = null;
     }
 
     public function readLine(): string

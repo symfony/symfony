@@ -1,0 +1,225 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-02T14:09:03Z
+
+That's a bit strange to me, I'm not sure we ever did that. Usually tag attributes are used in a compiler pass. Shouldn't we do the same here? What's the more extended use case for this?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-08-02T14:25:42Z
+
+> That's a bit strange to me, I'm not sure we ever did that. Usually tag attributes are used in a compiler pass. Shouldn't we do the same here? What's the more extended use case for this?
+
+It looks like you missed the PR description :D The example show a usage of tag attribute in a compiler pass
+
+And the use case is described in the PR description too. But to go a bit further
+
+```php
+class Kernel extends BaseKernel implements CompilerPassInterface
+{
+    use MicroKernelTrait;
+
+    public function process(ContainerBuilder $container)
+    {
+        $classesToWorkflow = [];
+        foreach ($container->findTaggedServiceIds('workflow.workflow') as $id => $attributes) {
+            $config = $container->getDefinition($id)->getTag('workflow')[0];
+            foreach ($config['supports'] ?? [] as $class) {
+                $classesToWorkflow[$class] = new Reference($id);
+            }
+        }
+
+        $container->register(MyRegistry::class, MyRegistry::class)
+            ->setArguments([$classesToWorkflow])
+        ;
+    }
+}
+```
+
+> **Note**
+> 1. I did not tested this very example
+> 2. Instead of an array of service, it would be better to use a service locator, but that's not the point here
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-08-03T13:45:54Z
+
+Doesn't your registry duplicate the code we have in the `Registry` class? Shouldn't we revert making it internal instead?
+I'm challenging this because it feel strange to me to use tags for what you do here (I'm not sure we have any similar example).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-08-03T14:05:32Z
+
+I have a big issue with the registry: People use it to get one workflow. In the documentation we used to tell to do :
+```php
+$workflowRegistry->get($subject)->apply($subject, 'foobar');
+````
+
+And this is wrong: people must inject the right Workflow directly (law of demeter, performance, etc)
+
+That's why I decided to make it internal initially.
+
+The documentation has been updated since (I just checked, and there is still [one occurrence](https://github.com/symfony/symfony-docs/blob/d476a49a670f19d683433e51489a125b62d60ff3/workflow.rst#L1086), cc @alexandre-daubois)
+
+But there is still one issue. If you have generic controller / service where you cannot know in advance which workflow to use, you have to use a ServiceLocator. There are all tagged, by name, so it should be easy...
+
+BUT, sometime, (cf [this discussion](https://github.com/symfony/symfony/discussions/49199)) the name is not enough.
+
+With this PR, people will have full power to build their own registry. It'll be faster, cleaner, and build exactly for each use case.
+
+Even with the current Registry and its [`WorkflowSupportStrategyInterface`](https://github.com/symfony/workflow/blob/6.3/SupportStrategy/WorkflowSupportStrategyInterface.php) you can't build something totally dynamic, since you miss some information about the configuration
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-08-04T08:52:12Z
+
+Mouais, I'm not convinced.
+The docs tell people the best way.
+The Registry is the entry point for more powerful features.
+If people want to shoot themselves in the foot, that's life.
+So, I don't see why we need to have yet another way. I understand that one is userland and the other is internal, but still. If we're talking about edge cases, just using the current Registry should be enough, right?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-08-04T10:38:52Z
+
+I disagree. Registry needs instantiated workflow to work. It means no lazy loading.
+
+Then you can't access `supports` configuration option.
+
+That's two pain points that show the current way to work doesn't work well.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-08-08T14:38:25Z
+
+Rebased, and conflict fixed
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-10-19T09:23:03Z
+
+Hello, This PR is ready and I have rebased it.
+
+@fabpot I understand your concern. But I have a real use case where I need to fetch a workflow dynamically based on some entity properties. We'll have a LOT of workflows - basically one by client (B to B to C), and every `Client` lays on the same entity. I could use the registry, but there is no lazy loading, so it will degrade performance.
+
+Finally, the diff is very minimal, and does not really impact the framework. Everything is thrown after the compilation. I don't really how it could hurt 🤓
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-19T09:26:44Z
+
+The issue is that if we start exposing this config on the attribute with the intent of allowing projects to read it, we must provide BC on the structure of this config (with no way at all to ever deprecate anything in it as it is not accessed through a dedicated API in which we can trigger deprecations)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-10-19T09:27:52Z
+
+Hmm, Got it 👍🏼 We could document that the shape is not BC?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-19T09:29:31Z
+
+@lyrixx but then, how would you use it ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-10-19T09:48:17Z
+
+Basically with something like this:
+
+```yaml
+# config/packages/workflow.yaml
+framework:
+    workflows:
+        my_workflow_name:
+            metadata:
+                features: [repair, wash, dry]
+```
+
+```php
+// src/Kernel.php
+class Kernel extends BaseKernel implements CompilerPassInterface
+{
+    use MicroKernelTrait;
+
+    public function process(ContainerBuilder $container)
+    {
+        $configurations = [];
+        foreach ($container->findTaggedServiceIds('workflow') as $id => $config) {
+            $configurations[$id] = $config[0]['config'];
+        }
+
+        $container
+            ->getDefinition(Selector::class)
+            ->setArgument('$configurations', $configurations)
+        ;
+    }
+}
+```
+
+```php
+<?php
+// src/Workflow/Selector.php
+namespace App\Workflow;
+
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+
+class Selector
+{
+    public function __construct(
+        #[TaggedLocator('workflow')]
+        private readonly ContainerInterface $container,
+        private readonly array $configurations,
+    ) {
+    }
+
+    public function getWorkflow(/** Article $article */)
+    {
+        foreach ($this->configurations as $id => $config) {
+            // $features = $article->getWorkflowFeatures();
+            $featuresRequired = ['repair', 'wash', 'dry'];
+            sort($featuresRequired);
+            $featuresAvailable = $config['metadata']['features'] ?? [];
+            sort($featuresAvailable);
+            if ($featuresRequired === $featuresAvailable) {
+                return $this->container->get($id);
+            }
+        }
+
+        throw new \RuntimeException('No workflow found');
+    }
+}
+```
+
+and finally
+
+```php
+    public function index(Selector $selector, Article $article): Response
+    {
+        $w = $selector->getWorkflow($article);
+        dd($w);
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-11-21T08:40:21Z
+
+Would you accept this PR if I inject in the tag **only** the workflow metadata? It'll be enough.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-01-29T13:12:25Z
+
+> Would you accept this PR if I inject in the tag **only** the workflow metadata? It'll be enough.
+
+cc @fabpot
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-02-08T16:56:43Z
+
+PR rebased, and updated

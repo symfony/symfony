@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\UniqueValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Dummy\DummyClassOne;
 
 class UniqueValidatorTest extends ConstraintValidatorTestCase
 {
@@ -281,6 +282,36 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 [['nullField' => null], ['nullField' => null]],
                 ['nullField'],
             ],
+        ];
+    }
+
+    public function testArrayOfObjectsUnique()
+    {
+        $array = [
+            new DummyClassOne(),
+            new DummyClassOne(),
+            new DummyClassOne(),
+        ];
+
+        $array[0]->code = '1';
+        $array[1]->code = '2';
+        $array[2]->code = '3';
+
+        $this->validator->validate(
+            $array,
+            new Unique(
+                normalizer: [self::class, 'normalizeDummyClassOne'],
+                fields: 'code'
+            )
+        );
+
+        $this->assertNoViolation();
+    }
+
+    public static function normalizeDummyClassOne(DummyClassOne $obj): array
+    {
+        return [
+            'code' => $obj->code,
         ];
     }
 }

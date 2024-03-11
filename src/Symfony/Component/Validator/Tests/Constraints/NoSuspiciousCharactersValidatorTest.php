@@ -60,14 +60,17 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate($string, new NoSuspiciousCharacters($options));
 
-        $violations = $this->buildViolation(reset($errors))
-            ->setCode(key($errors))
-            ->setParameter('{{ value }}', '"'.$string.'"')
-        ;
+        $violations = null;
 
-        while ($message = next($errors)) {
-            $violations = $violations->buildNextViolation($message)
-                ->setCode(key($errors))
+        foreach ($errors as $code => $message) {
+            if (null === $violations) {
+                $violations = $this->buildViolation($message);
+            } else {
+                $violations = $violations->buildNextViolation($message);
+            }
+
+            $violations = $violations
+                ->setCode($code)
                 ->setParameter('{{ value }}', '"'.$string.'"')
             ;
         }

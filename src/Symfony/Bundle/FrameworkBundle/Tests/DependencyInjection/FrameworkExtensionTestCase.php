@@ -84,7 +84,6 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Controller\WebhookController;
-use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\WorkflowEvents;
@@ -302,7 +301,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertArrayHasKey('index_4', $args);
         $this->assertNull($args['index_4'], 'Workflows has eventsToDispatch=null');
 
-        $this->assertSame(['workflow' => [['name' => 'article']], 'workflow.workflow' => [['name' => 'article']]], $container->getDefinition('workflow.article')->getTags());
+        $tags = $container->getDefinition('workflow.article')->getTags();
+        $this->assertArrayHasKey('workflow', $tags);
+        $this->assertArrayHasKey('workflow.workflow', $tags);
+        $this->assertSame([['name' => 'article']], $tags['workflow.workflow']);
+        $this->assertSame('article', $tags['workflow'][0]['name'] ?? null);
+        $this->assertSame([
+            'title' => 'article workflow',
+            'description' => 'workflow for articles',
+        ], $tags['workflow'][0]['metadata'] ?? null);
 
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
@@ -333,7 +340,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
         $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition'), 'State machine definition is registered as a service');
 
-        $this->assertSame(['workflow' => [['name' => 'pull_request']], 'workflow.state_machine' => [['name' => 'pull_request']]], $container->getDefinition('state_machine.pull_request')->getTags());
+        $tags = $container->getDefinition('state_machine.pull_request')->getTags();
+        $this->assertArrayHasKey('workflow', $tags);
+        $this->assertArrayHasKey('workflow.state_machine', $tags);
+        $this->assertSame([['name' => 'pull_request']], $tags['workflow.state_machine']);
+        $this->assertSame('pull_request', $tags['workflow'][0]['name'] ?? null);
+        $this->assertSame([
+            'title' => 'workflow title',
+        ], $tags['workflow'][0]['metadata'] ?? null);
 
         $stateMachineDefinition = $container->getDefinition('state_machine.pull_request.definition');
 
@@ -357,7 +371,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('state_machine.pull_request.metadata_store', (string) $metadataStoreReference);
 
         $metadataStoreDefinition = $container->getDefinition('state_machine.pull_request.metadata_store');
-        $this->assertSame(Workflow\Metadata\InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+        $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
         $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
 
         $workflowMetadata = $metadataStoreDefinition->getArgument(0);

@@ -77,6 +77,36 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertEmpty(iterator_to_array($receiver->get()));
     }
 
+    public function testItSendsAndReceivesMessagesThroughDefaultExchange()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), ['exchange' => ['name' => '']]);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection, $serializer);
+        $receiver = new AmqpReceiver($connection, $serializer);
+
+        $sender->send($first = new Envelope(new DummyMessage('First'), [new AmqpStamp('messages')]));
+        $sender->send($second = new Envelope(new DummyMessage('Second'), [new AmqpStamp('messages')]));
+
+        $envelopes = iterator_to_array($receiver->get());
+        $this->assertCount(1, $envelopes);
+        /** @var Envelope $envelope */
+        $envelope = $envelopes[0];
+        $this->assertEquals($first->getMessage(), $envelope->getMessage());
+        $this->assertInstanceOf(AmqpReceivedStamp::class, $envelope->last(AmqpReceivedStamp::class));
+
+        $envelopes = iterator_to_array($receiver->get());
+        $this->assertCount(1, $envelopes);
+        /** @var Envelope $envelope */
+        $envelope = $envelopes[0];
+        $this->assertEquals($second->getMessage(), $envelope->getMessage());
+
+        $this->assertEmpty(iterator_to_array($receiver->get()));
+    }
+
     public function testRetryAndDelay()
     {
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));

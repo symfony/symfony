@@ -877,6 +877,55 @@ class ConnectionTest extends TestCase
 
         return Connection::fromDsn('amqp://localhost', [], $factory);
     }
+
+    public function testGettingDefaultExchange()
+    {
+        $factory = $this->createMock(AmqpFactory::class);
+
+        $amqpExchange = $this->createMock(\AMQPExchange::class);
+        $amqpExchange->expects($this->once())->method('setName')->with('');
+        $amqpExchange->expects($this->never())->method('setType');
+        $amqpExchange->expects($this->never())->method('setFlags');
+        $amqpExchange->expects($this->never())->method('setArguments');
+
+        $factory->expects($this->once())->method('createExchange')->willReturn($amqpExchange);
+
+        $connection = new Connection([
+            'host' => 'localhost',
+            'port' => 5672,
+            'vhost' => '/',
+        ], [
+            'name' => '',
+        ], [
+            '' => [],
+        ], $factory);
+
+        $connection->exchange();
+    }
+
+    public function testBindIsNotCalledWhenPublishingInDefaultExchange()
+    {
+        $factory = $this->createMock(AmqpFactory::class);
+
+        $amqpExchange = $this->createMock(\AMQPExchange::class);
+        $amqpExchange->expects($this->never())->method('declareExchange');
+
+        $factory->expects($this->once())->method('createExchange')->willReturn($amqpExchange);
+        $factory->expects($this->once())->method('createQueue')->willReturn($queue = $this->createMock(\AMQPQueue::class));
+        $queue->expects($this->never())->method('bind');
+
+        $connection = new Connection([
+            'host' => 'localhost',
+            'port' => 5672,
+            'vhost' => '/',
+        ], [
+            'name' => '',
+        ], [
+            '' => [],
+        ], $factory);
+
+        $connection->publish('body');
+    }
 }
 
 class TestAmqpFactory extends AmqpFactory

@@ -21,16 +21,25 @@ class AccessToken implements AccessTokenInterface
      */
     public const IN_MEMORY = 'in_memory';
 
+    /**
+     * Default lifetime in use when the remote service does not expose the
+     * token lifetime.
+     *
+     * @see CredentialsInterface::getDefaultLifetime() for overriding this value.
+     */
+    public const DEFAULT_LIFETIME = 600;
+
     protected ?\DateTimeImmutable $expiresAt;
     protected ?bool $hasExpired = null;
 
     /**
-     * @param string $id Identifier of credentials used for generating it
+     * @param string $id        Identifier of credentials used for generating it
+     * @param int    $expiresIn Access token lifetime in seconds
      */
     public function __construct(
         protected readonly string $value,
         protected readonly string $type = 'Bearer',
-        protected readonly int $expiresIn = 600,
+        protected readonly int $expiresIn = self::DEFAULT_LIFETIME,
         protected readonly \DateTimeImmutable $issuedAt = new \DateTimeImmutable(),
         protected readonly string $id = self::IN_MEMORY,
     ) {

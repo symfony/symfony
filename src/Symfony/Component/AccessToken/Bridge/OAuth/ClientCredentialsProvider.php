@@ -139,7 +139,7 @@ class ClientCredentialsProvider extends AbstractProvider
         return new AccessToken(
             value: $data['access_token'],
             type: $data['token_type'] ?? 'Bearer',
-            expiresIn: (int) ($data['expires_in'] ?? 600),
+            expiresIn: (int) ($data['expires_in'] ?? $credentials->getDefaultLifetime()),
             id: $credentials->getId(),
         );
     }

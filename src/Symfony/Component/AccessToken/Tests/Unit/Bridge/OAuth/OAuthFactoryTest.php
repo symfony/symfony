@@ -57,7 +57,7 @@ class OAuthFactoryTest extends TestCase
     {
         $factory = new OAuthFactory();
 
-        $uri = 'oauth://example.tld/oauth?grant_type=client_credentials&client_id=fooId&client_secret=fooSecret&tenant=fooTenant&scope=fooScope%20barScope';
+        $uri = 'oauth://example.tld/oauth?grant_type=client_credentials&client_id=fooId&client_secret=fooSecret&tenant=fooTenant&scope=fooScope%20barScope&default_lifetime=12';
         $credentials = $factory->createCredentials(Dsn::fromString($uri));
         \assert($credentials instanceof ClientCredentials);
 
@@ -67,6 +67,7 @@ class OAuthFactoryTest extends TestCase
         self::assertSame('fooSecret', $credentials->getClientSecret());
         self::assertSame('fooTenant', $credentials->getTenant());
         self::assertSame(['fooScope', 'barScope'], $credentials->getScope());
+        self::assertSame(12, $credentials->getDefaultLifetime());
     }
 
     public function testClientCredentialsUserPassFallbackOnBasicAuth(): void
@@ -105,7 +106,7 @@ class OAuthFactoryTest extends TestCase
     {
         $factory = new OAuthFactory();
 
-        $uri = 'oauth://example.tld/oauth?grant_type=refresh_token&refresh_token=the_token&client_id=fooId&client_secret=fooSecret&tenant=fooTenant&scope=fooScope%20barScope';
+        $uri = 'oauth://example.tld/oauth?grant_type=refresh_token&refresh_token=the_token&client_id=fooId&client_secret=fooSecret&tenant=fooTenant&scope=fooScope%20barScope&default_lifetime=12';
         $credentials = $factory->createCredentials(Dsn::fromString($uri));
         \assert($credentials instanceof RefreshTokenCredentials);
 
@@ -115,6 +116,7 @@ class OAuthFactoryTest extends TestCase
         self::assertSame('fooId', $credentials->getClientId());
         self::assertSame('fooSecret', $credentials->getClientSecret());
         self::assertSame('fooTenant', $credentials->getTenant());
+        self::assertSame(12, $credentials->getDefaultLifetime());
     }
 
     public function testRefreshTokenCredentialsBareMinimum(): void

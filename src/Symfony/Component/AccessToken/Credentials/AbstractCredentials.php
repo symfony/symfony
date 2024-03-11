@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AccessToken\Credentials;
 
+use Symfony\Component\AccessToken\AccessToken;
 use Symfony\Component\AccessToken\CredentialsInterface;
 
 /**
@@ -25,8 +26,18 @@ abstract class AbstractCredentials implements CredentialsInterface
      */
     protected abstract function computeId(): string;
 
+    public function __construct(
+        private ?int $defaultLifetime = null
+    ) {
+    }
+
     public function getId(): string
     {
         return $this->id ??= $this->computeId();
+    }
+
+    public function getDefaultLifetime(): int
+    {
+        return $this->defaultLifetime ?? AccessToken::DEFAULT_LIFETIME;
     }
 }

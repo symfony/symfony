@@ -40,7 +40,8 @@ class OAuthFactory implements FactoryInterface
                 clientSecret: $clientSecret,
                 tenant: $dsn->getOption('tenant'),
                 scope: $dsn->getOption('scope'),
-                endpoint: $dsn->toEndpointUrl(['grant_type', 'client_id', 'client_secret', 'tenant', 'scope']),
+                endpoint: $dsn->toEndpointUrl(['grant_type', 'client_id', 'client_secret', 'tenant', 'scope', 'default_lifetime']),
+                defaultLifetime: (int) $dsn->getOption('default_lifetime'),
             );
         }
 
@@ -61,7 +62,8 @@ class OAuthFactory implements FactoryInterface
                 clientSecret: $clientSecret,
                 tenant: $dsn->getOption('tenant'),
                 scope: $dsn->getOption('scope'),
-                endpoint: $dsn->toEndpointUrl(['grant_type', 'refresh_token', 'client_id', 'client_secret', 'tenant', 'scope']),
+                endpoint: $dsn->toEndpointUrl(['grant_type', 'refresh_token', 'client_id', 'client_secret', 'tenant', 'scope', 'default_lifetime']),
+                defaultLifetime: (int) $dsn->getOption('default_lifetime'),
             );
         }
 

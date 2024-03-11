@@ -35,8 +35,9 @@ class ClientCredentials extends AbstractOAuthCredentials
         #[\SensitiveParameter] ?string $tenant = null,
         string|array|null $scope = null,
         ?string $endpoint = null,
+        ?int $defaultLifetime = null,
     ) {
-        parent::__construct($tenant, $endpoint);
+        parent::__construct($tenant, $endpoint, $defaultLifetime);
 
         $this->scope = \is_string($scope) ? array_filter(explode(' ', $scope)) : $scope;
     }

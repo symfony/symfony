@@ -29,7 +29,9 @@ abstract class AbstractOAuthCredentials extends AbstractCredentials
     public function __construct(
         #[\SensitiveParameter] protected readonly ?string $tenant = null,
         protected readonly ?string $endpoint = null,
+        ?int $defaultLifetime = null,
     ) {
+        parent::__construct($defaultLifetime);
     }
 
     /**

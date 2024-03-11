@@ -29,4 +29,12 @@ interface CredentialsInterface
      * order to avoid cache pollution.
      */
     public function getId(): string;
+
+    /**
+     * Get default lifetime for this credentials.
+     *
+     * When the remote service does not give any information about token
+     * lifetime, the value here will be used.
+     */
+    public function getDefaultLifetime(): int;
 }

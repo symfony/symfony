@@ -21,7 +21,10 @@ class BasicAuthCredentials extends AbstractCredentials
     public function __construct(
         private readonly string $username,
         private readonly ?string $password = null,
-    ) {}
+        ?int $defaultLifetime = null,
+    ) {
+        parent::__construct($defaultLifetime);
+    }
 
     public function getUsername(): string
     {

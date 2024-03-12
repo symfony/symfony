@@ -22,70 +22,24 @@ class MarkingTest extends TestCase
 
         $this->assertTrue($marking->has('a'));
         $this->assertFalse($marking->has('b'));
-        $this->assertPlaces(['a' => 1], $marking);
+        $this->assertSame(['a' => 1], $marking->getPlaces());
 
         $marking->mark('b');
 
         $this->assertTrue($marking->has('a'));
         $this->assertTrue($marking->has('b'));
-        $this->assertPlaces(['a' => 1, 'b' => 1], $marking);
+        $this->assertSame(['a' => 1, 'b' => 1], $marking->getPlaces());
 
         $marking->unmark('a');
 
         $this->assertFalse($marking->has('a'));
         $this->assertTrue($marking->has('b'));
-        $this->assertPlaces(['b' => 1], $marking);
+        $this->assertSame(['b' => 1], $marking->getPlaces());
 
         $marking->unmark('b');
 
         $this->assertFalse($marking->has('a'));
         $this->assertFalse($marking->has('b'));
-        $this->assertPlaces([], $marking);
-
-        $marking->mark('a');
-        $this->assertPlaces(['a' => 1], $marking);
-
-        $marking->mark('a');
-        $this->assertPlaces(['a' => 2], $marking);
-
-        $marking->unmark('a');
-        $this->assertPlaces(['a' => 1], $marking);
-
-        $marking->unmark('a');
-        $this->assertPlaces([], $marking);
-    }
-
-    public function testGuardNotMarked()
-    {
-        $marking = new Marking([]);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The place "a" is not marked.');
-        $marking->unmark('a');
-    }
-
-    public function testGuardNotNbTokenLowerThanZero()
-    {
-        $marking = new Marking(['a' => 1]);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The place "a" could not contain a negative token number.');
-        $marking->unmark('a', 2);
-    }
-
-    public function testGuardNotNbTokenEquals0()
-    {
-        $marking = new Marking(['a' => 1]);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The number of tokens must be greater than 0, "0" given.');
-        $marking->unmark('a', 0);
-    }
-
-    private function assertPlaces(array $expected, Marking $marking)
-    {
-        $places = $marking->getPlaces();
-        ksort($places);
-        $this->assertSame($expected, $places);
+        $this->assertSame([], $marking->getPlaces());
     }
 }

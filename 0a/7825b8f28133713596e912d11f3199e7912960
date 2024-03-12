@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-03-09T13:35:27Z
+
+Don't we have the same issue in 5.4?
+
+---------------------------------------------------------------------------
+
+by arjenm at 2024-03-09T18:59:45Z
+
+@fabpot if this code is in 5.4, than probably. I'm not sure if the fixes are valid php 7.x though.

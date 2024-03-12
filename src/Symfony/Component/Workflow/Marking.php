@@ -19,7 +19,7 @@ namespace Symfony\Component\Workflow;
 class Marking
 {
     private $places = [];
-    private $context;
+    private $context = null;
 
     /**
      * @param int[] $representation Keys are the place name and values should be 1
@@ -27,46 +27,23 @@ class Marking
     public function __construct(array $representation = [])
     {
         foreach ($representation as $place => $nbToken) {
-            $this->mark($place, $nbToken);
+            $this->mark($place);
         }
     }
 
-    public function mark(string $place, int $nbToken = 1)
+    public function mark(string $place)
     {
-        if ($nbToken < 1) {
-            throw new \LogicException(sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
-        }
-
-        if (!\array_key_exists($place, $this->places)) {
-            $this->places[$place] = 0;
-        }
-        $this->places[$place] += $nbToken;
+        $this->places[$place] = 1;
     }
 
-    public function unmark(string $place, int $nbToken = 1)
+    public function unmark(string $place)
     {
-        if ($nbToken < 1) {
-            throw new \LogicException(sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
-        }
-
-        if (!$this->has($place)) {
-            throw new \LogicException(sprintf('The place "%s" is not marked.', $place));
-        }
-
-        $this->places[$place] -= $nbToken;
-
-        if (0 > $this->places[$place]) {
-            throw new \LogicException(sprintf('The place "%s" could not contain a negative token number.', $place));
-        }
-
-        if (0 === $this->places[$place]) {
-            unset($this->places[$place]);
-        }
+        unset($this->places[$place]);
     }
 
     public function has(string $place)
     {
-        return \array_key_exists($place, $this->places);
+        return isset($this->places[$place]);
     }
 
     public function getPlaces()

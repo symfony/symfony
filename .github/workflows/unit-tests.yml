@@ -34,7 +34,7 @@ jobs:
             mode: low-deps
           - php: '8.3'
           - php: '8.4'
-            mode: experimental
+            #mode: experimental
       fail-fast: false
 
     runs-on: ubuntu-20.04

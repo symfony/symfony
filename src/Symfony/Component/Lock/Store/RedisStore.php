@@ -258,10 +258,10 @@ class RedisStore implements SharedLockStoreInterface
     private function evaluate(string $script, string $resource, array $args)
     {
         if (
-            $this->redis instanceof \Redis ||
-            $this->redis instanceof \RedisCluster ||
-            $this->redis instanceof RedisProxy ||
-            $this->redis instanceof RedisClusterProxy
+            $this->redis instanceof \Redis
+            || $this->redis instanceof \RedisCluster
+            || $this->redis instanceof RedisProxy
+            || $this->redis instanceof RedisClusterProxy
         ) {
             $this->redis->clearLastError();
             $result = $this->redis->eval($script, array_merge([$resource], $args), 1);
@@ -317,7 +317,9 @@ class RedisStore implements SharedLockStoreInterface
             try {
                 $this->supportTime = 1 === $this->evaluate($script, 'symfony_check_support_time', []);
             } catch (LockStorageException $e) {
-                if (false === strpos($e->getMessage(), 'commands not allowed after non deterministic')) {
+                if (!str_contains($e->getMessage(), 'commands not allowed after non deterministic')
+                    && !str_contains($e->getMessage(), 'is not allowed from script script')
+                ) {
                     throw $e;
                 }
                 $this->supportTime = false;

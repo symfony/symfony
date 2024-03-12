@@ -34,13 +34,10 @@ class_exists(TranslatorTrait::class);
  */
 final class TranslationExtension extends AbstractExtension
 {
-    private ?TranslatorInterface $translator;
-    private ?TranslationNodeVisitor $translationNodeVisitor;
-
-    public function __construct(?TranslatorInterface $translator = null, ?TranslationNodeVisitor $translationNodeVisitor = null)
-    {
-        $this->translator = $translator;
-        $this->translationNodeVisitor = $translationNodeVisitor;
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+        private ?TranslationNodeVisitor $translationNodeVisitor = null,
+    ) {
     }
 
     public function getTranslator(): TranslatorInterface

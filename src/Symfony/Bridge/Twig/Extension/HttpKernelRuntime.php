@@ -22,13 +22,10 @@ use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
  */
 final class HttpKernelRuntime
 {
-    private FragmentHandler $handler;
-    private ?FragmentUriGeneratorInterface $fragmentUriGenerator;
-
-    public function __construct(FragmentHandler $handler, ?FragmentUriGeneratorInterface $fragmentUriGenerator = null)
-    {
-        $this->handler = $handler;
-        $this->fragmentUriGenerator = $fragmentUriGenerator;
+    public function __construct(
+        private FragmentHandler $handler,
+        private ?FragmentUriGeneratorInterface $fragmentUriGenerator = null,
+    ) {
     }
 
     /**

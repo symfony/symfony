@@ -21,13 +21,13 @@ use Twig\Template;
  */
 class TwigRendererEngine extends AbstractRendererEngine
 {
-    private Environment $environment;
     private Template $template;
 
-    public function __construct(array $defaultThemes, Environment $environment)
-    {
+    public function __construct(
+        array $defaultThemes,
+        private Environment $environment,
+    ) {
         parent::__construct($defaultThemes);
-        $this->environment = $environment;
     }
 
     public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string

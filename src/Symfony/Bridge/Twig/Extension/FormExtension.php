@@ -33,11 +33,9 @@ use Twig\TwigTest;
  */
 final class FormExtension extends AbstractExtension
 {
-    private ?TranslatorInterface $translator;
-
-    public function __construct(?TranslatorInterface $translator = null)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
     public function getTokenParsers(): array

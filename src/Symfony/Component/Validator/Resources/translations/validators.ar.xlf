@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">هذه القيمة ليست عنوان IP صالحًا.</target>
+                <target>هذا ليس عنوان IP صحيح.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">لم يتم تكوين مجلد مؤقت في ملف php.ini، أو المجلد المعد لا يوجد.</target>
+                <target>لم يتم تكوين مجلد مؤقت في ملف php.ini.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">هذه القيمة ليست رقم حساب بنكي دولي (IBAN) صالحًا.</target>
+                <target>هذه القيمة ليست رقم حساب بنكي دولي (IBAN) صالحًا.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">هذه القيمة ليست رمز معرف الأعمال (BIC) صالحًا.</target>
+                <target>هذه القيمة ليست رمز معرف أعمال (BIC) صالحًا.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">هذه القيمة ليست UUID صالحًا.</target>
+                <target>هذه القيمة ليست UUID صالحًا.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -432,11 +432,11 @@
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-review-translation">تم اكتشاف ترميز الأحرف غير صالح ({{ detected }}). الترميزات المسموح بها هي {{ encodings }}.</target>
+                <target>تم اكتشاف ترميز أحرف غير صالح ({{ detected }}). الترميزات المسموح بها هي {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">هذه القيمة ليست عنوان MAC صالحًا.</target>
+                <target>هذه القيمة ليست عنوان MAC صالحًا.</target>
             </trans-unit>
         </body>
     </file>

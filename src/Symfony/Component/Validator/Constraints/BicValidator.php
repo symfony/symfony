@@ -102,16 +102,6 @@ class BicValidator extends ConstraintValidator
             return;
         }
 
-        // first 4 letters must be alphabetic (bank code)
-        if (!ctype_alpha(substr($canonicalize, 0, 4))) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Bic::INVALID_BANK_CODE_ERROR)
-                ->addViolation();
-
-            return;
-        }
-
         $bicCountryCode = substr($canonicalize, 4, 2);
         if (!isset(self::BIC_COUNTRY_TO_IBAN_COUNTRY_MAP[$bicCountryCode]) && !Countries::exists($bicCountryCode)) {
             $this->context->buildViolation($constraint->message)

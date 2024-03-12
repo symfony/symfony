@@ -50,6 +50,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      */
     private $logger;
 
+    private $maxHostConnections;
+    private $maxPendingPushes;
+
     /**
      * An internal object to share state between the client and its responses.
      *
@@ -70,18 +73,22 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\CurlHttpClient" as the "curl" extension is not installed.');
         }
 
+        $this->maxHostConnections = $maxHostConnections;
+        $this->maxPendingPushes = $maxPendingPushes;
+
         $this->defaultOptions['buffer'] = $this->defaultOptions['buffer'] ?? \Closure::fromCallable([__CLASS__, 'shouldBuffer']);
 
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);
         }
-
-        $this->multi = new CurlClientState($maxHostConnections, $maxPendingPushes);
     }
 
     public function setLogger(LoggerInterface $logger): void
     {
-        $this->logger = $this->multi->logger = $logger;
+        $this->logger = $logger;
+        if (isset($this->multi)) {
+            $this->multi->logger = $logger;
+        }
     }
 
     /**
@@ -91,6 +98,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        $multi = $this->ensureState();
+
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
         $scheme = $url['scheme'];
         $authority = $url['authority'];
@@ -161,25 +170,25 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         // curl's resolve feature varies by host:port but ours varies by host only, let's handle this with our own DNS map
-        if (isset($this->multi->dnsCache->hostnames[$host])) {
-            $options['resolve'] += [$host => $this->multi->dnsCache->hostnames[$host]];
+        if (isset($multi->dnsCache->hostnames[$host])) {
+            $options['resolve'] += [$host => $multi->dnsCache->hostnames[$host]];
         }
 
-        if ($options['resolve'] || $this->multi->dnsCache->evictions) {
+        if ($options['resolve'] || $multi->dnsCache->evictions) {
             // First reset any old DNS cache entries then add the new ones
-            $resolve = $this->multi->dnsCache->evictions;
-            $this->multi->dnsCache->evictions = [];
+            $resolve = $multi->dnsCache->evictions;
+            $multi->dnsCache->evictions = [];
             $port = parse_url($authority, \PHP_URL_PORT) ?: ('http:' === $scheme ? 80 : 443);
 
             if ($resolve && 0x072A00 > CurlClientState::$curlVersion['version_number']) {
                 // DNS cache removals require curl 7.42 or higher
-                $this->multi->reset();
+                $multi->reset();
             }
 
             foreach ($options['resolve'] as $host => $ip) {
                 $resolve[] = null === $ip ? "-$host:$port" : "$host:$port:$ip";
-                $this->multi->dnsCache->hostnames[$host] = $ip;
-                $this->multi->dnsCache->removals["-$host:$port"] = "-$host:$port";
+                $multi->dnsCache->hostnames[$host] = $ip;
+                $multi->dnsCache->removals["-$host:$port"] = "-$host:$port";
             }
 
             $curlopts[\CURLOPT_RESOLVE] = $resolve;
@@ -281,8 +290,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts += $options['extra']['curl'];
         }
 
-        if ($pushedResponse = $this->multi->pushedResponses[$url] ?? null) {
-            unset($this->multi->pushedResponses[$url]);
+        if ($pushedResponse = $multi->pushedResponses[$url] ?? null) {
+            unset($multi->pushedResponses[$url]);
 
             if (self::acceptPushForRequest($method, $options, $pushedResponse)) {
                 $this->logger && $this->logger->debug(sprintf('Accepting pushed response: "%s %s"', $method, $url));
@@ -290,7 +299,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 // Reinitialize the pushed response with request's options
                 $ch = $pushedResponse->handle;
                 $pushedResponse = $pushedResponse->response;
-                $pushedResponse->__construct($this->multi, $url, $options, $this->logger);
+                $pushedResponse->__construct($multi, $url, $options, $this->logger);
             } else {
                 $this->logger && $this->logger->debug(sprintf('Rejecting pushed response: "%s"', $url));
                 $pushedResponse = null;
@@ -300,7 +309,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         if (!$pushedResponse) {
             $ch = curl_init();
             $this->logger && $this->logger->info(sprintf('Request: "%s %s"', $method, $url));
-            $curlopts += [\CURLOPT_SHARE => $this->multi->share];
+            $curlopts += [\CURLOPT_SHARE => $multi->share];
         }
 
         foreach ($curlopts as $opt => $value) {
@@ -310,7 +319,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host), CurlClientState::$curlVersion['version_number']);
+        return $pushedResponse ?? new CurlResponse($multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host), CurlClientState::$curlVersion['version_number']);
     }
 
     /**
@@ -324,9 +333,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of CurlResponse objects, "%s" given.', __METHOD__, get_debug_type($responses)));
         }
 
-        if (\is_resource($this->multi->handle) || $this->multi->handle instanceof \CurlMultiHandle) {
+        $multi = $this->ensureState();
+
+        if (\is_resource($multi->handle) || $multi->handle instanceof \CurlMultiHandle) {
             $active = 0;
-            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active)) {
+            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active)) {
             }
         }
 
@@ -335,7 +346,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     public function reset()
     {
-        $this->multi->reset();
+        if (isset($this->multi)) {
+            $this->multi->reset();
+        }
     }
 
     /**
@@ -437,6 +450,16 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
             return implode('', $url);
         };
+    }
+
+    private function ensureState(): CurlClientState
+    {
+        if (!isset($this->multi)) {
+            $this->multi = new CurlClientState($this->maxHostConnections, $this->maxPendingPushes);
+            $this->multi->logger = $this->logger;
+        }
+
+        return $this->multi;
     }
 
     private function findConstantName(int $opt): ?string

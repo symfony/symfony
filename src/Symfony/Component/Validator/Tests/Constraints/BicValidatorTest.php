@@ -199,7 +199,6 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public static function getValidBics()
     {
-        // http://formvalidation.io/validators/bic/
         return [
             ['ASPKAT2LXXX'],
             ['ASPKAT2L'],
@@ -207,6 +206,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ['UNCRIT2B912'],
             ['DABADKKK'],
             ['RZOOAT2L303'],
+            ['1SBACNBXSHA'],
         ];
     }
 
@@ -252,11 +252,6 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ['ASPKAT2LX', Bic::INVALID_LENGTH_ERROR],
             ['ASPKAT2LXXX1', Bic::INVALID_LENGTH_ERROR],
             ['DABADKK', Bic::INVALID_LENGTH_ERROR],
-            ['1SBACNBXSHA', Bic::INVALID_BANK_CODE_ERROR],
-            ['RZ00AT2L303', Bic::INVALID_BANK_CODE_ERROR],
-            ['D2BACNBXSHA', Bic::INVALID_BANK_CODE_ERROR],
-            ['DS3ACNBXSHA', Bic::INVALID_BANK_CODE_ERROR],
-            ['DSB4CNBXSHA', Bic::INVALID_BANK_CODE_ERROR],
             ['DEUT12HH', Bic::INVALID_COUNTRY_CODE_ERROR],
             ['DSBAC6BXSHA', Bic::INVALID_COUNTRY_CODE_ERROR],
             ['DSBA5NBXSHA', Bic::INVALID_COUNTRY_CODE_ERROR],

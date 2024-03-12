@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by lermontex at 2024-03-12T17:34:02Z
+
+@fabpot, @nicolas-grekas
+
+Can you include this fix in the next minor version? This bug prevents you from migrating to Symfony 6.4+ because breaking the message reprocessing logic causes serious errors that cannot be avoided because unprocessed messages are permanently removed from the queue

@@ -66,7 +66,6 @@ class Length extends Constraint
      * @param self::COUNT_*|null           $countUnit  The character count unit for the length check (defaults to {@see Length::COUNT_CODEPOINTS})
      * @param string[]|null                $groups
      * @param array<string,mixed>          $options
-     *
      */
     public function __construct(
         int|array|null $exactly = null,

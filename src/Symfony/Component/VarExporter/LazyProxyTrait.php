@@ -31,14 +31,24 @@ trait LazyProxyTrait
     {
         if (self::class !== $class = $instance ? $instance::class : static::class) {
             $skippedProperties = ["\0".self::class."\0lazyObjectState" => true];
-        } elseif (\defined($class.'::LAZY_OBJECT_PROPERTY_SCOPES')) {
-            Hydrator::$propertyScopes[$class] ??= $class::LAZY_OBJECT_PROPERTY_SCOPES;
         }
 
-        $instance ??= (Registry::$classReflectors[$class] ??= new \ReflectionClass($class))->newInstanceWithoutConstructor();
+        if (!isset(Registry::$defaultProperties[$class])) {
+            Registry::$classReflectors[$class] ??= new \ReflectionClass($class);
+            $instance ??= Registry::$classReflectors[$class]->newInstanceWithoutConstructor();
+            Registry::$defaultProperties[$class] ??= (array) $instance;
+            Registry::$classResetters[$class] ??= Registry::getClassResetters($class);
+
+            if (self::class === $class && \defined($class.'::LAZY_OBJECT_PROPERTY_SCOPES')) {
+                Hydrator::$propertyScopes[$class] ??= $class::LAZY_OBJECT_PROPERTY_SCOPES;
+            }
+        } else {
+            $instance ??= Registry::$classReflectors[$class]->newInstanceWithoutConstructor();
+        }
+
         $instance->lazyObjectState = new LazyObjectState($initializer);
 
-        foreach (Registry::$classResetters[$class] ??= Registry::getClassResetters($class) as $reset) {
+        foreach (Registry::$classResetters[$class] as $reset) {
             $reset($instance, $skippedProperties ??= []);
         }
 

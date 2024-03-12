@@ -129,8 +129,8 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
             $mapping = $ret[0]->getFieldMapping($property);
 
-            if (isset($mapping['length'])) {
-                return new ValueGuess($mapping['length'], Guess::HIGH_CONFIDENCE);
+            if (isset($mapping->length)) {
+                return new ValueGuess($mapping->length, Guess::HIGH_CONFIDENCE);
             }
 
             if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT])) {

@@ -36,27 +36,19 @@ use Twig\Loader\FilesystemLoader;
 #[AsCommand(name: 'debug:twig', description: 'Show a list of twig functions, filters, globals and tests')]
 class DebugCommand extends Command
 {
-    private Environment $twig;
-    private ?string $projectDir;
-    private array $bundlesMetadata;
-    private ?string $twigDefaultPath;
-
     /**
      * @var FilesystemLoader[]
      */
     private array $filesystemLoaders;
 
-    private ?FileLinkFormatter $fileLinkFormatter;
-
-    public function __construct(Environment $twig, ?string $projectDir = null, array $bundlesMetadata = [], ?string $twigDefaultPath = null, ?FileLinkFormatter $fileLinkFormatter = null)
-    {
+    public function __construct(
+        private Environment $twig,
+        private ?string $projectDir = null,
+        private array $bundlesMetadata = [],
+        private ?string $twigDefaultPath = null,
+        private ?FileLinkFormatter $fileLinkFormatter = null,
+    ) {
         parent::__construct();
-
-        $this->twig = $twig;
-        $this->projectDir = $projectDir;
-        $this->bundlesMetadata = $bundlesMetadata;
-        $this->twigDefaultPath = $twigDefaultPath;
-        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     protected function configure(): void

@@ -517,7 +517,12 @@ class ErrorHandler
                         }
 
                         // Display the original error message instead of the default one.
-                        $this->handleException($errorAsException);
+                        $exitCode = self::$exitCode;
+                        try {
+                            $this->handleException($errorAsException);
+                        } finally {
+                            self::$exitCode = $exitCode;
+                        }
 
                         // Stop the process by giving back the error to the native handler.
                         return false;

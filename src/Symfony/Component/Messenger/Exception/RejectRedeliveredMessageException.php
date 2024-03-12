@@ -14,6 +14,6 @@ namespace Symfony\Component\Messenger\Exception;
 /**
  * @author Tobias Schultze <http://tobion.de>
  */
-class RejectRedeliveredMessageException extends RuntimeException implements UnrecoverableExceptionInterface
+class RejectRedeliveredMessageException extends RuntimeException
 {
 }

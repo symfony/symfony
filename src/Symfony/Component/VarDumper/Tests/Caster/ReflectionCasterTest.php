@@ -599,13 +599,14 @@ EOTXT
     public function testReflectionClassWithAttribute()
     {
         $var = new \ReflectionClass(LotsOfAttributes::class);
+        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
-        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+        $this->assertDumpMatchesFormat(<<<EOTXT
 ReflectionClass {
   +name: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
 %A  attributes: array:1 [
     0 => ReflectionAttribute {
-      name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+      $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
       arguments: []
     }
   ]
@@ -621,14 +622,15 @@ EOTXT
     public function testReflectionMethodWithAttribute()
     {
         $var = new \ReflectionMethod(LotsOfAttributes::class, 'someMethod');
+        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
-        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+        $this->assertDumpMatchesFormat(<<<EOTXT
 ReflectionMethod {
   +name: "someMethod"
   +class: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
 %A  attributes: array:1 [
     0 => ReflectionAttribute {
-      name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+      $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
       arguments: array:1 [
         0 => "two"
       ]
@@ -646,14 +648,15 @@ EOTXT
     public function testReflectionPropertyWithAttribute()
     {
         $var = new \ReflectionProperty(LotsOfAttributes::class, 'someProperty');
+        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
-        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+        $this->assertDumpMatchesFormat(<<<EOTXT
 ReflectionProperty {
   +name: "someProperty"
   +class: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
 %A  attributes: array:1 [
     0 => ReflectionAttribute {
-      name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+      $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
       arguments: array:2 [
         0 => "one"
         "extra" => "hello"
@@ -671,8 +674,9 @@ EOTXT
     public function testReflectionClassConstantWithAttribute()
     {
         $var = new \ReflectionClassConstant(LotsOfAttributes::class, 'SOME_CONSTANT');
+        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
-        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+        $this->assertDumpMatchesFormat(<<<EOTXT
 ReflectionClassConstant {
   +name: "SOME_CONSTANT"
   +class: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
@@ -680,13 +684,13 @@ ReflectionClassConstant {
   value: "some value"
   attributes: array:2 [
     0 => ReflectionAttribute {
-      name: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
+      $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
       arguments: array:1 [
         0 => "one"
       ]
     }
     1 => ReflectionAttribute {
-      name: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
+      $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
       arguments: array:1 [
         0 => "two"
       ]
@@ -703,14 +707,15 @@ EOTXT
     public function testReflectionParameterWithAttribute()
     {
         $var = new \ReflectionParameter([LotsOfAttributes::class, 'someMethod'], 'someParameter');
+        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
-        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+        $this->assertDumpMatchesFormat(<<<EOTXT
 ReflectionParameter {
   +name: "someParameter"
   position: 0
   attributes: array:1 [
     0 => ReflectionAttribute {
-      name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+      $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
       arguments: array:1 [
         0 => "three"
       ]

@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\DelayedEnvelope;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -20,6 +21,7 @@ use Symfony\Component\Mime\Email;
 class SendmailTransportTest extends TestCase
 {
     private const FAKE_SENDMAIL = __DIR__.'/Fixtures/fake-sendmail.php -t';
+    private const FAKE_FAILING_SENDMAIL = __DIR__.'/Fixtures/fake-failing-sendmail.php -t';
 
     /**
      * @var string
@@ -88,5 +90,28 @@ class SendmailTransportTest extends TestCase
         $sendmailTransport->send($mail, $envelope);
 
         $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com recipient@mail.com');
+    }
+
+    public function testThrowsTransportExceptionOnFailure()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');
+        }
+
+        $mail = new Email();
+        $mail
+            ->from('from@mail.com')
+            ->to('to@mail.com')
+            ->subject('Subject')
+            ->text('Some text')
+        ;
+
+        $envelope = new DelayedEnvelope($mail);
+        $envelope->setRecipients([new Address('recipient@mail.com')]);
+
+        $sendmailTransport = new SendmailTransport(self::FAKE_FAILING_SENDMAIL);
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Process failed with exit code 42: Sending failed');
+        $sendmailTransport->send($mail, $envelope);
     }
 }

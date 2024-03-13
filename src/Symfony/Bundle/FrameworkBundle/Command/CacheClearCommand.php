@@ -156,7 +156,7 @@ EOF
             }
 
             if ($this->isNfs($realBuildDir)) {
-                $io->note('For better performances, you should move the cache and log directories to a non-shared folder of the VM.');
+                $io->note('For better performance, you should move the cache and log directories to a non-shared folder of the VM.');
                 $fs->remove($realBuildDir);
             } else {
                 $fs->rename($realBuildDir, $oldBuildDir);

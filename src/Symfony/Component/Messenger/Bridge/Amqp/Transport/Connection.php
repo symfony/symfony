@@ -456,13 +456,13 @@ class Connection
     private function setupExchangeAndQueues(): void
     {
         $exchange = $this->exchange();
-        if ($this->exchangeOptions['name'] !== '') {
+        if ('' !== $this->exchangeOptions['name']) {
             $exchange->declareExchange();
         }
 
         foreach ($this->queuesOptions as $queueName => $queueConfig) {
             $this->queue($queueName)->declareQueue();
-            if ($this->exchangeOptions['name'] !== '') {
+            if ('' !== $this->exchangeOptions['name']) {
                 foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
                     $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey, $queueConfig['binding_arguments'] ?? []);
                 }
@@ -539,7 +539,7 @@ class Connection
         if (!isset($this->amqpExchange)) {
             $this->amqpExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpExchange->setName($this->exchangeOptions['name']);
-            if ($this->exchangeOptions['name'] !== '') {
+            if ('' !== $this->exchangeOptions['name']) {
                 $this->amqpExchange->setType($this->exchangeOptions['type'] ?? \AMQP_EX_TYPE_FANOUT);
                 $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? \AMQP_DURABLE);
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-03-13T10:13:35Z
+
+looks like the low deps failures are related
+
+---------------------------------------------------------------------------
+
+by AurelienPillevesse at 2024-03-13T10:16:51Z
+
+@xabbuh When I execute on my local machine, I have no more warning since the commit [daf1a91](https://github.com/symfony/symfony/pull/54260/commits/daf1a91bb20a9230d51b68c6834f235f6244d9e6). Can you try to run unit tests on your computer to verify that it's similar to me ?

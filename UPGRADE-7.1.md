@@ -46,3 +46,4 @@ Workflow
 --------
 
  * Add method `getEnabledTransition()` to `WorkflowInterface`
+ * Add `$nbToken` argument to `Marking::mark()` and `Marking::unmark()`

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add method `getEnabledTransition()` to `WorkflowInterface`
  * Automatically register places from transitions
+ * Add support for workflows that need to store many tokens in the marking
 
 7.0
 ---

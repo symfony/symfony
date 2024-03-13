@@ -48,14 +48,16 @@ final class LockMiddleware implements MiddlewareInterface
                     // The acquire call must be done before stamping the message
                     // in order to have the full state of the key in the stamp.
                     $lock = $message instanceof TTLAwareLockableMessageInterface
-                        ? $this->lockFactory->createLock($key, $message->getTTL(), autoRelease: false)
-                        : $this->lockFactory->createLock($key, autoRelease: false);
-                    $canAcquire = $lock->acquire();
+                        ? $this->lockFactory->createLockFromKey($key, $message->getTTL(), autoRelease: false)
+                        : $this->lockFactory->createLockFromKey($key, autoRelease: false);
 
-                    $envelope = $envelope->with(new LockStamp($key, $message->shouldBeReleasedBeforeHandlerCall()));
-                    if (!$canAcquire) {
+                    if (!$lock->acquire()) {
                         return $envelope;
                     }
+
+                    // The acquire call must be done before stamping the message
+                    // in order to have the full state of the key in the stamp.
+                    $envelope = $envelope->with(new LockStamp($key, $message->shouldBeReleasedBeforeHandlerCall()));
                 }
             }
         } else {

@@ -884,7 +884,7 @@ class ConnectionTest extends TestCase
 
         $amqpExchange = $this->createMock(\AMQPExchange::class);
         $amqpExchange->expects($this->once())->method('setName')->with('');
-        $amqpExchange->expects($this->never())->method('setType');
+        $amqpExchange->expects($this->once())->method('setType')->with(\AMQP_EX_TYPE_DIRECT);
         $amqpExchange->expects($this->never())->method('setFlags');
         $amqpExchange->expects($this->never())->method('setArguments');
 

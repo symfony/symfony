@@ -539,8 +539,9 @@ class Connection
         if (!isset($this->amqpExchange)) {
             $this->amqpExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpExchange->setName($this->exchangeOptions['name']);
+            $defaultExchangeType = '' !== $this->exchangeOptions['name'] ? \AMQP_EX_TYPE_FANOUT : \AMQP_EX_TYPE_DIRECT;
+            $this->amqpExchange->setType($this->exchangeOptions['type'] ?? $defaultExchangeType);
             if ('' !== $this->exchangeOptions['name']) {
-                $this->amqpExchange->setType($this->exchangeOptions['type'] ?? \AMQP_EX_TYPE_FANOUT);
                 $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? \AMQP_DURABLE);
 
                 if (isset($this->exchangeOptions['arguments'])) {

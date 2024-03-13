@@ -17,6 +17,8 @@ CHANGELOG
  * Add the ability to use an existing service as a lock/semaphore resource
  * Add support for configuring multiple serializer instances via the configuration
  * Add support for `SYMFONY_TRUSTED_PROXIES`, `SYMFONY_TRUSTED_HEADERS`, `SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER` and `SYMFONY_TRUSTED_HOSTS` env vars
+ * Add support for executing custom workflow definition validators during the
+   container compilation
 
 7.1
 ---

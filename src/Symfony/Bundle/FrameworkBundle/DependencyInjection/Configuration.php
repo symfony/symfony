@@ -49,6 +49,7 @@ use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
 use Symfony\Component\Workflow\WorkflowEvents;
 
 /**
@@ -378,6 +379,7 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->fixXmlConfig('support')
+                                ->fixXmlConfig('definition_validator')
                                 ->fixXmlConfig('place')
                                 ->fixXmlConfig('transition')
                                 ->fixXmlConfig('event_to_dispatch', 'events_to_dispatch')
@@ -412,6 +414,23 @@ class Configuration implements ConfigurationInterface
                                             ->validate()
                                                 ->ifTrue(fn ($v) => !class_exists($v) && !interface_exists($v, false))
                                                 ->thenInvalid('The supported class or interface "%s" does not exist.')
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('definition_validators')
+                                        ->prototype('scalar')
+                                            ->cannotBeEmpty()
+                                            ->validate()
+                                                ->ifTrue(fn ($v) => !class_exists($v))
+                                                ->thenInvalid('The validation class %s does not exist.')
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(fn ($v) => !is_a($v, DefinitionValidatorInterface::class, true))
+                                                ->thenInvalid(\sprintf('The validation class %%s is not an instance of %s.', DefinitionValidatorInterface::class))
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(fn ($v) => 1 <= (new \ReflectionClass($v))->getConstructor()?->getNumberOfRequiredParameters())
+                                                ->thenInvalid('The validation class %s constructor must not have any arguments.')
                                             ->end()
                                         ->end()
                                     ->end()

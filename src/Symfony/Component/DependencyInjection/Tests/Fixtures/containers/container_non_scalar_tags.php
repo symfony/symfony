@@ -10,6 +10,7 @@ $container = new ContainerBuilder();
 $container
     ->register('foo', FooClass::class)
     ->addTag('foo_tag', [
+        'name' => 'attributeName',
         'foo' => 'bar',
         'bar' => [
             'foo' => 'bar',

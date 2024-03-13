@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Middleware;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Message\LockableMessageInterface;
+use Symfony\Component\Messenger\Message\TTLAwareLockableMessageInterface;
 use Symfony\Component\Messenger\Stamp\LockStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 
@@ -35,20 +36,27 @@ final class LockMiddleware implements MiddlewareInterface
 
         $message = $envelope->getMessage();
 
-        // If we're trying to dispatch a lockable message.
-        if ($message instanceof LockableMessageInterface && null === $envelope->last(ReceivedStamp::class)) {
-            $key = $message->getKey();
+        if (null === $envelope->last(ReceivedStamp::class)) {
+            if ($message instanceof LockableMessageInterface) {
+                // If we're trying to dispatch a lockable message.
+                $key = $message->getKey();
 
-            if (null !== $key) {
-                // The acquire call must be done before stamping the message
-                // in order to have the full state of the key in the stamp.
-                $canAcquire = $this->lockFactory->createLock($key, autoRelease: false)->acquire();
+                if (null !== $key) {
+                    // The acquire call must be done before stamping the message
+                    // in order to have the full state of the key in the stamp.
+                    $lock = $message instanceof TTLAwareLockableMessageInterface
+                        ? $this->lockFactory->createLock($key, $message->getTTL(), autoRelease: false)
+                        : $this->lockFactory->createLock($key, autoRelease: false);
+                    $canAcquire = $lock->acquire();
 
-                $envelope = $envelope->with(new LockStamp($key));
-                if (!$canAcquire) {
-                    return $envelope;
+                    $envelope = $envelope->with(new LockStamp($key, $message->shouldBeReleasedBeforeHandlerCall()));
+                    if (!$canAcquire) {
+                        return $envelope;
+                    }
                 }
             }
+        } else {
+            $this->releaseLock($envelope, true);
         }
 
         try {
@@ -56,13 +64,22 @@ final class LockMiddleware implements MiddlewareInterface
         } finally {
             // If we've received a lockable message, we're releasing it.
             if (null !== $envelope->last(ReceivedStamp::class)) {
-                $stamp = $envelope->last(LockStamp::class);
-                if ($stamp instanceof LockStamp) {
-                    $this->lockFactory->createLockFromKey($stamp->getKey(), autoRelease: false)->release();
-                }
+                $this->releaseLock($envelope, false);
             }
         }
 
         return $envelope;
+    }
+
+    private function releaseLock(Envelope $envelope, bool $beforeHandlerCall): void
+    {
+        $stamp = $envelope->last(LockStamp::class);
+        if ($stamp instanceof LockStamp && $stamp->shouldBeReleasedBeforHandlerCall() === $beforeHandlerCall) {
+            $message = $envelope->getMessage();
+            $lock = $message instanceof TTLAwareLockableMessageInterface
+                ? $this->lockFactory->createLockFromKey($stamp->getKey(), $message->getTTL(), autoRelease: false)
+                : $this->lockFactory->createLockFromKey($stamp->getKey(), autoRelease: false);
+            $lock->release();
+        }
     }
 }

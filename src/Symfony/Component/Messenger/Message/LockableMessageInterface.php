@@ -17,4 +17,9 @@ interface LockableMessageInterface
      * Returns null if you want to force the dispatch of the message.
      */
     public function getKey(): ?string;
+
+    /**
+     * Should we release the lock before calling the handler or after.
+     */
+    public function shouldBeReleasedBeforeHandlerCall(): bool;
 }

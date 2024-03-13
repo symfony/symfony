@@ -27,6 +27,11 @@ class FileLinkFormatterTest extends TestCase
 
     public function testAfterUnserialize()
     {
+        if (get_cfg_var('xdebug.file_link_format')) {
+            // There is not way to override "xdebug.file_link_format" option in a test.
+            $this->markTestSkipped('php.ini has a custom option for "xdebug.file_link_format".');
+        }
+
         $ide = $_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? null;
         $_ENV['SYMFONY_IDE'] = $_SERVER['SYMFONY_IDE'] = null;
         $sut = unserialize(serialize(new FileLinkFormatter()));

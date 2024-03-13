@@ -199,7 +199,7 @@ Symfony\Component\Serializer\Annotation\Context {
 DUMP
         ];
 
-        yield 'named arguemnts: with groups option as array' => [
+        yield 'named arguments: with groups option as array' => [
             function () { return new Context(...['context' => ['foo' => 'bar'], 'groups' => ['a', 'b']]); },
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {

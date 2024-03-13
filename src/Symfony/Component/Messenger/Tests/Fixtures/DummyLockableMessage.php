@@ -3,9 +3,9 @@
 namespace Symfony\Component\Messenger\Tests\Fixtures;
 
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Messenger\Message\LockableMessage;
+use Symfony\Component\Messenger\Message\LockableMessageInterface;
 
-class DummyLockableMessage implements DummyMessageInterface, LockableMessage
+class DummyLockableMessage implements DummyMessageInterface, LockableMessageInterface
 {
     private string $message;
 

@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Messenger\Message;
 
-use Symfony\Component\Lock\Key;
-
-interface LockableMessage
+interface LockableMessageInterface
 {
     /**
      * Returns null if you want to force the dispatch of the message.
      */
-    public function getKey(): ?Key;
+    public function getKey(): ?string;
 }

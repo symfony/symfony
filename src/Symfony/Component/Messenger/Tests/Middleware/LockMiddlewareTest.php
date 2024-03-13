@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
-use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
@@ -53,7 +52,7 @@ final class LockMiddlewareTest extends MiddlewareTestCase
 
     public function testLockMiddlewareIfMessageHasKey()
     {
-        $message = new DummyLockableMessage('Hello', new Key('id'));
+        $message = new DummyLockableMessage('Hello', 'id');
         $envelope = new Envelope($message);
 
         if (SemaphoreStore::isSupported()) {
@@ -67,7 +66,7 @@ final class LockMiddlewareTest extends MiddlewareTestCase
         $envelope = $decorator->handle($envelope, $this->getStackMock(true));
         $this->assertNotNull($envelope->last(LockStamp::class));
 
-        $message2 = new DummyLockableMessage('Hello', new Key('id'));
+        $message2 = new DummyLockableMessage('Hello', 'id');
         $envelope2 = new Envelope($message2);
 
         $decorator->handle($envelope2, $this->getStackMock(false));
@@ -76,7 +75,7 @@ final class LockMiddlewareTest extends MiddlewareTestCase
         $envelope = $envelope->with(new ReceivedStamp('transport'));
         $decorator->handle($envelope, $this->getStackMock(true));
 
-        $message3 = new DummyLockableMessage('Hello', new Key('id'));
+        $message3 = new DummyLockableMessage('Hello', 'id');
         $envelope3 = new Envelope($message3);
         $decorator->handle($envelope3, $this->getStackMock(true));
     }

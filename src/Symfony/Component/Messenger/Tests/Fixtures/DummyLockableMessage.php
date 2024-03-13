@@ -2,16 +2,15 @@
 
 namespace Symfony\Component\Messenger\Tests\Fixtures;
 
-use Symfony\Component\Lock\Key;
 use Symfony\Component\Messenger\Message\LockableMessageInterface;
 
 class DummyLockableMessage implements DummyMessageInterface, LockableMessageInterface
 {
     private string $message;
 
-    private ?Key $key;
+    private ?string $key;
 
-    public function __construct(string $message, ?Key $key)
+    public function __construct(string $message, ?string $key)
     {
         $this->message = $message;
         $this->key = $key;
@@ -22,8 +21,13 @@ class DummyLockableMessage implements DummyMessageInterface, LockableMessageInte
         return $this->message;
     }
 
-    public function getKey(): ?Key
+    public function getKey(): ?string
     {
         return $this->key;
+    }
+
+    public function shouldBeReleasedBeforeHandlerCall(): bool
+    {
+        return false;
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Message\LockableMessageInterface;
@@ -39,9 +40,11 @@ final class LockMiddleware implements MiddlewareInterface
         if (null === $envelope->last(ReceivedStamp::class)) {
             if ($message instanceof LockableMessageInterface) {
                 // If we're trying to dispatch a lockable message.
-                $key = $message->getKey();
+                $keyResource = $message->getKey();
 
-                if (null !== $key) {
+                if (null !== $keyResource) {
+                    $key = new Key($keyResource);
+
                     // The acquire call must be done before stamping the message
                     // in order to have the full state of the key in the stamp.
                     $lock = $message instanceof TTLAwareLockableMessageInterface

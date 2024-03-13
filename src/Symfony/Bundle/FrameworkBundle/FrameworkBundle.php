@@ -108,6 +108,11 @@ class FrameworkBundle extends Bundle
         }
     }
 
+    public function shutdown(): void
+    {
+        ErrorHandler::unregister();
+    }
+
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

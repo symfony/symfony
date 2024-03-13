@@ -68,6 +68,36 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    public function testUnregister()
+    {
+        $errorHandler = function () {};
+        $exceptionHandler = function () {};
+
+        $initialErrorHandler = set_error_handler($errorHandler);
+        $initialExceptionHandler = set_exception_handler($exceptionHandler);
+
+        $handler = ErrorHandler::register();
+
+        try {
+            $h = set_error_handler('var_dump');
+            restore_error_handler();
+            $this->assertSame([$handler, 'handleError'], $h);
+
+            ErrorHandler::unregister();
+
+            $h = set_error_handler('var_dump');
+            restore_error_handler();
+            $this->assertSame($errorHandler, $h);
+
+            $h = set_exception_handler('var_dump');
+            restore_exception_handler();
+            $this->assertSame($exceptionHandler, $h);
+        } finally {
+            set_exception_handler($initialExceptionHandler);
+            set_error_handler($initialErrorHandler);
+        }
+    }
+
     public function testErrorGetLast()
     {
         $logger = $this->createMock(LoggerInterface::class);

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `ErrorHandler::unregister()`
+
 6.4
 ---
 

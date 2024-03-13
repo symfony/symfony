@@ -105,6 +105,11 @@ class ErrorHandler
     private static int $silencedErrorCount = 0;
     private static int $exitCode = 0;
 
+    /** @var callable|null */
+    private static $initialErrorHandler;
+    /** @var callable|null */
+    private static $initialExceptionHandler;
+
     /**
      * Registers the error handler.
      */
@@ -124,6 +129,8 @@ class ErrorHandler
             // Specifying the error types earlier would expose us to https://bugs.php.net/63206
             set_error_handler([$handler, 'handleError'], $handler->thrownErrors | $handler->loggedErrors);
             $handler->isRoot = true;
+        } else {
+            self::$initialErrorHandler = $prev;
         }
 
         if ($handlerIsNew && \is_array($prev) && $prev[0] instanceof self) {
@@ -150,9 +157,34 @@ class ErrorHandler
             $handler->setExceptionHandler($prev ?? [$handler, 'renderException']);
         }
 
+        self::$initialExceptionHandler = $prev ?? null;
+
         $handler->throwAt(\E_ALL & $handler->thrownErrors, true);
 
         return $handler;
+    }
+
+    public static function unregister(): void
+    {
+        restore_error_handler();
+        if (self::$initialErrorHandler) {
+            set_error_handler(self::$initialErrorHandler);
+        }
+
+        restore_exception_handler();
+        if (self::$initialExceptionHandler) {
+            set_exception_handler(self::$initialExceptionHandler);
+        }
+
+        // this will also shunt the fatal error handler set
+        // in register_shutdown_function()
+        self::$reservedMemory = null;
+
+        self::$silencedErrorCache = [];
+        self::$silencedErrorCount = 0;
+        self::$exitCode = 0;
+        self::$initialExceptionHandler = null;
+        self::$initialExceptionHandler = null;
     }
 
     /**

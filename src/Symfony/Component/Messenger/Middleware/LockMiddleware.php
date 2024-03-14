@@ -21,44 +21,40 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 
 final class LockMiddleware implements MiddlewareInterface
 {
-    private ?LockFactory $lockFactory = null;
+    private LockFactory $lockFactory;
 
-    public function __construct(
-        ?LockFactory $lockFactory,
-    ) {
+    public function __construct(LockFactory $lockFactory)
+    {
         $this->lockFactory = $lockFactory;
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if (null === $this->lockFactory) {
+        $message = $envelope->getMessage();
+        if (!$message instanceof LockableMessageInterface) {
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $message = $envelope->getMessage();
-
         if (null === $envelope->last(ReceivedStamp::class)) {
-            if ($message instanceof LockableMessageInterface) {
-                // If we're trying to dispatch a lockable message.
-                $keyResource = $message->getKey();
+            // If we're trying to dispatch a lockable message.
+            $keyResource = $message->getKey();
 
-                if (null !== $keyResource) {
-                    $key = new Key($keyResource);
+            if (null !== $keyResource) {
+                $key = new Key($keyResource);
 
-                    // The acquire call must be done before stamping the message
-                    // in order to have the full state of the key in the stamp.
-                    $lock = $message instanceof TTLAwareLockableMessageInterface
-                        ? $this->lockFactory->createLockFromKey($key, $message->getTTL(), autoRelease: false)
-                        : $this->lockFactory->createLockFromKey($key, autoRelease: false);
+                // The acquire call must be done before stamping the message
+                // in order to have the full state of the key in the stamp.
+                $lock = $message instanceof TTLAwareLockableMessageInterface
+                    ? $this->lockFactory->createLockFromKey($key, $message->getTTL(), autoRelease: false)
+                    : $this->lockFactory->createLockFromKey($key, autoRelease: false);
 
-                    if (!$lock->acquire()) {
-                        return $envelope;
-                    }
-
-                    // The acquire call must be done before stamping the message
-                    // in order to have the full state of the key in the stamp.
-                    $envelope = $envelope->with(new LockStamp($key, $message->shouldBeReleasedBeforeHandlerCall()));
+                if (!$lock->acquire()) {
+                    return $envelope;
                 }
+
+                // The acquire call must be done before stamping the message
+                // in order to have the full state of the key in the stamp.
+                $envelope = $envelope->with(new LockStamp($key, $message->shouldBeReleasedBeforeHandlerCall()));
             }
         } else {
             $this->releaseLock($envelope, true);
@@ -80,11 +76,7 @@ final class LockMiddleware implements MiddlewareInterface
     {
         $stamp = $envelope->last(LockStamp::class);
         if ($stamp instanceof LockStamp && $stamp->shouldBeReleasedBeforHandlerCall() === $beforeHandlerCall) {
-            $message = $envelope->getMessage();
-            $lock = $message instanceof TTLAwareLockableMessageInterface
-                ? $this->lockFactory->createLockFromKey($stamp->getKey(), $message->getTTL(), autoRelease: false)
-                : $this->lockFactory->createLockFromKey($stamp->getKey(), autoRelease: false);
-            $lock->release();
+            $this->lockFactory->createLockFromKey($stamp->getKey())->release();
         }
     }
 }

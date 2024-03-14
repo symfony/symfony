@@ -89,7 +89,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.middleware.lock_middleware', LockMiddleware::class)
             ->args([
-                service('lock.factory')->nullOnInvalid(),
+                service('lock.factory'),
             ])
 
         ->set('messenger.middleware.add_bus_name_stamp_middleware', AddBusNameStampMiddleware::class)

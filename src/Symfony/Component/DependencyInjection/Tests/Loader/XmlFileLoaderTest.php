@@ -468,7 +468,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_with_array_tags.xml');
 
-        $this->assertEquals(['foo_tag' => [['foo' => 'bar', 'bar' => ['foo' => 'bar', 'bar' => 'foo']]]], $container->getDefinition('foo')->getTags());
+        $this->assertEquals(['foo_tag' => [['name' => 'attributeName', 'foo' => 'bar', 'bar' => ['foo' => 'bar', 'bar' => 'foo']]]], $container->getDefinition('foo')->getTags());
     }
 
     public function testParseTagsWithoutNameThrowsException()

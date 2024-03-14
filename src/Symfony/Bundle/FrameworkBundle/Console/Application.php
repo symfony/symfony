@@ -12,8 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\AlarmableCommandInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\ListCommand;
+use Symfony\Component\Console\Command\TraceableAlarmableCommand;
 use Symfony\Component\Console\Command\TraceableCommand;
 use Symfony\Component\Console\Debug\CliRequest;
 use Symfony\Component\Console\Input\InputInterface;
@@ -112,7 +114,10 @@ class Application extends BaseApplication
 
                 (new SymfonyStyle($input, $output))->warning('The "--profile" option needs the profiler integration. Try enabling the "framework.profiler" option.');
             } else {
-                $command = new TraceableCommand($command, $container->get('debug.stopwatch'));
+                $command = $command instanceof AlarmableCommandInterface
+                    ? new TraceableAlarmableCommand($command, $container->get('debug.stopwatch'))
+                    : new TraceableCommand($command, $container->get('debug.stopwatch'))
+                ;
 
                 $requestStack = $container->get('.virtual_request_stack');
                 $requestStack->push(new CliRequest($command));

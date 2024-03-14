@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by aschempp at 2024-03-12T10:34:41Z
+
+The fabbot.io check errors seem unrelated to the pull request.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-12T13:01:03Z
+
+Can you please add a test case?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2024-03-14T08:36:46Z
+
+Sure thing, test added. I reverted the change so you can see the test failing and then re-added the fix 🙃
+
+---------------------------------------------------------------------------
+
+by stof at 2024-03-14T09:44:52Z
+
+@aschempp it looks like you forgot to re-add the fix
+
+---------------------------------------------------------------------------
+
+by aschempp at 2024-03-14T10:05:16Z
+
+Sorry about that, I pushed now. I had to wait for the queue to fail and went off to something else 🙈

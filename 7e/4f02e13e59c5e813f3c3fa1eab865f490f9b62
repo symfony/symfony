@@ -1,0 +1,195 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-02-24T05:33:17Z
+
+It would be better to update the following list directly
+
+https://github.com/symfony/symfony/blob/82acd7a7d6fe7a12200e949b6268ce5ba13e5e74/src/Symfony/Component/ErrorHandler/ErrorHandler.php#L71
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-02-24T07:08:27Z
+
+I don't understand the failure
+```
+1) Symfony\Component\HttpKernel\Tests\Debug\ErrorHandlerConfiguratorTest::testConfigure
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+         '__phpunit_returnValueGeneration' => true
+         '__phpunit_invocationMocker' => null
+     )
+-    1 => 'info'
++    1 => 'warning'
+ )```
+
+It looks like the component is not in the right version
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2024-02-24T08:47:36Z
+
+i feel like increasing the level is a workaround for something else?
+
+> E_WARNING => [null, LogLevel::WARNING]
+
+looks reasonable to me, it's not an error
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2024-02-24T10:16:02Z
+
+is this to workaround `action_level: error` in the monolog recipe?
+
+perhaps better to lower it there to WARNING, or prepend a php channel handler
+
+---------------------------------------------------------------------------
+
+by javaDeveloperKid at 2024-02-24T14:06:25Z
+
+I'm :-1:
+- deprecation is not a warning. It's informational.
+- notice is not an error. It's also informational.
+- warning is not an error. Warning means you're doing something undesirable and despite it works you should not do that. Error means that you do something wrong but it doesn't break the application because you have it handled somehow but please fix it because the application should not be put into that state (e.g. from the performance, security or business perspective).
+
+What's more, isn't it a BC break-like change? What if a team has observability set to given level (most ofter error level so promoting warnings to errors will have the biggest affect)? Then it will create tons of alerts they don't expect and changes will be required either in application logging logic or configuration and this is something that should not be required when bumping Symfony minor version I believe.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-02-24T15:48:09Z
+
+FYI in dev, notice and warning are converted to exceptions. So it means they are errors right? Why would it be different in prod?
+Thus, it's only about log levels. With the current **default** configuration, all log strictly inferior to error are ignored. So it means we are blind when a notice or a warning occurs. I don't get Why you don't want to be notified for such error. Don't get me wrong, I know PHP continues to run when notice occurs but you'll probably get an error after that. With time we get more and more typing, let's increase our application robustness.
+
+About the deprecations, I could revert it. But please read the monolog [documentation](https://github.com/Seldaek/monolog/blob/main/doc/01-usage.md#log-levels)
+> WARNING (300): Exceptional occurrences that are not errors. Examples: Use of deprecated APIs, poor use of an API, undesirable things that are not necessarily wrong.
+
+It's exactly done for that !
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2024-02-24T15:51:13Z
+
+> Why would it be different in prod?
+
+because of debug mode
+
+i agree if php _errors_ are thrown it's a log level error :')
+
+---------------------------------------------------------------------------
+
+by javaDeveloperKid at 2024-02-24T16:27:34Z
+
+> FYI in dev, notice and warning are converted to exceptions. So it means they are errors right? Why would it be different in prod?
+
+It doesn't mean they are errors. It means we want them to behave like errors in dev (debug mode) to write better code but on production runtime you have much bigger scale that can cause notices/warnings etc that will not happen locally in one-user (i.e. dev) environment.
+
+> With the current default configuration, all log strictly inferior to error are ignored (...) Why you don't want to be notified for such error.
+
+If one wanted to be notified he would change default configuration. This PR sets invalid level for a log. E.g. "Why this log has a warning level if this is a notice?".
+
+> But please read the monolog [documentation](https://github.com/Seldaek/monolog/blob/main/doc/01-usage.md#log-levels)
+
+I've read that just before my previous comment :slightly_smiling_face: To be honest I'm surprised every single time I read this doc. Why deprecations should be warnings? For me a deprecation is 100% informational. What if I won't upgrade my code to use the newer API for the next few years or ever? This API version I'm using is a valid API at the version I use. If deprecations will be promoted to warnings then I will not be able to disable warnings beeing deprecations and still have real warnings logged.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-02-27T07:46:27Z
+
+> If one wanted to be notified he would change default configuration.
+
+And this is exactly why I opened the pr.
+
+I add this configuration in every application I work on for age, and I think it should be the default configuration.
+
+I don't understand Why you are reluctant with this PR. Do you think you have so much notice it'll flood your log system? Can you try to add the new configuration (see the issue) and tell us how it's going. And you can still use the old configuration if you don't like the new **default**
+
+Or it's only about semantics?
+You said it's not error but for PHP it is. Look at the function name or documentation
+* https://www.php.net/manual/en/function.error-reporting.php
+* https://www.php.net/manual/en/reserved.constants.php#constant.e-notice
+* https://www.php.net/manual/en/errorfunc.configuration.php#ini.error-reporting
+
+And finally...
+
+> Prior to PHP 8.0.0, the default value was: E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED. This means diagnostics of level E_NOTICE, E_STRICT and E_DEPRECATED were not shown.
+
+So even PHP itself has increased the default **reporting** of notice, strict and deprecations
+
+---
+
+Silencing notice and warning doesn't make any sense. It must be shown by default. Then if you don't want, it's up to you to silence them.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-02-27T08:21:03Z
+
+I think it makes sense that we're talking about our mapping of PHP errors to log levels.
+
+PHP's classification of errors feels a bit outdated for modern applications. For instance, accessing an undefined variable is a mistake that deserves to be fixed. Logging this as an error is totally reasonable despite PHP classifying it as a warning. Knowing where PHP comes from, I understand that there's a ton of legacy code out there that "works" although it accesses undefined variables all the time. This is why this mapping has to remain configurable.
+
+I understand the goal of this discussion is to find reasonable defaults for new and modern applications. And I like @lyrixx' proposal in that regard. I might nit-pick on one or two mappings, but overall his proposal is reasonable.
+
+That being said, I'm not sure we should silently change this mapping in a minor release. We might want to start with a recipe first and implement these defaults for Symfony 8.
+
+---------------------------------------------------------------------------
+
+by kevinpapst at 2024-02-27T15:17:54Z
+
+Are these configurations influencing the levels that monolog receives? Can I still deactivate deprecations in prod by excluding the `!deprecation` channel?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-02-27T15:29:36Z
+
+> Are these configurations influencing the levels that monolog receives?
+
+Unless you override them, yes.
+
+> Can I still deactivate deprecations in prod by excluding the `!deprecation` channel?
+
+Sure.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-28T07:01:10Z
+
+@derrabus Can you share the ones you want to change?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-02-28T08:04:49Z
+
+> @derrabus Can you share the ones you want to change?
+
+* Logging deprecations at warning level might be too noisy. Maybe we should log them as notices instead. They deserve my attention and should be monitored, which is what the notice level is about and why it fits better than the level we map deprecations to currently (info). But a triggered deprecation does not affect the health of my system in any way.
+* I was a bit surprised about treating `E_STRICT` as errors, but then again the level is not used anymore since PHP 7.0, so it does not really matter what we map it to, I guess.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-02-28T08:07:02Z
+
+I'll revert all changes about deprecation 👍🏼
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-28T08:10:21Z
+
+Regarding the branch, I think doing it in 7.1 (with documentation) is fine.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-02-28T16:51:23Z
+
+* I reverted changes about deprecation.
+* The CI is green
+  (windows failure is unrelated)
+    ```
+    There was 1 failure:
+    1) Symfony\Component\Lock\Tests\Store\RedisArrayStoreTest::testBackwardCompatibility
+    Failed asserting that false is true.
+    C:\projects\symfony\src\Symfony\Component\Lock\Tests\Store\AbstractRedisStoreTestCase.php:50
+    FAILURES!
+    Tests: 178, Assertions: 201, Failures: 1, Skipped: 124.
+    ```

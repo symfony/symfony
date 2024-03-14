@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-03-13T16:17:19Z
+
+Actually, the PR you linked is not the one adding support for arrays in tag attributes (it is one that introduces a usage of such tag in the core).
+Please identify the actual PR introducing that feature in the DI component, to identify the lowest affected branch.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-13T16:25:50Z
+
+@stof I updated the PR description, the target branch (6.4), and fixed tests

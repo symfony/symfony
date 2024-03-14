@@ -346,6 +346,16 @@ class ArgvInput extends Input
     }
 
     /**
+     * Returns un-parsed and not validated tokens.
+     *
+     * @return list<string>
+     */
+    public function getRawTokens(): array
+    {
+        return $this->tokens;
+    }
+
+    /**
      * Returns a stringified representation of the args passed to the command.
      */
     public function __toString(): string

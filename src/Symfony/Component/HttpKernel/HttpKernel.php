@@ -98,7 +98,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 $response->setCallback(static function () use ($request, $callback, $requestStack) {
                     $requestStack->push($request);
                     try {
-                        $callback();
+                        return $callback();
                     } finally {
                         $requestStack->pop();
                     }

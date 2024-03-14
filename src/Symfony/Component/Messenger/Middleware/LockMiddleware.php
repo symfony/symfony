@@ -75,7 +75,7 @@ final class LockMiddleware implements MiddlewareInterface
     private function releaseLock(Envelope $envelope, bool $beforeHandlerCall): void
     {
         $stamp = $envelope->last(LockStamp::class);
-        if ($stamp instanceof LockStamp && $stamp->shouldBeReleasedBeforHandlerCall() === $beforeHandlerCall) {
+        if ($stamp instanceof LockStamp && $stamp->shouldBeReleasedBeforeHandlerCall() === $beforeHandlerCall) {
             $this->lockFactory->createLockFromKey($stamp->getKey())->release();
         }
     }

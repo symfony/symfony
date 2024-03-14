@@ -29,7 +29,7 @@ final class LockStamp implements StampInterface
         return $this->key;
     }
 
-    public function shouldBeReleasedBeforHandlerCall(): bool
+    public function shouldBeReleasedBeforeHandlerCall(): bool
     {
         return $this->shouldBeReleasedBeforeHandlerCall;
     }

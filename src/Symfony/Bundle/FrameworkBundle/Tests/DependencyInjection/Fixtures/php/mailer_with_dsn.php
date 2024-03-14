@@ -8,7 +8,7 @@ return static function (ContainerConfigurator $container) {
             'dsn' => 'smtp://example.com',
             'envelope' => [
                 'sender' => 'sender@example.org',
-                'recipients' => ['redirected@example.org', 'redirected1@example.org'],
+                'recipients' => ['redirected@example.org'],
             ],
             'headers' => [
                 'from' => 'from@example.org',

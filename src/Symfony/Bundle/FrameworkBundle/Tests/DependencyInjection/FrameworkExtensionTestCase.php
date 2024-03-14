@@ -318,7 +318,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('state_machine.pull_request.metadata_store', (string) $metadataStoreReference);
 
         $metadataStoreDefinition = $container->getDefinition('state_machine.pull_request.metadata_store');
-        $this->assertSame(Workflow\Metadata\InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+        $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
         $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
 
         $workflowMetadata = $metadataStoreDefinition->getArgument(0);
@@ -1940,21 +1940,27 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $defaultOptions['peer_fingerprint']);
     }
 
-    public static function provideMailer(): array
+    public static function provideMailer(): iterable
     {
-        return [
-            ['mailer_with_dsn', ['main' => 'smtp://example.com']],
-            ['mailer_with_transports', [
+        yield [
+            'mailer_with_dsn',
+            ['main' => 'smtp://example.com'],
+            ['redirected@example.org'],
+        ];
+        yield [
+            'mailer_with_transports',
+            [
                 'transport1' => 'smtp://example1.com',
                 'transport2' => 'smtp://example2.com',
-            ]],
+            ],
+            ['redirected@example.org', 'redirected1@example.org'],
         ];
     }
 
     /**
      * @dataProvider provideMailer
      */
-    public function testMailer(string $configFile, array $expectedTransports)
+    public function testMailer(string $configFile, array $expectedTransports, array $expectedRecipients)
     {
         $container = $this->createContainerFromFile($configFile);
 
@@ -1966,7 +1972,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('mailer.envelope_listener'));
         $l = $container->getDefinition('mailer.envelope_listener');
         $this->assertSame('sender@example.org', $l->getArgument(0));
-        $this->assertSame(['redirected@example.org', 'redirected1@example.org'], $l->getArgument(1));
+        $this->assertSame($expectedRecipients, $l->getArgument(1));
         $this->assertEquals(new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('mailer.mailer')->getArgument(1));
 
         $this->assertTrue($container->hasDefinition('mailer.message_listener'));

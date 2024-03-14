@@ -19,7 +19,6 @@ use Symfony\Component\Messenger\Middleware\LockMiddleware;
 use Symfony\Component\Messenger\Stamp\LockStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
-use Symfony\Component\Messenger\Tests\Fixtures\DummyLockableMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 final class LockMiddlewareTest extends MiddlewareTestCase
@@ -37,23 +36,10 @@ final class LockMiddlewareTest extends MiddlewareTestCase
         $decorator->handle($envelope, $this->getStackMock(true));
     }
 
-    public function testLockMiddlewareIgnoreIfMessageHasNoKey()
-    {
-        $message = new DummyLockableMessage('Hello', null);
-        $envelope = new Envelope($message);
-
-        $lockFactory = $this->createMock(LockFactory::class);
-        $lockFactory->expects($this->never())->method('createLock');
-
-        $decorator = new LockMiddleware($lockFactory);
-
-        $decorator->handle($envelope, $this->getStackMock(true));
-    }
-
     public function testLockMiddlewareIfMessageHasKey()
     {
-        $message = new DummyLockableMessage('Hello', 'id');
-        $envelope = new Envelope($message);
+        $message = new DummyMessage('Hello');
+        $envelope = new Envelope($message, [new LockStamp('id')]);
 
         if (SemaphoreStore::isSupported()) {
             $store = new SemaphoreStore();
@@ -66,8 +52,8 @@ final class LockMiddlewareTest extends MiddlewareTestCase
         $envelope = $decorator->handle($envelope, $this->getStackMock(true));
         $this->assertNotNull($envelope->last(LockStamp::class));
 
-        $message2 = new DummyLockableMessage('Hello', 'id');
-        $envelope2 = new Envelope($message2);
+        $message2 = new DummyMessage('Hello');
+        $envelope2 = new Envelope($message2, [new LockStamp('id')]);
 
         $decorator->handle($envelope2, $this->getStackMock(false));
 
@@ -75,8 +61,8 @@ final class LockMiddlewareTest extends MiddlewareTestCase
         $envelope = $envelope->with(new ReceivedStamp('transport'));
         $decorator->handle($envelope, $this->getStackMock(true));
 
-        $message3 = new DummyLockableMessage('Hello', 'id');
-        $envelope3 = new Envelope($message3);
+        $message3 = new DummyMessage('Hello');
+        $envelope3 = new Envelope($message3, [new LockStamp('id')]);
         $decorator->handle($envelope3, $this->getStackMock(true));
     }
 }

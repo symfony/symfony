@@ -781,7 +781,7 @@
     <xsd:complexType name="mailer_envelope">
         <xsd:sequence>
             <xsd:element name="sender" type="xsd:string" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="recipients" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="recipient" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
 

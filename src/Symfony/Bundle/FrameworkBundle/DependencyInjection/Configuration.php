@@ -2199,6 +2199,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('envelope')
                             ->info('Mailer Envelope configuration')
+                            ->fixXmlConfig('recipient')
                             ->children()
                                 ->scalarNode('sender')->end()
                                 ->arrayNode('recipients')

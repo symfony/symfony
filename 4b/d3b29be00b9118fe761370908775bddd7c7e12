@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-03-07T20:26:35Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-03-15T10:10:54Z
+
+Could you update the PR title to describe the bug fix?
+
+---------------------------------------------------------------------------
+
+by palgalik at 2024-03-15T11:44:09Z
+
+> Could you update the PR title to describe the bug fix?
+
+Sure, done.  👍
+
+---------------------------------------------------------------------------
+
+by stof at 2024-03-15T11:46:12Z
+
+Please add a test covering the conversion of a payload that has no tags, to prevent regressions.
+
+---------------------------------------------------------------------------
+
+by palgalik at 2024-03-15T13:34:29Z
+
+> Please add a test covering the conversion of a payload that has no tags, to prevent regressions.
+
+Just added a test case where there are no tag in the payload, but I only did it for one event type "request".
+
+ What do you think @stof , should I change the existing test cases to add the no tags variation for them also?
+ I think it's not needed, because the tags checking condition is common for each event type.

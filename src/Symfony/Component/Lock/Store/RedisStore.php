@@ -294,7 +294,9 @@ class RedisStore implements SharedLockStoreInterface
             try {
                 $this->supportTime = 1 === $this->evaluate($script, 'symfony_check_support_time', []);
             } catch (LockStorageException $e) {
-                if (!str_contains($e->getMessage(), 'commands not allowed after non deterministic')) {
+                if (!str_contains($e->getMessage(), 'commands not allowed after non deterministic')
+                    && !str_contains($e->getMessage(), 'is not allowed from script script')
+                ) {
                     throw $e;
                 }
                 $this->supportTime = false;

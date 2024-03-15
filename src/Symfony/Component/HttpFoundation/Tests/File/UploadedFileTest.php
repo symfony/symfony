@@ -119,6 +119,18 @@ class UploadedFileTest extends TestCase
         $this->assertEquals(\UPLOAD_ERR_OK, $file->getError());
     }
 
+    public function testErrorMessageIsNullIfErrorIsOk()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            null
+        );
+
+        $this->assertEquals('', $file->getErrorMessage());
+    }
+
     public function testGetClientOriginalName()
     {
         $file = new UploadedFile(

@@ -268,6 +268,7 @@ class UploadedFile extends File
     public function getErrorMessage(): string
     {
         static $errors = [
+            \UPLOAD_ERR_OK => '',
             \UPLOAD_ERR_INI_SIZE => 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d KiB).',
             \UPLOAD_ERR_FORM_SIZE => 'The file "%s" exceeds the upload limit defined in your form.',
             \UPLOAD_ERR_PARTIAL => 'The file "%s" was only partially uploaded.',

@@ -319,28 +319,32 @@ class WorkflowTest extends TestCase
 
         $marking = $workflow->apply($subject, 'a_to_bc');
 
-        $this->assertFalse($marking->has('a'));
-        $this->assertTrue($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+        $this->assertPlaces([
+            'b' => 1,
+            'c' => 1,
+        ], $marking);
 
         $marking = $workflow->apply($subject, 'to_a');
 
-        $this->assertTrue($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertFalse($marking->has('c'));
+        // Two tokens in "a"
+        $this->assertPlaces([
+            'a' => 2,
+        ], $marking);
 
         $workflow->apply($subject, 'a_to_bc');
         $marking = $workflow->apply($subject, 'b_to_c');
 
-        $this->assertFalse($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+        $this->assertPlaces([
+            'a' => 1,
+            'c' => 2,
+        ], $marking);
 
         $marking = $workflow->apply($subject, 'to_a');
 
-        $this->assertTrue($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertFalse($marking->has('c'));
+        $this->assertPlaces([
+            'a' => 2,
+            'c' => 1,
+        ], $marking);
     }
 
     public function testApplyWithSameNameTransition2()
@@ -775,6 +779,63 @@ class WorkflowTest extends TestCase
         $this->assertSame('b_to_c', $transitions[0]->getName());
         $this->assertSame('to_a', $transitions[1]->getName());
         $this->assertSame('to_a', $transitions[2]->getName());
+    }
+
+    /**
+     * @@testWith ["back1"]
+     *            ["back2"]
+     */
+    public function testApplyWithSameNameBackTransition(string $transition)
+    {
+        $definition = $this->createWorkflowWithSameNameBackTransition();
+        $workflow = new Workflow($definition, new MethodMarkingStore());
+
+        $subject = new Subject();
+
+        $marking = $workflow->apply($subject, 'a_to_bc');
+        $this->assertPlaces([
+            'b' => 1,
+            'c' => 1,
+        ], $marking);
+
+        $marking = $workflow->apply($subject, $transition);
+        $this->assertPlaces([
+            'a' => 1,
+            'b' => 1,
+        ], $marking);
+
+        $marking = $workflow->apply($subject, $transition);
+        $this->assertPlaces([
+            'a' => 2,
+        ], $marking);
+
+        $marking = $workflow->apply($subject, 'a_to_bc');
+        $this->assertPlaces([
+            'a' => 1,
+            'b' => 1,
+            'c' => 1,
+        ], $marking);
+
+        $marking = $workflow->apply($subject, 'c_to_cb');
+        $this->assertPlaces([
+            'a' => 1,
+            'b' => 2,
+            'c' => 1,
+        ], $marking);
+
+        $marking = $workflow->apply($subject, 'c_to_cb');
+        $this->assertPlaces([
+            'a' => 1,
+            'b' => 3,
+            'c' => 1,
+        ], $marking);
+    }
+
+    private function assertPlaces(array $expected, Marking $marking)
+    {
+        $places = $marking->getPlaces();
+        ksort($places);
+        $this->assertSame($expected, $places);
     }
 }
 

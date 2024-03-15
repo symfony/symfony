@@ -31,7 +31,7 @@ use Symfony\Component\ErrorHandler\Tests\Fixtures\LoggerThatSetAnErrorHandler;
  */
 class ErrorHandlerTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $r = new \ReflectionProperty(ErrorHandler::class, 'exitCode');
         $r->setAccessible(true);

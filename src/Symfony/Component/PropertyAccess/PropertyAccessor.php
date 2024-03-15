@@ -401,8 +401,18 @@ class PropertyAccessor implements PropertyAccessorInterface
                         throw $e;
                     }
                 } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
-                    if ($access->canBeReference() && !isset($object->$name) && !\array_key_exists($name, (array) $object) && !(new \ReflectionProperty($class, $name))->hasType()) {
-                        throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', $class, $name));
+                    if (!isset($object->$name) && !\array_key_exists($name, (array) $object)) {
+                        try {
+                            $r = new \ReflectionProperty($class, $name);
+
+                            if ($r->isPublic() && !$r->hasType()) {
+                                throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', $class, $name));
+                            }
+                        } catch (\ReflectionException $e) {
+                            if (!$ignoreInvalidProperty) {
+                                throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $class));
+                            }
+                        }
                     }
 
                     $result[self::VALUE] = $object->$name;

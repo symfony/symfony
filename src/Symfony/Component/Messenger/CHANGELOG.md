@@ -22,7 +22,6 @@ CHANGELOG
  * Add `HandlerDescriptor::getOptions`
  * Add support for multiple Redis Sentinel hosts
  * Add `--all` option to the `messenger:failed:remove` command
- * `RejectRedeliveredMessageException` implements `UnrecoverableExceptionInterface` in order to not be retried
  * Add `WrappedExceptionsInterface` interface for exceptions that hold multiple individual exceptions
  * Deprecate `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
    and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method

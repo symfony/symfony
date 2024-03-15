@@ -80,7 +80,10 @@ class BackedEnumNormalizerTest extends TestCase
     public function testDenormalize()
     {
         $this->assertSame(StringBackedEnumDummy::GET, $this->normalizer->denormalize('GET', StringBackedEnumDummy::class));
+        $this->assertSame(StringBackedEnumDummy::GET, $this->normalizer->denormalize(StringBackedEnumDummy::GET, StringBackedEnumDummy::class));
+        $this->assertSame(StringBackedEnumDummy::GET, $this->normalizer->denormalize(OtherStringBackedEnumDummy::GET, StringBackedEnumDummy::class));
         $this->assertSame(IntegerBackedEnumDummy::SUCCESS, $this->normalizer->denormalize(200, IntegerBackedEnumDummy::class));
+        $this->assertSame(IntegerBackedEnumDummy::SUCCESS, $this->normalizer->denormalize(IntegerBackedEnumDummy::SUCCESS, IntegerBackedEnumDummy::class));
     }
 
     /**
@@ -121,6 +124,17 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize('POST', StringBackedEnumDummy::class);
     }
 
+    /**
+     * @requires PHP 8.1
+     */
+    public function testDenormalizeIncompatibleEnumCaseThrowsException()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The data must belong to a backed enumeration of type '.StringBackedEnumDummy::class);
+
+        $this->normalizer->denormalize(IntegerBackedEnumDummy::SUCCESS, StringBackedEnumDummy::class);
+    }
+
     public function testNormalizeShouldThrowExceptionForNonEnumObjects()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -141,4 +155,9 @@ class BackedEnumNormalizerTest extends TestCase
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
+}
+
+enum OtherStringBackedEnumDummy : string
+{
+    case GET = 'GET';
 }

@@ -57,6 +57,14 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
         }
 
+        if ($data instanceof $type) {
+            return $data;
+        }
+
+        if ($data instanceof \BackedEnum) {
+            $data = $data->value;
+        }
+
         if (!\is_int($data) && !\is_string($data)) {
             throw NotNormalizableValueException::createForUnexpectedDataType('The data is neither an integer nor a string, you should pass an integer or a string that can be parsed as an enumeration case of type '.$type.'.', $data, [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         }

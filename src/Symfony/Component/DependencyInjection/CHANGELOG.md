@@ -8,6 +8,7 @@ CHANGELOG
  * Add argument `$prepend` to `ContainerConfigurator::extension()` to prepend the configuration instead of appending it
  * Have `ServiceLocator` implement `ServiceCollectionInterface`
  * Add `#[Lazy]` attribute as shortcut for `#[Autowire(lazy: [bool|string])]` and `#[Autoconfigure(lazy: [bool|string])]`
+ * Add `#[AutowireInline]` attribute to allow service definition at the class level
 
 7.0
 ---

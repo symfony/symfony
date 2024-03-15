@@ -13,8 +13,8 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
+use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -320,9 +320,9 @@ class AutowirePass extends AbstractRecursivePass
                         continue 2;
                     }
 
-                    if ($attribute instanceof AutowireCallable) {
-                        $value = $attribute->buildDefinition($value, $type, $parameter);
-                        $value = $this->doProcessValue($value);
+                    if ($attribute instanceof AutowireInline) {
+                        $value = $this->container->getDefinition(ContainerBuilder::hash($attribute));
+                        $value = $this->processValue($value);
                     } elseif ($lazy = $attribute->lazy) {
                         $definition = (new Definition($type))
                             ->setFactory('current')

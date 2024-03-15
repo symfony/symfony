@@ -1013,12 +1013,19 @@ class PropertyAccessorTest extends TestCase
 
     public function testGetValueGetterThrowsExceptionIfUninitializedWithLazyGhost()
     {
+        $lazyGhost = $this->createUninitializedObjectPropertyGhost();
+
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty::$privateUninitialized" is not readable because it is typed "DateTimeInterface". You should initialize it or declare a default value instead.');
 
+        $this->propertyAccessor->getValue($lazyGhost, 'privateUninitialized');
+    }
+
+    public function testIsReadableWithMissingPropertyAndLazyGhost()
+    {
         $lazyGhost = $this->createUninitializedObjectPropertyGhost();
 
-        $this->propertyAccessor->getValue($lazyGhost, 'privateUninitialized');
+        $this->assertFalse($this->propertyAccessor->isReadable($lazyGhost, 'dummy'));
     }
 
     private function createUninitializedObjectPropertyGhost(): UninitializedObjectProperty

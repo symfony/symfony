@@ -39,4 +39,9 @@ class TestClassMagicGet
             return 'constant value';
         }
     }
+
+    public function __isset(string $property)
+    {
+        return \in_array($property, ['magicProperty', 'constantMagicProperty'], true);
+    }
 }

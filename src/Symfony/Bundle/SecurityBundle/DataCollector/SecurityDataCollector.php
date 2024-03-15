@@ -131,6 +131,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         // collect voters and access decision manager information
         if ($this->accessDecisionManager instanceof TraceableAccessDecisionManager) {
             $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
+            $this->data['voters'] = [];
 
             foreach ($this->accessDecisionManager->getVoters() as $voter) {
                 if ($voter instanceof TraceableVoter) {

@@ -143,6 +143,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertInstanceof(ServiceClosureArgument::class, $locator['foo::fooAction']);
 
         $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator->getFactory()[0]);
 
         $this->assertSame(ServiceLocator::class, $locator->getClass());
         $this->assertFalse($locator->isPublic());
@@ -166,6 +167,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator->getFactory()[0]);
 
         $expected = ['bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE))];
         $this->assertEquals($expected, $locator->getArgument(0));
@@ -185,6 +187,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator->getFactory()[0]);
 
         $expected = ['bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE))];
         $this->assertEquals($expected, $locator->getArgument(0));
@@ -306,8 +309,8 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-
         $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator->getFactory()[0]);
 
         $expected = ['bar' => new ServiceClosureArgument(new Reference('foo'))];
         $this->assertEquals($expected, $locator->getArgument(0));
@@ -372,7 +375,8 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $this->assertInstanceOf(ServiceClosureArgument::class, $locator['child::fooAction']);
 
-        $locator = $container->getDefinition((string) $locator['child::fooAction']->getValues()[0])->getArgument(0);
+        $locator = $container->getDefinition((string) $locator['child::fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0);
         $this->assertInstanceOf(ServiceClosureArgument::class, $locator['someArg']);
         $this->assertEquals(new Reference('parent'), $locator['someArg']->getValues()[0]);
     }
@@ -439,6 +443,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator->getFactory()[0]);
 
         $expected = [
             'apiKey' => new ServiceClosureArgument(new Reference('the_api_key')),

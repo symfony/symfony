@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\IntegerBackedEnumDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\OtherStringBackedEnumDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StringBackedEnumDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\UnitEnumDummy;
 
@@ -155,9 +156,4 @@ class BackedEnumNormalizerTest extends TestCase
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
-}
-
-enum OtherStringBackedEnumDummy : string
-{
-    case GET = 'GET';
 }

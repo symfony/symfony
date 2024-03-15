@@ -37,6 +37,8 @@ class UriSigner
      *
      * The given URI is signed by adding the query string parameter
      * which value depends on the URI and the secret.
+     *
+     * @phpstan-pure
      */
     public function sign(string $uri): string
     {
@@ -55,6 +57,8 @@ class UriSigner
 
     /**
      * Checks that a URI contains the correct hash.
+     *
+     * @phpstan-pure
      */
     public function check(string $uri): bool
     {
@@ -75,6 +79,9 @@ class UriSigner
         return hash_equals($this->computeHash($this->buildUrl($url, $params)), $hash);
     }
 
+    /**
+     * @phpstan-pure
+     */
     public function checkRequest(Request $request): bool
     {
         $qs = ($qs = $request->server->get('QUERY_STRING')) ? '?'.$qs : '';

@@ -1,0 +1,126 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-02-20T20:07:58Z
+
+What is the reason to create a new attribute instead of making `method` optional?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-20T20:10:29Z
+
+> What is the reason to create a new attribute instead of making method optional?
+
+Because method is already optional and it currently means `__invoke`, so that would be confusing.
+A new attribute makes it explicit that some convention is used also IMHO (inferring the name of the method from the name of the parameter)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-02-20T20:13:34Z
+
+Really subjective point of view here, I definitely see an improvement of "instant understanding of what's being done". I think having this "alias attribute" helps to get what's happening at first sight, where the existing notation needs a bit of reflection before getting it.
+
+It feels more human friendly to me
+
+---------------------------------------------------------------------------
+
+by Kocal at 2024-02-20T20:39:24Z
+
+What are the benefits about `AutowireMethodOf` and `AutowireCallable`, versus directly injecting `CommentRepository`?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-02-20T20:40:15Z
+
+Only one con IMHO, if you refactor the method name via IDE this code breaks, I know it’s the same problem for the long attribute version. Not sure I would use it, because if you have no tests and even with static analysis this bug can go to prod. Sounds like a footgun but indeed nice DX
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-02-20T20:43:18Z
+
+@kocal my repositories are final so I cannot mock them, so I would need an interface. This way you don’t need an interface, can have a final class and you can easily test it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-20T20:47:44Z
+
+> versus directly injecting CommentRepository
+
+think about testing a service that has CommentRepository as a dependency: you cannot test it without having a database or without heavy mocking. Query functions are just trivial to replace instead.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2024-02-20T21:12:16Z
+
+Hum alright, I can understand the issue, but then doesn't it make sense to create by yourself a invokable class that you can easily mock?
+
+IINW you lose the autocompletion/static analysis by using `AutowireMethodOf`/`AutowireCallable` no?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-21T09:57:58Z
+
+> doesn't it make sense to create by yourself a invokable class that you can easily mock
+
+It's like invokable controllers vs action methods: everyone their preferences :shrug:  Mine is this attribute because of the low verbosity: just write a repository, and still get decoupling without creating a myriad of class boilerplate.
+
+> you lose the autocompletion/static analysis by using AutowireMethodOf/AutowireCallable no?
+
+`@param Closure(Conference, int): Paginator $getCommentPaginator` to the rescue in my example (or inline `@var Paginator $result`)). The attribute doesn't introduce this concern also since the current alternative works the same.
+
+> Only one con IMHO, if you refactor the method name via IDE this code breaks
+
+true with the current tooling, but this is fixable since the tools can very well be taught about the attribute. On this topic also the current situation is similar and the proposed attribute doesn't bring anything new.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2024-02-21T10:53:09Z
+
+Alright thanks for the explanations :)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-21T17:48:00Z
+
+You mentionned "query" but -naive question- would this work with setters / persisters too ?
+
+Could this work ?
+
+```php
+public function __invoke(
+    #[AutowireMethodOf(CommentRepository::class)] \Closure $saveComment,
+    #[MapRequestPayload] Comment $comment,
+) {
+    $saveComment($comment);
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-21T18:28:14Z
+
+@smnandre yes of course
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-23T14:55:10Z
+
+PR updated with better error handling and a test case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-15T13:01:24Z
+
+FTR, if I define this interface:
+
+```php
+interface GetCommentPaginatorInterface
+{
+    public function __invoke(Conference $conference, int $page): Paginator;
+}
+```
+
+Then I can also do native types (vs `@param` + closure) without doing anything else:
+```php
+        #[AutowireMethodOf(CommentRepository::class)]
+        GetCommentPaginatorInterface $getCommentPaginator,
+```

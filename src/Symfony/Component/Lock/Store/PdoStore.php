@@ -330,10 +330,10 @@ class PdoStore implements PersistingStoreInterface
     private function isTableMissing(\PDOException $exception): bool
     {
         $driver = $this->getDriver();
-        $code = $exception->errorInfo ? $exception->errorInfo[1] : $exception->getCode();
+        [$sqlState, $code] = $exception->errorInfo ?? [null, $exception->getCode()];
 
         switch (true) {
-            case 'pgsql' === $driver && '42P01' === $code:
+            case 'pgsql' === $driver && '42P01' === $sqlState:
             case 'sqlite' === $driver && str_contains($exception->getMessage(), 'no such table:'):
             case 'oci' === $driver && 942 === $code:
             case 'sqlsrv' === $driver && 208 === $code:

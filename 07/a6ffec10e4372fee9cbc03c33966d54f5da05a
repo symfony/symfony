@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-15T18:26:16Z
+
+I'd really prefer to have a logic that's as close as possible as what dbal does. Can you please have a look with this in mind?
+
+---------------------------------------------------------------------------
+
+by arifszn at 2024-03-15T20:19:51Z
+
+> I'd really prefer to have a logic that's as close as possible as what dbal does. Can you please have a look with this in mind?
+
+@nicolas-grekas, please check now.

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock;
 
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\LockStorageException;
 
 /**
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
@@ -22,6 +23,7 @@ interface BlockingStoreInterface extends PersistingStoreInterface
      * Waits until a key becomes free, then stores the resource.
      *
      * @throws LockConflictedException
+     * @throws LockStorageException
      */
     public function waitAndSave(Key $key): void;
 }

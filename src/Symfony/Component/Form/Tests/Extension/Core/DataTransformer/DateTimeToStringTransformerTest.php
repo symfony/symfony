@@ -137,7 +137,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
     {
         $transformer = new DateTimeToStringTransformer();
 
-        $nullByte = chr(0);
+        $nullByte = \chr(0);
         $value = '2024-03-15 21:11:00'.$nullByte;
 
         $this->expectException(TransformationFailedException::class);

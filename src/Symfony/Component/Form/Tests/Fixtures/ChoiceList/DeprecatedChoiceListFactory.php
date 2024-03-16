@@ -9,15 +9,15 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 
 class DeprecatedChoiceListFactory implements ChoiceListFactoryInterface
 {
-    public function createListFromChoices(iterable $choices, callable $value = null): ChoiceListInterface
+    public function createListFromChoices(iterable $choices, ?callable $value = null): ChoiceListInterface
     {
     }
 
-    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null): ChoiceListInterface
+    public function createListFromLoader(ChoiceLoaderInterface $loader, ?callable $value = null): ChoiceListInterface
     {
     }
 
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null): ChoiceListView
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, ?callable $index = null, ?callable $groupBy = null, $attr = null): ChoiceListView
     {
     }
 }

@@ -22,7 +22,7 @@ $var = [
     '[]' => [],
     'res' => $g,
     'obj' => $foo,
-    'closure' => function ($a, \PDO &$b = null) {},
+    'closure' => function ($a, ?\PDO &$b = null) {},
     'line' => __LINE__ - 1,
     'nobj' => [(object) []],
 ];

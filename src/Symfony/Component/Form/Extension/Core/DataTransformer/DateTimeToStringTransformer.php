@@ -118,7 +118,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException('Expected a string.');
         }
 
-        if (true === str_contains($value, "\0")) {
+        if (str_contains($value, "\0")) {
             throw new TransformationFailedException('Null bytes not allowed');
         }
 

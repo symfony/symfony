@@ -1,0 +1,122 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block page_title 'Feature Flag' %}
+
+{% block toolbar %}
+    {% if 0 < collector.features|length %}
+        {% set icon %}
+            <img alt="Feature Flag" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABVElEQVRIie2UO0oEURBFzxM/YGroAgQNxETUwEzwiytQ8/GzAhfhEnQNYqaJ4IyCv1QjERQjB1HEQDkGU8qzmRkHNJwLTcOtqtNVr6sb2mrrX6X2qOvqsfpi63qJmjW1O2emDN4P7AHDQAW4BpaznEpcCRgHxsLfAR4z7xKYTyndFTu/VKvqtNqnXkR3VXW6zrQzETtTuwre+Y9J1I2AFeHWg2d1s5Gz2sxDPVHLGfxVfVLLjeBZ7XExL7wKQEd4g8AVsA8MAIvAB/DrA4AjYKiR15mZK8BbwA+A3hbg3003j9ZGelen1A51O86x8iu5VntUxyvnxnoAlzL4YdxnmsDnIqfUzPta0wv1I4Kbapf6EGs32wBeVU/VzoJ39rWmxQ9tFxgBboBbYDJjnlB76QmYAEapnf1WwTsHFlJK9/VG7lZXY2WfbV3PUVOy8Ktoq62/6xORLdg+h+zBmgAAAABJRU5ErkJggg==" />
+            <span class="sf-toolbar-value">{{ collector.features|length }}</span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-group">
+                {% for feature_name, data in collector.features|filter(d => d.is_enabled is not null) %}
+                    <div class="sf-toolbar-info-piece">
+                        <b>{{ loop.first ? 'Resolved features' : '' }}</b>
+                        <span class="sf-toolbar-status sf-toolbar-status-{{ data['is_enabled'] ? 'green' : 'red' }}">
+                            {{ feature_name }}
+                        </span>
+                        <br />
+                    </div>
+                {% endfor %}
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.features|length is same as(0) ? 'disabled' }}">
+        <span class="icon"><img alt="Feature Flag" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABVElEQVRIie2UO0oEURBFzxM/YGroAgQNxETUwEzwiytQ8/GzAhfhEnQNYqaJ4IyCv1QjERQjB1HEQDkGU8qzmRkHNJwLTcOtqtNVr6sb2mrrX6X2qOvqsfpi63qJmjW1O2emDN4P7AHDQAW4BpaznEpcCRgHxsLfAR4z7xKYTyndFTu/VKvqtNqnXkR3VXW6zrQzETtTuwre+Y9J1I2AFeHWg2d1s5Gz2sxDPVHLGfxVfVLLjeBZ7XExL7wKQEd4g8AVsA8MAIvAB/DrA4AjYKiR15mZK8BbwA+A3hbg3003j9ZGelen1A51O86x8iu5VntUxyvnxnoAlzL4YdxnmsDnIqfUzPta0wv1I4Kbapf6EGs32wBeVU/VzoJ39rWmxQ9tFxgBboBbYDJjnlB76QmYAEapnf1WwTsHFlJK9/VG7lZXY2WfbV3PUVOy8Ktoq62/6xORLdg+h+zBmgAAAABJRU5ErkJggg==" /></span>
+        <strong>Feature Flag</strong>
+    </span>
+{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    <style>
+        tr.feature-check {
+            position: relative;
+        }
+        tr.feature-check > td:first-child:before {
+            border-radius: 0;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+        tr.feature-check-enabled > td:first-child:before {
+            background: var(--green-500);
+        }
+        tr.feature-check-disabled > td:first-child:before {
+            background: var(--red-500);
+        }
+        tr.feature-check-unknown > td:first-child:before {
+            background: var(--gray-400);
+        }
+        .badge {
+            color: var(--white);
+            display: inline-block;
+            text-align: center;
+            min-width: 100px;
+        }
+        .badge.badge-enabled {
+            background-color: var(--green-500);
+        }
+        .badge.badge-disabled {
+            background-color: var(--red-500);
+        }
+        .badge.badge-unknown {
+            background-color: var(--gray-400);
+        }
+    </style>
+{% endblock %}
+
+{% block panel %}
+    <h2>Features</h2>
+    {% if collector.features|length > 0 %}
+        <table>
+            <thead>
+            <tr>
+                <th>Feature</th>
+                <th>Resolved value</th>
+                <th>Enabled</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for feature_name, data in collector.features %}
+                {% set result = data['is_enabled'] is not null ? (data['is_enabled'] ? 'enabled' : 'disabled') : 'unknown' %}
+                <tr class="feature-check feature-check-{{ result }}">
+                    <td>{{ feature_name }}</td>
+                    <td>
+                        {% if data['value'].value is not null %}
+                            {{ profiler_dump(data['value'], maxDepth=2) }}
+                        {% else %}
+                            <span class="text-muted">Not resolved</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if data['is_enabled'] is not null %}
+                            <span class="badge badge-{{ result }}">
+                                {{ result|capitalize }}
+                            </span>
+                        {% else %}
+                            <span class="badge badge-unknown">
+                                Not resolved
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>No features checked</p>
+        </div>
+    {% endif %}
+{% endblock %}

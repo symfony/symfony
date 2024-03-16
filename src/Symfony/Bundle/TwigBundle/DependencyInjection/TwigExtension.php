@@ -18,6 +18,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\FeatureFlag\FeatureChecker;
 use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -91,6 +92,10 @@ class TwigExtension extends Extension
 
         if ($container::willBeAvailable('symfony/asset-mapper', AssetMapper::class, ['symfony/twig-bundle'])) {
             $loader->load('importmap.php');
+        }
+
+        if ($container::willBeAvailable('symfony/feature-flag', FeatureChecker::class, ['symfony/twig-bundle'])) {
+            $loader->load('feature_flag.php');
         }
 
         $container->setParameter('twig.form.resources', $config['form_themes']);

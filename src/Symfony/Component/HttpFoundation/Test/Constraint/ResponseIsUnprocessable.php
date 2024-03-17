@@ -44,12 +44,11 @@ final class ResponseIsUnprocessable extends Constraint
         return 'the Response '.$this->toString();
     }
 
-    protected function additionalFailureDescription($other): string
+    /**
+     * @param Response $response
+     */
+    protected function additionalFailureDescription($response): string
     {
-        if ($this->verbose || !($other instanceof Response)) {
-            return (string) $other;
-        } else {
-            return explode("\r\n\r\n", (string) $other)[0];
-        }
+        return $this->verbose ? (string) $response : explode("\r\n\r\n", (string) $response)[0];
     }
 }

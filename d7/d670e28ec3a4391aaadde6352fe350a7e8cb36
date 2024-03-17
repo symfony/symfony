@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-05T08:09:27Z
+
+I'm not sure how useful this could be: the query string can be a tuple of many different type of values, while this works only of all properties of the DTO are of the same type, isn't it?
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2024-03-05T10:41:47Z
+
+> I'm not sure how useful this could be: the query string can be a tuple of many different type of values, while this works only of all properties of the DTO are of the same type, isn't it?
+
+The associative array allows to define which parameter is concerned. `#[MapQueryString(filters: ['restricted' => \FILTER_VALIDATE_BOOL])]` will only apply this filter on the `restricted` parameter.
+
+TBH, I think that this mapping will mainly be used to cast string to boolean since other types (ex: string to int) are already handled by the Serializer.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-05T10:48:07Z
+
+Ah OK, so "restricted" is the name of the property. This wasn't obvious to me.
+
+It's a bit of a shame that a type that is already clearly described on the DTO need to be specified again somewhere else.
+
+This maps to the serializer component, which could have a mode to do the cast on its own, don't you think?
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2024-03-05T15:21:05Z
+
+> It's a bit of a shame that a type that is already clearly described on the DTO need to be specified again somewhere else.
+
+I totally agree.
+
+> This maps to the serializer component, which could have a mode to do the cast on its own, don't you think?
+
+We could pass `[FILTER_BOOL => value]` in the context to apply this filter. Should this filter be applied by default when using `#[MapQueryString]` ? Current request parameters like `active=false` will be cast to `false` in place of `true`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-05T15:25:32Z
+
+Yes, that'd be better IMHO. Dunno if bool is the only concerned type of if other ones could benefit from using filter_var to do the casting. Would need to be investigated.
+Then yes, I would enable that flag for MapQueryString, but also for MapRequestPayload *when the payload is a form submission*.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2024-03-06T12:53:48Z
+
+I updated this PR and its description this way with a new `AbstractNormalizer::FILTER_BOOL` context option.

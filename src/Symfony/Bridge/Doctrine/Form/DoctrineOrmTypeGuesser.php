@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\ORM\Mapping\JoinColumnMapping;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -141,8 +142,10 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
             $mapping = $ret[0]->getFieldMapping($property);
 
-            if (isset($mapping['length'])) {
-                return new ValueGuess($mapping['length'], Guess::HIGH_CONFIDENCE);
+            $length = $mapping instanceof FieldMapping ? $mapping->length : ($mapping['length'] ?? null);
+
+            if (null !== $length) {
+                return new ValueGuess($length, Guess::HIGH_CONFIDENCE);
             }
 
             if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT])) {

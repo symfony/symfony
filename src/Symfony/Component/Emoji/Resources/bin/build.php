@@ -56,6 +56,7 @@ final class Builder
 
     public static function buildRules(array $emojisCodePoints): Generator
     {
+        $filesystem = new Filesystem();
         $files = (new Finder())
             ->files()
             ->in([
@@ -74,7 +75,7 @@ final class Builder
             $mapsByLocale[$locale] ??= [];
 
             $document = new DOMDocument();
-            $document->loadXML(file_get_contents($file));
+            $document->loadXML($filesystem->readFile($file));
             $xpath = new DOMXPath($document);
             $results = $xpath->query('.//annotation[@type="tts"]');
 
@@ -128,7 +129,7 @@ final class Builder
 
     public static function buildGitHubRules(array $emojisCodePoints): iterable
     {
-        $emojis = json_decode(file_get_contents(__DIR__.'/vendor/github-emojis.json'), true);
+        $emojis = json_decode((new Filesystem())->readFile(__DIR__.'/vendor/github-emojis.json'), true, flags: JSON_THROW_ON_ERROR);
 
         $ignored = [];
         $maps = [];
@@ -157,7 +158,7 @@ final class Builder
 
     public static function buildSlackRules(array $emojisCodePoints): iterable
     {
-        $emojis = json_decode(file_get_contents(__DIR__.'/vendor/slack-emojis.json'), true);
+        $emojis = json_decode((new Filesystem())->readFile(__DIR__.'/vendor/slack-emojis.json'), true, flags: JSON_THROW_ON_ERROR);
 
         $ignored = [];
         $emojiSlackMaps = [];
@@ -213,9 +214,10 @@ final class Builder
 
     public static function saveRules(iterable $rulesByLocale): void
     {
+        $fs = new Filesystem();
         $firstChars = [];
         foreach ($rulesByLocale as $filename => $rules) {
-            file_put_contents(self::TARGET_DIR."/$filename.php", "<?php\n\nreturn ".VarExporter::export($rules).";\n");
+            $fs->dumpFile(self::TARGET_DIR."/$filename.php", "<?php\n\nreturn ".VarExporter::export($rules).";\n");
 
             foreach ($rules as $k => $v) {
                 if (!str_starts_with($filename, 'emoji-')) {
@@ -234,7 +236,7 @@ final class Builder
 
         $quickCheck = '"'.str_replace('%', '\\x', rawurlencode(implode('', $firstChars))).'"';
         $file = dirname(__DIR__, 2).'/EmojiTransliterator.php';
-        file_put_contents($file, preg_replace('/QUICK_CHECK = .*;/m', "QUICK_CHECK = {$quickCheck};", file_get_contents($file)));
+        $fs->dumpFile($file, preg_replace('/QUICK_CHECK = .*;/m', "QUICK_CHECK = {$quickCheck};", $fs->readFile($file)));
     }
 
     private static function testEmoji(string $emoji, string $locale, string $codePoints): bool

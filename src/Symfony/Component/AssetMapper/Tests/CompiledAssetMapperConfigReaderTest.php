@@ -55,7 +55,7 @@ class CompiledAssetMapperConfigReaderTest extends TestCase
     {
         $reader = new CompiledAssetMapperConfigReader($this->writableRoot);
         $this->assertEquals($this->writableRoot.\DIRECTORY_SEPARATOR.'foo.json', realpath($reader->saveConfig('foo.json', ['foo' => 'bar'])));
-        $this->assertEquals(['foo' => 'bar'], json_decode(file_get_contents($this->writableRoot.'/foo.json'), true));
+        $this->assertEquals(['foo' => 'bar'], json_decode($this->filesystem->readFile($this->writableRoot.'/foo.json'), true));
     }
 
     public function testRemoveConfig()

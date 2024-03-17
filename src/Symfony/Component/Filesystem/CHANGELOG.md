@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add the `Filesystem::readFile()` method
+
 7.0
 ---
 

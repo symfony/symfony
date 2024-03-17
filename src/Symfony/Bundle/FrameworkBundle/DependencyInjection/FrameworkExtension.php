@@ -71,6 +71,7 @@ use Symfony\Component\Dotenv\Command\DebugCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Glob;
 use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExtension;
@@ -3141,7 +3142,7 @@ class FrameworkExtension extends Extension
         }
 
         $container->addResource(new FileResource($composerFilePath));
-        $composerConfig = json_decode(file_get_contents($composerFilePath), true);
+        $composerConfig = json_decode((new Filesystem())->readFile($composerFilePath), true, flags: \JSON_THROW_ON_ERROR);
 
         return isset($composerConfig['extra']['public-dir']) ? $projectDir.'/'.$composerConfig['extra']['public-dir'] : $defaultPublicDir;
     }

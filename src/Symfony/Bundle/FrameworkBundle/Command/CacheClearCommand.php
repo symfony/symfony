@@ -232,7 +232,7 @@ EOF
         $search = [$warmupDir, str_replace('\\', '\\\\', $warmupDir)];
         $replace = str_replace('\\', '/', $realBuildDir);
         foreach (Finder::create()->files()->in($warmupDir) as $file) {
-            $content = str_replace($search, $replace, file_get_contents($file), $count);
+            $content = str_replace($search, $replace, $this->filesystem->readFile($file), $count);
             if ($count) {
                 file_put_contents($file, $content);
             }

@@ -70,7 +70,7 @@ class RemotePackageStorageTest extends TestCase
         $storage->save($entry, 'any content');
         $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/module_specifier.index.js';
         $this->assertFileExists($targetPath);
-        $this->assertEquals('any content', file_get_contents($targetPath));
+        $this->assertEquals('any content', $this->filesystem->readFile($targetPath));
     }
 
     public function testSaveExtraFile()
@@ -80,7 +80,7 @@ class RemotePackageStorageTest extends TestCase
         $storage->saveExtraFile($entry, '/path/to/extra-file.woff2', 'any content');
         $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/path/to/extra-file.woff2';
         $this->assertFileExists($targetPath);
-        $this->assertEquals('any content', file_get_contents($targetPath));
+        $this->assertEquals('any content', $this->filesystem->readFile($targetPath));
     }
 
     /**

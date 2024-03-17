@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by patrickmaynard at 2023-04-23T12:17:33Z
+
+All tests seem to be passing, but there's some sort of infrastructure error when the pipeline runs:
+```
+Error: KO src/Symfony/Component/Mime
+```
+
+Any ideas on what this means? It seems to be unrelated to the change in my PR.
+
+---------------------------------------------------------------------------
+
+by patrickmaynard at 2023-08-02T10:15:21Z
+
+> All tests seem to be passing, but there's some sort of infrastructure error when the pipeline runs:
+>
+> ```
+> Error: KO src/Symfony/Component/Mime
+> ```
+>
+> Any ideas on what this means? It seems to be unrelated to the change in my PR.
+
+@nicolas-grekas @aurelijus @theinterned @alexislefebvre @OskarStark @xabbuh anybody have thoughts on what I should do next to try to get the pipeline running correctly again? As I mentioned, this broken pipeline doesn't seem to have anything to do with my (very small) changes, which I would really like to merge soon.

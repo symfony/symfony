@@ -7,6 +7,7 @@ CHANGELOG
  * Add `DateTimeNormalizer::CAST_KEY` context option
  * Add `Default` and "class name" default groups
  * Add `AbstractNormalizer::FILTER_BOOL` context option
+ * Add `CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES` context option
 
 7.0
 ---

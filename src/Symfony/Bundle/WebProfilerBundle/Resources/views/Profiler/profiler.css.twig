@@ -614,6 +614,29 @@ table tbody td.num-col {
     text-align: center;
 }
 
+div.table-with-search-field {
+    position: relative;
+}
+div.table-with-search-field label.table-search-field-label {
+    display: none;
+}
+div.table-with-search-field input.table-search-field-input {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    max-height: 27px; /* needed for Safari */
+}
+div.table-with-search-field .no-results-message {
+    background: var(--page-background);
+    border: solid var(--table-border-color);
+    border-width: 0 1px 1px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    font-size: var(--table-font-size);
+    margin-top: -1em;
+    padding: 15px 10px;
+}
+
 {# Utility classes
    ========================================================================= #}
 .block {

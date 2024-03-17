@@ -29,13 +29,30 @@ class ResponseStatusCodeSameTest extends TestCase
 
         $constraint = new ResponseStatusCodeSame(200);
         try {
-            $constraint->evaluate(new Response('', 404));
+            $constraint->evaluate(new Response('Response body', 404));
         } catch (ExpectationFailedException $e) {
+            $exceptionMessage = TestFailure::exceptionToString($e);
             $this->assertStringContainsString("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
+            $this->assertStringContainsString('Response body', $exceptionMessage);
 
             return;
         }
 
         $this->fail();
+    }
+
+    public function testReducedVerbosity()
+    {
+        $constraint = new ResponseStatusCodeSame(200, verbose: false);
+
+        try {
+            $constraint->evaluate(new Response('Response body', 404));
+        } catch (ExpectationFailedException $e) {
+            $exceptionMessage = TestFailure::exceptionToString($e);
+            $this->assertStringContainsString("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
+            $this->assertStringNotContainsString('Response body', $exceptionMessage);
+
+            return;
+        }
     }
 }

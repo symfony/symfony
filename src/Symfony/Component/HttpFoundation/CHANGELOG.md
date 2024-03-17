@@ -8,6 +8,7 @@ CHANGELOG
  * Add `QueryParameterRequestMatcher`
  * Add `HeaderRequestMatcher`
  * Add support for `\SplTempFileObject` in `BinaryFileResponse`
+ * Add `verbose` argument to response test constraints
 
 7.0
 ---

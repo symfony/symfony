@@ -18,7 +18,7 @@ final class ResponseStatusCodeSame extends Constraint
 {
     private int $statusCode;
 
-    public function __construct(int $statusCode)
+    public function __construct(int $statusCode, private readonly bool $verbose = true)
     {
         $this->statusCode = $statusCode;
     }
@@ -44,11 +44,12 @@ final class ResponseStatusCodeSame extends Constraint
         return 'the Response '.$this->toString();
     }
 
-    /**
-     * @param Response $response
-     */
-    protected function additionalFailureDescription($response): string
+    protected function additionalFailureDescription($other): string
     {
-        return (string) $response;
+        if ($this->verbose || !($other instanceof Response)) {
+            return (string) $other;
+        } else {
+            return explode("\r\n\r\n", (string) $other)[0];
+        }
     }
 }

@@ -722,6 +722,88 @@ class RequestPayloadValueResolverTest extends TestCase
             $this->assertSame('This value should be of type string.', $validationFailedException->getViolations()[0]->getMessage());
         }
     }
+
+    /**
+     * @dataProvider provideBoolArgument
+     */
+    public function testBoolArgumentInQueryString(mixed $expectedValue, ?string $parameterValue)
+    {
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('filtered', ObjectWithBoolArgument::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(),
+        ]);
+        $request = Request::create('/', 'GET', ['value' => $parameterValue]);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertSame($expectedValue, $event->getArguments()[0]->value);
+    }
+
+    /**
+     * @dataProvider provideBoolArgument
+     */
+    public function testBoolArgumentInBody(mixed $expectedValue, ?string $parameterValue)
+    {
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('filtered', ObjectWithBoolArgument::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', ['value' => $parameterValue], server: ['CONTENT_TYPE' => 'multipart/form-data']);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertSame($expectedValue, $event->getArguments()[0]->value);
+    }
+
+    public static function provideBoolArgument()
+    {
+        yield 'default value' => [null, null];
+        yield '"0"' => [false, '0'];
+        yield '"false"' => [false, 'false'];
+        yield '"no"' => [false, 'no'];
+        yield '"off"' => [false, 'off'];
+        yield '"1"' => [true, '1'];
+        yield '"true"' => [true, 'true'];
+        yield '"yes"' => [true, 'yes'];
+        yield '"on"' => [true, 'on'];
+    }
+
+    /**
+     * Boolean filtering must be disabled for content types other than form data.
+     */
+    public function testBoolArgumentInJsonBody()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('filtered', ObjectWithBoolArgument::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', ['value' => 'off'], server: ['CONTENT_TYPE' => 'application/json']);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertTrue($event->getArguments()[0]->value);
+    }
 }
 
 class RequestPayload
@@ -763,5 +845,12 @@ class User
     public function getPassword(): string
     {
         return $this->password;
+    }
+}
+
+class ObjectWithBoolArgument
+{
+    public function __construct(public readonly ?bool $value = null)
+    {
     }
 }

@@ -601,7 +601,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $parameterData = $this->validateAndDenormalize($types, $class->getName(), $parameterName, $parameterData, $format, $context);
 
-        return $this->applyCallbacks($parameterData, $class->getName(), $parameterName, $format, $context);
+        $parameterData = $this->applyCallbacks($parameterData, $class->getName(), $parameterName, $format, $context);
+
+        return $this->applyFilterBool($parameter, $parameterData, $context);
     }
 
     /**

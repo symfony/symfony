@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `DateTimeNormalizer::CAST_KEY` context option
  * Add `Default` and "class name" default groups
+ * Add `AbstractNormalizer::FILTER_BOOL` context option
 
 7.0
 ---

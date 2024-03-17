@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-03-02T13:11:59Z
+
+Hey!
+
+I think @alli83 has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-03-16T21:45:44Z
+
+Hi Nicolas! Thank you for submitting this pull request and for all the hard work you put into it. I appreciate your effort and dedication to improving this project.
+
+However, after reviewing your changes, I'm not entirely sure if your solution is necessary or if using [`$client->catchExceptions(false);`](https://symfony.com/doc/6.3/testing.html#reporting-exceptions) might already achieve the same result.
+
+---------------------------------------------------------------------------
+
+by Nicals at 2023-04-17T09:21:49Z
+
+Catching exception effectively reduces the verbosity.
+
+This PR intends to reduces the verbosity of test logs in all cases.
+
+For example, a failed assertion about response status code will dump the entire response, including body.
+When debugging such assertion I want to see the actual response status code, but this information is in the response header, hundreds of lines above the tail of the unit test logs.
+Exception catching is not the issue in this case.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-03T17:47:54Z
+
+@Nicals Are you still interested in finishing this PR?
+
+---------------------------------------------------------------------------
+
+by Nicals at 2024-02-04T11:55:47Z
+
+@fabpot I totally forgot about this MR. I don't work with php/symfony anymore so I did not keep track of it.
+
+I quickly rebased this branch on up to date 7.1 and built the response headers manually.

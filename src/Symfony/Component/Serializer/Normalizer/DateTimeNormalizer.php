@@ -137,7 +137,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
         } catch (NotNormalizableValueException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, ['string'], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
+            throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [Type::string()], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
         }
     }
 

@@ -29,11 +29,6 @@ final class BuiltinType extends Type
     public function __construct(
         private readonly TypeIdentifier $typeIdentifier,
     ) {
-        // BC layer for Symfony\Component\PropertyInfo\Type.
-        // Can be removed as soon as Symfony\Component\PropertyInfo\Type is removed (8.0).
-        if (\in_array($typeIdentifier, [TypeIdentifier::MIXED, TypeIdentifier::NULL], true)) {
-            $this->setNullable(true);
-        }
     }
 
     /**

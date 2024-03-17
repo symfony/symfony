@@ -416,11 +416,11 @@ class PhpStanExtractorTest extends TestCase
     public static function provideLegacyUnionTypes(): array
     {
         return [
-            ['a', [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['a', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT)]],
             ['b', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT)])]],
             ['c', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT)])]],
             ['d', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])])]],
-            ['e', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, Dummy::class, true, [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])], [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DefaultValue::class)])])]), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, ParentDummy::class)]],
+            ['e', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, Dummy::class, true, [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])], [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DefaultValue::class)])])]), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
             ['f', null],
             ['g', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])]],
         ];
@@ -453,10 +453,10 @@ class PhpStanExtractorTest extends TestCase
             ['negativeInt', [new LegacyType(LegacyType::BUILTIN_TYPE_INT, false, null)]],
             ['nonEmptyArray', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true)]],
             ['nonEmptyList', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT))]],
-            ['scalar', [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
-            ['number', [new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), new LegacyType(LegacyType::BUILTIN_TYPE_INT)]],
-            ['numeric', [new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
-            ['arrayKey', [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['scalar', [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_BOOL)]],
+            ['number', [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]],
+            ['numeric', [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['arrayKey', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT)]],
             ['double', [new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]],
         ];
     }

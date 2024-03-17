@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyInfo\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\TypeInfo\BackwardCompatibilityHelper;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -33,8 +32,7 @@ final class ConstructorExtractor implements PropertyTypeExtractorInterface
     public function getType(string $class, string $property, array $context = []): ?Type
     {
         foreach ($this->extractors as $extractor) {
-            $value = $extractor->getTypeFromConstructor($class, $property);
-            if (null !== $value) {
+            if (null !== $value = $value = $extractor->getTypeFromConstructor($class, $property)) {
                 return $value;
             }
         }
@@ -49,6 +47,13 @@ final class ConstructorExtractor implements PropertyTypeExtractorInterface
     {
         trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
 
-        return BackwardCompatibilityHelper::convertTypeToLegacyTypes($this->getType($class, $property, $context));
+        foreach ($this->extractors as $extractor) {
+            $value = $extractor->getTypesFromConstructor($class, $property);
+            if (null !== $value) {
+                return $value;
+            }
+        }
+
+        return null;
     }
 }

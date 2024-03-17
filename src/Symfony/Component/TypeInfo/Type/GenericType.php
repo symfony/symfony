@@ -85,30 +85,4 @@ final class GenericType extends Type
     {
         return $this->type->{$method}(...$arguments);
     }
-
-    /**
-     * BC layer for Symfony\Component\PropertyInfo\Type.
-     *
-     * Can be removed as soon as Symfony\Component\PropertyInfo\Type is removed (8.0).
-     *
-     * @internal
-     */
-    public function setCollection(bool $collection): void
-    {
-        parent::setCollection($collection);
-        $this->type->setCollection($collection);
-    }
-
-    /**
-     * BC layer for Symfony\Component\PropertyInfo\Type.
-     *
-     * Can be removed as soon as Symfony\Component\PropertyInfo\Type is removed (8.0).
-     *
-     * @internal
-     */
-    public function setNullable(bool $nullable): void
-    {
-        parent::setNullable($nullable);
-        $this->type->setNullable($nullable);
-    }
 }

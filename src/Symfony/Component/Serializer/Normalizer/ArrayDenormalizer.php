@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -58,7 +59,11 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
 
         $typeIdentifiers = [];
         if (null !== $keyType = ($context['key_type'] ?? null)) {
-            $typeIdentifiers = array_map(fn (Type $t) => $t->getBaseType()->getTypeIdentifier(), $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType]);
+            if ($keyType instanceof Type) {
+                $typeIdentifiers = array_map(fn (Type $t): string => $t->getBaseType()->getTypeIdentifier()->value, $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType]);
+            } else {
+                $typeIdentifiers = array_map(fn (LegacyType $t): string => $t->getBuiltinType(), \is_array($keyType) ? $keyType : [$keyType]);
+            }
         }
 
         foreach ($data as $key => $value) {
@@ -84,15 +89,13 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
     }
 
     /**
-     * @param list<TypeIdentifier> $typeIdentifiers
+     * @param list<string> $typeIdentifiers
      */
     private function validateKeyType(array $typeIdentifiers, mixed $key, string $path): void
     {
         if (!$typeIdentifiers) {
             return;
         }
-
-        $typeIdentifiers = array_map(fn (TypeIdentifier $t): string => $t->value, $typeIdentifiers);
 
         foreach ($typeIdentifiers as $typeIdentifier) {
             if (('is_'.$typeIdentifier)($key)) {

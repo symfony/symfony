@@ -24,7 +24,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\TypeInfo\BackwardCompatibilityHelper;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -74,9 +74,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     $nullable = false;
                 }
 
-                $t = Type::object($class);
-
-                return $nullable ? Type::nullable($t) : $t;
+                return $nullable ? Type::nullable(Type::object($class)) : Type::object($class);
             }
 
             $collectionKeyType = TypeIdentifier::INT;
@@ -107,7 +105,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                         }
                     }
 
-                    if (!$collectionKeyType = $this->getPhpType($typeOfField)) {
+                    if (!$collectionKeyType = $this->getTypeIdentifier($typeOfField)) {
                         return null;
                     }
                 }
@@ -120,80 +118,40 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             return Type::object(self::getMappingValue($metadata->embeddedClasses[$property], 'class'));
         }
 
-        if ($metadata->hasField($property)) {
-            $typeOfField = $metadata->getTypeOfField($property);
-
-            if (!$builtinType = $this->getPhpType($typeOfField)) {
-                return null;
-            }
-
-            $nullable = $metadata instanceof ClassMetadata && $metadata->isNullable($property);
-            $enumType = null;
-            if (null !== $enumClass = self::getMappingValue($metadata->getFieldMapping($property), 'enumType') ?? null) {
-                $enumType = Type::enum($enumClass);
-                $enumType = $nullable ? Type::nullable($enumType) : $enumType;
-            }
-
-            switch ($builtinType) {
-                case TypeIdentifier::OBJECT:
-                    switch ($typeOfField) {
-                        case Types::DATE_MUTABLE:
-                        case Types::DATETIME_MUTABLE:
-                        case Types::DATETIMETZ_MUTABLE:
-                        case 'vardatetime':
-                        case Types::TIME_MUTABLE:
-                            $t = Type::object(\DateTime::class);
-
-                            return $nullable ? Type::nullable($t) : $t;
-
-                        case Types::DATE_IMMUTABLE:
-                        case Types::DATETIME_IMMUTABLE:
-                        case Types::DATETIMETZ_IMMUTABLE:
-                        case Types::TIME_IMMUTABLE:
-                            $t = Type::object(\DateTimeImmutable::class);
-
-                            return $nullable ? Type::nullable($t) : $t;
-
-                        case Types::DATEINTERVAL:
-                            $t = Type::object(\DateInterval::class);
-
-                            return $nullable ? Type::nullable($t) : $t;
-                    }
-
-                    break;
-                case TypeIdentifier::ARRAY:
-                    switch ($typeOfField) {
-                        case 'array':      // DBAL < 4
-                        case 'json_array': // DBAL < 3
-                            // return null if $enumType is set, because we can't determine if collectionKeyType is string or int
-                            if ($enumType) {
-                                return null;
-                            }
-
-                            $t = Type::array();
-
-                            return $nullable ? Type::nullable($t) : $t;
-
-                        case Types::SIMPLE_ARRAY:
-                            $t = Type::list($enumType ?? Type::string());
-
-                            return $nullable ? Type::nullable($t) : $t;
-                    }
-                    break;
-                case TypeIdentifier::INT:
-                case TypeIdentifier::STRING:
-                    if ($enumType) {
-                        return $enumType;
-                    }
-                    break;
-            }
-
-            $t = Type::builtin($builtinType);
-
-            return $nullable ? Type::nullable($t) : $t;
+        if (!$metadata->hasField($property)) {
+            return null;
         }
 
-        return null;
+        $typeOfField = $metadata->getTypeOfField($property);
+
+        if (!$typeIdentifier = $this->getTypeIdentifier($typeOfField)) {
+            return null;
+        }
+
+        $nullable = $metadata instanceof ClassMetadata && $metadata->isNullable($property);
+        $enumType = null;
+
+        if (null !== $enumClass = self::getMappingValue($metadata->getFieldMapping($property), 'enumType') ?? null) {
+            $enumType = $nullable ? Type::nullable(Type::enum($enumClass)) : Type::enum($enumClass);
+        }
+
+        $builtinType = $nullable ? Type::nullable(Type::builtin($typeIdentifier)) : Type::builtin($typeIdentifier);
+
+        return match ($typeIdentifier) {
+            TypeIdentifier::OBJECT => match ($typeOfField) {
+                Types::DATE_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, 'vardatetime', Types::TIME_MUTABLE => $nullable ? Type::nullable(Type::object(\DateTime::class)) : Type::object(\DateTime::class),
+                Types::DATE_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE, Types::TIME_IMMUTABLE => $nullable ? Type::nullable(Type::object(\DateTimeImmutable::class)) : Type::object(\DateTimeImmutable::class),
+                Types::DATEINTERVAL => $nullable ? Type::nullable(Type::object(\DateInterval::class)) : Type::object(\DateInterval::class),
+                default => $builtinType,
+            },
+            TypeIdentifier::ARRAY => match ($typeOfField) {
+                'array', 'json_array' => $enumType ? null : ($nullable ? Type::nullable(Type::array()) : Type::array()),
+                Types::SIMPLE_ARRAY => $nullable ? Type::nullable(Type::list($enumType ?? Type::string())) : Type::list($enumType ?? Type::string()),
+                default => $builtinType,
+            },
+            TypeIdentifier::INT, TypeIdentifier::STRING => $enumType ? $enumType : $builtinType,
+            default => $builtinType,
+        };
     }
 
     /**
@@ -203,7 +161,134 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     {
         trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
 
-        return BackwardCompatibilityHelper::convertTypeToLegacyTypes($this->getType($class, $property, $context));
+        if (null === $metadata = $this->getMetadata($class)) {
+            return null;
+        }
+
+        if ($metadata->hasAssociation($property)) {
+            $class = $metadata->getAssociationTargetClass($property);
+
+            if ($metadata->isSingleValuedAssociation($property)) {
+                if ($metadata instanceof ClassMetadata) {
+                    $associationMapping = $metadata->getAssociationMapping($property);
+
+                    $nullable = $this->isAssociationNullable($associationMapping);
+                } else {
+                    $nullable = false;
+                }
+
+                return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, $class)];
+            }
+
+            $collectionKeyType = LegacyType::BUILTIN_TYPE_INT;
+
+            if ($metadata instanceof ClassMetadata) {
+                $associationMapping = $metadata->getAssociationMapping($property);
+
+                if (self::getMappingValue($associationMapping, 'indexBy')) {
+                    $subMetadata = $this->entityManager->getClassMetadata(self::getMappingValue($associationMapping, 'targetEntity'));
+
+                    // Check if indexBy value is a property
+                    $fieldName = self::getMappingValue($associationMapping, 'indexBy');
+                    if (null === ($typeOfField = $subMetadata->getTypeOfField($fieldName))) {
+                        $fieldName = $subMetadata->getFieldForColumn(self::getMappingValue($associationMapping, 'indexBy'));
+                        // Not a property, maybe a column name?
+                        if (null === ($typeOfField = $subMetadata->getTypeOfField($fieldName))) {
+                            // Maybe the column name is the association join column?
+                            $associationMapping = $subMetadata->getAssociationMapping($fieldName);
+
+                            $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($fieldName);
+                            $subMetadata = $this->entityManager->getClassMetadata(self::getMappingValue($associationMapping, 'targetEntity'));
+
+                            // Not a property, maybe a column name?
+                            if (null === ($typeOfField = $subMetadata->getTypeOfField($indexProperty))) {
+                                $fieldName = $subMetadata->getFieldForColumn($indexProperty);
+                                $typeOfField = $subMetadata->getTypeOfField($fieldName);
+                            }
+                        }
+                    }
+
+                    if (!$collectionKeyType = $this->getTypeIdentifier($typeOfField)?->value) {
+                        return null;
+                    }
+                }
+            }
+
+            return [new LegacyType(
+                LegacyType::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                new LegacyType($collectionKeyType),
+                new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, $class)
+            )];
+        }
+
+        if ($metadata instanceof ClassMetadata && isset($metadata->embeddedClasses[$property])) {
+            return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, self::getMappingValue($metadata->embeddedClasses[$property], 'class'))];
+        }
+
+        if ($metadata->hasField($property)) {
+            $typeOfField = $metadata->getTypeOfField($property);
+
+            if (!$builtinType = $this->getTypeIdentifier($typeOfField)?->value) {
+                return null;
+            }
+
+            $nullable = $metadata instanceof ClassMetadata && $metadata->isNullable($property);
+            $enumType = null;
+            if (null !== $enumClass = self::getMappingValue($metadata->getFieldMapping($property), 'enumType') ?? null) {
+                $enumType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
+            }
+
+            switch ($builtinType) {
+                case LegacyType::BUILTIN_TYPE_OBJECT:
+                    switch ($typeOfField) {
+                        case Types::DATE_MUTABLE:
+                        case Types::DATETIME_MUTABLE:
+                        case Types::DATETIMETZ_MUTABLE:
+                        case 'vardatetime':
+                        case Types::TIME_MUTABLE:
+                            return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
+
+                        case Types::DATE_IMMUTABLE:
+                        case Types::DATETIME_IMMUTABLE:
+                        case Types::DATETIMETZ_IMMUTABLE:
+                        case Types::TIME_IMMUTABLE:
+                            return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
+
+                        case Types::DATEINTERVAL:
+                            return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
+                    }
+
+                    break;
+                case LegacyType::BUILTIN_TYPE_ARRAY:
+                    switch ($typeOfField) {
+                        case 'array':      // DBAL < 4
+                        case 'json_array': // DBAL < 3
+                            // return null if $enumType is set, because we can't determine if collectionKeyType is string or int
+                            if ($enumType) {
+                                return null;
+                            }
+
+                            return [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
+
+                        case Types::SIMPLE_ARRAY:
+                            return [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $nullable, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $enumType ?? new LegacyType(LegacyType::BUILTIN_TYPE_STRING))];
+                    }
+                    break;
+                case LegacyType::BUILTIN_TYPE_INT:
+                case LegacyType::BUILTIN_TYPE_STRING:
+                    if ($enumType) {
+                        return [$enumType];
+                    }
+                    break;
+            }
+
+            return [new LegacyType($builtinType, $nullable)];
+        }
+
+        return null;
     }
 
     public function isReadable(string $class, string $property, array $context = []): ?bool
@@ -263,7 +348,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * Gets the corresponding built-in PHP type.
      */
-    private function getPhpType(string $doctrineType): ?TypeIdentifier
+    private function getTypeIdentifier(string $doctrineType): ?TypeIdentifier
     {
         return match ($doctrineType) {
             Types::SMALLINT,

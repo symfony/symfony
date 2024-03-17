@@ -296,8 +296,8 @@ class ReflectionExtractorTest extends TestCase
         return [
             ['foo', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, true, null, true)]],
             ['bar', [new LegacyType(LegacyType::BUILTIN_TYPE_INT, true)]],
-            ['timeout', [new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), new LegacyType(LegacyType::BUILTIN_TYPE_INT)]],
-            ['optional', [new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT, true), new LegacyType(LegacyType::BUILTIN_TYPE_INT, true)]],
+            ['timeout', [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]],
+            ['optional', [new LegacyType(LegacyType::BUILTIN_TYPE_INT, true), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT, true)]],
             ['string', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'Stringable'), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
             ['payload', null],
             ['data', null],
@@ -319,7 +319,7 @@ class ReflectionExtractorTest extends TestCase
     {
         return [
             ['nothing', null],
-            ['collection', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'Countable'), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'Traversable')]],
+            ['collection', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'Traversable'), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'Countable')]],
         ];
     }
 
@@ -692,8 +692,6 @@ class ReflectionExtractorTest extends TestCase
     {
         yield ['a', null];
         yield ['b', Type::nullable(Type::object(ParentDummy::class))];
-        yield ['c', Type::bool()];
-        yield ['d', Type::bool()];
         yield ['e', null];
         yield ['f', Type::list(Type::object(\DateTimeImmutable::class))];
         yield ['donotexist', null];

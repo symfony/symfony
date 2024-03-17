@@ -13,6 +13,8 @@ namespace Symfony\Component\PropertyInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\Type as TypeInfoType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -86,5 +88,35 @@ class TypeTest extends TestCase
         $this->expectExceptionMessage('"Symfony\Component\PropertyInfo\Type::validateCollectionArgument()": Argument #5 ($collectionKeyType) must be of type "Symfony\Component\PropertyInfo\Type[]", "Symfony\Component\PropertyInfo\Type" or "null", array value "array" given.');
 
         new Type('array', false, null, true, [new \stdClass()], [new Type('string')]);
+    }
+
+    /**
+     * @dataProvider createProperInternalTypeDataProvider
+     *
+     * @param list<TypeInfoType> $types
+     * @param list<Type>         $legacyTypes
+     */
+    public function testCreateProperInternalTypes(array $types, array $legacyTypes)
+    {
+        $this->assertEquals($types, array_map(fn (Type $t): TypeInfoType => $t->internalType, $legacyTypes));
+    }
+
+    /**
+     * @return iterable<array{0: list<TypeInfoType>, 1: list<LegacyType>}>
+     */
+    public function createProperInternalTypeDataProvider(): iterable
+    {
+        yield [[TypeInfoType::null()], [new Type('null')]];
+        yield [[TypeInfoType::int()], [new Type('int')]];
+        yield [[TypeInfoType::object(\stdClass::class)], [new Type('object', false, \stdClass::class)]];
+        yield [
+            [TypeInfoType::generic(TypeInfoType::object('Foo'), TypeInfoType::string(), TypeInfoType::int())],
+            [new Type('object', false, 'Foo', false, [new Type('string')], new Type('int'))],
+        ];
+        yield [[TypeInfoType::nullable(TypeInfoType::int())], [new Type('int', true)]];
+        yield [[TypeInfoType::int(), TypeInfoType::string()], [new Type('int'), new Type('string')]];
+
+        $type = TypeInfoType::collection(TypeInfoType::builtin(TypeIdentifier::ARRAY), TypeInfoType::int(), TypeInfoType::string());
+        yield [[$type], [new Type('array', false, null, true, [new Type('string')], new Type('int'))]];
     }
 }

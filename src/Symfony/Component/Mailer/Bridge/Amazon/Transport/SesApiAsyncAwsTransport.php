@@ -98,6 +98,11 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         if ($header = $email->getHeaders()->get('X-SES-SOURCE-ARN')) {
             $request['FromEmailAddressIdentityArn'] = $header->getBodyAsString();
         }
+        if ($header = $email->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+            if (preg_match("/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix", $header->getBodyAsString(), $listManagementOptions)) {
+                $request['ListManagementOptions'] = array_filter($listManagementOptions, fn ($e) => \in_array($e, ['ContactListName', 'TopicName']), \ARRAY_FILTER_USE_KEY);
+            }
+        }
         if ($email->getReturnPath()) {
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }

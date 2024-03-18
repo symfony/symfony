@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-03-02T10:46:11Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "7.1 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by 94noni at 2024-03-02T17:05:18Z
+
+it could be a valuable addition indeed,
+but this reminds me a [discussion of mine](https://github.com/symfony/symfony/issues/35535) (other account)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-03-02T22:26:28Z
+
+> it could be a valuable addition indeed,
+>
+> but this reminds me a [discussion of mine](https://github.com/symfony/symfony/issues/35535) (other account)
+>
+>
+
+I also saw #53923.
+
+I currently find the LockableTrait really confusing because when using it (without reading the code inside) you could expect that the trait use the default configured lock factory instead of creating a new one.
+
+I was trying to improve the situation...
+
+---------------------------------------------------------------------------
+
+by 94noni at 2024-03-03T08:34:07Z
+
+Yes and you do good i think but may it will leverage discussion
+Perhaps create another trait and name it specifically ?
+and yes i’ve also seen the issue discussion and the doc and/or the class can be improved to give more context to the dev
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-03-03T20:47:20Z
+
+> Tests? 🙃
+
+Indeed, I added some now @derrabus

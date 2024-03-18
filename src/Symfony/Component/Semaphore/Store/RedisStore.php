@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
+use Predis\ClientInterface;
 use Relay\Relay;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
@@ -27,7 +28,7 @@ use Symfony\Component\Semaphore\PersistingStoreInterface;
 class RedisStore implements PersistingStoreInterface
 {
     public function __construct(
-        private \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
+        private \Redis|Relay|\RedisArray|\RedisCluster|ClientInterface $redis,
     ) {
     }
 
@@ -166,7 +167,7 @@ class RedisStore implements PersistingStoreInterface
             return $this->redis->_instance($this->redis->_target($resource))->eval($script, array_merge([$resource], $args), 1);
         }
 
-        if ($this->redis instanceof \Predis\ClientInterface) {
+        if ($this->redis instanceof ClientInterface) {
             return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
         }
 

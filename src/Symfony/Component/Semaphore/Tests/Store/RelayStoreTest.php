@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
+use Relay\Exception as RelayException;
 use Relay\Relay;
 
 /**
@@ -27,7 +28,7 @@ class RelayStoreTest extends AbstractRedisStoreTestCase
     {
         try {
             new Relay(...explode(':', getenv('REDIS_HOST')));
-        } catch (\Relay\Exception $e) {
+        } catch (RelayException $e) {
             self::markTestSkipped($e->getMessage());
         }
     }

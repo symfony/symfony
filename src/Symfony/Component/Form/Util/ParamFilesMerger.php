@@ -44,17 +44,17 @@ class ParamFilesMerger
                 return null;
             } elseif (self::isFileUpload($filesValue)) {
                 return $filesValue;
-            } elseif (is_array($filesValue)) {
+            } elseif (\is_array($filesValue)) {
                 return $filesValue;
             } else { // $filesValue has a non-array value
                 return $filesValue;
             }
-        } elseif (is_array($paramsValue)) {
+        } elseif (\is_array($paramsValue)) {
             if (null === $filesValue) {
                 return $paramsValue;
             } elseif (self::isFileUpload($filesValue)) {
-                return $filesValue; // if the array is a file upload fields, it has the precedence
-            } elseif (is_array($filesValue)) {
+                return $filesValue; // if the array is a file upload field, it has the precedence
+            } elseif (\is_array($filesValue)) {
                 return $this->getResultArray($paramsValue, $filesValue);
             } else { // $filesValue has a non-array value
                 return $paramsValue; // params has the precedence
@@ -63,8 +63,8 @@ class ParamFilesMerger
             if (null === $filesValue) {
                 return $paramsValue;
             } elseif (self::isFileUpload($filesValue)) {
-                return $filesValue; // if the array is a file upload fields, it has the precedence
-            } elseif (is_array($filesValue)) {
+                return $filesValue; // if the array is a file upload field, it has the precedence
+            } elseif (\is_array($filesValue)) {
                 return $paramsValue; // params has the precedence
             } else { // $filesValue has a non-array value
                 return $paramsValue; // params has the precedence
@@ -73,7 +73,6 @@ class ParamFilesMerger
     }
 
     /**
-     * @param mixed $value
      * @return bool
      */
     private static function isFileUpload($value)
@@ -94,13 +93,14 @@ class ParamFilesMerger
 
     /**
      * @param array $array
+     *
      * @return bool
      */
     private static function doesNotContainArrayOrFileUpload($array)
     {
         foreach ($array as $value) {
             if (
-                is_array($value)
+                \is_array($value)
                 && !self::isFileUpload($value)
             ) {
                 return false;
@@ -117,16 +117,16 @@ class ParamFilesMerger
     {
         // if both are lists and both does not contains array, then merge them and return
         if (
-            \array_is_list($paramsValue)
+            array_is_list($paramsValue)
             && self::doesNotContainArrayOrFileUpload($paramsValue)
-            && \array_is_list($filesValue)
+            && array_is_list($filesValue)
             && self::doesNotContainArrayOrFileUpload($filesValue)
         ) {
-            return \array_merge($paramsValue, $filesValue);
+            return array_merge($paramsValue, $filesValue);
         }
 
         // heuristics to preserve order, the bigger array wins
-        if (count($filesValue) > count($paramsValue)) {
+        if (\count($filesValue) > \count($paramsValue)) {
             $keys = array_unique(array_merge(array_keys($filesValue), array_keys($paramsValue)));
         } else {
             $keys = array_unique(array_merge(array_keys($paramsValue), array_keys($filesValue)));
@@ -148,8 +148,6 @@ class ParamFilesMerger
 
     /**
      * Gets the value of the current element in the params according to the path.
-     *
-     * @return mixed
      */
     private function getParamsValue()
     {
@@ -168,15 +166,12 @@ class ParamFilesMerger
 
     /**
      * Gets the value of the current element in the files according to the path.
-     *
-     * @return mixed
      */
     private function getFilesValue()
     {
         $files = $this->files;
 
         foreach ($this->path as $key) {
-
             $files = $files[$key] ?? null;
 
             if (null === $files) {

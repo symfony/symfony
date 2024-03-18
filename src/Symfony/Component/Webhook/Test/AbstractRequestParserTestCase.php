@@ -43,7 +43,7 @@ abstract class AbstractRequestParserTestCase extends TestCase
 
             yield $filename => [
                 file_get_contents($file),
-                include(str_replace('.'.static::getFixtureExtension(), '.php', $file->getPathname())),
+                include (str_replace('.'.static::getFixtureExtension(), '.php', $file->getPathname())),
             ];
         }
     }

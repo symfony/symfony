@@ -34,7 +34,7 @@ final readonly class TypeResolver implements TypeResolverInterface
     ) {
     }
 
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         $subjectType = match (\is_object($subject)) {
             true => match (true) {

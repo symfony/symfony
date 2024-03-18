@@ -36,8 +36,7 @@ final class SmscTransport extends AbstractTransport
         private string $from,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

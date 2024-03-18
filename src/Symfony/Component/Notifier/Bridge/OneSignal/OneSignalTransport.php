@@ -35,8 +35,7 @@ final class OneSignalTransport extends AbstractTransport
         private ?string $defaultRecipientId = null,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

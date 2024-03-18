@@ -84,7 +84,7 @@ function get_icu_version_from_genrb(string $genrb)
 error_reporting(\E_ALL);
 
 set_error_handler(function (int $type, string $msg, string $file, int $line) {
-    throw new \ErrorException($msg, 0, $type, $file, $line);
+    throw new ErrorException($msg, 0, $type, $file, $line);
 });
 
 set_exception_handler(function (Throwable $exception) {

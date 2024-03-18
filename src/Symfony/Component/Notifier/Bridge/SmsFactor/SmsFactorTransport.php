@@ -34,8 +34,7 @@ final class SmsFactorTransport extends AbstractTransport
         private ?SmsFactorPushType $pushType,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-    )
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

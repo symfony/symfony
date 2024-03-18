@@ -35,8 +35,7 @@ final class OctopushTransport extends AbstractTransport
         private string $type,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

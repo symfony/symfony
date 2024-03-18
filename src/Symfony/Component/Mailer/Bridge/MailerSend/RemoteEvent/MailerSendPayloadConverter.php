@@ -89,7 +89,7 @@ final class MailerSendPayloadConverter implements PayloadConverterInterface
 
         return match ($morphObject) {
             'open' => [
-                'ip' => $payload['data']['morph']['ip'] ?? null
+                'ip' => $payload['data']['morph']['ip'] ?? null,
             ],
             'click' => [
                 'ip' => $payload['data']['morph']['ip'] ?? null,

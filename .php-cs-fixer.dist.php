@@ -62,6 +62,10 @@ return (new PhpCsFixer\Config())
             ->notPath('Symfony/Component/Cache/Traits/Redis6Proxy.php')
             ->notPath('Symfony/Component/Cache/Traits/RedisCluster5Proxy.php')
             ->notPath('Symfony/Component/Cache/Traits/RedisCluster6Proxy.php')
+            // svg
+            ->notPath('Symfony/Component/ErrorHandler/Resources/assets/images/symfony-ghost.svg.php')
+            // HTML templates
+            ->notPath('#Symfony/.*\.html\.php#')
     )
     ->setCacheFile('.php-cs-fixer.cache')
 ;

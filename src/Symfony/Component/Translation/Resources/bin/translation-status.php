@@ -162,7 +162,7 @@ function extractLocaleFromFilePath($filePath)
 function extractTranslationKeys($filePath): array
 {
     $translationKeys = [];
-    $contents = new \SimpleXMLElement(file_get_contents($filePath));
+    $contents = new SimpleXMLElement(file_get_contents($filePath));
 
     foreach ($contents->file->body->{'trans-unit'} as $translationKey) {
         $translationId = (string) $translationKey['id'];

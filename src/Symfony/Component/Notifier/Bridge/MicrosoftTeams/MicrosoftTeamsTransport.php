@@ -33,8 +33,7 @@ final class MicrosoftTeamsTransport extends AbstractTransport
         private string $path,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

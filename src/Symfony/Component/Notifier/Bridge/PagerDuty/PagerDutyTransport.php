@@ -32,8 +32,7 @@ final class PagerDutyTransport extends AbstractTransport
         #[\SensitiveParameter] private readonly string $token,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

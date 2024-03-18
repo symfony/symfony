@@ -33,8 +33,7 @@ final class RocketChatTransport extends AbstractTransport
         private ?string $chatChannel = null,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

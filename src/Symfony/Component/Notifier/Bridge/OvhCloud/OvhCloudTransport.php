@@ -38,8 +38,7 @@ final class OvhCloudTransport extends AbstractTransport
         private string $serviceName,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-    )
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

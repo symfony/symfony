@@ -148,7 +148,7 @@ trait TypeFactoryTrait
      *
      * @return CollectionType<T>
      */
-    public static function collection(BuiltinType|ObjectType|GenericType $type, Type $value = null, Type $key = null, bool $asList = false): CollectionType
+    public static function collection(BuiltinType|ObjectType|GenericType $type, ?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
     {
         if (!$type instanceof GenericType && (null !== $value || null !== $key)) {
             $type = self::generic($type, $key ?? self::union(self::int(), self::string()), $value ?? self::mixed());
@@ -160,7 +160,7 @@ trait TypeFactoryTrait
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ARRAY>>
      */
-    public static function array(Type $value = null, Type $key = null, bool $asList = false): CollectionType
+    public static function array(?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
     {
         return self::collection(self::builtin(TypeIdentifier::ARRAY), $value, $key, $asList);
     }
@@ -168,7 +168,7 @@ trait TypeFactoryTrait
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ITERABLE>>
      */
-    public static function iterable(Type $value = null, Type $key = null, bool $asList = false): CollectionType
+    public static function iterable(?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
     {
         return self::collection(self::builtin(TypeIdentifier::ITERABLE), $value, $key, $asList);
     }
@@ -176,7 +176,7 @@ trait TypeFactoryTrait
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ARRAY>>
      */
-    public static function list(Type $value = null): CollectionType
+    public static function list(?Type $value = null): CollectionType
     {
         return self::array($value, self::int(), asList: true);
     }
@@ -184,7 +184,7 @@ trait TypeFactoryTrait
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ARRAY>>
      */
-    public static function dict(Type $value = null): CollectionType
+    public static function dict(?Type $value = null): CollectionType
     {
         return self::array($value, self::string());
     }
@@ -196,7 +196,7 @@ trait TypeFactoryTrait
      *
      * @return ($className is class-string ? ObjectType<T> : BuiltinType<TypeIdentifier::OBJECT>)
      */
-    public static function object(string $className = null): BuiltinType|ObjectType
+    public static function object(?string $className = null): BuiltinType|ObjectType
     {
         return null !== $className ? new ObjectType($className) : new BuiltinType(TypeIdentifier::OBJECT);
     }
@@ -210,7 +210,7 @@ trait TypeFactoryTrait
      *
      * @return ($className is class-string<\BackedEnum> ? ($backingType is U ? BackedEnumType<T,U> : BackedEnumType<T,BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>>) : EnumType<T>))
      */
-    public static function enum(string $className, BuiltinType $backingType = null): EnumType
+    public static function enum(string $className, ?BuiltinType $backingType = null): EnumType
     {
         if (is_subclass_of($className, \BackedEnum::class)) {
             if (null === $backingType) {
@@ -237,7 +237,7 @@ trait TypeFactoryTrait
         return new GenericType($mainType, ...$variableTypes);
     }
 
-    public static function template(string $name, Type $bound = null): TemplateType
+    public static function template(string $name, ?Type $bound = null): TemplateType
     {
         return new TemplateType($name, $bound ?? Type::mixed());
     }

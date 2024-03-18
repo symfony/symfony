@@ -43,7 +43,7 @@ final class TypeContextFactory
     ) {
     }
 
-    public function createFromClassName(string $calledClassName, string $declaringClassName = null): TypeContext
+    public function createFromClassName(string $calledClassName, ?string $declaringClassName = null): TypeContext
     {
         $declaringClassName ??= $calledClassName;
 

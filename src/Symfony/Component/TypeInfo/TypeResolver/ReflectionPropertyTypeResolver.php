@@ -32,7 +32,7 @@ final readonly class ReflectionPropertyTypeResolver implements TypeResolverInter
     ) {
     }
 
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if (!$subject instanceof \ReflectionProperty) {
             throw new UnsupportedException(sprintf('Expected subject to be a "ReflectionProperty", "%s" given.', get_debug_type($subject)), $subject);

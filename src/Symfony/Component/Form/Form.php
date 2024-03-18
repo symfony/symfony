@@ -613,7 +613,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return null === $this->transformationFailure;
     }
 
-    public function getTransformationFailure(): ?Exception\TransformationFailedException
+    public function getTransformationFailure(): ?TransformationFailedException
     {
         return $this->transformationFailure;
     }

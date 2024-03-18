@@ -49,8 +49,7 @@ final class SmsBiurasTransport extends AbstractTransport
         private bool $testMode,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

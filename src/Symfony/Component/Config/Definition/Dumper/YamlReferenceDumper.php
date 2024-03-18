@@ -170,7 +170,7 @@ class YamlReferenceDumper
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
-            $this->writeArray(array_map(Inline::dump(...), $example), $depth + 1);
+            $this->writeArray(array_map(Inline::dump(...), $example), $depth + 1, true);
         }
 
         if ($children) {
@@ -191,7 +191,7 @@ class YamlReferenceDumper
         $this->reference .= sprintf($format, $text)."\n";
     }
 
-    private function writeArray(array $array, int $depth): void
+    private function writeArray(array $array, int $depth, bool $asComment = false): void
     {
         $isIndexed = array_is_list($array);
 
@@ -201,11 +201,12 @@ class YamlReferenceDumper
             } else {
                 $val = $value;
             }
+            $prefix = $asComment ? '# ' : '';
 
             if ($isIndexed) {
-                $this->writeLine('- '.$val, $depth * 4);
+                $this->writeLine($prefix.'- '.$val, $depth * 4);
             } else {
-                $this->writeLine(sprintf('%-20s %s', $key.':', $val), $depth * 4);
+                $this->writeLine($prefix.sprintf('%-20s %s', $key.':', $val), $depth * 4);
             }
 
             if (\is_array($value)) {

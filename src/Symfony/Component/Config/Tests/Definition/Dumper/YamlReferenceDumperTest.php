@@ -117,8 +117,8 @@ acme_root:
     variable:
 
         # Examples:
-        - foo
-        - bar
+        # - foo
+        # - bar
     parameters:
 
         # Prototype: Parameter name

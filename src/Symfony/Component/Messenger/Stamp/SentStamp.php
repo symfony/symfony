@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
+use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
+
 /**
  * Marker stamp identifying a message sent by the `SendMessageMiddleware`.
  *
- * @see \Symfony\Component\Messenger\Middleware\SendMessageMiddleware
+ * @see SendMessageMiddleware
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */

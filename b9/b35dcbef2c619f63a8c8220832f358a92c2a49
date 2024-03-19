@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-18T21:03:19Z
+
+Looks like there are more found by the CI?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-03-19T07:36:02Z
+
+I think the remaining ones are raised by Composer and PHPUnit, which have been fixed in recent commits: https://github.com/composer/composer/commit/62126e1a402c2f5252a1e6026c20765ceae49252 and https://github.com/sebastianbergmann/phpunit/commit/eb22ea1dafbe60991f17fb62522ebf3279903a63

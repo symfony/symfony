@@ -23,6 +23,7 @@ use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Util\FormUtil;
+use Symfony\Component\Form\Util\InheritDataAwareFilter;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -275,13 +276,20 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         $this->lockSetData = true;
-        $dispatcher = $this->config->getEventDispatcher();
+
+        // Collecting $this + all children with "inherit_data" option TRUE
+        $thisModelDataAwareFormsIterator = new \AppendIterator();
+        $thisModelDataAwareFormsIterator->append(new \ArrayIterator([$this]));
+        $thisModelDataAwareFormsIterator->append(new InheritDataAwareFilter(new InheritDataAwareIterator($this->children)));
 
         // Hook to change content of the model data before transformation and mapping children
-        if ($dispatcher->hasListeners(FormEvents::PRE_SET_DATA)) {
-            $event = new PreSetDataEvent($this, $modelData);
-            $dispatcher->dispatch($event, FormEvents::PRE_SET_DATA);
-            $modelData = $event->getData();
+        foreach ($thisModelDataAwareFormsIterator as $form) {
+            $dispatcher = $form->getConfig()->getEventDispatcher();
+            if ($dispatcher->hasListeners(FormEvents::PRE_SET_DATA)) {
+                $event = new PreSetDataEvent($form, $modelData);
+                $dispatcher->dispatch($event, FormEvents::PRE_SET_DATA);
+                $modelData = $event->getData();
+            }
         }
 
         // Treat data as strings unless a transformer exists
@@ -317,9 +325,12 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $this->config->getDataMapper()->mapDataToForms($viewData, new \RecursiveIteratorIterator(new InheritDataAwareIterator($this->children)));
         }
 
-        if ($dispatcher->hasListeners(FormEvents::POST_SET_DATA)) {
-            $event = new PostSetDataEvent($this, $modelData);
-            $dispatcher->dispatch($event, FormEvents::POST_SET_DATA);
+        foreach ($thisModelDataAwareFormsIterator as $form) {
+            $dispatcher = $form->getConfig()->getEventDispatcher();
+            if ($dispatcher->hasListeners(FormEvents::POST_SET_DATA)) {
+                $event = new PostSetDataEvent($form, $modelData);
+                $dispatcher->dispatch($event, FormEvents::POST_SET_DATA);
+            }
         }
 
         return $this;
@@ -459,7 +470,13 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
         }
 
-        $dispatcher = $this->config->getEventDispatcher();
+        $thisModelDataAwareFormsIterator = new \AppendIterator();
+
+        // Collecting $this + all children with "inherit_data" option TRUE only if $this has "inherit_data" option FALSE to avoid to dispatch events two times.
+        if (!$this->getConfig()->getInheritData()) {
+            $thisModelDataAwareFormsIterator->append(new \ArrayIterator(['' => $this]));
+            $thisModelDataAwareFormsIterator->append(new InheritDataAwareFilter(new InheritDataAwareIterator($this->children)));
+        }
 
         $modelData = null;
         $normData = null;
@@ -471,10 +488,19 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             }
 
             // Hook to change content of the data submitted by the browser
-            if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
-                $event = new PreSubmitEvent($this, $submittedData);
-                $dispatcher->dispatch($event, FormEvents::PRE_SUBMIT);
-                $submittedData = $event->getData();
+            foreach ($thisModelDataAwareFormsIterator as $name => $form) {
+                $dispatcher = $form->getConfig()->getEventDispatcher();
+                if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
+                    $eventSubmittedData = null;
+                    if (empty($name)) {
+                        $eventSubmittedData = $submittedData;
+                    } elseif (\array_key_exists($name, $submittedData)) {
+                        $eventSubmittedData = $submittedData[$name];
+                    }
+                    $event = new PreSubmitEvent($form, $eventSubmittedData);
+                    $dispatcher->dispatch($event, FormEvents::PRE_SUBMIT);
+                    $submittedData = $event->getData();
+                }
             }
 
             // Check whether the form is compound.
@@ -553,10 +579,13 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
                 // Hook to change content of the data in the normalized
                 // representation
-                if ($dispatcher->hasListeners(FormEvents::SUBMIT)) {
-                    $event = new SubmitEvent($this, $normData);
-                    $dispatcher->dispatch($event, FormEvents::SUBMIT);
-                    $normData = $event->getData();
+                foreach ($thisModelDataAwareFormsIterator as $form) {
+                    $dispatcher = $form->getConfig()->getEventDispatcher();
+                    if ($dispatcher->hasListeners(FormEvents::SUBMIT)) {
+                        $event = new SubmitEvent($form, $normData);
+                        $dispatcher->dispatch($event, FormEvents::SUBMIT);
+                        $normData = $event->getData();
+                    }
                 }
 
                 // Synchronize representations - must not change the content!
@@ -580,9 +609,12 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         $this->normData = $normData;
         $this->viewData = $viewData;
 
-        if ($dispatcher->hasListeners(FormEvents::POST_SUBMIT)) {
-            $event = new PostSubmitEvent($this, $viewData);
-            $dispatcher->dispatch($event, FormEvents::POST_SUBMIT);
+        foreach ($thisModelDataAwareFormsIterator as $form) {
+            $dispatcher = $form->getConfig()->getEventDispatcher();
+            if ($dispatcher->hasListeners(FormEvents::POST_SUBMIT)) {
+                $event = new PostSubmitEvent($form, $viewData);
+                $dispatcher->dispatch($event, FormEvents::POST_SUBMIT);
+            }
         }
 
         return $this;

@@ -109,6 +109,10 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException('Expected a string.');
         }
 
+        if (str_contains($value, "\0")) {
+            throw new TransformationFailedException('Null bytes not allowed');
+        }
+
         $outputTz = new \DateTimeZone($this->outputTimezone);
         $dateTime = \DateTime::createFromFormat($this->parseFormat, $value, $outputTz);
 

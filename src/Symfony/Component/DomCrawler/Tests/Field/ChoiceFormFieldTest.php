@@ -110,6 +110,18 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException if the value is an array');
         }
+
+        $option = $this->createNode('option', 'Hello World', ['value' => 'hello_world']);
+        $field->addChoice($option);
+
+        $this->assertNotSame('hello_world', $field->getValue());
+        $field->setValue('hello_world');
+        $this->assertSame('hello_world', $field->getValue(), '->setValue() changes the selected option to dynamically added one');
+
+        $option = $this->createNode('option', 'Mr. Robot', ['value' => 'mr_robot', 'selected' => true]);
+        $field->addChoice($option);
+
+        $this->assertSame('mr_robot', $field->getValue(), '->addChoice() changes the value to added choice if selected attribute is set');
     }
 
     public function testSelectWithEmptyBooleanAttribute()

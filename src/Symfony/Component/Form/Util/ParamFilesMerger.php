@@ -34,9 +34,6 @@ class ParamFilesMerger
         $this->files = $files;
     }
 
-    /**
-     * @return mixed
-     */
     public function getResult()
     {
         $paramsValue = $this->getParamsValue();
@@ -126,8 +123,6 @@ class ParamFilesMerger
 
     /**
      * Gets the value of the current element in the params according to the path.
-     *
-     * @return mixed
      */
     private function getParamsValue()
     {
@@ -146,8 +141,6 @@ class ParamFilesMerger
 
     /**
      * Gets the value of the current element in the files according to the path.
-     *
-     * @return mixed
      */
     private function getFilesValue()
     {

@@ -170,6 +170,10 @@ class InputOptionTest extends TestCase
         $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
         $option->setDefault([1, 2]);
         $this->assertEquals([1, 2], $option->getDefault(), '->setDefault() changes the default value');
+
+        $option = new InputOption('foo', null, InputOption::VALUE_NONE | InputOption::VALUE_NEGATABLE);
+        $option->setDefault(true);
+        $this->assertTrue($option->getDefault(), '->setDefault() changes the default value');
     }
 
     public function testDefaultValueWithValueNoneMode()

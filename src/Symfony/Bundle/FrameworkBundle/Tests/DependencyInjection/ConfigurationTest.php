@@ -668,6 +668,7 @@ class ConfigurationTest extends TestCase
                     'localizable_html_attributes' => [],
                 ],
                 'providers' => [],
+                'default_parameters' => [],
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),

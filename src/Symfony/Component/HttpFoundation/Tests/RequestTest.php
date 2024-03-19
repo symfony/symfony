@@ -2197,6 +2197,23 @@ class RequestTest extends TestCase
         Request::setFactory(null);
     }
 
+    public function testFactoryCallable()
+    {
+        $requestFactory = new class {
+            public function createRequest(): Request
+            {
+                return new NewRequest();
+            }
+        };
+
+        Request::setFactory([$requestFactory, 'createRequest']);
+
+        $this->assertEquals('foo', Request::create('/')->getFoo());
+
+        Request::setFactory(null);
+
+    }
+
     /**
      * @dataProvider getLongHostNames
      */

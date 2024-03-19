@@ -15,12 +15,12 @@ class Bar implements BarInterface
 {
     public $quz;
 
-    public function __construct($quz = null, \NonExistent $nonExistent = null, BarInterface $decorated = null, array $foo = [], iterable $baz = [])
+    public function __construct($quz = null, ?\NonExistent $nonExistent = null, ?BarInterface $decorated = null, array $foo = [], iterable $baz = [])
     {
         $this->quz = $quz;
     }
 
-    public static function create(\NonExistent $nonExistent = null, $factory = null)
+    public static function create(?\NonExistent $nonExistent = null, $factory = null)
     {
     }
 

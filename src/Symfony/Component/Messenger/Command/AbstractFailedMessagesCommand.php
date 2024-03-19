@@ -185,7 +185,7 @@ abstract class AbstractFailedMessagesCommand extends Command
     /**
      * @param string|null $name
      */
-    protected function getReceiver(/* string $name = null */): ReceiverInterface
+    protected function getReceiver(/* ?string $name = null */): ReceiverInterface
     {
         if (1 > \func_num_args() && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
             trigger_deprecation('symfony/messenger', '5.3', 'The "%s()" method will have a new "string $name" argument in version 6.0, not defining it is deprecated.', __METHOD__);

@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @method bool isAuthenticated(TokenInterface $token = null)
+ * @method bool isAuthenticated(?TokenInterface $token = null)
  */
 interface AuthenticationTrustResolverInterface
 {

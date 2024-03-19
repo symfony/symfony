@@ -39,7 +39,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return array
      */
-    public function all(/* string $key = null */)
+    public function all(/* ?string $key = null */)
     {
         $key = \func_num_args() > 0 ? func_get_arg(0) : null;
 

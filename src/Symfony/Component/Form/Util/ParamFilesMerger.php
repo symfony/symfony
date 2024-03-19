@@ -45,9 +45,7 @@ class ParamFilesMerger
         if (null === $paramsValue) {
             return $filesValue;
         } elseif (\is_array($paramsValue)) {
-            if (null === $filesValue) {
-                return $paramsValue;
-            } elseif (self::isFileUpload($filesValue)) {
+            if (self::isFileUpload($filesValue)) {
                 return $filesValue; // if the array is a file upload field, it has the precedence
             } elseif (\is_array($filesValue)) {
                 return $this->getResultArray($paramsValue, $filesValue);
@@ -55,14 +53,10 @@ class ParamFilesMerger
                 return $paramsValue; // params has the precedence
             }
         } else { // $paramsValue has a non-array value
-            if (null === $filesValue) {
-                return $paramsValue;
-            } elseif (self::isFileUpload($filesValue)) {
+            if (self::isFileUpload($filesValue)) {
                 return $filesValue; // if the array is a file upload field, it has the precedence
-            } elseif (\is_array($filesValue)) {
-                return $paramsValue; // params has the precedence
-            } else { // $filesValue has a non-array value
-                return $paramsValue; // params has the precedence
+            } else {
+                return $paramsValue;
             }
         }
     }

@@ -565,6 +565,7 @@
             <xsd:element name="routing" type="messenger_routing" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="transport" type="messenger_transport" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="bus" type="messenger_bus" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="stop-worker-on-signal" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="default-bus" type="xsd:string" />
         <xsd:attribute name="enabled" type="xsd:boolean" />

@@ -24,18 +24,20 @@ class FormConfigTest extends TestCase
 {
     public static function provideInvalidFormInputName(): iterable
     {
-        yield ['isindex'];
+        return [
+            ['isindex'],
+            ['#'],
+            ['a#'],
+            ['a$'],
+            ['a%'],
+            ['a '],
+            ["a\t"],
+            ["a\n"],
 
-        yield ['#'];
-        yield ['a#'];
-        yield ['a$'];
-        yield ['a%'];
-        yield ['a '];
-        yield ["a\t"];
-        yield ["a\n"];
-        // Periods are allowed by the HTML4 spec, but disallowed by us
-        // because they break the generated property paths
-        yield ['a.'];
+            // Periods are allowed by the HTML4 spec, but disallowed by us
+            // because they break the generated property paths
+            ['a.'],
+        ];
     }
 
     /**
@@ -51,42 +53,48 @@ class FormConfigTest extends TestCase
 
     public static function provideValidFormInputName(): iterable
     {
-        yield ['z0'];
-        yield ['A0'];
-        yield ['A9'];
-        yield ['Z0'];
-        yield ['a-'];
-        yield ['a_'];
-        yield ['a:'];
-        // Contrary to the HTML4 spec, we allow names starting with a
-        // number, otherwise naming fields by collection indices is not
-        // possible.
-        // For root forms, leading digits will be stripped from the
-        // "id" attribute to produce valid HTML4.
-        yield ['0'];
-        yield ['9'];
-        // Contrary to the HTML4 spec, we allow names starting with an
-        // underscore, since this is already a widely used practice in
-        // Symfony.
-        // For root forms, leading underscores will be stripped from the
-        // "id" attribute to produce valid HTML4.
-        yield ['_'];
-        // Integers are allowed
-        yield [0];
-        yield [123];
-        // NULL is allowed
-        yield [null];
+        return [
+            ['z0'],
+            ['A0'],
+            ['A9'],
+            ['Z0'],
+            ['a-'],
+            ['a_'],
+            ['a:'],
 
-        // Allowed in HTML 5 specification
-        // See: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fe-name
-        yield ['_charset_'];
-        yield ['-x'];
-        yield [':x'];
-        yield ['isINDEX'];
+            // Contrary to the HTML4 spec, we allow names starting with a
+            // number, otherwise naming fields by collection indices is not
+            // possible.
+            // For root forms, leading digits will be stripped from the
+            // "id" attribute to produce valid HTML4.
+            ['0'],
+            ['9'],
 
-        // This value shouldn't be allowed.
-        // However, many tests in Form component require empty name
-        yield [''];
+            // Contrary to the HTML4 spec, we allow names starting with an
+            // underscore, since this is already a widely used practice in
+            // Symfony.
+            // For root forms, leading underscores will be stripped from the
+            // "id" attribute to produce valid HTML4.
+            ['_'],
+
+            // Integers are allowed
+            [0],
+            [123],
+
+            // NULL is allowed
+            [null],
+
+            // Allowed in HTML 5 specification
+            // See: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fe-name
+            ['_charset_'],
+            ['-x'],
+            [':x'],
+            ['isINDEX'],
+
+            // This value shouldn't be allowed.
+            // However, many tests in Form component require empty name
+            [''],
+        ];
     }
 
     /**

@@ -14,8 +14,8 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerBusyEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
-use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Worker;
@@ -31,17 +31,17 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
         $worker->expects($shouldStop ? $this->atLeastOnce() : $this->never())->method('stop');
 
         $failedEvent = $this->createFailedEvent();
-        $runningEvent = new WorkerRunningEvent($worker, false);
+        $runningEvent = new WorkerBusyEvent($worker);
 
         $failureLimitListener = new StopWorkerOnFailureLimitListener($max);
         // simulate three messages (of which 2 failed)
         $failureLimitListener->onMessageFailed($failedEvent);
-        $failureLimitListener->onWorkerRunning($runningEvent);
+        $failureLimitListener->onWorkerBusy($runningEvent);
 
-        $failureLimitListener->onWorkerRunning($runningEvent);
+        $failureLimitListener->onWorkerBusy($runningEvent);
 
         $failureLimitListener->onMessageFailed($failedEvent);
-        $failureLimitListener->onWorkerRunning($runningEvent);
+        $failureLimitListener->onWorkerBusy($runningEvent);
     }
 
     public static function countProvider(): iterable
@@ -62,11 +62,11 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
             );
 
         $worker = $this->createMock(Worker::class);
-        $event = new WorkerRunningEvent($worker, false);
+        $event = new WorkerBusyEvent($worker);
 
         $failureLimitListener = new StopWorkerOnFailureLimitListener(1, $logger);
         $failureLimitListener->onMessageFailed($this->createFailedEvent());
-        $failureLimitListener->onWorkerRunning($event);
+        $failureLimitListener->onWorkerBusy($event);
     }
 
     private function createFailedEvent(): WorkerMessageFailedEvent

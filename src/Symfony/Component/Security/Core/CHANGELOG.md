@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 
+7.1
+---
+
+ * Add `getEncompassingRoleNames` method to `RoleHierarchyInterface`
+
 7.0
 ---
 

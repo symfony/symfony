@@ -32,7 +32,7 @@ class DriverWrapper implements Driver
         return $this->driver->connect($params, $username, $password, $driverOptions);
     }
 
-    public function getDatabasePlatform(ServerVersionProvider $versionProvider = null): AbstractPlatform
+    public function getDatabasePlatform(?ServerVersionProvider $versionProvider = null): AbstractPlatform
     {
         return $this->driver->getDatabasePlatform($versionProvider);
     }

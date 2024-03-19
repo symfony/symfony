@@ -22,7 +22,7 @@ class DummyString implements DenormalizableInterface
     /** @var string $value */
     public $value;
 
-    public function denormalize(DenormalizerInterface $denormalizer, $data, string $format = null, array $context = [])
+    public function denormalize(DenormalizerInterface $denormalizer, $data, ?string $format = null, array $context = [])
     {
         $this->value = $data;
     }

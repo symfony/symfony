@@ -525,7 +525,7 @@ class ConfigurationTest extends TestCase
         $this->expectException(\ErrorException::class);
         $this->expectExceptionMessageMatches('/[Ff]ailed to open stream: Permission denied/');
 
-        set_error_handler(static function (int $errno, string $errstr, string $errfile = null, int $errline = null): bool {
+        set_error_handler(static function (int $errno, string $errstr, ?string $errfile = null, ?int $errline = null): bool {
             if ($errno & (E_WARNING | E_WARNING)) {
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
             }

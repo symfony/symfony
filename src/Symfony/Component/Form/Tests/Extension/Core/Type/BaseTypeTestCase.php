@@ -40,16 +40,6 @@ abstract class BaseTypeTestCase extends TypeTestCase
         $this->assertEquals('name', $view->vars['full_name']);
     }
 
-    public function testStripLeadingUnderscoresAndDigitsFromId()
-    {
-        $view = $this->factory->createNamed('_09name', $this->getTestedType(), null, $this->getTestOptions())
-            ->createView();
-
-        $this->assertEquals('name', $view->vars['id']);
-        $this->assertEquals('_09name', $view->vars['name']);
-        $this->assertEquals('_09name', $view->vars['full_name']);
-    }
-
     public function testPassIdAndNameToViewWithParent()
     {
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)

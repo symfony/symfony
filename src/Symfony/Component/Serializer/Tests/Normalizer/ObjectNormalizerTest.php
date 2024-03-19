@@ -42,6 +42,9 @@ use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80Dummy;
+use Symfony\Component\Serializer\Tests\Fixtures\SamePropertyAsMethodDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\SamePropertyAsMethodWithMethodSerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\SamePropertyAsMethodWithPropertySerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\AttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
@@ -849,6 +852,53 @@ class ObjectNormalizerTest extends TestCase
         $o2->baz = 'baz';
 
         $this->assertSame(['baz' => 'baz'], $this->normalizer->normalize($o2));
+    }
+
+    public function testSamePropertyAsMethod()
+    {
+        $object = new SamePropertyAsMethodDummy('free_trial', 'has_subscribe', 'get_ready', 'is_active');
+        $expected = [
+            'freeTrial' => 'free_trial',
+            'hasSubscribe' => 'has_subscribe',
+            'getReady' => 'get_ready',
+            'isActive' => 'is_active',
+        ];
+
+        $this->assertSame($expected, $this->normalizer->normalize($object));
+    }
+
+    public function testSamePropertyAsMethodWithPropertySerializedName()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $this->normalizer->setSerializer($this->serializer);
+
+        $object = new SamePropertyAsMethodWithPropertySerializedNameDummy('free_trial', 'has_subscribe', 'get_ready', 'is_active');
+        $expected = [
+            'free_trial_property' => 'free_trial',
+            'has_subscribe_property' => 'has_subscribe',
+            'get_ready_property' => 'get_ready',
+            'is_active_property' => 'is_active',
+        ];
+
+        $this->assertSame($expected, $this->normalizer->normalize($object));
+    }
+
+    public function testSamePropertyAsMethodWithMethodSerializedName()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $this->normalizer->setSerializer($this->serializer);
+
+        $object = new SamePropertyAsMethodWithMethodSerializedNameDummy('free_trial', 'has_subscribe', 'get_ready', 'is_active');
+        $expected = [
+            'free_trial_method' => 'free_trial',
+            'has_subscribe_method' => 'has_subscribe',
+            'get_ready_method' => 'get_ready',
+            'is_active_method' => 'is_active',
+        ];
+
+        $this->assertSame($expected, $this->normalizer->normalize($object));
     }
 }
 

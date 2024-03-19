@@ -35,7 +35,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     use AbstractAdapterTrait;
     use ContractsTrait;
 
-    private const TAGS_PREFIX = "\1tags\1";
+    final protected const TAGS_PREFIX = "\1tags\1";
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {

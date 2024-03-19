@@ -12,6 +12,9 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\VarExporter\ProxyHelper;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildMagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildStdClass;
@@ -21,6 +24,7 @@ use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\LazyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\MagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ReadOnlyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\TestClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\SimpleObject;
 
 class LazyGhostTraitTest extends TestCase
 {
@@ -261,6 +265,19 @@ class LazyGhostTraitTest extends TestCase
         $this->expectExceptionMessage('Typed property Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ClassWithUninitializedObjectProperty::$property must not be accessed before initialization');
 
         $object->property;
+    }
+
+    public function testNormalization()
+    {
+        $object = $this->createLazyGhost(SimpleObject::class, function ($instance) {});
+
+        $loader = new AttributeLoader();
+        $metadataFactory = new ClassMetadataFactory($loader);
+        $serializer = new ObjectNormalizer($metadataFactory);
+
+        $output = $serializer->normalize($object);
+
+        $this->assertSame(['property' => 'property', 'method' => 'method'], $output);
     }
 
     /**

@@ -15,24 +15,16 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class SamePropertyAsMethodWithPropertySerializedNameDummy
 {
-    /**
-     * @SerializedName("free_trial_property")
-     */
+    #[SerializedName('free_trial_property')]
     private $freeTrial;
 
-    /**
-     * @SerializedName("has_subscribe_property")
-     */
+    #[SerializedName('has_subscribe_property')]
     private $hasSubscribe;
 
-    /**
-     * @SerializedName("get_ready_property")
-     */
+    #[SerializedName('get_ready_property')]
     private $getReady;
 
-    /**
-     * @SerializedName("is_active_property")
-     */
+    #[SerializedName('is_active_property')]
     private $isActive;
 
     public function __construct($freeTrial, $hasSubscribe, $getReady, $isActive)

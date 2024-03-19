@@ -28,33 +28,25 @@ class SamePropertyAsMethodWithMethodSerializedNameDummy
         $this->isActive = $isActive;
     }
 
-    /**
-     * @SerializedName("free_trial_method")
-     */
+    #[SerializedName('free_trial_method')]
     public function getFreeTrial()
     {
         return $this->freeTrial;
     }
 
-    /**
-     * @SerializedName("has_subscribe_method")
-     */
+    #[SerializedName('has_subscribe_method')]
     public function hasSubscribe()
     {
         return $this->hasSubscribe;
     }
 
-    /**
-     * @SerializedName("get_ready_method")
-     */
+    #[SerializedName('get_ready_method')]
     public function getReady()
     {
         return $this->getReady;
     }
 
-    /**
-     * @SerializedName("is_active_method")
-     */
+    #[SerializedName('is_active_method')]
     public function isActive()
     {
         return $this->isActive;

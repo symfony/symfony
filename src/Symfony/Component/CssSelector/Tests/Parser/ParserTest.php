@@ -134,6 +134,7 @@ class ParserTest extends TestCase
             ['div:contains("foo")', ["Function[Element[div]:contains(['foo'])]"]],
             ['div#foobar', ['Hash[Element[div]#foobar]']],
             ['div:not(div.foo)', ['Negation[Element[div]:not(Class[Element[div].foo])]']],
+            ['div:has(div.foo)', ['Relation[Element[div]:has(Selector[Class[Element[div].foo]])]']],
             ['td ~ th', ['CombinedSelector[Element[td] ~ Element[th]]']],
             ['.foo[data-bar][data-baz=0]', ["Attribute[Attribute[Class[Element[*].foo][data-bar]][data-baz = '0']]"]],
             ['div#foo\.bar', ['Hash[Element[div]#foo.bar]']],

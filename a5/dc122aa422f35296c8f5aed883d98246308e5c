@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-12T12:18:06Z
+
+I would prefer dealing with this on the Serialize side. Is that doable without too much impact?
+
+---------------------------------------------------------------------------
+
+by priyadi at 2024-03-12T14:36:33Z
+
+It should be possible, but I don't know if there is any impact yet.
+
+I considered that approach, but the consumer should not need to be aware it is dealing with a proxy object. However, either way it is going to be ugly. It is either Serializer needs to know it is dealing with a proxy or the proxy needs to tell Serializer to skip certain properties. Then, there are third party serializers and proxy generators.
+
+To me, the best way forward is to change `LazyObjectInterface`. Instead of doing:
+
+```php
+$object->isLazyObjectInitialized();
+```
+
+we do this:
+
+```php
+$object::isLazyObjectInitialized($object);
+```
+
+Alternatively, it should offer the option not to expose `LazyObjectInterface`. Similar to what Doctrine does, but with better DX.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-12T14:41:37Z
+
+Yes I agree, it'd be better to move all methods of LazyObjectInterface outside of it. We'd need a BC-path forward though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-12T14:43:05Z
+
+Why adding the attribute on e.g. lazyObjectState while only isLazyObjectInitialized leaks?
+
+---------------------------------------------------------------------------
+
+by priyadi at 2024-03-18T09:13:52Z
+
+I added them for completeness, because some serializers access private properties directly.

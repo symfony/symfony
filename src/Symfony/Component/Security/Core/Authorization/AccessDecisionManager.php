@@ -68,7 +68,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(iterable $voters = [], /* AccessDecisionStrategyInterface */ $strategy = null)
+    public function __construct(iterable $voters = [], /* ?AccessDecisionStrategyInterface */ $strategy = null)
     {
         $this->voters = $voters;
         if (\is_string($strategy)) {

@@ -87,7 +87,7 @@ array:24 [
     +foo: ""…3
     +"bar": "bar"
   }
-  "closure" => Closure(\$a, PDO &\$b = null) {#%d
+  "closure" => Closure(\$a, ?PDO &\$b = null) {#%d
     class: "Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest"
     this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {#%d …}
     file: "%s%eTests%eFixtures%edumb-var.php"

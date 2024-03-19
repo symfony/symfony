@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarExporter;
 
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry as Registry;
 use Symfony\Component\VarExporter\Internal\LazyObjectState;
@@ -55,6 +56,7 @@ trait LazyGhostTrait
      *
      * @param $partial Whether partially initialized objects should be considered as initialized
      */
+    #[Ignore]
     public function isLazyObjectInitialized(bool $partial = false): bool
     {
         if (!$state = $this->lazyObjectState ?? null) {
@@ -331,6 +333,7 @@ trait LazyGhostTrait
         }
     }
 
+    #[Ignore]
     private function setLazyObjectAsInitialized(bool $initialized): void
     {
         if ($state = $this->lazyObjectState ?? null) {

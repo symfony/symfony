@@ -45,7 +45,7 @@ final class UnwrappingDenormalizerContextBuilder implements ContextBuilderInterf
         try {
             new PropertyPath($unwrapPath);
         } catch (InvalidPropertyPathException $e) {
-            throw new InvalidArgumentException('The "%s" property path is not valid.', previous: $e);
+            throw new InvalidArgumentException(sprintf('The "%s" property path is not valid.', $unwrapPath), previous: $e);
         }
 
         return $this->with(UnwrappingDenormalizer::UNWRAP_PATH, $unwrapPath);

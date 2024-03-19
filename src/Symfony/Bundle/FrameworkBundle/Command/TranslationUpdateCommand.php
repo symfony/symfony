@@ -76,7 +76,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the extract be done'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to extract'),
-                new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically (only works with --dump-messages)', 'asc'),
+                new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically', 'asc'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
             ])
             ->setHelp(<<<'EOF'
@@ -266,7 +266,35 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write($operation->getResult(), $format, ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $xliffVersion, 'as_tree' => $input->getOption('as-tree'), 'inline' => $input->getOption('as-tree') ?? 0]);
+            $catalogue = $operation->getResult();
+            if ($sort = $input->getOption('sort')) {
+                $sort = strtolower($sort);
+                if (!\in_array($sort, self::SORT_ORDERS, true)) {
+                    $errorIo->error(['Wrong sort order', 'Supported formats are: '.implode(', ', self::SORT_ORDERS).'.']);
+
+                    return 1;
+                }
+
+                foreach ($catalogue->getDomains() as $domain) {
+                    $intlDomain = $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX;
+                    $intlMessages = $catalogue->all($intlDomain);
+
+                    if (!$intlMessages) {
+                        $intlDomain = $domain;
+                        $intlMessages = $catalogue->all($domain);
+                    }
+
+                    if (self::DESC === $sort) {
+                        krsort($intlMessages);
+                    } else {
+                        ksort($intlMessages);
+                    }
+
+                    $catalogue->replace($intlMessages, $intlDomain);
+                }
+            }
+
+            $this->writer->write($catalogue, $format, ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $xliffVersion, 'as_tree' => $input->getOption('as-tree'), 'inline' => $input->getOption('as-tree') ?? 0]);
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

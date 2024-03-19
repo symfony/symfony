@@ -869,7 +869,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testSamePropertyAsMethodWithPropertySerializedName()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
         $this->normalizer->setSerializer($this->serializer);
 
@@ -886,7 +886,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testSamePropertyAsMethodWithMethodSerializedName()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
         $this->normalizer->setSerializer($this->serializer);
 

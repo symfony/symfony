@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `extra_lazy` option to `DoctrineType` for loading entities on demand
+
 7.0
 ---
 

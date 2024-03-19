@@ -22,6 +22,7 @@ use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\ChoiceList\Loader\ExtraLazyChoiceLoader;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -118,7 +119,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
                     $vary[] = $this->getQueryBuilderPartsForCachingHash($options['query_builder']) ?? $options['query_builder'];
                 }
 
-                return ChoiceList::loader($this, new DoctrineChoiceLoader(
+                $loader = new DoctrineChoiceLoader(
                     $options['em'],
                     $options['class'],
                     $options['id_reader'],
@@ -126,9 +127,15 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
                         $options['em'],
                         $options['query_builder'] ?? $options['em']->getRepository($options['class'])->createQueryBuilder('e'),
                         $options['class'],
-                        $vary
-                    )
-                ), $vary);
+                        $vary,
+                    ),
+                );
+
+                if ($options['extra_lazy']) {
+                    $loader = new ExtraLazyChoiceLoader($loader);
+                }
+
+                return ChoiceList::loader($this, $loader, $vary);
             }
 
             return null;
@@ -208,6 +215,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
             'choice_value' => $choiceValue,
             'id_reader' => null, // internal
             'choice_translation_domain' => false,
+            'extra_lazy' => false,
         ]);
 
         $resolver->setRequired(['class']);
@@ -217,6 +225,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $resolver->setNormalizer('id_reader', $idReaderNormalizer);
 
         $resolver->setAllowedTypes('em', ['null', 'string', ObjectManager::class]);
+        $resolver->setAllowedTypes('extra_lazy', 'bool');
     }
 
     /**

@@ -80,7 +80,7 @@ final class FrenchInflector implements InflectorInterface
 
         // Words finishing with "al" are pluralized with a "aux" expected
         // Les mots finissant en "al" se terminent en "aux" sauf
-        ['/(amir|anim|arsen|boc|can|capit|capor|chev|crist|génér|hopit|hôpit|idé|journ|littor|loc|m|mét|minér|princip|radic|termin)aux$/i', '\1al'],
+        ['/(amir|anim|arsen|boc|can|capit|capor|chev|crist|génér|hopit|hôpit|idé|journ|littor|loc|m|mét|minér|princip|radic|termin|sign|médiév|flor|origin|géni)aux$/i', '\1al'],
 
         // Words finishing with "au" are pluralized with a "x" excepted "landau"
         // Les mots finissant par "au" prennent un "x" au pluriel sauf "landau"
@@ -108,7 +108,7 @@ final class FrenchInflector implements InflectorInterface
      * A list of words which should not be inflected.
      * This list is only used by singularize.
      */
-    private const UNINFLECTED = '/^(abcès|accès|abus|albatros|anchois|anglais|autobus|bois|brebis|carquois|cas|chas|colis|concours|corps|cours|cyprès|décès|devis|discours|dos|embarras|engrais|entrelacs|excès|fils|fois|gâchis|gars|glas|héros|intrus|jars|jus|kermès|lacis|legs|lilas|marais|mars|matelas|mépris|mets|mois|mors|obus|os|palais|paradis|parcours|pardessus|pays|plusieurs|poids|pois|pouls|printemps|processus|progrès|puits|pus|rabais|radis|recors|recours|refus|relais|remords|remous|rictus|rhinocéros|repas|rubis|sans|sas|secours|sens|souris|succès|talus|tapis|tas|taudis|temps|tiers|univers|velours|verglas|vernis|virus)$/i';
+    private const UNINFLECTED = '/^(abcès|accès|abus|albatros|anchois|anglais|autobus|bois|brebis|carquois|cas|chas|colis|concours|corps|cours|cyprès|décès|devis|discours|dos|embarras|engrais|entrelacs|excès|fils|fois|gâchis|gars|glas|héros|intrus|jars|jus|kermès|lacis|legs|lilas|marais|mars|matelas|mépris|mets|mois|mors|obus|os|palais|paradis|parcours|pardessus|pays|plusieurs|poids|pois|pouls|printemps|processus|progrès|puits|pus|rabais|radis|recors|recours|refus|relais|remords|remous|rictus|rhinocéros|repas|rubis|sans|sas|secours|sens|souris|succès|talus|tapis|tas|taudis|temps|tiers|univers|velours|verglas|vernis|virus|albanais|angolais|bangladais|bostwanais|burundais|camerounais|congolais|finlandais|français|gabonais|guyanais|irlandais|islandais|japonais|libanais|malais|maltais|martiniquais|népalais|néo-zélandais|ougandais|pakistanais|néerlandais|polonais|portugais|réunionnais|rwandais|sénégalais|sierra-léonais|soudanais|sri lankais|taïwanais|thaïlandais|togolais|québécois|chinois|suèdois|hongrois|danois|luxembourgeois|béninois|seychellois)$/i';
 
     public function singularize(string $plural): array
     {

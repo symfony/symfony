@@ -73,7 +73,7 @@ class RegisterListenersPass implements CompilerPassInterface
                         continue;
                     }
 
-                    $event['method'] ??= '__invoke';
+                    $event['method'] ??= $this->resolveListenerMethodFromPublicMethod($container, $id);
                     $event['event'] = $this->getEventFromTypeDeclaration($container, $id, $event['method']);
                 }
 
@@ -182,6 +182,23 @@ class RegisterListenersPass implements CompilerPassInterface
         }
 
         return $name;
+    }
+
+    /**
+     * Resolve the listener method by checking if the class has only one public method.
+     * If such method exists, return its name, if multiple public methods exist, fallback on `__invoke`.
+     */
+    private function resolveListenerMethodFromPublicMethod(ContainerBuilder $container, string $id): string
+    {
+        if (
+            null === ($class = $container->getDefinition($id)->getClass())
+            || !($r = $container->getReflectionClass($class, false))
+            || 1 !== \count($publicMethods = $r->getMethods(\ReflectionMethod::IS_PUBLIC))
+        ) {
+            return '__invoke';
+        }
+
+        return $publicMethods[0]->getName();
     }
 }
 

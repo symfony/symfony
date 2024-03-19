@@ -12,37 +12,40 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
- * A sequence of validation groups.
+ * The GroupSequence class represents a sequence of validation groups.
+ * It is used to enforce a specific order in which validation groups should be processed.
  *
- * When validating a group sequence, each group will only be validated if all
- * of the previous groups in the sequence succeeded. For example:
+ * When validating a group sequence, each group is validated sequentially. A group is only validated if all
+ * previous groups in the sequence succeeded. This approach is beneficial for scenarios where certain validation
+ * groups are more resource-intensive or rely on the success of prior validations.
+ *
+ * For example, when validating an address:
  *
  *     $validator->validate($address, null, new GroupSequence(['Basic', 'Strict']));
  *
- * In the first step, all constraints that belong to the group "Basic" will be
- * validated. If none of the constraints fail, the validator will then validate
- * the constraints in group "Strict". This is useful, for example, if "Strict"
- * contains expensive checks that require a lot of CPU or slow, external
- * services. You usually don't want to run expensive checks if any of the cheap
- * checks fail.
+ * In this case, all constraints in the "Basic" group are validated first. If none of the "Basic" constraints fail,
+ * the "Strict" group constraints are then validated. This is useful if, for instance, the "Strict" group contains
+ * more resource-intensive checks.
  *
- * When adding metadata to a class, you can override the "Default" group of
- * that class with a group sequence:
+ * Group sequences can also be used to override the "Default" validation group for a class:
+ *
  *     #[GroupSequence(['Address', 'Strict'])]
  *     class Address
  *     {
  *         // ...
  *     }
  *
- * Whenever you validate that object in the "Default" group, the group sequence
- * will be validated:
+ * When you validate the `Address` object in the "Default" group, the specified group sequence is applied:
  *
  *     $validator->validate($address);
  *
- * If you want to execute the constraints of the "Default" group for a class
- * with an overridden default group, pass the class name as group name instead:
+ * To validate the constraints of the "Default" group for a class with an overridden default group,
+ * pass the class name as the group name:
  *
  *     $validator->validate($address, null, "Address")
+ *
+ * This feature allows for fine-grained control over the validation process, ensuring efficient and effective
+ * validation flows.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -50,28 +53,25 @@ namespace Symfony\Component\Validator\Constraints;
 class GroupSequence
 {
     /**
-     * The groups in the sequence.
+     * An array of groups that make up the sequence. The validation process will adhere to this order.
+     * Each element can be a string representing a single group, an array of groups, or another GroupSequence.
      *
      * @var array<int, string|string[]|GroupSequence>
      */
     public array $groups;
 
     /**
-     * The group in which cascaded objects are validated when validating
-     * this sequence.
+     * Specifies the group that will be used for cascaded validation.
+     * By default, all groups in the sequence are used for cascading.
+     * If a group sequence is attached to a class, replacing the "Default" group,
+     * this property allows specifying an alternate group for cascading validations.
      *
-     * By default, cascaded objects are validated in each of the groups of
-     * the sequence.
-     *
-     * If a class has a group sequence attached, that sequence replaces the
-     * "Default" group. When validating that class in the "Default" group, the
-     * group sequence is used instead, but still the "Default" group should be
-     * cascaded to other objects.
+     * @var string|GroupSequence
      */
     public string|GroupSequence $cascadedGroup;
 
     /**
-     * Creates a new group sequence.
+     * Constructs a new GroupSequence with the specified sequence of groups.
      *
      * @param array<string|string[]|GroupSequence> $groups The groups in the sequence
      */

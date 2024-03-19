@@ -76,7 +76,7 @@ final class CsvEncoderContextBuilder implements ContextBuilderInterface
     /**
      * Configures the key separator when (un)flattening arrays.
      */
-    public function withKeySeparator(?string $keySeparator): static
+    public function withKeySeparator(string|false|null $keySeparator): static
     {
         return $this->with(CsvEncoder::KEY_SEPARATOR_KEY, $keySeparator);
     }

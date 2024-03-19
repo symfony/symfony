@@ -133,6 +133,19 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertNull($reverseTransformer->reverseTransform(''));
     }
 
+    public function testReverseTransformWithNullBytes()
+    {
+        $transformer = new DateTimeToStringTransformer();
+
+        $nullByte = \chr(0);
+        $value = '2024-03-15 21:11:00'.$nullByte;
+
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Null bytes not allowed');
+
+        $transformer->reverseTransform($value);
+    }
+
     public function testReverseTransformWithDifferentTimezones()
     {
         $reverseTransformer = new DateTimeToStringTransformer('America/New_York', 'Asia/Hong_Kong', 'Y-m-d H:i:s');

@@ -60,7 +60,10 @@ final class BrevoPayloadConverter implements PayloadConverterInterface
 
         $event->setDate($date);
         $event->setRecipientEmail($payload['email']);
-        $event->setTags($payload['tags']);
+
+        if (isset($payload['tags'])) {
+            $event->setTags($payload['tags']);
+        }
 
         return $event;
     }

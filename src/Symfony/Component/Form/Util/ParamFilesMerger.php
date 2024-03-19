@@ -34,21 +34,16 @@ class ParamFilesMerger
         $this->files = $files;
     }
 
+    /**
+     * @return mixed
+     */
     public function getResult()
     {
         $paramsValue = $this->getParamsValue();
         $filesValue = $this->getFilesValue();
 
         if (null === $paramsValue) {
-            if (null === $filesValue) {
-                return null;
-            } elseif (self::isFileUpload($filesValue)) {
-                return $filesValue;
-            } elseif (\is_array($filesValue)) {
-                return $filesValue;
-            } else { // $filesValue has a non-array value
-                return $filesValue;
-            }
+            return $filesValue;
         } elseif (\is_array($paramsValue)) {
             if (null === $filesValue) {
                 return $paramsValue;
@@ -73,9 +68,9 @@ class ParamFilesMerger
     }
 
     /**
-     * @return bool
+     * @param UploadedFile|array $value
      */
-    private static function isFileUpload($value)
+    private static function isFileUpload($value): bool
     {
         if ($value instanceof UploadedFile) {
             return true;
@@ -91,18 +86,10 @@ class ParamFilesMerger
         return $keys === ['error', 'name', 'size', 'tmp_name', 'type'];
     }
 
-    /**
-     * @param array $array
-     *
-     * @return bool
-     */
-    private static function doesNotContainArrayOrFileUpload($array)
+    private static function doesNotContainArrayOrFileUpload(array $array): bool
     {
         foreach ($array as $value) {
-            if (
-                \is_array($value)
-                && !self::isFileUpload($value)
-            ) {
+            if (\is_array($value) && !self::isFileUpload($value)) {
                 return false;
             }
         }
@@ -110,10 +97,7 @@ class ParamFilesMerger
         return true;
     }
 
-    /**
-     * @return array
-     */
-    private function getResultArray(array $paramsValue, array $filesValue)
+    private function getResultArray(array $paramsValue, array $filesValue): array
     {
         // if both are lists and both does not contains array, then merge them and return
         if (
@@ -148,6 +132,8 @@ class ParamFilesMerger
 
     /**
      * Gets the value of the current element in the params according to the path.
+     *
+     * @return mixed
      */
     private function getParamsValue()
     {
@@ -166,6 +152,8 @@ class ParamFilesMerger
 
     /**
      * Gets the value of the current element in the files according to the path.
+     *
+     * @return mixed
      */
     private function getFilesValue()
     {

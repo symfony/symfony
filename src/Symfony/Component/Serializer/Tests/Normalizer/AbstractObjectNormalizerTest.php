@@ -931,12 +931,12 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer = new class() extends AbstractObjectNormalizerDummy {
             public $childContextCacheKey;
 
-            protected function extractAttributes(object $object, string $format = null, array $context = []): array
+            protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
             {
                 return array_keys((array) $object);
             }
 
-            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+            protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
             {
                 return $object->{$attribute};
             }
@@ -971,12 +971,12 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer = new class() extends AbstractObjectNormalizerDummy {
             public $childContextCacheKey;
 
-            protected function extractAttributes(object $object, string $format = null, array $context = []): array
+            protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
             {
                 return array_keys((array) $object);
             }
 
-            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+            protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
             {
                 return $object->{$attribute};
             }
@@ -1006,12 +1006,12 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer = new class() extends AbstractObjectNormalizerDummy {
             public $childContextCacheKey;
 
-            protected function extractAttributes(object $object, string $format = null, array $context = []): array
+            protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
             {
                 return array_keys((array) $object);
             }
 
-            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+            protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
             {
                 return $object->{$attribute};
             }

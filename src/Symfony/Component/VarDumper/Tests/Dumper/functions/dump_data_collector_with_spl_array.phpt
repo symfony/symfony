@@ -14,10 +14,10 @@ use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\VarDumper;
 
-VarDumper::setHandler(function ($var, string $label = null) {
+VarDumper::setHandler(function ($var, ?string $label = null) {
     $dumper = new DumpDataCollector();
     $cloner = new VarCloner();
-    $handler = function ($var, string $label = null) use ($dumper, $cloner) {
+    $handler = function ($var, ?string $label = null) use ($dumper, $cloner) {
         $var = $cloner->cloneVar($var);
         if (null !== $label) {
             $var = $var->withContext(['label' => $label]);

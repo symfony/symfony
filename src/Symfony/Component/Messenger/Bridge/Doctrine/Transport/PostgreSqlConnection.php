@@ -21,6 +21,8 @@ use Doctrine\DBAL\Schema\Table;
  * @internal
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Herberto Graca <herberto.graca@gmail.com>
+ * @author Alexander Malyk <shu.rick.ifmo@gmail.com>
  */
 final class PostgreSqlConnection extends Connection
 {
@@ -54,7 +56,7 @@ final class PostgreSqlConnection extends Connection
         $this->unlisten();
     }
 
-    public function get(): ?array
+    public function get(): array
     {
         if (null === $this->queueEmptiedAt) {
             return parent::get();
@@ -76,7 +78,7 @@ final class PostgreSqlConnection extends Connection
         ) {
             usleep(1000);
 
-            return null;
+            return [];
         }
 
         return parent::get();

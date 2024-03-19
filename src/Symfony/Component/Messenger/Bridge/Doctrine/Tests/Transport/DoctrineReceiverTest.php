@@ -36,7 +36,7 @@ class DoctrineReceiverTest extends TestCase
 
         $doctrineEnvelope = $this->createDoctrineEnvelope();
         $connection = $this->createMock(Connection::class);
-        $connection->method('get')->willReturn($doctrineEnvelope);
+        $connection->method('get')->willReturn([$doctrineEnvelope]);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->get();
@@ -64,7 +64,7 @@ class DoctrineReceiverTest extends TestCase
 
         $doctrineEnvelop = $this->createDoctrineEnvelope();
         $connection = $this->createMock(Connection::class);
-        $connection->method('get')->willReturn($doctrineEnvelop);
+        $connection->method('get')->willReturn([$doctrineEnvelop]);
         $connection->expects($this->once())->method('reject');
 
         $receiver = new DoctrineReceiver($connection, $serializer);

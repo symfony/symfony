@@ -23,6 +23,8 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
+ * @author Herberto Graca <herberto.graca@gmail.com>
+ * @author Alexander Malyk <shu.rick.ifmo@gmail.com>
  */
 class DoctrineTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
@@ -35,6 +37,18 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
     {
         $this->connection = $connection;
         $this->serializer = $serializer;
+    }
+
+    public function __destruct()
+    {
+        // The worker using this transport might have pulled 50 msgs out of the mq, marking them as "in process",
+        // but because of its options (ie --limit, --failure-limit, --memory-limit, --time-limit) it might terminate
+        // before it actually handles them all, leaving messages in limbo where they will not be handled by the
+        // consumer that pulled them, and they won't be picked up by any other consumer because they are
+        // "in process" already.
+        // Thus, when the consumer stops, and its transport gets destroyed, we need to put the messages not handled,
+        // back in "waiting to be processed" so that they can be picked up by other consumers.
+        $this->getReceiver()->undeliverNotHandled();
     }
 
     public function get(): iterable

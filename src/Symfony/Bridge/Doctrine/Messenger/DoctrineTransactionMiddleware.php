@@ -34,7 +34,10 @@ class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
 
             return $envelope;
         } catch (\Throwable $exception) {
-            $entityManager->getConnection()->rollBack();
+            try {
+                $entityManager->getConnection()->rollBack();
+            } catch (\Throwable $e) {
+            }
 
             if ($exception instanceof HandlerFailedException) {
                 // Remove all HandledStamp from the envelope so the retry will execute all handlers again.

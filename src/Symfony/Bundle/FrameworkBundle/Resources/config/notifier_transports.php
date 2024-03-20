@@ -75,6 +75,7 @@ return static function (ContainerConfigurator $container) {
         'isendpro' => Bridge\Isendpro\IsendproTransportFactory::class,
         'kaz-info-teh' => Bridge\KazInfoTeh\KazInfoTehTransportFactory::class,
         'light-sms' => Bridge\LightSms\LightSmsTransportFactory::class,
+        'lox24' => Bridge\Lox24\Lox24TransportFactory::class,
         'mailjet' => Bridge\Mailjet\MailjetTransportFactory::class,
         'message-bird' => Bridge\MessageBird\MessageBirdTransportFactory::class,
         'message-media' => Bridge\MessageMedia\MessageMediaTransportFactory::class,

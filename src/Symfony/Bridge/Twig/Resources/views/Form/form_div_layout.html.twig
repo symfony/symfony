@@ -458,7 +458,8 @@
 {%- endblock form_rows -%}
 
 {%- block widget_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"
+    id="{{ attr.id is defined ? attr.id : id }}"
+    name=" {{ attr.name is defined ? attr.name : full_name }} "
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
     {{ block('attributes') }}

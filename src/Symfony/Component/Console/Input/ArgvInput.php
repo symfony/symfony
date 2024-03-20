@@ -348,11 +348,30 @@ class ArgvInput extends Input
     /**
      * Returns un-parsed and not validated tokens.
      *
+     * @param bool $strip Whether to return the raw parameters (false) or the values after the command name (true)
+     *
      * @return list<string>
      */
-    public function getRawTokens(): array
+    public function getRawTokens(bool $strip = false): array
     {
-        return $this->tokens;
+        if (!$strip) {
+            return $this->tokens;
+        }
+
+        $parameters = [];
+        $keep = false;
+        foreach ($this->tokens as $value) {
+            if (!$keep && $value === $this->getFirstArgument()) {
+                $keep = true;
+
+                continue;
+            }
+            if ($keep) {
+                $parameters[] = $value;
+            }
+        }
+
+        return $parameters;
     }
 
     /**

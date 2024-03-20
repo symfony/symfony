@@ -20,6 +20,8 @@
         "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
+        "symfony/property-access": "^6.4|^7.0",
+        "symfony/serializer": "^6.4|^7.0",
         "symfony/var-dumper": "^5.4|^6.0|^7.0"
     },
     "autoload": {

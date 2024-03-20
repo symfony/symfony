@@ -88,7 +88,14 @@ class InputOption
                 $shortcut = implode('|', $shortcut);
             }
             $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
-            $shortcuts = array_filter($shortcuts, 'strlen');
+            $shortcuts = array_filter($shortcuts, \strlen(...));
+
+            foreach ($shortcuts as $shortcut) {
+                if (\strlen($shortcut) > 1) {
+                    throw new InvalidArgumentException("Shortcut of more than 1 letter such as $shortcut are not allowed");
+                }
+            }
+
             $shortcut = implode('|', $shortcuts);
 
             if ('' === $shortcut) {

@@ -433,6 +433,12 @@ XML;
         $this->assertEquals($expected, $serializer->serialize(new NormalizableTraversableDummy(), 'xml'));
     }
 
+    public function testEncodeException()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->encoder->encode('Invalid character: '.\chr(7), 'xml');
+    }
+
     public function testDecode()
     {
         $source = $this->getXmlSource();

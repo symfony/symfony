@@ -82,7 +82,12 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $encoderIgnoredNodeTypes = $context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
         $ignorePiNode = \in_array(\XML_PI_NODE, $encoderIgnoredNodeTypes, true);
         if ($data instanceof \DOMDocument) {
-            return $data->saveXML($ignorePiNode ? $data->documentElement : null);
+            set_error_handler(static function ($type, $message) { throw new NotEncodableValueException($message); }, \E_ERROR | \E_WARNING);
+            try {
+                return $data->saveXML($ignorePiNode ? $data->documentElement : null);
+            } finally {
+                restore_error_handler();
+            }
         }
 
         $xmlRootNodeName = $context[self::ROOT_NODE_NAME] ?? $this->defaultContext[self::ROOT_NODE_NAME];
@@ -97,7 +102,12 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             $this->appendNode($dom, $data, $format, $context, $xmlRootNodeName);
         }
 
-        return $dom->saveXML($ignorePiNode ? $dom->documentElement : null, $context[self::SAVE_OPTIONS] ?? $this->defaultContext[self::SAVE_OPTIONS]);
+        set_error_handler(static function ($type, $message) { throw new NotEncodableValueException($message); }, \E_ERROR | \E_WARNING);
+        try {
+            return $dom->saveXML($ignorePiNode ? $dom->documentElement : null, $context[self::SAVE_OPTIONS] ?? $this->defaultContext[self::SAVE_OPTIONS]);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     public function decode(string $data, string $format, array $context = []): mixed

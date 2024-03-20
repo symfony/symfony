@@ -130,7 +130,7 @@
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^2.13.1|^3.0",
         "doctrine/orm": "^2.7.4",
-        "guzzlehttp/promises": "^1.4",
+        "guzzlehttp/promises": "^1.4|^2.0",
         "masterminds/html5": "^2.6",
         "monolog/monolog": "^1.25.1|^2",
         "nyholm/psr7": "^1.0",

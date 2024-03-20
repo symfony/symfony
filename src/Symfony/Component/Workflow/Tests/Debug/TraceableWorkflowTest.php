@@ -23,7 +23,7 @@ class TraceableWorkflowTest extends TestCase
 {
     private MockObject|Workflow $innerWorkflow;
 
-    private StopWatch $stopwatch;
+    private Stopwatch $stopwatch;
 
     private TraceableWorkflow $traceableWorkflow;
 

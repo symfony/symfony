@@ -32,7 +32,7 @@ final class ReflectionTypeResolver implements TypeResolverInterface
      */
     private static array $reflectionEnumCache = [];
 
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if ($subject instanceof \ReflectionUnionType) {
             return Type::union(...array_map(fn (mixed $t): Type => $this->resolve($t, $typeContext), $subject->getTypes()));

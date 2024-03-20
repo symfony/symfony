@@ -29,5 +29,5 @@ interface TypeResolverInterface
      *
      * @throws UnsupportedException
      */
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type;
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type;
 }

@@ -32,8 +32,7 @@ final class MattermostTransport extends AbstractTransport
         private ?string $path = null,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

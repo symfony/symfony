@@ -94,8 +94,12 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
     {
         if (\is_int($data) || \is_float($data)) {
             switch ($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY] ?? null) {
-                case 'U': $data = sprintf('%d', $data); break;
-                case 'U.u': $data = sprintf('%.6F', $data); break;
+                case 'U':
+                    $data = sprintf('%d', $data);
+                    break;
+                case 'U.u':
+                    $data = sprintf('%.6F', $data);
+                    break;
             }
         }
 

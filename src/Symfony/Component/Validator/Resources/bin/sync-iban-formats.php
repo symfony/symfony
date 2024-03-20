@@ -11,7 +11,7 @@
  */
 
 if ('cli' !== \PHP_SAPI) {
-    throw new \Exception('This script must be run from the command line.');
+    throw new Exception('This script must be run from the command line.');
 }
 
 /*
@@ -24,7 +24,7 @@ if ('cli' !== \PHP_SAPI) {
 error_reporting(\E_ALL);
 
 set_error_handler(static function (int $type, string $msg, string $file, int $line): void {
-    throw new \ErrorException($msg, 0, $type, $file, $line);
+    throw new ErrorException($msg, 0, $type, $file, $line);
 });
 
 echo "Collecting IBAN formats...\n";

@@ -69,7 +69,7 @@ final class StringTypeResolver implements TypeResolverInterface
         $this->parser = new TypeParser(new ConstExprParser());
     }
 
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if (!\is_string($subject)) {
             throw new UnsupportedException(sprintf('Expected subject to be a "string", "%s" given.', get_debug_type($subject)), $subject);

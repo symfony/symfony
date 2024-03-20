@@ -33,8 +33,7 @@ final class ZulipTransport extends AbstractTransport
         private string $channel,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
 
         parent::__construct($client, $dispatcher);
     }

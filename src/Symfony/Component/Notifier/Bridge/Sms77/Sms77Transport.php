@@ -33,8 +33,7 @@ final class Sms77Transport extends AbstractTransport
         private ?string $from = null,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

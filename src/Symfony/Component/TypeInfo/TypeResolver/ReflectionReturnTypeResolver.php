@@ -32,7 +32,7 @@ final readonly class ReflectionReturnTypeResolver implements TypeResolverInterfa
     ) {
     }
 
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if (!$subject instanceof \ReflectionFunctionAbstract) {
             throw new UnsupportedException(sprintf('Expected subject to be a "ReflectionFunctionAbstract", "%s" given.', get_debug_type($subject)), $subject);

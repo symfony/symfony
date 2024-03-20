@@ -31,8 +31,7 @@ final class ZendeskTransport extends AbstractTransport
         #[\SensitiveParameter] private string $token,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

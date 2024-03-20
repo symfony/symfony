@@ -336,7 +336,7 @@ class Form extends Link implements \ArrayAccess
     public function disableValidation(): static
     {
         foreach ($this->fields->all() as $field) {
-            if ($field instanceof Field\ChoiceFormField) {
+            if ($field instanceof ChoiceFormField) {
                 $field->disableValidation();
             }
         }
@@ -444,14 +444,14 @@ class Form extends Link implements \ArrayAccess
 
         $nodeName = $node->nodeName;
         if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == strtolower($node->getAttribute('type'))) {
-            $this->set(new Field\ChoiceFormField($node));
+            $this->set(new ChoiceFormField($node));
         } elseif ('input' == $nodeName && 'radio' == strtolower($node->getAttribute('type'))) {
             // there may be other fields with the same name that are no choice
             // fields already registered (see https://github.com/symfony/symfony/issues/11689)
             if ($this->has($node->getAttribute('name')) && $this->get($node->getAttribute('name')) instanceof ChoiceFormField) {
                 $this->get($node->getAttribute('name'))->addChoice($node);
             } else {
-                $this->set(new Field\ChoiceFormField($node));
+                $this->set(new ChoiceFormField($node));
             }
         } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type'))) {
             $this->set(new Field\FileFormField($node));

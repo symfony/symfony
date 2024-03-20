@@ -34,7 +34,7 @@ class StringTypeResolverTest extends TestCase
     /**
      * @dataProvider resolveDataProvider
      */
-    public function testResolve(Type $expectedType, string $string, TypeContext $typeContext = null)
+    public function testResolve(Type $expectedType, string $string, ?TypeContext $typeContext = null)
     {
         $this->assertEquals($expectedType, $this->resolver->resolve($string, $typeContext));
     }

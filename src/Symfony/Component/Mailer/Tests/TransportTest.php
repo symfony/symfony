@@ -100,7 +100,7 @@ class TransportTest extends TestCase
     }
 }
 
-class DummyTransport implements Transport\TransportInterface
+class DummyTransport implements TransportInterface
 {
     private string $host;
 

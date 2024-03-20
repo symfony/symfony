@@ -36,7 +36,7 @@ class ReflectionTypeResolverTest extends TestCase
     /**
      * @dataProvider resolveDataProvider
      */
-    public function testResolve(Type $expectedType, \ReflectionType $reflection, TypeContext $typeContext = null)
+    public function testResolve(Type $expectedType, \ReflectionType $reflection, ?TypeContext $typeContext = null)
     {
         $this->assertEquals($expectedType, $this->resolver->resolve($reflection, $typeContext));
     }

@@ -88,7 +88,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Creates a new map.
      *
-     * @param TValue[] $elements The initial elements of the map, indexed by their keys.
+     * @param TValue[] $elements The initial elements of the map, indexed by their keys
      */
     public function __construct(
         private array $elements = [],

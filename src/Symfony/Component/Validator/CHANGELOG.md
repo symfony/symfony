@@ -58,6 +58,7 @@ CHANGELOG
  * Add the `exclude` option to the `Cascade` constraint
  * Add the `value_length` parameter to `Length` constraint
  * Allow to disable the translation domain for `ConstraintViolationInterface` messages
+ * Add `CompoundConstraintTestCase` to ease testing Compound Constraint
 
 6.2
 ---

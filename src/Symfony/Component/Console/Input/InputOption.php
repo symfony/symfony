@@ -92,7 +92,7 @@ class InputOption
 
             foreach ($shortcuts as $shortcut) {
                 if (\strlen($shortcut) > 1) {
-                    throw new InvalidArgumentException("Shortcut of more than 1 letter such as $shortcut are not allowed");
+                    throw new InvalidArgumentException("Shortcut of more than 1 letter such as $shortcut are not allowed.");
                 }
             }
 

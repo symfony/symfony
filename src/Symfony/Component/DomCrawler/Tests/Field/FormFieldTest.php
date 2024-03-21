@@ -11,10 +11,26 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Field;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 
 class FormFieldTest extends FormFieldTestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
+    public function testGetLabelIsDeprecated()
+    {
+        $this->expectDeprecation('Since symfony/dom-crawler 7.1: The "Symfony\Component\DomCrawler\Field\DomFormField::getLabel()" method is deprecated, use "Symfony\Component\DomCrawler\Field\DomFormField::getDomLabel()" instead.');
+
+        $node = $this->createNode('input', '', ['type' => 'text', 'name' => 'name', 'value' => 'value']);
+        $field = new InputFormField($node);
+
+        $field->getLabel();
+    }
+
     public function testGetName()
     {
         $node = $this->createNode('input', '', ['type' => 'text', 'name' => 'name', 'value' => 'value']);
@@ -42,7 +58,7 @@ class FormFieldTest extends FormFieldTestCase
         $dom->loadHTML('<html><form><input type="text" id="foo" name="foo" value="foo" /><input type="submit" /></form></html>');
 
         $field = new InputFormField($dom->getElementById('foo'));
-        $this->assertNull($field->getLabel(), '->getLabel() returns null if no label is defined');
+        $this->assertNull($field->getDomLabel(), '->getLabel() returns null if no label is defined');
     }
 
     public function testLabelIsAssignedByForAttribute()
@@ -55,7 +71,7 @@ class FormFieldTest extends FormFieldTestCase
         </form></html>');
 
         $field = new InputFormField($dom->getElementById('foo'));
-        $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
+        $this->assertEquals('Foo label', $field->getDomLabel()->textContent, '->getLabel() returns the associated label');
     }
 
     public function testLabelIsAssignedByParentingRelation()
@@ -67,6 +83,6 @@ class FormFieldTest extends FormFieldTestCase
         </form></html>');
 
         $field = new InputFormField($dom->getElementById('foo'));
-        $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the parent label');
+        $this->assertEquals('Foo label', $field->getDomLabel()->textContent, '->getLabel() returns the parent label');
     }
 }

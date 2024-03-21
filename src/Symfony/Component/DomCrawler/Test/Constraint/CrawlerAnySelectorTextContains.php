@@ -12,7 +12,7 @@
 namespace Symfony\Component\DomCrawler\Test\Constraint;
 
 use PHPUnit\Framework\Constraint\Constraint;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\CrawlerInterface;
 
 final class CrawlerAnySelectorTextContains extends Constraint
 {
@@ -37,8 +37,8 @@ final class CrawlerAnySelectorTextContains extends Constraint
 
     protected function matches($other): bool
     {
-        if (!$other instanceof Crawler) {
-            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, Crawler::class, get_debug_type($other)));
+        if (!$other instanceof CrawlerInterface) {
+            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, CrawlerInterface::class, get_debug_type($other)));
         }
 
         $other = $other->filter($this->selector);
@@ -50,7 +50,7 @@ final class CrawlerAnySelectorTextContains extends Constraint
 
         $this->hasNode = true;
 
-        $nodes = $other->each(fn (Crawler $node) => $node->text(null, true));
+        $nodes = $other->each(fn (CrawlerInterface $node) => $node->text(null, true));
         $matches = array_filter($nodes, function (string $node): bool {
             return str_contains($node, $this->expectedText);
         });
@@ -60,8 +60,8 @@ final class CrawlerAnySelectorTextContains extends Constraint
 
     protected function failureDescription($other): string
     {
-        if (!$other instanceof Crawler) {
-            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, Crawler::class, get_debug_type($other)));
+        if (!$other instanceof CrawlerInterface) {
+            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, CrawlerInterface::class, get_debug_type($other)));
         }
 
         return $this->toString();

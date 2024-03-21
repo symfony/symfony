@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `DomCrawler` to support PHP 8.4 native HTML parsing capabilities when available
+ * Deprecate `Crawler`, use `DomCrawler` instead
+
 7.0
 ---
 

@@ -26,6 +26,11 @@ abstract class AbstractCrawlerTestCase extends TestCase
         return new Crawler($node, $uri, $baseHref, $useHtml5Parser);
     }
 
+    protected static function getCrawlerClass(): string
+    {
+        return Crawler::class;
+    }
+
     public function testConstructor()
     {
         $crawler = $this->createCrawler();
@@ -247,7 +252,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li');
         $this->assertNotSame($crawler, $crawler->eq(0), '->eq() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->eq(0), '->eq() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->eq(0), '->eq() returns a new instance of a crawler');
 
         $this->assertEquals('Two', $crawler->eq(1)->text(), '->eq() returns the nth node of the list');
         $this->assertCount(0, $crawler->eq(100), '->eq() returns an empty crawler if the nth node does not exist');
@@ -279,7 +284,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
         $this->assertNotSame($crawler->slice(), $crawler, '->slice() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->slice(), '->slice() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->slice(), '->slice() returns a new instance of a crawler');
 
         $this->assertCount(3, $crawler->slice(), '->slice() does not slice the nodes in the list if any param is entered');
         $this->assertCount(1, $crawler->slice(1, 1), '->slice() slices the nodes in the list');
@@ -290,7 +295,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
         $nodes = $crawler->reduce(fn ($node, $i) => 1 !== $i);
         $this->assertNotSame($nodes, $crawler, '->reduce() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $nodes, '->reduce() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $nodes, '->reduce() returns a new instance of a crawler');
 
         $this->assertCount(2, $nodes, '->reduce() filters the nodes in the list');
     }
@@ -467,7 +472,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->filterXPath('//li'), '->filterXPath() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->filterXPath('//li'), '->filterXPath() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->filterXPath('//li'), '->filterXPath() returns a new instance of a crawler');
 
         $crawler = $this->createTestCrawler()->filterXPath('//ul');
         $this->assertCount(6, $crawler->filterXPath('//li'), '->filterXPath() filters the node list with the XPath expression');
@@ -634,7 +639,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->filter('li'), '->filter() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->filter('li'), '->filter() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->filter('li'), '->filter() returns a new instance of a crawler');
 
         $crawler = $this->createTestCrawler()->filter('ul');
 
@@ -687,7 +692,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->selectLink('Foo'), '->selectLink() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->selectLink('Foo'), '->selectLink() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->selectLink('Foo'), '->selectLink() returns a new instance of a crawler');
 
         $this->assertCount(1, $crawler->selectLink('Fabien\'s Foo'), '->selectLink() selects links by the node values');
         $this->assertCount(1, $crawler->selectLink('Fabien\'s Bar'), '->selectLink() selects links by the alt attribute of a clickable image');
@@ -706,7 +711,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->selectImage('Bar'), '->selectImage() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->selectImage('Bar'), '->selectImage() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->selectImage('Bar'), '->selectImage() returns a new instance of a crawler');
 
         $this->assertCount(1, $crawler->selectImage('Fabien\'s Bar'), '->selectImage() selects images by alt attribute');
         $this->assertCount(2, $crawler->selectImage('Fabien"s Bar'), '->selectImage() selects images by alt attribute');
@@ -717,7 +722,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->selectButton('FooValue'), '->selectButton() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->selectButton('FooValue'), '->selectButton() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->selectButton('FooValue'), '->selectButton() returns a new instance of a crawler');
 
         $this->assertEquals(1, $crawler->selectButton('FooValue')->count(), '->selectButton() selects buttons');
         $this->assertEquals(1, $crawler->selectButton('FooName')->count(), '->selectButton() selects buttons');
@@ -887,7 +892,7 @@ HTML;
         $this->assertInstanceOf(Form::class, $crawler->form(), '->form() returns a Form instance');
         $this->assertInstanceOf(Form::class, $crawler2->form(), '->form() returns a Form instance');
 
-        $this->assertEquals($crawler->form()->getFormNode()->getAttribute('id'), $crawler2->form()->getFormNode()->getAttribute('id'), '->form() works on elements with form attribute');
+        $this->assertEquals($crawler->form()->getFormDomNode()->getAttribute('id'), $crawler2->form()->getFormDomNode()->getAttribute('id'), '->form() works on elements with form attribute');
 
         $this->assertEquals(['FooName' => 'FooBar', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'], $crawler->form(['FooName' => 'FooBar'])->getValues(), '->form() takes an array of values to submit as its first argument');
         $this->assertEquals(['FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'], $crawler->form()->getValues(), '->getValues() returns correct form values');
@@ -913,7 +918,7 @@ HTML;
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
         $this->assertNotSame($crawler, $crawler->last(), '->last() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->last(), '->last() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->last(), '->last() returns a new instance of a crawler');
 
         $this->assertEquals('Three', $crawler->last()->text());
     }
@@ -922,7 +927,7 @@ HTML;
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li');
         $this->assertNotSame($crawler, $crawler->first(), '->first() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->first(), '->first() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->first(), '->first() returns a new instance of a crawler');
 
         $this->assertEquals('One', $crawler->first()->text());
     }
@@ -931,7 +936,7 @@ HTML;
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(1);
         $this->assertNotSame($crawler, $crawler->siblings(), '->siblings() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->siblings(), '->siblings() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->siblings(), '->siblings() returns a new instance of a crawler');
 
         $nodes = $crawler->siblings();
         $this->assertEquals(2, $nodes->count());
@@ -1009,15 +1014,15 @@ HTML;
         $foo = $crawler->filter('#foo');
 
         $newFoo = $foo->closest('#foo');
-        $this->assertInstanceOf(Crawler::class, $newFoo);
+        $this->assertInstanceOf(static::getCrawlerClass(), $newFoo);
         $this->assertSame('newFoo ok', $newFoo->attr('class'));
 
         $lorem1 = $foo->closest('.lorem1');
-        $this->assertInstanceOf(Crawler::class, $lorem1);
+        $this->assertInstanceOf(static::getCrawlerClass(), $lorem1);
         $this->assertSame('lorem1 ok', $lorem1->attr('class'));
 
         $lorem2 = $foo->closest('.lorem2');
-        $this->assertInstanceOf(Crawler::class, $lorem2);
+        $this->assertInstanceOf(static::getCrawlerClass(), $lorem2);
         $this->assertSame('lorem2 ok', $lorem2->attr('class'));
 
         $lorem3 = $foo->closest('.lorem3');
@@ -1054,7 +1059,7 @@ HTML;
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(1);
         $this->assertNotSame($crawler, $crawler->nextAll(), '->nextAll() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->nextAll(), '->nextAll() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->nextAll(), '->nextAll() returns a new instance of a crawler');
 
         $nodes = $crawler->nextAll();
         $this->assertEquals(1, $nodes->count());
@@ -1072,7 +1077,7 @@ HTML;
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(2);
         $this->assertNotSame($crawler, $crawler->previousAll(), '->previousAll() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->previousAll(), '->previousAll() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->previousAll(), '->previousAll() returns a new instance of a crawler');
 
         $nodes = $crawler->previousAll();
         $this->assertEquals(2, $nodes->count());
@@ -1090,7 +1095,7 @@ HTML;
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul');
         $this->assertNotSame($crawler, $crawler->children(), '->children() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->children(), '->children() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler->children(), '->children() returns a new instance of a crawler');
 
         $nodes = $crawler->children();
         $this->assertEquals(3, $nodes->count());
@@ -1151,7 +1156,7 @@ HTML;
         $nodes = $crawler->ancestors();
 
         $this->assertNotSame($crawler, $nodes, '->ancestors() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $nodes, '->ancestors() returns a new instance of a crawler');
+        $this->assertInstanceOf(static::getCrawlerClass(), $nodes, '->ancestors() returns a new instance of a crawler');
 
         $this->assertEquals(3, $crawler->ancestors()->count());
 
@@ -1246,7 +1251,7 @@ HTML;
     {
         $crawler = $this->createTestCrawler()->evaluate('//form/input[1]');
 
-        $this->assertInstanceOf(Crawler::class, $crawler);
+        $this->assertInstanceOf(static::getCrawlerClass(), $crawler);
         $this->assertCount(1, $crawler);
         $this->assertSame('input', $crawler->first()->nodeName());
     }

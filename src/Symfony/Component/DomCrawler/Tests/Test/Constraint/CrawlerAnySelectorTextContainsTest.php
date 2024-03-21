@@ -14,7 +14,7 @@ namespace Symfony\Component\DomCrawler\Tests\Test\Constraint;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestFailure;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\DomCrawler;
 use Symfony\Component\DomCrawler\Test\Constraint\CrawlerAnySelectorTextContains;
 
 class CrawlerAnySelectorTextContainsTest extends TestCase
@@ -23,13 +23,13 @@ class CrawlerAnySelectorTextContainsTest extends TestCase
     {
         $constraint = new CrawlerAnySelectorTextContains('ul li', 'Foo');
 
-        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Foo</li>'), '', true));
-        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo'), '', true));
-        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo Bar Baz'), '', true));
-        self::assertFalse($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz'), '', true));
+        self::assertTrue($constraint->evaluate(new DomCrawler('<ul><li>Foo</li>'), '', true));
+        self::assertTrue($constraint->evaluate(new DomCrawler('<ul><li>Bar</li><li>Foo'), '', true));
+        self::assertTrue($constraint->evaluate(new DomCrawler('<ul><li>Bar</li><li>Foo Bar Baz'), '', true));
+        self::assertFalse($constraint->evaluate(new DomCrawler('<ul><li>Bar</li><li>Baz'), '', true));
 
         try {
-            $constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz'));
+            $constraint->evaluate(new DomCrawler('<ul><li>Bar</li><li>Baz'));
 
             self::fail();
         } catch (ExpectationFailedException $e) {
@@ -37,7 +37,7 @@ class CrawlerAnySelectorTextContainsTest extends TestCase
         }
 
         try {
-            $constraint->evaluate(new Crawler('<html><head><title>Foobar'));
+            $constraint->evaluate(new DomCrawler('<html><head><title>Foobar'));
 
             self::fail();
         } catch (ExpectationFailedException $e) {

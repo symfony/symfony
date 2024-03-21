@@ -17,6 +17,9 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 final class TransitionEvent extends Event
 {
+    use EventNameTrait {
+        getNameForTransition as public getName;
+    }
     use HasContextTrait;
 
     public function __construct(object $subject, Marking $marking, ?Transition $transition = null, ?WorkflowInterface $workflow = null, array $context = [])

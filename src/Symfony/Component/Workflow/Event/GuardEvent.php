@@ -23,6 +23,10 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 final class GuardEvent extends Event
 {
+    use EventNameTrait {
+        getNameForTransition as public getName;
+    }
+
     private TransitionBlockerList $transitionBlockerList;
 
     public function __construct(object $subject, Marking $marking, Transition $transition, ?WorkflowInterface $workflow = null)

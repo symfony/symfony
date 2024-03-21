@@ -3,7 +3,15 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        :root {
+            --workflow-dialog-background: var(--gray-200);
+        }
+        .theme-dark {
+            --workflow-dialog-background: var(--gray-900);
+        }
+
         dialog {
+            background: var(--workflow-dialog-background);
             border: none;
             border-radius: 6px;
             box-shadow: var(--settings-modal-shadow);
@@ -32,7 +40,10 @@
         }
 
         dialog h2 {
-            margin-top: 0.2em
+            box-shadow: none !important;
+            color: var(--page-color);
+            font-size: 18px;
+            margin: 0 0 .5em;
         }
 
         dialog i.cancel {
@@ -42,47 +53,37 @@
         }
 
         dialog table {
-            border: 1px solid #ccc;
+            background: var(--page-background);
             border-collapse: collapse;
+            border-radius: 4px;
+            box-shadow: inset 0 0 0 1px var(--table-border-color);
+            color: var(--page-color);
             margin: 0 0 1em 0;
             margin-bottom: 1em;
             padding: 0;
-            table-layout: fixed;
         }
 
         dialog table tr {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
+            border: 1px solid var(--table-border-color);
             padding: .35em;
         }
 
         dialog table th,
         dialog table td {
+            border: 1px solid var(--table-border-color);
             padding: .625em;
-            text-align: center;
+            text-align: left;
         }
 
-        dialog table th {
+        dialog table thead th {
+            background: var(--table-header);
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
             font-size: .85em;
-            letter-spacing: .1em;
-            text-transform: uppercase;
         }
 
         dialog menu {
-            padding: 0;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            flex-direction: row;
-            vertical-align: middle;
-            justify-content: center;
-        }
-
-        dialog menu small {
-            margin-right: auto;
-        }
-        dialog menu small i {
-            margin-right: 3px;
+            display: none;
         }
 
         @keyframes scale {
@@ -133,9 +134,23 @@
     {% else %}
         <script type="module">
             import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+            const isDarkMode = document.querySelector('body').classList.contains('theme-dark');
             mermaid.initialize({
                 flowchart: { useMaxWidth: false },
                 securityLevel: 'loose',
+                'theme': 'base',
+                'themeVariables': {
+                    darkMode: isDarkMode,
+                    'fontFamily': 'var(--font-family-system)',
+                    'fontSize': 'var(--font-size-body)',
+                    // the properties below don't support CSS variables
+                    'primaryColor': isDarkMode ? 'lightsteelblue' : 'aliceblue',
+                    'primaryTextColor': isDarkMode ? '#000' : '#000',
+                    'primaryBorderColor': isDarkMode ? 'steelblue' : 'lightsteelblue',
+                    'lineColor': isDarkMode ? '#939393' : '#d4d4d4',
+                    'secondaryColor': isDarkMode ? 'lightyellow' : 'lightyellow',
+                    'tertiaryColor': isDarkMode ? 'lightSalmon' : 'lightSalmon',
+                }
             });
 
             {% for name, data in collector.workflows %}

@@ -1,7 +1,8 @@
 LOX24 SMS Notifier
-=========================
+==================
 
-Provides [LOX24 SMS Gateway](https://doc.lox24.eu/#tag/sms/operation/api_sms_post_collection) integration for Symfony Notifier.
+Provides [LOX24 SMS Gateway](https://doc.lox24.eu/#tag/sms/operation/api_sms_post_collection) integration for Symfony
+Notifier.
 
 DSN example
 -----------
@@ -12,20 +13,19 @@ LOX24_DSN=lox24://TOKEN@default?from=FROM&type=SERVICE_CODE&voice_language=VOICE
 
 where:
 
-- `TOKEN` (required) is LOX24 API v2 token.
-- `FROM` (required) is the sender of the message.
-- `TYPE` (optional) type of message: `sms` (by default) or `voice` (voice call).
-- `VOICE_LANGUAGE` (optional) if `type` is `voice`, then you can set the language of the voice message. Possible values: `de`, `en`, `es`, `fr`, `it` or `auto` (by default) per auto-detection.
-- `IS_TEXT_DELETE` (optional) delete SMS text from LOX24 database after sending SMS. Allowed values: `1` (true) or `0` (false). Default value: `0`.
-- `CALLBACK_DATA` (optional) additional data for the callback payload.
+ - `TOKEN` (required) is LOX24 API v2 token.
+ - `FROM` (required) is the sender of the message.
+ - `TYPE` (optional) type of message: `sms` (by default) or `voice` (voice call).
+ - `VOICE_LANGUAGE` (optional) if `type` is `voice`, then you can set the language of the voice message. Possible
+  values: `de`, `en`, `es`, `fr`, `it` or `auto` (by default) per auto-detection.
+ - `IS_TEXT_DELETE` (optional) delete SMS text from LOX24 database after sending SMS. Allowed values: `1` (true) or `0` (
+  false). Default value: `0`.
+ - `CALLBACK_DATA` (optional) additional data for the callback payload.
 
 See your account info at https://account.lox24.eu
 
 Send a Message
----------------------------
-
-With a LOX24 Message, you can use the `LOX24Options` class to add
-message options.
+--------------
 
 ```php
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -36,10 +36,7 @@ $texter->send($sms);
 ```
 
 Advanced Message options
----------------------------
-
-With a LOX24 Message, you can use the `LOX24Options` class to add
-message options.
+------------------------
 
 ```php
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -54,8 +51,8 @@ $options = (new LOX24Options())
     // If not set or set 'auto', the automatic language detection by message text will be used
     ->voiceLanguage('en')
     // unix timestamp of SMS the delivery time. If 0 or not set, the message will be sent immediately
-    ->deliveryAt(1710871761)
-    // set True per delete the message from the LOX24 database after delivery
+    ->deliveryAt(new DateTime('2024-03-21 12:17:00'))
+    // set True to delete the message from the LOX24 database after delivery
     ->textDelete(true)
     // pass any string to the callback object
     ->callbackData('some_data_per_callback');
@@ -69,7 +66,7 @@ $texter->send($sms);
 Resources
 ---------
 
-* [Contributing](https://symfony.com/doc/current/contributing/index.html)
-* [Report issues](https://github.com/symfony/symfony/issues) and
-  [send Pull Requests](https://github.com/symfony/symfony/pulls)
-  in the [main Symfony repository](https://github.com/symfony/symfony)
+ * [Contributing](https://symfony.com/doc/current/contributing/index.html)
+ * [Report issues](https://github.com/symfony/symfony/issues) and 
+ [send Pull Requests](https://github.com/symfony/symfony/pulls) 
+ in the [main Symfony repository](https://github.com/symfony/symfony)

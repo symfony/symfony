@@ -11,8 +11,8 @@
 
 declare(strict_types=1);
 
-use Symfony\Component\Notifier\Bridge\Lox24\Lox24Options;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Notifier\Bridge\Lox24\Lox24Options;
 
 /**
  * @author Andrei Lebedev <andrew.lebedev@gmail.com>
@@ -20,24 +20,17 @@ use PHPUnit\Framework\TestCase;
 class Lox24OptionsTest extends TestCase
 {
 
-    public function testDeliveryAtGreaterThanZero(): void
+    public function testDeliveryAtWithNotNull(): void
     {
-        $options = (new Lox24Options())->deliveryAt(123);
+        $options = (new Lox24Options())->deliveryAt((new DateTimeImmutable())->setTimestamp(123));
         $this->assertSame(123, $options->toArray()['delivery_at']);
     }
 
-    public function testDeliveryAtEqualZero(): void
+    public function testDeliveryWithNull(): void
     {
-        $options = (new Lox24Options())->deliveryAt(0);
+        $options = (new Lox24Options())->deliveryAt(null);
         $this->assertSame(0, $options->toArray()['delivery_at']);
     }
-
-    public function testDeliveryAtLessThanZero(): void
-    {
-        $options = (new Lox24Options())->deliveryAt(0);
-        $this->assertSame(0, $options->toArray()['delivery_at']);
-    }
-
 
     public function testVoiceLangNull(): void
     {
@@ -48,7 +41,9 @@ class Lox24OptionsTest extends TestCase
     public function testVoiceLangInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The language "invalid" is not supported; supported languages are: en, de, es, fr, it, auto.');
+        $this->expectExceptionMessage(
+            'The language \'invalid\' is not supported; supported languages are: de, en, es, fr, it, auto.'
+        );
         (new Lox24Options())->voiceLanguage('invalid');
     }
 
@@ -78,7 +73,7 @@ class Lox24OptionsTest extends TestCase
         $this->assertNull($options->getRecipientId());
     }
 
-    public function testCallbackData() : void
+    public function testCallbackData(): void
     {
         $options = (new Lox24Options())->callbackData('test');
         $this->assertSame('test', $options->toArray()['callback_data']);
@@ -102,6 +97,4 @@ class Lox24OptionsTest extends TestCase
         $this->expectExceptionMessage('Invalid type: fax');
         (new Lox24Options())->type('fax');
     }
-
-
 }

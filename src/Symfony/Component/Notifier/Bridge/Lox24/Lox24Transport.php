@@ -35,14 +35,12 @@ final class Lox24Transport extends AbstractTransport
 {
     protected const HOST = 'api.lox24.eu';
 
-    public const ALLOWED_VOICE_LANGUAGES = ['en', 'de', 'es', 'fr', 'it', 'auto'];
-
     public function __construct(
         #[\SensitiveParameter] private readonly string $auth,
-        private readonly string                        $from,
-        private readonly array                         $options = [],
-        ?HttpClientInterface                           $client = null,
-        ?EventDispatcherInterface                      $dispatcher = null
+        private readonly string $from,
+        private readonly array $options = [],
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null
     ) {
         parent::__construct($client, $dispatcher);
     }
@@ -56,7 +54,7 @@ final class Lox24Transport extends AbstractTransport
 
         $query = $params ? '?'.http_build_query($params) : '';
 
-        return "lox24://{$this->getEndpoint()}$query";
+        return sprintf("lox24://%s%s", $this->getEndpoint(), $query);
     }
 
     public function supports(MessageInterface $message): bool
@@ -82,7 +80,10 @@ final class Lox24Transport extends AbstractTransport
 
         if (!$this->isFromValid($from)) {
             throw new InvalidArgumentException(
-                "The \"From\" number \"$from\" is not a valid phone number, shortcode, or alphanumeric sender ID."
+                sprintf(
+                    'The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.',
+                    $from
+                )
             );
         }
 
@@ -100,7 +101,7 @@ final class Lox24Transport extends AbstractTransport
         $body = $this->setServiceCode($body, $options);
         $body = $this->setVoiceLang($body, $options);
 
-        $response = $this->client->request('POST', "https://{$this->getEndpoint()}/sms", [
+        $response = $this->client->request('POST', sprintf("https://%s/sms", $this->getEndpoint()), [
             'headers' => [
                 'X-LOX24-AUTH-TOKEN' => $this->auth,
                 'Accept' => 'application/json',
@@ -120,7 +121,8 @@ final class Lox24Transport extends AbstractTransport
             $error = $response->toArray(false);
 
             throw new TransportException(
-                "Unable to send the SMS: {$error['detail']}", $response
+                sprintf("Unable to send the SMS: %s", $error['detail']),
+                $response
             );
         }
 
@@ -132,58 +134,10 @@ final class Lox24Transport extends AbstractTransport
         return $sentMessage;
     }
 
-
-    private function setVoiceLang(array $body, array $options): array
-    {
-        $voiceLang = $options['voice_lang'] ?? null;
-        if ($voiceLang) {
-            $voiceLang = strtolower($voiceLang);
-            if (!$this->isVoiceLangValid($voiceLang)) {
-                throw new InvalidArgumentException(
-                    "The \"voice_lang\" option \"$voiceLang\" is not a valid language. Allowed languages are: "
-                    .implode(', ', self::ALLOWED_VOICE_LANGUAGES)."."
-                );
-            }
-
-            if($voiceLang !== 'auto') {
-                $body['voice_lang'] = $voiceLang;
-            }
-        }
-
-        return $body;
-    }
-
     private function isFromValid(string $from): bool
     {
         return preg_match('/^[.\-a-zA-Z0-9_ ]{2,11}$/', $from) || preg_match('/^\+[1-9]\d{1,14}$/', $from);
     }
-
-    private function isVoiceLangValid(string $voiceLang): bool
-    {
-        return in_array($voiceLang, self::ALLOWED_VOICE_LANGUAGES, true);
-    }
-
-    private function setServiceCode(array $body, array $options): array
-    {
-        $code = $options['type'] ?? Type::Sms->value;
-        $type = Type::tryFrom((string)$code);
-
-        if (!$type) {
-            throw new InvalidArgumentException("Invalid type: $code");
-        }
-
-        $body['service_code'] = $type === Type::Voice ? 'text2speech' : 'direct';
-
-        return $body;
-    }
-
-    private function setDeliveryAt(array $body, array $options): array
-    {
-        $body['delivery_at'] = max((int)($options['delivery_at'] ?? 0), 0);
-
-        return $body;
-    }
-
 
     private function setIsTextDeleted(array $body, array $options): array
     {
@@ -196,6 +150,51 @@ final class Lox24Transport extends AbstractTransport
     {
         if (!empty($options['callback_data'])) {
             $body['callback_data'] = $options['callback_data'];
+        }
+
+        return $body;
+    }
+
+    private function setDeliveryAt(array $body, array $options): array
+    {
+        $body['delivery_at'] = max((int)($options['delivery_at'] ?? 0), 0);
+
+        return $body;
+    }
+
+    private function setServiceCode(array $body, array $options): array
+    {
+        $code = $options['type'] ?? Type::Sms->value;
+        $type = Type::tryFrom((string)$code);
+
+        if (!$type) {
+            throw new InvalidArgumentException(sprintf("Invalid type: %s", $code));
+        }
+
+        $body['service_code'] = $this->getServiceCode($type)->value;
+
+        return $body;
+    }
+
+    private function getServiceCode(Type $type): ServiceCode
+    {
+        return $type === Type::Voice ? ServiceCode::Voice : ServiceCode::Sms;
+    }
+
+    private function setVoiceLang(array $body, array $options): array
+    {
+        $voiceLang = $options['voice_lang'] ?? null;
+        if ($voiceLang) {
+            $voiceLang = strtolower($voiceLang);
+            if (!VoiceLanguage::tryFrom($voiceLang)) {
+                $allowed = implode(', ', array_map(static fn ($case) => $case->value, VoiceLanguage::cases()));
+                $str = 'The "voice_lang" option "%s" is not a valid language. Allowed languages are: %s.';
+                throw new InvalidArgumentException(sprintf($str, $voiceLang, $allowed));
+            }
+
+            if ($voiceLang !== 'auto') {
+                $body['voice_lang'] = $voiceLang;
+            }
         }
 
         return $body;

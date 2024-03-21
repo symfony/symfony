@@ -22,8 +22,10 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 /**
  * @author Andrei Lebedev <andrew.lebedev@gmail.com>
+ *
+ * Notifications: https://doc.lox24.eu/#section/Introduction/Notifications
  */
-final class Lox24RequestParser extends AbstractRequestParser
+final class LOX24RequestParser extends AbstractRequestParser
 {
 
     protected function getRequestMatcher(): RequestMatcherInterface
@@ -36,7 +38,7 @@ final class Lox24RequestParser extends AbstractRequestParser
      */
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?SmsEvent
     {
-        // Notifications: https://doc.lox24.eu/#section/Introduction/Notifications
+
         $payload = $request->request->all() ?? [];
         $name = $payload['name'] ?? null;
         $data = $payload['data'] ?? [];

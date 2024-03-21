@@ -22,27 +22,23 @@ use Symfony\Component\Notifier\Transport\Dsn;
  */
 final class Lox24TransportFactory extends AbstractTransportFactory
 {
+
     public function create(Dsn $dsn): Lox24Transport
     {
         $scheme = $dsn->getScheme();
 
-        if (!in_array($scheme, $this->getSupportedSchemes(), true))   {
+        if (!in_array($scheme, $this->getSupportedSchemes(), true)) {
             throw new UnsupportedSchemeException($dsn, $scheme, $this->getSupportedSchemes());
         }
 
         $authUser = $this->getUser($dsn);
         $authToken = $this->getPassword($dsn);
+        $auth = sprintf('%s:%s', $authUser, $authToken);
         $from = $dsn->getRequiredOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new Lox24Transport(
-            "$authUser:$authToken",
-            $from,
-            $dsn->getOptions(),
-            $this->client,
-            $this->dispatcher
-        ))
+        return (new Lox24Transport($auth, $from, $dsn->getOptions(), $this->client, $this->dispatcher))
             ->setHost($host)
             ->setPort($port);
     }

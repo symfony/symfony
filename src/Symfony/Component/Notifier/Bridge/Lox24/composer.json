@@ -8,22 +8,23 @@
   "require": {
     "php": ">=8.1",
     "symfony/http-client": "^6.4|^7.0",
-    "symfony/notifier": "^6.4|^7.0"
+    "symfony/notifier": "^7.1"
   },
   "require-dev": {
     "symfony/webhook": "^6.4|^7.0",
-    "phpunit/phpunit": "^11.0"
-  },
-  "conflict": {
-    "symfony/http-foundation": "<6.4"
+    "phpunit/phpunit": "^11.0",
+    "friendsofphp/php-cs-fixer": "^3.0"
   },
   "autoload": {
     "psr-4": {
-      "Symfony\\Component\\Notifier\\Bridge\\Lox24\\": "*"
+      "Symfony\\Component\\Notifier\\Bridge\\Lox24\\": ""
     },
     "exclude-from-classmap": [
       "/Tests/"
     ]
+  },
+  "scripts": {
+    "php-cs-fixer": "php-cs-fixer --config=./.php_cs"
   },
   "minimum-stability": "dev"
 }

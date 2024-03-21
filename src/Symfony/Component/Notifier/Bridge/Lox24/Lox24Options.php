@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Notifier\Bridge\Lox24;
 
+use DateTimeInterface;
 use InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
@@ -38,11 +39,13 @@ final class Lox24Options implements MessageOptionsInterface
 
 
     /**
-     * Unix timestamp of SMS the delivery time. If 0 or not set, the message will be sent immediately.
+     * DateTime object of SMS the delivery time.
+     * If Null or not set, the message will be sent immediately.
+     * E.g. deliveryAt(new DateTime('2024-03-21 12:17:00')) or deliveryAt(null)
      */
-    public function deliveryAt(int $deliveryAt): self
+    public function deliveryAt(?DateTimeInterface $deliveryAt = null): self
     {
-        $this->options['delivery_at'] = max($deliveryAt, 0);
+        $this->options['delivery_at'] = $deliveryAt ? $deliveryAt->getTimestamp() : 0;
 
         return $this;
     }
@@ -50,21 +53,23 @@ final class Lox24Options implements MessageOptionsInterface
 
     /**
      * The language of the voice message.
-     * If not set, the automatic language detection by message text will be used.
+     * If not set or 'auto', the automatic language detection by message text will be used.
+     * E.g. voiceLanguage('en') or voiceLanguage('auto')
      */
     public function voiceLanguage(?string $language): self
     {
-        if($language) {
-            $language = strtolower($language);
+        if (!$language) {
+            unset($this->options['voice_lang']);
+
+            return $this;
         }
 
-        if ($language && !in_array($language, Lox24Transport::ALLOWED_VOICE_LANGUAGES, true)) {
+        $language = strtolower($language);
+
+        if (!VoiceLanguage::tryFrom($language)) {
+            $allowed = implode(', ', array_map(static fn ($case) => $case->value, VoiceLanguage::cases()));
             throw new InvalidArgumentException(
-                sprintf(
-                    'The language "%s" is not supported; supported languages are: %s.',
-                    $language,
-                    implode(', ', Lox24Transport::ALLOWED_VOICE_LANGUAGES)
-                )
+                sprintf("The language '%s' is not supported; supported languages are: %s.", $language, $allowed)
             );
         }
 
@@ -74,7 +79,8 @@ final class Lox24Options implements MessageOptionsInterface
     }
 
     /**
-     * If true delete from DB the message text after sending.
+     * If True deletes the message from the LOX24 database after delivery
+     * E.g. textDelete(true) or textDelete(false)
      */
     public function textDelete(bool $isTextDelete): self
     {
@@ -85,12 +91,13 @@ final class Lox24Options implements MessageOptionsInterface
 
     /**
      * The message type: 'sms' or 'voice'.
+     * E.g. type('sms') or type('voice')
      */
     public function type(string $type): self
     {
         $service = Type::tryFrom($type);
         if (!$service) {
-            throw new InvalidArgumentException("Invalid type: $type");
+            throw new InvalidArgumentException(sprintf("Invalid type: %s", $type));
         }
 
         $this->options['type'] = $service->value;
@@ -99,8 +106,8 @@ final class Lox24Options implements MessageOptionsInterface
     }
 
     /**
-     * String which will be sent back to your endpoint.
-     * E.g. it can be usable to pass your system message id.
+     * String which will be sent back to your endpoint. It can be usable to pass your system message id.
+     * E.g. callbackData('internal_message_id_123')
      */
     public function callbackData(?string $data): self
     {
@@ -108,6 +115,4 @@ final class Lox24Options implements MessageOptionsInterface
 
         return $this;
     }
-
-
 }

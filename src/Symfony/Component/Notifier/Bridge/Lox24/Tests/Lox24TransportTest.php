@@ -12,23 +12,48 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24Options;
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24Transport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
+use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Andrei Lebedev <andrew.lebedev@gmail.com>
  */
-class Lox24TransportTest extends TestCase
+class Lox24TransportTest extends TransportTestCase
 {
+    public static function createTransport(?HttpClientInterface $client = null): Lox24Transport
+    {
+        return (new Lox24Transport('id:token', 'sender', ['type' => 'voice'], $client ?? new MockHttpClient()
+        ))->setHost('host.test');
+    }
+
+    public static function toStringProvider(): iterable
+    {
+        yield ['lox24://host.test?from=sender&type=voice', self::createTransport()];
+    }
+
+    public static function supportedMessagesProvider(): iterable
+    {
+        yield [new SmsMessage('+33611223344', 'Hello World!')];
+    }
+
+    public static function unsupportedMessagesProvider(): iterable
+    {
+        yield [new ChatMessage('Hello World!')];
+        yield [new PushMessage('subject', 'content')];
+    }
+
     private const REQUEST_HEADERS = [
         'X-LOX24-AUTH-TOKEN' => 'testToken',
         'Accept' => 'application/json',
@@ -52,18 +77,6 @@ class Lox24TransportTest extends TestCase
         $this->client = $this->createMock(HttpClientInterface::class);
     }
 
-    public function testToString(): void
-    {
-        $transport = new Lox24Transport(
-            'testToken',
-            'testFrom',
-            ['testOption' => 'test', 'anotherTestOption' => 'anotherTest']
-        );
-        $this->assertSame(
-            'lox24://api.lox24.eu?from=testFrom&testOption=test&anotherTestOption=anotherTest',
-            (string)$transport
-        );
-    }
 
     public function testSupportWithNotSmsMessage(): void
     {
@@ -150,7 +163,6 @@ class Lox24TransportTest extends TestCase
         $transport->send($message);
     }
 
-
     public function testOptionDeliveryAtGreaterThanZero(): void
     {
         $this->assertRequestBody([
@@ -163,26 +175,7 @@ class Lox24TransportTest extends TestCase
         ], [], 201, ['uuid' => '123456']);
         $transport = new Lox24Transport('testToken', 'testFrom', [], $this->client);
 
-        $options = (new Lox24Options())->deliveryAt(1000000000);
-        $message = new SmsMessage('+1411111111', 'test text');
-        $message->options($options);
-
-        $transport->send($message);
-    }
-
-    public function testOptionDeliveryAtGreaterLessThanZero(): void
-    {
-        $this->assertRequestBody([
-            'sender_id' => 'testFrom',
-            'phone' => '+1411111111',
-            'text' => 'test text',
-            'is_text_deleted' => false,
-            'delivery_at' => 0,
-            'service_code' => 'direct',
-        ], [], 201, ['uuid' => '123456']);
-        $transport = new Lox24Transport('testToken', 'testFrom', [], $this->client);
-
-        $options = (new Lox24Options())->deliveryAt(-1);
+        $options = (new Lox24Options())->deliveryAt((new DateTimeImmutable())->setTimestamp(1000000000));
         $message = new SmsMessage('+1411111111', 'test text');
         $message->options($options);
 
@@ -272,7 +265,9 @@ class Lox24TransportTest extends TestCase
     public function testResponseStatusCodeNotEqual201(): void
     {
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Unable to send the SMS: service_code: Service\'s code is invalid or unavailable.');
+        $this->expectExceptionMessage(
+            'Unable to send the SMS: service_code: Service\'s code is invalid or unavailable.'
+        );
 
         $this->assertRequestBody([
             'sender_id' => 'testFrom',
@@ -281,7 +276,9 @@ class Lox24TransportTest extends TestCase
             'is_text_deleted' => false,
             'delivery_at' => 0,
             'service_code' => 'direct',
-        ], [], 400,
+        ],
+            [],
+            400,
             [
                 'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
                 'title' => 'An error occurred',
@@ -305,7 +302,7 @@ class Lox24TransportTest extends TestCase
     private function assertRequestBody(
         array $bodyOverride = [],
         array $headersOverride = [],
-        int   $responseStatus = 200,
+        int $responseStatus = 200,
         array $responseContent = []
     ): void {
         $body = array_merge(self::REQUEST_BODY, $bodyOverride);
@@ -320,6 +317,4 @@ class Lox24TransportTest extends TestCase
                 'headers' => $headers,
             ])->willReturn($response);
     }
-
-
 }

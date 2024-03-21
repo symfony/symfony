@@ -15,7 +15,7 @@ namespace Symfony\Component\Notifier\Bridge\Lox24\Tests\Webhook;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Notifier\Bridge\Lox24\Webhook\Lox24RequestParser;
+use Symfony\Component\Notifier\Bridge\Lox24\Webhook\LOX24RequestParser;
 use Symfony\Component\RemoteEvent\Event\Sms\SmsEvent;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
@@ -24,11 +24,11 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
  */
 class Lox24RequestParserTest extends TestCase
 {
-    private Lox24RequestParser $parser;
+    private LOX24RequestParser $parser;
 
     protected function setUp(): void
     {
-        $this->parser = new Lox24RequestParser();
+        $this->parser = new LOX24RequestParser();
     }
 
     public function testInvalidNotificationName(): void

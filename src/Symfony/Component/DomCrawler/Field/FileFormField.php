@@ -16,7 +16,7 @@ namespace Symfony\Component\DomCrawler\Field;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileFormField extends FormField
+class FileFormField extends DomFormField
 {
     /**
      * Sets the PHP error code associated with the field.
@@ -90,12 +90,14 @@ class FileFormField extends FormField
      */
     protected function initialize(): void
     {
-        if ('input' !== $this->node->nodeName) {
-            throw new \LogicException(\sprintf('A FileFormField can only be created from an input tag (%s given).', $this->node->nodeName));
+        $nodeName = strtolower($this->domNode->nodeName);
+        if ('input' !== $nodeName) {
+            throw new \LogicException(\sprintf('A FileFormField can only be created from an input tag (%s given).', $nodeName));
         }
 
-        if ('file' !== strtolower($this->node->getAttribute('type'))) {
-            throw new \LogicException(\sprintf('A FileFormField can only be created from an input tag with a type of file (given type is "%s").', $this->node->getAttribute('type')));
+        $attribute = strtolower($this->domNode->getAttribute('type') ?? '');
+        if ('file' !== $attribute) {
+            throw new \LogicException(\sprintf('A FileFormField can only be created from an input tag with a type of file (given type is "%s").', $attribute));
         }
 
         $this->setValue(null);

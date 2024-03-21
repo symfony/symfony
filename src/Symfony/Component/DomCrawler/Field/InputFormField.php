@@ -19,7 +19,7 @@ namespace Symfony\Component\DomCrawler\Field;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class InputFormField extends FormField
+class InputFormField extends DomFormField
 {
     /**
      * Initializes the form field.
@@ -28,11 +28,12 @@ class InputFormField extends FormField
      */
     protected function initialize(): void
     {
-        if ('input' !== $this->node->nodeName && 'button' !== $this->node->nodeName) {
-            throw new \LogicException(\sprintf('An InputFormField can only be created from an input or button tag (%s given).', $this->node->nodeName));
+        $nodeName = strtolower($this->domNode->nodeName);
+        if ('input' !== $nodeName && 'button' !== $nodeName) {
+            throw new \LogicException(\sprintf('An InputFormField can only be created from an input or button tag (%s given).', $nodeName));
         }
 
-        $type = strtolower($this->node->getAttribute('type'));
+        $type = strtolower($this->domNode->getAttribute('type'));
         if ('checkbox' === $type) {
             throw new \LogicException('Checkboxes should be instances of ChoiceFormField.');
         }
@@ -41,6 +42,6 @@ class InputFormField extends FormField
             throw new \LogicException('File inputs should be instances of FileFormField.');
         }
 
-        $this->value = $this->node->getAttribute('value');
+        $this->value = $this->domNode->getAttribute('value') ?? '';
     }
 }

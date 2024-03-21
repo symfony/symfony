@@ -41,15 +41,17 @@ Advanced Message options
 ```php
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Bridge\LOX24\LOX24Options;
+use Symfony\Component\Notifier\Bridge\Lox24\Type;
+use Symfony\Component\Notifier\Bridge\Lox24\VoiceLanguage;
 
 $sms = new SmsMessage('+1411111111', 'My message');
 
 $options = (new LOX24Options())
-    // set 'voice' per voice call (text-to-speech)
-    ->type('voice')
+    // set `Type::Voice` per voice call (text-to-speech)
+    ->type(Type::Voice)
     // set the language of the voice message.
-    // If not set or set 'auto', the automatic language detection by message text will be used
-    ->voiceLanguage('en')
+    // If set `VoiceLanguage::Auto`, the automatic language detection by message text will be used
+    ->voiceLanguage(VoiceLanguage::English)
     // unix timestamp of SMS the delivery time. If 0 or not set, the message will be sent immediately
     ->deliveryAt(new DateTime('2024-03-21 12:17:00'))
     // set True to delete the message from the LOX24 database after delivery

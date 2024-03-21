@@ -26,6 +26,7 @@
         "league/html-to-markdown": "^5.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+        "symfony/process": "^5.4|^6.4|^7.0",
         "symfony/property-access": "^5.4|^6.0|^7.0",
         "symfony/property-info": "^5.4|^6.0|^7.0",
         "symfony/serializer": "^6.3.2|^7.0"

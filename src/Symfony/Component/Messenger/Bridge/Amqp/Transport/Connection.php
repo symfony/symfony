@@ -80,9 +80,6 @@ class Connection
         'arguments',
     ];
 
-    private array $connectionOptions;
-    private array $exchangeOptions;
-    private array $queuesOptions;
     private AmqpFactory $amqpFactory;
     private mixed $autoSetupExchange;
     private mixed $autoSetupDelayExchange;
@@ -97,8 +94,12 @@ class Connection
     private \AMQPExchange $amqpDelayExchange;
     private int $lastActivityTime = 0;
 
-    public function __construct(#[\SensitiveParameter] array $connectionOptions, array $exchangeOptions, array $queuesOptions, ?AmqpFactory $amqpFactory = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] private array $connectionOptions,
+        private array $exchangeOptions,
+        private array $queuesOptions,
+        ?AmqpFactory $amqpFactory = null,
+    ) {
         if (!\extension_loaded('amqp')) {
             throw new LogicException(sprintf('You cannot use the "%s" as the "amqp" extension is not installed.', __CLASS__));
         }
@@ -110,8 +111,6 @@ class Connection
             ],
         ], $connectionOptions);
         $this->autoSetupExchange = $this->autoSetupDelayExchange = $connectionOptions['auto_setup'] ?? true;
-        $this->exchangeOptions = $exchangeOptions;
-        $this->queuesOptions = $queuesOptions;
         $this->amqpFactory = $amqpFactory ?? new AmqpFactory();
     }
 

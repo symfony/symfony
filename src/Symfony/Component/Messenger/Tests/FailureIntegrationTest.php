@@ -463,11 +463,10 @@ class DummyFailureTestSenderAndReceiver implements ReceiverInterface, SenderInte
 class DummyTestHandler
 {
     private int $timesCalled = 0;
-    private bool $shouldThrow;
 
-    public function __construct(bool $shouldThrow)
-    {
-        $this->shouldThrow = $shouldThrow;
+    public function __construct(
+        private bool $shouldThrow,
+    ) {
     }
 
     public function __invoke()

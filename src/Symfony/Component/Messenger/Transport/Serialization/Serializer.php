@@ -36,14 +36,14 @@ class Serializer implements SerializerInterface
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
     private SymfonySerializerInterface $serializer;
-    private string $format;
-    private array $context;
 
-    public function __construct(?SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
-    {
+    public function __construct(
+        ?SymfonySerializerInterface $serializer = null,
+        private string $format = 'json',
+        private array $context = [],
+    ) {
         $this->serializer = $serializer ?? self::create()->serializer;
-        $this->format = $format;
-        $this->context = $context + [self::MESSENGER_SERIALIZATION_CONTEXT => true];
+        $this->context += [self::MESSENGER_SERIALIZATION_CONTEXT => true];
     }
 
     public static function create(): self

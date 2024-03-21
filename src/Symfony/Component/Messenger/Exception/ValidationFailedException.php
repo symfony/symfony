@@ -18,14 +18,10 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 class ValidationFailedException extends RuntimeException
 {
-    private ConstraintViolationListInterface $violations;
-    private object $violatingMessage;
-
-    public function __construct(object $violatingMessage, ConstraintViolationListInterface $violations)
-    {
-        $this->violatingMessage = $violatingMessage;
-        $this->violations = $violations;
-
+    public function __construct(
+        private object $violatingMessage,
+        private ConstraintViolationListInterface $violations,
+    ) {
         parent::__construct(sprintf('Message of type "%s" failed validation.', $this->violatingMessage::class));
     }
 

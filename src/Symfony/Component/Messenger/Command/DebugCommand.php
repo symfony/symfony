@@ -29,12 +29,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'debug:messenger', description: 'List messages you can dispatch using the message buses')]
 class DebugCommand extends Command
 {
-    private array $mapping;
-
-    public function __construct(array $mapping)
-    {
-        $this->mapping = $mapping;
-
+    public function __construct(
+        private array $mapping,
+    ) {
         parent::__construct();
     }
 

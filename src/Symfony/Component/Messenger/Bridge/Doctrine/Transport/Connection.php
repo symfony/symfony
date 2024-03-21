@@ -48,8 +48,12 @@ class Connection implements ResetInterface
         'auto_setup' => true,
     ];
 
+    protected ?float $queueEmptiedAt = null;
+
+    private bool $autoSetup;
+
     /**
-     * Configuration of the connection.
+     * Constructor.
      *
      * Available options:
      *
@@ -59,16 +63,11 @@ class Connection implements ResetInterface
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default: 3600
      * * auto_setup: Whether the table should be created automatically during send / get. Default: true
      */
-    protected array $configuration;
-    protected DBALConnection $driverConnection;
-    protected ?float $queueEmptiedAt = null;
-
-    private bool $autoSetup;
-
-    public function __construct(array $configuration, DBALConnection $driverConnection)
-    {
+    public function __construct(
+        protected array $configuration,
+        protected DBALConnection $driverConnection,
+    ) {
         $this->configuration = array_replace_recursive(static::DEFAULT_OPTIONS, $configuration);
-        $this->driverConnection = $driverConnection;
         $this->autoSetup = $this->configuration['auto_setup'];
     }
 

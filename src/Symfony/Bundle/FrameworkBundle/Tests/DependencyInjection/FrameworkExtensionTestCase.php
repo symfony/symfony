@@ -1197,6 +1197,38 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNull($options['cache_dir']);
     }
 
+    public function testTranslatorIncludeBundleTranslationsInCommands()
+    {
+        require_once __DIR__.'/Fixtures/TestBundle/TestBundle.php';
+        require_once __DIR__.'/Fixtures/CustomPathBundle/src/CustomPathBundle.php';
+
+        $container = $this->createContainerFromFile('translator_include_bundles_translations_in_commands', [
+            'kernel.bundles' => [
+                'FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
+                'TestBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\TestBundle',
+                'CustomPathBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\CustomPathBundle',
+            ],
+            'kernel.bundles_metadata' => [
+                'FrameworkBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..'],
+                'TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle'],
+                'CustomPathBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/CustomPathBundle'],
+            ],
+        ]);
+
+        $transPaths = $container->getDefinition('console.command.translation_extract')->getArgument(6);
+        $this->assertContains(
+            strtr(__DIR__.'/Fixtures/TestBundle/Resources/translations', '/', \DIRECTORY_SEPARATOR),
+            $transPaths,
+            '->registerTranslatorConfiguration() finds translation resources in bundles to extract'
+        );
+
+        $this->assertNotContains(
+            strtr(__DIR__.'/Fixtures/CustomPathBundle/Resources/translations', '/', \DIRECTORY_SEPARATOR),
+            $transPaths,
+            '->registerTranslatorConfiguration() exclude some bundles from translation resources to extract'
+        );
+    }
+
     public function testValidation()
     {
         $container = $this->createContainerFromFile('full');

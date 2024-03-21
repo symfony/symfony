@@ -18,6 +18,8 @@ use Symfony\Component\Mime\Header\IdentificationHeader;
 use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class DataPartTest extends TestCase
 {
@@ -134,16 +136,22 @@ class DataPartTest extends TestCase
         DataPart::fromPath(__DIR__.'/../Fixtures/mimetypes/');
     }
 
-    /**
-     * @group network
-     */
     public function testFromPathWithUrl()
     {
         if (!\in_array('https', stream_get_wrappers())) {
             $this->markTestSkipped('"https" stream wrapper is not enabled.');
         }
 
-        $p = DataPart::fromPath($file = 'https://symfony.com/images/common/logo/logo_symfony_header.png');
+        $finder = new PhpExecutableFinder();
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', '127.0.0.1:8057']));
+        $process->setWorkingDirectory(__DIR__.'/../Fixtures/web');
+        $process->start();
+
+        do {
+            usleep(50000);
+        } while (!@fopen('http://127.0.0.1:8057', 'r'));
+
+        $p = DataPart::fromPath($file = 'http://localhost:8057/logo_symfony_header.png');
         $content = file_get_contents($file);
         $this->assertEquals($content, $p->getBody());
         $maxLineLength = 76;

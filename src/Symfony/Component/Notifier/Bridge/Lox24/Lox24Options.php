@@ -36,7 +36,6 @@ final class Lox24Options implements MessageOptionsInterface
         return null;
     }
 
-
     /**
      * DateTime object of SMS the delivery time.
      * If Null or not set, the message will be sent immediately.
@@ -49,7 +48,6 @@ final class Lox24Options implements MessageOptionsInterface
         return $this;
     }
 
-
     /**
      * The language of the voice message.
      * If set 'auto', the automatic language detection by message text will be used.
@@ -57,7 +55,7 @@ final class Lox24Options implements MessageOptionsInterface
     public function voiceLanguage(VoiceLanguage $language): self
     {
 
-        if ($language->value === 'auto') {
+        if ($language === VoiceLanguage::Auto) {
             unset($this->options['voice_lang']);
         } else {
             $this->options['voice_lang'] = $language->value;

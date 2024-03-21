@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Symfony\Component\Notifier\Bridge\Lox24;
 
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -169,15 +171,13 @@ final class Lox24Transport extends AbstractTransport
             throw new InvalidArgumentException(sprintf("Invalid type: %s", $code));
         }
 
-        $body['service_code'] = $this->getServiceCode($type)->value;
+        $body['service_code'] = $type->getServiceCode();
 
         return $body;
     }
 
-    private function getServiceCode(Type $type): ServiceCode
-    {
-        return $type === Type::Voice ? ServiceCode::Voice : ServiceCode::Sms;
-    }
+
+
 
     private function setVoiceLang(array $body, array $options): array
     {

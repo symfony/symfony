@@ -32,8 +32,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     public const REQUIREMENT_MISMATCH = 1;
     public const ROUTE_MATCH = 2;
 
-    protected RequestContext $context;
-
     /**
      * Collects HTTP methods that would be allowed for the request.
      */
@@ -45,8 +43,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      * @internal
      */
     protected array $allowSchemes = [];
-
-    protected RouteCollection $routes;
     protected ?Request $request = null;
     protected ExpressionLanguage $expressionLanguage;
 
@@ -55,10 +51,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected array $expressionLanguageProviders = [];
 
-    public function __construct(RouteCollection $routes, RequestContext $context)
-    {
-        $this->routes = $routes;
-        $this->context = $context;
+    public function __construct(
+        protected RouteCollection $routes,
+        protected RequestContext $context,
+    ) {
     }
 
     public function setContext(RequestContext $context): void

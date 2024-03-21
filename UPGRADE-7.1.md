@@ -11,6 +11,11 @@ Cache
 
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter` instead
 
+DependencyInjection
+-------------------
+
+ * Deprecate `#[TaggedIterator]` and `#[TaggedLocator]` attributes, use `#[AutowireIterator]` and `#[AutowireLocator]` instead
+
 ExpressionLanguage
 ------------------
 

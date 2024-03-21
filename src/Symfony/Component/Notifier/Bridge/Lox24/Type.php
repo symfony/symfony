@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Notifier\Bridge\LOX24;
+namespace Symfony\Component\Notifier\Bridge\Lox24;
 
 enum Type: string
 {

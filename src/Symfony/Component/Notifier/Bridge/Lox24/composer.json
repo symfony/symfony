@@ -19,7 +19,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Symfony\\Component\\Notifier\\Bridge\\Lox24\\": ""
+      "Symfony\\Component\\Notifier\\Bridge\\Lox24\\": "*"
     },
     "exclude-from-classmap": [
       "/Tests/"

@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdPriorityStamp;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdSender;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
@@ -27,7 +28,7 @@ final class BeanstalkdSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0);
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0, null);
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
@@ -42,7 +43,22 @@ final class BeanstalkdSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 500);
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 500, null);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $sender = new BeanstalkdSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testSendWithPriority()
+    {
+        $envelope = (new Envelope(new DummyMessage('Oy')))->with(new BeanstalkdPriorityStamp(2));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0, 2);
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);

@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\SentForRetryStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 class SendFailedMessageForRetryListenerTest extends TestCase
@@ -38,6 +39,39 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
+
+        /** @var SentForRetryStamp|null $sentForRetryStamp */
+        $sentForRetryStamp = $event->getEnvelope()->last(SentForRetryStamp::class);
+
+        $this->assertInstanceOf(SentForRetryStamp::class, $sentForRetryStamp);
+        $this->assertFalse($sentForRetryStamp->isSent);
+    }
+
+    public function testIsRetryableFalseCausesNoRetry()
+    {
+        $senderLocator = $this->createMock(ContainerInterface::class);
+        $senderLocator->expects($this->never())->method('has');
+        $senderLocator->expects($this->never())->method('get');
+        $retryStategy = $this->createMock(RetryStrategyInterface::class);
+        $retryStategy->expects($this->once())->method('isRetryable')->willReturn(false);
+        $retryStategy->expects($this->never())->method('getWaitingTime');
+        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
+        $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);
+
+        $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
+
+        $exception = new \Exception('no!');
+        $envelope = new Envelope(new \stdClass());
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
+
+        $listener->onMessageFailed($event);
+
+        /** @var SentForRetryStamp|null $sentForRetryStamp */
+        $sentForRetryStamp = $event->getEnvelope()->last(SentForRetryStamp::class);
+
+        $this->assertInstanceOf(SentForRetryStamp::class, $sentForRetryStamp);
+        $this->assertFalse($sentForRetryStamp->isSent);
     }
 
     public function testRecoverableStrategyCausesRetry()
@@ -72,6 +106,12 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
+
+        /** @var SentForRetryStamp|null $sentForRetryStamp */
+        $sentForRetryStamp = $event->getEnvelope()->last(SentForRetryStamp::class);
+
+        $this->assertInstanceOf(SentForRetryStamp::class, $sentForRetryStamp);
+        $this->assertTrue($sentForRetryStamp->isSent);
     }
 
     public function testEnvelopeIsSentToTransportOnRetry()
@@ -110,6 +150,12 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
+
+        /** @var SentForRetryStamp|null $sentForRetryStamp */
+        $sentForRetryStamp = $event->getEnvelope()->last(SentForRetryStamp::class);
+
+        $this->assertInstanceOf(SentForRetryStamp::class, $sentForRetryStamp);
+        $this->assertTrue($sentForRetryStamp->isSent);
     }
 
     public function testEnvelopeIsSentToTransportOnRetryWithExceptionPassedToRetryStrategy()
@@ -145,6 +191,12 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
+
+        /** @var SentForRetryStamp|null $sentForRetryStamp */
+        $sentForRetryStamp = $event->getEnvelope()->last(SentForRetryStamp::class);
+
+        $this->assertInstanceOf(SentForRetryStamp::class, $sentForRetryStamp);
+        $this->assertTrue($sentForRetryStamp->isSent);
     }
 
     public function testEnvelopeKeepOnlyTheLast10Stamps()
@@ -179,5 +231,11 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
+
+        /** @var SentForRetryStamp|null $sentForRetryStamp */
+        $sentForRetryStamp = $event->getEnvelope()->last(SentForRetryStamp::class);
+
+        $this->assertInstanceOf(SentForRetryStamp::class, $sentForRetryStamp);
+        $this->assertTrue($sentForRetryStamp->isSent);
     }
 }

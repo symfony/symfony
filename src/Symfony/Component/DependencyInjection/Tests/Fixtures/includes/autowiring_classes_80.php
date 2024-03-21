@@ -5,9 +5,9 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
-use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -119,8 +119,8 @@ class AutowireNestedAttributes implements AsDecoratorInterface
     public function __construct(
         #[Autowire([
             'decorated' => new AutowireDecorated(),
-            'iterator' => new TaggedIterator('foo'),
-            'locator' => new TaggedLocator('foo'),
+            'iterator' => new AutowireIterator('foo'),
+            'locator' => new AutowireLocator('foo'),
             'service' => new Autowire(service: 'bar')
         ])] array $options)
     {

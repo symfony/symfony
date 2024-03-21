@@ -11,9 +11,7 @@
     "symfony/notifier": "^7.1"
   },
   "require-dev": {
-    "symfony/webhook": "^6.4|^7.0",
-    "phpunit/phpunit": "^11.0",
-    "friendsofphp/php-cs-fixer": "^3.0"
+    "symfony/webhook": "^6.4|^7.0"
   },
   "autoload": {
     "psr-4": {

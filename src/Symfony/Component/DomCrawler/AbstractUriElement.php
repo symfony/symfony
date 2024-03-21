@@ -18,22 +18,26 @@ namespace Symfony\Component\DomCrawler;
  */
 abstract class AbstractUriElement
 {
+    /**
+     * @deprecated since Symfony 7.1, use `$domeNode` instead
+     */
     protected \DOMElement $node;
+    protected \DOMElement|\DOM\Element $domNode;
     protected ?string $method;
 
     /**
-     * @param \DOMElement $node       A \DOMElement instance
-     * @param string|null $currentUri The URI of the page where the link is embedded (or the base href)
-     * @param string|null $method     The method to use for the link (GET by default)
+     * @param \DOMElement|\DOM\Element $node       A \DOMElement or a \DOM\Element instance
+     * @param string|null              $currentUri The URI of the page where the link is embedded (or the base href)
+     * @param string|null              $method     The method to use for the link (GET by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
     public function __construct(
-        \DOMElement $node,
+        \DOMElement|\DOM\Element $node,
         protected ?string $currentUri = null,
         ?string $method = 'GET',
     ) {
-        $this->setNode($node);
+        $this->setDomNode($node);
         $this->method = $method ? strtoupper($method) : null;
 
         $elementUriIsRelative = null === parse_url(trim($this->getRawUri()), \PHP_URL_SCHEME);
@@ -44,11 +48,25 @@ abstract class AbstractUriElement
     }
 
     /**
-     * Gets the node associated with this link.
+     * @deprecated since Symfony 7.1, use `getDomNode()` instead
      */
     public function getNode(): \DOMElement
     {
-        return $this->node;
+        trigger_deprecation('symfony/dom-crawler', '7.1', 'The "%s()" method is deprecated, use "%s::getDomNode()" instead.', __METHOD__, __CLASS__);
+
+        if ($this->domNode instanceof \DOM\Element) {
+            throw new \LogicException('The node is not an instance of legacy \DOMElement. Use "getDomNode()" instead.');
+        }
+
+        return $this->domNode;
+    }
+
+    /**
+     * Gets the node associated with this link.
+     */
+    public function getDomNode(): \DOMElement|\DOM\Element
+    {
+        return $this->domNode;
     }
 
     /**
@@ -108,4 +126,20 @@ abstract class AbstractUriElement
      * @throws \LogicException If given node is not an anchor
      */
     abstract protected function setNode(\DOMElement $node): void;
+
+    /**
+     * Sets current \DOMElement or \DOM\Element instance.
+     *
+     * @param \DOMElement|\DOM\Element $node A \DOMElement or \DOM\Element instance
+     *
+     * @throws \LogicException If given node is not an anchor
+     */
+    protected function setDomNode(\DOMElement|\DOM\Element $node): void
+    {
+        $this->domNode = $node;
+
+        if ($node instanceof \DOMElement) {
+            $this->setNode($node);
+        }
+    }
 }

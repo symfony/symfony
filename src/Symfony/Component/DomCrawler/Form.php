@@ -21,19 +21,19 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form extends Link implements \ArrayAccess
 {
-    private \DOMElement $button;
+    private \DOMElement|\DOM\Element $button;
     private FormFieldRegistry $fields;
 
     /**
-     * @param \DOMElement $node       A \DOMElement instance
-     * @param string|null $currentUri The URI of the page where the form is embedded
-     * @param string|null $method     The method to use for the link (if null, it defaults to the method defined by the form)
-     * @param string|null $baseHref   The URI of the <base> used for relative links, but not for empty action
+     * @param \DOMElement|\DOM\Element $node       A \DOMElement instance
+     * @param string|null              $currentUri The URI of the page where the form is embedded
+     * @param string|null              $method     The method to use for the link (if null, it defaults to the method defined by the form)
+     * @param string|null              $baseHref   The URI of the <base> used for relative links, but not for empty action
      *
      * @throws \LogicException if the node is not a button inside a form tag
      */
     public function __construct(
-        \DOMElement $node,
+        \DOMElement|\DOM\Element $node,
         ?string $currentUri = null,
         ?string $method = null,
         private ?string $baseHref = null,
@@ -45,10 +45,26 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the form node associated with this form.
+     *
+     * @deprecated since Symfony 7.1, use `getFormDomNode()` instead
      */
     public function getFormNode(): \DOMElement
     {
-        return $this->node;
+        trigger_deprecation('symfony/dom-crawler', '7.1', 'The "%s()" method is deprecated, use "%s::getFormDomNode()" instead.', __METHOD__, __CLASS__);
+
+        if ($this->domNode instanceof \DOM\Element) {
+            throw new \LogicException('The form node is not an instance of legacy \DOMElement.');
+        }
+
+        return $this->domNode;
+    }
+
+    /**
+     * Gets the form node associated with this form.
+     */
+    public function getFormDomNode(): \DOMElement|\DOM\Element
+    {
+        return $this->domNode;
     }
 
     /**
@@ -201,11 +217,11 @@ class Form extends Link implements \ArrayAccess
     protected function getRawUri(): string
     {
         // If the form was created from a button rather than the form node, check for HTML5 action overrides
-        if ($this->button !== $this->node && $this->button->getAttribute('formaction')) {
+        if ($this->button !== $this->domNode && $this->button->getAttribute('formaction')) {
             return $this->button->getAttribute('formaction');
         }
 
-        return $this->node->getAttribute('action');
+        return $this->domNode->getAttribute('action') ?? '';
     }
 
     /**
@@ -220,11 +236,11 @@ class Form extends Link implements \ArrayAccess
         }
 
         // If the form was created from a button rather than the form node, check for HTML5 method override
-        if ($this->button !== $this->node && $this->button->getAttribute('formmethod')) {
+        if ($this->button !== $this->domNode && $this->button->getAttribute('formmethod')) {
             return strtoupper($this->button->getAttribute('formmethod'));
         }
 
-        return $this->node->getAttribute('method') ? strtoupper($this->node->getAttribute('method')) : 'GET';
+        return $this->domNode->getAttribute('method') ? strtoupper($this->domNode->getAttribute('method') ?? '') : 'GET';
     }
 
     /**
@@ -234,7 +250,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getName(): string
     {
-        return $this->node->getAttribute('name');
+        return $this->domNode->getAttribute('name') ?? '';
     }
 
     /**
@@ -347,16 +363,28 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
+     * @deprecated since Symfony 7.1, use `setDomNode()` instead
+     */
+    protected function setNode(\DOMElement $node): void
+    {
+        trigger_deprecation('symfony/dom-crawler', '7.1', 'The "%s()" method is deprecated, use "%s::setDomNode()" instead.', __METHOD__, __CLASS__);
+
+        $this->setDomNode($node);
+    }
+
+    /**
      * Sets the node for the form.
      *
      * Expects a 'submit' button \DOMElement and finds the corresponding form element, or the form element itself.
      *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
-    protected function setNode(\DOMElement $node): void
+    protected function setDomNode(\DOMElement|\DOM\Element $node): void
     {
         $this->button = $node;
-        if ('button' === $node->nodeName || ('input' === $node->nodeName && \in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image']))) {
+        $nodeName = strtolower($node->nodeName);
+
+        if ('button' === $nodeName || ('input' === $nodeName && \in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image']))) {
             if ($node->hasAttribute('form')) {
                 // if the node has the HTML5-compliant 'form' attribute, use it
                 $formId = $node->getAttribute('form');
@@ -364,7 +392,7 @@ class Form extends Link implements \ArrayAccess
                 if (null === $form) {
                     throw new \LogicException(\sprintf('The selected node has an invalid form attribute (%s).', $formId));
                 }
-                $this->node = $form;
+                $this->domNode = $form;
 
                 return;
             }
@@ -373,12 +401,15 @@ class Form extends Link implements \ArrayAccess
                 if (null === $node = $node->parentNode) {
                     throw new \LogicException('The selected node does not have a form ancestor.');
                 }
-            } while ('form' !== $node->nodeName);
-        } elseif ('form' !== $node->nodeName) {
-            throw new \LogicException(\sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
+            } while ('form' !== strtolower($node->nodeName));
+        } elseif ('form' !== $nodeName) {
+            throw new \LogicException(\sprintf('Unable to submit on a "%s" tag.', $nodeName));
         }
 
-        $this->node = $node;
+        $this->domNode = $node;
+        if ($node instanceof \DOMElement) {
+            $this->node = $node;
+        }
     }
 
     /**
@@ -392,11 +423,16 @@ class Form extends Link implements \ArrayAccess
     {
         $this->fields = new FormFieldRegistry();
 
-        $xpath = new \DOMXPath($this->node->ownerDocument);
+        if ($this->domNode->ownerDocument instanceof \DOM\Document) {
+            $xpath = new \DOM\XPath($this->domNode->ownerDocument);
+        } else {
+            $xpath = new \DOMXPath($this->domNode->ownerDocument);
+        }
 
+        $buttonNodeName = strtolower($this->button->nodeName);
         // add submitted button if it has a valid name
-        if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
-            if ('input' == $this->button->nodeName && 'image' == strtolower($this->button->getAttribute('type'))) {
+        if ('form' !== $buttonNodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
+            if ('input' == $buttonNodeName && 'image' == strtolower($this->button->getAttribute('type') ?? '')) {
                 $name = $this->button->getAttribute('name');
                 $this->button->setAttribute('value', '0');
 
@@ -416,35 +452,35 @@ class Form extends Link implements \ArrayAccess
         }
 
         // find form elements corresponding to the current form
-        if ($this->node->hasAttribute('id')) {
+        if ($this->domNode->hasAttribute('id')) {
             // corresponding elements are either descendants or have a matching HTML5 form attribute
-            $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
+            $formId = DomCrawler::xpathLiteral($this->domNode->getAttribute('id') ?? '');
 
             $fieldNodes = $xpath->query(\sprintf('( descendant::input[@form=%s] | descendant::button[@form=%1$s] | descendant::textarea[@form=%1$s] | descendant::select[@form=%1$s] | //form[@id=%1$s]//input[not(@form)] | //form[@id=%1$s]//button[not(@form)] | //form[@id=%1$s]//textarea[not(@form)] | //form[@id=%1$s]//select[not(@form)] )[( not(ancestor::template) or ancestor::turbo-stream )]', $formId));
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
         } else {
-            // do the xpath query with $this->node as the context node, to only find descendant elements
+            // do the xpath query with $this->domNode as the context node, to only find descendant elements
             // however, descendant elements with form attribute are not part of this form
-            $fieldNodes = $xpath->query('( descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)] )[( not(ancestor::template) or ancestor::turbo-stream )]', $this->node);
+            $fieldNodes = $xpath->query('( descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)] )[( not(ancestor::template) or ancestor::turbo-stream )]', $this->domNode);
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
         }
 
-        if ($this->baseHref && '' !== $this->node->getAttribute('action')) {
+        if ($this->baseHref && '' !== ($this->domNode->getAttribute('action') ?? '')) {
             $this->currentUri = $this->baseHref;
         }
     }
 
-    private function addField(\DOMElement $node): void
+    private function addField(\DOMElement|\DOM\Element $node): void
     {
         if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {
             return;
         }
 
-        $nodeName = $node->nodeName;
+        $nodeName = strtolower($node->nodeName);
         if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == strtolower($node->getAttribute('type'))) {
             $this->set(new ChoiceFormField($node));
         } elseif ('input' == $nodeName && 'radio' == strtolower($node->getAttribute('type'))) {
@@ -455,9 +491,9 @@ class Form extends Link implements \ArrayAccess
             } else {
                 $this->set(new ChoiceFormField($node));
             }
-        } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type'))) {
+        } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type') ?? '')) {
             $this->set(new Field\FileFormField($node));
-        } elseif ('input' == $nodeName && !\in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image'])) {
+        } elseif ('input' == $nodeName && !\in_array(strtolower($node->getAttribute('type') ?? ''), ['submit', 'button', 'image'])) {
             $this->set(new Field\InputFormField($node));
         } elseif ('textarea' == $nodeName) {
             $this->set(new Field\TextareaFormField($node));

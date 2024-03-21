@@ -12,6 +12,7 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\DomCrawler\Field\InputFormField;
@@ -21,22 +22,56 @@ use Symfony\Component\DomCrawler\FormFieldRegistry;
 
 class FormTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public static function setUpBeforeClass(): void
     {
         // Ensure that the private helper class FormFieldRegistry is loaded
         class_exists(Form::class);
     }
 
-    public function testConstructorThrowsExceptionIfTheNodeHasNoFormAncestor()
+    private function createDocument(bool $legacy, string $content): \DOMDocument|\DOM\Document
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('
+        if ($legacy) {
+            $dom = new \DOMDocument();
+            $dom->loadHTML($content);
+
+            return $dom;
+        }
+
+        if (\PHP_VERSION_ID < 80400) {
+            $this->markTestSkipped('This test requires PHP 8.4 or higher.');
+        }
+
+        return \DOM\HTMLDocument::createFromString('<!DOCTYPE html>'.$content, \DOM\HTML_NO_DEFAULT_NS);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testGetFormNodeIsDeprecated()
+    {
+        $this->expectDeprecation('Since symfony/dom-crawler 7.1: The "Symfony\Component\DomCrawler\Form::getFormNode()" method is deprecated, use "Symfony\Component\DomCrawler\Form::getFormDomNode()" instead.');
+
+        $dom = $this->createDocument(true, '<html><form><input type="submit"></form></html>');
+
+        $form = new Form($dom->getElementsByTagName('input')->item(0), 'http://example.com');
+        $form->getFormNode();
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testConstructorThrowsExceptionIfTheNodeHasNoFormAncestor(bool $useLegacyNodes)
+    {
+        $dom = $this->createDocument($useLegacyNodes, '
             <html>
-                <input type="submit" />
+                <input type="submit">
                 <form>
-                    <input type="foo" />
+                    <input type="foo">
                 </form>
-                <button />
+                <button>
             </html>
         ');
 
@@ -71,7 +106,7 @@ class FormTest extends TestCase
      *
      * __construct() should throw a \LogicException if the form attribute is invalid.
      */
-    public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement $node)
+    public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement|\DOM\Element $node)
     {
         $this->expectException(\LogicException::class);
 
@@ -93,15 +128,33 @@ class FormTest extends TestCase
 
         $nodes = $dom->getElementsByTagName('input');
 
-        return [
-            [$nodes->item(0)],
-            [$nodes->item(1)],
-        ];
+        yield [$nodes->item(0)];
+        yield [$nodes->item(1)];
+
+        if (\PHP_VERSION_ID >= 80400) {
+            $dom = \DOM\HTMLDocument::createFromString('
+                <!DOCTYPE html>
+                <form id="bar">
+                    <input type="submit" form="nonexistent">
+                </form>
+                <input type="text" form="nonexistent">
+                <button >
+            ');
+
+            $nodes = $dom->getElementsByTagName('input');
+
+            yield [$nodes->item(0)];
+            yield [$nodes->item(1)];
+        }
     }
 
-    public function testConstructorLoadsOnlyFieldsOfTheRightForm()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testConstructorLoadsOnlyFieldsOfTheRightForm(bool $useLegacyNode)
     {
-        $dom = $this->createTestMultipleForm();
+        $dom = $this->createTestMultipleForm($useLegacyNode);
 
         $nodes = $dom->getElementsByTagName('form');
         $buttonElements = $dom->getElementsByTagName('button');
@@ -113,27 +166,35 @@ class FormTest extends TestCase
         $this->assertCount(5, $form->all());
     }
 
-    public function testConstructorHandlesFormAttribute()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testConstructorHandlesFormAttribute(bool $useLegacyNode)
     {
-        $dom = $this->createTestHtml5Form();
+        $dom = $this->createTestHtml5Form($useLegacyNode);
 
         $inputElements = $dom->getElementsByTagName('input');
         $buttonElements = $dom->getElementsByTagName('button');
 
         // Tests if submit buttons are correctly assigned to forms
         $form1 = new Form($buttonElements->item(1), 'http://example.com');
-        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form1->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form1->getFormDomNode(), 'HTML5-compliant form attribute handled incorrectly');
 
         $form1 = new Form($inputElements->item(3), 'http://example.com');
-        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form1->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form1->getFormDomNode(), 'HTML5-compliant form attribute handled incorrectly');
 
         $form2 = new Form($buttonElements->item(0), 'http://example.com');
-        $this->assertSame($dom->getElementsByTagName('form')->item(1), $form2->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+        $this->assertSame($dom->getElementsByTagName('form')->item(1), $form2->getFormDomNode(), 'HTML5-compliant form attribute handled incorrectly');
     }
 
-    public function testConstructorHandlesFormValues()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testConstructorHandlesFormValues(bool $useLegacyNoce)
     {
-        $dom = $this->createTestHtml5Form();
+        $dom = $this->createTestHtml5Form($useLegacyNoce);
 
         $inputElements = $dom->getElementsByTagName('input');
         $buttonElements = $dom->getElementsByTagName('button');
@@ -159,18 +220,22 @@ class FormTest extends TestCase
         $this->assertEquals($values2, $form2->getPhpValues(), 'HTML5-compliant form attribute handled incorrectly');
     }
 
-    public function testMultiValuedFields()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testMultiValuedFields(bool $useLegacyNode)
     {
         $form = $this->createForm('<form>
-            <input type="text" name="foo[4]" value="foo" disabled="disabled" />
-            <input type="text" name="foo" value="foo" disabled="disabled" />
-            <input type="text" name="foo[2]" value="foo" disabled="disabled" />
-            <input type="text" name="foo[]" value="foo" disabled="disabled" />
-            <input type="text" name="bar[foo][]" value="foo" disabled="disabled" />
-            <input type="text" name="bar[foo][foobar]" value="foo" disabled="disabled" />
-            <input type="submit" />
+            <input type="text" name="foo[4]" value="foo" disabled="disabled">
+            <input type="text" name="foo" value="foo" disabled="disabled">
+            <input type="text" name="foo[2]" value="foo" disabled="disabled">
+            <input type="text" name="foo[]" value="foo" disabled="disabled">
+            <input type="text" name="bar[foo][]" value="foo" disabled="disabled">
+            <input type="text" name="bar[foo][foobar]" value="foo" disabled="disabled">
+            <input type="submit">
         </form>
-        ');
+        ', useLegacyNode: $useLegacyNode);
 
         $this->assertEquals(
             ['foo[2]', 'foo[3]', 'bar[foo][0]', 'bar[foo][foobar]'],
@@ -217,30 +282,50 @@ class FormTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider provideInitializeValues
+     */
+    public function testConstructorWithModerNodes($message, $form, $values)
+    {
+        $form = $this->createForm('<form>'.$form.'</form>', useLegacyNode: false);
+        $this->assertEquals(
+            $values,
+            array_map(
+                function ($field) {
+                    $class = $field::class;
+
+                    return [substr($class, strrpos($class, '\\') + 1), $field->getValue()];
+                },
+                $form->all()
+            ),
+            '->getDefaultValues() '.$message
+        );
+    }
+
     public static function provideInitializeValues()
     {
         return [
             [
                 'does not take into account input fields without a name attribute',
-                '<input type="text" value="foo" />
-                 <input type="submit" />',
+                '<input type="text" value="foo">
+                 <input type="submit">',
                 [],
             ],
             [
                 'does not take into account input fields with an empty name attribute value',
-                '<input type="text" name="" value="foo" />
-                 <input type="submit" />',
+                '<input type="text" name="" value="foo">
+                 <input type="submit">',
                 [],
             ],
             [
                 'takes into account disabled input fields',
-                '<input type="text" name="foo" value="foo" disabled="disabled" />
-                 <input type="submit" />',
+                '<input type="text" name="foo" value="foo" disabled="disabled">
+                 <input type="submit">',
                 ['foo' => ['InputFormField', 'foo']],
             ],
             [
                 'appends the submitted button value',
-                '<input type="submit" name="bar" value="bar" />',
+                '<input type="submit" name="bar" value="bar">',
                 ['bar' => ['InputFormField', 'bar']],
             ],
             [
@@ -250,114 +335,155 @@ class FormTest extends TestCase
             ],
             [
                 'appends the submitted button value but not other submit buttons',
-                '<input type="submit" name="bar" value="bar" />
-                 <input type="submit" name="foobar" value="foobar" />',
+                '<input type="submit" name="bar" value="bar">
+                 <input type="submit" name="foobar" value="foobar">',
                 ['foobar' => ['InputFormField', 'foobar']],
             ],
             [
                 'turns an image input into x and y fields',
-                '<input type="image" name="bar" />',
+                '<input type="image" name="bar">',
                 ['bar.x' => ['InputFormField', '0'], 'bar.y' => ['InputFormField', '0']],
             ],
             [
                 'returns textareas',
                 '<textarea name="foo">foo</textarea>
-                 <input type="submit" />',
+                 <input type="submit">',
                 ['foo' => ['TextareaFormField', 'foo']],
             ],
             [
                 'returns inputs',
-                '<input type="text" name="foo" value="foo" />
-                 <input type="submit" />',
+                '<input type="text" name="foo" value="foo">
+                 <input type="submit">',
                 ['foo' => ['InputFormField', 'foo']],
             ],
             [
                 'returns checkboxes',
-                '<input type="checkbox" name="foo" value="foo" checked="checked" />
-                 <input type="submit" />',
+                '<input type="checkbox" name="foo" value="foo" checked="checked">
+                 <input type="submit">',
                 ['foo' => ['ChoiceFormField', 'foo']],
             ],
             [
                 'returns not-checked checkboxes',
-                '<input type="checkbox" name="foo" value="foo" />
-                 <input type="submit" />',
+                '<input type="checkbox" name="foo" value="foo">
+                 <input type="submit">',
                 ['foo' => ['ChoiceFormField', false]],
             ],
             [
                 'returns radio buttons',
-                '<input type="radio" name="foo" value="foo" />
-                 <input type="radio" name="foo" value="bar" checked="bar" />
-                 <input type="submit" />',
+                '<input type="radio" name="foo" value="foo">
+                 <input type="radio" name="foo" value="bar" checked="bar">
+                 <input type="submit">',
                 ['foo' => ['ChoiceFormField', 'bar']],
             ],
             [
                 'returns file inputs',
-                '<input type="file" name="foo" />
-                 <input type="submit" />',
+                '<input type="file" name="foo">
+                 <input type="submit">',
                 ['foo' => ['FileFormField', ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]],
             ],
         ];
     }
 
-    public function testGetFormNode()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetFormDomNode(bool $useLegacyNode)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><form><input type="submit" /></form></html>');
+        $dom = $this->createDocument($useLegacyNode, '<html><form><input type="submit"></form></html>');
 
         $form = new Form($dom->getElementsByTagName('input')->item(0), 'http://example.com');
 
-        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
+        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormDomNode(), '->getFormDomNode() returns the form node associated with this form');
     }
 
-    public function testGetFormNodeFromNamedForm()
+    /**
+     * @group legacy
+     */
+    public function testGetFormNodeOnModernNode()
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><form name="my_form"><input type="submit" /></form></html>');
+        $dom = $this->createDocument(false, '<html><form><input type="submit"></form></html>');
+        $form = new Form($dom->getElementsByTagName('input')->item(0), 'http://example.com');
+
+        $this->expectDeprecation('Since symfony/dom-crawler 7.1: The "Symfony\Component\DomCrawler\AbstractUriElement::getNode()" method is deprecated, use "Symfony\Component\DomCrawler\AbstractUriElement::getDomNode()" instead.');
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The node is not an instance of legacy \DOMElement. Use "getDomNode()" instead.');
+        $form->getNode();
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetFormNodeFromNamedForm(bool $useLegacyNode)
+    {
+        $dom = $this->createDocument($useLegacyNode, '<html><form name="my_form"><input type="submit"></form></html>');
 
         $form = new Form($dom->getElementsByTagName('form')->item(0), 'http://example.com');
 
-        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
+        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormDomNode(), '->getFormDomNode() returns the form node associated with this form');
     }
 
-    public function testGetMethod()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetMethod(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals('GET', $form->getMethod(), '->getMethod() returns get if no method is defined');
 
-        $form = $this->createForm('<form method="post"><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals('POST', $form->getMethod(), '->getMethod() returns the method attribute value of the form');
 
-        $form = $this->createForm('<form method="post"><input type="submit" /></form>', 'put');
+        $form = $this->createForm('<form method="post"><input type="submit"></form>', 'put', useLegacyNode: $useLegacyNode);
         $this->assertEquals('PUT', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
 
-        $form = $this->createForm('<form method="post"><input type="submit" /></form>', 'delete');
+        $form = $this->createForm('<form method="post"><input type="submit"></form>', 'delete', useLegacyNode: $useLegacyNode);
         $this->assertEquals('DELETE', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
 
-        $form = $this->createForm('<form method="post"><input type="submit" /></form>', 'patch');
+        $form = $this->createForm('<form method="post"><input type="submit"></form>', 'patch', useLegacyNode: $useLegacyNode);
         $this->assertEquals('PATCH', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
     }
 
-    public function testGetMethodWithOverride()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetMethodWithOverride(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form method="get"><input type="submit" formmethod="post" /></form>');
+        $form = $this->createForm('<form method="get"><input type="submit" formmethod="post"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals('POST', $form->getMethod(), '->getMethod() returns the method attribute value of the form');
     }
 
-    public function testGetName()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetName(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form name="foo"><input type="submit" /></form>');
+        $form = $this->createForm('<form name="foo"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertSame('foo', $form->getName());
     }
 
-    public function testGetNameOnFormWithoutName()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetNameOnFormWithoutName(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertSame('', $form->getName());
     }
 
-    public function testGetSetValue()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetSetValue(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="foo" value="foo"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
 
         $this->assertEquals('foo', $form['foo']->getValue(), '->offsetGet() returns the value of a form field');
 
@@ -380,7 +506,11 @@ class FormTest extends TestCase
         }
     }
 
-    public function testDisableValidation()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testDisableValidation(bool $useLegacyNode)
     {
         $form = $this->createForm('<form>
             <select name="foo[bar]">
@@ -389,8 +519,8 @@ class FormTest extends TestCase
             <select name="foo[baz]">
                 <option value="foo">foo</option>
             </select>
-            <input type="submit" />
-        </form>');
+            <input type="submit">
+        </form>', useLegacyNode: $useLegacyNode);
 
         $form->disableValidation();
 
@@ -400,118 +530,150 @@ class FormTest extends TestCase
         $this->assertEquals('bar', $form['foo[baz]']->getValue(), '->disableValidation() disables validation of all ChoiceFormField.');
     }
 
-    public function testOffsetUnset()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testOffsetUnset(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="foo" value="foo"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         unset($form['foo']);
         $this->assertArrayNotHasKey('foo', $form, '->offsetUnset() removes a field');
     }
 
-    public function testOffsetExists()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testOffsetExists(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="foo" value="foo"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
 
         $this->assertArrayHasKey('foo', $form, '->offsetExists() return true if the field exists');
         $this->assertArrayNotHasKey('bar', $form, '->offsetExists() return false if the field does not exist');
     }
 
-    public function testGetValues()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetValues(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><select multiple="multiple" name="baz[]"></select><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo"><input type="text" name="bar" value="bar"><select multiple="multiple" name="baz[]"></select><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo[bar]' => 'foo', 'bar' => 'bar', 'baz' => []], $form->getValues(), '->getValues() returns all form field values');
 
-        $form = $this->createForm('<form><input type="checkbox" name="foo" value="foo" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="checkbox" name="foo" value="foo"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include not-checked checkboxes');
 
-        $form = $this->createForm('<form><input type="file" name="foo" value="foo" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="file" name="foo" value="foo"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include file input fields');
 
-        $form = $this->createForm('<form><input type="text" name="foo" value="foo" disabled="disabled" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="foo" value="foo" disabled="disabled"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include disabled fields');
 
-        $form = $this->createForm('<form><template><input type="text" name="foo" value="foo" /></template><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><template><input type="text" name="foo" value="foo"></template><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include template fields');
         $this->assertFalse($form->has('foo'));
 
-        $form = $this->createForm('<turbo-stream><template><form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><select multiple="multiple" name="baz[]"></select><input type="submit" /></form></template></turbo-stream>');
+        $form = $this->createForm('<turbo-stream><template><form><input type="text" name="foo[bar]" value="foo"><input type="text" name="bar" value="bar"><select multiple="multiple" name="baz[]"></select><input type="submit"></form></template></turbo-stream>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo[bar]' => 'foo', 'bar' => 'bar', 'baz' => []], $form->getValues(), '->getValues() returns all form field values from template field inside a turbo-stream');
     }
 
-    public function testSetValues()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testSetValues(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="checkbox" name="foo" value="foo" checked="checked" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="checkbox" name="foo" value="foo" checked="checked"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $form->setValues(['foo' => false, 'bar' => 'foo']);
         $this->assertEquals(['bar' => 'foo'], $form->getValues(), '->setValues() sets the values of fields');
     }
 
-    public function testMultiselectSetValues()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testMultiselectSetValues(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><select multiple="multiple" name="multi"><option value="foo">foo</option><option value="bar">bar</option></select><input type="submit" /></form>');
+        $form = $this->createForm('<form><select multiple="multiple" name="multi"><option value="foo">foo</option><option value="bar">bar</option></select><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $form->setValues(['multi' => ['foo', 'bar']]);
         $this->assertEquals(['multi' => ['foo', 'bar']], $form->getValues(), '->setValue() sets the values of select');
     }
 
-    public function testGetPhpValues()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetPhpValues(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo' => ['bar' => 'foo'], 'bar' => 'bar'], $form->getPhpValues(), '->getPhpValues() converts keys with [] to arrays');
 
-        $form = $this->createForm('<form><input type="text" name="fo.o[ba.r]" value="foo" /><input type="text" name="ba r" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="fo.o[ba.r]" value="foo"><input type="text" name="ba r" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['fo.o' => ['ba.r' => 'foo'], 'ba r' => 'bar'], $form->getPhpValues(), '->getPhpValues() preserves periods and spaces in names');
 
-        $form = $this->createForm('<form><input type="text" name="fo.o[ba.r][]" value="foo" /><input type="text" name="fo.o[ba.r][ba.z]" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="fo.o[ba.r][]" value="foo"><input type="text" name="fo.o[ba.r][ba.z]" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['fo.o' => ['ba.r' => ['foo', 'ba.z' => 'bar']]], $form->getPhpValues(), '->getPhpValues() preserves periods and spaces in names recursively');
 
-        $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><select multiple="multiple" name="baz[]"></select><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo"><input type="text" name="bar" value="bar"><select multiple="multiple" name="baz[]"></select><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo' => ['bar' => 'foo'], 'bar' => 'bar'], $form->getPhpValues(), "->getPhpValues() doesn't return empty values");
     }
 
-    public function testGetFiles()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetFiles(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="file" name="foo[bar]"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals([], $form->getFiles(), '->getFiles() returns an empty array if method is get');
 
-        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() only returns file fields for POST');
 
-        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'put');
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]"><input type="text" name="bar" value="bar"><input type="submit"></form>', 'put', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() only returns file fields for PUT');
 
-        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'delete');
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]"><input type="text" name="bar" value="bar"><input type="submit"></form>', 'delete', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() only returns file fields for DELETE');
 
-        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'patch');
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]"><input type="text" name="bar" value="bar"><input type="submit"></form>', 'patch', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() only returns file fields for PATCH');
 
-        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" disabled="disabled" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" disabled="disabled"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals([], $form->getFiles(), '->getFiles() does not include disabled file fields');
 
-        $form = $this->createForm('<form method="post"><template><input type="file" name="foo"/></template><input type="text" name="bar" value="bar"/><input type="submit"/></form>');
+        $form = $this->createForm('<form method="post"><template><input type="file" name="foo"></template><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals([], $form->getFiles(), '->getFiles() does not include template file fields');
         $this->assertFalse($form->has('foo'));
 
-        $form = $this->createForm('<turbo-stream><template><form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form></template></turbo-stream>');
+        $form = $this->createForm('<turbo-stream><template><form method="post"><input type="file" name="foo[bar]"><input type="text" name="bar" value="bar"><input type="submit"></form></template></turbo-stream>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() return files fields from template inside turbo-stream');
     }
 
-    public function testGetPhpFiles()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetPhpFiles(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['foo' => ['bar' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]], $form->getPhpFiles(), '->getPhpFiles() converts keys with [] to arrays');
 
-        $form = $this->createForm('<form method="post"><input type="file" name="f.o o[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="file" name="f.o o[bar]"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['f.o o' => ['bar' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]], $form->getPhpFiles(), '->getPhpFiles() preserves periods and spaces in names');
 
-        $form = $this->createForm('<form method="post"><input type="file" name="f.o o[bar][ba.z]" /><input type="file" name="f.o o[bar][]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="file" name="f.o o[bar][ba.z]"><input type="file" name="f.o o[bar][]"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $this->assertEquals(['f.o o' => ['bar' => ['ba.z' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0], ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]]], $form->getPhpFiles(), '->getPhpFiles() preserves periods and spaces in names recursively');
 
-        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $files = $form->getPhpFiles();
 
         $this->assertSame(0, $files['foo']['bar']['size'], '->getPhpFiles() converts size to int');
         $this->assertSame(4, $files['foo']['bar']['error'], '->getPhpFiles() converts error to int');
 
-        $form = $this->createForm('<form method="post"><input type="file" name="size[error]" /><input type="text" name="error" value="error" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="file" name="size[error]"><input type="text" name="error" value="error"><input type="submit"></form>');
         $this->assertEquals(['size' => ['error' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]], $form->getPhpFiles(), '->getPhpFiles() int conversion does not collide with file names');
     }
 
@@ -526,68 +688,106 @@ class FormTest extends TestCase
         $this->assertEquals('http://example.com'.$uri, $form->getUri(), '->getUri() '.$message);
     }
 
-    public function testGetBaseUri()
+    /**
+     * @dataProvider provideGetUriValues
+     */
+    public function testGetUriWithModernNode($message, $form, $values, $uri, $method = null)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<form method="post" action="foo.php"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm($form, $method, useLegacyNode: false);
+        $form->setValues($values);
+
+        $this->assertEquals('http://example.com'.$uri, $form->getUri(), '->getUri() '.$message);
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetBaseUri(bool $useLegacyNode)
+    {
+        $dom = $this->createDocument($useLegacyNode, '<form method="post" action="foo.php"><input type="text" name="bar" value="bar"><input type="submit"></form>');
 
         $nodes = $dom->getElementsByTagName('input');
         $form = new Form($nodes->item($nodes->length - 1), 'http://www.foo.com/');
         $this->assertEquals('http://www.foo.com/foo.php', $form->getUri());
     }
 
-    public function testGetUriWithAnchor()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetUriWithAnchor(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form action="#foo"><input type="submit" /></form>', null, 'http://example.com/id/123');
+        $form = $this->createForm('<form action="#foo"><input type="submit"></form>', null, 'http://example.com/id/123', useLegacyNode: $useLegacyNode);
 
         $this->assertEquals('http://example.com/id/123#foo', $form->getUri());
     }
 
-    public function testGetUriActionAbsolute()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetUriActionAbsolute(bool $useLegacyNode)
     {
-        $formHtml = '<form id="login_form" action="https://login.foo.com/login.php?login_attempt=1" method="POST"><input type="text" name="foo" value="foo" /><input type="submit" /></form>';
+        $formHtml = '<form id="login_form" action="https://login.foo.com/login.php?login_attempt=1" method="POST"><input type="text" name="foo" value="foo"><input type="submit"></form>';
 
-        $form = $this->createForm($formHtml);
+        $form = $this->createForm($formHtml, useLegacyNode: $useLegacyNode);
         $this->assertEquals('https://login.foo.com/login.php?login_attempt=1', $form->getUri(), '->getUri() returns absolute URIs set in the action form');
 
-        $form = $this->createForm($formHtml, null, 'https://login.foo.com');
+        $form = $this->createForm($formHtml, null, 'https://login.foo.com', useLegacyNode: $useLegacyNode);
         $this->assertEquals('https://login.foo.com/login.php?login_attempt=1', $form->getUri(), '->getUri() returns absolute URIs set in the action form');
 
-        $form = $this->createForm($formHtml, null, 'https://login.foo.com/bar/');
+        $form = $this->createForm($formHtml, null, 'https://login.foo.com/bar/', useLegacyNode: $useLegacyNode);
         $this->assertEquals('https://login.foo.com/login.php?login_attempt=1', $form->getUri(), '->getUri() returns absolute URIs set in the action form');
 
         // The action URI haven't the same domain Host have an another domain as Host
-        $form = $this->createForm($formHtml, null, 'https://www.foo.com');
+        $form = $this->createForm($formHtml, null, 'https://www.foo.com', useLegacyNode: $useLegacyNode);
         $this->assertEquals('https://login.foo.com/login.php?login_attempt=1', $form->getUri(), '->getUri() returns absolute URIs set in the action form');
 
-        $form = $this->createForm($formHtml, null, 'https://www.foo.com/bar/');
+        $form = $this->createForm($formHtml, null, 'https://www.foo.com/bar/', useLegacyNode: $useLegacyNode);
         $this->assertEquals('https://login.foo.com/login.php?login_attempt=1', $form->getUri(), '->getUri() returns absolute URIs set in the action form');
     }
 
-    public function testGetUriAbsolute()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetUriAbsolute(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form action="foo"><input type="submit" /></form>', null, 'http://localhost/foo/');
+        $form = $this->createForm('<form action="foo"><input type="submit"></form>', null, 'http://localhost/foo/', useLegacyNode: $useLegacyNode);
         $this->assertEquals('http://localhost/foo/foo', $form->getUri(), '->getUri() returns absolute URIs');
 
-        $form = $this->createForm('<form action="/foo"><input type="submit" /></form>', null, 'http://localhost/foo/');
+        $form = $this->createForm('<form action="/foo"><input type="submit"></form>', null, 'http://localhost/foo/');
         $this->assertEquals('http://localhost/foo', $form->getUri(), '->getUri() returns absolute URIs');
     }
 
-    public function testGetUriWithOnlyQueryString()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetUriWithOnlyQueryString(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form action="?get=param"><input type="submit" /></form>', null, 'http://localhost/foo/bar');
+        $form = $this->createForm('<form action="?get=param"><input type="submit"></form>', null, 'http://localhost/foo/bar', useLegacyNode: $useLegacyNode);
         $this->assertEquals('http://localhost/foo/bar?get=param', $form->getUri(), '->getUri() returns absolute URIs only if the host has been defined in the constructor');
     }
 
-    public function testGetUriWithoutAction()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetUriWithoutAction(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form><input type="submit" /></form>', null, 'http://localhost/foo/bar');
+        $form = $this->createForm('<form><input type="submit"></form>', null, 'http://localhost/foo/bar', useLegacyNode: $useLegacyNode);
         $this->assertEquals('http://localhost/foo/bar', $form->getUri(), '->getUri() returns path if no action defined');
     }
 
-    public function testGetUriWithActionOverride()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetUriWithActionOverride(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form action="/foo"><button type="submit" formaction="/bar" /></form>', null, 'http://localhost/foo/');
+        $form = $this->createForm('<form action="/foo"><button type="submit" formaction="/bar"></button></form>', null, 'http://localhost/foo/', useLegacyNode: $useLegacyNode);
         $this->assertEquals('http://localhost/bar', $form->getUri(), '->getUri() returns absolute URIs');
     }
 
@@ -596,100 +796,112 @@ class FormTest extends TestCase
         return [
             [
                 'returns the URI of the form',
-                '<form action="/foo"><input type="submit" /></form>',
+                '<form action="/foo"><input type="submit"></form>',
                 [],
                 '/foo',
             ],
             [
                 'appends the form values if the method is get',
-                '<form action="/foo"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                '<form action="/foo"><input type="text" name="foo" value="foo"><input type="submit"></form>',
                 [],
                 '/foo?foo=foo',
             ],
             [
                 'appends the form values and merges the submitted values',
-                '<form action="/foo"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                '<form action="/foo"><input type="text" name="foo" value="foo"><input type="submit"></form>',
                 ['foo' => 'bar'],
                 '/foo?foo=bar',
             ],
             [
                 'does not append values if the method is post',
-                '<form action="/foo" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                '<form action="/foo" method="post"><input type="text" name="foo" value="foo"><input type="submit"></form>',
                 [],
                 '/foo',
             ],
             [
                 'does not append values if the method is patch',
-                '<form action="/foo" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                '<form action="/foo" method="post"><input type="text" name="foo" value="foo"><input type="submit"></form>',
                 [],
                 '/foo',
                 'PUT',
             ],
             [
                 'does not append values if the method is delete',
-                '<form action="/foo" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                '<form action="/foo" method="post"><input type="text" name="foo" value="foo"><input type="submit"></form>',
                 [],
                 '/foo',
                 'DELETE',
             ],
             [
                 'does not append values if the method is put',
-                '<form action="/foo" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                '<form action="/foo" method="post"><input type="text" name="foo" value="foo"><input type="submit"></form>',
                 [],
                 '/foo',
                 'PATCH',
             ],
             [
                 'appends the form values to an existing query string',
-                '<form action="/foo?bar=bar"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                '<form action="/foo?bar=bar"><input type="text" name="foo" value="foo"><input type="submit"></form>',
                 [],
                 '/foo?bar=bar&foo=foo',
             ],
             [
                 'replaces query values with the form values',
-                '<form action="/foo?bar=bar"><input type="text" name="bar" value="foo" /><input type="submit" /></form>',
+                '<form action="/foo?bar=bar"><input type="text" name="bar" value="foo"><input type="submit"></form>',
                 [],
                 '/foo?bar=foo',
             ],
             [
                 'returns an empty URI if the action is empty',
-                '<form><input type="submit" /></form>',
+                '<form><input type="submit"></form>',
                 [],
                 '/',
             ],
             [
                 'appends the form values even if the action is empty',
-                '<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                '<form><input type="text" name="foo" value="foo"><input type="submit"></form>',
                 [],
                 '/?foo=foo',
             ],
             [
                 'chooses the path if the action attribute value is a sharp (#)',
-                '<form action="#" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                '<form action="#" method="post"><input type="text" name="foo" value="foo"><input type="submit"></form>',
                 [],
                 '/#',
             ],
         ];
     }
 
-    public function testHas()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testHas(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
 
         $this->assertFalse($form->has('foo'), '->has() returns false if a field is not in the form');
         $this->assertTrue($form->has('bar'), '->has() returns true if a field is in the form');
     }
 
-    public function testRemove()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testRemove(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $form->remove('bar');
         $this->assertFalse($form->has('bar'), '->remove() removes a field');
     }
 
-    public function testGet()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGet(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
 
         $this->assertInstanceOf(InputFormField::class, $form->get('bar'), '->get() returns the field object associated with the given name');
 
@@ -701,39 +913,54 @@ class FormTest extends TestCase
         }
     }
 
-    public function testAll()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testAll(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
 
         $fields = $form->all();
         $this->assertCount(1, $fields, '->all() return an array of form field objects');
         $this->assertInstanceOf(InputFormField::class, $fields['bar'], '->all() return an array of form field objects');
     }
 
-    public function testSubmitWithoutAFormButton()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testSubmitWithoutAFormButton(bool $useLegacyNode)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('
+        $dom = $this->createDocument($useLegacyNode, '
             <html>
                 <form>
-                    <input type="foo" />
+                    <input type="foo">
                 </form>
             </html>
         ');
 
         $nodes = $dom->getElementsByTagName('form');
         $form = new Form($nodes->item(0), 'http://example.com');
-        $this->assertSame($nodes->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
+        $this->assertSame($nodes->item(0), $form->getFormDomNode(), '->getFormDomNode() returns the form node associated with this form');
     }
 
-    public function testTypeAttributeIsCaseInsensitive()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testTypeAttributeIsCaseInsensitive(bool $useLegacyNode)
     {
-        $form = $this->createForm('<form method="post"><input type="IMAGE" name="example" /></form>');
+        $form = $this->createForm('<form method="post"><input type="IMAGE" name="example"></form>', useLegacyNode: $useLegacyNode);
         $this->assertTrue($form->has('example.x'), '->has() returns true if the image input was correctly turned into an x and a y fields');
         $this->assertTrue($form->has('example.y'), '->has() returns true if the image input was correctly turned into an x and a y fields');
     }
 
-    public function testFormFieldRegistryAcceptAnyNames()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testFormFieldRegistryAcceptAnyNames(bool $useLegacyNode)
     {
         $field = $this->getFormFieldMock('[t:dbt%3adate;]data_daterange_enddate_value');
 
@@ -742,7 +969,7 @@ class FormTest extends TestCase
         $this->assertEquals($field, $registry->get('[t:dbt%3adate;]data_daterange_enddate_value'));
         $registry->set('[t:dbt%3adate;]data_daterange_enddate_value', null);
 
-        $form = $this->createForm('<form><input type="text" name="[t:dbt%3adate;]data_daterange_enddate_value" value="bar" /><input type="submit" /></form>');
+        $form = $this->createForm('<form><input type="text" name="[t:dbt%3adate;]data_daterange_enddate_value" value="bar"><input type="submit"></form>', useLegacyNode: $useLegacyNode);
         $form['[t:dbt%3adate;]data_daterange_enddate_value'] = 'bar';
 
         $registry->remove('[t:dbt%3adate;]data_daterange_enddate_value');
@@ -854,10 +1081,13 @@ class FormTest extends TestCase
         $registry->set('bar', ['baz']);
     }
 
-    public function testDifferentFieldTypesWithSameName()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testDifferentFieldTypesWithSameName(bool $useLegacyNode)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('
+        $dom = $this->createDocument($useLegacyNode, '
             <html>
                 <body>
                     <form action="/">
@@ -900,38 +1130,46 @@ class FormTest extends TestCase
         return $field;
     }
 
-    protected function createForm($form, $method = null, $currentUri = null)
+    protected function createForm($form, $method = null, $currentUri = null, bool $useLegacyNode = true)
     {
-        $dom = new \DOMDocument();
-        @$dom->loadHTML('<html>'.$form.'</html>');
+        if ($useLegacyNode) {
+            $dom = new \DOMDocument();
+            @$dom->loadHTML('<html>'.$form.'</html>');
 
-        $xPath = new \DOMXPath($dom);
+            $xPath = new \DOMXPath($dom);
+        } else {
+            if (\PHP_VERSION_ID < 80400) {
+                $this->markTestSkipped('This test requires PHP 8.4.0 or higher.');
+            }
+
+            $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html>'.$form.'</html>', \DOM\HTML_NO_DEFAULT_NS);
+            $xPath = new \DOM\XPath($dom);
+        }
+
         $nodes = $xPath->query('//input | //button');
-
         $currentUri ??= 'http://example.com/';
 
         return new Form($nodes->item($nodes->length - 1), $currentUri, $method);
     }
 
-    protected function createTestHtml5Form()
+    protected function createTestHtml5Form(bool $useLegacyNode = true)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('
+        $html = '
         <html>
             <h1>Hello form</h1>
             <form id="form-1" action="" method="POST">
-                <div><input type="checkbox" name="apples[]" value="1" checked /></div>
-                <input form="form_2" type="checkbox" name="oranges[]" value="1" checked />
-                <div><label></label><input form="form-1" type="hidden" name="form_name" value="form-1" /></div>
-                <input form="form-1" type="submit" name="button_1" value="Capture fields" />
+                <div><input type="checkbox" name="apples[]" value="1" checked></div>
+                <input form="form_2" type="checkbox" name="oranges[]" value="1" checked>
+                <div><label></label><input form="form-1" type="hidden" name="form_name" value="form-1"></div>
+                <input form="form-1" type="submit" name="button_1" value="Capture fields">
                 <button form="form_2" type="submit" name="button_2">Submit form_2</button>
             </form>
-            <input form="form-1" type="checkbox" name="apples[]" value="2" checked />
+            <input form="form-1" type="checkbox" name="apples[]" value="2" checked>
             <form id="form_2" action="" method="POST">
-                <div><div><input type="checkbox" name="oranges[]" value="2" checked />
-                <input type="checkbox" name="oranges[]" value="3" checked /></div></div>
-                <input form="form_2" type="hidden" name="form_name" value="form_2" />
-                <input form="form-1" type="hidden" name="outer_field" value="success" />
+                <div><div><input type="checkbox" name="oranges[]" value="2" checked>
+                <input type="checkbox" name="oranges[]" value="3" checked></div></div>
+                <input form="form_2" type="hidden" name="form_name" value="form_2">
+                <input form="form-1" type="hidden" name="outer_field" value="success">
                 <button form="form-1" type="submit" name="button_3">Submit from outside the form</button>
                 <div>
                     <label for="app_frontend_form_type_contact_form_type_contactType">Message subject</label>
@@ -941,61 +1179,87 @@ class FormTest extends TestCase
                 </div>
                 <div>
                     <label for="app_frontend_form_type_contact_form_type_firstName">Firstname</label>
-                    <input type="text" name="app_frontend_form_type_contact_form_type[firstName]" value="John" id="app_frontend_form_type_contact_form_type_firstName"/>
+                    <input type="text" name="app_frontend_form_type_contact_form_type[firstName]" value="John" id="app_frontend_form_type_contact_form_type_firstName">
                 </div>
             </form>
             <button />
-        </html>');
+        </html>';
 
-        return $dom;
+        if ($useLegacyNode) {
+            $dom = new \DOMDocument();
+            $dom->loadHTML($html);
+
+            return $dom;
+        }
+
+        if (\PHP_VERSION_ID < 80400) {
+            $this->markTestSkipped('This test requires PHP 8.4.0 or higher.');
+        }
+
+        return \DOM\HTMLDocument::createFromString('<!DOCTYPE html>'.$html, \DOM\HTML_NO_DEFAULT_NS);
     }
 
-    protected function createTestMultipleForm()
+    protected function createTestMultipleForm(bool $useLegacyNode = true)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('
-        <html>
-            <h1>Hello form</h1>
-            <form action="" method="POST">
-                <div><input type="checkbox" name="apples[]" value="1" checked /></div>
-                <input type="checkbox" name="oranges[]" value="1" checked />
-                <div><label></label><input type="hidden" name="form_name" value="form-1" /></div>
-                <input type="submit" name="button_1" value="Capture fields" />
-                <button type="submit" name="button_2">Submit form_2</button>
-            </form>
-            <form action="" method="POST">
-                <div><div><input type="checkbox" name="oranges[]" value="2" checked />
-                <input type="checkbox" name="oranges[]" value="3" checked /></div></div>
-                <input type="hidden" name="form_name" value="form_2" />
-                <input type="hidden" name="outer_field" value="success" />
-                <button type="submit" name="button_3">Submit from outside the form</button>
-            </form>
-            <button />
-        </html>');
+        $html = '
+            <html>
+                <h1>Hello form</h1>
+                <form action="" method="POST">
+                    <div><input type="checkbox" name="apples[]" value="1" checked></div>
+                    <input type="checkbox" name="oranges[]" value="1" checked>
+                    <div><label></label><input type="hidden" name="form_name" value="form-1"></div>
+                    <input type="submit" name="button_1" value="Capture fields">
+                    <button type="submit" name="button_2">Submit form_2</button>
+                </form>
+                <form action="" method="POST">
+                    <div><div><input type="checkbox" name="oranges[]" value="2" checked>
+                    <input type="checkbox" name="oranges[]" value="3" checked></div></div>
+                    <input type="hidden" name="form_name" value="form_2">
+                    <input type="hidden" name="outer_field" value="success">
+                    <button type="submit" name="button_3">Submit from outside the form</button>
+                </form>
+                <button>
+            </html>';
 
-        return $dom;
+        if ($useLegacyNode) {
+            $dom = new \DOMDocument();
+            $dom->loadHTML($html);
+
+            return $dom;
+        }
+
+        if (\PHP_VERSION_ID < 80400) {
+            $this->markTestSkipped('This test requires PHP 8.4.0 or higher.');
+        }
+
+        return \DOM\HTMLDocument::createFromString('<!DOCTYPE html>'.$html, \DOM\HTML_NO_DEFAULT_NS);
     }
 
-    public function testGetPhpValuesWithEmptyTextarea()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetPhpValuesWithEmptyTextarea(bool $useLegacyNode)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('
+        $dom = $this->createDocument($useLegacyNode, '
             <html>
                 <form>
                     <textarea name="example"></textarea>
                 </form>
-            </html>'
-        );
+            </html>');
 
         $nodes = $dom->getElementsByTagName('form');
         $form = new Form($nodes->item(0), 'http://example.com');
         $this->assertEquals(['example' => ''], $form->getPhpValues());
     }
 
-    public function testGetReturnTypes()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGetReturnTypes(bool $useLegacyNode)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('
+        $dom = $this->createDocument($useLegacyNode, '
             <html>
                 <form>
                     <textarea name="foo[collection][0][bar]">item 0</textarea>

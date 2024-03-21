@@ -18,7 +18,7 @@ namespace Symfony\Component\DomCrawler\Field;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ChoiceFormField extends FormField
+class ChoiceFormField extends DomFormField
 {
     private string $type;
     private bool $multiple;
@@ -141,7 +141,7 @@ class ChoiceFormField extends FormField
      *
      * @internal
      */
-    public function addChoice(\DOMElement $node): void
+    public function addChoice(\DOMElement|\DOM\Element $node): void
     {
         if (!$this->multiple && 'radio' !== $this->type) {
             throw new \LogicException(\sprintf('Unable to add a choice for "%s" as it is not multiple or is not a radio button.', $this->name));
@@ -178,36 +178,37 @@ class ChoiceFormField extends FormField
      */
     protected function initialize(): void
     {
-        if ('input' !== $this->node->nodeName && 'select' !== $this->node->nodeName) {
-            throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input or select tag (%s given).', $this->node->nodeName));
+        $nodeName = strtolower($this->domNode->nodeName);
+        if ('input' !== $nodeName && 'select' !== $nodeName) {
+            throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input or select tag (%s given).', $nodeName));
         }
 
-        if ('input' === $this->node->nodeName && 'checkbox' !== strtolower($this->node->getAttribute('type')) && 'radio' !== strtolower($this->node->getAttribute('type'))) {
-            throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input tag with a type of checkbox or radio (given type is "%s").', $this->node->getAttribute('type')));
+        if ('input' === $nodeName && 'checkbox' !== strtolower($this->domNode->getAttribute('type')) && 'radio' !== strtolower($this->domNode->getAttribute('type'))) {
+            throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input tag with a type of checkbox or radio (given type is "%s").', $this->domNode->getAttribute('type')));
         }
 
         $this->value = null;
         $this->options = [];
         $this->multiple = false;
 
-        if ('input' == $this->node->nodeName) {
-            $this->type = strtolower($this->node->getAttribute('type'));
-            $optionValue = $this->buildOptionValue($this->node);
+        if ('input' == $nodeName) {
+            $this->type = strtolower($this->domNode->getAttribute('type'));
+            $optionValue = $this->buildOptionValue($this->domNode);
             $this->options[] = $optionValue;
 
-            if ($this->node->hasAttribute('checked')) {
+            if ($this->domNode->hasAttribute('checked')) {
                 $this->value = $optionValue['value'];
             }
         } else {
             $this->type = 'select';
-            if ($this->node->hasAttribute('multiple')) {
+            if ($this->domNode->hasAttribute('multiple')) {
                 $this->multiple = true;
                 $this->value = [];
                 $this->name = str_replace('[]', '', $this->name);
             }
 
             $found = false;
-            foreach ($this->xpath->query('descendant::option', $this->node) as $option) {
+            foreach ($this->domXpath->query('descendant::option', $this->domNode) as $option) {
                 $optionValue = $this->buildOptionValue($option);
                 $this->options[] = $optionValue;
 
@@ -231,11 +232,11 @@ class ChoiceFormField extends FormField
     /**
      * Returns option value with associated disabled flag.
      */
-    private function buildOptionValue(\DOMElement $node): array
+    private function buildOptionValue(\DOMElement|\DOM\Element $node): array
     {
         $option = [];
 
-        $defaultDefaultValue = 'select' === $this->node->nodeName ? '' : 'on';
+        $defaultDefaultValue = 'select' === strtolower($this->domNode->nodeName) ? '' : 'on';
         $defaultValue = (isset($node->nodeValue) && $node->nodeValue) ? $node->nodeValue : $defaultDefaultValue;
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
         $option['disabled'] = $node->hasAttribute('disabled');

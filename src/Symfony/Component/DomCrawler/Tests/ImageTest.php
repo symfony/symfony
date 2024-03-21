@@ -18,10 +18,21 @@ class ImageTest extends TestCase
 {
     public function testConstructorWithANonImgTag()
     {
-        $this->expectException(\LogicException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
 
+        $this->expectException(\LogicException::class);
+        new Image($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testConstructorWithANonImgTagFromHTMLDocument()
+    {
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><div><div></html>');
+
+        $this->expectException(\LogicException::class);
         new Image($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
@@ -34,14 +45,35 @@ class ImageTest extends TestCase
         $this->assertSame('https://example.com/foo', $image->getUri());
     }
 
+    /**
+     * @requires PHP 8.4
+     */
+    public function testBaseUriIsOptionalWhenImageUrlIsAbsoluteFromHTMLDocument()
+    {
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><img alt="foo" src="https://example.com/foo"></html>');
+
+        $image = new Image($dom->getElementsByTagName('img')->item(0));
+        $this->assertSame('https://example.com/foo', $image->getUri());
+    }
+
     public function testAbsoluteBaseUriIsMandatoryWhenImageUrlIsRelative()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><img alt="foo" src="/foo" /></html>');
 
-        $image = new Image($dom->getElementsByTagName('img')->item(0), 'example.com');
-        $image->getUri();
+        $this->expectException(\InvalidArgumentException::class);
+        new Image($dom->getElementsByTagName('img')->item(0), 'example.com');
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testAbsoluteBaseUriIsMandatoryWhenImageUrlIsRelativeFromHTMLDocument()
+    {
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><img alt="foo" src="/foo"></html>');
+
+        $this->expectException(\InvalidArgumentException::class);
+        new Image($dom->getElementsByTagName('img')->item(0), 'example.com');
     }
 
     /**
@@ -51,6 +83,20 @@ class ImageTest extends TestCase
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(\sprintf('<html><img alt="foo" src="%s" /></html>', $url));
+        $image = new Image($dom->getElementsByTagName('img')->item(0), $currentUri);
+
+        $this->assertEquals($expected, $image->getUri());
+    }
+
+    /**
+     * @requires PHP 8.4
+     *
+     * @dataProvider getGetUriTests
+     */
+    public function testGetUriFromHTMLDocument($url, $currentUri, $expected)
+    {
+        $dom = \DOM\HTMLDocument::createFromString(sprintf('<!DOCTYPE html><html><img alt="foo" src="%s"></html>', $url));
+
         $image = new Image($dom->getElementsByTagName('img')->item(0), $currentUri);
 
         $this->assertEquals($expected, $image->getUri());

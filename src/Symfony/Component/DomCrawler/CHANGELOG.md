@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `DomCrawler` to parse HTML and XML with native capabilities
+
 7.0
 ---
 

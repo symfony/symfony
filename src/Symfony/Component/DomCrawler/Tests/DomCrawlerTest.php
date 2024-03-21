@@ -12,31 +12,60 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\DomCrawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Image;
 use Symfony\Component\DomCrawler\Link;
 
-abstract class AbstractCrawlerTestCase extends TestCase
+/**
+ * @requires PHP 8.4
+ */
+class DomCrawlerTest extends TestCase
 {
-    abstract public static function getDoctype(): string;
-
-    protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null, bool $useHtml5Parser = true)
+    public static function getDoctype(): string
     {
-        return new Crawler($node, $uri, $baseHref, $useHtml5Parser);
+        return '<!DOCTYPE html>';
+    }
+
+    protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null)
+    {
+        return new DomCrawler($node, $uri, $baseHref, DomCrawler::CRAWLER_DISABLE_DEFAULT_NAMESPACE);
     }
 
     protected static function getCrawlerClass(): string
     {
-        return Crawler::class;
+        return DomCrawler::class;
     }
+
+    public function testConstructorWithModernNode()
+    {
+        $crawler = $this->createCrawler();
+        $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
+
+        $doc = \DOM\HTMLDocument::createEmpty();
+        $node = $doc->createElement('test');
+
+        $crawler = $this->createCrawler($node);
+        $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
+    }
+
+    public function testClearWithModerNode()
+    {
+        $doc = \DOM\HTMLDocument::createEmpty();
+        $node = $doc->createElement('test');
+
+        $crawler = $this->createCrawler($node);
+        $crawler->clear();
+        $this->assertCount(0, $crawler, '->clear() removes all the nodes from the crawler');
+    }
+
 
     public function testConstructor()
     {
         $crawler = $this->createCrawler();
         $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
 
-        $doc = new \DOMDocument();
+        $doc = \DOM\XMLDocument::createEmpty();
         $node = $doc->createElement('test');
 
         $crawler = $this->createCrawler($node);
@@ -61,7 +90,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     {
         $crawler = $this->createCrawler();
         $crawler->add($this->createDomDocument());
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMDocument');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOM\Document');
 
         $crawler = $this->createCrawler();
         $crawler->add($this->createNodeList());
@@ -183,11 +212,11 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $this->assertCount(0, $crawler, '->addContent() does nothing if the type is not (x|ht)ml');
 
         $crawler = $this->createCrawler();
-        $crawler->addContent($this->getDoctype().'<html><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><span>中文</span></html>');
+        $crawler->addContent($this->getDoctype().'<html><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><span>中文</span></html>');
         $this->assertEquals('中文', $crawler->filterXPath('//span')->text(), '->addContent() guess wrong charset');
 
         $crawler = $this->createCrawler();
-        $crawler->addContent($this->getDoctype().'<html><meta http-equiv="Content-Type" content="text/html; charset=unicode" /><div class="foo"></html></html>');
+        $crawler->addContent($this->getDoctype().'<html><meta http-equiv="Content-Type" content="text/html; charset=unicode"><div class="foo"></html></html>');
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() ignores bad charset');
 
         $crawler = $this->createCrawler();
@@ -210,7 +239,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createCrawler();
         $crawler->addDocument($this->createDomDocument());
 
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addDocument() adds nodes from a \DOMDocument');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addDocument() adds nodes from a \DOM\Document');
     }
 
     public function testAddNodeList()
@@ -244,7 +273,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
 
     public function testClear()
     {
-        $doc = new \DOMDocument();
+        $doc = \DOM\XMLDocument::createEmpty();
         $node = $doc->createElement('test');
 
         $crawler = $this->createCrawler($node);
@@ -281,7 +310,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createTestCrawler()->filterXPath('//li');
 
         $this->assertInstanceOf(\Traversable::class, $crawler);
-        $this->assertContainsOnlyInstancesOf('DOMElement', iterator_to_array($crawler), 'Iterating a Crawler gives DOMElement instances');
+        $this->assertContainsOnlyInstancesOf(\DOM\Element::class, iterator_to_array($crawler), 'Iterating a Crawler gives DOMElement instances');
     }
 
     public function testSlice()
@@ -416,8 +445,8 @@ abstract class AbstractCrawlerTestCase extends TestCase
 
     public function testHtml()
     {
-        $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());
-        $this->assertEquals('<input type="text" value="TextValue" name="TextName"><input type="submit" value="FooValue" name="FooName" id="FooId"><input type="button" value="BarValue" name="BarName" id="BarId"><button value="ButtonValue" name="ButtonName" id="ButtonId"></button>', trim(preg_replace('~>\s+<~', '><', $this->createTestCrawler()->filterXPath('//form[@id="FooFormId"]')->html())));
+        $this->assertEquals('<img alt="Bar"></img>', $this->createTestCrawler()->filterXPath('//a[5]')->html());
+        $this->assertEquals('<input type="text" value="TextValue" name="TextName"></input><input type="submit" value="FooValue" name="FooName" id="FooId"></input><input type="button" value="BarValue" name="BarName" id="BarId"></input><button value="ButtonValue" name="ButtonName" id="ButtonId"></button>', trim(preg_replace('~>\s+<~', '><', $this->createTestCrawler()->filterXPath('//form[@id="FooFormId"]')->html())));
 
         try {
             $this->createTestCrawler()->filterXPath('//ol')->html();
@@ -431,9 +460,9 @@ abstract class AbstractCrawlerTestCase extends TestCase
 
     public function testEmojis()
     {
-        $crawler = $this->createCrawler('<body><p>Hey 👋</p></body>');
+        $crawler = $this->createCrawler($this->getDoctype().'<body><p>Hey 👋</p></body>');
 
-        $this->assertSame('<body><p>Hey 👋</p></body>', $crawler->html());
+        $this->assertSame('<head></head><body><p>Hey 👋</p></body>', $crawler->html());
     }
 
     public function testExtract()
@@ -602,11 +631,12 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $this->assertCount(0, $crawler->filterXPath('namespace::*'), 'The fake root node has no namespace nodes');
     }
 
-    public function testFilterXPathWithNamespaceAxisAfterElementAxis()
+    public function testFilterXPathWithNamespaceAxisThrows()
     {
-        $crawler = $this->createTestCrawler()->filterXPath('//div[@id="parent"]/namespace::*');
+        $this->expectException(\DOMException::class);
+        $this->expectExceptionMessage('The namespace axis is not well-defined in the living DOM specification. Use Dom\Element::getInScopeNamespaces() or Dom\Element::getDescendantNamespaces() instead.');
 
-        $this->assertCount(0, $crawler->filterXPath('namespace::*'), 'Namespace axes cannot be requested');
+        $this->createTestCrawler()->filterXPath('//div[@id="parent"]/namespace::*');
     }
 
     public function testFilterXPathWithParentAxis()
@@ -801,7 +831,7 @@ HTML;
     public function testInvalidLink()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
+        $this->expectExceptionMessage('The selected node should be instance of "DOM\Element", got "Dom\Text".');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->link();
     }
@@ -809,7 +839,7 @@ HTML;
     public function testInvalidLinks()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
+        $this->expectExceptionMessage('The selected node should be instance of "DOM\Element", got "Dom\Text".');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->link();
     }
@@ -913,7 +943,7 @@ HTML;
     public function testInvalidForm()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
+        $this->expectExceptionMessage('The selected node should be instance of "DOM\Element", got "Dom\Text".');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->form();
     }
@@ -1115,7 +1145,7 @@ HTML;
         }
 
         try {
-            $crawler = $this->createCrawler('<p></p>');
+            $crawler = $this->createCrawler($this->getDoctype().'<p></p>');
             $crawler->filter('p')->children();
             $this->assertTrue(true, '->children() does not trigger a notice if the node has no children');
         } catch (\PHPUnit\Framework\Error\Notice $e) {
@@ -1179,7 +1209,7 @@ HTML;
      */
     public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = '')
     {
-        $crawler = $this->createCrawler($this->getDoctype().'<html><base href="'.$baseValue.'"><a href="'.$linkValue.'"></a></html>', $currentUri);
+        $crawler = $this->createCrawler($this->getDoctype() . '<html><base href="' . $baseValue . '"><a href="' . $linkValue . '"></a></html>', $currentUri);
         $this->assertEquals($expectedUri, $crawler->filterXPath('//a')->link()->getUri(), $description);
     }
 
@@ -1199,7 +1229,7 @@ HTML;
      */
     public function testBaseTagWithForm($baseValue, $actionValue, $expectedUri, $currentUri = null, $description = null)
     {
-        $crawler = $this->createCrawler($this->getDoctype().'<html><base href="'.$baseValue.'"><form method="post" action="'.$actionValue.'"><button type="submit" name="submit"/></form></html>', $currentUri);
+        $crawler = $this->createCrawler($this->getDoctype() . '<html><base href="' . $baseValue . '"><form method="post" action="' . $actionValue . '"><button type="submit" name="submit"></button></form></html>', $currentUri);
         $this->assertEquals($expectedUri, $crawler->filterXPath('//button')->form()->getUri(), $description);
     }
 
@@ -1218,7 +1248,7 @@ HTML;
 
     public function testCountOfNestedElements()
     {
-        $crawler = $this->createCrawler('<html><body><ul><li>List item 1<ul><li>Sublist item 1</li><li>Sublist item 2</ul></li></ul></body></html>');
+        $crawler = $this->createCrawler($this->getDoctype().'<html><body><ul><li>List item 1<ul><li>Sublist item 1</li><li>Sublist item 2</ul></li></ul></body></html>');
 
         $this->assertCount(1, $crawler->filter('li:contains("List item 1")'));
     }
@@ -1276,8 +1306,7 @@ HTML;
 
     public function createTestCrawler($uri = null)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML($this->getDoctype().'
+        $dom = \DOM\HTMLDocument::createFromString($this->getDoctype().'
             <html>
                 <body>
                     <a href="foo">Foo</a>
@@ -1285,24 +1314,24 @@ HTML;
                     <a href="/foo">Fabien"s Foo</a>
                     <a href="/foo">\' Fabien"s Foo</a>
 
-                    <a href="/bar"><img alt="Bar"/></a>
-                    <a href="/bar"><img alt="   Fabien\'s Bar   "/></a>
-                    <a href="/bar"><img alt="Fabien&quot;s Bar"/></a>
-                    <a href="/bar"><img alt="\' Fabien&quot;s Bar"/></a>
+                    <a href="/bar"><img alt="Bar"></a>
+                    <a href="/bar"><img alt="   Fabien\'s Bar   "></a>
+                    <a href="/bar"><img alt="Fabien&quot;s Bar"></a>
+                    <a href="/bar"><img alt="\' Fabien&quot;s Bar"></a>
 
                     <a href="?get=param">GetLink</a>
 
                     <a href="/example">Klausi|Claudiu</a>
 
                     <form action="foo" id="FooFormId">
-                        <input type="text" value="TextValue" name="TextName" />
-                        <input type="submit" value="FooValue" name="FooName" id="FooId" />
-                        <input type="button" value="BarValue" name="BarName" id="BarId" />
-                        <button value="ButtonValue" name="ButtonName" id="ButtonId" />
+                        <input type="text" value="TextValue" name="TextName">
+                        <input type="submit" value="FooValue" name="FooName" id="FooId">
+                        <input type="button" value="BarValue" name="BarName" id="BarId">
+                        <button value="ButtonValue" name="ButtonName" id="ButtonId"></button>
                     </form>
 
-                    <input type="submit" value="FooBarValue" name="FooBarName" form="FooFormId" />
-                    <input type="text" value="FooTextValue" name="FooTextName" form="FooFormId" />
+                    <input type="submit" value="FooBarValue" name="FooBarName" form="FooFormId">
+                    <input type="text" value="FooTextValue" name="FooTextName" form="FooFormId">
 
                     <ul class="first">
                         <li class="first">One</li>
@@ -1322,7 +1351,7 @@ HTML;
                         <div id="child"></div>
                         <div id="child2" xmlns:foo="http://example.com"></div>
                     </div>
-                    <div id="sibling"><img /></div>
+                    <div id="sibling"><img></div>
                     <div id="complex-elements">
                         <div class="one"> Parent text <span>Child text</span> </div>
                         <div class="two"> <span>Child text</span> Parent text </div>
@@ -1333,7 +1362,7 @@ HTML;
                     </div>
                 </body>
             </html>
-        ');
+        ', \DOM\HTML_NO_DEFAULT_NS);
 
         return $this->createCrawler($dom, $uri);
     }
@@ -1357,17 +1386,13 @@ HTML;
 
     protected function createDomDocument()
     {
-        $dom = new \DOMDocument();
-        $dom->loadXML('<html><div class="foo"></div></html>');
-
-        return $dom;
+        return \DOM\HTMLDocument::createFromString($this->getDoctype().'<html><div class="foo"></div></html>', \DOM\HTML_NO_DEFAULT_NS);
     }
 
     protected function createNodeList()
     {
-        $dom = new \DOMDocument();
-        $dom->loadXML('<html><div class="foo"></div></html>');
-        $domxpath = new \DOMXPath($dom);
+        $dom = \DOM\HTMLDocument::createFromString($this->getDoctype().'<html><div class="foo"></div></html>', \DOM\HTML_NO_DEFAULT_NS);
+        $domxpath = new \DOM\XPath($dom);
 
         return $domxpath->query('//div');
     }

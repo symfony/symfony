@@ -58,7 +58,6 @@ class PhpDocExtractorTest extends TestCase
         return [
             'pub' => ['pub', null, null],
             'stat' => ['stat', null, null],
-            'foo' => ['foo', self::isPhpDocumentorV5() ? 'Foo.' : null, null],
             'bar' => ['bar', self::isPhpDocumentorV5() ? 'Bar.' : null, null],
         ];
     }
@@ -71,6 +70,16 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
         $this->assertSame($longDescription, $this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testEmptyParamAnnotation()
+    {
+        $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', 'foo'));
+        $this->assertSame(self::isPhpDocumentorV5() ? 'Foo.' : null, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', 'foo'));
+        $this->assertNull($this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', 'foo'));
     }
 
     /**

@@ -12,6 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_PARAMETER)]
-class CustomAnyAttribute
+class CustomChildAttribute extends CustomAnyAttribute
 {
 }

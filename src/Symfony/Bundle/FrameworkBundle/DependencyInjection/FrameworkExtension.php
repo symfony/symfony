@@ -699,9 +699,9 @@ class FrameworkExtension extends Extension
                 $taskAttributeClass,
                 static function (ChildDefinition $definition, AsPeriodicTask|AsCronTask $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
                     $tagAttributes = get_object_vars($attribute) + [
-                        'trigger' => match ($attribute::class) {
-                            AsPeriodicTask::class => 'every',
-                            AsCronTask::class => 'cron',
+                        'trigger' => match (true) {
+                            $attribute instanceof AsPeriodicTask => 'every',
+                            $attribute instanceof AsCronTask => 'cron',
                         },
                     ];
                     if ($reflector instanceof \ReflectionMethod) {

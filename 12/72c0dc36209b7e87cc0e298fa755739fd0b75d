@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-20T11:02:21Z
+
+Did you see https://github.com/symfony/symfony/pull/51210?
+
+---------------------------------------------------------------------------
+
+by squrious at 2024-03-20T11:48:24Z
+
+> Did you see #51210?
+
+Yes! But as event subscribers allow to register events too, shouldn't we take care of their DX too? Or maybe I could leverage the existing code for this?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-20T13:24:10Z
+
+IMHO, event listener are better thank event subscriber now.
+
+But I think we can do something for the subscriber too. I'll review it
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-03-20T13:52:55Z
+
+> But as event subscribers allow to register events too, shouldn't we take care of their DX too?
+
+No. I'd rather get rid of subscribers, tbh. From my POV, the only reason subscribers still exist, is the amount of busy work we would force upon downstream code if we removed them. Regarding DX improvements, I'd keep our efforts focused on attribute-based listeners.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-20T14:04:29Z
+
+@derrabus with SF full stack, it's easy to register listener, but without the framework, it's harder. I think it's still better to merge this PR once ready
+
+---------------------------------------------------------------------------
+
+by squrious at 2024-03-20T14:11:04Z
+
+Thanks for your feedback! I addressed your comments :)
+
+---------------------------------------------------------------------------
+
+by squrious at 2024-03-20T14:31:19Z
+
+> Can you add a note in the CHANGELOG ?
+>
+> 👍🏼
+
+Done!

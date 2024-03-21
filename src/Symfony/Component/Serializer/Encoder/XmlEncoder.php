@@ -82,12 +82,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $encoderIgnoredNodeTypes = $context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
         $ignorePiNode = \in_array(\XML_PI_NODE, $encoderIgnoredNodeTypes, true);
         if ($data instanceof \DOMDocument) {
-            set_error_handler(static function ($type, $message) { throw new NotEncodableValueException($message); }, \E_ERROR | \E_WARNING);
-            try {
-                return $data->saveXML($ignorePiNode ? $data->documentElement : null);
-            } finally {
-                restore_error_handler();
-            }
+            return $this->saveXml($data, $ignorePiNode ? $data->documentElement : null);
         }
 
         $xmlRootNodeName = $context[self::ROOT_NODE_NAME] ?? $this->defaultContext[self::ROOT_NODE_NAME];
@@ -102,12 +97,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             $this->appendNode($dom, $data, $format, $context, $xmlRootNodeName);
         }
 
-        set_error_handler(static function ($type, $message) { throw new NotEncodableValueException($message); }, \E_ERROR | \E_WARNING);
-        try {
-            return $dom->saveXML($ignorePiNode ? $dom->documentElement : null, $context[self::SAVE_OPTIONS] ?? $this->defaultContext[self::SAVE_OPTIONS]);
-        } finally {
-            restore_error_handler();
-        }
+        return $this->saveXml($dom, $ignorePiNode ? $dom->documentElement : null, $context[self::SAVE_OPTIONS] ?? $this->defaultContext[self::SAVE_OPTIONS]);
     }
 
     public function decode(string $data, string $format, array $context = []): mixed
@@ -507,5 +497,24 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         return $document;
+    }
+
+    /**
+     * @throws NotEncodableValueException
+     */
+    private function saveXml(\DOMDocument $DOMDocument, ?\DOMNode $node = null, ?int $options = null): string
+    {
+        $prevErrorHandler = set_error_handler(static function ($type, $message, $file, $line, $context = []) use (&$prevErrorHandler) {
+            if (\in_array($type, [\E_ERROR, \E_WARNING], true)) {
+                throw new NotEncodableValueException($message);
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($type, $message, $file, $line, $context) : false;
+        });
+        try {
+            return $DOMDocument->saveXML($node, $options);
+        } finally {
+            restore_error_handler();
+        }
     }
 }

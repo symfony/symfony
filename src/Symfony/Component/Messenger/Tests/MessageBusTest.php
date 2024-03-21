@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\SelfStampableDummyMessage;
 
 class MessageBusTest extends TestCase
 {
@@ -131,6 +132,14 @@ class MessageBusTest extends TestCase
     {
         $finalEnvelope = (new MessageBus())->dispatch(new Envelope(new \stdClass()), [new DelayStamp(5), new BusNameStamp('bar')]);
         $this->assertCount(2, $finalEnvelope->all());
+    }
+
+    public function testSelfStampableMessage()
+    {
+        $finalEnvelope = (new MessageBus())->dispatch(new SelfStampableDummyMessage(''), [new DelayStamp(5), new BusNameStamp('bar')]);
+        $this->assertCount(2, $finalEnvelope->all());
+        $this->assertCount(2, $finalEnvelope->all()[DelayStamp::class]);
+        $this->assertSame(5, $finalEnvelope->last(DelayStamp::class)->getDelay());
     }
 
     public static function provideConstructorDataStucture(): iterable

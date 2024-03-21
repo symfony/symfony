@@ -9,10 +9,14 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24Options;
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24Transport;
+use Symfony\Component\Notifier\Bridge\Lox24\Type;
+use Symfony\Component\Notifier\Bridge\Lox24\VoiceLanguage;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -193,7 +197,9 @@ class Lox24TransportTest extends TransportTestCase
         ], [], 201, ['uuid' => '123456']);
         $transport = new Lox24Transport('testToken', 'testFrom', [], $this->client);
 
-        $options = (new Lox24Options())->voiceLanguage('es')->type('voice');
+        $options = (new Lox24Options())
+            ->voiceLanguage(VoiceLanguage::Spanish)
+            ->type(Type::Voice);
         $message = new SmsMessage('+1411111111', 'test text');
         $message->options($options);
 
@@ -212,7 +218,9 @@ class Lox24TransportTest extends TransportTestCase
         ], [], 201, ['uuid' => '123456']);
         $transport = new Lox24Transport('testToken', 'testFrom', [], $this->client);
 
-        $options = (new Lox24Options())->voiceLanguage('auto')->type('voice');
+        $options = (new Lox24Options())
+            ->voiceLanguage(VoiceLanguage::Auto)
+            ->type(Type::Voice);
         $message = new SmsMessage('+1411111111', 'test text');
         $message->options($options);
 
@@ -232,7 +240,7 @@ class Lox24TransportTest extends TransportTestCase
 
         $transport = new Lox24Transport('testToken', 'testFrom', ['type' => 'voice'], $this->client);
 
-        $options = (new Lox24Options())->type('sms');
+        $options = (new Lox24Options())->type(Type::Sms);
         $message = new SmsMessage('+1411111111', 'test text');
         $message->options($options);
 

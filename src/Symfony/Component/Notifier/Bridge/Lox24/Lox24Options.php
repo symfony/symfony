@@ -9,10 +9,11 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Symfony\Component\Notifier\Bridge\Lox24;
 
 use DateTimeInterface;
-use InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
@@ -51,27 +52,16 @@ final class Lox24Options implements MessageOptionsInterface
 
     /**
      * The language of the voice message.
-     * If not set or 'auto', the automatic language detection by message text will be used.
-     * E.g. voiceLanguage('en') or voiceLanguage('auto')
+     * If set 'auto', the automatic language detection by message text will be used.
      */
-    public function voiceLanguage(?string $language): self
+    public function voiceLanguage(VoiceLanguage $language): self
     {
-        if (!$language) {
+
+        if ($language->value === 'auto') {
             unset($this->options['voice_lang']);
-
-            return $this;
+        } else {
+            $this->options['voice_lang'] = $language->value;
         }
-
-        $language = strtolower($language);
-
-        if (!VoiceLanguage::tryFrom($language)) {
-            $allowed = implode(', ', array_map(static fn ($case) => $case->value, VoiceLanguage::cases()));
-            throw new InvalidArgumentException(
-                sprintf("The language '%s' is not supported; supported languages are: %s.", $language, $allowed)
-            );
-        }
-
-        $this->options['voice_lang'] = $language;
 
         return $this;
     }
@@ -89,16 +79,10 @@ final class Lox24Options implements MessageOptionsInterface
 
     /**
      * The message type: 'sms' or 'voice'.
-     * E.g. type('sms') or type('voice')
      */
-    public function type(string $type): self
+    public function type(Type $type): self
     {
-        $service = Type::tryFrom($type);
-        if (!$service) {
-            throw new InvalidArgumentException(sprintf("Invalid type: %s", $type));
-        }
-
-        $this->options['type'] = $service->value;
+        $this->options['type'] = $type->value;
 
         return $this;
     }

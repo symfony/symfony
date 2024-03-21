@@ -9,8 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24Options;
+use Symfony\Component\Notifier\Bridge\Lox24\Type;
+use Symfony\Component\Notifier\Bridge\Lox24\VoiceLanguage;
 
 /**
  * @author Andrei Lebedev <andrew.lebedev@gmail.com>
@@ -30,30 +34,15 @@ class Lox24OptionsTest extends TestCase
         $this->assertSame(0, $options->toArray()['delivery_at']);
     }
 
-    public function testVoiceLangNull(): void
+    public function testVoiceLangAuto(): void
     {
-        $options = (new Lox24Options())->voiceLanguage(null);
-        $this->assertNull($options->toArray()['voice_lang'] ?? null);
+        $options = (new Lox24Options())->voiceLanguage(VoiceLanguage::Auto);
+        $this->assertNull($options->toArray()['voice_lang']);
     }
 
-    public function testVoiceLangInvalid(): void
+    public function testVoiceLangValid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'The language \'invalid\' is not supported; supported languages are: de, en, es, fr, it, auto.'
-        );
-        (new Lox24Options())->voiceLanguage('invalid');
-    }
-
-    public function testVoiceLangValidLower(): void
-    {
-        $options = (new Lox24Options())->voiceLanguage('en');
-        $this->assertSame('en', $options->toArray()['voice_lang']);
-    }
-
-    public function testVoiceLangValidUpper(): void
-    {
-        $options = (new Lox24Options())->voiceLanguage('EN');
+        $options = (new Lox24Options())->voiceLanguage(VoiceLanguage::English);
         $this->assertSame('en', $options->toArray()['voice_lang']);
     }
 
@@ -79,20 +68,14 @@ class Lox24OptionsTest extends TestCase
 
     public function testTypeSms(): void
     {
-        $options = (new Lox24Options())->type('sms');
+        $options = (new Lox24Options())->type(Type::Sms);
         $this->assertSame('sms', $options->toArray()['type']);
     }
 
     public function testTypeVoice(): void
     {
-        $options = (new Lox24Options())->type('voice');
+        $options = (new Lox24Options())->type(Type::Voice);
         $this->assertSame('voice', $options->toArray()['type']);
     }
 
-    public function testTypeInvalid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid type: fax');
-        (new Lox24Options())->type('fax');
-    }
 }

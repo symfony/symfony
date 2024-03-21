@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Notifier\Bridge\Lox24;
 
 use DateTimeInterface;
@@ -41,7 +39,7 @@ final class Lox24Options implements MessageOptionsInterface
      * If Null or not set, the message will be sent immediately.
      * E.g. deliveryAt(new DateTime('2024-03-21 12:17:00')) or deliveryAt(null)
      */
-    public function deliveryAt(?DateTimeInterface $deliveryAt = null): self
+    public function deliveryAt(?DateTimeInterface $deliveryAt): self
     {
         $this->options['delivery_at'] = $deliveryAt ? $deliveryAt->getTimestamp() : 0;
 

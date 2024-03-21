@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpClient\MockHttpClient;

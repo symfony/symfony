@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24Options;
 

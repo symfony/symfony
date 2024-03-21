@@ -37,7 +37,7 @@ class Lox24OptionsTest extends TestCase
     public function testVoiceLangAuto(): void
     {
         $options = (new Lox24Options())->voiceLanguage(VoiceLanguage::Auto);
-        $this->assertNull($options->toArray()['voice_lang']);
+        $this->assertNull($options->toArray()['voice_lang'] ?? null);
     }
 
     public function testVoiceLangValid(): void

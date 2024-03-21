@@ -23,11 +23,9 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 trait DecoratorTrait
 {
-    private HttpClientInterface $client;
-
-    public function __construct(?HttpClientInterface $client = null)
+    public function __construct(private ?HttpClientInterface $client = null)
     {
-        $this->client = $client ?? HttpClient::create();
+        $this->client ??= HttpClient::create();
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface

@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-03-20T18:36:27Z
+
+should we also implement this in ArrayInput (and deprecate not implementing in child classes of Input to have it in all Input implementations in 8.0) ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-21T07:42:31Z
+
+> should we also implement this in ArrayInput (and deprecate not implementing in child classes of Input to have it in all Input implementations in 8.0) ?
+
+I though about this, and It's not necessary IMHO. since you construct the array yourself, before calling new ArrayInput, you already have the array by definition.
+
+More over, I don't really this any use case for that.
+
+Anyway, I started to implements it:
+
+```diff
+diff --git a/src/Symfony/Component/Console/Input/ArrayInput.php b/src/Symfony/Component/Console/Input/ArrayInput.php
+index d27ff411ee..5f4439faf1 100644
+--- a/src/Symfony/Component/Console/Input/ArrayInput.php
++++ b/src/Symfony/Component/Console/Input/ArrayInput.php
+@@ -87,6 +87,35 @@ class ArrayInput extends Input
+         return $default;
+     }
+
++    /**
++     * Returns un-parsed and not validated tokens.
++     *
++     * @param bool $strip Whether to return the raw parameters (false) or the values after the command name (true)
++     *
++     * @return list<string>
++     */
++    public function getRawTokens(bool $strip = false): array
++    {
++        if (!$strip) {
++            return $this->parameters;
++        }
++
++        $parameters = [];
++        $keep = false;
++        foreach ($this->parameters as $name => $value) {
++            if (!$keep && $value === $this->getFirstArgument()) {
++                $keep = true;
++
++                continue;
++            }
++            if ($keep) {
++                $parameters[$name] = $value;
++            }
++        }
++
++        return $parameters;
++    }
++
+     /**
+      * Returns a stringified representation of the args passed to the command.
+      */
+diff --git a/src/Symfony/Component/Console/Tests/Input/ArrayInputTest.php b/src/Symfony/Component/Console/Tests/Input/ArrayInputTest.php
+index d6fe32bb3a..f965e3c58e 100644
+--- a/src/Symfony/Component/Console/Tests/Input/ArrayInputTest.php
++++ b/src/Symfony/Component/Console/Tests/Input/ArrayInputTest.php
+@@ -170,4 +170,28 @@ class ArrayInputTest extends TestCase
+         $input = new ArrayInput(['array_arg' => ['val_1', 'val_2']]);
+         $this->assertSame('val_1 val_2', (string) $input);
+     }
++
++
++    public function testGetRawTokensFalse()
++    {
++        $input = new ArrayInput(['cli.php', '--foo', 'bar']);
++        $this->assertSame(['cli.php', '--foo', 'bar'], $input->getRawTokens());
++    }
++
++    /**
++     * @dataProvider provideGetRawTokensTrueTests
++     */
++    public function testGetRawTokensTrue(array $argv, array $expected)
++    {
++        $input = new ArrayInput($argv);
++        $this->assertSame($expected, $input->getRawTokens(true));
++    }
++
++    public static function provideGetRawTokensTrueTests(): iterable
++    {
++        yield [['command' => 'foo:bar'], []];
++        yield [['command' => 'foo:bar', '--no-ansi' => true], ['--no-ansi' => true]];
++        yield [['command' => 'foo:bar', 'name' => 'john'], ['name' => 'john']];
++        yield [['--no-ansi' => true, 'command' => 'foo:bar', 'name' => 'john'], ['name' => 'john']];
++    }
+ }
+```
+
+But when I see the tests, especially the very last one, I really think it does not make sens to add it to the array input, and by extension to input

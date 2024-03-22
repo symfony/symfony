@@ -21,7 +21,7 @@ final class DatePoint extends \DateTimeImmutable
     /**
      * @throws \DateMalformedStringException When $datetime is invalid
      */
-    public function __construct(string $datetime = 'now', \DateTimeZone $timezone = null, parent $reference = null)
+    public function __construct(string $datetime = 'now', ?\DateTimeZone $timezone = null, ?parent $reference = null)
     {
         $now = $reference ?? Clock::get()->now();
 
@@ -51,7 +51,7 @@ final class DatePoint extends \DateTimeImmutable
     /**
      * @throws \DateMalformedStringException When $format or $datetime are invalid
      */
-    public static function createFromFormat(string $format, string $datetime, \DateTimeZone $timezone = null): static
+    public static function createFromFormat(string $format, string $datetime, ?\DateTimeZone $timezone = null): static
     {
         return parent::createFromFormat($format, $datetime, $timezone) ?: throw new \DateMalformedStringException(static::getLastErrors()['errors'][0] ?? 'Invalid date string or format.');
     }
@@ -116,5 +116,27 @@ final class DatePoint extends \DateTimeImmutable
     public function getTimezone(): \DateTimeZone
     {
         return parent::getTimezone() ?: throw new \DateInvalidTimeZoneException('The DatePoint object has no timezone.');
+    }
+
+    public function setMicrosecond(int $microsecond): static
+    {
+        if ($microsecond < 0 || $microsecond > 999999) {
+            throw new \DateRangeError('DatePoint::setMicrosecond(): Argument #1 ($microsecond) must be between 0 and 999999, '.$microsecond.' given');
+        }
+
+        if (\PHP_VERSION_ID < 80400) {
+            return $this->setTime(...explode('.', $this->format('H.i.s.'.$microsecond)));
+        }
+
+        return parent::setMicrosecond($microsecond);
+    }
+
+    public function getMicrosecond(): int
+    {
+        if (\PHP_VERSION_ID >= 80400) {
+            return parent::getMicrosecond();
+        }
+
+        return $this->format('u');
     }
 }

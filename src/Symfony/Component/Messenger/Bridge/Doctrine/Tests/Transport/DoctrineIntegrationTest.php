@@ -64,10 +64,29 @@ class DoctrineIntegrationTest extends TestCase
         // DBAL 2 compatibility
         $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
 
-        $available_at = new \DateTimeImmutable($result->fetchOne());
+        $availableAt = new \DateTimeImmutable($result->fetchOne(), new \DateTimeZone('UTC'));
 
-        $now = new \DateTimeImmutable('now + 60 seconds');
-        $this->assertGreaterThan($now, $available_at);
+        $now = new \DateTimeImmutable('now + 60 seconds', new \DateTimeZone('UTC'));
+        $this->assertGreaterThan($now, $availableAt);
+    }
+
+    public function testSendWithNegativeDelay()
+    {
+        $this->connection->send('{"message": "Hi, I am not actually delayed"}', ['type' => DummyMessage::class], -600000);
+
+        $qb = $this->driverConnection->createQueryBuilder()
+            ->select('m.available_at')
+            ->from('messenger_messages', 'm')
+            ->where('m.body = :body')
+            ->setParameter('body', '{"message": "Hi, I am not actually delayed"}');
+
+        // DBAL 2 compatibility
+        $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
+
+        $availableAt = new \DateTimeImmutable($result->fetchOne(), new \DateTimeZone('UTC'));
+
+        $now = new \DateTimeImmutable('now - 60 seconds', new \DateTimeZone('UTC'));
+        $this->assertLessThan($now, $availableAt);
     }
 
     public function testItRetrieveTheFirstAvailableMessage()
@@ -148,7 +167,7 @@ class DoctrineIntegrationTest extends TestCase
     public function testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout()
     {
         $this->connection->setup();
-        $twoHoursAgo = new \DateTimeImmutable('now -2 hours');
+        $twoHoursAgo = new \DateTimeImmutable('now -2 hours', new \DateTimeZone('UTC'));
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi requeued"}',
             'headers' => json_encode(['type' => DummyMessage::class]),

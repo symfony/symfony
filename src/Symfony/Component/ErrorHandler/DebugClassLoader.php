@@ -158,13 +158,13 @@ class DebugClassLoader
             $test = realpath($dir.$test);
 
             if (false === $test || false === $i) {
-                // filesystem is case sensitive
+                // filesystem is case-sensitive
                 self::$caseCheck = 0;
             } elseif (str_ends_with($test, $file)) {
-                // filesystem is case insensitive and realpath() normalizes the case of characters
+                // filesystem is case-insensitive and realpath() normalizes the case of characters
                 self::$caseCheck = 1;
             } elseif ('Darwin' === \PHP_OS_FAMILY) {
-                // on MacOSX, HFS+ is case insensitive but realpath() doesn't normalize the case of characters
+                // on MacOSX, HFS+ is case-insensitive but realpath() doesn't normalize the case of characters
                 self::$caseCheck = 2;
             } else {
                 // filesystem case checks failed, fallback to disabling them
@@ -184,7 +184,7 @@ class DebugClassLoader
     public static function enable(): void
     {
         // Ensures we don't hit https://bugs.php.net/42098
-        class_exists(\Symfony\Component\ErrorHandler\ErrorHandler::class);
+        class_exists(ErrorHandler::class);
         class_exists(\Psr\Log\LogLevel::class);
 
         if (!\is_array($functions = spl_autoload_functions())) {
@@ -311,7 +311,7 @@ class DebugClassLoader
         $this->checkClass($class, $file);
     }
 
-    private function checkClass(string $class, string $file = null): void
+    private function checkClass(string $class, ?string $file = null): void
     {
         $exists = null === $file || class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 
@@ -796,7 +796,7 @@ class DebugClassLoader
         return $ownInterfaces;
     }
 
-    private function setReturnType(string $types, string $class, string $method, string $filename, ?string $parent, \ReflectionType $returnType = null): void
+    private function setReturnType(string $types, string $class, string $method, string $filename, ?string $parent, ?\ReflectionType $returnType = null): void
     {
         if ('__construct' === $method) {
             return;
@@ -1135,7 +1135,7 @@ EOTXT;
         $braces = 0;
         for (; $i < $end; ++$i) {
             if (!$inClosure) {
-                $inClosure = str_contains($code[$i], 'function (');
+                $inClosure = false !== strpos($code[$i], 'function (');
             }
 
             if ($inClosure) {

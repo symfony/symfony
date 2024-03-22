@@ -44,7 +44,7 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
         return $this->storage->getToken();
     }
 
-    public function setToken(TokenInterface $token = null): void
+    public function setToken(?TokenInterface $token = null): void
     {
         $this->storage->setToken($token);
 

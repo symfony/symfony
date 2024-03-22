@@ -27,7 +27,7 @@ class PredisTagAwareAdapterTest extends PredisAdapterTest
         $this->skippedTests['testTagItemExpiry'] = 'Testing expiration slows down the test suite';
     }
 
-    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface
     {
         $this->assertInstanceOf(\Predis\Client::class, self::$redis);
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);

@@ -32,7 +32,7 @@ class RemotePackageDownloader
      *
      * @return string[] The downloaded packages
      */
-    public function downloadPackages(callable $progressCallback = null): array
+    public function downloadPackages(?callable $progressCallback = null): array
     {
         try {
             $installed = $this->loadInstalled();

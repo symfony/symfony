@@ -75,7 +75,7 @@ class CacheClearCommandTest extends TestCase
         $kernelRef = new \ReflectionObject($this->kernel);
         $kernelFile = $kernelRef->getFileName();
         /** @var ResourceInterface[] $meta */
-        $meta = unserialize(file_get_contents($containerMetaFile));
+        $meta = unserialize($this->fs->readFile($containerMetaFile));
         $found = false;
         foreach ($meta as $resource) {
             if ((string) $resource === $kernelFile) {
@@ -93,7 +93,7 @@ class CacheClearCommandTest extends TestCase
         );
         $this->assertMatchesRegularExpression(
             sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass),
-            file_get_contents($containerFile),
+            $this->fs->readFile($containerFile),
             'kernel.container_class is properly set on the dumped container'
         );
     }

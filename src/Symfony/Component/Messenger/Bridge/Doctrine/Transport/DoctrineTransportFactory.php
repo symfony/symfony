@@ -25,13 +25,14 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class DoctrineTransportFactory implements TransportFactoryInterface
 {
-    private ConnectionRegistry $registry;
-
-    public function __construct(ConnectionRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        private ConnectionRegistry $registry,
+    ) {
     }
 
+    /**
+     * @param array $options You can set 'use_notify' to false to not use LISTEN/NOTIFY with postgresql
+     */
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         $useNotify = ($options['use_notify'] ?? true);

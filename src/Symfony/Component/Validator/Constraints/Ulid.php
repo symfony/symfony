@@ -14,6 +14,10 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates that a value is a valid Universally Unique Lexicographically Sortable Identifier (ULID).
+ *
+ * @see https://github.com/ulid/spec
+ *
  * @author Laurent Clouet <laurent35240@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -33,11 +37,15 @@ class Ulid extends Constraint
 
     public string $message = 'This is not a valid ULID.';
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
+     */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        array $groups = null,
-        mixed $payload = null
+        ?array $options = null,
+        ?string $message = null,
+        ?array $groups = null,
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

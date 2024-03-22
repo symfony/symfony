@@ -17,6 +17,7 @@ CHANGELOG
 6.4
 ---
 
+ * [BC BREAK] Add argument `$buildDir` to `ProxyCacheWarmer::warmUp()` 
  * [BC BREAK] Add return type-hints to `EntityFactory`
  * Deprecate `DbalLogger`, use a middleware instead
  * Deprecate not constructing `DoctrineDataCollector` with an instance of `DebugDataHolder`

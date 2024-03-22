@@ -50,27 +50,17 @@ class TranslationDebugCommand extends Command
     public const MESSAGE_UNUSED = 1;
     public const MESSAGE_EQUALS_FALLBACK = 2;
 
-    private TranslatorInterface $translator;
-    private TranslationReaderInterface $reader;
-    private ExtractorInterface $extractor;
-    private ?string $defaultTransPath;
-    private ?string $defaultViewsPath;
-    private array $transPaths;
-    private array $codePaths;
-    private array $enabledLocales;
-
-    public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private TranslationReaderInterface $reader,
+        private ExtractorInterface $extractor,
+        private ?string $defaultTransPath = null,
+        private ?string $defaultViewsPath = null,
+        private array $transPaths = [],
+        private array $codePaths = [],
+        private array $enabledLocales = [],
+    ) {
         parent::__construct();
-
-        $this->translator = $translator;
-        $this->reader = $reader;
-        $this->extractor = $extractor;
-        $this->defaultTransPath = $defaultTransPath;
-        $this->defaultViewsPath = $defaultViewsPath;
-        $this->transPaths = $transPaths;
-        $this->codePaths = $codePaths;
-        $this->enabledLocales = $enabledLocales;
     }
 
     protected function configure(): void
@@ -223,8 +213,8 @@ EOF
                     }
                 }
 
-                if (!\in_array(self::MESSAGE_UNUSED, $states) && $input->getOption('only-unused')
-                    || !\in_array(self::MESSAGE_MISSING, $states) && $input->getOption('only-missing')
+                if (!\in_array(self::MESSAGE_UNUSED, $states, true) && $input->getOption('only-unused')
+                    || !\in_array(self::MESSAGE_MISSING, $states, true) && $input->getOption('only-missing')
                 ) {
                     continue;
                 }

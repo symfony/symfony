@@ -151,7 +151,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public static function getUncanonicalizedLocales(): iterable
+    public static function getUncanonicalizedLocales(): array
     {
         return [
             ['en-US'],

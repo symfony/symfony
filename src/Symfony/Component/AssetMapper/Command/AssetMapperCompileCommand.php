@@ -62,7 +62,7 @@ EOT
     {
         $io = new SymfonyStyle($input, $output);
 
-        $this->eventDispatcher?->dispatch(new PreAssetsCompileEvent($output));
+        $this->eventDispatcher?->dispatch(new PreAssetsCompileEvent($io));
 
         // remove existing config files
         $this->compiledConfigReader->removeConfig(AssetMapper::MANIFEST_FILE_NAME);
@@ -89,7 +89,7 @@ EOT
 
         if ($this->isDebug) {
             $io->warning(sprintf(
-                'You are compiling assets in development. Symfony will not serve any changed assets until you delete the files in the "%s" directory.',
+                'Debug mode is enabled in your project: Symfony will not serve any changed assets until you delete the files in the "%s" directory again.',
                 $this->shortenPath(\dirname($manifestPath))
             ));
         }

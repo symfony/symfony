@@ -50,12 +50,12 @@ class ImpersonateUrlGenerator
         return $request->getUriForPath($this->buildPath(null, $identifier));
     }
 
-    public function generateExitPath(string $targetUri = null): string
+    public function generateExitPath(?string $targetUri = null): string
     {
         return $this->buildPath($targetUri);
     }
 
-    public function generateExitUrl(string $targetUri = null): string
+    public function generateExitUrl(?string $targetUri = null): string
     {
         if (null === $request = $this->requestStack->getCurrentRequest()) {
             return '';
@@ -69,7 +69,7 @@ class ImpersonateUrlGenerator
         return $this->tokenStorage->getToken() instanceof SwitchUserToken;
     }
 
-    private function buildPath(string $targetUri = null, string $identifier = SwitchUserListener::EXIT_VALUE): string
+    private function buildPath(?string $targetUri = null, string $identifier = SwitchUserListener::EXIT_VALUE): string
     {
         if (null === ($request = $this->requestStack->getCurrentRequest())) {
             return '';

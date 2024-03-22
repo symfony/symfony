@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="lt" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -36,11 +36,11 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Nebuvo tikimasi Šis laukas.</target>
+                <target>Nebuvo tikimasi šio laukelio.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>Šiame lauke yra dingęs.</target>
+                <target>Trūkstamas laukelis.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Byla nėra paveikslėlis.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Ši reikšmė nėra tinkamas IP adresas.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target state="needs-review-translation">Ši vertė nėra galiojantis IP adresas.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Nebuvo įkelta jokių failų.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Nėra sukonfiguruoto jokio laikino katalogo php.ini faile.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target state="needs-review-translation">php.ini nesukonfigūruotas laikinas aplankas, arba sukonfigūruotas aplankas neegzistuoja.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Kortelės tipas nepalaikomas arba klaidingas kortelės numeris.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Ši reišmė neatitinka tarptautinio banko sąskaitos numerio formato (IBAN).</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target state="needs-review-translation">Ši vertė nėra galiojantis Tarptautinis Banko Sąskaitos Numeris (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Ši reikšmė neatitinka {{ charset }} koduotės.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Bendrovės Identifikavimo Kodas (BIC) nėra tinkamas.</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target state="needs-review-translation">Ši vertė nėra galiojantis Verslo Identifikavimo Kodas (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Klaida</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Ši reikšmė nėra tinkamas UUID.</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">Ši vertė nėra galiojantis UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -425,6 +425,18 @@
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>Draudžiama naudoti paslėptus perdangos simbolius.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Failo plėtinys netinkamas ({{ extension }}). Leidžiami plėtiniai yra {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-review-translation">Nustatyta simbolių koduotė yra netinkama ({{ detected }}). Leidžiamos koduotės yra {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">Ši vertė nėra galiojantis MAC adresas.</target>
             </trans-unit>
         </body>
     </file>

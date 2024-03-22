@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
@@ -21,6 +22,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class ImportMapConfigReaderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private Filesystem $filesystem;
 
     protected function setUp(): void
@@ -161,5 +164,14 @@ EOF;
         $entry = $configReader->findRootImportMapEntry('file2');
         $this->assertSame('file2', $entry->importName);
         $this->assertSame('file2.js', $entry->path);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedMethodTriggerDeprecation()
+    {
+        $this->expectDeprecation('Since symfony/asset-mapper 7.1: The method "Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader::splitPackageNameAndFilePath()" is deprecated and will be removed in 8.0. Use ImportMapEntry::splitPackageNameAndFilePath() instead.');
+        ImportMapConfigReader::splitPackageNameAndFilePath('foo');
     }
 }

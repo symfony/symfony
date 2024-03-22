@@ -28,6 +28,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Bandwidth\BandwidthTransportFactory::class,
             'package' => 'symfony/bandwidth-notifier',
         ],
+        'bluesky' => [
+            'class' => Bridge\Bluesky\BlueskyTransportFactory::class,
+            'package' => 'symfony/bluesky-notifier',
+        ],
         'brevo' => [
             'class' => Bridge\Brevo\BrevoTransportFactory::class,
             'package' => 'symfony/brevo-notifier',
@@ -196,6 +200,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Pushover\PushoverTransportFactory::class,
             'package' => 'symfony/pushover-notifier',
         ],
+        'pushy' => [
+            'class' => Bridge\Pushy\PushyTransportFactory::class,
+            'package' => 'symfony/pushy-notifier',
+        ],
         'redlink' => [
             'class' => Bridge\Redlink\RedlinkTransportFactory::class,
             'package' => 'symfony/redlink-notifier',
@@ -211,6 +219,10 @@ class UnsupportedSchemeException extends LogicException
         'sendberry' => [
             'class' => Bridge\Sendberry\SendberryTransportFactory::class,
             'package' => 'symfony/sendberry-notifier',
+        ],
+        'sevenio' => [
+            'class' => Bridge\Sevenio\SevenIoTransportFactory::class,
+            'package' => 'symfony/sevenio-notifier',
         ],
         'simpletextin' => [
             'class' => Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
@@ -236,9 +248,17 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
             'package' => 'symfony/sms-biuras-notifier',
         ],
+        'smsbox' => [
+            'class' => Bridge\Smsbox\SmsboxTransportFactory::class,
+            'package' => 'symfony/smsbox-notifier',
+        ],
         'smsc' => [
             'class' => Bridge\Smsc\SmscTransportFactory::class,
             'package' => 'symfony/smsc-notifier',
+        ],
+        'smsense' => [
+            'class' => Bridge\Smsense\SmsenseTransportFactory::class,
+            'package' => 'symfony/smsense-notifier',
         ],
         'sms-factor' => [
             'class' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
@@ -247,6 +267,10 @@ class UnsupportedSchemeException extends LogicException
         'smsmode' => [
             'class' => Bridge\Smsmode\SmsmodeTransportFactory::class,
             'package' => 'symfony/smsmode-notifier',
+        ],
+        'sms-sluzba' => [
+            'class' => Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
+            'package' => 'symfony/sms-sluzba-notifier',
         ],
         'sns' => [
             'class' => Bridge\AmazonSns\AmazonSnsTransportFactory::class,
@@ -305,7 +329,7 @@ class UnsupportedSchemeException extends LogicException
     /**
      * @param string[] $supported
      */
-    public function __construct(Dsn $dsn, string $name = null, array $supported = [], \Throwable $previous = null)
+    public function __construct(Dsn $dsn, ?string $name = null, array $supported = [], ?\Throwable $previous = null)
     {
         $provider = $dsn->getScheme();
         if (false !== $pos = strpos($provider, '+')) {

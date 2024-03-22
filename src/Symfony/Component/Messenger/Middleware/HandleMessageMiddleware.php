@@ -64,7 +64,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
                 /** @var AckStamp $ackStamp */
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {
-                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor) {
+                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor) {
                         if (null !== $e) {
                             $e = new HandlerFailedException($envelope, [$handlerDescriptor->getName() => $e]);
                         } else {

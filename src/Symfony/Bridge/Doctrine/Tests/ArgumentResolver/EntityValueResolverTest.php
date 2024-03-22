@@ -153,7 +153,7 @@ class EntityValueResolverTest extends TestCase
         $request = new Request();
         $request->attributes->set('id', 'test');
 
-        $argument = $this->createArgument('stdClass', new MapEntity(id: 'id'));
+        $argument = $this->createArgument('stdClass', new MapEntity(id: 'id', message: 'Test'));
 
         $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $repository->expects($this->once())
@@ -167,6 +167,7 @@ class EntityValueResolverTest extends TestCase
             ->willReturn($repository);
 
         $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Test');
 
         $resolver->resolve($request, $argument);
     }
@@ -388,12 +389,12 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
-    private function createArgument(string $class = null, MapEntity $entity = null, string $name = 'arg', bool $isNullable = false): ArgumentMetadata
+    private function createArgument(?string $class = null, ?MapEntity $entity = null, string $name = 'arg', bool $isNullable = false): ArgumentMetadata
     {
         return new ArgumentMetadata($name, $class ?? \stdClass::class, false, false, null, $isNullable, $entity ? [$entity] : []);
     }
 
-    private function createRegistry(ObjectManager $manager = null): ManagerRegistry&MockObject
+    private function createRegistry(?ObjectManager $manager = null): ManagerRegistry&MockObject
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
 

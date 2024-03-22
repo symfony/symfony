@@ -31,8 +31,12 @@ final class NtfyTransport extends AbstractTransport
     private ?string $user = null;
     private ?string $password = null;
 
-    public function __construct(private string $topic, private bool $secureHttp = true, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
+    public function __construct(
+        private string $topic,
+        private bool $secureHttp = true,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -41,7 +45,7 @@ final class NtfyTransport extends AbstractTransport
         return $this->topic;
     }
 
-    public function setPassword(?string $password): self
+    public function setPassword(#[\SensitiveParameter] ?string $password): self
     {
         $this->password = $password;
 
@@ -84,6 +88,8 @@ final class NtfyTransport extends AbstractTransport
 
         if (null !== $this->user && null !== $this->password) {
             $headers['Authorization'] = 'Basic '.rtrim(base64_encode($this->user.':'.$this->password), '=');
+        } elseif (null !== $this->password) {
+            $headers['Authorization'] = 'Bearer '.$this->password;
         }
 
         $response = $this->client->request('POST', ($this->secureHttp ? 'https' : 'http').'://'.$this->getEndpoint(), [

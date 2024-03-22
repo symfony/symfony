@@ -105,7 +105,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
         return MockResponse::fromRequest($method, $url, $options, $response);
     }
 
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof ResponseInterface) {
             $responses = [$responses];

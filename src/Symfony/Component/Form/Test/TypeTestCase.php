@@ -32,7 +32,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
     {
         $extensions = [];
 
-        if (\in_array(ValidatorExtensionTrait::class, class_uses($this))) {
+        if (\in_array(ValidatorExtensionTrait::class, class_uses($this), true)) {
             $extensions[] = $this->getValidatorExtension();
         }
 

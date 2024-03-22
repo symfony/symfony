@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="my" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>ဤဖိုင်သည်မှန်ကန်သော ဓါတ်ပုံမဟုတ်ပါ။</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>၎င်းသည်တရားဝင် IP လိပ်စာမဟုတ်ပါ။</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target state="needs-review-translation">ဤတန်ဖိုးသည် မှန်ကန်သော IP လိပ်စာ မဟုတ်ပါ။</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>မည်သည့် ဖိုင်မျှ upload မလုပ်ခဲ့ပါ။</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>php.ini တွင်ယာယီဖိုင်တွဲကိုပြင်ဆင်ထားခြင်းမရှိပါ၊</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target state="needs-review-translation">php.ini တွင်ယာယီဖိုင်တွဲကိုပြင်ဆင်ထားခြင်းမရှိပါ၊ သို့မဟုတ် ပြင်ဆင်ထားသောဖိုင်တွဲမရှိပါ။</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>ကဒ်အမျိုးအစားမမှန်ပါ (သို့မဟုတ်) ကဒ်နံပါတ်မမှန်ပါ။</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>ဤတန်ဖိုးသည် တရား၀င်နိုင်ငံတကာဘဏ်အကောင့်နံပါတ် (International Bank Account Number, IBAN) မဟုတ်ပါ။</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target state="needs-review-translation">ဤတန်ဖိုးသည် မှန်ကန်သော နိုင်ငံတကာ ဘဏ်စာရင်းနံပါတ် (IBAN) မဟုတ်ပါ။</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>ဤတန်ဖိုးသည် မျှော်မှန်းထားသော {{ charset }} စားလုံးနှင့် ကိုက်ညီမှုမရှိပါ။</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>၎င်းသည်မှန်ကန်သော Business Identifier Code (BIC) မဟုတ်ပါ။</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target state="needs-review-translation">ဤတန်ဖိုးသည် မှန်ကန်သော စီးပွားရေး မှတ်ပုံတင်ကုဒ် (BIC) မဟုတ်ပါ။</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>အမှား</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>ဤတန်ဖိုးသည် သင့်လျှော်သော် UUID မဟုတ်ပါ။</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">ဤတန်ဖိုးသည် မှန်ကန်သော UUID မဟုတ်ပါ။</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -389,6 +389,54 @@
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
                 <target>ဤတန်ဖိုးသည်မှန်ကန်သောစကားရပ်ဖြစ်သင့်သည်။</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target state="needs-review-translation">ဤတန်ဖိုးသည် CSS အရောင်မှန်ကန်မှုမရှိပါ။</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target state="needs-review-translation">ဤတန်ဖိုးသည် CIDR မှတ်စုံမှန်ကန်မှုမရှိပါ။</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target state="needs-review-translation">ကွန်ယက်မျက်နှာဖုံး၏ တန်ဖိုးသည် {{ min }} နှင့် {{ max }} ကြားရှိရမည်။</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target state="needs-review-translation">ဖိုင်နာမည်သည် အရှည်လွန်းသည်။ သင်္ကေတ {{ filename_max_length }} သို့မဟုတ် နည်းသည့်အရေအတွက်ရှိရမည်။|ဖိုင်နာမည်သည် အရှည်လွန်းသည်။ သင်္ကေတ {{ filename_max_length }} သို့မဟုတ် နည်းသည့်အရေအတွက်ရှိရမည်။</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target state="needs-review-translation">စကားဝှက်ခိုင်မာမှုနည်းပါးသည်။ ပိုခိုင်မာသော စကားဝှက်ကို သုံးပါ။</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target state="needs-review-translation">ဤတန်ဖိုးတွင် လက်ရှိကန့်သတ်မှုအဆင့်မှ ခွင့်မပြုထားသော ဇာတ်ကောင်များပါဝင်သည်။</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target state="needs-review-translation">မမြင်ရသော ဇာတ်ကောင်များကို သုံးခြင်းကို ခွင့်မပြုပါ။</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target state="needs-review-translation">မတူညီသော ဇာတ်ကောင်များမှ နံပါတ်များကို ရောနှောစပ်ခြင်းကို ခွင့်မပြုပါ။</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target state="needs-review-translation">ပုန်းထားသော အထပ်ကောင်းဇာတ်ကောင်များကို သုံးခြင်းကို ခွင့်မပြုပါ။</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target state="needs-review-translation">ဖိုင်တွင်းတိုးခြင်းသည် မမှန်ကန်ပါ ({{ extension }})။ ခွင့်ပြုထားသော တိုးခြင်းများမှာ {{ extensions }} ဖြစ်သည်။</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-review-translation">တွေ့ရှိထားသော စာလုံးကုဒ်စံနစ်သည် မမှန်ကန်ပါ ({{ detected }})။ ခွင့်ပြုထားသော ကုဒ်စံနစ်များမှာ {{ encodings }} ဖြစ်သည်။</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">ဤတန်ဖိုးသည် မှန်ကန်သော MAC လိပ်စာ မဟုတ်ပါ။</target>
             </trans-unit>
         </body>
     </file>

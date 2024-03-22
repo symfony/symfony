@@ -1,5 +1,5 @@
 <p align="center"><a href="https://symfony.com" target="_blank">
-    <img src="https://symfony.com/logos/symfony_black_02.svg">
+    <img src="https://symfony.com/logos/symfony_dynamic_01.svg" alt="Symfony Logo">
 </a></p>
 
 [Symfony][1] is a **PHP framework** for web and console applications and a set
@@ -17,26 +17,16 @@ Installation
 Sponsor
 -------
 
-Symfony 7.0 is [backed][27] by
-- [Shopware][28]
-- [Sulu][29]
-- [Les-Tilleuls.coop][30]
+Symfony 7.1 is [backed][27] by
+- [Rector][29]
 
-**Shopware** is an open headless commerce platform powered by Symfony and Vue.js
-that is used by thousands of shops and supported by a huge, worldwide community
-of developers, agencies and merchants.
+**Rector** helps successful and growing companies to get the most of the code
+they already have. Including upgrading to the latest Symfony LTS. They deliver
+automated refactoring, reduce maintenance costs, speed up feature delivery, and
+transform legacy code into a strategic asset. They can handle the dirty work,
+so you can focus on the features.
 
-**Sulu** is the CMS for Symfony developers. It provides pre-built content-management
-features while giving developers the freedom to build, deploy, and maintain custom
-solutions using full-stack Symfony. Sulu is ideal for creating complex websites,
-integrating external tools, and building custom-built solutions.
-
-**Les-Tilleuls.coop** is a team of 70+ Symfony experts who can help you design,
-develop and fix your projects. We provide a wide range of professional services
-including development, consulting, coaching, training and audits. We also are
-highly skilled in JS, Go and DevOps. We are a worker cooperative!
-
-Help Symfony by [sponsoring][31] its development!
+Help Symfony by [sponsoring][28] its development!
 
 Documentation
 -------------
@@ -99,7 +89,5 @@ and supported by [Symfony contributors][19].
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
-[28]: https://www.shopware.com
-[29]: https://sulu.io
-[30]: https://les-tilleuls.coop/
-[31]: https://symfony.com/sponsor
+[28]: https://symfony.com/sponsor
+[29]: https://getrector.com

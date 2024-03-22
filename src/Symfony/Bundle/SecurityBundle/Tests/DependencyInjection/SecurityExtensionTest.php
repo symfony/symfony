@@ -869,11 +869,9 @@ class SecurityExtensionTest extends TestCase
         $container->loadFromExtension('security');
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Enabling bundle "Symfony\Bundle\SecurityBundle\SecurityBundle" and not configuring it is not allowed.');
+        $this->expectExceptionMessage('The SecurityBundle is enabled but is not configured. Please define your settings for the "security" config section.');
 
         $container->compile();
-
-        $this->assertFalse($container->has('security.authorization_checker'));
     }
 
     public function testCustomHasherWithMigrateFrom()

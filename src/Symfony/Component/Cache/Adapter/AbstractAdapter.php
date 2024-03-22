@@ -86,7 +86,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
      *
      * Using ApcuAdapter makes system caches compatible with read-only filesystems.
      */
-    public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, LoggerInterface $logger = null): AdapterInterface
+    public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, ?LoggerInterface $logger = null): AdapterInterface
     {
         $opcache = new PhpFilesAdapter($namespace, $defaultLifetime, $directory, true);
         if (null !== $logger) {
@@ -124,8 +124,11 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
             return CouchbaseCollectionAdapter::createConnection($dsn, $options);
         }
+        if (preg_match('/^(mysql|oci|pgsql|sqlsrv|sqlite):/', $dsn)) {
+            return PdoAdapter::createConnection($dsn, $options);
+        }
 
-        throw new InvalidArgumentException('Unsupported DSN: it does not start with "redis[s]:", "memcached:" nor "couchbase:".');
+        throw new InvalidArgumentException('Unsupported DSN: it does not start with "redis[s]:", "memcached:", "couchbase:", "mysql:", "oci:", "pgsql:", "sqlsrv:" nor "sqlite:".');
     }
 
     public function commit(): bool

@@ -50,8 +50,6 @@ final class MailgunRequestParser extends AbstractRequestParser
             || !isset($content['signature']['token'])
             || !isset($content['signature']['signature'])
             || !isset($content['event-data']['event'])
-            || !isset($content['event-data']['tags'])
-            || !isset($content['event-data']['user-variables'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }

@@ -128,7 +128,7 @@ abstract class Descriptor implements DescriptorInterface
             }
         }
 
-        if (isset($definition['deprecation']) && isset($definition['deprecation']['message']) && \is_string($definition['deprecation']['message'])) {
+        if (isset($definition['deprecation']['message']) && \is_string($definition['deprecation']['message'])) {
             $definition['deprecationMessage'] = strtr($definition['deprecation']['message'], ['%name%' => $option]);
             $definition['deprecationPackage'] = $definition['deprecation']['package'];
             $definition['deprecationVersion'] = $definition['deprecation']['version'];

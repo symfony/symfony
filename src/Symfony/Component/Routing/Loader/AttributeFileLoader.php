@@ -25,17 +25,15 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class AttributeFileLoader extends FileLoader
 {
-    protected AttributeClassLoader $loader;
-
-    public function __construct(FileLocatorInterface $locator, AttributeClassLoader $loader)
-    {
+    public function __construct(
+        FileLocatorInterface $locator,
+        protected AttributeClassLoader $loader,
+    ) {
         if (!\function_exists('token_get_all')) {
             throw new \LogicException('The Tokenizer extension is required for the routing attribute loader.');
         }
 
         parent::__construct($locator);
-
-        $this->loader = $loader;
     }
 
     /**
@@ -43,7 +41,7 @@ class AttributeFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */
-    public function load(mixed $file, string $type = null): ?RouteCollection
+    public function load(mixed $file, ?string $type = null): ?RouteCollection
     {
         $path = $this->locator->locate($file);
 
@@ -63,7 +61,7 @@ class AttributeFileLoader extends FileLoader
         return $collection;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return \is_string($resource) && 'php' === pathinfo($resource, \PATHINFO_EXTENSION) && (!$type || 'attribute' === $type);
     }

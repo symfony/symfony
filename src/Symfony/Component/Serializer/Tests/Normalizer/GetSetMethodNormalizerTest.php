@@ -30,6 +30,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ClassWithIgnoreAnnotation;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ClassWithIgnoreAttribute;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
@@ -38,6 +39,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttrib
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\FilterBoolTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\GroupsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\IgnoredAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
@@ -52,6 +54,7 @@ class GetSetMethodNormalizerTest extends TestCase
     use CallbacksTestTrait;
     use CircularReferenceTestTrait;
     use ConstructorArgumentsTestTrait;
+    use FilterBoolTestTrait;
     use GroupsTestTrait;
     use IgnoredAttributesTestTrait;
     use MaxDepthTestTrait;
@@ -278,6 +281,11 @@ class GetSetMethodNormalizerTest extends TestCase
         return new GetSetMethodNormalizer($classMetadataFactory);
     }
 
+    protected function getNormalizerForFilterBool(): GetSetMethodNormalizer
+    {
+        return new GetSetMethodNormalizer();
+    }
+
     public function testGroupsNormalizeWithNameConverter()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -294,6 +302,8 @@ class GetSetMethodNormalizerTest extends TestCase
                 'bar' => null,
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
+                'default' => null,
+                'class_name' => null,
             ],
             $this->normalizer->normalize($obj, null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
         );
@@ -374,14 +384,15 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testUnableToNormalizeObjectAttribute()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot normalize attribute "object" because the injected serializer is not a normalizer');
         $serializer = $this->createMock(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);
 
         $obj = new GetSetDummy();
         $object = new \stdClass();
         $obj->setObject($object);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "object" because the injected serializer is not a normalizer');
 
         $this->normalizer->normalize($obj, 'any');
     }
@@ -391,14 +402,12 @@ class GetSetMethodNormalizerTest extends TestCase
         $serializer = new Serializer([$this->normalizer]);
         $this->normalizer->setSerializer($serializer);
 
-        $siblingHolder = new SiblingHolder();
-
         $expected = [
             'sibling0' => ['coopTilleuls' => 'Les-Tilleuls.coop'],
             'sibling1' => ['coopTilleuls' => 'Les-Tilleuls.coop'],
             'sibling2' => ['coopTilleuls' => 'Les-Tilleuls.coop'],
         ];
-        $this->assertEquals($expected, $this->normalizer->normalize($siblingHolder));
+        $this->assertEquals($expected, $this->normalizer->normalize(new SiblingHolder()));
     }
 
     public function testDenormalizeNonExistingAttribute()
@@ -427,9 +436,22 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new ObjectWithJustStaticSetterDummy()));
     }
 
-    public function testNotIgnoredMethodSupport()
+    /**
+     * @param class-string $class
+     *
+     * @dataProvider provideNotIgnoredMethodSupport
+     */
+    public function testNotIgnoredMethodSupport(string $class)
     {
-        $this->assertFalse($this->normalizer->supportsNormalization(new ClassWithIgnoreAttribute()));
+        $this->assertFalse($this->normalizer->supportsNormalization(new $class()));
+    }
+
+    public static function provideNotIgnoredMethodSupport(): iterable
+    {
+        return [
+            [ClassWithIgnoreAttribute::class],
+            [ClassWithIgnoreAnnotation::class],
+        ];
     }
 
     public function testPrivateSetter()
@@ -487,7 +509,7 @@ class GetSetMethodNormalizerTest extends TestCase
         return new GetSetMethodNormalizer();
     }
 
-    protected function getNormalizerForSkipUninitializedValues(): NormalizerInterface
+    protected function getNormalizerForSkipUninitializedValues(): GetSetMethodNormalizer
     {
         return new GetSetMethodNormalizer(new ClassMetadataFactory(new AttributeLoader()));
     }

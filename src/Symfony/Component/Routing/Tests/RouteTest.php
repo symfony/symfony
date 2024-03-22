@@ -146,8 +146,10 @@ class RouteTest extends TestCase
      */
     public function testSetInvalidRequirement($req)
     {
-        $this->expectException(\InvalidArgumentException::class);
         $route = new Route('/{foo}');
+
+        $this->expectException(\InvalidArgumentException::class);
+
         $route->setRequirement('foo', $req);
     }
 

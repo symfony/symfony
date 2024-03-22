@@ -98,7 +98,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerService(object $service, array $options = [], ?ContainerBuilder $container = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -206,7 +206,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ?ContainerBuilder $container = null): void
     {
         $output = '';
 
@@ -276,7 +276,7 @@ class MarkdownDescriptor extends Descriptor
         $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerAlias(Alias $alias, array $options = [], ?ContainerBuilder $container = null): void
     {
         $output = '- Service: `'.$alias.'`'
             ."\n".'- Public: '.($alias->isPublic() && !$alias->isPrivate() ? 'yes' : 'no');
@@ -403,7 +403,7 @@ class MarkdownDescriptor extends Descriptor
             $string .= "\n- Type: `closure`";
 
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure}')) {
+            if ($r->isAnonymous()) {
                 $this->write($string."\n");
 
                 return;

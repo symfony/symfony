@@ -23,8 +23,14 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
 {
     private int $divisor;
 
-    public function __construct(?int $scale = 2, ?bool $grouping = true, ?int $roundingMode = \NumberFormatter::ROUND_HALFUP, ?int $divisor = 1, string $locale = null)
-    {
+    public function __construct(
+        ?int $scale = 2,
+        ?bool $grouping = true,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        ?int $divisor = 1,
+        ?string $locale = null,
+        private string $modelType = 'float',
+    ) {
         parent::__construct($scale ?? 2, $grouping ?? true, $roundingMode, $locale);
 
         $this->divisor = $divisor ?? 1;
@@ -62,7 +68,17 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     {
         $value = parent::reverseTransform($value);
         if (null !== $value && 1 !== $this->divisor) {
-            $value = (float) (string) ($value * $this->divisor);
+            $value = (string) ($value * $this->divisor);
+
+            if ('float' === $this->modelType) {
+                return (float) $value;
+            }
+
+            if ($value > \PHP_INT_MAX || $value < \PHP_INT_MIN) {
+                throw new TransformationFailedException(sprintf("The value '%d' is too large you should pass the 'model_type' to 'float'.", $value));
+            }
+
+            $value = (int) $value;
         }
 
         return $value;

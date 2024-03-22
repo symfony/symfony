@@ -30,7 +30,12 @@ class FileLocator implements FileLocatorInterface
         $this->paths = (array) $paths;
     }
 
-    public function locate(string $name, string $currentPath = null, bool $first = true): string|array
+    /**
+     * @return string|string[]
+     *
+     * @psalm-return ($first is true ? string : string[])
+     */
+    public function locate(string $name, ?string $currentPath = null, bool $first = true): string|array
     {
         if ('' === $name) {
             throw new \InvalidArgumentException('An empty file name is not valid to be located.');

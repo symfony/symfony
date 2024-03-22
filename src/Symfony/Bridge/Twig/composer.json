@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.2",
         "symfony/translation-contracts": "^2.5|^3",
-        "twig/twig": "^3.0.4|^4.0"
+        "twig/twig": "^3.0.4"
     },
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3|^4",
@@ -43,7 +43,7 @@
         "symfony/security-core": "^6.4|^7.0",
         "symfony/security-csrf": "^6.4|^7.0",
         "symfony/security-http": "^6.4|^7.0",
-        "symfony/serializer": "^6.4|^7.0",
+        "symfony/serializer": "^6.4.3|^7.0.3",
         "symfony/stopwatch": "^6.4|^7.0",
         "symfony/console": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",

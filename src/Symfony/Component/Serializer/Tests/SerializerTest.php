@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -69,6 +70,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\FooInterfaceDummyDenormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ObjectCollectionPropertyDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
+use Symfony\Component\Serializer\Tests\Fixtures\Php80WithOptionalConstructorParameter;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TrueBuiltInDummy;
@@ -96,8 +98,10 @@ class SerializerTest extends TestCase
 
     public function testNormalizeNoMatch()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->normalize(new \stdClass(), 'xml');
     }
 
@@ -117,15 +121,19 @@ class SerializerTest extends TestCase
 
     public function testNormalizeOnDenormalizer()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([new TestDenormalizer()], []);
+
+        $this->expectException(UnexpectedValueException::class);
+
         $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
     }
 
     public function testDenormalizeNoMatch()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->denormalize('foo', 'stdClass');
     }
 
@@ -139,9 +147,11 @@ class SerializerTest extends TestCase
 
     public function testDenormalizeOnNormalizer()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([new TestNormalizer()], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(UnexpectedValueException::class);
+
         $this->assertTrue($serializer->denormalize(json_encode($data), 'stdClass', 'json'));
     }
 
@@ -236,17 +246,21 @@ class SerializerTest extends TestCase
 
     public function testSerializeNoEncoder()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->serialize($data, 'json');
     }
 
     public function testSerializeNoNormalizer()
     {
-        $this->expectException(LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(LogicException::class);
+
         $serializer->serialize(Model::fromArray($data), 'json');
     }
 
@@ -270,25 +284,31 @@ class SerializerTest extends TestCase
 
     public function testDeserializeNoNormalizer()
     {
-        $this->expectException(LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(LogicException::class);
+
         $serializer->deserialize(json_encode($data), Model::class, 'json');
     }
 
     public function testDeserializeWrongNormalizer()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([new CustomNormalizer()], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->deserialize(json_encode($data), Model::class, 'json');
     }
 
     public function testDeserializeNoEncoder()
     {
-        $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
+
+        $this->expectException(UnexpectedValueException::class);
+
         $serializer->deserialize(json_encode($data), Model::class, 'json');
     }
 
@@ -688,29 +708,37 @@ class SerializerTest extends TestCase
 
     public function testDeserializeLegacyScalarType()
     {
-        $this->expectException(LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->expectException(LogicException::class);
+
         $serializer->deserialize('42', 'integer', 'json');
     }
 
     public function testDeserializeScalarTypeToCustomType()
     {
-        $this->expectException(LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->expectException(LogicException::class);
+
         $serializer->deserialize('"something"', Foo::class, 'json');
     }
 
     public function testDeserializeNonscalarTypeToScalar()
     {
-        $this->expectException(NotNormalizableValueException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->expectException(NotNormalizableValueException::class);
+
         $serializer->deserialize('{"foo":true}', 'string', 'json');
     }
 
     public function testDeserializeInconsistentScalarType()
     {
-        $this->expectException(NotNormalizableValueException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->expectException(NotNormalizableValueException::class);
+
         $serializer->deserialize('"42"', 'int', 'json');
     }
 
@@ -726,8 +754,10 @@ class SerializerTest extends TestCase
 
     public function testDeserializeInconsistentScalarArray()
     {
-        $this->expectException(NotNormalizableValueException::class);
         $serializer = new Serializer([new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
+
+        $this->expectException(NotNormalizableValueException::class);
+
         $serializer->deserialize('["42"]', 'int[]', 'json');
     }
 
@@ -753,9 +783,6 @@ class SerializerTest extends TestCase
         $this->assertSame(42, $serializer->deserialize('{"wrapper": 42}', 'int', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[wrapper]']));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testDeserializeNullableIntInXml()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
@@ -1059,7 +1086,7 @@ class SerializerTest extends TestCase
                 'expectedTypes' => [
                     'unknown',
                 ],
-                'path' => 'php74FullWithConstructor',
+                'path' => 'php74FullWithConstructor.constructorArgument',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the class misses the "constructorArgument" property.',
             ],
@@ -1192,6 +1219,70 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
+    public function testCollectDenormalizationErrorsWithoutTypeExtractor()
+    {
+        $json = '
+        {
+            "string": [],
+            "int": [],
+            "float": []
+        }';
+
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        try {
+            $serializer->deserialize($json, Php74Full::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $this->assertInstanceOf(Php74Full::class, $th->getData());
+
+        $exceptionsAsArray = array_map(fn (NotNormalizableValueException $e): array => [
+            'currentType' => $e->getCurrentType(),
+            'expectedTypes' => $e->getExpectedTypes(),
+            'path' => $e->getPath(),
+            'useMessageForUser' => $e->canUseMessageForUser(),
+            'message' => $e->getMessage(),
+        ], $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    class_exists(InvalidTypeException::class) ? 'string' : 'unknown',
+                ],
+                'path' => 'string',
+                'useMessageForUser' => false,
+                'message' => 'Failed to denormalize attribute "string" value for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full": Expected argument of type "string", "array" given at property path "string".',
+            ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    class_exists(InvalidTypeException::class) ? 'int' : 'unknown',
+                ],
+                'path' => 'int',
+                'useMessageForUser' => false,
+                'message' => 'Failed to denormalize attribute "int" value for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full": Expected argument of type "int", "array" given at property path "int".',
+            ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    class_exists(InvalidTypeException::class) ? 'float' : 'unknown',
+                ],
+                'path' => 'float',
+                'useMessageForUser' => false,
+                'message' => 'Failed to denormalize attribute "float" value for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full": Expected argument of type "float", "array" given at property path "float".',
+            ],
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
+    }
+
     /**
      * @dataProvider provideCollectDenormalizationErrors
      */
@@ -1241,18 +1332,18 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'array',
                 'expectedTypes' => [
-                    'unknown',
+                    'string',
                 ],
-                'path' => null,
+                'path' => 'string',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the class misses the "string" property.',
             ],
             [
                 'currentType' => 'array',
                 'expectedTypes' => [
-                    'unknown',
+                    'int',
                 ],
-                'path' => null,
+                'path' => 'int',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the class misses the "int" property.',
             ],
@@ -1302,7 +1393,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'string',
                 'expectedTypes' => [
-                    0 => 'bool',
+                    'bool',
                 ],
                 'path' => 'bool',
                 'useMessageForUser' => false,
@@ -1311,7 +1402,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'bool',
                 'expectedTypes' => [
-                    0 => 'int',
+                    'int',
                 ],
                 'path' => 'int',
                 'useMessageForUser' => false,
@@ -1516,6 +1607,58 @@ class SerializerTest extends TestCase
 
         $serializer->denormalize('foo', Model::class, 'json');
         $serializer->denormalize('foo', Model::class, 'json');
+    }
+
+    public function testPartialDenormalizationWithMissingConstructorTypes()
+    {
+        $json = '{"one": "one string", "three": "three string"}';
+
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+
+        $serializer = new Serializer(
+            [new ObjectNormalizer(null, null, null, $extractor)],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize($json, Php80WithOptionalConstructorParameter::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $this->assertInstanceOf(Php80WithOptionalConstructorParameter::class, $object = $th->getData());
+
+        $this->assertSame('one string', $object->one);
+        $this->assertFalse(isset($object->two));
+        $this->assertSame('three string', $object->three);
+
+        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
+            return [
+                'currentType' => $e->getCurrentType(),
+                'expectedTypes' => $e->getExpectedTypes(),
+                'path' => $e->getPath(),
+                'useMessageForUser' => $e->canUseMessageForUser(),
+                'message' => $e->getMessage(),
+            ];
+        }, $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => 'two',
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the class misses the "two" property.',
+            ],
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
     }
 }
 

@@ -254,7 +254,7 @@ class Request
         $request = self::createRequestFromFactory($_GET, $_POST, [], $_COOKIE, $_FILES, $_SERVER);
 
         if (str_starts_with($request->headers->get('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded')
-            && \in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT', 'DELETE', 'PATCH'])
+            && \in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT', 'DELETE', 'PATCH'], true)
         ) {
             parse_str($request->getContent(), $data);
             $request->request = new InputBag($data);
@@ -382,7 +382,7 @@ class Request
      */
     public static function setFactory(?callable $callable): void
     {
-        self::$requestFactory = $callable;
+        self::$requestFactory = null === $callable ? null : $callable(...);
     }
 
     /**
@@ -395,7 +395,7 @@ class Request
      * @param array|null $files      The FILES parameters
      * @param array|null $server     The SERVER parameters
      */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null): static
+    public function duplicate(?array $query = null, ?array $request = null, ?array $attributes = null, ?array $cookies = null, ?array $files = null, ?array $server = null): static
     {
         $dup = clone $this;
         if (null !== $query) {
@@ -1090,7 +1090,7 @@ class Request
         if (\count(self::$trustedHostPatterns) > 0) {
             // to avoid host header injection attacks, you should provide a list of trusted host patterns
 
-            if (\in_array($host, self::$trustedHosts)) {
+            if (\in_array($host, self::$trustedHosts, true)) {
                 return $host;
             }
 
@@ -1221,10 +1221,10 @@ class Request
         }
 
         foreach (static::$formats as $format => $mimeTypes) {
-            if (\in_array($mimeType, (array) $mimeTypes)) {
+            if (\in_array($mimeType, (array) $mimeTypes, true)) {
                 return $format;
             }
-            if (null !== $canonicalMimeType && \in_array($canonicalMimeType, (array) $mimeTypes)) {
+            if (null !== $canonicalMimeType && \in_array($canonicalMimeType, (array) $mimeTypes, true)) {
                 return $format;
             }
         }
@@ -1524,7 +1524,7 @@ class Request
      *
      * @param string[] $locales An array of ordered available locales
      */
-    public function getPreferredLanguage(array $locales = null): ?string
+    public function getPreferredLanguage(?array $locales = null): ?string
     {
         $preferredLanguages = $this->getLanguages();
 
@@ -1541,7 +1541,7 @@ class Request
             $extendedPreferredLanguages[] = $language;
             if (false !== $position = strpos($language, '_')) {
                 $superLanguage = substr($language, 0, $position);
-                if (!\in_array($superLanguage, $preferredLanguages)) {
+                if (!\in_array($superLanguage, $preferredLanguages, true)) {
                     $extendedPreferredLanguages[] = $superLanguage;
                 }
             }
@@ -1917,7 +1917,7 @@ class Request
      * getPort(), isSecure(), getHost(), getClientIps(), getBaseUrl() etc. Thus, we try to cache the results for
      * best performance.
      */
-    private function getTrustedValues(int $type, string $ip = null): array
+    private function getTrustedValues(int $type, ?string $ip = null): array
     {
         $cacheKey = $type."\0".((self::$trustedHeaderSet & $type) ? $this->headers->get(self::TRUSTED_HEADERS[$type]) : '');
         $cacheKey .= "\0".$ip."\0".$this->headers->get(self::TRUSTED_HEADERS[self::HEADER_FORWARDED]);

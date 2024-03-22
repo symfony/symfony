@@ -33,18 +33,14 @@ use Symfony\Component\Routing\RouterInterface;
 #[AsCommand(name: 'router:match', description: 'Help debug routes by simulating a path info match')]
 class RouterMatchCommand extends Command
 {
-    private RouterInterface $router;
-    private iterable $expressionLanguageProviders;
-
     /**
      * @param iterable<mixed, ExpressionFunctionProviderInterface> $expressionLanguageProviders
      */
-    public function __construct(RouterInterface $router, iterable $expressionLanguageProviders = [])
-    {
+    public function __construct(
+        private RouterInterface $router,
+        private iterable $expressionLanguageProviders = [],
+    ) {
         parent::__construct();
-
-        $this->router = $router;
-        $this->expressionLanguageProviders = $expressionLanguageProviders;
     }
 
     protected function configure(): void

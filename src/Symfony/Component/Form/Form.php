@@ -70,7 +70,6 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
-    private FormConfigInterface $config;
     private ?FormInterface $parent = null;
 
     /**
@@ -135,8 +134,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * @throws LogicException if a data mapper is not provided for a compound form
      */
-    public function __construct(FormConfigInterface $config)
-    {
+    public function __construct(
+        private FormConfigInterface $config,
+    ) {
         // Compound forms always need a data mapper, otherwise calls to
         // `setData` and `add` will not lead to the correct population of
         // the child forms.
@@ -150,7 +150,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $this->defaultDataSet = true;
         }
 
-        $this->config = $config;
         $this->children = new OrderedHashMap();
         $this->name = $config->getName();
     }
@@ -614,7 +613,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return null === $this->transformationFailure;
     }
 
-    public function getTransformationFailure(): ?Exception\TransformationFailedException
+    public function getTransformationFailure(): ?TransformationFailedException
     {
         return $this->transformationFailure;
     }
@@ -715,7 +714,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return iterator_to_array($this->children);
     }
 
-    public function add(FormInterface|string $child, string $type = null, array $options = []): static
+    public function add(FormInterface|string $child, ?string $type = null, array $options = []): static
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot add children to a submitted form.');
@@ -872,7 +871,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return \count($this->children);
     }
 
-    public function createView(FormView $parent = null): FormView
+    public function createView(?FormView $parent = null): FormView
     {
         if (null === $parent && $this->parent) {
             $parent = $this->parent->createView();

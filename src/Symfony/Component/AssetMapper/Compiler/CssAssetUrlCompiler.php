@@ -70,7 +70,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
         return 'css' === $asset->publicExtension;
     }
 
-    private function handleMissingImport(string $message, \Throwable $e = null): void
+    private function handleMissingImport(string $message, ?\Throwable $e = null): void
     {
         match ($this->missingImportMode) {
             AssetCompilerInterface::MISSING_IMPORT_IGNORE => null,

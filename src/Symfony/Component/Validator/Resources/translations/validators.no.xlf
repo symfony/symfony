@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="nb" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Denne filen er ikke et gyldig bilde.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Dette er ikke en gyldig IP adresse.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target state="needs-review-translation">Denne verdien er ikke en gyldig IP-adresse.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Ingen fil var lastet opp.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Den midlertidige mappen (tmp) er ikke konfigurert i php.ini.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target state="needs-review-translation">Ingen midlertidig mappe ble konfigurert i php.ini, eller den konfigurerte mappen eksisterer ikke.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Korttypen er ikke støttet eller kortnummeret er ugyldig.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Dette er ikke et gyldig IBAN-nummer.</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target state="needs-review-translation">Denne verdien er ikke et gyldig internasjonalt bankkontonummer (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Verdien samsvarer ikke med forventet tegnsett {{ charset }}.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Dette er ikke en gyldig BIC.</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target state="needs-review-translation">Denne verdien er ikke en gyldig forretningsidentifikasjonskode (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Feil</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Dette er ikke en gyldig UUID.</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">Denne verdien er ikke en gyldig UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -401,6 +401,42 @@
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Verdien på nettmasken skal være mellom {{ min }} og {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target state="needs-review-translation">Filnavnet er for langt. Det bør ha {{ filename_max_length }} tegn eller mindre.|Filnavnet er for langt. Det bør ha {{ filename_max_length }} tegn eller mindre.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target state="needs-review-translation">Passordstyrken er for lav. Vennligst bruk et sterkere passord.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target state="needs-review-translation">Denne verdien inneholder tegn som ikke er tillatt av gjeldende restriksjonsnivå.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target state="needs-review-translation">Det er ikke tillatt å bruke usynlige tegn.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target state="needs-review-translation">Det er ikke tillatt å blande tall fra forskjellige skript.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target state="needs-review-translation">Det er ikke tillatt å bruke skjulte overleggskarakterer.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target state="needs-review-translation">Filutvidelsen er ugyldig ({{ extension }}). Tillatte utvidelser er {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-review-translation">Den oppdagede tegnkodingen er ugyldig ({{ detected }}). Tillatte kodinger er {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">Denne verdien er ikke en gyldig MAC-adresse.</target>
             </trans-unit>
         </body>
     </file>

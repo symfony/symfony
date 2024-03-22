@@ -41,7 +41,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
     ) {
     }
 
-    public function normalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
+    public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         if (null === $class) {
             return $this->normalizeFallback($propertyName, $class, $format, $context);
@@ -54,7 +54,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$normalizeCache[$class][$propertyName] ?? $this->normalizeFallback($propertyName, $class, $format, $context);
     }
 
-    public function denormalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
+    public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         if (null === $class) {
             return $this->denormalizeFallback($propertyName, $class, $format, $context);
@@ -86,7 +86,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
     }
 
-    private function normalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = []): string
+    private function normalizeFallback(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         return $this->fallbackNameConverter ? $this->fallbackNameConverter->normalize($propertyName, $class, $format, $context) : $propertyName;
     }
@@ -101,7 +101,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$attributesMetadataCache[$cacheKey][$propertyName] ?? null;
     }
 
-    private function denormalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = []): string
+    private function denormalizeFallback(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         return $this->fallbackNameConverter ? $this->fallbackNameConverter->denormalize($propertyName, $class, $format, $context) : $propertyName;
     }
@@ -128,13 +128,16 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             }
 
             $metadataGroups = $metadata->getGroups();
-            $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
 
-            if ($contextGroups && !$metadataGroups) {
+            $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
+            $contextGroupsHasBeenDefined = [] !== $contextGroups;
+            $contextGroups = array_merge($contextGroups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
+
+            if ($contextGroupsHasBeenDefined && !$metadataGroups) {
                 continue;
             }
 
-            if ($metadataGroups && !array_intersect($metadataGroups, $contextGroups) && !\in_array('*', $contextGroups, true)) {
+            if ($metadataGroups && !array_intersect(array_merge($metadataGroups, ['*']), $contextGroups)) {
                 continue;
             }
 

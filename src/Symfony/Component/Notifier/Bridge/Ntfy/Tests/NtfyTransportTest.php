@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class NtfyTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): NtfyTransport
+    public static function createTransport(?HttpClientInterface $client = null): NtfyTransport
     {
         return new NtfyTransport('test', true, $client ?? new MockHttpClient());
     }
@@ -85,6 +85,32 @@ final class NtfyTransportTest extends TransportTestCase
         $this->assertSame('2BYIwRmvBKcv', $sentMessage->getMessageId());
     }
 
+    public function testSendWithPassword()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn(json_encode(['id' => '2BYIwRmvBKcv', 'event' => 'message']));
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+            $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
+            $expectedAuthorization = 'Authorization: Bearer testtokentesttoken';
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            $this->assertTrue(\in_array($expectedAuthorization, $options['headers'], true));
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client)->setPassword('testtokentesttoken');
+
+        $sentMessage = $transport->send(new PushMessage('Hello', 'World'));
+
+        $this->assertSame('2BYIwRmvBKcv', $sentMessage->getMessageId());
+    }
+
     public function testSendWithUserAndPassword()
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -99,7 +125,7 @@ final class NtfyTransportTest extends TransportTestCase
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
             $expectedAuthorization = 'Authorization: Basic dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ';
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
-            $this->assertTrue(\in_array($expectedAuthorization, $options['headers']));
+            $this->assertTrue(\in_array($expectedAuthorization, $options['headers'], true));
 
             return $response;
         });

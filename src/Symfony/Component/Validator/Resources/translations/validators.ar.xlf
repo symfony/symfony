@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="ar" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>هذا الملف ليس صورة صحيحة.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>هذه القيمة ليست عنوان رقمى صحيح.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>هذا ليس عنوان IP صحيح.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>لم يتم ارسال اى ملف.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>لم يتم تهيئة حافظة مؤقتة فى ملف php.ini.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>لم يتم تكوين مجلد مؤقت في ملف php.ini.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>نوع البطاقه غير مدعوم او الرقم غير صحيح.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>الرقم IBAN (رقم الحساب المصرفي الدولي) الذي تم إدخاله غير صالح.</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>هذه القيمة ليست رقم حساب بنكي دولي (IBAN) صالحًا.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>هذه القيمة غير متطابقة مع صيغة التحويل {{ charset }}.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>هذه القيمة ليست رمز معرّف نشاط تجاري صالح (BIC).</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>هذه القيمة ليست رمز معرف أعمال (BIC) صالحًا.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>خطأ</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>هذا ليس UUID صالح.</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>هذه القيمة ليست UUID صالحًا.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -425,6 +425,18 @@
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
                 <target>لا يسمح باستخدام أحرف التراكب المخفية.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>امتداد الملف غير صحيح ({{ extension }}). الامتدادات المسموح بها هي {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>تم اكتشاف ترميز أحرف غير صالح ({{ detected }}). الترميزات المسموح بها هي {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>هذه القيمة ليست عنوان MAC صالحًا.</target>
             </trans-unit>
         </body>
     </file>

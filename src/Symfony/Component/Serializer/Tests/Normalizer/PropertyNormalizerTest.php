@@ -25,7 +25,6 @@ use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -39,6 +38,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttrib
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\FilterBoolTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\GroupsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\IgnoredAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
@@ -53,6 +53,7 @@ class PropertyNormalizerTest extends TestCase
     use CallbacksTestTrait;
     use CircularReferenceTestTrait;
     use ConstructorArgumentsTestTrait;
+    use FilterBoolTestTrait;
     use GroupsTestTrait;
     use IgnoredAttributesTestTrait;
     use MaxDepthTestTrait;
@@ -185,7 +186,18 @@ class PropertyNormalizerTest extends TestCase
         $group->setKevin('Kevin');
         $group->setCoopTilleuls('coop');
         $this->assertEquals(
-            ['foo' => 'foo', 'bar' => 'bar', 'quux' => 'quux', 'kevin' => 'Kevin', 'coopTilleuls' => 'coop', 'fooBar' => null, 'symfony' => null, 'baz' => 'baz'],
+            [
+                'foo' => 'foo',
+                'bar' => 'bar',
+                'quux' => 'quux',
+                'kevin' => 'Kevin',
+                'coopTilleuls' => 'coop',
+                'fooBar' => null,
+                'symfony' => null,
+                'baz' => 'baz',
+                'default' => null,
+                'className' => null,
+            ],
             $this->normalizer->normalize($group, 'any')
         );
     }
@@ -249,6 +261,11 @@ class PropertyNormalizerTest extends TestCase
         return new PropertyCircularReferenceDummy();
     }
 
+    protected function getNormalizerForFilterBool(): PropertyNormalizer
+    {
+        return new PropertyNormalizer();
+    }
+
     public function testSiblingReference()
     {
         $serializer = new Serializer([$this->normalizer]);
@@ -304,6 +321,8 @@ class PropertyNormalizerTest extends TestCase
                 'bar' => null,
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
+                'default' => null,
+                'class_name' => null,
             ],
             $this->normalizer->normalize($obj, null, [PropertyNormalizer::GROUPS => ['name_converter']])
         );
@@ -400,14 +419,15 @@ class PropertyNormalizerTest extends TestCase
 
     public function testUnableToNormalizeObjectAttribute()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot normalize attribute "bar" because the injected serializer is not a normalizer');
         $serializer = $this->createMock(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);
 
         $obj = new PropertyDummy();
         $object = new \stdClass();
         $obj->setBar($object);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "bar" because the injected serializer is not a normalizer');
 
         $this->normalizer->normalize($obj, 'any');
     }
@@ -492,7 +512,7 @@ class PropertyNormalizerTest extends TestCase
         return new PropertyNormalizer();
     }
 
-    protected function getNormalizerForSkipUninitializedValues(): NormalizerInterface
+    protected function getNormalizerForSkipUninitializedValues(): PropertyNormalizer
     {
         return new PropertyNormalizer(new ClassMetadataFactory(new AttributeLoader()));
     }

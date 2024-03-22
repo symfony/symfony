@@ -27,7 +27,9 @@ use Symfony\Component\WebLink\Link;
  */
 class ImportMapRenderer
 {
-    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.8.0/dist/es-module-shims.js';
+    // https://generator.jspm.io/#S2NnYGAIzSvJLMlJTWEAAMYOgCAOAA
+    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.8.2/dist/es-module-shims.js';
+    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY = 'sha384-+dzlBT6NPToF0UZu7ZUA6ehxHY8h/TxJOZxzNXKhFD+5He5Hbex+0AIOiSsEaokw';
 
     public function __construct(
         private readonly ImportMapGenerator $importMapGenerator,
@@ -47,7 +49,7 @@ class ImportMapRenderer
         $importMap = [];
         $modulePreloads = [];
         $cssLinks = [];
-        $polyFillPath = null;
+        $polyfillPath = null;
         foreach ($importMapData as $importName => $data) {
             $path = $data['path'];
 
@@ -58,7 +60,7 @@ class ImportMapRenderer
 
             // if this represents the polyfill, hide it from the import map
             if ($importName === $this->polyfillImportName) {
-                $polyFillPath = $path;
+                $polyfillPath = $path;
                 continue;
             }
 
@@ -78,7 +80,7 @@ class ImportMapRenderer
                 // importmap entry is a noop
                 $importMap[$importName] = 'data:application/javascript,';
             } else {
-                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(sprintf('const d=document,l=d.createElement("link");l.rel="stylesheet",l.href="%s",(d.head||d.getElementsByTagName("head")[0]).appendChild(l)', $path));
+                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(sprintf('document.head.appendChild(Object.assign(document.createElement("link"),{rel:"stylesheet",href:"%s"}))', addslashes($path)));
             }
         }
 
@@ -102,22 +104,31 @@ class ImportMapRenderer
             </script>
             HTML;
 
-        if (false !== $this->polyfillImportName && null === $polyFillPath) {
+        if (false !== $this->polyfillImportName && null === $polyfillPath) {
             if ('es-module-shims' !== $this->polyfillImportName) {
                 throw new \InvalidArgumentException(sprintf('The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "php bin/console importmap:require "%s"" to install it.', $this->polyfillImportName));
             }
 
             // a fallback for the default polyfill in case it's not in the importmap
-            $polyFillPath = self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL;
+            $polyfillPath = self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL;
         }
 
-        if ($polyFillPath) {
-            $url = $this->escapeAttributeValue($polyFillPath);
+        if ($polyfillPath) {
+            $url = $this->escapeAttributeValue($polyfillPath);
+            $polyfillAttributes = $scriptAttributes;
+
+            // Add security attributes for the default polyfill hosted on jspm.io
+            if (self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL === $polyfillPath) {
+                $polyfillAttributes = $this->createAttributesString([
+                    'crossorigin' => 'anonymous',
+                    'integrity' => self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY,
+                ] + $attributes);
+            }
 
             $output .= <<<HTML
 
                 <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
-                <script async src="$url"$scriptAttributes></script>
+                <script async src="$url"$polyfillAttributes></script>
                 HTML;
         }
 

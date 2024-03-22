@@ -16,6 +16,8 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
+ * Validates that a given string length is between some minimum and maximum value.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -56,22 +58,29 @@ class Length extends Constraint
     public string $countUnit = self::COUNT_CODEPOINTS;
 
     /**
-     * @param self::COUNT_*|null $countUnit
+     * @param int|array<string,mixed>|null $exactly    The exact expected length
+     * @param int|null                     $min        The minimum expected length
+     * @param int|null                     $max        The maximum expected length
+     * @param string|null                  $charset    The charset to be used when computing value's length (defaults to UTF-8)
+     * @param callable|null                $normalizer A callable to normalize value before it is validated
+     * @param self::COUNT_*|null           $countUnit  The character count unit for the length check (defaults to {@see Length::COUNT_CODEPOINTS})
+     * @param string[]|null                $groups
+     * @param array<string,mixed>          $options
      */
     public function __construct(
-        int|array $exactly = null,
-        int $min = null,
-        int $max = null,
-        string $charset = null,
-        callable $normalizer = null,
-        string $countUnit = null,
-        string $exactMessage = null,
-        string $minMessage = null,
-        string $maxMessage = null,
-        string $charsetMessage = null,
-        array $groups = null,
+        int|array|null $exactly = null,
+        ?int $min = null,
+        ?int $max = null,
+        ?string $charset = null,
+        ?callable $normalizer = null,
+        ?string $countUnit = null,
+        ?string $exactMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
+        ?string $charsetMessage = null,
+        ?array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
     ) {
         if (\is_array($exactly)) {
             $options = array_merge($exactly, $options);
@@ -107,7 +116,7 @@ class Length extends Constraint
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
 
-        if (!\in_array($this->countUnit, self::VALID_COUNT_UNITS)) {
+        if (!\in_array($this->countUnit, self::VALID_COUNT_UNITS, true)) {
             throw new InvalidArgumentException(sprintf('The "countUnit" option must be one of the "%s"::COUNT_* constants ("%s" given).', __CLASS__, $this->countUnit));
         }
     }

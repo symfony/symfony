@@ -39,7 +39,7 @@ class DoctrineDataCollector extends DataCollector
         $this->managers = $registry->getManagerNames();
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->data = [
             'queries' => $this->collectQueries(),
@@ -85,7 +85,7 @@ class DoctrineDataCollector extends DataCollector
         return $this->data['queries'];
     }
 
-    public function getTime(): int
+    public function getTime(): float
     {
         $time = 0;
         foreach ($this->data['queries'] as $queries) {
@@ -163,8 +163,7 @@ class DoctrineDataCollector extends DataCollector
                     $query['types'][$j] = $type->getBindingType();
                     try {
                         $param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
-                    } catch (\TypeError $e) {
-                    } catch (ConversionException $e) {
+                    } catch (\TypeError|ConversionException) {
                     }
                 }
             }

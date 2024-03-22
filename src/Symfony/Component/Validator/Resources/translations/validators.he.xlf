@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="he" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>הקובץ הזה אינו תמונה תקינה.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>זו אינה כתובת IP חוקית.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target state="needs-review-translation">ערך זה אינו כתובת IP תקפה.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>הקובץ לא הועלה.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>לא הוגדרה תיקייה זמנית ב php.ini.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target state="needs-review-translation">לא הוגדרה תיקייה זמנית ב-php.ini, או שהתיקייה המוגדרת אינה קיימת.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>סוג הכרטיס אינו נתמך או לא חוקי.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>מספר חשבון בנק בינלאומי אינו חוקי (IBAN).</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target state="needs-review-translation">ערך זה אינו מספר חשבון בנק בינלאומי (IBAN) תקף.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>הערך אינו תואם למערך התווים {{ charset }} הצפוי.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>קוד זיהוי עסקי אינו חוקי (BIC).</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target state="needs-review-translation">ערך זה אינו קוד מזהה עסקי (BIC) תקף.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>שגיאה</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>הערך אינו ערך UUID חוקי.</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">ערך זה אינו UUID תקף.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -386,7 +386,7 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>ערך זה אינו מספר זיהוי ניירות ערך בינלאומי תקף (ISIN).</target>
             </trans-unit>
-             <trans-unit id="100">
+            <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
                 <target>ערך זה חייב להיות ביטוי חוקי.</target>
             </trans-unit>
@@ -401,6 +401,42 @@
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>הערך של מסכת הרשת חייב להיות בין {{ min }} ו {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target state="needs-review-translation">שם הקובץ ארוך מדי. עליו להכיל {{ filename_max_length }} תווים או פחות.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target state="needs-review-translation">חוזק הסיסמה נמוך מדי. אנא השתמש בסיסמה חזקה יותר.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target state="needs-review-translation">הערך כולל תווים שאינם מותרים על פי רמת ההגבלה הנוכחית.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target state="needs-review-translation">אסור להשתמש בתווים בלתי נראים.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target state="needs-review-translation">אסור לערבב מספרים מתסריטים שונים.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target state="needs-review-translation">אסור להשתמש בתווים מוסתרים של חפיפה.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target state="needs-review-translation">סיומת הקובץ אינה תקינה ({{ extension }}). הסיומות המותרות הן {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-review-translation">קידוד התווים שזוהה אינו חוקי ({{ detected }}). הקידודים המותרים הם {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">ערך זה אינו כתובת MAC תקפה.</target>
             </trans-unit>
         </body>
     </file>

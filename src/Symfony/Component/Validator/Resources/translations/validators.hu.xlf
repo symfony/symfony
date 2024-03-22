@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="hu" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Ez a fájl nem egy érvényes kép.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Ez az érték nem egy érvényes IP cím.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>Ez az érték nem érvényes IP-cím.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Nem lett fájl feltöltve.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Nincs ideiglenes könyvtár beállítva a php.ini-ben.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>Nem lett ideiglenes mappa beállítva a php.ini-ben, vagy a beállított mappa nem létezik.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Nem támogatott kártyatípus vagy érvénytelen kártyaszám.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Érvénytelen nemzetközi bankszámlaszám (IBAN).</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>Ez az érték nem érvényes Nemzetközi Bankszámlaszám (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Ez az érték nem az elvárt {{ charset }} karakterkódolást használja.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Érvénytelen nemzetközi bankazonosító kód (BIC/SWIFT).</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>Ez az érték nem érvényes Üzleti Azonosító Kód (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Hiba</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Érvénytelen egyedi azonosító (UUID).</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Ez az érték nem érvényes UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -335,24 +335,24 @@
                 <target>Ez az érték érvényes JSON kell, hogy legyen.</target>
             </trans-unit>
             <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Ez a gyűjtemény csak egyedi elemeket tartalmazhat.</target>
+            </trans-unit>
+            <trans-unit id="88">
                 <source>This value should be positive.</source>
                 <target>Ennek az értéknek pozitívnak kell lennie.</target>
             </trans-unit>
-            <trans-unit id="88">
+            <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
                 <target>Ennek az értéknek pozitívnak vagy nullának kell lennie.</target>
             </trans-unit>
-            <trans-unit id="89">
+            <trans-unit id="90">
                 <source>This value should be negative.</source>
                 <target>Ennek az értéknek negatívnak kell lennie.</target>
             </trans-unit>
-            <trans-unit id="90">
+            <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
                 <target>Ennek az értéknek negatívnak vagy nullának kell lennie.</target>
-            </trans-unit>
-            <trans-unit id="91">
-                <source>This collection should contain only unique elements.</source>
-                <target>Ez a gyűjtemény csak egyedi elemeket tartalmazhat.</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
@@ -429,6 +429,14 @@
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>A fájl kiterjesztése érvénytelen ({{ extension }}). Engedélyezett kiterjesztések: {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Az érzékelt karakterkódolás érvénytelen ({{ detected }}). Engedélyezett karakterkódolások: {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>Ez az érték nem érvényes MAC-cím.</target>
             </trans-unit>
         </body>
     </file>

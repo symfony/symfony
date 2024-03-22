@@ -32,8 +32,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
     use TransportResponseTrait;
 
-    private CurlClientState $multi;
-
     /**
      * @var resource
      */
@@ -42,10 +40,16 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     /**
      * @internal
      */
-    public function __construct(CurlClientState $multi, \CurlHandle|string $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null, int $curlVersion = null, string $originalUrl = null)
-    {
-        $this->multi = $multi;
-
+    public function __construct(
+        private CurlClientState $multi,
+        \CurlHandle|string $ch,
+        ?array $options = null,
+        ?LoggerInterface $logger = null,
+        string $method = 'GET',
+        ?callable $resolveRedirect = null,
+        ?int $curlVersion = null,
+        ?string $originalUrl = null,
+    ) {
         if ($ch instanceof \CurlHandle) {
             $this->handle = $ch;
             $this->debugBuffer = fopen('php://temp', 'w+');
@@ -98,7 +102,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->info['pause_handler'] = static function (float $duration) use ($ch, $multi, $execCounter) {
             if (0 < $duration) {
                 if ($execCounter === $multi->execCounter) {
-                    $multi->execCounter = !\is_float($execCounter) ? 1 + $execCounter : \PHP_INT_MIN;
                     curl_multi_remove_handle($multi->handle, $ch);
                 }
 
@@ -193,7 +196,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         });
     }
 
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         if (!$info = $this->finalInfo) {
             $info = array_merge($this->info, curl_getinfo($this->handle));
@@ -266,7 +269,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     /**
      * @param CurlClientState $multi
      */
-    private static function perform(ClientState $multi, array &$responses = null): void
+    private static function perform(ClientState $multi, ?array &$responses = null): void
     {
         if ($multi->performing) {
             if ($responses) {

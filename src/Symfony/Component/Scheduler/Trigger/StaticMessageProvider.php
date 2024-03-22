@@ -13,7 +13,7 @@ namespace Symfony\Component\Scheduler\Trigger;
 
 use Symfony\Component\Scheduler\Generator\MessageContext;
 
-final class StaticMessageProvider implements MessageProviderInterface
+final class StaticMessageProvider implements MessageProviderInterface, \Stringable
 {
     /**
      * @param array<object> $messages
@@ -21,6 +21,7 @@ final class StaticMessageProvider implements MessageProviderInterface
     public function __construct(
         private array $messages,
         private string $id = '',
+        private string $description = '',
     ) {
     }
 
@@ -32,5 +33,10 @@ final class StaticMessageProvider implements MessageProviderInterface
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function __toString(): string
+    {
+        return $this->description ?: $this->id;
     }
 }

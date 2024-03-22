@@ -36,7 +36,7 @@ class W3CReferenceTest extends TestCase
         sort($referenceElements);
 
         $this->assertSame(
-            json_decode(file_get_contents(self::STANDARD_RESOURCES['elements']), true, 512, \JSON_THROW_ON_ERROR),
+            $this->getResourceData(self::STANDARD_RESOURCES['elements']),
             $referenceElements
         );
     }
@@ -48,8 +48,18 @@ class W3CReferenceTest extends TestCase
         }
 
         $this->assertSame(
-            json_decode(file_get_contents(self::STANDARD_RESOURCES['attributes']), true, 512, \JSON_THROW_ON_ERROR),
+            $this->getResourceData(self::STANDARD_RESOURCES['attributes']),
             array_keys(W3CReference::ATTRIBUTES)
+        );
+    }
+
+    private function getResourceData(string $resource): array
+    {
+        return json_decode(
+            file_get_contents($resource, false, stream_context_create(['ssl' => ['verify_peer' => false, 'verify_peer_name' => false]])),
+            true,
+            512,
+            \JSON_THROW_ON_ERROR
         );
     }
 }

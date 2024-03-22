@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class BlueskyTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): BlueskyTransport
+    public static function createTransport(?HttpClientInterface $client = null): BlueskyTransport
     {
         $blueskyTransport = new BlueskyTransport('username', 'password', new NullLogger(), $client ?? new MockHttpClient());
         $blueskyTransport->setHost('bsky.social');
@@ -267,7 +267,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * A small helper function to test BlueskyTransport::parseFacets().
      */
-    private function parseFacets(string $input, HttpClientInterface $httpClient = null): array
+    private function parseFacets(string $input, ?HttpClientInterface $httpClient = null): array
     {
         $class = new \ReflectionClass(BlueskyTransport::class);
         $method = $class->getMethod('parseFacets');

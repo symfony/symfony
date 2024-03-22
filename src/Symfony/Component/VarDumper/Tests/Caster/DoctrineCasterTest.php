@@ -36,9 +36,9 @@ class DoctrineCasterTest extends TestCase
             $expected = <<<EODUMP
                 Doctrine\ORM\PersistentCollection {
                 %A
-                  -em: Mock_EntityManagerInterface_%s { …3}
                   -backRefFieldName: null
                   -isDirty: false
+                  -em: Mock_EntityManagerInterface_%s { …3}
                   -typeClass: Doctrine\ORM\Mapping\ClassMetadata { …}
                 %A
                 EODUMP;

@@ -379,10 +379,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testReadProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -407,6 +403,10 @@ class PhraseProviderTest extends TestCase
             ],
         ]), endpoint: 'api.phrase.com/api/v2');
 
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
         $provider->read(['messages'], ['en_GB']);
     }
 
@@ -415,10 +415,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testInitLocalesExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -441,6 +437,10 @@ class PhraseProviderTest extends TestCase
                 'User-Agent' => 'myProject',
             ],
         ]), endpoint: 'api.phrase.com/api/v2');
+
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $provider->read(['messages'], ['en_GB']);
     }
@@ -539,10 +539,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testCreateLocaleExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -566,6 +562,10 @@ class PhraseProviderTest extends TestCase
                 'User-Agent' => 'myProject',
             ],
         ]), endpoint: 'api.phrase.com/api/v2');
+
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $provider->read(['messages'], ['nl_NL']);
     }
@@ -627,10 +627,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testDeleteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -660,6 +656,10 @@ class PhraseProviderTest extends TestCase
                 'key.to.delete' => 'translated value',
             ],
         ]));
+
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $provider->delete($bag);
     }
@@ -693,7 +693,7 @@ class PhraseProviderTest extends TestCase
                     }
 
                     if (str_starts_with($part, '<?xml')) {
-                        $this->assertSame($content, $part);
+                        $this->assertStringMatchesFormat($content, $part);
                         $testedContent = true;
                     }
 
@@ -745,10 +745,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testWriteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -784,6 +780,10 @@ class PhraseProviderTest extends TestCase
             ],
         ]));
 
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
         $provider->write($bag);
     }
 
@@ -797,11 +797,11 @@ class PhraseProviderTest extends TestCase
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="YQ5EBNy" resname="general.back">
+      <trans-unit id="%s" resname="general.back">
         <source>general.back</source>
         <target><![CDATA[back &!]]></target>
       </trans-unit>
-      <trans-unit id="QoyA.iN" resname="general.cancel">
+      <trans-unit id="%s" resname="general.cancel">
         <source>general.cancel</source>
         <target>Cancel</target>
       </trans-unit>
@@ -837,11 +837,11 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="YQ5EBNy" resname="general.back">
+      <trans-unit id="%s" resname="general.back">
         <source>general.back</source>
         <target>zurück</target>
       </trans-unit>
-      <trans-unit id="QoyA.iN" resname="general.cancel">
+      <trans-unit id="%s" resname="general.cancel">
         <source>general.cancel</source>
         <target>Abbrechen</target>
       </trans-unit>
@@ -1119,7 +1119,7 @@ XLIFF,
         };
     }
 
-    private function createProvider(MockHttpClient $httpClient = null, string $endpoint = null, XliffFileDumper $dumper = null, bool $isFallbackLocaleEnabled = false): ProviderInterface
+    private function createProvider(?MockHttpClient $httpClient = null, ?string $endpoint = null, ?XliffFileDumper $dumper = null, bool $isFallbackLocaleEnabled = false): ProviderInterface
     {
         return new PhraseProvider(
             $httpClient ?? $this->getHttpClient(),

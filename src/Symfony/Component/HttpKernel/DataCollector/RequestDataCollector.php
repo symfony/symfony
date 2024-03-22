@@ -36,15 +36,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     private \SplObjectStorage $controllers;
     private array $sessionUsages = [];
-    private ?RequestStack $requestStack;
 
-    public function __construct(RequestStack $requestStack = null)
-    {
+    public function __construct(
+        private ?RequestStack $requestStack = null,
+    ) {
         $this->controllers = new \SplObjectStorage();
-        $this->requestStack = $requestStack;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = [];
@@ -469,7 +468,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 'line' => $r->getStartLine(),
             ];
 
-            if (str_contains($r->name, '{closure}')) {
+            if ($r->isAnonymous()) {
                 return $controller;
             }
             $controller['method'] = $r->name;

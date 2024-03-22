@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints\CssColor;
 use Symfony\Component\Validator\Constraints\CssColorValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\StringableValue;
 
 final class CssColorValidatorTest extends ConstraintValidatorTestCase
 {
@@ -67,6 +68,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
             ['rgba(255, 255, 255, 0.3)'],
             ['hsl(0, 0%, 20%)'],
             ['hsla(0, 0%, 20%, 0.4)'],
+            [new StringableValue('hsla(0, 0%, 20%, 0.4)')],
         ];
     }
 
@@ -323,7 +325,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public static function getInvalidNamedColors(): array
     {
-        return [['fabpot'], ['ngrekas'], ['symfony'], ['FABPOT'], ['NGREKAS'], ['SYMFONY']];
+        return [['fabpot'], ['ngrekas'], ['symfony'], ['FABPOT'], ['NGREKAS'], ['SYMFONY'], [new StringableValue('SYMFONY')]];
     }
 
     /**
@@ -369,7 +371,12 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public static function getInvalidRGBA(): array
     {
-        return [['rgba(999,999,999,999)'], ['rgba(-99,-99,-99,-99)'], ['rgba(a,b,c,d)'], ['rgba(99 99, 9 99, 99 9, . 9)']];
+        return [
+            ['rgba(999,999,999,999)'],
+            ['rgba(-99,-99,-99,-99)'],
+            ['rgba(a,b,c,d)'],
+            ['rgba(99 99, 9 99, 99 9, . 9)'],
+        ];
     }
 
     /**
@@ -415,14 +422,31 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidHSLA(): array
     {
-        return [['hsla(1000, 1000%, 20000%, 999)'], ['hsla(-100, -10%, -2%, 999)'], ['hsla(a, b, c, d)'], ['hsla(a, b%, c%, d)'], ['hsla( 9 99% , 99 9% , 9 %']];
+        return [
+            ['hsla(1000, 1000%, 20000%, 999)'],
+            ['hsla(-100, -10%, -2%, 999)'],
+            ['hsla(a, b, c, d)'],
+            ['hsla(a, b%, c%, d)'],
+            ['hsla( 9 99% , 99 9% , 9 %'],
+        ];
     }
 
-    public function testUnknownFormatsOnValidateTriggerException()
+    /**
+     * @dataProvider getInvalidFormats
+     */
+    public function testUnknownFormatAsStringThrowsException($formats)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "formats" parameter value is not valid. It must contain one or more of the following values: "hex_long, hex_long_with_alpha, hex_short, hex_short_with_alpha, basic_named_colors, extended_named_colors, system_colors, keywords, rgb, rgba, hsl, hsla".');
-        $constraint = new CssColor('Unknown Format');
-        $this->validator->validate('#F4B907', $constraint);
+
+        new CssColor($formats);
+    }
+
+    public static function getInvalidFormats(): array
+    {
+        return [
+            'as string' => ['Unknown Format'],
+            'as array' => [['Unknown Format']],
+        ];
     }
 }

@@ -63,15 +63,10 @@ class OidcUserInfoTokenHandlerTest extends TestCase
 
     public function testThrowsAnExceptionIfUserPropertyIsMissing()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
-        $response = ['foo' => 'bar'];
-
         $responseMock = $this->createMock(ResponseInterface::class);
         $responseMock->expects($this->once())
             ->method('toArray')
-            ->willReturn($response);
+            ->willReturn(['foo' => 'bar']);
 
         $clientMock = $this->createMock(HttpClientInterface::class);
         $clientMock->expects($this->once())
@@ -83,6 +78,10 @@ class OidcUserInfoTokenHandlerTest extends TestCase
             ->method('error');
 
         $handler = new OidcUserInfoTokenHandler($clientMock, $loggerMock);
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+
         $handler->getUserBadgeFrom('a-secret-token');
     }
 }

@@ -31,7 +31,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class CrowdinProviderTest extends ProviderTestCase
 {
-    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, TranslatorBagInterface $translatorBag = null): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null): ProviderInterface
     {
         return new CrowdinProvider($client, $loader, $logger, new XliffFileDumper(), $defaultLocale, $endpoint);
     }
@@ -75,7 +75,7 @@ class CrowdinProviderTest extends ProviderTestCase
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -93,7 +93,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="9dF75ai" resname="post.num_comments">
+      <trans-unit id="%s" resname="post.num_comments">
         <source>post.num_comments</source>
         <target>{count, plural, one {# comment} other {# comments}}</target>
       </trans-unit>
@@ -111,12 +111,18 @@ XLIFF;
 
                 return new JsonMockResponse(['data' => []]);
             },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+
+                return new MockResponse(json_encode(['data' => ['languageMapping' => []]]));
+            },
             'addStorage' => function (string $method, string $url, array $options = []) use ($expectedMessagesFileContent): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -132,7 +138,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: validators.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedValidatorsFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedValidatorsFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -171,7 +177,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -189,12 +195,18 @@ XLIFF;
 
                 return new JsonMockResponse(['data' => []]);
             },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+
+                return new MockResponse(json_encode(['data' => ['languageMapping' => []]]));
+            },
             'addStorage' => function (string $method, string $url, array $options = []) use ($expectedMessagesFileContent): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -236,7 +248,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -261,12 +273,18 @@ XLIFF;
                     ],
                 ]));
             },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+
+                return new MockResponse(json_encode(['data' => ['languageMapping' => []]]));
+            },
             'addStorage' => function (string $method, string $url, array $options = []) use ($expectedMessagesFileContent): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -308,7 +326,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_fr_a</target>
       </trans-unit>
@@ -326,7 +344,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -350,12 +368,18 @@ XLIFF;
                     ],
                 ]);
             },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+
+                return new MockResponse(json_encode(['data' => ['languageMapping' => []]]));
+            },
             'addStorage' => function (string $method, string $url, array $options = []) use ($expectedMessagesFileContent): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -371,7 +395,7 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesTranslationsContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesTranslationsContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -415,11 +439,11 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
-      <trans-unit id="SyIS4xr" resname="b">
+      <trans-unit id="%s" resname="b">
         <source>b</source>
         <target>trans_en_b</target>
       </trans-unit>
@@ -443,12 +467,18 @@ XLIFF;
                     ],
                 ]);
             },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+
+                return new MockResponse(json_encode(['data' => ['languageMapping' => []]]));
+            },
             'addStorage' => function (string $method, string $url, array $options = []) use ($expectedMessagesFileContent): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -489,7 +519,7 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
       </trans-unit>
@@ -513,12 +543,26 @@ XLIFF;
                     ],
                 ]);
             },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+
+                return new MockResponse(json_encode([
+                    'data' => [
+                        'languageMapping' => [
+                            'pt-PT' => [
+                                'locale' => 'pt',
+                            ],
+                        ],
+                    ],
+                ]));
+            },
             'addStorage' => function (string $method, string $url, array $options = []) use ($expectedMessagesFileContent): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesFileContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesFileContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
@@ -534,11 +578,27 @@ XLIFF;
                 $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
                 $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
                 $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
-                $this->assertSame($expectedMessagesTranslationsContent, $options['body']);
+                $this->assertStringMatchesFormat($expectedMessagesTranslationsContent, $options['body']);
 
                 return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
             },
             'uploadTranslations' => function (string $method, string $url, array $options = []) use ($expectedLocale): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame(sprintf('https://api.crowdin.com/api/v2/projects/1/translations/%s', $expectedLocale), $url);
+                $this->assertSame('{"storageId":19,"fileId":12}', $options['body']);
+
+                return new MockResponse();
+            },
+            'addStorage3' => function (string $method, string $url, array $options = []) use ($expectedMessagesTranslationsContent): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
+                $this->assertSame('Content-Type: application/octet-stream', $options['normalized_headers']['content-type'][0]);
+                $this->assertSame('Crowdin-API-FileName: messages.xlf', $options['normalized_headers']['crowdin-api-filename'][0]);
+                $this->assertStringMatchesFormat($expectedMessagesTranslationsContent, $options['body']);
+
+                return new MockResponse(json_encode(['data' => ['id' => 19]], ['http_code' => 201]));
+            },
+            'uploadTranslations2' => function (string $method, string $url, array $options = []) use ($expectedLocale): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame(sprintf('https://api.crowdin.com/api/v2/projects/1/translations/%s', $expectedLocale), $url);
                 $this->assertSame('{"storageId":19,"fileId":12}', $options['body']);
@@ -575,9 +635,36 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_fr_a</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+
+XLIFF
+        ];
+
+        $translatorBagPt = new TranslatorBag();
+        $translatorBagPt->addCatalogue($arrayLoader->load([
+            'a' => 'trans_en_a',
+        ], 'en'));
+        $translatorBagPt->addCatalogue($arrayLoader->load([
+            'a' => 'trans_pt_a',
+        ], 'pt'));
+
+        yield [$translatorBagPt, 'pt-PT', <<<'XLIFF'
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="pt" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="%s" resname="a">
+        <source>a</source>
+        <target>trans_pt_a</target>
       </trans-unit>
     </body>
   </file>
@@ -602,7 +689,7 @@ XLIFF
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qW_vcFr" resname="a">
+      <trans-unit id="%s" resname="a">
         <source>a</source>
         <target>trans_en_gb_a</target>
       </trans-unit>
@@ -633,25 +720,15 @@ XLIFF
                     ],
                 ]);
             },
-            'listLanguages' => function (string $method, string $url, array $options = []): ResponseInterface {
+            'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
-                $this->assertSame('Authorization: Bearer API_TOKEN', $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
 
                 return new JsonMockResponse([
                     'data' => [
-                        [
-                            'data' => [
-                                'id' => 'en-GB',
-                                'osxLocale' => 'en_GB',
-                                'locale' => 'en-GB',
-                            ],
-                        ],
-                        [
-                            'data' => [
-                                'id' => 'fr',
-                                'osxLocale' => 'fr_FR',
-                                'locale' => 'fr-FR',
+                        'languageMapping' => [
+                            'pt-PT' => [
+                                'locale' => 'pt',
                             ],
                         ],
                     ],
@@ -771,25 +848,15 @@ XLIFF
                     ],
                 ]);
             },
-            'listLanguages' => function (string $method, string $url, array $options = []): ResponseInterface {
+            'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
-                $this->assertSame('Authorization: Bearer API_TOKEN', $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
 
                 return new JsonMockResponse([
                     'data' => [
-                        [
-                            'data' => [
-                                'id' => 'en',
-                                'osxLocale' => 'en_GB',
-                                'locale' => 'en-GB',
-                            ],
-                        ],
-                        [
-                            'data' => [
-                                'id' => 'fr',
-                                'osxLocale' => 'fr_FR',
-                                'locale' => 'fr-FR',
+                        'languageMapping' => [
+                            'pt-PT' => [
+                                'locale' => 'pt',
                             ],
                         ],
                     ],
@@ -875,25 +942,15 @@ XLIFF
                     ],
                 ]);
             },
-            'listLanguages' => function (string $method, string $url, array $options = []): ResponseInterface {
+            'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
-                $this->assertSame('Authorization: Bearer API_TOKEN', $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
 
                 return new JsonMockResponse([
                     'data' => [
-                        [
-                            'data' => [
-                                'id' => 'en',
-                                'osxLocale' => 'en_GB',
-                                'locale' => 'en-GB',
-                            ],
-                        ],
-                        [
-                            'data' => [
-                                'id' => 'fr',
-                                'osxLocale' => 'fr_FR',
-                                'locale' => 'fr-FR',
+                        'languageMapping' => [
+                            'pt-PT' => [
+                                'locale' => 'pt',
                             ],
                         ],
                     ],
@@ -934,25 +991,15 @@ XLIFF
                     ],
                 ]);
             },
-            'listLanguages' => function (string $method, string $url, array $options = []): ResponseInterface {
+            'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
-                $this->assertSame('Authorization: Bearer API_TOKEN', $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
 
                 return new JsonMockResponse([
                     'data' => [
-                        [
-                            'data' => [
-                                'id' => 'en',
-                                'osxLocale' => 'en_GB',
-                                'locale' => 'en-GB',
-                            ],
-                        ],
-                        [
-                            'data' => [
-                                'id' => 'fr',
-                                'osxLocale' => 'fr_FR',
-                                'locale' => 'fr-FR',
+                        'languageMapping' => [
+                            'pt-PT' => [
+                                'locale' => 'pt',
                             ],
                         ],
                     ],

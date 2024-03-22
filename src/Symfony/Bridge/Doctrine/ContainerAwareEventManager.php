@@ -44,7 +44,7 @@ class ContainerAwareEventManager extends EventManager
         $this->listeners = $listeners;
     }
 
-    public function dispatchEvent(string $eventName, EventArgs $eventArgs = null): void
+    public function dispatchEvent(string $eventName, ?EventArgs $eventArgs = null): void
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -200,7 +200,7 @@ class ContainerAwareEventManager extends EventManager
                 continue;
             }
 
-            throw new \InvalidArgumentException(sprintf('Using Doctrine subscriber "%s" is not allowed, declare it as a listener instead.', get_debug_type($listener)));
+            throw new \InvalidArgumentException(sprintf('Using Doctrine subscriber "%s" is not allowed. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.', \is_object($listener) ? get_debug_type($listener) : $listener));
         }
     }
 

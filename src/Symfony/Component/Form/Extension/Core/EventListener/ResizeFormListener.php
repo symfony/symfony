@@ -24,24 +24,21 @@ use Symfony\Component\Form\FormInterface;
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
-    protected string $type;
-    protected array $options;
     protected array $prototypeOptions;
-    protected bool $allowAdd;
-    protected bool $allowDelete;
 
     private \Closure|bool $deleteEmpty;
-    private bool $keepAsList;
 
-    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, bool|callable $deleteEmpty = false, array $prototypeOptions = null, bool $keepAsList = false)
-    {
-        $this->type = $type;
-        $this->allowAdd = $allowAdd;
-        $this->allowDelete = $allowDelete;
-        $this->options = $options;
+    public function __construct(
+        private string $type,
+        private array $options = [],
+        private bool $allowAdd = false,
+        private bool $allowDelete = false,
+        bool|callable $deleteEmpty = false,
+        ?array $prototypeOptions = null,
+        private bool $keepAsList = false,
+    ) {
         $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
         $this->prototypeOptions = $prototypeOptions ?? $options;
-        $this->keepAsList = $keepAsList;
     }
 
     public static function getSubscribedEvents(): array

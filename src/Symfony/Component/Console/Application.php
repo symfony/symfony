@@ -75,8 +75,6 @@ class Application implements ResetInterface
     private array $commands = [];
     private bool $wantHelps = false;
     private ?Command $runningCommand = null;
-    private string $name;
-    private string $version;
     private ?CommandLoaderInterface $commandLoader = null;
     private bool $catchExceptions = true;
     private bool $catchErrors = false;
@@ -91,10 +89,10 @@ class Application implements ResetInterface
     private ?SignalRegistry $signalRegistry = null;
     private array $signalsToDispatchEvent = [];
 
-    public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
-    {
-        $this->name = $name;
-        $this->version = $version;
+    public function __construct(
+        private string $name = 'UNKNOWN',
+        private string $version = 'UNKNOWN',
+    ) {
         $this->terminal = new Terminal();
         $this->defaultCommand = 'list';
         if (\defined('SIGINT') && SignalRegistry::isSupported()) {
@@ -137,7 +135,7 @@ class Application implements ResetInterface
      *
      * @throws \Exception When running fails. Bypass this when {@link setCatchExceptions()}.
      */
-    public function run(InputInterface $input = null, OutputInterface $output = null): int
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
         if (\function_exists('putenv')) {
             @putenv('LINES='.$this->terminal->getHeight());
@@ -716,7 +714,7 @@ class Application implements ResetInterface
 
                 $aliases[$nameOrAlias] = $commandName;
 
-                return $commandName === $nameOrAlias || !\in_array($commandName, $commands);
+                return $commandName === $nameOrAlias || !\in_array($commandName, $commands, true);
             }));
         }
 
@@ -762,7 +760,7 @@ class Application implements ResetInterface
      *
      * @return Command[]
      */
-    public function all(string $namespace = null): array
+    public function all(?string $namespace = null): array
     {
         $this->init();
 
@@ -1130,7 +1128,7 @@ class Application implements ResetInterface
      *
      * This method is not part of public API and should not be used directly.
      */
-    public function extractNamespace(string $name, int $limit = null): string
+    public function extractNamespace(string $name, ?int $limit = null): string
     {
         $parts = explode(':', $name, -1);
 

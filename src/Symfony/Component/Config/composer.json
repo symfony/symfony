@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.2",
         "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/filesystem": "^6.4|^7.0",
+        "symfony/filesystem": "^7.1",
         "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {

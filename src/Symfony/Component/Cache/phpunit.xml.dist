@@ -15,7 +15,7 @@
         <env name="MEMCACHED_HOST" value="localhost" />
         <env name="COUCHBASE_HOST" value="localhost" />
         <env name="COUCHBASE_USER" value="Administrator" />
-        <env name="COUCHBASE_PASS" value="111111" />
+        <env name="COUCHBASE_PASS" value="111111%40" />
     </php>
 
     <testsuites>

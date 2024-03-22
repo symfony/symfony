@@ -82,7 +82,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      * @param string[]|null $accessorPrefixes
      * @param string[]|null $arrayMutatorPrefixes
      */
-    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC, InflectorInterface $inflector = null, int $magicMethodsFlags = self::ALLOW_MAGIC_GET | self::ALLOW_MAGIC_SET)
+    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC, ?InflectorInterface $inflector = null, int $magicMethodsFlags = self::ALLOW_MAGIC_GET | self::ALLOW_MAGIC_SET)
     {
         $this->mutatorPrefixes = $mutatorPrefixes ?? self::$defaultMutatorPrefixes;
         $this->accessorPrefixes = $accessorPrefixes ?? self::$defaultAccessorPrefixes;
@@ -274,14 +274,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $getsetter, $this->getReadVisiblityForMethod($method), $method->isStatic(), false);
         }
 
-        if ($allowMagicGet && $reflClass->hasMethod('__get') && ($reflClass->getMethod('__get')->getModifiers() & $this->methodReflectionFlags)) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, false);
+        if ($allowMagicGet && $reflClass->hasMethod('__get') && (($r = $reflClass->getMethod('__get'))->getModifiers() & $this->methodReflectionFlags)) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, $r->returnsReference());
         }
 
-        if ($hasProperty && ($reflClass->getProperty($property)->getModifiers() & $this->propertyReflectionFlags)) {
-            $reflProperty = $reflClass->getProperty($property);
-
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisiblityForProperty($reflProperty), $reflProperty->isStatic(), true);
+        if ($hasProperty && (($r = $reflClass->getProperty($property))->getModifiers() & $this->propertyReflectionFlags)) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisiblityForProperty($r), $r->isStatic(), true);
         }
 
         if ($allowMagicCall && $reflClass->hasMethod('__call') && ($reflClass->getMethod('__call')->getModifiers() & $this->methodReflectionFlags)) {
@@ -424,7 +422,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
         $type = $this->extractFromReflectionType($reflectionType, $reflectionMethod->getDeclaringClass());
 
-        if (1 === \count($type) && \in_array($prefix, $this->arrayMutatorPrefixes)) {
+        if (1 === \count($type) && \in_array($prefix, $this->arrayMutatorPrefixes, true)) {
             $type = [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $type[0])];
         }
 
@@ -631,7 +629,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         foreach ($mutatorPrefixes as $prefix) {
             $names = [$ucProperty];
-            if (\in_array($prefix, $this->arrayMutatorPrefixes)) {
+            if (\in_array($prefix, $this->arrayMutatorPrefixes, true)) {
                 $names = array_merge($names, $ucSingulars);
             }
 
@@ -642,7 +640,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                         continue;
                     }
 
-                    // Parameter can be optional to allow things like: method(array $foo = null)
+                    // Parameter can be optional to allow things like: method(?array $foo = null)
                     if ($reflectionMethod->getNumberOfParameters() >= 1) {
                         return [$reflectionMethod, $prefix];
                     }
@@ -660,7 +658,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $pattern = implode('|', array_merge($this->accessorPrefixes, $this->mutatorPrefixes));
 
         if ('' !== $pattern && preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
-            if (!\in_array($matches[1], $this->arrayMutatorPrefixes)) {
+            if (!\in_array($matches[1], $this->arrayMutatorPrefixes, true)) {
                 return $matches[2];
             }
 
@@ -688,7 +686,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars): array
     {
-        if (!\is_array($this->arrayMutatorPrefixes) && 2 !== \count($this->arrayMutatorPrefixes)) {
+        if (2 !== \count($this->arrayMutatorPrefixes)) {
             return [null, null, []];
         }
 

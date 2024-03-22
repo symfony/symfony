@@ -71,13 +71,23 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame($savedParsedExpression, $parsedExpression);
     }
 
-    public function testConstantFunction()
+    /**
+     * @dataProvider basicPhpFunctionProvider
+     */
+    public function testBasicPhpFunction($expression, $expected, $compiled)
     {
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals(\PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
+        $this->assertEquals($expected, $expressionLanguage->evaluate($expression));
+        $this->assertEquals($compiled, $expressionLanguage->compile($expression));
+    }
 
-        $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+    public static function basicPhpFunctionProvider()
+    {
+        return [
+            ['constant("PHP_VERSION")', \PHP_VERSION, '\constant("PHP_VERSION")'],
+            ['min(1,2,3)', 1, '\min(1, 2, 3)'],
+            ['max(1,2,3)', 3, '\max(1, 2, 3)'],
+        ];
     }
 
     public function testEnumFunctionWithConstantThrows()
@@ -166,6 +176,14 @@ class ExpressionLanguageTest extends TestCase
         $this->expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->parse('node.', ['node']);
+    }
+
+    public function testParseReturnsObjectOnAlreadyParsedExpression()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expression = $expressionLanguage->parse('1 + 1', []);
+
+        $this->assertSame($expression, $expressionLanguage->parse($expression, []));
     }
 
     public static function shortCircuitProviderEvaluate()
@@ -366,7 +384,7 @@ class ExpressionLanguageTest extends TestCase
 
         $this->expectException(\ErrorException::class);
 
-        set_error_handler(static function (int $errno, string $errstr, string $errfile = null, int $errline = null): bool {
+        set_error_handler(static function (int $errno, string $errstr, ?string $errfile = null, ?int $errline = null): bool {
             if ($errno & (\E_WARNING | \E_USER_WARNING) && (str_contains($errstr, 'Attempt to read property') || str_contains($errstr, 'Trying to access'))) {
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
             }
@@ -438,6 +456,24 @@ class ExpressionLanguageTest extends TestCase
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
         $registerCallback($el);
+    }
+
+    public function testLintDoesntThrowOnValidExpression()
+    {
+        $el = new ExpressionLanguage();
+        $el->lint('1 + 1', []);
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testLintThrowsOnInvalidExpression()
+    {
+        $el = new ExpressionLanguage();
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
+
+        $el->lint('node.', ['node']);
     }
 
     public static function getRegisterCallbacks()

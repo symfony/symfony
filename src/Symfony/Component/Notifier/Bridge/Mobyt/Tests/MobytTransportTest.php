@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MobytTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): MobytTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): MobytTransport
     {
         return (new MobytTransport('accountSid', 'authToken', 'from', $messageType, $client ?? new MockHttpClient()))->setHost('host.test');
     }

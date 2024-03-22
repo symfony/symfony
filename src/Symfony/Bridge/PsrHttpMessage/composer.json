@@ -3,7 +3,7 @@
     "type": "symfony-bridge",
     "description": "PSR HTTP message bridge",
     "keywords": ["http", "psr-7", "psr-17", "http-message"],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {

@@ -38,7 +38,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         $this->clients[$name] = $client;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->lateCollect();
     }

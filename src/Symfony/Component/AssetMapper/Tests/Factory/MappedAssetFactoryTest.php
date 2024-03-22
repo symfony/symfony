@@ -137,7 +137,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertTrue($asset->isVendor);
     }
 
-    private function createFactory(AssetCompilerInterface $extraCompiler = null): MappedAssetFactory
+    private function createFactory(?AssetCompilerInterface $extraCompiler = null): MappedAssetFactory
     {
         $compilers = [
             new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class)),

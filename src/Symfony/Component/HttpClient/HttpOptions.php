@@ -66,9 +66,8 @@ class HttpOptions
     /**
      * @return $this
      */
-    public function addHeader(string $key, string $value): static
+    public function setHeader(string $key, string $value): static
     {
-        $this->options['headers'] ??= [];
         $this->options['headers'][$key] = $value;
 
         return $this;

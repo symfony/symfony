@@ -24,7 +24,7 @@ class ExpressionValidator extends ConstraintValidator
 {
     private ExpressionLanguage $expressionLanguage;
 
-    public function __construct(ExpressionLanguage $expressionLanguage = null)
+    public function __construct(?ExpressionLanguage $expressionLanguage = null)
     {
         if ($expressionLanguage) {
             $this->expressionLanguage = $expressionLanguage;

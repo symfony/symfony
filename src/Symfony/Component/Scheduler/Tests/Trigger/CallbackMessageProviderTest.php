@@ -29,8 +29,9 @@ class CallbackMessageProviderTest extends TestCase
         $this->assertEquals([new \stdClass()], $messageProvider->getMessages($context));
         $this->assertSame('', $messageProvider->getId());
 
-        $messageProvider = new CallbackMessageProvider(fn () => yield new \stdClass(), 'foo');
+        $messageProvider = new CallbackMessageProvider(fn () => yield new \stdClass(), 'foo', 'bar');
         $this->assertInstanceOf(\Generator::class, $messageProvider->getMessages($context));
         $this->assertSame('foo', $messageProvider->getId());
+        $this->assertSame('bar', (string) $messageProvider);
     }
 }

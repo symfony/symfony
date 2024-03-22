@@ -21,18 +21,18 @@ final class HandlerDescriptor
     private \Closure $handler;
     private string $name;
     private ?BatchHandlerInterface $batchHandler = null;
-    private array $options;
 
-    public function __construct(callable $handler, array $options = [])
-    {
+    public function __construct(
+        callable $handler,
+        private array $options = [],
+    ) {
         $handler = $handler(...);
 
         $this->handler = $handler;
-        $this->options = $options;
 
         $r = new \ReflectionFunction($handler);
 
-        if (str_contains($r->name, '{closure}')) {
+        if ($r->isAnonymous()) {
             $this->name = 'Closure';
         } elseif (!$handler = $r->getClosureThis()) {
             $class = $r->getClosureCalledClass();

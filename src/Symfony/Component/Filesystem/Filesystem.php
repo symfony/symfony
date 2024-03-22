@@ -72,6 +72,9 @@ class Filesystem
                 // Like `cp`, preserve executable permission bits
                 self::box('chmod', $targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
 
+                // Like `cp`, preserve the file modification time
+                self::box('touch', $targetFile, filemtime($originFile));
+
                 if ($bytesCopied !== $bytesOrigin = filesize($originFile)) {
                     throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
                 }
@@ -125,7 +128,7 @@ class Filesystem
      *
      * @throws IOException When touch fails
      */
-    public function touch(string|iterable $files, int $time = null, int $atime = null): void
+    public function touch(string|iterable $files, ?int $time = null, ?int $atime = null): void
     {
         foreach ($this->toIterable($files) as $file) {
             if (!($time ? self::box('touch', $file, $time, $atime) : self::box('touch', $file))) {
@@ -190,7 +193,7 @@ class Filesystem
 
                     throw new IOException(sprintf('Failed to remove directory "%s": ', $file).$lastError);
                 }
-            } elseif (!self::box('unlink', $file) && (str_contains(self::$lastError, 'Permission denied') || file_exists($file))) {
+            } elseif (!self::box('unlink', $file) && ((self::$lastError && str_contains(self::$lastError, 'Permission denied')) || file_exists($file))) {
                 throw new IOException(sprintf('Failed to remove file "%s": ', $file).self::$lastError);
             }
         }
@@ -508,7 +511,7 @@ class Filesystem
      *
      * @throws IOException When file type is unknown
      */
-    public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
+    public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = []): void
     {
         $targetDir = rtrim($targetDir, '/\\');
         $originDir = rtrim($originDir, '/\\');
@@ -692,6 +695,25 @@ class Filesystem
         if (false === self::box('file_put_contents', $filename, $content, \FILE_APPEND | ($lock ? \LOCK_EX : 0))) {
             throw new IOException(sprintf('Failed to write file "%s": ', $filename).self::$lastError, 0, null, $filename);
         }
+    }
+
+    /**
+     * Returns the content of a file as a string.
+     *
+     * @throws IOException If the file cannot be read
+     */
+    public function readFile(string $filename): string
+    {
+        if (is_dir($filename)) {
+            throw new IOException(sprintf('Failed to read file "%s": File is a directory.', $filename));
+        }
+
+        $content = self::box('file_get_contents', $filename);
+        if (false === $content) {
+            throw new IOException(sprintf('Failed to read file "%s": ', $filename).self::$lastError, 0, null, $filename);
+        }
+
+        return $content;
     }
 
     private function toIterable(string|iterable $files): iterable

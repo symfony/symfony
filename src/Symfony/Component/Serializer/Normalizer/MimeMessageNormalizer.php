@@ -17,6 +17,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -61,7 +62,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         $this->normalizer->setSerializer($serializer);
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if ($object instanceof Headers) {
             $ret = [];
@@ -72,18 +73,21 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
             return $ret;
         }
 
+        $ret = $this->normalizer->normalize($object, $format, $context);
+
         if ($object instanceof AbstractPart) {
-            $ret = $this->normalizer->normalize($object, $format, $context);
             $ret['class'] = $object::class;
             unset($ret['seekable'], $ret['cid'], $ret['handle']);
-
-            return $ret;
         }
 
-        return $this->normalizer->normalize($object, $format, $context);
+        if ($object instanceof RawMessage && \array_key_exists('message', $ret) && null === $ret['message']) {
+            unset($ret['message']);
+        }
+
+        return $ret;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (Headers::class === $type) {
             $ret = [];
@@ -105,12 +109,12 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         return $this->normalizer->denormalize($data, $type, $format, $context);
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Message || $data instanceof Headers || $data instanceof HeaderInterface || $data instanceof Address || $data instanceof AbstractPart;
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_a($type, Message::class, true) || Headers::class === $type || AbstractPart::class === $type;
     }

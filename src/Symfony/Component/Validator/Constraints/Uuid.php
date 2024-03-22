@@ -15,6 +15,11 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
+ * Validates that a value is a valid Universally unique identifier (UUID).
+ *
+ * @see https://en.wikipedia.org/wiki/Universally_unique_identifier
+ * @see https://datatracker.ietf.org/doc/html/rfc4122
+ *
  * @author Colin O'Dell <colinodell@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -90,16 +95,19 @@ class Uuid extends Constraint
     public $normalizer;
 
     /**
-     * @param int[]|int|null $versions
+     * @param array<string,mixed>|null $options
+     * @param self::V*[]|self::V*|null $versions Specific UUID versions (defaults to {@see Uuid::ALL_VERSIONS})
+     * @param bool|null                $strict   Whether to force the value to follow the RFC's input format rules; pass false to allow alternate formats (defaults to true)
+     * @param string[]|null            $groups
      */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        array|int $versions = null,
-        bool $strict = null,
-        callable $normalizer = null,
-        array $groups = null,
-        mixed $payload = null
+        ?array $options = null,
+        ?string $message = null,
+        array|int|null $versions = null,
+        ?bool $strict = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

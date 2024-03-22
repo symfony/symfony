@@ -4,6 +4,12 @@ CHANGELOG
 7.1
 ---
 
+ * Add support for `Stringable` values when using the `Cidr`, `CssColor`, `ExpressionSyntax` and `PasswordStrength` constraints
+ * Add `MacAddress` constraint
+ * Add `*_NO_PUBLIC`, `*_ONLY_PRIVATE` and `*_ONLY_RESERVED` versions to `Ip` constraint
+ * Possibility to use all `Ip` constraint versions for `Cidr` constraint
+ * Add `list` and `associative_array` types to `Type` constraint
+ * Add the `Charset` constraint
  * Add the `callbackArgs` option to the `Choice` constraint
 
 7.0

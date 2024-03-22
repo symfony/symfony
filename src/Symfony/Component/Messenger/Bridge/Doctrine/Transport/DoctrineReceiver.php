@@ -30,12 +30,12 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
 {
     private const MAX_RETRIES = 3;
     private int $retryingSafetyCounter = 0;
-    private Connection $connection;
     private SerializerInterface $serializer;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
@@ -92,7 +92,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
         }
     }
 
-    public function all(int $limit = null): iterable
+    public function all(?int $limit = null): iterable
     {
         try {
             $doctrineEnvelopes = $this->connection->findAll($limit);

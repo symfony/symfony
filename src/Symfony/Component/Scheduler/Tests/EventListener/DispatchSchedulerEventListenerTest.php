@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\EventListener;
+namespace Symfony\Component\Scheduler\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -25,7 +25,7 @@ use Symfony\Component\Scheduler\EventListener\DispatchSchedulerEventListener;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
 use Symfony\Component\Scheduler\RecurringMessage;
-use Symfony\Component\Scheduler\Tests\Messenger\SomeScheduleProvider;
+use Symfony\Component\Scheduler\Tests\Fixtures\SomeScheduleProvider;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class DispatchSchedulerEventListenerTest extends TestCase
@@ -36,14 +36,12 @@ class DispatchSchedulerEventListenerTest extends TestCase
         $defaultRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'default']);
 
         $schedulerProvider = new SomeScheduleProvider([$defaultRecurringMessage]);
-        $scheduleProviderLocator = $this->createMock(ContainerInterface::class);
-        $scheduleProviderLocator->expects($this->any())->method('has')->willReturn(true);
-        $scheduleProviderLocator->expects($this->any())->method('get')->willReturn($schedulerProvider);
+        $scheduleProviderLocator = new Container();
+        $scheduleProviderLocator->set('default', $schedulerProvider);
 
         $context = new MessageContext('default', 'default', $trigger, $this->createMock(\DateTimeImmutable::class));
         $envelope = (new Envelope(new \stdClass()))->with(new ScheduledStamp($context));
 
-        /** @var ContainerInterface $scheduleProviderLocator */
         $listener = new DispatchSchedulerEventListener($scheduleProviderLocator, $eventDispatcher = new EventDispatcher());
         $workerReceivedEvent = new WorkerMessageReceivedEvent($envelope, 'default');
         $workerHandledEvent = new WorkerMessageHandledEvent($envelope, 'default');

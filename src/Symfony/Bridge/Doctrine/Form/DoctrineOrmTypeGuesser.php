@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Doctrine\Form;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\FieldMapping;
+use Doctrine\ORM\Mapping\JoinColumnMapping;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
@@ -110,13 +112,13 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         if ($classMetadata->isAssociationWithSingleJoinColumn($property)) {
             $mapping = $classMetadata->getAssociationMapping($property);
 
-            if (!isset($mapping['joinColumns'][0]['nullable'])) {
+            if (null === self::getMappingValue($mapping['joinColumns'][0], 'nullable')) {
                 // The "nullable" option defaults to true, in that case the
                 // field should not be required.
                 return new ValueGuess(false, Guess::HIGH_CONFIDENCE);
             }
 
-            return new ValueGuess(!$mapping['joinColumns'][0]['nullable'], Guess::HIGH_CONFIDENCE);
+            return new ValueGuess(!self::getMappingValue($mapping['joinColumns'][0], 'nullable'), Guess::HIGH_CONFIDENCE);
         }
 
         return null;
@@ -128,8 +130,10 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
             $mapping = $ret[0]->getFieldMapping($property);
 
-            if (isset($mapping['length'])) {
-                return new ValueGuess($mapping['length'], Guess::HIGH_CONFIDENCE);
+            $length = $mapping instanceof FieldMapping ? $mapping->length : ($mapping['length'] ?? null);
+
+            if (null !== $length) {
+                return new ValueGuess($length, Guess::HIGH_CONFIDENCE);
             }
 
             if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT])) {
@@ -189,5 +193,14 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         }
 
         return substr($class, $pos + Proxy::MARKER_LENGTH + 2);
+    }
+
+    private static function getMappingValue(array|JoinColumnMapping $mapping, string $key): mixed
+    {
+        if ($mapping instanceof JoinColumnMapping) {
+            return $mapping->$key ?? null;
+        }
+
+        return $mapping[$key] ?? null;
     }
 }

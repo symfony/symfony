@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SpotHitTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): SpotHitTransport
+    public static function createTransport(?HttpClientInterface $client = null): SpotHitTransport
     {
         return (new SpotHitTransport('api_token', 'MyCompany', $client ?? new MockHttpClient()))->setHost('host.test');
     }

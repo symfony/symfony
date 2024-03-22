@@ -29,7 +29,7 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
     public function __construct(
         private HttpClientInterface $client,
         private ?LoggerInterface $logger = null,
-        private string $claim = 'sub'
+        private string $claim = 'sub',
     ) {
     }
 

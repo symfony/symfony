@@ -22,9 +22,11 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class Target
 {
-    public function __construct(
-        public ?string $name = null,
-    ) {
+    /**
+     * @param string|null $name The name of the target autowiring alias
+     */
+    public function __construct(public ?string $name = null)
+    {
     }
 
     public function getParsedName(): string
@@ -36,7 +38,7 @@ final class Target
         return lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $this->name))));
     }
 
-    public static function parseName(\ReflectionParameter $parameter, self &$attribute = null, string &$parsedName = null): string
+    public static function parseName(\ReflectionParameter $parameter, ?self &$attribute = null, ?string &$parsedName = null): string
     {
         $attribute = null;
         if (!$target = $parameter->getAttributes(self::class)[0] ?? null) {

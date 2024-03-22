@@ -32,8 +32,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     public const REQUIREMENT_MISMATCH = 1;
     public const ROUTE_MATCH = 2;
 
-    protected RequestContext $context;
-
     /**
      * Collects HTTP methods that would be allowed for the request.
      */
@@ -45,8 +43,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      * @internal
      */
     protected array $allowSchemes = [];
-
-    protected RouteCollection $routes;
     protected ?Request $request = null;
     protected ExpressionLanguage $expressionLanguage;
 
@@ -55,10 +51,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected array $expressionLanguageProviders = [];
 
-    public function __construct(RouteCollection $routes, RequestContext $context)
-    {
-        $this->routes = $routes;
-        $this->context = $context;
+    public function __construct(
+        protected RouteCollection $routes,
+        protected RequestContext $context,
+    ) {
     }
 
     public function setContext(RequestContext $context): void
@@ -163,7 +159,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             }
 
             if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
-                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
+                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods, true))) {
                     return $this->allow = $this->allowSchemes = [];
                 }
                 continue;
@@ -174,7 +170,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            if ($requiredMethods && !\in_array($method, $requiredMethods)) {
+            if ($requiredMethods && !\in_array($method, $requiredMethods, true)) {
                 $this->allow = array_merge($this->allow, $requiredMethods);
                 continue;
             }

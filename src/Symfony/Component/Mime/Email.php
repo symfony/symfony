@@ -120,6 +120,10 @@ class Email extends Message
      */
     public function from(Address|string ...$addresses): static
     {
+        if (!$addresses) {
+            throw new LogicException('"from()" must be called with at least one address.');
+        }
+
         return $this->setListAddressHeaderBody('From', $addresses);
     }
 
@@ -325,7 +329,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function attach($body, string $name = null, string $contentType = null): static
+    public function attach($body, ?string $name = null, ?string $contentType = null): static
     {
         return $this->addPart(new DataPart($body, $name, $contentType));
     }
@@ -333,7 +337,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function attachFromPath(string $path, string $name = null, string $contentType = null): static
+    public function attachFromPath(string $path, ?string $name = null, ?string $contentType = null): static
     {
         return $this->addPart(new DataPart(new File($path), $name, $contentType));
     }
@@ -343,7 +347,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function embed($body, string $name = null, string $contentType = null): static
+    public function embed($body, ?string $name = null, ?string $contentType = null): static
     {
         return $this->addPart((new DataPart($body, $name, $contentType))->asInline());
     }
@@ -351,7 +355,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function embedFromPath(string $path, string $name = null, string $contentType = null): static
+    public function embedFromPath(string $path, ?string $name = null, ?string $contentType = null): static
     {
         return $this->addPart((new DataPart(new File($path), $name, $contentType))->asInline());
     }

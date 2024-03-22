@@ -34,7 +34,7 @@ class Inline
     private static bool $objectForMap = false;
     private static bool $constantSupport = false;
 
-    public static function initialize(int $flags, int $parsedLineNumber = null, string $parsedFilename = null): void
+    public static function initialize(int $flags, ?int $parsedLineNumber = null, ?string $parsedFilename = null): void
     {
         self::$exceptionOnInvalidType = (bool) (Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE & $flags);
         self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);
@@ -116,7 +116,7 @@ class Inline
                     default => 'Y-m-d\TH:i:s.uP',
                 });
             case $value instanceof \UnitEnum:
-                return sprintf('!php/const %s::%s', $value::class, $value->name);
+                return sprintf('!php/enum %s::%s', $value::class, $value->name);
             case \is_object($value):
                 if ($value instanceof TaggedValue) {
                     return '!'.$value->getTag().' '.self::dump($value->getValue(), $flags);
@@ -267,7 +267,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    public static function parseScalar(string $scalar, int $flags = 0, array $delimiters = null, int &$i = 0, bool $evaluate = true, array &$references = [], bool &$isQuoted = null): mixed
+    public static function parseScalar(string $scalar, int $flags = 0, ?array $delimiters = null, int &$i = 0, bool $evaluate = true, array &$references = [], ?bool &$isQuoted = null): mixed
     {
         if (\in_array($scalar[$i], ['"', "'"], true)) {
             // quoted scalar
@@ -556,7 +556,7 @@ class Inline
      *
      * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
      */
-    private static function evaluateScalar(string $scalar, int $flags, array &$references = [], bool &$isQuotedString = null): mixed
+    private static function evaluateScalar(string $scalar, int $flags, array &$references = [], ?bool &$isQuotedString = null): mixed
     {
         $isQuotedString = false;
         $scalar = trim($scalar);
@@ -643,24 +643,31 @@ class Inline
                             }
 
                             $i = 0;
-                            $enum = self::parseScalar(substr($scalar, 10), 0, null, $i, false);
-                            if ($useValue = str_ends_with($enum, '->value')) {
-                                $enum = substr($enum, 0, -7);
-                            }
-                            if (!\defined($enum)) {
+                            $enumName = self::parseScalar(substr($scalar, 10), 0, null, $i, false);
+                            $useName = str_contains($enumName, '::');
+                            $enum = $useName ? strstr($enumName, '::', true) : $enumName;
+
+                            if (!enum_exists($enum)) {
                                 throw new ParseException(sprintf('The enum "%s" is not defined.', $enum), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                             }
-
-                            $value = \constant($enum);
-
-                            if (!$value instanceof \UnitEnum) {
-                                throw new ParseException(sprintf('The string "%s" is not the name of a valid enum.', $enum), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                            if (!$useName) {
+                                return $enum::cases();
                             }
+                            if ($useValue = str_ends_with($enumName, '->value')) {
+                                $enumName = substr($enumName, 0, -7);
+                            }
+
+                            if (!\defined($enumName)) {
+                                throw new ParseException(sprintf('The string "%s" is not the name of a valid enum.', $enumName), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                            }
+
+                            $value = \constant($enumName);
+
                             if (!$useValue) {
                                 return $value;
                             }
                             if (!$value instanceof \BackedEnum) {
-                                throw new ParseException(sprintf('The enum "%s" defines no value next to its name.', $enum), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                                throw new ParseException(sprintf('The enum "%s" defines no value next to its name.', $enumName), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                             }
 
                             return $value->value;

@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
+ * Validates that a given number or DateTime object is between some minimum and maximum.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -45,19 +47,29 @@ class Range extends Constraint
     public mixed $max = null;
     public ?string $maxPropertyPath = null;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string|null              $invalidMessage         The message if min and max values are numeric but the given value is not
+     * @param string|null              $invalidDateTimeMessage The message if min and max values are PHP datetimes but the given value is not
+     * @param int|float|string|null    $min                    The minimum value, either numeric or a datetime string representation
+     * @param string|null              $minPropertyPath        Property path to the min value
+     * @param int|float|string|null    $max                    The maximum value, either numeric or a datetime string representation
+     * @param string|null              $maxPropertyPath        Property path to the max value
+     * @param string[]|null            $groups
+     */
     public function __construct(
-        array $options = null,
-        string $notInRangeMessage = null,
-        string $minMessage = null,
-        string $maxMessage = null,
-        string $invalidMessage = null,
-        string $invalidDateTimeMessage = null,
+        ?array $options = null,
+        ?string $notInRangeMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
+        ?string $invalidMessage = null,
+        ?string $invalidDateTimeMessage = null,
         mixed $min = null,
-        string $minPropertyPath = null,
+        ?string $minPropertyPath = null,
         mixed $max = null,
-        string $maxPropertyPath = null,
-        array $groups = null,
-        mixed $payload = null
+        ?string $maxPropertyPath = null,
+        ?array $groups = null,
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

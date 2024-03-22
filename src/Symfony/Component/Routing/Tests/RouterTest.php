@@ -89,7 +89,7 @@ class RouterTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Router does not support the "option_foo" option');
-        $this->router->getOption('option_foo', true);
+        $this->router->getOption('option_foo');
     }
 
     public function testThatRouteCollectionIsLoaded()

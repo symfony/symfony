@@ -22,16 +22,15 @@ use Symfony\Component\Asset\Exception\LogicException;
  */
 class Packages
 {
-    private ?PackageInterface $defaultPackage;
     private array $packages = [];
 
     /**
      * @param PackageInterface[] $packages Additional packages indexed by name
      */
-    public function __construct(PackageInterface $defaultPackage = null, iterable $packages = [])
-    {
-        $this->defaultPackage = $defaultPackage;
-
+    public function __construct(
+        private ?PackageInterface $defaultPackage = null,
+        iterable $packages = [],
+    ) {
         foreach ($packages as $name => $package) {
             $this->addPackage($name, $package);
         }
@@ -55,7 +54,7 @@ class Packages
      * @throws InvalidArgumentException If there is no package by that name
      * @throws LogicException           If no default package is defined
      */
-    public function getPackage(string $name = null): PackageInterface
+    public function getPackage(?string $name = null): PackageInterface
     {
         if (null === $name) {
             if (null === $this->defaultPackage) {
@@ -78,7 +77,7 @@ class Packages
      * @param string      $path        A public path
      * @param string|null $packageName A package name
      */
-    public function getVersion(string $path, string $packageName = null): string
+    public function getVersion(string $path, ?string $packageName = null): string
     {
         return $this->getPackage($packageName)->getVersion($path);
     }
@@ -93,7 +92,7 @@ class Packages
      *
      * @return string A public path which takes into account the base path and URL path
      */
-    public function getUrl(string $path, string $packageName = null): string
+    public function getUrl(string $path, ?string $packageName = null): string
     {
         return $this->getPackage($packageName)->getUrl($path);
     }

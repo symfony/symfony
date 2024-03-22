@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * Validates an object embedded in an object's property.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -21,7 +23,12 @@ class Valid extends Constraint
 {
     public bool $traverse = true;
 
-    public function __construct(array $options = null, array $groups = null, $payload = null, bool $traverse = null)
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
+     * @param bool|null                $traverse Whether to validate {@see \Traversable} objects (defaults to true)
+     */
+    public function __construct(?array $options = null, ?array $groups = null, $payload = null, ?bool $traverse = null)
     {
         parent::__construct($options ?? [], $groups, $payload);
 

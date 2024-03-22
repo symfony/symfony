@@ -19,6 +19,12 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DiscriminatorMap
 {
+    /**
+     * @param string                      $typeProperty The property holding the type discriminator
+     * @param array<string, class-string> $mapping      The mapping between types and classes (i.e. ['admin_user' => AdminUser::class])
+     *
+     * @throws InvalidArgumentException
+     */
     public function __construct(
         private readonly string $typeProperty,
         private readonly array $mapping,

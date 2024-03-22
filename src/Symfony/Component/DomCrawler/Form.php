@@ -33,7 +33,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \LogicException if the node is not a button inside a form tag
      */
-    public function __construct(\DOMElement $node, string $currentUri = null, string $method = null, string $baseHref = null)
+    public function __construct(\DOMElement $node, ?string $currentUri = null, ?string $method = null, ?string $baseHref = null)
     {
         parent::__construct($node, $currentUri, $method);
         $this->baseHref = $baseHref;
@@ -336,7 +336,7 @@ class Form extends Link implements \ArrayAccess
     public function disableValidation(): static
     {
         foreach ($this->fields->all() as $field) {
-            if ($field instanceof Field\ChoiceFormField) {
+            if ($field instanceof ChoiceFormField) {
                 $field->disableValidation();
             }
         }
@@ -418,14 +418,14 @@ class Form extends Link implements \ArrayAccess
             // corresponding elements are either descendants or have a matching HTML5 form attribute
             $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
 
-            $fieldNodes = $xpath->query(sprintf('( descendant::input[@form=%s] | descendant::button[@form=%1$s] | descendant::textarea[@form=%1$s] | descendant::select[@form=%1$s] | //form[@id=%1$s]//input[not(@form)] | //form[@id=%1$s]//button[not(@form)] | //form[@id=%1$s]//textarea[not(@form)] | //form[@id=%1$s]//select[not(@form)] )[not(ancestor::template)]', $formId));
+            $fieldNodes = $xpath->query(sprintf('( descendant::input[@form=%s] | descendant::button[@form=%1$s] | descendant::textarea[@form=%1$s] | descendant::select[@form=%1$s] | //form[@id=%1$s]//input[not(@form)] | //form[@id=%1$s]//button[not(@form)] | //form[@id=%1$s]//textarea[not(@form)] | //form[@id=%1$s]//select[not(@form)] )[( not(ancestor::template) or ancestor::turbo-stream )]', $formId));
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
         } else {
             // do the xpath query with $this->node as the context node, to only find descendant elements
             // however, descendant elements with form attribute are not part of this form
-            $fieldNodes = $xpath->query('( descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)] )[not(ancestor::template)]', $this->node);
+            $fieldNodes = $xpath->query('( descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)] )[( not(ancestor::template) or ancestor::turbo-stream )]', $this->node);
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
@@ -444,14 +444,14 @@ class Form extends Link implements \ArrayAccess
 
         $nodeName = $node->nodeName;
         if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == strtolower($node->getAttribute('type'))) {
-            $this->set(new Field\ChoiceFormField($node));
+            $this->set(new ChoiceFormField($node));
         } elseif ('input' == $nodeName && 'radio' == strtolower($node->getAttribute('type'))) {
             // there may be other fields with the same name that are no choice
             // fields already registered (see https://github.com/symfony/symfony/issues/11689)
             if ($this->has($node->getAttribute('name')) && $this->get($node->getAttribute('name')) instanceof ChoiceFormField) {
                 $this->get($node->getAttribute('name'))->addChoice($node);
             } else {
-                $this->set(new Field\ChoiceFormField($node));
+                $this->set(new ChoiceFormField($node));
             }
         } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type'))) {
             $this->set(new Field\FileFormField($node));

@@ -26,15 +26,14 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class Button implements \IteratorAggregate, FormInterface
 {
     private ?FormInterface $parent = null;
-    private FormConfigInterface $config;
     private bool $submitted = false;
 
     /**
      * Creates a new button from a form configuration.
      */
-    public function __construct(FormConfigInterface $config)
-    {
-        $this->config = $config;
+    public function __construct(
+        private FormConfigInterface $config,
+    ) {
     }
 
     /**
@@ -104,7 +103,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function add(string|FormInterface $child, string $type = null, array $options = []): static
+    public function add(string|FormInterface $child, ?string $type = null, array $options = []): static
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -312,7 +311,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return $this
      *
-     * @throws Exception\AlreadySubmittedException if the button has already been submitted
+     * @throws AlreadySubmittedException if the button has already been submitted
      */
     public function submit(array|string|null $submittedData, bool $clearMissing = true): static
     {
@@ -335,7 +334,7 @@ class Button implements \IteratorAggregate, FormInterface
         return null === $this->parent;
     }
 
-    public function createView(FormView $parent = null): FormView
+    public function createView(?FormView $parent = null): FormView
     {
         if (null === $parent && $this->parent) {
             $parent = $this->parent->createView();

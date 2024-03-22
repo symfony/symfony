@@ -92,7 +92,7 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString('"app_css_preload": "data:application/javascript,', $html);
         $this->assertStringContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-preload-d1g35t.css">', $html);
         // non-preloaded CSS file
-        $this->assertStringContainsString('"app_css_no_preload": "data:application/javascript,const%20d%3Ddocument%2Cl%3Dd.createElement%28%22link%22%29%3Bl.rel%3D%22stylesheet%22%2Cl.href%3D%22%2Fsubdirectory%2Fassets%2Fstyles%2Fapp-nopreload-d1g35t.css%22%2C%28d.head%7C%7Cd.getElementsByTagName%28%22head%22%29%5B0%5D%29.appendChild%28l%29', $html);
+        $this->assertStringContainsString('"app_css_no_preload": "data:application/javascript,document.head.appendChild%28Object.assign%28document.createElement%28%22link%22%29%2C%7Brel%3A%22stylesheet%22%2Chref%3A%22%2Fsubdirectory%2Fassets%2Fstyles%2Fapp-nopreload-d1g35t.css%22%7D', $html);
         $this->assertStringNotContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-nopreload-d1g35t.css">', $html);
         // remote js
         $this->assertStringContainsString('"remote_js": "https://cdn.example.com/assets/remote-d1g35t.js"', $html);
@@ -121,6 +121,7 @@ class ImportMapRendererTest extends TestCase
         );
         $html = $renderer->render(['app']);
         $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims@', $html);
+        $this->assertStringContainsString('es-module-shims.js" crossorigin="anonymous" integrity="sha384-', $html);
     }
 
     public function testCustomScriptAttributes()

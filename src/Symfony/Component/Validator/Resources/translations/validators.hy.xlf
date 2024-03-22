@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="hy" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Նիշքը նկարի վավեր ֆորմատ չէ։</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Արժեքը վավեր IP հասցե չէ։</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target state="needs-review-translation">Այս արժեքը վավեր IP հասցե չէ։</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Նիշքը չի բեռնվել։</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>php.ini նիշքում ժամանակավոր պանակ նշված չէ։</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target state="needs-review-translation">php.ini-ում չի կարգավորվել ժամանակավոր թղթապանակ, կամ կարգավորված թղթապանակը չկա։</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Չսպասարկվող կամ սխալ քարտի համար:</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Արժեքը վավեր միջազային բանկային հաշվի համար չէ (IBAN)։</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target state="needs-review-translation">Այս արժեքը վավեր միջազգային բանկային հաշվի համար (IBAN) չէ։</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Արժեքը չի համընկնում {{ charset }} կոդավորման հետ։</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Սա վավեր Business Identifier Code (BIC) չէ։</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target state="needs-review-translation">Այս արժեքը վավեր բիզնեսի նորմատիվ կոդ (BIC) չէ։</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Սխալ</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Սա վավեր UUID չէ։</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">Այս արժեքը վավեր UUID չէ։</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -371,7 +371,7 @@
                 <target>Այս հոստի անունը վավեր չէ։</target>
             </trans-unit>
             <trans-unit id="96">
-                <source>The number of elements in this collection should be a multiple of {{ compared_value }}․</source>
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
                 <target>Այս համախմբի տարրերի քանակը պետք է հավասար լինի {{ compared_value }}-ի բազմապատիկներին։</target>
             </trans-unit>
             <trans-unit id="97">
@@ -389,6 +389,54 @@
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
                 <target>Այս արժեքը պետք է լինի վավեր արտահայտություն:</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target state="needs-review-translation">Այս արժեքը վավեր CSS գույն չէ։</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target state="needs-review-translation">Այս արժեքը վավեր CIDR նշում չէ։</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target state="needs-review-translation">Ցանցային դիմակի արժեքը պետք է լինի {{ min }}-ի և {{ max }}-ի միջև։</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target state="needs-review-translation">Ֆայլի անունը շատ երկար է։ Այն պետք է ունենա {{ filename_max_length }} նիշ կամ պակաս։</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target state="needs-review-translation">Գաղտնաբառի անվտանգությունը շատ ցածր է։ Խնդրում ենք գործածել ավելի ամրագույն գաղտնաբառ։</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target state="needs-review-translation">Այս արժեքը պարունակում է այն նիշերը, որոնք չեն թույլատրվում ըստ ընթացիկ սահմանումների։</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target state="needs-review-translation">Անտեսանելի նիշերի օգտագործումը չի թույլատրվում։</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target state="needs-review-translation">Թվերի խառնուրդը տարբեր սցենարներից չի թույլատրվում։</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target state="needs-review-translation">Թաքնված ծածկանիշերի օգտագործումը չի թույլատրվում։</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target state="needs-review-translation">Ֆայլի ընդլայնումը անվավեր է ({{ extension }})։ Թույլատրվող ընդլայնումներն են՝ {{ extensions }}։</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-review-translation">Հայտնաբերված նիշագրության կոդը անվավեր է ({{ detected }})։ Թույլատրվող կոդերն են՝ {{ encodings }}։</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">Այս արժեքը վավեր MAC հասցե չէ։</target>
             </trans-unit>
         </body>
     </file>

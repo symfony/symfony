@@ -61,8 +61,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     protected array $bundles = [];
 
     protected ?ContainerInterface $container = null;
-    protected string $environment;
-    protected bool $debug;
     protected bool $booted = false;
     protected ?float $startTime = null;
 
@@ -86,13 +84,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public const END_OF_MAINTENANCE = '01/2025';
     public const END_OF_LIFE = '01/2025';
 
-    public function __construct(string $environment, bool $debug)
-    {
-        if (!$this->environment = $environment) {
+    public function __construct(
+        protected string $environment,
+        protected bool $debug,
+    ) {
+        if (!$environment) {
             throw new \InvalidArgumentException(sprintf('Invalid environment provided to "%s": the environment cannot be empty.', get_debug_type($this)));
         }
-
-        $this->debug = $debug;
     }
 
     public function __clone()
@@ -314,6 +312,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * Gets the patterns defining the classes to parse and cache for annotations.
+     *
+     * @return string[]
      */
     public function getAnnotatedClassesToCompile(): array
     {
@@ -534,6 +534,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * Returns the kernel parameters.
+     *
+     * @return array<string, array|bool|string|int|float|\UnitEnum|null>
      */
     protected function getKernelParameters(): array
     {

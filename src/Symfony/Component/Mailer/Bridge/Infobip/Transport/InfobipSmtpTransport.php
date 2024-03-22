@@ -17,7 +17,7 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 final class InfobipSmtpTransport extends EsmtpTransport
 {
-    public function __construct(string $key, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(#[\SensitiveParameter] string $key, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         parent::__construct('smtp-api.infobip.com', 587, false, $dispatcher, $logger);
 

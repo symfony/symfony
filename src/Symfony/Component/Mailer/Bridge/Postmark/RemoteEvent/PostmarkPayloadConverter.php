@@ -47,13 +47,25 @@ final class PostmarkPayloadConverter implements PayloadConverterInterface
             'SpamComplaint' => $payload['BouncedAt'],
             default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['RecordType'])),
         };
-        if (!$date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:sT', $payloadDate)) {
+
+        $date = \DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, $payloadDate)
+            // microseconds, 6 digits
+            ?: \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', $payloadDate)
+            // microseconds, 7 digits
+            ?: \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u?P', $payloadDate);
+
+        if (!$date) {
             throw new ParseException(sprintf('Invalid date "%s".', $payloadDate));
         }
         $event->setDate($date);
         $event->setRecipientEmail($payload['Recipient'] ?? $payload['Email']);
-        $event->setMetadata($payload['Metadata']);
-        $event->setTags([$payload['Tag']]);
+
+        if (isset($payload['Metadata'])) {
+            $event->setMetadata($payload['Metadata']);
+        }
+        if (isset($payload['Tag'])) {
+            $event->setTags([$payload['Tag']]);
+        }
 
         return $event;
     }

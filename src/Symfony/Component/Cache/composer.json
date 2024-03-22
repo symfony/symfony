@@ -25,6 +25,7 @@
         "psr/cache": "^2.0|^3.0",
         "psr/log": "^1.1|^2|^3",
         "symfony/cache-contracts": "^2.5|^3",
+        "symfony/deprecation-contracts": "^2.5|^3.0",
         "symfony/service-contracts": "^2.5|^3",
         "symfony/var-exporter": "^6.4|^7.0"
     },

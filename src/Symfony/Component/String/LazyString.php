@@ -39,7 +39,7 @@ class LazyString implements \Stringable, \JsonSerializable
                     $callback[1] ??= '__invoke';
                 }
                 $value = $callback(...$arguments);
-                $callback = self::getPrettyName($callback);
+                $callback = !\is_scalar($value) && !$value instanceof \Stringable ? self::getPrettyName($callback) : 'callable';
                 $arguments = null;
             }
 
@@ -129,7 +129,7 @@ class LazyString implements \Stringable, \JsonSerializable
         } elseif ($callback instanceof \Closure) {
             $r = new \ReflectionFunction($callback);
 
-            if (str_contains($r->name, '{closure}') || !$class = $r->getClosureCalledClass()) {
+            if ($r->isAnonymous() || !$class = $r->getClosureCalledClass()) {
                 return $r->name;
             }
 

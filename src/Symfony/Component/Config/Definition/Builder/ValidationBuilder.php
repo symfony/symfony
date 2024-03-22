@@ -20,11 +20,9 @@ class ValidationBuilder
 {
     public array $rules = [];
 
-    protected NodeDefinition $node;
-
-    public function __construct(NodeDefinition $node)
-    {
-        $this->node = $node;
+    public function __construct(
+        protected NodeDefinition $node,
+    ) {
     }
 
     /**
@@ -32,7 +30,7 @@ class ValidationBuilder
      *
      * @return ExprBuilder|$this
      */
-    public function rule(\Closure $closure = null): ExprBuilder|static
+    public function rule(?\Closure $closure = null): ExprBuilder|static
     {
         if (null !== $closure) {
             $this->rules[] = $closure;

@@ -50,7 +50,7 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
     private string $cookieName;
     private ?LoggerInterface $logger;
 
-    public function __construct(RememberMeHandlerInterface $rememberMeHandler, #[\SensitiveParameter] string $secret, TokenStorageInterface $tokenStorage, string $cookieName, LoggerInterface $logger = null)
+    public function __construct(RememberMeHandlerInterface $rememberMeHandler, #[\SensitiveParameter] string $secret, TokenStorageInterface $tokenStorage, string $cookieName, ?LoggerInterface $logger = null)
     {
         if (!$secret) {
             throw new InvalidArgumentException('A non-empty secret is required.');

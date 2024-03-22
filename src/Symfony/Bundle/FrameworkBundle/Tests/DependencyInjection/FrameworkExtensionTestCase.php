@@ -40,6 +40,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -51,6 +52,8 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\ThrottlingHttpClient;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
@@ -81,7 +84,6 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Controller\WebhookController;
-use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\WorkflowEvents;
@@ -299,7 +301,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertArrayHasKey('index_4', $args);
         $this->assertNull($args['index_4'], 'Workflows has eventsToDispatch=null');
 
-        $this->assertSame(['workflow' => [['name' => 'article']], 'workflow.workflow' => [['name' => 'article']]], $container->getDefinition('workflow.article')->getTags());
+        $tags = $container->getDefinition('workflow.article')->getTags();
+        $this->assertArrayHasKey('workflow', $tags);
+        $this->assertArrayHasKey('workflow.workflow', $tags);
+        $this->assertSame([['name' => 'article']], $tags['workflow.workflow']);
+        $this->assertSame('article', $tags['workflow'][0]['name'] ?? null);
+        $this->assertSame([
+            'title' => 'article workflow',
+            'description' => 'workflow for articles',
+        ], $tags['workflow'][0]['metadata'] ?? null);
 
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
@@ -330,7 +340,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
         $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition'), 'State machine definition is registered as a service');
 
-        $this->assertSame(['workflow' => [['name' => 'pull_request']], 'workflow.state_machine' => [['name' => 'pull_request']]], $container->getDefinition('state_machine.pull_request')->getTags());
+        $tags = $container->getDefinition('state_machine.pull_request')->getTags();
+        $this->assertArrayHasKey('workflow', $tags);
+        $this->assertArrayHasKey('workflow.state_machine', $tags);
+        $this->assertSame([['name' => 'pull_request']], $tags['workflow.state_machine']);
+        $this->assertSame('pull_request', $tags['workflow'][0]['name'] ?? null);
+        $this->assertSame([
+            'title' => 'workflow title',
+        ], $tags['workflow'][0]['metadata'] ?? null);
 
         $stateMachineDefinition = $container->getDefinition('state_machine.pull_request.definition');
 
@@ -354,7 +371,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('state_machine.pull_request.metadata_store', (string) $metadataStoreReference);
 
         $metadataStoreDefinition = $container->getDefinition('state_machine.pull_request.metadata_store');
-        $this->assertSame(Workflow\Metadata\InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+        $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
         $this->assertSame(InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
 
         $workflowMetadata = $metadataStoreDefinition->getArgument(0);
@@ -1614,6 +1631,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('serializer'));
     }
 
+    public function testTypeInfoEnabled()
+    {
+        $container = $this->createContainerFromFile('type_info');
+        $this->assertTrue($container->has('type_info.resolver'));
+    }
+
     public function testPropertyInfoEnabled()
     {
         $container = $this->createContainerFromFile('property_info');
@@ -1693,7 +1716,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                     ->replaceArgument(0, $expectedSeed)
                     ->replaceArgument(1, 12),
                 (new ChildDefinition('cache.adapter.redis'))
-                    ->replaceArgument(0, new Reference('.cache_connection.U5HliuY'))
+                    ->replaceArgument(0, new Reference('.cache_connection.'.(\count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? 'U5HliuY' : 'kYdiLgf')))
                     ->replaceArgument(1, $expectedSeed)
                     ->replaceArgument(2, 12),
             ],
@@ -1928,9 +1951,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testHttpClientRetry()
     {
-        if (!class_exists(RetryableHttpClient::class)) {
-            $this->expectException(LogicException::class);
-        }
         $container = $this->createContainerFromFile('http_client_retry');
 
         $this->assertSame([429, 500 => ['GET', 'HEAD']], $container->getDefinition('http_client.retry_strategy')->getArgument(0));
@@ -1988,21 +2008,56 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['foo' => ['bar' => 'baz']], $defaultOptions['extra']);
     }
 
-    public static function provideMailer(): array
+    public function testHttpClientRateLimiter()
     {
-        return [
-            ['mailer_with_dsn', ['main' => 'smtp://example.com']],
-            ['mailer_with_transports', [
+        if (!class_exists(ThrottlingHttpClient::class)) {
+            $this->expectException(LogicException::class);
+        }
+
+        $container = $this->createContainerFromFile('http_client_rate_limiter');
+
+        $this->assertTrue($container->hasDefinition('http_client.throttling'));
+        $definition = $container->getDefinition('http_client.throttling');
+        $this->assertSame(ThrottlingHttpClient::class, $definition->getClass());
+        $this->assertSame('http_client', $definition->getDecoratedService()[0]);
+        $this->assertCount(2, $arguments = $definition->getArguments());
+        $this->assertInstanceOf(Reference::class, $arguments[0]);
+        $this->assertSame('http_client.throttling.inner', (string) $arguments[0]);
+        $this->assertInstanceOf(Reference::class, $arguments[1]);
+        $this->assertSame('http_client.throttling.limiter', (string) $arguments[1]);
+
+        $this->assertTrue($container->hasDefinition('foo.throttling'));
+        $definition = $container->getDefinition('foo.throttling');
+        $this->assertSame(ThrottlingHttpClient::class, $definition->getClass());
+        $this->assertSame('foo', $definition->getDecoratedService()[0]);
+        $this->assertCount(2, $arguments = $definition->getArguments());
+        $this->assertInstanceOf(Reference::class, $arguments[0]);
+        $this->assertSame('foo.throttling.inner', (string) $arguments[0]);
+        $this->assertInstanceOf(Reference::class, $arguments[1]);
+        $this->assertSame('foo.throttling.limiter', (string) $arguments[1]);
+    }
+
+    public static function provideMailer(): iterable
+    {
+        yield [
+            'mailer_with_dsn',
+            ['main' => 'smtp://example.com'],
+            ['redirected@example.org'],
+        ];
+        yield [
+            'mailer_with_transports',
+            [
                 'transport1' => 'smtp://example1.com',
                 'transport2' => 'smtp://example2.com',
-            ]],
+            ],
+            ['redirected@example.org', 'redirected1@example.org'],
         ];
     }
 
     /**
      * @dataProvider provideMailer
      */
-    public function testMailer(string $configFile, array $expectedTransports)
+    public function testMailer(string $configFile, array $expectedTransports, array $expectedRecipients)
     {
         $container = $this->createContainerFromFile($configFile);
 
@@ -2014,7 +2069,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('mailer.envelope_listener'));
         $l = $container->getDefinition('mailer.envelope_listener');
         $this->assertSame('sender@example.org', $l->getArgument(0));
-        $this->assertSame(['redirected@example.org', 'redirected1@example.org'], $l->getArgument(1));
+        $this->assertSame($expectedRecipients, $l->getArgument(1));
         $this->assertEquals(new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('mailer.mailer')->getArgument(1));
 
         $this->assertTrue($container->hasDefinition('mailer.message_listener'));
@@ -2264,6 +2319,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.sms')->getArgument(1));
     }
 
+    public function testTrustedProxiesWithPrivateRanges()
+    {
+        $container = $this->createContainerFromFile('trusted_proxies_private_ranges');
+
+        $this->assertSame(IpUtils::PRIVATE_SUBNETS, array_map('trim', explode(',', $container->getParameter('kernel.trusted_proxies'))));
+    }
+
     public function testWebhook()
     {
         if (!class_exists(WebhookController::class)) {
@@ -2315,7 +2377,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $data)));
     }
 
-    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, FrameworkExtension $extension = null): ContainerBuilder
+    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, ?FrameworkExtension $extension = null): ContainerBuilder
     {
         $cacheKey = md5(static::class.$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {

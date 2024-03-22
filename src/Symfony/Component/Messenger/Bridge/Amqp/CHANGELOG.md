@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add option `delay[arguments]` in the transport definition
+
 6.0
 ---
 

@@ -154,6 +154,72 @@ class DateTimeNormalizerTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider provideNormalizeUsingCastCases
+     */
+    public function testNormalizeUsingCastPassedInConstructor(\DateTimeInterface $value, string $format, ?string $cast, string|int|float $expectedResult)
+    {
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::CAST_KEY => $cast]);
+
+        $this->assertSame($normalizer->normalize($value, null, [DateTimeNormalizer::FORMAT_KEY => $format]), $expectedResult);
+    }
+
+    /**
+     * @dataProvider provideNormalizeUsingCastCases
+     */
+    public function testNormalizeUsingCastPassedInContext(\DateTimeInterface $value, string $format, ?string $cast, string|int|float $expectedResult)
+    {
+        $this->assertSame($this->normalizer->normalize($value, null, [DateTimeNormalizer::FORMAT_KEY => $format, DateTimeNormalizer::CAST_KEY => $cast]), $expectedResult);
+    }
+
+    /**
+     * @return iterable<array{0: \DateTimeImmutable, 1: non-empty-string, 2: 'int'|'float'|null, 3: 'int'|'float'|'string'}>
+     */
+    public static function provideNormalizeUsingCastCases(): iterable
+    {
+        yield [
+            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            'Y',
+            null,
+            '2023',
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            'Y',
+            'int',
+            2023,
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            'Ymd',
+            'int',
+            20231220,
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            'Y',
+            'int',
+            2023,
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U.v', '1703071202.388'),
+            'U.v',
+            'float',
+            1703071202.388,
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U.u', '1703071202.388811'),
+            'U.u',
+            'float',
+            1703071202.388811,
+        ];
+    }
+
     public function testNormalizeInvalidObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

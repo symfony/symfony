@@ -90,7 +90,7 @@ class AttributeMetadata implements AttributeMetadataInterface
 
     public function addGroup(string $group): void
     {
-        if (!\in_array($group, $this->groups)) {
+        if (!\in_array($group, $this->groups, true)) {
             $this->groups[] = $group;
         }
     }
@@ -120,7 +120,7 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->serializedName;
     }
 
-    public function setSerializedPath(PropertyPath $serializedPath = null): void
+    public function setSerializedPath(?PropertyPath $serializedPath = null): void
     {
         $this->serializedPath = $serializedPath;
     }

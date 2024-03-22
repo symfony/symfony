@@ -28,7 +28,7 @@ final class TokenBucketLimiter implements LimiterInterface
     private int $maxBurst;
     private Rate $rate;
 
-    public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, LockInterface $lock = null)
+    public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, ?LockInterface $lock = null)
     {
         $this->id = $id;
         $this->maxBurst = $maxBurst;
@@ -50,7 +50,7 @@ final class TokenBucketLimiter implements LimiterInterface
      * @throws MaxWaitDurationExceededException if $maxTime is set and the process needs to wait longer than its value (in seconds)
      * @throws \InvalidArgumentException        if $tokens is larger than the maximum burst size
      */
-    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
         if ($tokens > $this->maxBurst) {
             throw new \InvalidArgumentException(sprintf('Cannot reserve more tokens (%d) than the burst size of the rate limiter (%d).', $tokens, $this->maxBurst));
@@ -67,11 +67,20 @@ final class TokenBucketLimiter implements LimiterInterface
             $now = microtime(true);
             $availableTokens = $bucket->getAvailableTokens($now);
 
-            if ($availableTokens >= max(1, $tokens)) {
+            if ($availableTokens >= $tokens) {
                 // tokens are now available, update bucket
                 $bucket->setTokens($availableTokens - $tokens);
 
-                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->maxBurst));
+                if (0 === $availableTokens) {
+                    // This means 0 tokens where consumed (discouraged in most cases).
+                    // Return the first time a new token is available
+                    $waitDuration = $this->rate->calculateTimeForTokens(1);
+                    $waitTime = \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration));
+                } else {
+                    $waitTime = \DateTimeImmutable::createFromFormat('U', floor($now));
+                }
+
+                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), $waitTime, true, $this->maxBurst));
             } else {
                 $remainingTokens = $tokens - $availableTokens;
                 $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);

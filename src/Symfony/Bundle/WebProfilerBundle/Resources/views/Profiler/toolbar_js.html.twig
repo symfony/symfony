@@ -51,6 +51,9 @@
             }
 
             var request = function(url, onSuccess, onError, payload, options, tries) {
+                url = new URL(url);
+                url.searchParams.set('XDEBUG_IGNORE', '1');
+                url = url.toString();
                 var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
                 options = options || {};
                 options.retry = options.retry || false;
@@ -550,7 +553,9 @@
                             /* Evaluate in global scope scripts embedded inside the toolbar */
                             var i, scripts = [].slice.call(el.querySelectorAll('script'));
                             for (i = 0; i < scripts.length; ++i) {
-                                eval.call({}, scripts[i].firstChild.nodeValue);
+                                if (scripts[i].firstChild) {
+                                    eval.call({}, scripts[i].firstChild.nodeValue);
+                                }
                             }
 
                             el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';

@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 
 /**
  * Yields a service keyed by _controller and argument name.
@@ -24,11 +25,9 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 final class ServiceValueResolver implements ValueResolverInterface
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container,
+    ) {
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): array
@@ -56,17 +55,16 @@ final class ServiceValueResolver implements ValueResolverInterface
         try {
             return [$this->container->get($controller)->get($argument->getName())];
         } catch (RuntimeException $e) {
-            $what = sprintf('argument $%s of "%s()"', $argument->getName(), $controller);
-            $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $e->getMessage());
+            $what = 'argument $'.$argument->getName();
+            $message = str_replace(sprintf('service "%s"', $argument->getName()), $what, $e->getMessage());
+            $what .= sprintf(' of "%s()"', $controller);
+            $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $message);
 
             if ($e->getMessage() === $message) {
                 $message = sprintf('Cannot resolve %s: %s', $what, $message);
             }
 
-            $r = new \ReflectionProperty($e, 'message');
-            $r->setValue($e, $message);
-
-            throw $e;
+            throw new NearMissValueResolverException($message, $e->getCode(), $e);
         }
     }
 }

@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="cs" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Tento soubor není obrázek.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Toto není platná IP adresa.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>Tato hodnota není platnou IP adresou.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Žádný soubor nebyl nahrán.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>V php.ini není nastavena cesta k adresáři pro dočasné soubory.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>V php.ini nebyla nastavena cesta k dočasnému adresáři, nebo nastavený adresář neexistuje.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Nepodporovaný typ karty nebo neplatné číslo karty.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Toto je neplatný IBAN.</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>Tato hodnota není platným Mezinárodním bankovním číslem účtu (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Tato hodnota neodpovídá očekávané znakové sadě {{ charset }}.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Tato hodnota není platný identifikační kód podniku (BIC).</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>Tato hodnota není platným Kódem obchodního identifikátoru (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Chyba</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Tato hodnota není platné UUID.</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Tato hodnota není platným UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -414,18 +414,30 @@
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
                 <target>Tato hodnota obsahuje znaky, které nejsou povoleny aktuální úrovní omezení.</target>
             </trans-unit>
-           <trans-unit id="107">
-               <source>Using invisible characters is not allowed.</source>
-               <target>Používání neviditelných znaků není povoleno.</target>
-           </trans-unit>
-           <trans-unit id="108">
-               <source>Mixing numbers from different scripts is not allowed.</source>
-               <target>Kombinování čísel z různých písem není povoleno.</target>
-           </trans-unit>
-           <trans-unit id="109">
-               <source>Using hidden overlay characters is not allowed.</source>
-               <target>Použití skrytých překrývajících znaků není povoleno.</target>
-           </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Používání neviditelných znaků není povoleno.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Kombinování čísel z různých písem není povoleno.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Použití skrytých překrývajících znaků není povoleno.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Přípona souboru je neplatná ({{ extension }}). Povolené přípony jsou {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Zjištěné kódování znaků je neplatné ({{ detected }}). Povolená kódování jsou {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>Tato hodnota není platnou MAC adresou.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

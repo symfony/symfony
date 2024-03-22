@@ -40,7 +40,7 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
     ) {
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
     }
 
@@ -165,13 +165,13 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
         return $listeners;
     }
 
-    private function summarizeListener(callable $callable, string $eventName = null, Transition $transition = null): array
+    private function summarizeListener(callable $callable, ?string $eventName = null, ?Transition $transition = null): array
     {
         $extra = [];
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure}')) {
+            if ($r->isAnonymous()) {
                 $title = (string) $r;
             } elseif ($class = $r->getClosureCalledClass()) {
                 $title = $class->name.'::'.$r->name.'()';

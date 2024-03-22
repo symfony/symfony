@@ -405,7 +405,7 @@ class ImportMapVersionCheckerTest extends TestCase
         ];
     }
 
-    private static function createRemoteEntry(string $importName, string $version, string $packageModuleSpecifier = null): ImportMapEntry
+    private static function createRemoteEntry(string $importName, string $version, ?string $packageModuleSpecifier = null): ImportMapEntry
     {
         $packageModuleSpecifier = $packageModuleSpecifier ?? $importName;
 

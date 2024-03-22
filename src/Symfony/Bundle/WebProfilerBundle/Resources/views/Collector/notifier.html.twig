@@ -134,11 +134,11 @@
                                                     <h3 class="tab-title">Notification</h3>
                                                     <div class="tab-content">
                                                         <pre class="prewrap" style="max-height: 600px">
-                                                            {{- 'Subject: ' ~ notification.getSubject() }}<br>
-                                                            {{- 'Content: ' ~ notification.getContent() }}<br>
-                                                            {{- 'Importance: ' ~ notification.getImportance() }}<br>
-                                                            {{- 'Emoji: ' ~ (notification.getEmoji() is empty ? '(empty)' : notification.getEmoji()) }}<br>
-                                                            {{- 'Exception: ' ~ notification.getException() ?? '(empty)' }}<br>
+                                                            {{- 'Subject: ' ~ notification.getSubject() }}<br/>
+                                                            {{- 'Content: ' ~ notification.getContent() }}<br/>
+                                                            {{- 'Importance: ' ~ notification.getImportance() }}<br/>
+                                                            {{- 'Emoji: ' ~ (notification.getEmoji() is empty ? '(empty)' : notification.getEmoji()) }}<br/>
+                                                            {{- 'Exception: ' ~ notification.getException() ?? '(empty)' }}<br/>
                                                             {{- 'ExceptionAsString: ' ~ (notification.getExceptionAsString() is empty ? '(empty)' : notification.getExceptionAsString()) }}
                                                         </pre>
                                                     </div>

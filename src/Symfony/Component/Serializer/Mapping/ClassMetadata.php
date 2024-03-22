@@ -44,7 +44,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * Constructs a metadata for the given class.
      */
-    public function __construct(string $class, ClassDiscriminatorMapping $classDiscriminatorMapping = null)
+    public function __construct(string $class, ?ClassDiscriminatorMapping $classDiscriminatorMapping = null)
     {
         $this->name = $class;
         $this->classDiscriminatorMapping = $classDiscriminatorMapping;

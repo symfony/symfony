@@ -16,6 +16,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\EmbeddedClassMapping;
+use Doctrine\ORM\Mapping\FieldMapping;
+use Doctrine\ORM\Mapping\JoinColumnMapping;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
@@ -78,20 +81,20 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             if ($metadata instanceof ClassMetadata) {
                 $associationMapping = $metadata->getAssociationMapping($property);
 
-                if (isset($associationMapping['indexBy'])) {
-                    $subMetadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
+                if (self::getMappingValue($associationMapping, 'indexBy')) {
+                    $subMetadata = $this->entityManager->getClassMetadata(self::getMappingValue($associationMapping, 'targetEntity'));
 
                     // Check if indexBy value is a property
-                    $fieldName = $associationMapping['indexBy'];
+                    $fieldName = self::getMappingValue($associationMapping, 'indexBy');
                     if (null === ($typeOfField = $subMetadata->getTypeOfField($fieldName))) {
-                        $fieldName = $subMetadata->getFieldForColumn($associationMapping['indexBy']);
+                        $fieldName = $subMetadata->getFieldForColumn(self::getMappingValue($associationMapping, 'indexBy'));
                         // Not a property, maybe a column name?
                         if (null === ($typeOfField = $subMetadata->getTypeOfField($fieldName))) {
                             // Maybe the column name is the association join column?
                             $associationMapping = $subMetadata->getAssociationMapping($fieldName);
 
                             $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($fieldName);
-                            $subMetadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
+                            $subMetadata = $this->entityManager->getClassMetadata(self::getMappingValue($associationMapping, 'targetEntity'));
 
                             // Not a property, maybe a column name?
                             if (null === ($typeOfField = $subMetadata->getTypeOfField($indexProperty))) {
@@ -118,7 +121,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         }
 
         if ($metadata instanceof ClassMetadata && isset($metadata->embeddedClasses[$property])) {
-            return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $metadata->embeddedClasses[$property]['class'])];
+            return [new Type(Type::BUILTIN_TYPE_OBJECT, false, self::getMappingValue($metadata->embeddedClasses[$property], 'class'))];
         }
 
         if ($metadata->hasField($property)) {
@@ -130,7 +133,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
             $nullable = $metadata instanceof ClassMetadata && $metadata->isNullable($property);
             $enumType = null;
-            if (null !== $enumClass = $metadata->getFieldMapping($property)['enumType'] ?? null) {
+            if (null !== $enumClass = self::getMappingValue($metadata->getFieldMapping($property), 'enumType') ?? null) {
                 $enumType = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
             }
 
@@ -220,17 +223,17 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
      */
     private function isAssociationNullable(array|AssociationMapping $associationMapping): bool
     {
-        if (isset($associationMapping['id']) && $associationMapping['id']) {
+        if (self::getMappingValue($associationMapping, 'id')) {
             return false;
         }
 
-        if (!isset($associationMapping['joinColumns'])) {
+        if (!self::getMappingValue($associationMapping, 'joinColumns')) {
             return true;
         }
 
-        $joinColumns = $associationMapping['joinColumns'];
+        $joinColumns = self::getMappingValue($associationMapping, 'joinColumns');
         foreach ($joinColumns as $joinColumn) {
-            if (isset($joinColumn['nullable']) && !$joinColumn['nullable']) {
+            if (false === self::getMappingValue($joinColumn, 'nullable')) {
                 return false;
             }
         }
@@ -271,5 +274,14 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             Types::SIMPLE_ARRAY => Type::BUILTIN_TYPE_ARRAY,
             default => null,
         };
+    }
+
+    private static function getMappingValue(array|AssociationMapping|EmbeddedClassMapping|FieldMapping|JoinColumnMapping $mapping, string $key): mixed
+    {
+        if ($mapping instanceof AssociationMapping || $mapping instanceof EmbeddedClassMapping || $mapping instanceof FieldMapping || $mapping instanceof JoinColumnMapping) {
+            return $mapping->$key ?? null;
+        }
+
+        return $mapping[$key] ?? null;
     }
 }

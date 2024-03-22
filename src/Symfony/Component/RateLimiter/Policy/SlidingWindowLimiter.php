@@ -37,7 +37,7 @@ final class SlidingWindowLimiter implements LimiterInterface
     private int $limit;
     private int $interval;
 
-    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
+    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, ?LockInterface $lock = null)
     {
         $this->storage = $storage;
         $this->lock = $lock;
@@ -46,7 +46,7 @@ final class SlidingWindowLimiter implements LimiterInterface
         $this->interval = TimeUtil::dateIntervalToSeconds($interval);
     }
 
-    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
         if ($tokens > $this->limit) {
             throw new \InvalidArgumentException(sprintf('Cannot reserve more tokens (%d) than the size of the rate limiter (%d).', $tokens, $this->limit));
@@ -65,12 +65,18 @@ final class SlidingWindowLimiter implements LimiterInterface
             $now = microtime(true);
             $hitCount = $window->getHitCount();
             $availableTokens = $this->getAvailableTokens($hitCount);
+            if (0 === $tokens) {
+                $resetDuration = $window->calculateTimeForTokens($this->limit, $window->getHitCount());
+                $resetTime = \DateTimeImmutable::createFromFormat('U', $availableTokens ? floor($now) : floor($now + $resetDuration));
+
+                return new Reservation($now, new RateLimit($availableTokens, $resetTime, true, $this->limit));
+            }
             if ($availableTokens >= $tokens) {
                 $window->add($tokens);
 
                 $reservation = new Reservation($now, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->limit));
             } else {
-                $waitDuration = $window->calculateTimeForTokens($this->limit, max(1, $tokens));
+                $waitDuration = $window->calculateTimeForTokens($this->limit, $tokens);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval

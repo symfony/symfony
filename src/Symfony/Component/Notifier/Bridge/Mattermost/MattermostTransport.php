@@ -26,16 +26,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MattermostTransport extends AbstractTransport
 {
-    private string $token;
-    private string $channel;
-    private ?string $path;
-
-    public function __construct(#[\SensitiveParameter] string $token, string $channel, string $path = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
-        $this->channel = $channel;
-        $this->path = $path;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        private string $channel,
+        private ?string $path = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

@@ -158,7 +158,7 @@ class WebProfilerExtensionTest extends TestCase
         bool $toolbarEnabled,
         bool $interceptRedirects,
         bool $listenerInjected,
-        bool $listenerEnabled
+        bool $listenerEnabled,
     ) {
         $extension = new WebProfilerExtension();
         $extension->load(

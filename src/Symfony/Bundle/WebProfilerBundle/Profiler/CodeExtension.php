@@ -94,6 +94,8 @@ final class CodeExtension extends AbstractExtension
                 $formattedValue = '<em>'.strtolower(htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset)).'</em>';
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
+            } elseif (preg_match('/[^\x07-\x0D\x1B\x20-\xFF]/', $item[1])) {
+                $formattedValue = '<em>binary string</em>';
             } else {
                 $formattedValue = str_replace("\n", '', htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
             }
@@ -155,7 +157,7 @@ final class CodeExtension extends AbstractExtension
     /**
      * Formats a file path.
      */
-    public function formatFile(string $file, int $line, string $text = null): string
+    public function formatFile(string $file, int $line, ?string $text = null): string
     {
         $file = trim($file);
 

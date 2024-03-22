@@ -80,7 +80,7 @@ class ResponseHeaderBag extends HeaderBag
         }
     }
 
-    public function all(string $key = null): array
+    public function all(?string $key = null): array
     {
         $headers = parent::all();
 
@@ -166,7 +166,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * Removes a cookie from the array, but does not unset it in the browser.
      */
-    public function removeCookie(string $name, ?string $path = '/', string $domain = null): void
+    public function removeCookie(string $name, ?string $path = '/', ?string $domain = null): void
     {
         $path ??= '/';
 
@@ -216,10 +216,14 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Clears a cookie in the browser.
+     *
+     * @param bool $partitioned
      */
-    public function clearCookie(string $name, ?string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true, string $sameSite = null): void
+    public function clearCookie(string $name, ?string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true, ?string $sameSite = null /* , bool $partitioned = false */): void
     {
-        $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly, false, $sameSite));
+        $partitioned = 6 < \func_num_args() ? \func_get_arg(6) : false;
+
+        $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly, false, $sameSite, $partitioned));
     }
 
     /**

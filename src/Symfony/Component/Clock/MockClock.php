@@ -26,7 +26,7 @@ final class MockClock implements ClockInterface
      * @throws \DateMalformedStringException When $now is invalid
      * @throws \DateInvalidTimeZoneException When $timezone is invalid
      */
-    public function __construct(\DateTimeImmutable|string $now = 'now', \DateTimeZone|string $timezone = null)
+    public function __construct(\DateTimeImmutable|string $now = 'now', \DateTimeZone|string|null $timezone = null)
     {
         if (\PHP_VERSION_ID >= 80300 && \is_string($timezone)) {
             $timezone = new \DateTimeZone($timezone);

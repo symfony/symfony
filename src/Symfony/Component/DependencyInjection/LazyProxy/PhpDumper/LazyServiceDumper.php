@@ -26,7 +26,7 @@ final class LazyServiceDumper implements DumperInterface
     ) {
     }
 
-    public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null, string $id = null): bool
+    public function isProxyCandidate(Definition $definition, ?bool &$asGhostObject = null, ?string $id = null): bool
     {
         $asGhostObject = false;
 
@@ -96,7 +96,7 @@ final class LazyServiceDumper implements DumperInterface
         EOF;
     }
 
-    public function getProxyCode(Definition $definition, string $id = null): string
+    public function getProxyCode(Definition $definition, ?string $id = null): string
     {
         if (!$this->isProxyCandidate($definition, $asGhostObject, $id)) {
             throw new InvalidArgumentException(sprintf('Cannot instantiate lazy proxy for service "%s".', $id ?? $definition->getClass()));
@@ -105,7 +105,7 @@ final class LazyServiceDumper implements DumperInterface
 
         if ($asGhostObject) {
             try {
-                return 'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
+                return (\PHP_VERSION_ID >= 80200 && $class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
             } catch (LogicException $e) {
                 throw new InvalidArgumentException(sprintf('Cannot generate lazy ghost for service "%s".', $id ?? $definition->getClass()), 0, $e);
             }
@@ -139,7 +139,7 @@ final class LazyServiceDumper implements DumperInterface
         }
     }
 
-    public function getProxyClass(Definition $definition, bool $asGhostObject, \ReflectionClass &$class = null): string
+    public function getProxyClass(Definition $definition, bool $asGhostObject, ?\ReflectionClass &$class = null): string
     {
         $class = 'object' !== $definition->getClass() ? $definition->getClass() : 'stdClass';
         $class = new \ReflectionClass($class);

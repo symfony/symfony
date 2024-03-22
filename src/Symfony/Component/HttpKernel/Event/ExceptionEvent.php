@@ -31,14 +31,17 @@ final class ExceptionEvent extends RequestEvent
 {
     private \Throwable $throwable;
     private bool $allowCustomResponseCode = false;
-    private bool $isKernelTerminating = false;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, \Throwable $e, bool $isKernelTerminating = false)
-    {
+    public function __construct(
+        HttpKernelInterface $kernel,
+        Request $request,
+        int $requestType,
+        \Throwable $e,
+        private bool $isKernelTerminating = false,
+    ) {
         parent::__construct($kernel, $request, $requestType);
 
         $this->setThrowable($e);
-        $this->isKernelTerminating = $isKernelTerminating;
     }
 
     public function getThrowable(): \Throwable

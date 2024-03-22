@@ -76,14 +76,21 @@ class InlineTest extends TestCase
     public function testParsePhpEnumThrowsExceptionWhenUndefined()
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('The enum "SomeEnum::Foo" is not defined');
-        Inline::parse('!php/enum SomeEnum::Foo', Yaml::PARSE_CONSTANT);
+        $this->expectExceptionMessage('The enum "SomeEnum" is not defined');
+        Inline::parse('!php/enum SomeEnum', Yaml::PARSE_CONSTANT);
+    }
+
+    public function testParsePhpEnumThrowsExceptionWhenNameUndefined()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The string "Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::Foo" is not the name of a valid enum');
+        Inline::parse('!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::Foo', Yaml::PARSE_CONSTANT);
     }
 
     public function testParsePhpEnumThrowsExceptionWhenNotAnEnum()
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('The string "PHP_INT_MAX" is not the name of a valid enum');
+        $this->expectExceptionMessage('The enum "PHP_INT_MAX" is not defined');
         Inline::parse('!php/enum PHP_INT_MAX', Yaml::PARSE_CONSTANT);
     }
 
@@ -715,7 +722,12 @@ class InlineTest extends TestCase
 
     public function testDumpUnitEnum()
     {
-        $this->assertSame("!php/const Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
+        $this->assertSame("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
+    }
+
+    public function testParseUnitEnumCases()
+    {
+        $this->assertSame(FooUnitEnum::cases(), Inline::parse("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum", Yaml::PARSE_CONSTANT));
     }
 
     public function testParseUnitEnum()
@@ -827,20 +839,20 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */
-    public function testImplicitStringCastingOfMappingKeysThrows($yaml, $expected)
+    public function testImplicitStringCastingOfMappingKeysThrowsException(string $yaml)
     {
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Implicit casting of incompatible mapping keys to strings is not supported. Quote your evaluable mapping keys instead');
-        $this->assertSame($expected, Inline::parse($yaml));
+        Inline::parse($yaml);
     }
 
     public static function getNotPhpCompatibleMappingKeyData()
     {
         return [
-            'boolean-true' => ['{true: "foo"}', ['true' => 'foo']],
-            'boolean-false' => ['{false: "foo"}', ['false' => 'foo']],
-            'null' => ['{null: "foo"}', ['null' => 'foo']],
-            'float' => ['{0.25: "foo"}', ['0.25' => 'foo']],
+            'boolean-true' => ['{true: "foo"}'],
+            'boolean-false' => ['{false: "foo"}'],
+            'null' => ['{null: "foo"}'],
+            'float' => ['{0.25: "foo"}'],
         ];
     }
 

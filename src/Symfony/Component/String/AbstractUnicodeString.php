@@ -198,7 +198,7 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
-    public function join(array $strings, string $lastGlue = null): static
+    public function join(array $strings, ?string $lastGlue = null): static
     {
         $str = clone $this;
 

@@ -29,5 +29,5 @@ interface TransportInterface extends \Stringable
     /**
      * @throws TransportExceptionInterface
      */
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage;
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage;
 }

@@ -30,11 +30,6 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     ];
 
     /**
-     * The parent view.
-     */
-    public ?self $parent = null;
-
-    /**
      * The child views.
      *
      * @var array<int|string, FormView>
@@ -52,9 +47,12 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     private bool $methodRendered = false;
 
-    public function __construct(self $parent = null)
-    {
-        $this->parent = $parent;
+    /**
+     * @param FormView|null $parent The parent view
+     */
+    public function __construct(
+        public ?self $parent = null,
+    ) {
     }
 
     /**

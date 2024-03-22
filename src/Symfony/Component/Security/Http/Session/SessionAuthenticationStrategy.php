@@ -34,7 +34,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
     private string $strategy;
     private ?ClearableTokenStorageInterface $csrfTokenStorage = null;
 
-    public function __construct(string $strategy, ClearableTokenStorageInterface $csrfTokenStorage = null)
+    public function __construct(string $strategy, ?ClearableTokenStorageInterface $csrfTokenStorage = null)
     {
         $this->strategy = $strategy;
 
@@ -51,10 +51,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
 
             case self::MIGRATE:
                 $request->getSession()->migrate(true);
-
-                if ($this->csrfTokenStorage) {
-                    $this->csrfTokenStorage->clear();
-                }
+                $this->csrfTokenStorage?->clear();
 
                 return;
 

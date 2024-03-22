@@ -49,23 +49,25 @@ class TokenBucketLimiterTest extends TestCase
 
     public function testReserveMoreTokensThanBucketSize()
     {
+        $limiter = $this->createLimiter();
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot reserve more tokens (15) than the burst size of the rate limiter (10).');
 
-        $limiter = $this->createLimiter();
         $limiter->reserve(15);
     }
 
     public function testReserveMaxWaitingTime()
     {
-        $this->expectException(MaxWaitDurationExceededException::class);
-
         $limiter = $this->createLimiter(10, Rate::perMinute());
 
         // enough free tokens
         $this->assertEquals(0, $limiter->reserve(10, 300)->getWaitDuration());
         // waiting time within set maximum
         $this->assertEquals(300, $limiter->reserve(5, 300)->getWaitDuration());
+
+        $this->expectException(MaxWaitDurationExceededException::class);
+
         // waiting time exceeded maximum time (as 5 tokens are already reserved)
         $limiter->reserve(5, 300);
     }
@@ -134,11 +136,26 @@ class TokenBucketLimiterTest extends TestCase
 
         $limiter->consume(9);
 
+        // peek by consuming 0 tokens twice (making sure peeking doesn't claim a token)
         for ($i = 0; $i < 2; ++$i) {
             $rateLimit = $limiter->consume(0);
             $this->assertTrue($rateLimit->isAccepted());
             $this->assertSame(10, $rateLimit->getLimit());
+            $this->assertEquals(
+                \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true))),
+                $rateLimit->getRetryAfter()
+            );
         }
+
+        $limiter->consume();
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertEquals(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 1)),
+            $rateLimit->getRetryAfter()
+        );
     }
 
     public function testBucketRefilledWithStrictFrequency()
@@ -167,7 +184,7 @@ class TokenBucketLimiterTest extends TestCase
         }
     }
 
-    private function createLimiter($initialTokens = 10, Rate $rate = null)
+    private function createLimiter($initialTokens = 10, ?Rate $rate = null)
     {
         return new TokenBucketLimiter('test', $initialTokens, $rate ?? Rate::perSecond(10), $this->storage);
     }

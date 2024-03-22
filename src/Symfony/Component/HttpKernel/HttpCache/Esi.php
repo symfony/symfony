@@ -39,7 +39,7 @@ class Esi extends AbstractSurrogate
         }
     }
 
-    public function renderIncludeTag(string $uri, string $alt = null, bool $ignoreErrors = true, string $comment = ''): string
+    public function renderIncludeTag(string $uri, ?string $alt = null, bool $ignoreErrors = true, string $comment = ''): string
     {
         $html = sprintf('<esi:include src="%s"%s%s />',
             $uri,
@@ -62,7 +62,7 @@ class Esi extends AbstractSurrogate
         }
 
         $parts = explode(';', $type);
-        if (!\in_array($parts[0], $this->contentTypes)) {
+        if (!\in_array($parts[0], $this->contentTypes, true)) {
             return $response;
         }
 

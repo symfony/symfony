@@ -227,7 +227,7 @@ class SecurityDataCollectorTest extends TestCase
         $voter2 = new DummyVoter();
 
         $decoratedVoter1 = new TraceableVoter($voter1, new class() implements EventDispatcherInterface {
-            public function dispatch(object $event, string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 return new \stdClass();
             }
@@ -302,7 +302,7 @@ class SecurityDataCollectorTest extends TestCase
         $voter2 = new DummyVoter();
 
         $decoratedVoter1 = new TraceableVoter($voter1, new class() implements EventDispatcherInterface {
-            public function dispatch(object $event, string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 return new \stdClass();
             }
@@ -395,6 +395,36 @@ class SecurityDataCollectorTest extends TestCase
         );
 
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
+    }
+
+    public function testGetVotersIfAccessDecisionManagerHasNoVoters()
+    {
+        $strategy = MainConfiguration::STRATEGY_AFFIRMATIVE;
+
+        $accessDecisionManager = $this->createMock(TraceableAccessDecisionManager::class);
+
+        $accessDecisionManager
+            ->method('getStrategy')
+            ->willReturn($strategy);
+
+        $accessDecisionManager
+            ->method('getVoters')
+            ->willReturn([]);
+
+        $accessDecisionManager
+            ->method('getDecisionLog')
+            ->willReturn([[
+                'attributes' => ['view'],
+                'object' => new \stdClass(),
+                'result' => true,
+                'voterDetails' => [],
+            ]]);
+
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
+
+        $dataCollector->collect(new Request(), new Response());
+
+        $this->assertEmpty($dataCollector->getVoters());
     }
 
     public static function provideRoles(): array

@@ -42,7 +42,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         $this->data = $this->cloneVar($this->data);
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->data['locale'] = $this->translator->getLocale();
         $this->data['fallback_locales'] = $this->translator->getFallbackLocales();

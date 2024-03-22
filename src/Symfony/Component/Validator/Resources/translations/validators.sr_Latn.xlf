@@ -1,38 +1,38 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="sr-Latn" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>Vrednost bi trebalo da bude netačna.</target>
+                <target>Vrednost bi trebala da bude netačna.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>Vrednost bi trebalo da bude tačna.</target>
+                <target>Vrednost bi trebala da bude tačna.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
-                <target>Vrednost bi trebalo da bude tipa {{ type }}.</target>
+                <target>Vrednost bi trebala da bude tipa {{ type }}.</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>
-                <target>Vrednost bi trebalo da bude prazna.</target>
+                <target>Vrednost bi trebala da bude prazna.</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>Odabrana vrednost nije validan izbor.</target>
+                <target>Vrednost koju ste izabrali nije validan izbor.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>Morate odabrati bar {{ limit }} mogućnost.|Morate odabrati bar {{ limit }} mogućnosti.|Morate odabrati bar {{ limit }} mogućnosti.</target>
+                <target>Morate izabrati najmanje {{ limit }} mogućnosti.|Morate izabrati najmanje {{ limit }} mogućnosti.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>Morate odabrati najviše {{ limit }} mogućnost.|Morate odabrati najviše {{ limit }} mogućnosti.|Morate odabrati najviše {{ limit }} mogućnosti.</target>
+                <target>Morate izabrati najviše {{ limit }} mogućnosti.|Morate izabrati najviše {{ limit }} mogućnosti.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
-                <target>Jedna ili više vrednosti nisu validne.</target>
+                <target>Jedna ili više od odabranih vrednosti nisu validne.</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
@@ -44,11 +44,11 @@
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
-                <target>Vrednost nije validan datum.</target>
+                <target>Vrednost nije validna kao datum.</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>Vrednost nije validno vreme.</target>
+                <target>Vrednost nije validna kao datum i vreme.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
@@ -56,47 +56,47 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
-                <target>Datoteka ne može biti pronađena.</target>
+                <target>Fajl ne može biti pronađen.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable.</source>
-                <target>Datoteka nije čitljiva.</target>
+                <target>Fajl nije čitljiv.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Datoteka je prevelika ({{ size }} {{ suffix }}). Najveća dozvoljena veličina je {{ limit }} {{ suffix }}.</target>
+                <target>Fajl je preveliki ({{ size }} {{ suffix }}). Najveća dozvoljena veličina fajla je {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>MIME tip datoteke nije validan ({{ type }}). Dozvoljeni MIME tipovi su {{ types }}.</target>
+                <target>MIME tip fajla nije validan ({{ type }}). Dozvoljeni MIME tipovi su {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
-                <target>Vrednost bi trebalo da bude {{ limit }} ili manje.</target>
+                <target>Vrednost bi trebala da bude {{ limit }} ili manje.</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>Vrednost je predugačka. Trebalo bi da ima {{ limit }} karakter ili manje.|Vrednost je predugačka. Trebalo bi da ima {{ limit }} karaktera ili manje.|Vrednost je predugačka. Trebalo bi da ima {{ limit }} karaktera ili manje.</target>
+                <target>Vrednost je predugačka. Trebalo bi da ima {{ limit }} karaktera ili manje.|Vrednost je predugačka. Trebalo bi da ima {{ limit }} karaktera ili manje.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
-                <target>Vrednost bi trebalo da bude {{ limit }} ili više.</target>
+                <target>Vrednost bi trebala da bude {{ limit }} ili više.</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
-                <target>Vrednost je prekratka. Trebalo bi da ima {{ limit }} karakter ili više.|Vrednost je prekratka. Trebalo bi da ima {{ limit }} karaktera ili više.|Vrednost je prekratka. Trebalo bi da ima {{ limit }} karaktera ili više.</target>
+                <target>Vrednost je prekratka. Trebalo bi da ima {{ limit }} karaktera ili više.|Vrednost je prekratka. Trebalo bi da ima {{ limit }} karaktera ili više.</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
-                <target>Vrednost ne bi trebalo da bude prazna.</target>
+                <target>Vrednost ne bi trebala da bude prazna.</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>Vrednost ne bi trebalo da bude prazna.</target>
+                <target>Vrednost ne bi trebala da bude null.</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>Vrednost bi trebalo da bude prazna.</target>
+                <target>Vrednost bi trebala da bude null.</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
@@ -112,31 +112,31 @@
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
-                <target>Obe vrednosti bi trebalo da budu jednake.</target>
+                <target>Obe vrednosti bi trebale da budu jednake.</target>
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Datoteka je prevelika. Najveća dozvoljena veličina je {{ limit }} {{ suffix }}.</target>
+                <target>Fajl je preveliki. Najveća dozvoljena veličina je {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
-                <target>Datoteka je prevelika.</target>
+                <target>Fajl je preveliki.</target>
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>Datoteka ne može biti otpremljena.</target>
+                <target>Fajl ne može biti otpremljen.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
-                <target>Vrednost bi trebalo da bude validan broj.</target>
+                <target>Vrednost bi trebala da bude validan broj.</target>
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>Ova datoteka nije validna slika.</target>
+                <target>Ovaj fajl nije validan kao slika.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Ovo nije validna IP adresa.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target state="needs-review-translation">Ova vrednost nije validna IP adresa.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -172,31 +172,31 @@
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>Visina slike je premala ({{ height }} piksela). Najmanja dozvoljena visina je {{ min_height }} piksela.</target>
+                <target>Visina slike je preniska ({{ height }} piksela). Najmanja dozvoljena visina je {{ min_height }} piksela.</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
-                <target>Vrednost bi trebalo da bude trenutna korisnička lozinka.</target>
+                <target>Vrednost bi trebala da bude trenutna korisnička lozinka.</target>
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>Vrednost bi trebalo da ima tačno {{ limit }} karakter.|Vrednost bi trebalo da ima tačno {{ limit }} karaktera.|Vrednost bi trebalo da ima tačno {{ limit }} karaktera.</target>
+                <target>Vrednost bi trebala da ima tačno {{ limit }} karaktera.|Vrednost bi trebala da ima tačno {{ limit }} karaktera.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>Datoteka je samo parcijalno otpremljena.</target>
+                <target>Fajl je samo parcijalno otpremljena.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
-                <target>Datoteka nije otpremljena.</target>
+                <target>Fajl nije otpremljen.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Privremeni direktorijum nije konfigurisan u php.ini.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target state="needs-review-translation">Privremeni direktorijum nije konfigurisan u php.ini, ili konfigurisani direktorijum ne postoji.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
-                <target>Nemoguće pisanje privremene datoteke na disk.</target>
+                <target>Nije moguće upisati privremeni fajl na disk.</target>
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
@@ -204,79 +204,79 @@
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
-                <target>Ova kolekcija bi trebalo da sadrži {{ limit }} ili više elemenata.|Ova kolekcija bi trebalo da sadrži {{ limit }} ili više elemenata.|Ova kolekcija bi trebalo da sadrži {{ limit }} ili više elemenata.</target>
+                <target>Ova kolekcija bi trebala da sadrži {{ limit }} ili više elemenata.|Ova kolekcija bi trebala da sadrži {{ limit }} ili više elemenata.</target>
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
-                <target>Ova kolekcija bi trebalo da sadrži {{ limit }} ili manje elemenata.|Ova kolekcija bi trebalo da sadrži {{ limit }} ili manje elemenata.|Ova kolekcija bi trebalo da sadrži {{ limit }} ili manje elemenata.</target>
+                <target>Ova kolekcija bi trebala da sadrži {{ limit }} ili manje elemenata.|Ova kolekcija bi trebala da sadrži {{ limit }} ili manje elemenata.</target>
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
-                <target>Ova kolekcija bi trebalo da sadrži tačno {{ limit }} element.|Ova kolekcija bi trebalo da sadrži tačno {{ limit }} elementa.|Ova kolekcija bi trebalo da sadrži tačno {{ limit }} elemenata.</target>
+                <target>Ova kolekcija bi trebala da sadrži tačno {{ limit }} element.|Ova kolekcija bi trebala da sadrži tačno {{ limit }} elementa.</target>
             </trans-unit>
             <trans-unit id="57">
                 <source>Invalid card number.</source>
-                <target>Broj kartice nije validan.</target>
+                <target>Nevalidan broj kartice.</target>
             </trans-unit>
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
-                <target>Tip kartice nije podržan ili broj kartice nije validan.</target>
+                <target>Nevalidan broj kartice ili nepodržan tip kartice.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Ovo nije validan međunarodni broj bankovnog računa (IBAN).</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target state="needs-review-translation">Ova vrednost nije validan Međunarodni broj bankovnog računa (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
-                <target>Ovo nije validan ISBN-10.</target>
+                <target>Nevalidna vrednost ISBN-10.</target>
             </trans-unit>
             <trans-unit id="61">
                 <source>This value is not a valid ISBN-13.</source>
-                <target>Ovo nije validan ISBN-13.</target>
+                <target>Nevalidna vrednost ISBN-13.</target>
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>Ovo nije validan ISBN-10 ili ISBN-13.</target>
+                <target>Vrednost nije ni validan ISBN-10 ni validan ISBN-13.</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
-                <target>Ovo nije validan ISSN.</target>
+                <target>Nevalidna vrednost ISSN.</target>
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>Ovo nije validna valuta.</target>
+                <target>Vrednost nije validna valuta.</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
-                <target>Ova vrednost bi trebalo da bude jednaka {{ compared_value }}.</target>
+                <target>Ova vrednost bi trebala da bude jednaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>
-                <target>Ova vrednost bi trebalo da bude veća od {{ compared_value }}.</target>
+                <target>Ova vrednost bi trebala da bude veća od {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="67">
                 <source>This value should be greater than or equal to {{ compared_value }}.</source>
-                <target>Ova vrednost bi trebalo da bude veća ili jednaka {{ compared_value }}.</target>
+                <target>Ova vrednost bi trebala da je veća ili jednaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Ova vrednost bi trebalo da bude identična sa {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Ova vrednost bi trebala da bude identična sa {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
-                <target>Ova vrednost bi trebalo da bude manja od {{ compared_value }}.</target>
+                <target>Ova vrednost bi trebala da bude manja od {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>Ova vrednost bi trebalo da bude manja ili jednaka {{ compared_value }}.</target>
+                <target>Ova vrednost bi trebala da bude manja ili jednaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>Ova vrednost ne bi trebalo da bude jednaka {{ compared_value }}.</target>
+                <target>Ova vrednost ne bi trebala da bude jednaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Ova vrednost ne bi trebalo da bude identična sa {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Ova vrednost ne bi trebala da bude identična sa {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
@@ -292,7 +292,7 @@
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
-                <target>Slika je pejzažno orijentisana ({{ width }}x{{ height }} piksela). Pejzažna orijentisane slike nisu dozvoljene.</target>
+                <target>Slika je pejzažno orijentisana ({{ width }}x{{ height }} piksela). Pejzažno orijentisane slike nisu dozvoljene.</target>
             </trans-unit>
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
@@ -300,7 +300,7 @@
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
-                <target>Prazna datoteka nije dozvoljena.</target>
+                <target>Prazan fajl nije dozvoljen.</target>
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
@@ -310,21 +310,21 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Vrednost se ne poklapa sa očekivanim {{ charset }} setom karaktera.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Ovo nije validan BIC.</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target state="needs-review-translation">Ova vrednost nije validan Kod za identifikaciju biznisa (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Greška</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Ovo nije validan univerzalni unikatni identifikator (UUID).</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">Ova vrednost nije validan UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Ova vrednost bi trebalo da bude deljiva sa {{ compared_value }}.</target>
+                <target>Ova vrednost bi trebala da bude višestruka u odnosu na {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
@@ -332,7 +332,7 @@
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>Ova vrednost bi trebalo da bude validan JSON.</target>
+                <target>Ova vrednost bi trebala da bude validan JSON.</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
@@ -344,7 +344,7 @@
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>Ova vrednost bi trebala biti pozitivna ili nula.</target>
+                <target>Ova vrednost bi trebala biti ili pozitivna ili nula.</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
@@ -352,7 +352,7 @@
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>Ova vrednost bi trebala biti negativna ili nula.</target>
+                <target>Ova vrednost bi trebala biti ili negativna ili nula.</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>Ova lozinka je kompromitovana prilikom prethodnih napada, nemojte je koristiti. Koristite drugu lozinku.</target>
+                <target>Lozinka je kompromitovana prilikom curenja podataka usled napada, nemojte je koristiti. Koristite drugu lozinku.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -372,11 +372,11 @@
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-                <target>Broj elemenata u ovoj kolekciji bi trebalo da bude deljiv sa {{ compared_value }}.</target>
+                <target>Broj elemenata u ovoj kolekciji bi trebala da bude višestruka u odnosu na {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Ova vrednost bi trebalo da zadovoljava namjanje jedno od narednih ograničenja:</target>
+                <target>Ova vrednost bi trebala da zadovoljava namjanje jedno od narednih ograničenja:</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
@@ -384,7 +384,7 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>Ova vrednost nije ispravna međunarodna identifikaciona oznaka hartija od vrednosti (ISIN).</target>
+                <target>Ova vrednost nije ispravan međunarodni sigurnosni i identifikacioni broj (ISIN).</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
@@ -392,11 +392,11 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
-                <target>Ova vrednost nije ispravna CSS boja.</target>
+                <target>Ova vrednost nije validna CSS boja.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target>Ova vrednost nije ispravna CIDR notacija.</target>
+                <target>Ova vrednost nije validna CIDR notacija.</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
@@ -404,7 +404,7 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>Naziv datoteke je suviše dugačak. Treba da ima {{ filename_max_length }} karakter ili manje.|Naziv datoteke je suviše dugačak. Treba da ima {{ filename_max_length }} karaktera ili manje.</target>
+                <target>Naziv fajla je suviše dugačak. Treba da ima {{ filename_max_length }} karaktera ili manje.|Naziv fajla je suviše dugačak. Treba da ima {{ filename_max_length }} karaktera ili manje.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
@@ -424,7 +424,19 @@
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
-                <target>Korišćenje skrivenih preklopnih karaktera nije dozvoljeno.</target>
+                <target>Korišćenje skrivenih pokrivenih karaktera nije dozvoljeno.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Ekstenzija fajla je nevalidna ({{ extension }}). Dozvoljene ekstenzije su {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Detektovani enkoding karaktera nije validan ({{ detected }}). Dozvoljne vrednosti za enkoding su: {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">Ova vrednost nije validna MAC adresa.</target>
             </trans-unit>
         </body>
     </file>

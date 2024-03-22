@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
+ * Validates that a value is a valid email address.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -35,7 +37,7 @@ class Email extends Constraint
     ];
 
     protected const ERROR_NAMES = [
-        self::INVALID_FORMAT_ERROR => 'STRICT_CHECK_FAILED_ERROR',
+        self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
     ];
 
     public string $message = 'This value is not a valid email address.';
@@ -43,13 +45,18 @@ class Email extends Constraint
     /** @var callable|null */
     public $normalizer;
 
+    /**
+     * @param array<string,mixed>|null     $options
+     * @param self::VALIDATION_MODE_*|null $mode    The pattern used to validate the email address; pass null to use the default mode configured for the EmailValidator
+     * @param string[]|null                $groups
+     */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        string $mode = null,
-        callable $normalizer = null,
-        array $groups = null,
-        mixed $payload = null
+        ?array $options = null,
+        ?string $message = null,
+        ?string $mode = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
+        mixed $payload = null,
     ) {
         if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::VALIDATION_MODES, true)) {
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');

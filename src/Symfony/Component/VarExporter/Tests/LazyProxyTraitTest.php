@@ -12,6 +12,9 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
@@ -22,6 +25,7 @@ use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestOverwritePropClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestUnserializeClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestWakeupClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\SimpleObject;
 
 class LazyProxyTraitTest extends TestCase
 {
@@ -254,7 +258,7 @@ class LazyProxyTraitTest extends TestCase
     {
         if (\PHP_VERSION_ID < 80300) {
             $this->expectException(LogicException::class);
-            $this->expectExceptionMessage('Cannot generate lazy proxy: class "Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\ReadOnlyClass" is readonly.');
+            $this->expectExceptionMessage('Cannot generate lazy proxy with PHP < 8.3: class "Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\ReadOnlyClass" is readonly.');
         }
 
         $proxy = $this->createLazyProxy(ReadOnlyClass::class, fn () => new ReadOnlyClass(123));
@@ -276,6 +280,19 @@ class LazyProxyTraitTest extends TestCase
         };
 
         $this->assertSame(['foo' => 123], (array) $obj->getDep());
+    }
+
+    public function testNormalization()
+    {
+        $object = $this->createLazyProxy(SimpleObject::class, fn () => new SimpleObject());
+
+        $loader = new AttributeLoader();
+        $metadataFactory = new ClassMetadataFactory($loader);
+        $serializer = new ObjectNormalizer($metadataFactory);
+
+        $output = $serializer->normalize($object);
+
+        $this->assertSame(['property' => 'property', 'method' => 'method'], $output);
     }
 
     /**

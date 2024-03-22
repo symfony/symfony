@@ -81,6 +81,7 @@ class Process implements \IteratorAggregate
     private WindowsPipes|UnixPipes $processPipes;
 
     private ?int $latestSignal = null;
+    private ?int $cachedExitCode = null;
 
     private static ?bool $sigchild = null;
 
@@ -141,7 +142,7 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException When proc_open is not installed
      */
-    public function __construct(array $command, string $cwd = null, array $env = null, mixed $input = null, ?float $timeout = 60)
+    public function __construct(array $command, ?string $cwd = null, ?array $env = null, mixed $input = null, ?float $timeout = 60)
     {
         if (!\function_exists('proc_open')) {
             throw new LogicException('The Process class relies on proc_open, which is not available on your PHP installation.');
@@ -187,7 +188,7 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException When proc_open is not installed
      */
-    public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, mixed $input = null, ?float $timeout = 60): static
+    public static function fromShellCommandline(string $command, ?string $cwd = null, ?array $env = null, mixed $input = null, ?float $timeout = 60): static
     {
         $process = new static([], $cwd, $env, $input, $timeout);
         $process->commandline = $command;
@@ -242,7 +243,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function run(callable $callback = null, array $env = []): int
+    public function run(?callable $callback = null, array $env = []): int
     {
         $this->start($callback, $env);
 
@@ -261,7 +262,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function mustRun(callable $callback = null, array $env = []): static
+    public function mustRun(?callable $callback = null, array $env = []): static
     {
         if (0 !== $this->run($callback, $env)) {
             throw new ProcessFailedException($this);
@@ -289,7 +290,7 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException            When process is already running
      * @throws LogicException              In case a callback is provided and output has been disabled
      */
-    public function start(callable $callback = null, array $env = []): void
+    public function start(?callable $callback = null, array $env = []): void
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running.');
@@ -384,7 +385,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function restart(callable $callback = null, array $env = []): static
+    public function restart(?callable $callback = null, array $env = []): static
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running.');
@@ -411,7 +412,7 @@ class Process implements \IteratorAggregate
      * @throws ProcessSignaledException When process stopped after receiving signal
      * @throws LogicException           When process is not yet started
      */
-    public function wait(callable $callback = null): int
+    public function wait(?callable $callback = null): int
     {
         $this->requireProcessIsStarted(__FUNCTION__);
 
@@ -884,7 +885,7 @@ class Process implements \IteratorAggregate
      *
      * @return int|null The exit-code of the process or null if it's not running
      */
-    public function stop(float $timeout = 10, int $signal = null): ?int
+    public function stop(float $timeout = 10, ?int $signal = null): ?int
     {
         $timeoutMicro = microtime(true) + $timeout;
         if ($this->isRunning()) {
@@ -1258,7 +1259,7 @@ class Process implements \IteratorAggregate
      *
      * @param callable|null $callback The user defined PHP callback
      */
-    protected function buildCallback(callable $callback = null): \Closure
+    protected function buildCallback(?callable $callback = null): \Closure
     {
         if ($this->outputDisabled) {
             return fn ($type, $data): bool => null !== $callback && $callback($type, $data);
@@ -1290,6 +1291,19 @@ class Process implements \IteratorAggregate
 
         $this->processInformation = proc_get_status($this->process);
         $running = $this->processInformation['running'];
+
+        // In PHP < 8.3, "proc_get_status" only returns the correct exit status on the first call.
+        // Subsequent calls return -1 as the process is discarded. This workaround caches the first
+        // retrieved exit status for consistent results in later calls, mimicking PHP 8.3 behavior.
+        if (\PHP_VERSION_ID < 80300) {
+            if (!isset($this->cachedExitCode) && !$running && -1 !== $this->processInformation['exitcode']) {
+                $this->cachedExitCode = $this->processInformation['exitcode'];
+            }
+
+            if (isset($this->cachedExitCode) && !$running && -1 === $this->processInformation['exitcode']) {
+                $this->processInformation['exitcode'] = $this->cachedExitCode;
+            }
+        }
 
         $this->readPipes($running && $blocking, '\\' !== \DIRECTORY_SEPARATOR || !$running);
 

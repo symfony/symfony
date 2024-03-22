@@ -34,7 +34,7 @@ final class SignatureRememberMeHandler extends AbstractRememberMeHandler
 {
     private SignatureHasher $signatureHasher;
 
-    public function __construct(SignatureHasher $signatureHasher, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null)
+    public function __construct(SignatureHasher $signatureHasher, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, ?LoggerInterface $logger = null)
     {
         parent::__construct($userProvider, $requestStack, $options, $logger);
 

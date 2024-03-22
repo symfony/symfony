@@ -47,7 +47,7 @@
         "psr/http-message": "^1.0|^2.0",
         "psr/link": "^1.1|^2.0",
         "psr/log": "^1|^2|^3",
-        "symfony/contracts": "^2.5|^3.0",
+        "symfony/contracts": "^3.5",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-grapheme": "~1.0",
         "symfony/polyfill-intl-icu": "~1.0",
@@ -71,6 +71,7 @@
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/dotenv": "self.version",
+        "symfony/emoji": "self.version",
         "symfony/error-handler": "self.version",
         "symfony/event-dispatcher": "self.version",
         "symfony/expression-language": "self.version",
@@ -109,6 +110,7 @@
         "symfony/translation": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",
+        "symfony/type-info": "self.version",
         "symfony/uid": "self.version",
         "symfony/validator": "self.version",
         "symfony/var-dumper": "self.version",
@@ -124,7 +126,7 @@
         "amphp/http-client": "^4.2.1",
         "amphp/http-tunnel": "^1.0",
         "async-aws/ses": "^1.0",
-        "async-aws/sqs": "^1.0",
+        "async-aws/sqs": "^1.0|^2.0",
         "async-aws/sns": "^1.0",
         "cache/integration-tests": "dev-master",
         "doctrine/collections": "^1.0|^2.0",
@@ -133,11 +135,12 @@
         "doctrine/orm": "^2.15|^3",
         "dragonmantank/cron-expression": "^3.1",
         "egulias/email-validator": "^2.1.10|^3.1|^4",
-        "guzzlehttp/promises": "^1.4",
+        "guzzlehttp/promises": "^1.4|^2.0",
         "league/html-to-markdown": "^5.0",
         "league/uri": "^6.5|^7.0",
         "masterminds/html5": "^2.7.2",
         "monolog/monolog": "^3.0",
+        "nikic/php-parser": "^4.18|^5.0",
         "nyholm/psr7": "^1.0",
         "pda/pheanstalk": "^4.0",
         "php-http/discovery": "^1.15",
@@ -206,7 +209,7 @@
             "url": "src/Symfony/Contracts",
             "options": {
                 "versions": {
-                    "symfony/contracts": "3.4.x-dev"
+                    "symfony/contracts": "3.5.x-dev"
                 }
             }
         },

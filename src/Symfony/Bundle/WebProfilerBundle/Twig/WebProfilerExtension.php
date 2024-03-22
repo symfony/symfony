@@ -37,7 +37,7 @@ class WebProfilerExtension extends ProfilerExtension
 
     private int $stackLevel = 0;
 
-    public function __construct(HtmlDumper $dumper = null)
+    public function __construct(?HtmlDumper $dumper = null)
     {
         $this->dumper = $dumper ?? new HtmlDumper();
         $this->dumper->setOutput($this->output = fopen('php://memory', 'r+'));
@@ -77,7 +77,7 @@ class WebProfilerExtension extends ProfilerExtension
         return str_replace("\n</pre", '</pre', rtrim($dump));
     }
 
-    public function dumpLog(Environment $env, string $message, Data $context = null): string
+    public function dumpLog(Environment $env, string $message, ?Data $context = null): string
     {
         $message = self::escape($env, $message);
         $message = preg_replace('/&quot;(.*?)&quot;/', '&quot;<b>$1</b>&quot;', $message);

@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
@@ -33,19 +34,13 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
  */
 class SendFailedMessageForRetryListener implements EventSubscriberInterface
 {
-    private ContainerInterface $sendersLocator;
-    private ContainerInterface $retryStrategyLocator;
-    private ?LoggerInterface $logger;
-    private ?EventDispatcherInterface $eventDispatcher;
-    private int $historySize;
-
-    public function __construct(ContainerInterface $sendersLocator, ContainerInterface $retryStrategyLocator, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, int $historySize = 10)
-    {
-        $this->sendersLocator = $sendersLocator;
-        $this->retryStrategyLocator = $retryStrategyLocator;
-        $this->logger = $logger;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->historySize = $historySize;
+    public function __construct(
+        private ContainerInterface $sendersLocator,
+        private ContainerInterface $retryStrategyLocator,
+        private ?LoggerInterface $logger = null,
+        private ?EventDispatcherInterface $eventDispatcher = null,
+        private int $historySize = 10,
+    ) {
     }
 
     public function onMessageFailed(WorkerMessageFailedEvent $event): void
@@ -57,6 +52,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
         $message = $envelope->getMessage();
         $context = [
             'class' => $message::class,
+            'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
         ];
 
         $shouldRetry = $retryStrategy && $this->shouldRetry($throwable, $envelope, $retryStrategy);

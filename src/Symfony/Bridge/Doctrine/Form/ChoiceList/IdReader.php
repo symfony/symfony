@@ -76,7 +76,7 @@ class IdReader
      *
      * This method assumes that the object has a single-column ID.
      */
-    public function getIdValue(object $object = null): string
+    public function getIdValue(?object $object = null): string
     {
         if (!$object) {
             return '';

@@ -25,7 +25,7 @@ abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
 
     protected static \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis;
 
-    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface
     {
         return new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }

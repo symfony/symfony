@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add support for new DOM extension classes in `DOMCaster`
+
 7.0
 ---
 

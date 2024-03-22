@@ -133,7 +133,7 @@ Symfony\Component\Serializer\Attribute\Context {
 DUMP
         ];
 
-        yield 'named arguemnts: with groups option as array' => [
+        yield 'named arguments: with groups option as array' => [
             fn () => new Context(context: ['foo' => 'bar'], groups: ['a', 'b']),
             <<<DUMP
 Symfony\Component\Serializer\Attribute\Context {

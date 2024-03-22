@@ -157,5 +157,28 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtps', 'example.com', '', '', 465, ['ping_threshold' => '10']),
             $transport,
         ];
+
+        $transport = new EsmtpTransport('example.com', 25, false, null, $logger);
+        $transport->setAutoTls(false);
+
+        yield [
+            new Dsn('smtp', 'example.com', '', '', 25, ['auto_tls' => false]),
+            $transport,
+        ];
+        yield [
+            new Dsn('smtp', 'example.com', '', '', 0, ['auto_tls' => false]),
+            $transport,
+        ];
+        yield [
+            Dsn::fromString('smtp://:@example.com?auto_tls=false'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, false, null, $logger);
+        $transport->setAutoTls(false);
+        yield [
+            Dsn::fromString('smtp://:@example.com:465?auto_tls=false'),
+            $transport,
+        ];
     }
 }

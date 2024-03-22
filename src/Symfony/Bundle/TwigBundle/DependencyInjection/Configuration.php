@@ -64,7 +64,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
                     ->example(['@My/form.html.twig'])
                     ->validate()
-                        ->ifTrue(fn ($v) => !\in_array('form_div_layout.html.twig', $v))
+                        ->ifTrue(fn ($v) => !\in_array('form_div_layout.html.twig', $v, true))
                         ->then(fn ($v) => array_merge(['form_div_layout.html.twig'], $v))
                     ->end()
                 ->end()
@@ -153,7 +153,7 @@ class Configuration implements ConfigurationInterface
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('paths')
                     ->beforeNormalization()
-                        ->always()
+                        ->ifArray()
                         ->then(function ($paths) {
                             $normalized = [];
                             foreach ($paths as $path => $namespace) {

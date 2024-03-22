@@ -18,8 +18,9 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
  */
 class ImportMapRuntime
 {
-    public function __construct(private readonly ImportMapRenderer $importMapRenderer)
-    {
+    public function __construct(
+        private readonly ImportMapRenderer $importMapRenderer,
+    ) {
     }
 
     public function importmap(string|array $entryPoint = 'app', array $attributes = []): string

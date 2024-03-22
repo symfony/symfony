@@ -87,7 +87,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
     abstract public function toBinary(): string;
 
     /**
-     * Returns the identifier as a base58 case sensitive string.
+     * Returns the identifier as a base58 case-sensitive string.
      *
      * @example 2AifFTC3zXgZzK5fPrrprL (len=22)
      */
@@ -97,7 +97,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Returns the identifier as a base32 case insensitive string.
+     * Returns the identifier as a base32 case-insensitive string.
      *
      * @see https://tools.ietf.org/html/rfc4648#section-6
      *
@@ -120,7 +120,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Returns the identifier as a RFC4122 case insensitive string.
+     * Returns the identifier as a RFC4122 case-insensitive string.
      *
      * @see https://tools.ietf.org/html/rfc4122#section-3
      *
@@ -162,6 +162,11 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
     public function compare(self $other): int
     {
         return (\strlen($this->uid) - \strlen($other->uid)) ?: ($this->uid <=> $other->uid);
+    }
+
+    final public function toString(): string
+    {
+        return $this->__toString();
     }
 
     public function __toString(): string

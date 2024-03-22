@@ -25,10 +25,12 @@ interface FileLocatorInterface
      * @param string|null $currentPath The current path
      * @param bool        $first       Whether to return the first occurrence or an array of filenames
      *
-     * @return string|array The full path to the file or an array of file paths
+     * @return string|string[] The full path to the file or an array of file paths
      *
      * @throws \InvalidArgumentException        If $name is empty
      * @throws FileLocatorFileNotFoundException If a file is not found
+     *
+     * @psalm-return ($first is true ? string : string[])
      */
-    public function locate(string $name, string $currentPath = null, bool $first = true): string|array;
+    public function locate(string $name, ?string $currentPath = null, bool $first = true): string|array;
 }

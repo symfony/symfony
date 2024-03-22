@@ -17,29 +17,17 @@ class CoverageListenerTest extends TestCase
 {
     public function test()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test cannot be run on Windows.');
-        }
-
-        exec('type phpdbg 2> /dev/null', $output, $returnCode);
-
-        if (0 === $returnCode) {
-            $php = 'phpdbg -qrr';
-        } else {
-            exec('php --ri xdebug -d zend_extension=xdebug.so 2> /dev/null', $output, $returnCode);
-            if (0 !== $returnCode) {
-                $this->markTestSkipped('Xdebug is required to run this test.');
-            }
-            $php = 'php -d zend_extension=xdebug.so';
-        }
-
         $dir = __DIR__.'/../Tests/Fixtures/coverage';
         $phpunit = $_SERVER['argv'][0];
 
+        $php = $this->findCoverageDriver();
+
+        $output = '';
         exec("$php $phpunit -c $dir/phpunit-without-listener.xml.dist $dir/tests/ --coverage-text --colors=never 2> /dev/null", $output);
         $output = implode("\n", $output);
         $this->assertMatchesRegularExpression('/FooCov\n\s*Methods:\s+100.00%[^\n]+Lines:\s+100.00%/', $output);
 
+        $output = '';
         exec("$php $phpunit -c $dir/phpunit-with-listener.xml.dist $dir/tests/ --coverage-text --colors=never 2> /dev/null", $output);
         $output = implode("\n", $output);
 
@@ -53,5 +41,29 @@ class CoverageListenerTest extends TestCase
         $this->assertStringNotContainsString("CoversTest::test\nCould not find the tested class.", $output);
         $this->assertStringNotContainsString("CoversDefaultClassTest::test\nCould not find the tested class.", $output);
         $this->assertStringNotContainsString("CoversNothingTest::test\nCould not find the tested class.", $output);
+    }
+
+    private function findCoverageDriver(): string
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot be run on Windows.');
+        }
+
+        exec('php --ri xdebug -d zend_extension=xdebug 2> /dev/null', $output, $returnCode);
+        if (0 === $returnCode) {
+            return 'php -d zend_extension=xdebug';
+        }
+
+        exec('php --ri pcov -d zend_extension=pcov 2> /dev/null', $output, $returnCode);
+        if (0 === $returnCode) {
+            return 'php -d zend_extension=pcov';
+        }
+
+        exec('type phpdbg 2> /dev/null', $output, $returnCode);
+        if (0 === $returnCode) {
+            return 'phpdbg -qrr';
+        }
+
+        $this->markTestSkipped('Xdebug or pvoc is required to run this test.');
     }
 }

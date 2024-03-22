@@ -39,13 +39,18 @@ final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorIn
             throw new \LogicException(sprintf('You cannot use "%s" as the "nikic/php-parser" package is not installed. Try running "composer require nikic/php-parser".', static::class));
         }
 
-        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $this->parser = (new ParserFactory())->createForHostVersion();
     }
 
     public function extract(iterable|string $resource, MessageCatalogue $catalogue): void
     {
         foreach ($this->extractFiles($resource) as $file) {
             $traverser = new NodeTraverser();
+
+            // This is needed to resolve namespaces in class methods/constants.
+            $nameResolver = new NodeVisitor\NameResolver();
+            $traverser->addVisitor($nameResolver);
+
             /** @var AbstractVisitor&NodeVisitor $visitor */
             foreach ($this->visitors as $visitor) {
                 $visitor->initialize($catalogue, $file, $this->prefix);

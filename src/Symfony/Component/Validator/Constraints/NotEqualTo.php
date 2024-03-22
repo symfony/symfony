@@ -12,6 +12,8 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
+ * Validates that a value is not equal to another value.
+ *
  * @author Daniel Holmes <daniel@danielholmes.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

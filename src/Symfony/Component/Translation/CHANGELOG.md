@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Mark class `DataCollectorTranslator` as `final`
+
 7.0
 ---
 

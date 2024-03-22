@@ -28,7 +28,7 @@ final class PsrResponseListener implements EventSubscriberInterface
 {
     private readonly HttpFoundationFactoryInterface $httpFoundationFactory;
 
-    public function __construct(HttpFoundationFactoryInterface $httpFoundationFactory = null)
+    public function __construct(?HttpFoundationFactoryInterface $httpFoundationFactory = null)
     {
         $this->httpFoundationFactory = $httpFoundationFactory ?? new HttpFoundationFactory();
     }

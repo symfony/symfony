@@ -28,6 +28,7 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
@@ -141,6 +142,42 @@ class ConfigurationTest extends TestCase
         ];
 
         $this->assertEquals($defaultConfig, $config['asset_mapper']);
+    }
+
+    /**
+     * @dataProvider provideImportmapPolyfillTests
+     */
+    public function testAssetMapperPolyfillValue(mixed $polyfillValue, bool $isValid, mixed $expected)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        if (!$isValid) {
+            $this->expectException(InvalidConfigurationException::class);
+            $this->expectExceptionMessage($expected);
+        }
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'asset_mapper' => null === $polyfillValue ? [] : [
+                'importmap_polyfill' => $polyfillValue,
+            ],
+        ]]);
+
+        if ($isValid) {
+            $this->assertEquals($expected, $config['asset_mapper']['importmap_polyfill']);
+        }
+    }
+
+    public static function provideImportmapPolyfillTests()
+    {
+        yield [true, false, 'Must be either an importmap name or false.'];
+        yield [null, true, 'es-module-shims'];
+        yield ['es-module-shims', true, 'es-module-shims'];
+        yield ['foo', true, 'foo'];
+        yield [false, true, false];
     }
 
     /**
@@ -530,6 +567,46 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testScopedHttpClientsInheritRateLimiterAndRetryFailedConfiguration()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_client' => [
+                'default_options' => ['rate_limiter' => 'default_limiter', 'retry_failed' => ['max_retries' => 77]],
+                'scoped_clients' => [
+                    'foo' => ['base_uri' => 'http://example.com'],
+                    'bar' => ['base_uri' => 'http://example.com', 'rate_limiter' => true, 'retry_failed' => true],
+                    'baz' => ['base_uri' => 'http://example.com', 'rate_limiter' => false, 'retry_failed' => false],
+                    'qux' => ['base_uri' => 'http://example.com', 'rate_limiter' => 'foo_limiter', 'retry_failed' => ['max_retries' => 88, 'delay' => 999]],
+                ],
+            ],
+        ]]);
+
+        $scopedClients = $config['http_client']['scoped_clients'];
+
+        $this->assertSame('default_limiter', $scopedClients['foo']['rate_limiter']);
+        $this->assertTrue($scopedClients['foo']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['foo']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['foo']['retry_failed']['delay']);
+
+        $this->assertSame('default_limiter', $scopedClients['bar']['rate_limiter']);
+        $this->assertTrue($scopedClients['bar']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['bar']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['bar']['retry_failed']['delay']);
+
+        $this->assertNull($scopedClients['baz']['rate_limiter']);
+        $this->assertFalse($scopedClients['baz']['retry_failed']['enabled']);
+        $this->assertSame(3, $scopedClients['baz']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['baz']['retry_failed']['delay']);
+
+        $this->assertSame('foo_limiter', $scopedClients['qux']['rate_limiter']);
+        $this->assertTrue($scopedClients['qux']['retry_failed']['enabled']);
+        $this->assertSame(88, $scopedClients['qux']['retry_failed']['max_retries']);
+        $this->assertSame(999, $scopedClients['qux']['retry_failed']['delay']);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [
@@ -623,6 +700,9 @@ class ConfigurationTest extends TestCase
                 'magic_set' => true,
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
+            ],
+            'type_info' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(Type::class),
             ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),

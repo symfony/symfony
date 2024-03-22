@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Node;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\TransNode;
+use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
@@ -35,7 +36,8 @@ class TransNodeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                'echo $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans("trans %%var%%", array_merge(["%%var%%" => %s], %s), "messages");',
+                '%s $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans("trans %%var%%", array_merge(["%%var%%" => %s], %s), "messages");',
+                class_exists(YieldReady::class) ? 'yield' : 'echo',
                 $this->getVariableGetterWithoutStrictCheck('var'),
                 $this->getVariableGetterWithStrictCheck('foo')
             ),

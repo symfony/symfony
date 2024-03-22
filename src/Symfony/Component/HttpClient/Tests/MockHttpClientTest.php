@@ -471,11 +471,21 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testNonBlockingStream':
             case 'testSeekAsyncStream':
-                $responses[] = new MockResponse((function () { yield '<1>'; yield ''; yield '<2>'; })(), ['response_headers' => $headers]);
+                $responses[] = new MockResponse(
+                    (function () {
+                        yield '<1>';
+                        yield '';
+                        yield '<2>';
+                    })(),
+                    ['response_headers' => $headers]
+                );
                 break;
 
             case 'testMaxDuration':
-                $responses[] = new MockResponse('', ['error' => 'Max duration was reached.']);
+                $responses[] = new MockResponse(
+                    '',
+                    ['error' => 'Max duration was reached.']
+                );
                 break;
         }
 

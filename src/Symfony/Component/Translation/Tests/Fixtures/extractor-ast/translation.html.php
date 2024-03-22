@@ -62,3 +62,8 @@ EOF
 <?php echo $view['translator']->trans('mix-named-arguments-disordered', domain: 'not_messages', parameters: []); ?>
 
 <?php echo $view['translator']->trans(...); // should not fail ?>
+
+<?php
+use Symfony\Component\Translation\Tests\Extractor\PhpAstExtractorTest;
+echo $view['translator']->trans('const-domain', [], PhpAstExtractorTest::OTHER_DOMAIN);
+?>

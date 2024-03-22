@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -56,7 +57,14 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                     BaseNode::setPlaceholderUniquePrefix($resolvingBag->getEnvPlaceholderUniquePrefix());
                 }
             }
-            $config = $resolvingBag->resolveValue($config);
+
+            try {
+                $config = $resolvingBag->resolveValue($config);
+            } catch (ParameterNotFoundException $e) {
+                $e->setSourceExtensionName($name);
+
+                throw $e;
+            }
 
             try {
                 $tmpContainer = new MergeExtensionConfigurationContainerBuilder($extension, $resolvingBag);
@@ -153,7 +161,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
 {
     private string $extensionClass;
 
-    public function __construct(ExtensionInterface $extension, ParameterBagInterface $parameterBag = null)
+    public function __construct(ExtensionInterface $extension, ?ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
 
@@ -175,7 +183,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
         throw new LogicException(sprintf('Cannot compile the container in extension "%s".', $this->extensionClass));
     }
 
-    public function resolveEnvPlaceholders(mixed $value, string|bool $format = null, array &$usedEnvs = null): mixed
+    public function resolveEnvPlaceholders(mixed $value, string|bool|null $format = null, ?array &$usedEnvs = null): mixed
     {
         if (true !== $format || !\is_string($value)) {
             return parent::resolveEnvPlaceholders($value, $format, $usedEnvs);

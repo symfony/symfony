@@ -311,7 +311,7 @@ class Response
      *
      * @return $this
      */
-    public function sendHeaders(int $statusCode = null): static
+    public function sendHeaders(?int $statusCode = null): static
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
@@ -330,22 +330,20 @@ class Response
             $replace = false;
 
             // As recommended by RFC 8297, PHP automatically copies headers from previous 103 responses, we need to deal with that if headers changed
-            if (103 === $statusCode) {
-                $previousValues = $this->sentHeaders[$name] ?? null;
-                if ($previousValues === $values) {
-                    // Header already sent in a previous response, it will be automatically copied in this response by PHP
-                    continue;
-                }
-
-                $replace = 0 === strcasecmp($name, 'Content-Type');
-
-                if (null !== $previousValues && array_diff($previousValues, $values)) {
-                    header_remove($name);
-                    $previousValues = null;
-                }
-
-                $newValues = null === $previousValues ? $values : array_diff($values, $previousValues);
+            $previousValues = $this->sentHeaders[$name] ?? null;
+            if ($previousValues === $values) {
+                // Header already sent in a previous response, it will be automatically copied in this response by PHP
+                continue;
             }
+
+            $replace = 0 === strcasecmp($name, 'Content-Type');
+
+            if (null !== $previousValues && array_diff($previousValues, $values)) {
+                header_remove($name);
+                $previousValues = null;
+            }
+
+            $newValues = null === $previousValues ? $values : array_diff($values, $previousValues);
 
             foreach ($newValues as $value) {
                 header($name.': '.$value, $replace, $this->statusCode);
@@ -471,7 +469,7 @@ class Response
      *
      * @final
      */
-    public function setStatusCode(int $code, string $text = null): static
+    public function setStatusCode(int $code, ?string $text = null): static
     {
         $this->statusCode = $code;
         if ($this->isInvalid()) {
@@ -1249,7 +1247,7 @@ class Response
      *
      * @final
      */
-    public function isRedirect(string $location = null): bool
+    public function isRedirect(?string $location = null): bool
     {
         return \in_array($this->statusCode, [201, 301, 302, 303, 307, 308]) && (null === $location ?: $location == $this->headers->get('Location'));
     }

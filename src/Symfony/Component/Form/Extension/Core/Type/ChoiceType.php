@@ -30,6 +30,7 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\CheckboxListMapper;
 use Symfony\Component\Form\Extension\Core\DataMapper\RadioListMapper;
@@ -52,7 +53,7 @@ class ChoiceType extends AbstractType
     private ChoiceListFactoryInterface $choiceListFactory;
     private ?TranslatorInterface $translator;
 
-    public function __construct(ChoiceListFactoryInterface $choiceListFactory = null, TranslatorInterface $translator = null)
+    public function __construct(?ChoiceListFactoryInterface $choiceListFactory = null, ?TranslatorInterface $translator = null)
     {
         $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(
             new PropertyAccessDecorator(
@@ -98,6 +99,7 @@ class ChoiceType extends AbstractType
             // Make sure that scalar, submitted values are converted to arrays
             // which can be submitted to the checkboxes/radio buttons
             $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) use ($choiceList, $options, &$unknownValues) {
+                /** @var PreSubmitEvent $event */
                 $form = $event->getForm();
                 $data = $event->getData();
 
@@ -234,7 +236,8 @@ class ChoiceType extends AbstractType
             'expanded' => $options['expanded'],
             'preferred_choices' => $choiceListView->preferredChoices,
             'choices' => $choiceListView->choices,
-            'separator' => '-------------------',
+            'separator' => $options['separator'],
+            'separator_html' => $options['separator_html'],
             'placeholder' => null,
             'placeholder_attr' => [],
             'choice_translation_domain' => $choiceTranslationDomain,
@@ -342,6 +345,8 @@ class ChoiceType extends AbstractType
             'choice_attr' => null,
             'choice_translation_parameters' => [],
             'preferred_choices' => [],
+            'separator' => '-------------------',
+            'separator_html' => false,
             'duplicate_preferred_choices' => true,
             'group_by' => null,
             'empty_data' => $emptyData,
@@ -372,6 +377,8 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_translation_parameters', ['null', 'array', 'callable', ChoiceTranslationParameters::class]);
         $resolver->setAllowedTypes('placeholder_attr', ['array']);
         $resolver->setAllowedTypes('preferred_choices', ['array', \Traversable::class, 'callable', 'string', PropertyPath::class, PreferredChoice::class]);
+        $resolver->setAllowedTypes('separator', ['string']);
+        $resolver->setAllowedTypes('separator_html', ['bool']);
         $resolver->setAllowedTypes('duplicate_preferred_choices', 'bool');
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
     }
@@ -437,7 +444,7 @@ class ChoiceType extends AbstractType
         }
 
         // Harden against NULL values (like in EntityType and ModelType)
-        $choices = null !== $options['choices'] ? $options['choices'] : [];
+        $choices = $options['choices'] ?? [];
 
         return $this->choiceListFactory->createListFromChoices(
             $choices,

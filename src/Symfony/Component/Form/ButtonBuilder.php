@@ -31,19 +31,19 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     private ResolvedFormTypeInterface $type;
     private string $name;
     private array $attributes = [];
-    private array $options;
 
     /**
      * @throws InvalidArgumentException if the name is empty
      */
-    public function __construct(?string $name, array $options = [])
-    {
+    public function __construct(
+        ?string $name,
+        private array $options = [],
+    ) {
         if ('' === $name || null === $name) {
             throw new InvalidArgumentException('Buttons cannot have empty names.');
         }
 
         $this->name = $name;
-        $this->options = $options;
 
         FormConfigBuilder::validateName($name);
     }
@@ -53,7 +53,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function add(string|FormBuilderInterface $child, string $type = null, array $options = []): never
+    public function add(string|FormBuilderInterface $child, ?string $type = null, array $options = []): never
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -63,7 +63,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function create(string $name, string $type = null, array $options = []): never
+    public function create(string $name, ?string $type = null, array $options = []): never
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }

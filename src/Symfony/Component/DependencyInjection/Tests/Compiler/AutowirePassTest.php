@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\OptionalParameter;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAnonymous;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -399,6 +400,9 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, $container->getDefinition('bar')->getArgument(0));
     }
 
+    /**
+     * @group legacy
+     */
     public function testOptionalParameter()
     {
         $container = new ContainerBuilder();
@@ -1367,5 +1371,30 @@ class AutowirePassTest extends TestCase
             'service' => new Reference('bar'),
         ];
         $this->assertEquals($expected, $container->getDefinition(AutowireNestedAttributes::class)->getArgument(0));
+    }
+
+    public function testLazyServiceAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', A::class)->setAutowired(true);
+        $container->register('foo', LazyServiceAttributeAutowiring::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $expected = new Reference('.lazy.'.A::class);
+        $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(0));
+    }
+
+    public function testLazyNotCompatibleWithAutowire()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', A::class)->setAutowired(true);
+        $container->register('foo', LazyAutowireServiceAttributesAutowiring::class)->setAutowired(true);
+
+        try {
+            (new AutowirePass())->process($container);
+        } catch (AutowiringFailedException $e) {
+            $this->assertSame('Using both attributes #[Lazy] and #[Autowire] on an argument is not allowed; use the "lazy" parameter of #[Autowire] instead.', $e->getMessage());
+        }
     }
 }

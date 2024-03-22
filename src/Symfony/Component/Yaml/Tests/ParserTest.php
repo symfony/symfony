@@ -650,25 +650,27 @@ YAML;
 
     public function testObjectsSupportDisabledWithExceptions()
     {
-        $this->expectException(ParseException::class);
         $yaml = <<<'EOF'
 foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
+
+        $this->expectException(ParseException::class);
 
         $this->parser->parse($yaml, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
     public function testMappingKeyInMultiLineStringThrowsException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Mapping values are not allowed in multi-line blocks at line 2 (near "dbal:wrong").');
-
         $yaml = <<<'EOF'
 data:
     dbal:wrong
         default_connection: monolith
 EOF;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Mapping values are not allowed in multi-line blocks at line 2 (near "dbal:wrong").');
+
         $this->parser->parse($yaml);
     }
 
@@ -707,7 +709,6 @@ EOF;
 
     public function testUnindentedCollectionException()
     {
-        $this->expectException(ParseException::class);
         $yaml = <<<'EOF'
 
 collection:
@@ -717,12 +718,13 @@ collection:
 
 EOF;
 
+        $this->expectException(ParseException::class);
+
         $this->parser->parse($yaml);
     }
 
     public function testShortcutKeyUnindentedCollectionException()
     {
-        $this->expectException(ParseException::class);
         $yaml = <<<'EOF'
 
 collection:
@@ -730,6 +732,8 @@ collection:
   foo: bar
 
 EOF;
+
+        $this->expectException(ParseException::class);
 
         $this->parser->parse($yaml);
     }
@@ -929,8 +933,6 @@ EOF
      */
     public function testMappingDuplicateKeyBlock()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Duplicate key "child" detected');
         $input = <<<'EOD'
 parent:
     child: first
@@ -939,28 +941,24 @@ parent:
     child: duplicate
     child: duplicate
 EOD;
-        $expected = [
-            'parent' => [
-                'child' => 'first',
-            ],
-        ];
-        $this->assertSame($expected, Yaml::parse($input));
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Duplicate key "child" detected');
+
+        Yaml::parse($input);
     }
 
     public function testMappingDuplicateKeyFlow()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Duplicate key "child" detected');
         $input = <<<'EOD'
 parent: { child: first, child: duplicate }
 parent: { child: duplicate, child: duplicate }
 EOD;
-        $expected = [
-            'parent' => [
-                'child' => 'first',
-            ],
-        ];
-        $this->assertSame($expected, Yaml::parse($input));
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Duplicate key "child" detected');
+
+        Yaml::parse($input);
     }
 
     /**
@@ -1202,25 +1200,27 @@ EOF;
 
     public function testFloatKeys()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Numeric keys are not supported. Quote your evaluable mapping keys instead');
         $yaml = <<<'EOF'
 foo:
     1.2: "bar"
     1.3: "baz"
 EOF;
 
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Numeric keys are not supported. Quote your evaluable mapping keys instead');
+
         $this->parser->parse($yaml);
     }
 
     public function testBooleanKeys()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Non-string keys are not supported. Quote your evaluable mapping keys instead');
         $yaml = <<<'EOF'
 true: foo
 false: bar
 EOF;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Non-string keys are not supported. Quote your evaluable mapping keys instead');
 
         $this->parser->parse($yaml);
     }
@@ -1252,11 +1252,12 @@ EOF;
 
     public function testColonInMappingValueException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('A colon cannot be used in an unquoted mapping value');
         $yaml = <<<'EOF'
 foo: bar: baz
 EOF;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('A colon cannot be used in an unquoted mapping value');
 
         $this->parser->parse($yaml);
     }
@@ -2347,21 +2348,20 @@ YAML
 
     public function testComplexMappingThrowsParseException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Complex mappings are not supported at line 1 (near "? "1"").');
         $yaml = <<<YAML
 ? "1"
 :
   name: végétalien
 YAML;
 
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Complex mappings are not supported at line 1 (near "? "1"").');
+
         $this->parser->parse($yaml);
     }
 
     public function testComplexMappingNestedInMappingThrowsParseException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Complex mappings are not supported at line 2 (near "? "1"").');
         $yaml = <<<YAML
 diet:
   ? "1"
@@ -2369,31 +2369,36 @@ diet:
     name: végétalien
 YAML;
 
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Complex mappings are not supported at line 2 (near "? "1"").');
+
         $this->parser->parse($yaml);
     }
 
     public function testComplexMappingNestedInSequenceThrowsParseException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Complex mappings are not supported at line 1 (near "- ? "1"").');
         $yaml = <<<YAML
 - ? "1"
   :
     name: végétalien
 YAML;
 
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Complex mappings are not supported at line 1 (near "- ? "1"").');
+
         $this->parser->parse($yaml);
     }
 
     public function testParsingIniThrowsException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 2 (near "  foo = bar").');
         $ini = <<<INI
 [parameters]
   foo = bar
   bar = %foo%
 INI;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unable to parse at line 2 (near "  foo = bar").');
 
         $this->parser->parse($ini);
     }
@@ -2440,8 +2445,6 @@ INI;
 
     public function testParserCleansUpReferencesBetweenRuns()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Reference "foo" does not exist at line 2');
         $yaml = <<<YAML
 foo: &foo
     baz: foobar
@@ -2454,6 +2457,10 @@ YAML;
 bar:
     <<: *foo
 YAML;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Reference "foo" does not exist at line 2');
+
         $this->parser->parse($yaml);
     }
 
@@ -2574,8 +2581,6 @@ YAML;
 
     public function testParsingNotReadableFilesThrowsException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessageMatches('#^File ".+/Fixtures/not_readable.yml" cannot be read\.$#');
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }
@@ -2586,6 +2591,9 @@ YAML;
 
         $file = __DIR__.'/Fixtures/not_readable.yml';
         chmod($file, 0200);
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessageMatches('#^File ".+/Fixtures/not_readable.yml" cannot be read\.$#');
 
         $this->parser->parseFile($file);
     }
@@ -2648,11 +2656,13 @@ YAML;
 
     public function testEvalRefException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Reference "foo" does not exist');
         $yaml = <<<EOE
 foo: { &foo { a: Steve, <<: *foo} }
 EOE;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Reference "foo" does not exist');
+
         $this->parser->parse($yaml);
     }
 

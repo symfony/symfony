@@ -23,22 +23,23 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
  * Warms up XML and YAML serializer metadata.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
+ *
+ * @final since Symfony 7.1
  */
 class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
 {
-    private array $loaders;
-
     /**
      * @param LoaderInterface[] $loaders      The serializer metadata loaders
      * @param string            $phpArrayFile The PHP file where metadata are cached
      */
-    public function __construct(array $loaders, string $phpArrayFile)
-    {
+    public function __construct(
+        private array $loaders,
+        string $phpArrayFile,
+    ) {
         parent::__construct($phpArrayFile);
-        $this->loaders = $loaders;
     }
 
-    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, string $buildDir = null): bool
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool
     {
         if (!$this->loaders) {
             return true;

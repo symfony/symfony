@@ -16,7 +16,6 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\Authentic
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
@@ -61,6 +60,7 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Flex\Command\InstallRecipesCommand;
 
 /**
  * SecurityExtension.
@@ -91,7 +91,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     public function load(array $configs, ContainerBuilder $container): void
     {
         if (!array_filter($configs)) {
-            throw new InvalidConfigurationException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
+            $hint = class_exists(InstallRecipesCommand::class) ? 'Try running "composer symfony:recipes:install symfony/security-bundle".' : 'Please define your settings for the "security" config section.';
+
+            throw new InvalidConfigurationException('The SecurityBundle is enabled but is not configured. '.$hint);
         }
 
         $mainConfig = $this->getConfiguration($configs, $container);
@@ -752,7 +754,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $config['algorithm'] = 'native';
                 $config['native_algorithm'] = \PASSWORD_ARGON2I;
             } else {
-                throw new InvalidConfigurationException(sprintf('Algorithm "argon2i" is not available. Either use "%s" or upgrade to PHP 7.2+ instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id", "auto' : 'auto'));
+                throw new InvalidConfigurationException(sprintf('Algorithm "argon2i" is not available; use "%s" instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id" or "auto' : 'auto'));
             }
 
             return $this->createHasher($config);
@@ -765,7 +767,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $config['algorithm'] = 'native';
                 $config['native_algorithm'] = \PASSWORD_ARGON2ID;
             } else {
-                throw new InvalidConfigurationException(sprintf('Algorithm "argon2id" is not available. Either use "%s", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
+                throw new InvalidConfigurationException(sprintf('Algorithm "argon2id" is not available; use "%s" or libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
             }
 
             return $this->createHasher($config);
@@ -917,7 +919,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->expressions[$id] = new Reference($id);
     }
 
-    private function createRequestMatcher(ContainerBuilder $container, string $path = null, string $host = null, int $port = null, array $methods = [], array $ips = null, array $attributes = []): Reference
+    private function createRequestMatcher(ContainerBuilder $container, ?string $path = null, ?string $host = null, ?int $port = null, array $methods = [], ?array $ips = null, array $attributes = []): Reference
     {
         if ($methods) {
             $methods = array_map('strtoupper', $methods);

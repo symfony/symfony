@@ -130,7 +130,6 @@ class PasswordHasherFactoryTest extends TestCase
 
     public function testGetInvalidNamedHasherForHasherAware()
     {
-        $this->expectException(\RuntimeException::class);
         $factory = new PasswordHasherFactory([
             HasherAwareUser::class => new MessageDigestPasswordHasher('sha1'),
             'hasher_name' => new MessageDigestPasswordHasher('sha256'),
@@ -138,6 +137,9 @@ class PasswordHasherFactoryTest extends TestCase
 
         $user = new HasherAwareUser();
         $user->hasherName = 'invalid_hasher_name';
+
+        $this->expectException(\RuntimeException::class);
+
         $factory->getPasswordHasher($user);
     }
 
@@ -171,6 +173,22 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo'), 'foo', null));
         $this->assertTrue($hasher->verify($digest->hash('foo'), 'foo', null));
         $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
+    }
+
+    public function testMissingClass()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"class" must be set in {"arguments":[]}');
+
+        (new PasswordHasherFactory([SomeUser::class => ['arguments' => []]]))->getPasswordHasher(SomeUser::class);
+    }
+
+    public function testMissingArguments()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"arguments" must be set in {"class":"stdClass"}');
+
+        (new PasswordHasherFactory([SomeUser::class => ['class' => \stdClass::class]]))->getPasswordHasher(SomeUser::class);
     }
 
     public function testDefaultMigratingHashers()

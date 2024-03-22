@@ -23,8 +23,6 @@ class_exists(Section::class);
  */
 class Stopwatch implements ResetInterface
 {
-    private bool $morePrecision;
-
     /**
      * @var Section[]
      */
@@ -38,9 +36,9 @@ class Stopwatch implements ResetInterface
     /**
      * @param bool $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
-    public function __construct(bool $morePrecision = false)
-    {
-        $this->morePrecision = $morePrecision;
+    public function __construct(
+        private bool $morePrecision = false,
+    ) {
         $this->reset();
     }
 
@@ -59,7 +57,7 @@ class Stopwatch implements ResetInterface
      *
      * @throws \LogicException When the section to re-open is not reachable
      */
-    public function openSection(string $id = null): void
+    public function openSection(?string $id = null): void
     {
         $current = end($this->activeSections);
 
@@ -96,7 +94,7 @@ class Stopwatch implements ResetInterface
     /**
      * Starts an event.
      */
-    public function start(string $name, string $category = null): StopwatchEvent
+    public function start(string $name, ?string $category = null): StopwatchEvent
     {
         return end($this->activeSections)->startEvent($name, $category);
     }

@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SmsmodeTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'test_from'): SmsmodeTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'test_from'): SmsmodeTransport
     {
         return new SmsmodeTransport('test_api_key', $from, $client ?? new MockHttpClient());
     }

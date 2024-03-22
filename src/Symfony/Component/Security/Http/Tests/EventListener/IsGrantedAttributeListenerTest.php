@@ -191,8 +191,6 @@ class IsGrantedAttributeListenerTest extends TestCase
 
     public function testExceptionWhenMissingSubjectAttribute()
     {
-        $this->expectException(\RuntimeException::class);
-
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $event = new ControllerArgumentsEvent(
@@ -204,6 +202,9 @@ class IsGrantedAttributeListenerTest extends TestCase
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
+
+        $this->expectException(\RuntimeException::class);
+
         $listener->onKernelControllerArguments($event);
     }
 
@@ -261,9 +262,6 @@ class IsGrantedAttributeListenerTest extends TestCase
 
     public function testNotFoundHttpException()
     {
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('Not found');
-
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->any())
             ->method('isGranted')
@@ -278,6 +276,10 @@ class IsGrantedAttributeListenerTest extends TestCase
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
+
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('Not found');
+
         $listener->onKernelControllerArguments($event);
     }
 
@@ -387,10 +389,6 @@ class IsGrantedAttributeListenerTest extends TestCase
 
     public function testHttpExceptionWithExceptionCode()
     {
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('Exception Code');
-        $this->expectExceptionCode(10010);
-
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->any())
             ->method('isGranted')
@@ -405,15 +403,16 @@ class IsGrantedAttributeListenerTest extends TestCase
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
+
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('Exception Code');
+        $this->expectExceptionCode(10010);
+
         $listener->onKernelControllerArguments($event);
     }
 
     public function testAccessDeniedExceptionWithExceptionCode()
     {
-        $this->expectException(AccessDeniedException::class);
-        $this->expectExceptionMessage('Exception Code');
-        $this->expectExceptionCode(10010);
-
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->any())
             ->method('isGranted')
@@ -428,6 +427,11 @@ class IsGrantedAttributeListenerTest extends TestCase
         );
 
         $listener = new IsGrantedAttributeListener($authChecker);
+
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Exception Code');
+        $this->expectExceptionCode(10010);
+
         $listener->onKernelControllerArguments($event);
     }
 }

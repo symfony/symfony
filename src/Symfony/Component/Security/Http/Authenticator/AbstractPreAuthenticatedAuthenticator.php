@@ -41,7 +41,7 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
     private string $firewallName;
     private ?LoggerInterface $logger;
 
-    public function __construct(UserProviderInterface $userProvider, TokenStorageInterface $tokenStorage, string $firewallName, LoggerInterface $logger = null)
+    public function __construct(UserProviderInterface $userProvider, TokenStorageInterface $tokenStorage, string $firewallName, ?LoggerInterface $logger = null)
     {
         $this->userProvider = $userProvider;
         $this->tokenStorage = $tokenStorage;

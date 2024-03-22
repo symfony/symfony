@@ -15,20 +15,11 @@ use Symfony\Component\Mime\Header\Headers;
 
 class PostmarkDeliveryEvent
 {
-    public const CODE_INACTIVE_RECIPIENT = 406;
-
-    private int $errorCode;
-
-    private Headers $headers;
-
-    private ?string $message;
-
-    public function __construct(string $message, int $errorCode)
-    {
-        $this->message = $message;
-        $this->errorCode = $errorCode;
-
-        $this->headers = new Headers();
+    public function __construct(
+        private readonly string $message,
+        private readonly int $errorCode,
+        private readonly Headers $headers,
+    ) {
     }
 
     public function getErrorCode(): int
@@ -41,7 +32,7 @@ class PostmarkDeliveryEvent
         return $this->headers;
     }
 
-    public function getMessage(): ?string
+    public function getMessage(): string
     {
         return $this->message;
     }
@@ -53,12 +44,5 @@ class PostmarkDeliveryEvent
         }
 
         return $this->headers->get('Message-ID')->getBodyAsString();
-    }
-
-    public function setHeaders(Headers $headers): self
-    {
-        $this->headers = $headers;
-
-        return $this;
     }
 }

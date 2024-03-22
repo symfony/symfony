@@ -20,7 +20,7 @@ final class ZendeskOptions implements MessageOptionsInterface
 {
     private ?string $priority;
 
-    public function __construct(string $priority = null)
+    public function __construct(?string $priority = null)
     {
         $this->priority = $priority;
     }

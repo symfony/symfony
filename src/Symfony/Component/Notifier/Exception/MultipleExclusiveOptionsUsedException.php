@@ -20,7 +20,7 @@ class MultipleExclusiveOptionsUsedException extends InvalidArgumentException
      * @param string[] $usedExclusiveOptions
      * @param string[] $exclusiveOptions
      */
-    public function __construct(array $usedExclusiveOptions, array $exclusiveOptions, \Throwable $previous = null)
+    public function __construct(array $usedExclusiveOptions, array $exclusiveOptions, ?\Throwable $previous = null)
     {
         $message = sprintf(
             'Multiple exclusive options have been used "%s". Only one of "%s" can be used.',

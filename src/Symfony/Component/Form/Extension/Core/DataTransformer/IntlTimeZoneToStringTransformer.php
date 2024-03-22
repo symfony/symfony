@@ -23,11 +23,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class IntlTimeZoneToStringTransformer implements DataTransformerInterface
 {
-    private bool $multiple;
-
-    public function __construct(bool $multiple = false)
-    {
-        $this->multiple = $multiple;
+    public function __construct(
+        private bool $multiple = false,
+    ) {
     }
 
     public function transform(mixed $intlTimeZone): mixed

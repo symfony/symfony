@@ -106,7 +106,7 @@ abstract class Constraint
      *                                       array, but getDefaultOption() returns
      *                                       null
      */
-    public function __construct(mixed $options = null, array $groups = null, mixed $payload = null)
+    public function __construct(mixed $options = null, ?array $groups = null, mixed $payload = null)
     {
         unset($this->groups); // enable lazy initialization
 
@@ -228,7 +228,7 @@ abstract class Constraint
             throw new \LogicException(sprintf('"%s::$groups" is set to null. Did you forget to call "%s::__construct()"?', static::class, self::class));
         }
 
-        if (\in_array(self::DEFAULT_GROUP, $this->groups) && !\in_array($group, $this->groups)) {
+        if (\in_array(self::DEFAULT_GROUP, $this->groups) && !\in_array($group, $this->groups, true)) {
             $this->groups[] = $group;
         }
     }

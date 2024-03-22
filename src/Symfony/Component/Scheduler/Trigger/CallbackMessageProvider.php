@@ -13,14 +13,14 @@ namespace Symfony\Component\Scheduler\Trigger;
 
 use Symfony\Component\Scheduler\Generator\MessageContext;
 
-final class CallbackMessageProvider implements MessageProviderInterface
+final class CallbackMessageProvider implements MessageProviderInterface, \Stringable
 {
     private \Closure $callback;
 
     /**
      * @param callable(MessageContext): iterable<object> $callback
      */
-    public function __construct(callable $callback, private string $id = '')
+    public function __construct(callable $callback, private string $id = '', private string $description = '')
     {
         $this->callback = $callback(...);
     }
@@ -33,5 +33,10 @@ final class CallbackMessageProvider implements MessageProviderInterface
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function __toString(): string
+    {
+        return $this->description ?: $this->id;
     }
 }

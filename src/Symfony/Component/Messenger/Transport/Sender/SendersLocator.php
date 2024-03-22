@@ -24,17 +24,14 @@ use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
  */
 class SendersLocator implements SendersLocatorInterface
 {
-    private array $sendersMap;
-    private ContainerInterface $sendersLocator;
-
     /**
      * @param array<string, list<string>> $sendersMap     An array, keyed by "type", set to an array of sender aliases
      * @param ContainerInterface          $sendersLocator Locator of senders, keyed by sender alias
      */
-    public function __construct(array $sendersMap, ContainerInterface $sendersLocator)
-    {
-        $this->sendersMap = $sendersMap;
-        $this->sendersLocator = $sendersLocator;
+    public function __construct(
+        private array $sendersMap,
+        private ContainerInterface $sendersLocator,
+    ) {
     }
 
     public function getSenders(Envelope $envelope): iterable

@@ -24,7 +24,7 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
     protected ?EventDispatcherInterface $dispatcher;
     protected ?HttpClientInterface $client;
 
-    public function __construct(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
+    public function __construct(?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
     {
         $this->dispatcher = $dispatcher;
         $this->client = $client;
@@ -32,7 +32,7 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
 
     public function supports(Dsn $dsn): bool
     {
-        return \in_array($dsn->getScheme(), $this->getSupportedSchemes());
+        return \in_array($dsn->getScheme(), $this->getSupportedSchemes(), true);
     }
 
     /**

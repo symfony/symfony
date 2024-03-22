@@ -59,15 +59,15 @@ class Workflow implements WorkflowInterface
 
     /**
      * When `null` fire all events (the default behaviour).
-     * Setting this to an empty array `[]` means no events are dispatched (except the Guard Event).
+     * Setting this to an empty array `[]` means no events are dispatched (except the {@see GuardEvent}).
      * Passing an array with WorkflowEvents will allow only those events to be dispatched plus
-     * the Guard Event.
+     * the {@see GuardEvent}.
      *
      * @var array|string[]|null
      */
     private ?array $eventsToDispatch = null;
 
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed', array $eventsToDispatch = null)
+    public function __construct(Definition $definition, ?MarkingStoreInterface $markingStore = null, ?EventDispatcherInterface $dispatcher = null, string $name = 'unnamed', ?array $eventsToDispatch = null)
     {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?? new MethodMarkingStore();

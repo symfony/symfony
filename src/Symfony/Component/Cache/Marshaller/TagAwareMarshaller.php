@@ -20,7 +20,7 @@ class TagAwareMarshaller implements MarshallerInterface
 {
     private MarshallerInterface $marshaller;
 
-    public function __construct(MarshallerInterface $marshaller = null)
+    public function __construct(?MarshallerInterface $marshaller = null)
     {
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
+ * Validates that a value is divisible by another value.
+ *
  * @author Colin O'Dell <colinodell@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]

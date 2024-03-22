@@ -411,10 +411,6 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
     public function testSubscribedServiceWithAttributes()
     {
-        if (!property_exists(SubscribedService::class, 'attributes')) {
-            $this->markTestSkipped('Requires symfony/service-contracts 3.2+');
-        }
-
         $container = new ContainerBuilder();
 
         $subscriber = new class() implements ServiceSubscriberInterface {
@@ -464,10 +460,6 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
     public function testLegacySubscribedServiceWithAttributes()
     {
-        if (!property_exists(SubscribedService::class, 'attributes')) {
-            $this->markTestSkipped('Requires symfony/service-contracts 3.2+');
-        }
-
         $container = new ContainerBuilder();
 
         $subscriber = new class() implements ServiceSubscriberInterface {

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-03-19T11:22:11Z
+
+This PR changes #39336 behavior. If it is okay the corresponding condition probably need to be removed. https://github.com/symfony/symfony/blob/e8fbd7d9883ed0fbb97b0db7a323ae47388290fd/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php#L103
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-03-19T11:24:07Z
+
+Isn't this issue prior to 7.0?

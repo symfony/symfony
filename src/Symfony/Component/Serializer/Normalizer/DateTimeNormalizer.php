@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Normalizes an object implementing the {@see \DateTimeInterface} to a date string.
@@ -104,7 +104,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
         }
 
         if (!\is_string($data) || '' === trim($data)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.', $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
+            throw NotNormalizableValueException::createForUnexpectedDataType('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.', $data, [Type::string()], $context['deserialization_path'] ?? null, true);
         }
 
         try {
@@ -122,7 +122,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
 
                 $dateTimeErrors = $type::getLastErrors();
 
-                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Parsing datetime string "%s" using format "%s" resulted in %d errors: ', $data, $dateTimeFormat, $dateTimeErrors['error_count'])."\n".implode("\n", $this->formatDateTimeErrors($dateTimeErrors['errors'])), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
+                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Parsing datetime string "%s" using format "%s" resulted in %d errors: ', $data, $dateTimeFormat, $dateTimeErrors['error_count'])."\n".implode("\n", $this->formatDateTimeErrors($dateTimeErrors['errors'])), $data, [Type::string()], $context['deserialization_path'] ?? null, true);
             }
 
             $defaultDateTimeFormat = $this->defaultContext[self::FORMAT_KEY] ?? null;
@@ -137,7 +137,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
         } catch (NotNormalizableValueException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
+            throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [Type::string()], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
         }
     }
 

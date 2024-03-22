@@ -28,6 +28,8 @@ use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use Symfony\Component\PropertyInfo\PhpStan\NameScope;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
 
 /**
  * Transforms a php doc tag value to a {@link Type} instance.
@@ -81,13 +83,22 @@ final class PhpStanTypeHelper
 
         if (null !== $firstTypeIndex && null !== $nullableTypeIndex) {
             $firstType = $types[$firstTypeIndex];
+
+            $collectionKeyTypes = [];
+            $collectionValueTypes = [];
+
+            if ($firstType->internalType instanceof CollectionType && $firstType->internalType->getType() instanceof GenericType) {
+                $collectionKeyTypes = $firstType->getCollectionKeyTypes();
+                $collectionValueTypes = $firstType->getCollectionValueTypes();
+            }
+
             $types[$firstTypeIndex] = new Type(
                 $firstType->getBuiltinType(),
                 true,
                 $firstType->getClassName(),
                 $firstType->isCollection(),
-                $firstType->getCollectionKeyTypes(),
-                $firstType->getCollectionValueTypes()
+                $collectionKeyTypes,
+                $collectionValueTypes,
             );
             unset($types[$nullableTypeIndex]);
         }
@@ -125,8 +136,15 @@ final class PhpStanTypeHelper
                 return [$mainType];
             }
 
-            $collectionKeyTypes = $mainType->getCollectionKeyTypes();
+            $collectionKeyTypes = [];
+            $collectionValueTypes = [];
+
+            if ($mainType->internalType instanceof CollectionType && $mainType->internalType->getType() instanceof GenericType) {
+                $collectionKeyTypes = $mainType->getCollectionKeyTypes();
+            }
+
             $collectionKeyValues = [];
+
             if (1 === \count($node->genericTypes)) {
                 foreach ($this->extractTypes($node->genericTypes[0], $nameScope) as $subType) {
                     $collectionKeyValues[] = $subType;

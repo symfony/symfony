@@ -11,6 +11,11 @@ Cache
 
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter` instead
 
+DoctrineBridge
+--------------
+
+ * The `DoctrineExtractor::getTypes()` method is deprecated, use `DoctrineExtractor::getType()` instead
+
 ExpressionLanguage
 ------------------
 
@@ -26,6 +31,11 @@ Messenger
 ---------
 
  * Make `#[AsMessageHandler]` final
+
+PropertyInfo
+------------
+
+ * The `PropertyTypeExtractorInterface::getTypes()` method is deprecated, use `PropertyTypeExtractorInterface::getType()` instead
 
 SecurityBundle
 --------------

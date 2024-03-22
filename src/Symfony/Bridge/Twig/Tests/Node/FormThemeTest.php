@@ -60,10 +60,18 @@ class FormThemeTest extends TestCase
         $this->registerTwigRuntimeLoader($environment, $formRenderer);
         $compiler = new Compiler($environment);
 
+        // There's a different result when testing in Symfony 4 with PHP 8.2 + high-deps
+        // This workaround is used to deal with the difference.
+        $source = '[1 => "tpl1", 0 => "tpl2"]';
+        if ('["tpl1", "tpl2"]' === (new Compiler($environment))->subcompile($node->getNode('resources'))->getSource()) {
+            $source = '["tpl1", "tpl2"]';
+        }
+
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], true);',
-                $this->getVariableGetter('form')
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, %s, true);',
+                $this->getVariableGetter('form'),
+                $source
             ),
             trim($compiler->compile($node)->getSource())
         );
@@ -72,8 +80,9 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], false);',
-                $this->getVariableGetter('form')
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, %s, false);',
+                $this->getVariableGetter('form'),
+                $source
             ),
             trim($compiler->compile($node)->getSource())
         );

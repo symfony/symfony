@@ -42,7 +42,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 }
             }
             if (!preg_match('/^(?:[-.\w\\\\]*+:)*+\w*+$/', $env)) {
-                throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
+                throw new InvalidArgumentException(sprintf('The given env var name "%s" contains invalid characters (allowed characters: letters, digits, hyphens, backslashes and colons).', $name));
             }
             if ($this->has($name) && null !== ($defaultValue = parent::get($name)) && !\is_string($defaultValue)) {
                 throw new RuntimeException(sprintf('The default value of an env() parameter must be a string or null, but "%s" given to "%s".', get_debug_type($defaultValue), $name));

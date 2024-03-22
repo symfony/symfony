@@ -192,7 +192,7 @@ final class EntityValueResolver implements ValueResolverInterface
         return $criteria;
     }
 
-    private function findViaExpression(ObjectManager $manager, Request $request, MapEntity $options): ?object
+    private function findViaExpression(ObjectManager $manager, Request $request, MapEntity $options): object|iterable|null
     {
         if (!$this->expressionLanguage) {
             throw new \LogicException(sprintf('You cannot use the "%s" if the ExpressionLanguage component is not available. Try running "composer require symfony/expression-language".', __CLASS__));

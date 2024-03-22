@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Allow `EntityValueResolver` to return a list of entities
+
 7.0
 ---
 

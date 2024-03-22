@@ -114,11 +114,11 @@ acme_root:
         # which should be indented
         child3:               ~ # Example: 'example setting'
     scalar_prototyped:    []
-    variable:
+    variable:             ~
 
         # Examples:
-        - foo
-        - bar
+        # - foo
+        # - bar
     parameters:
 
         # Prototype: Parameter name
@@ -142,6 +142,11 @@ acme_root:
 
         # Prototype
         name:                 []
+    array_with_array_example_and_no_default_value: []
+
+        # Examples:
+        # - foo
+        # - bar
     custom_node:          true
 
 EOL;

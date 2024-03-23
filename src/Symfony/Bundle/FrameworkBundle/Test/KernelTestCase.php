@@ -25,6 +25,7 @@ use Symfony\Contracts\Service\ResetInterface;
 abstract class KernelTestCase extends TestCase
 {
     use MailerAssertionsTrait;
+    use MessengerAssertionsTrait;
     use NotificationAssertionsTrait;
 
     protected static ?string $class = null;

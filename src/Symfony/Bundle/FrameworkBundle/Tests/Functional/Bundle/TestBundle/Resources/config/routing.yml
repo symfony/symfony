@@ -72,3 +72,7 @@ uid:
 send_notification:
     path:     /send_notification
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\NotificationController::indexAction }
+
+send_messenger_message:
+    path:     /send_messenger_message
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\MessengerController::indexAction }

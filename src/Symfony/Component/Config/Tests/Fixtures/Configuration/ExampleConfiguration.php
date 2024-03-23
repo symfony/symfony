@@ -96,6 +96,9 @@ class ExampleConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('array_with_array_example_and_no_default_value')
+                    ->example(['foo', 'bar'])
+                ->end()
                 ->append(new CustomNodeDefinition('acme'))
             ->end()
         ;

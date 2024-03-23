@@ -30,7 +30,7 @@ class Foo
     public static int $counter = 0;
 
     #[Required]
-    public function cloneFoo(\stdClass $bar = null): static
+    public function cloneFoo(?\stdClass $bar = null): static
     {
         ++self::$counter;
 

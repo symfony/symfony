@@ -22,11 +22,6 @@ FrameworkBundle
 
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
 
-Messenger
----------
-
- * Make `#[AsMessageHandler]` final
-
 SecurityBundle
 --------------
 

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-03-21T12:54:20Z
+
+The list of autoconfigured attributes is in [`FrameworkExtension`](https://github.com/symfony/symfony/blob/7.1/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L663)
+
+- [x] `AsEventListener`
+- [x] `AsController`
+- [x] `AsRemoteEventConsumer`
+- [x] `AsMessageHandler`
+- [x] `AsTargetedValueResolver`
+- [x] `AsSchedule`
+- [x] `AsPeriodicTask`
+- [x] `AsCronTask`
+- [x] `Workflow\Attribute\AsAnnounceListener`
+- [x] `Workflow\Attribute\AsCompletedListener`
+- [x] `Workflow\Attribute\AsEnterListener`
+- [x] `Workflow\Attribute\AsEnteredListener`
+- [x] `Workflow\Attribute\AsGuardListener`
+- [x] `Workflow\Attribute\AsLeaveListener`
+- [x] `Workflow\Attribute\AsTransitionListener`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-03-22T09:14:52Z
+
+The use case for `AsMessageHandler` makes sense to me (see linked issue) so I'd be fine reverting the change that made it final, likely for another PR.
+For the rest of the attributes I'll let other mergers chime in, but to me all of them feel ok-ish to extend.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-03-22T10:17:34Z
+
+It will be also possible to remove the handling for all the `Workflow` attributes, since it duplicates `AsEventListener` handler.
+https://github.com/symfony/symfony/blob/bff8e0889497f5e722681efda730d1f078848427/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1108-L1129
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-03-22T13:30:56Z
+
+All the [internal attributes](https://github.com/symfony/symfony/pull/54365#issuecomment-2012212477) can be extended and we already have an [internal use-case with Workflow attributes](https://github.com/symfony/symfony/pull/54365#issuecomment-2014772039).
+
+Ready for review.

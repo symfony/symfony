@@ -72,8 +72,9 @@ abstract class FileLoader extends Loader
      */
     public function import($resource, ?string $type = null, bool $ignoreErrors = false, ?string $sourceResource = null, $exclude = null)
     {
-        if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
+        if (\is_string($resource) && !class_exists($resource)) {
             $excluded = [];
+            $isGlobPattern = \strlen($resource) !== strcspn($resource, '*?{[');
             foreach ((array) $exclude as $pattern) {
                 foreach ($this->glob($pattern, true, $_, false, true) as $path => $info) {
                     // normalize Windows slashes and remove trailing slashes
@@ -81,17 +82,26 @@ abstract class FileLoader extends Loader
                 }
             }
 
-            $ret = [];
-            $isSubpath = 0 !== $i && str_contains(substr($resource, 0, $i), '/');
-            foreach ($this->glob($resource, false, $_, $ignoreErrors || !$isSubpath, false, $excluded) as $path => $info) {
-                if (null !== $res = $this->doImport($path, 'glob' === $type ? null : $type, $ignoreErrors, $sourceResource)) {
-                    $ret[] = $res;
-                }
-                $isSubpath = true;
+            if (!$isGlobPattern && \count($excluded) > 0) {
+                $resource = rtrim(str_replace('\\', '/', $resource), '/');
+                $resource .= '/**/*';
+                $isGlobPattern = true;
             }
 
-            if ($isSubpath) {
-                return isset($ret[1]) ? $ret : ($ret[0] ?? null);
+            if ($isGlobPattern && !str_contains($resource, "\n")) {
+                $ret = [];
+                $i = strcspn($resource, '*?{[');
+                $isSubpath = 0 !== $i && str_contains(substr($resource, 0, $i), '/');
+                foreach ($this->glob($resource, false, $_, $ignoreErrors || !$isSubpath, false, $excluded) as $path => $info) {
+                    if (null !== $res = $this->doImport($path, 'glob' === $type ? null : $type, $ignoreErrors, $sourceResource)) {
+                        $ret[] = $res;
+                    }
+                    $isSubpath = true;
+                }
+
+                if ($isSubpath) {
+                    return isset($ret[1]) ? $ret : ($ret[0] ?? null);
+                }
             }
         }
 

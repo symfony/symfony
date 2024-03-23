@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 
+use Relay\Exception as RelayException;
 use Relay\Relay;
 use Relay\Sentinel;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
@@ -132,7 +133,7 @@ class Connection
                             if ($address = $sentinel->getMasterAddrByName($sentinelMaster)) {
                                 [$host, $port] = $address;
                             }
-                        } catch (\RedisException|\Relay\Exception $redisException) {
+                        } catch (\RedisException|RelayException $redisException) {
                         }
                     } while (++$hostIndex < \count($hosts) && !$address);
 
@@ -337,7 +338,7 @@ class Connection
             // This could soon be optimized with https://github.com/antirez/redis/issues/5212 or
             // https://github.com/antirez/redis/issues/6256
             $pendingMessages = $this->getRedis()->xpending($this->stream, $this->group, '-', '+', 1);
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|RelayException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -366,7 +367,7 @@ class Connection
                 );
 
                 $this->couldHavePendingMessages = true;
-            } catch (\RedisException|\Relay\Exception $e) {
+            } catch (\RedisException|RelayException $e) {
                 throw new TransportException($e->getMessage(), 0, $e);
             }
         }
@@ -425,7 +426,7 @@ class Connection
                 1,
                 1
             );
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|RelayException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -463,7 +464,7 @@ class Connection
             if ($this->deleteAfterAck) {
                 $acknowledged = $redis->xdel($this->stream, [$id]);
             }
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|RelayException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -484,7 +485,7 @@ class Connection
             if ($this->deleteAfterReject) {
                 $deleted = $redis->xdel($this->stream, [$id]) && $deleted;
             }
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|RelayException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -547,7 +548,7 @@ class Connection
 
                 $id = $added;
             }
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|RelayException $e) {
             if ($error = $redis->getLastError() ?: null) {
                 $redis->clearLastError();
             }
@@ -570,7 +571,7 @@ class Connection
 
         try {
             $redis->xgroup('CREATE', $this->stream, $this->group, 0, true);
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|RelayException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -668,7 +669,7 @@ class Connection
             } else {
                 $result = $redis->rawCommand($command, $this->queue, ...$arguments);
             }
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|RelayException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 

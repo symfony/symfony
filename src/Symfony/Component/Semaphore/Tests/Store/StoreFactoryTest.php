@@ -12,6 +12,7 @@
 namespace Symfony\Component\Semaphore\Tests\Store;
 
 use PHPUnit\Framework\TestCase;
+use Predis\Client;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Semaphore\Store\RedisStore;
 use Symfony\Component\Semaphore\Store\StoreFactory;
@@ -54,11 +55,11 @@ class StoreFactoryTest extends TestCase
 
     public function testCreatePredisStore()
     {
-        if (!class_exists(\Predis\Client::class)) {
+        if (!class_exists(Client::class)) {
             $this->markTestSkipped();
         }
 
-        $store = StoreFactory::createStore(new \Predis\Client());
+        $store = StoreFactory::createStore(new Client());
 
         $this->assertInstanceOf(RedisStore::class, $store);
     }

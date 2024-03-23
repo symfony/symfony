@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
+use Predis\Client;
+
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
@@ -18,7 +20,7 @@ class PredisStoreTest extends AbstractRedisStoreTestCase
 {
     public static function setUpBeforeClass(): void
     {
-        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
+        $redis = new Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
         try {
             $redis->connect();
         } catch (\Exception $e) {
@@ -26,9 +28,9 @@ class PredisStoreTest extends AbstractRedisStoreTestCase
         }
     }
 
-    protected function getRedisConnection(): \Predis\Client
+    protected function getRedisConnection(): Client
     {
-        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
+        $redis = new Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
         $redis->connect();
 
         return $redis;

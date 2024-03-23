@@ -32,6 +32,7 @@ return (new PhpCsFixer\Config())
         'header_comment' => ['header' => $fileHeaderComment],
         'nullable_type_declaration' => true,
         'trailing_comma_in_multiline' => ['elements' => ['arrays', 'match', 'parameters']],
+        'fully_qualified_strict_types' => ['import_symbols' => true],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
+use Predis\ClientInterface;
 use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
@@ -30,7 +31,7 @@ class StoreFactory
             case $connection instanceof Relay:
             case $connection instanceof \RedisArray:
             case $connection instanceof \RedisCluster:
-            case $connection instanceof \Predis\ClientInterface:
+            case $connection instanceof ClientInterface:
                 return new RedisStore($connection);
 
             case !\is_string($connection):

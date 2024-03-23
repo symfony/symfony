@@ -24,6 +24,11 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists(\PHPUnit\TextUI\Comman
     return;
 }
 
+// Detect if we're under PHPUnit 10 (not compatible yet!)
+if (class_exists(\PHPUnit\Event\Event::class)) {
+    return;
+}
+
 // Enforce a consistent locale
 setlocale(\LC_ALL, 'C');
 

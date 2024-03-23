@@ -130,7 +130,16 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
                 ->scalarNode('base_template_class')->example('Twig\Template')->cannotBeEmpty()->end()
-                ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
+                ->scalarNode('cache')
+                    ->validate()
+                        ->ifTrue(fn ($v) => !\is_bool($v))
+                        ->then(function ($v) {
+                            trigger_deprecation('symfony/twig-bundle', '7.1', 'Setting the "twig.cache" configuration option to a string is deprecated. It will only accept boolean values to enable or disable the cache in version 8.0.');
+
+                            return $v;
+                        })
+                    ->end()
+                ->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->booleanNode('strict_variables')->defaultValue('%kernel.debug%')->end()

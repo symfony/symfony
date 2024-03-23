@@ -12,7 +12,6 @@ $container->loadFromExtension('twig', [
     ],
     'auto_reload' => true,
     'base_template_class' => 'stdClass',
-    'cache' => '/tmp',
     'charset' => 'ISO-8859-1',
     'debug' => true,
     'strict_variables' => true,

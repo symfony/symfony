@@ -1104,29 +1104,6 @@ class FrameworkExtension extends Extension
                 $container->setParameter('workflow.has_guard_listeners', true);
             }
         }
-
-        $listenerAttributes = [
-            Workflow\Attribute\AsAnnounceListener::class,
-            Workflow\Attribute\AsCompletedListener::class,
-            Workflow\Attribute\AsEnterListener::class,
-            Workflow\Attribute\AsEnteredListener::class,
-            Workflow\Attribute\AsGuardListener::class,
-            Workflow\Attribute\AsLeaveListener::class,
-            Workflow\Attribute\AsTransitionListener::class,
-        ];
-
-        foreach ($listenerAttributes as $attribute) {
-            $container->registerAttributeForAutoconfiguration($attribute, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
-                $tagAttributes = get_object_vars($attribute);
-                if ($reflector instanceof \ReflectionMethod) {
-                    if (isset($tagAttributes['method'])) {
-                        throw new LogicException(sprintf('"%s" attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
-                    }
-                    $tagAttributes['method'] = $reflector->getName();
-                }
-                $definition->addTag('kernel.event_listener', $tagAttributes);
-            });
-        }
     }
 
     private function registerDebugConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

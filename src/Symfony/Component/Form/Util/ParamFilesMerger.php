@@ -67,7 +67,7 @@ class ParamFilesMerger
             return true;
         }
 
-        if (!\is_array($value)) {
+        if (!\is_array($value) || !\in_array(\count($value), [5, 6], true)) {
             return false;
         }
 
@@ -78,7 +78,7 @@ class ParamFilesMerger
         $keys = array_keys($value);
         sort($keys);
 
-        return $keys === ['error', 'name', 'size', 'tmp_name', 'type'];
+        return ['error', 'name', 'size', 'tmp_name', 'type'] === $keys;
     }
 
     private static function doesNotContainNonFileUploadArray(array $array): bool

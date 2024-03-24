@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @author Priyadi Iman Nurcahyo <priyadi@rekalogika.com>
+ *
+ * @internal
  */
 class ParamFilesMerger
 {
@@ -23,7 +25,7 @@ class ParamFilesMerger
     private array $files;
 
     /**
-     * @param array $path   The path to the current element, empty means the root
+     * @param array $path The path to the current element, empty means the root
      * @param array $params The parameters
      * @param array $files  The files
      */
@@ -46,15 +48,13 @@ class ParamFilesMerger
                 return $filesValue; // if the array is a file upload field, it has the precedence
             } elseif (\is_array($filesValue)) {
                 return $this->getResultArray($paramsValue, $filesValue);
-            } else { // $filesValue has a non-array value
-                return $paramsValue; // params has the precedence
             }
+            return $paramsValue; // params has the precedence
         } else { // $paramsValue has a non-array value
             if (self::isFileUpload($filesValue)) {
                 return $filesValue; // if the array is a file upload field, it has the precedence
-            } else {
-                return $paramsValue;
             }
+            return $paramsValue;
         }
     }
 
@@ -71,13 +71,17 @@ class ParamFilesMerger
             return false;
         }
 
+        if (\array_key_exists('full_path', $value)) {
+            unset($value['full_path']);
+        }
+
         $keys = array_keys($value);
         sort($keys);
 
         return $keys === ['error', 'name', 'size', 'tmp_name', 'type'];
     }
 
-    private static function doesNotContainArrayOrFileUpload(array $array): bool
+    private static function doesNotContainNonFileUploadArray(array $array): bool
     {
         foreach ($array as $value) {
             if (\is_array($value) && !self::isFileUpload($value)) {
@@ -93,9 +97,9 @@ class ParamFilesMerger
         // if both are lists and both does not contains array, then merge them and return
         if (
             array_is_list($paramsValue)
-            && self::doesNotContainArrayOrFileUpload($paramsValue)
+            && self::doesNotContainNonFileUploadArray($paramsValue)
             && array_is_list($filesValue)
-            && self::doesNotContainArrayOrFileUpload($filesValue)
+            && self::doesNotContainNonFileUploadArray($filesValue)
         ) {
             return array_merge($paramsValue, $filesValue);
         }
@@ -129,9 +133,7 @@ class ParamFilesMerger
         $params = $this->params;
 
         foreach ($this->path as $key) {
-            $params = $params[$key] ?? null;
-
-            if (null === $params) {
+            if (null === $params = $params[$key] ?? null) {
                 return null;
             }
         }
@@ -147,9 +149,7 @@ class ParamFilesMerger
         $files = $this->files;
 
         foreach ($this->path as $key) {
-            $files = $files[$key] ?? null;
-
-            if (null === $files) {
+            if (null === $files = $files[$key] ?? null) {
                 return null;
             }
         }

@@ -51,12 +51,7 @@
         "symfony/validator": "^6.4|^7.0",
         "symfony/yaml": "^6.4|^7.0",
         "twig/twig": "^3.0.4",
-        "web-token/jwt-checker": "^3.1",
-        "web-token/jwt-signature-algorithm-hmac": "^3.1",
-        "web-token/jwt-signature-algorithm-ecdsa": "^3.1",
-        "web-token/jwt-signature-algorithm-rsa": "^3.1",
-        "web-token/jwt-signature-algorithm-eddsa": "^3.1",
-        "web-token/jwt-signature-algorithm-none": "^3.1"
+        "web-token/jwt-library": "^3.3.2"
     },
     "conflict": {
         "symfony/browser-kit": "<6.4",

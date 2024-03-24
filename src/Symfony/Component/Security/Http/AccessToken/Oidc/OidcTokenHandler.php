@@ -16,6 +16,7 @@ use Jose\Component\Checker\ClaimCheckerManager;
 use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
@@ -38,14 +39,22 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     use OidcTrait;
 
     public function __construct(
-        private Algorithm $signatureAlgorithm,
-        private JWK $jwk,
+        private Algorithm|AlgorithmManager $signatureAlgorithm,
+        private JWK|JWKSet $jwkset,
         private string $audience,
         private array $issuers,
         private string $claim = 'sub',
         private ?LoggerInterface $logger = null,
         private ClockInterface $clock = new Clock(),
     ) {
+        if ($signatureAlgorithm instanceof Algorithm) {
+            trigger_deprecation('symfony/security-http', '7.1', 'First argument must be instance of %s, %s given.', AlgorithmManager::class, Algorithm::class);
+            $this->signatureAlgorithm = new AlgorithmManager([$signatureAlgorithm]);
+        }
+        if ($jwkset instanceof JWK) {
+            trigger_deprecation('symfony/security-http', '7.1', 'Second argument must be instance of %s, %s given.', JWKSet::class, JWK::class);
+            $this->jwkset = new JWKSet([$jwkset]);
+        }
     }
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
@@ -56,19 +65,19 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
         try {
             // Decode the token
-            $jwsVerifier = new JWSVerifier(new AlgorithmManager([$this->signatureAlgorithm]));
+            $jwsVerifier = new JWSVerifier($this->signatureAlgorithm);
             $serializerManager = new JWSSerializerManager([new CompactSerializer()]);
             $jws = $serializerManager->unserialize($accessToken);
             $claims = json_decode($jws->getPayload(), true);
 
             // Verify the signature
-            if (!$jwsVerifier->verifyWithKey($jws, $this->jwk, 0)) {
+            if (!$jwsVerifier->verifyWithKeySet($jws, $this->jwkset, 0)) {
                 throw new InvalidSignatureException();
             }
 
             // Verify the headers
             $headerCheckerManager = new Checker\HeaderCheckerManager([
-                new Checker\AlgorithmChecker([$this->signatureAlgorithm->name()]),
+                new Checker\AlgorithmChecker($this->signatureAlgorithm->list()),
             ], [
                 new JWSTokenSupport(),
             ]);

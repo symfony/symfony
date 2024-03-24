@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Mark class `ExpressionCacheWarmer` as `final`
+ * Support multiple signature algorithms for OIDC Token
+ * Support JWK or JWKSet for OIDC Token
 
 7.0
 ---

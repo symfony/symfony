@@ -25,7 +25,7 @@ class ParamFilesMerger
     private array $files;
 
     /**
-     * @param array $path The path to the current element, empty means the root
+     * @param array $path   The path to the current element, empty means the root
      * @param array $params The parameters
      * @param array $files  The files
      */
@@ -49,11 +49,13 @@ class ParamFilesMerger
             } elseif (\is_array($filesValue)) {
                 return $this->getResultArray($paramsValue, $filesValue);
             }
+
             return $paramsValue; // params has the precedence
         } else { // $paramsValue has a non-array value
             if (self::isFileUpload($filesValue)) {
                 return $filesValue; // if the array is a file upload field, it has the precedence
             }
+
             return $paramsValue;
         }
     }

@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=8.2",
+        "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/http-foundation": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/polyfill-mbstring": "~1.0",
@@ -35,8 +36,7 @@
         "symfony/security-csrf": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",
         "psr/log": "^1|^2|^3",
-        "web-token/jwt-checker": "^3.1",
-        "web-token/jwt-signature-algorithm-ecdsa": "^3.1"
+        "web-token/jwt-library": "^3.3.2"
     },
     "conflict": {
         "symfony/clock": "<6.4",

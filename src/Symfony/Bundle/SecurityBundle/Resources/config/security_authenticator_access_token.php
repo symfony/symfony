@@ -11,12 +11,19 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Jose\Component\Core\Algorithm;
+use Jose\Component\Core\AlgorithmManager;
+use Jose\Component\Core\AlgorithmManagerFactory;
 use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\Algorithm\ES384;
 use Jose\Component\Signature\Algorithm\ES512;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SignatureAlgorithmFactory;
+use Jose\Component\Signature\Algorithm\PS256;
+use Jose\Component\Signature\Algorithm\PS384;
+use Jose\Component\Signature\Algorithm\PS512;
+use Jose\Component\Signature\Algorithm\RS256;
+use Jose\Component\Signature\Algorithm\RS384;
+use Jose\Component\Signature\Algorithm\RS512;
 use Symfony\Component\Security\Http\AccessToken\ChainAccessTokenExtractor;
 use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
 use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
@@ -77,28 +84,56 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.access_token_handler.oidc.jwk', JWK::class)
             ->abstract()
+            ->deprecate('symfony/security-http', '7.1', 'The "%service_id%" service is deprecated. Please use "security.access_token_handler.oidc.jwkset" instead')
             ->factory([JWK::class, 'createFromJson'])
             ->args([
                 abstract_arg('signature key'),
             ])
 
-        ->set('security.access_token_handler.oidc.signature', Algorithm::class)
+        ->set('security.access_token_handler.oidc.jwkset', JWKSet::class)
             ->abstract()
-            ->factory([SignatureAlgorithmFactory::class, 'create'])
+            ->factory([JWKSet::class, 'createFromJson'])
             ->args([
-                abstract_arg('signature algorithm'),
+                abstract_arg('signature keyset'),
+            ])
+
+        ->set('security.access_token_handler.oidc.algorithm_manager_factory', AlgorithmManagerFactory::class)
+            ->args([
+                tagged_iterator('security.access_token_handler.oidc.signature_algorithm'),
+            ])
+
+        ->set('security.access_token_handler.oidc.signature', AlgorithmManager::class)
+            ->abstract()
+            ->factory([service('security.access_token_handler.oidc.algorithm_manager_factory'), 'create'])
+            ->args([
+                abstract_arg('signature algorithms'),
             ])
 
         ->set('security.access_token_handler.oidc.signature.ES256', ES256::class)
-            ->parent('security.access_token_handler.oidc.signature')
-            ->args(['index_0' => 'ES256'])
+            ->tag('security.access_token_handler.oidc.signature_algorithm')
 
         ->set('security.access_token_handler.oidc.signature.ES384', ES384::class)
-            ->parent('security.access_token_handler.oidc.signature')
-            ->args(['index_0' => 'ES384'])
+            ->tag('security.access_token_handler.oidc.signature_algorithm')
 
         ->set('security.access_token_handler.oidc.signature.ES512', ES512::class)
-            ->parent('security.access_token_handler.oidc.signature')
-            ->args(['index_0' => 'ES512'])
+            ->tag('security.access_token_handler.oidc.signature_algorithm')
+
+        ->set('security.access_token_handler.oidc.signature.RS256', RS256::class)
+            ->tag('security.access_token_handler.oidc.signature_algorithm')
+
+        ->set('security.access_token_handler.oidc.signature.RS384', RS384::class)
+            ->tag('security.access_token_handler.oidc.signature_algorithm')
+
+        ->set('security.access_token_handler.oidc.signature.RS512', RS512::class)
+            ->tag('security.access_token_handler.oidc.signature_algorithm')
+
+        ->set('security.access_token_handler.oidc.signature.PS256', PS256::class)
+            ->tag('security.access_token_handler.oidc.signature_algorithm')
+
+        ->set('security.access_token_handler.oidc.signature.PS384', PS384::class)
+            ->tag('security.access_token_handler.oidc.signature_algorithm')
+
+        ->set('security.access_token_handler.oidc.signature.PS512', PS512::class)
+            ->tag('security.access_token_handler.oidc.signature_algorithm')
     ;
 };

@@ -25,9 +25,7 @@ class ParamFilesMerger
     private array $files;
 
     /**
-     * @param array $path   The path to the current element, empty means the root
-     * @param array $params The parameters
-     * @param array $files  The files
+     * @param array $path The path to the current element, empty means the root
      */
     public function __construct(array $path, array $params, array $files)
     {

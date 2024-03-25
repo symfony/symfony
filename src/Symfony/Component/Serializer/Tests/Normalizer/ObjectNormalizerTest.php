@@ -31,6 +31,8 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -282,7 +284,7 @@ class ObjectNormalizerTest extends TestCase
         ];
 
         $normalizer = new ObjectNormalizer();
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], null, $normalizer);
         $normalizer->setSerializer($serializer);
 
         $obj = $normalizer->denormalize($data, DummyWithConstructorObject::class);
@@ -301,7 +303,7 @@ class ObjectNormalizerTest extends TestCase
         ];
 
         $normalizer = new ObjectNormalizer();
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], null, $normalizer);
         $normalizer->setSerializer($serializer);
 
         $obj = $normalizer->denormalize($data, DummyWithNullableConstructorObject::class);
@@ -321,7 +323,7 @@ class ObjectNormalizerTest extends TestCase
         ];
 
         $normalizer = new ObjectNormalizer();
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], null, $normalizer);
         $normalizer->setSerializer($serializer);
 
         $this->expectException(RuntimeException::class);
@@ -336,7 +338,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $normalizer = new ObjectNormalizer();
         // instantiate a serializer with the normalizer to handle normalizing recursive structures
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer);
 
         return $normalizer;
     }
@@ -345,7 +347,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor());
-        new Serializer([$normalizer]);
+        new Serializer([], [], null, $normalizer);
 
         return $normalizer;
     }
@@ -358,7 +360,7 @@ class ObjectNormalizerTest extends TestCase
     public function testAttributesContextDenormalizeConstructor()
     {
         $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], null, $normalizer);
 
         $objectInner = new ObjectInner();
         $objectInner->bar = 'bar';
@@ -376,8 +378,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->normalizer = new ObjectNormalizer($classMetadataFactory);
-        $serializer = new Serializer([$this->normalizer]);
-        $this->normalizer->setSerializer($serializer);
+        $serializer = new Serializer([], [], new ChainNormalizer([$this->normalizer]));
 
         $dummy = new ObjectOuter();
         $dummy->foo = new ObjectInner();
@@ -420,7 +421,7 @@ class ObjectNormalizerTest extends TestCase
     protected function getNormalizerForCircularReference(array $defaultContext): ObjectNormalizer
     {
         $normalizer = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer);
 
         return $normalizer;
     }
@@ -432,9 +433,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testSiblingReference()
     {
-        $serializer = new Serializer([$this->normalizer]);
-        $this->normalizer->setSerializer($serializer);
-
+        $serializer = new Serializer([], [], new ChainNormalizer([$this->normalizer]));
         $siblingHolder = new SiblingHolder();
 
         $expected = [
@@ -451,8 +450,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $denormalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
-        $serializer = new Serializer([$denormalizer]);
-        $denormalizer->setSerializer($serializer);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([$denormalizer]));
 
         return $denormalizer;
     }
@@ -464,7 +462,7 @@ class ObjectNormalizerTest extends TestCase
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory);
         // instantiate a serializer with the normalizer to handle normalizing recursive structures
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer);
 
         return $normalizer;
     }
@@ -543,7 +541,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $normalizer = new ObjectNormalizer();
         // instantiate a serializer with the normalizer to handle normalizing recursive structures
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer);
 
         return $normalizer;
     }
@@ -552,7 +550,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor());
-        new Serializer([$normalizer]);
+        new Serializer([], [], null, $normalizer);
 
         return $normalizer;
     }
@@ -563,7 +561,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory);
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer);
         $normalizer->setSerializer($serializer);
 
         return $normalizer;
@@ -575,7 +573,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new PhpDocExtractor());
-        new Serializer([$normalizer]);
+        new Serializer([], [], $normalizer, $normalizer);
 
         return $normalizer;
     }
@@ -629,7 +627,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
-        new Serializer([new ArrayDenormalizer(), $normalizer]);
+        new Serializer([], [], null, new ChainDenormalizer([new ArrayDenormalizer(), $normalizer]));
 
         return $normalizer;
     }
@@ -699,7 +697,8 @@ class ObjectNormalizerTest extends TestCase
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
-        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+        $chainDenormalizer = new ChainDenormalizer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+        $serializer = new Serializer([], [], null, $chainDenormalizer);
 
         $obj = $serializer->denormalize([
             'inner' => ['foo' => 'foo', 'bar' => 'bar'],
@@ -718,7 +717,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
-        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]));
 
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'json')->number);
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'jsonld')->number);
@@ -732,7 +731,7 @@ class ObjectNormalizerTest extends TestCase
 
         $extractor = new PropertyInfoExtractor([], [new PhpStanExtractor(), new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
-        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]));
 
         $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], (new class() {
             /** @var self::*|null */
@@ -757,7 +756,7 @@ class ObjectNormalizerTest extends TestCase
         $propertyTypeExtractor = new PropertyInfoExtractor([], [new ReflectionExtractor()], [], [], []);
         $objectNormalizer = new ObjectNormalizer(null, null, null, $propertyTypeExtractor);
 
-        $serializer = new Serializer([$objectNormalizer]);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([$objectNormalizer]));
 
         // when denormalizing some data into an object where an attribute uses the false pseudo type
         /** @var Php80Dummy $object */

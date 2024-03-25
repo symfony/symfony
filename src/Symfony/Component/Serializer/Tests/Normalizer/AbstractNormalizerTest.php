@@ -24,6 +24,8 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -191,8 +193,7 @@ class AbstractNormalizerTest extends TestCase
         $d2->qux = 'QUZ';
         $obj = new VariadicConstructorTypedArgsDummy($d1, $d2);
 
-        $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
-        $normalizer->setSerializer($serializer);
+        $serializer = new Serializer([], [new JsonEncoder()], new ChainNormalizer([$normalizer]), new ChainDenormalizer([$normalizer]));
         $data = $serializer->serialize($obj, 'json');
         $dummy = $normalizer->denormalize(json_decode($data, true), VariadicConstructorTypedArgsDummy::class);
         $this->assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
@@ -227,8 +228,8 @@ class AbstractNormalizerTest extends TestCase
         $arr = ['d1' => $d1, 'd2' => $d2];
         $obj = new VariadicConstructorTypedArgsDummy(...$arr);
 
-        $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
-        $normalizer->setSerializer($serializer);
+        $serializer = new Serializer([], [new JsonEncoder()], new ChainNormalizer([$normalizer]), new ChainDenormalizer([$normalizer]));
+
         $this->assertEquals(
             '{"foo":{"d1":{"foo":"Foo","bar":"Bar","baz":"Baz","qux":"Quz"},"d2":{"foo":"FOO","bar":"BAR","baz":"BAZ","qux":"QUZ"}}}',
             $data = $serializer->serialize($obj, 'json')
@@ -260,7 +261,7 @@ class AbstractNormalizerTest extends TestCase
         ];
 
         $normalizer = new ObjectNormalizer();
-        $normalizer->setSerializer(new Serializer([$normalizer]));
+        new Serializer([], [], $normalizer, $normalizer);
 
         $expected = new DummyWithWithVariadicParameterConstructor('woo', 1, new Dummy(), new Dummy());
         $actual = $normalizer->denormalize($data, DummyWithWithVariadicParameterConstructor::class);

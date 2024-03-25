@@ -38,6 +38,8 @@ use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -531,8 +533,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
         $normalizer = new AbstractObjectNormalizerDummy($factory, null, new PhpDocExtractor(), $discriminatorResolver);
-        $serializer = new Serializer([$normalizer]);
-        $normalizer->setSerializer($serializer);
+        $serializer = new Serializer([], [], null, $normalizer);
         $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'baz' => 'baz', 'quux' => ['value' => 'quux'], 'type' => 'second'], AbstractDummy::class);
 
         $this->assertInstanceOf(DummySecondChildQuux::class, $normalizedData->quux);
@@ -566,8 +567,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
         $normalizer = new AbstractObjectNormalizerDummy($factory, null, new PhpDocExtractor(), $discriminatorResolver);
-        $serializer = new Serializer([$normalizer]);
-        $normalizer->setSerializer($serializer);
+        $serializer = new Serializer([], [], null, $normalizer);
 
         $data = [
             'foo' => 'foo',
@@ -731,7 +731,7 @@ class AbstractObjectNormalizerTest extends TestCase
     {
         $extractor = new ReflectionExtractor();
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], null, $normalizer);
 
         $obj = $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
 
@@ -744,7 +744,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
-        $serializer = new Serializer([new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'd-m-Y']), $normalizer]);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'd-m-Y']), $normalizer]));
 
         /** @var ObjectDummyWithContextAttribute $obj */
         $obj = $serializer->denormalize(['property_with_serialized_name' => '01-02-2022', 'propertyWithoutSerializedName' => '01-02-2022'], ObjectDummyWithContextAttribute::class);
@@ -758,7 +758,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
-        $serializer = new Serializer([new DateTimeNormalizer(), $normalizer]);
+        $serializer = new Serializer([], [], new ChainNormalizer([new DateTimeNormalizer(), $normalizer]));
 
         $obj = new ObjectDummyWithContextAttributeAndSerializedPath(new \DateTimeImmutable('22-02-2023'));
 
@@ -773,7 +773,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer);
 
         $obj = new ObjectDummyWithContextAttributeSkipNullValues();
 
@@ -797,7 +797,7 @@ class AbstractObjectNormalizerTest extends TestCase
             }
         };
 
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], new ChainNormalizer([$normalizer]));
         $serializer->normalize($object);
 
         $this->assertSame('called', $object->bar);
@@ -805,13 +805,15 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeUnionOfEnums()
     {
-        $serializer = new Serializer([
+        $normalizers = [
             new BackedEnumNormalizer(),
             new ObjectNormalizer(
                 classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()),
                 propertyTypeExtractor: new PropertyInfoExtractor([], [new ReflectionExtractor()]),
             ),
-        ]);
+        ];
+
+        $serializer = new Serializer([], [], new ChainNormalizer($normalizers), new ChainDenormalizer($normalizers));
 
         $normalized = $serializer->normalize(new DummyWithEnumUnion(EnumA::A));
         $this->assertEquals(new DummyWithEnumUnion(EnumA::A), $serializer->denormalize($normalized, DummyWithEnumUnion::class));
@@ -899,7 +901,8 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeUntypedFormat()
     {
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $denormalizer = new ChainDenormalizer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $serializer = new Serializer([], [], null, $denormalizer);
         $actual = $serializer->denormalize(['value' => ''], DummyWithObjectOrNull::class, 'xml');
 
         $this->assertEquals(new DummyWithObjectOrNull(null), $actual);
@@ -907,21 +910,26 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeUntypedFormatNotNormalizable()
     {
+        $denormalizer = new ChainDenormalizer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $serializer = new Serializer([], [], null, $denormalizer);
+
         $this->expectException(NotNormalizableValueException::class);
-        $serializer = new Serializer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
         $serializer->denormalize(['value' => 'test'], DummyWithNotNormalizable::class, 'xml');
     }
 
     public function testDenormalizeUntypedFormatMissingArg()
     {
+        $denormalizer = new ChainDenormalizer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $serializer = new Serializer([], [], null, $denormalizer);
+
         $this->expectException(MissingConstructorArgumentsException::class);
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
         $serializer->denormalize(['value' => 'invalid'], DummyWithObjectOrNull::class, 'xml');
     }
 
     public function testDenormalizeUntypedFormatScalar()
     {
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $denormalizer = new ChainDenormalizer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $serializer = new Serializer([], [], null, $denormalizer);
         $actual = $serializer->denormalize(['value' => 'false'], DummyWithObjectOrBool::class, 'xml');
 
         $this->assertEquals(new DummyWithObjectOrBool(false), $actual);
@@ -929,7 +937,8 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeUntypedStringObject()
     {
-        $serializer = new Serializer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $denormalizer = new ChainDenormalizer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $serializer = new Serializer([], [], null, $denormalizer);
         $actual = $serializer->denormalize(['value' => ''], DummyWithStringObject::class, 'xml');
 
         $this->assertEquals(new DummyWithStringObject(new DummyString()), $actual);
@@ -965,7 +974,7 @@ class AbstractObjectNormalizerTest extends TestCase
             }
         };
 
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer, $normalizer);
 
         $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded', 'iri' => '/dummy/1']);
         $firstChildContextCacheKey = $normalizer->childContextCacheKey;
@@ -1005,7 +1014,7 @@ class AbstractObjectNormalizerTest extends TestCase
             }
         };
 
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer, $normalizer);
         $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded', 'iri' => '/dummy/1']);
 
         $this->assertSame('hardcoded-foo', $normalizer->childContextCacheKey);
@@ -1040,7 +1049,7 @@ class AbstractObjectNormalizerTest extends TestCase
             }
         };
 
-        $serializer = new Serializer([$normalizer]);
+        $serializer = new Serializer([], [], $normalizer, $normalizer);
         $serializer->normalize($foobar, null, ['cache_key' => false]);
 
         $this->assertFalse($normalizer->childContextCacheKey);

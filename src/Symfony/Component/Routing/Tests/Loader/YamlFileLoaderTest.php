@@ -117,7 +117,7 @@ class YamlFileLoaderTest extends TestCase
             $this->assertSame('\d+', $route->getRequirement('foo'));
             $this->assertSame('bar', $route->getOption('foo'));
             $this->assertSame('', $route->getHost());
-            $this->assertSame('context.getMethod() == "POST"', $route->getCondition());
+            $this->assertSame('(context.getMethod() == "GET") and (context.getMethod() == "POST")', $route->getCondition());
         }
     }
 

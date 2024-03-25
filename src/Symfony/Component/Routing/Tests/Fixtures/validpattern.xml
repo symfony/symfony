@@ -14,5 +14,7 @@
         <condition>context.getMethod() == "GET"</condition>
     </route>
 
-    <route id="blog_show_inherited" path="/blog/{slug}" />
+    <route id="blog_show_inherited" path="/blog/{slug}">
+        <condition>context.getMethod() == "GET"</condition>
+    </route>
 </routes>

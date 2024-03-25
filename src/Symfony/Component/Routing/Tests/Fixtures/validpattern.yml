@@ -11,3 +11,4 @@ blog_show:
 
 blog_show_inherited:
     path:      /blog/{slug}
+    condition:    'context.getMethod() == "GET"'

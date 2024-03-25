@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Psr\Log\LogLevel;
 use Seld\JsonLint\JsonParser;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\AccessToken\CredentialsInterface;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
@@ -156,6 +157,7 @@ class Configuration implements ConfigurationInterface
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
+        $this->addAccessTokenSection($rootNode, $enableIfStandalone);
         $this->addAssetsSection($rootNode, $enableIfStandalone);
         $this->addAssetMapperSection($rootNode, $enableIfStandalone);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
@@ -714,6 +716,40 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->beforeNormalization()->castToArray()->end()
                                 ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addAccessTokenSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('access_token')
+                    ->info('access token manager configuration')
+                    ->{$enableIfStandalone('symfony/access-token', CredentialsInterface::class)}()
+                    ->canBeEnabled()
+                    ->children()
+                        ->arrayNode('lock')
+                            ->canBeDisabled()
+                            ->children()
+                                ->scalarNode('ttl')
+                                    ->info('The lock TTL value in seconds')
+                                    ->defaultValue(5)
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('credentials')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('url')
+                                        ->info('The URL of the credentials, scheme will determine which implementation to use')
+                                    ->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()

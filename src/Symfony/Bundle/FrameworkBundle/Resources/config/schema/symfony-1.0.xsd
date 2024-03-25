@@ -9,6 +9,7 @@
 
     <xsd:complexType name="config">
         <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="access-token" type="access-token" minOccurs="0" maxOccurs="1" />
             <xsd:element name="assets" type="assets" minOccurs="0" maxOccurs="1" />
             <xsd:element name="asset-mapper" type="asset_mapper" minOccurs="0" maxOccurs="1" />
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
@@ -185,6 +186,25 @@
         <xsd:attribute name="version-format" type="xsd:string" />
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
         <xsd:attribute name="strict-mode" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="access-token">
+        <xsd:sequence>
+            <xsd:element name="credentials" type="access-token-credentials" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="lock" type="access-token-lock" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="access-token-lock">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="ttl" type="xsd:integer" />
+    </xsd:complexType>
+
+    <xsd:complexType name="access-token-credentials">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="url" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="asset_mapper">

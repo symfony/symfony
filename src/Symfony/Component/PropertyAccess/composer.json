@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "symfony/property-info": "^6.4|^7.0"
+        "symfony/property-info": "^6.4|^7.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
         "symfony/cache": "^6.4|^7.0"

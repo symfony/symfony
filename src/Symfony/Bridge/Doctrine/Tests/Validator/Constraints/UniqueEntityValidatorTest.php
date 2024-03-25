@@ -174,6 +174,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->atPath('property.path.name')
             ->setParameter('{{ value }}', '"Foo"')
+            ->setParameter('{{ name }}', '"Foo"')
             ->setInvalidValue($entity2)
             ->setCause([$entity1])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
@@ -207,6 +208,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->atPath('property.path.bar')
             ->setParameter('{{ value }}', '"Foo"')
+            ->setParameter('{{ name }}', '"Foo"')
             ->setInvalidValue($entity2)
             ->setCause([$entity1])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
@@ -267,6 +269,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->atPath('property.path.name')
             ->setParameter('{{ value }}', '"Foo"')
+            ->setParameter('{{ name }}', '"Foo"')
+            ->setParameter('{{ name2 }}', '')
             ->setInvalidValue('Foo')
             ->setCause([$entity1])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
@@ -373,6 +377,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->atPath('property.path.name2')
             ->setParameter('{{ value }}', '"Bar"')
+            ->setParameter('{{ name }}', '"Foo"')
+            ->setParameter('{{ name2 }}', '"Bar"')
             ->setInvalidValue('Bar')
             ->setCause([$entity1])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
@@ -512,6 +518,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->atPath('property.path.single')
             ->setParameter('{{ value }}', 'foo')
+            ->setParameter('{{ single }}', 'foo')
             ->setInvalidValue($entity1)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->setCause([$associated, $associated2])
@@ -550,6 +557,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->atPath('property.path.single')
             ->setParameter('{{ value }}', $expectedValue)
+            ->setParameter('{{ single }}', $expectedValue)
             ->setInvalidValue($entity1)
             ->setCause([$associated, $associated2])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
@@ -609,6 +617,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->atPath('property.path.phoneNumbers')
             ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ phoneNumbers }}', 'array')
             ->setInvalidValue([123])
             ->setCause([$entity1])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
@@ -715,7 +724,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->setInvalidValue('Foo')
             ->setCode('23bd9dbf-6b9b-41cd-a99e-4844bcf3077f')
             ->setCause([$entity1])
-            ->setParameters(['{{ value }}' => '"Foo"'])
+            ->setParameters(['{{ value }}' => '"Foo"', '{{ name }}' => '"Foo"'])
             ->assertRaised();
     }
 
@@ -760,11 +769,14 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($newEntity, $constraint);
 
-        $expectedValue = 'object("Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity") identified by (id => 1)';
+        $expectedValueForObjectOne = 'object("Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity") identified by (id => 1)';
+        $expectedValueForObjectTwo = 'object("Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity") identified by (id => 2)';
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.objectOne')
-            ->setParameter('{{ value }}', $expectedValue)
+            ->setParameter('{{ value }}', $expectedValueForObjectOne)
+            ->setParameter('{{ objectOne }}', $expectedValueForObjectOne)
+            ->setParameter('{{ objectTwo }}', $expectedValueForObjectTwo)
             ->setInvalidValue($objectOne)
             ->setCause([$entity])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
@@ -793,6 +805,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->atPath('property.path.name')
             ->setParameter('{{ value }}', $expectedValue)
+            ->setParameter('{{ name }}', $expectedValue)
             ->setInvalidValue($existingEntity->name)
             ->setCause([$existingEntity])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
@@ -829,6 +842,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->atPath('property.path.name')
             ->setParameter('{{ value }}', '"Foo"')
+            ->setParameter('{{ name }}', '"Foo"')
             ->setInvalidValue($entity2)
             ->setCause([$entity1])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `EntityValidationListener` to allow auto validation of entities on flush
+
 7.0
 ---
 

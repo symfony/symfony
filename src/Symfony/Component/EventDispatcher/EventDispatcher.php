@@ -34,12 +34,14 @@ class EventDispatcher implements EventDispatcherInterface
     private array $listeners = [];
     private array $sorted = [];
     private array $optimized;
+    private array $deprecated;
 
-    public function __construct()
+    public function __construct(array $deprecated = [])
     {
         if (__CLASS__ === static::class) {
             $this->optimized = [];
         }
+        $this->deprecated = $deprecated;
     }
 
     public function dispatch(object $event, ?string $eventName = null): object
@@ -125,6 +127,10 @@ class EventDispatcher implements EventDispatcherInterface
 
     public function addListener(string $eventName, callable|array $listener, int $priority = 0): void
     {
+        if (isset($this->deprecated[$eventName])) {
+            trigger_deprecation(...array_values($this->deprecated[$eventName]));
+        }
+
         $this->listeners[$eventName][$priority][] = $listener;
         unset($this->sorted[$eventName], $this->optimized[$eventName]);
     }

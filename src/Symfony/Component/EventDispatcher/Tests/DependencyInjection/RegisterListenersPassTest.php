@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
@@ -22,6 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\CustomEvent;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedInvokableListener;
@@ -29,6 +31,8 @@ use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedMultiListener;
 
 class RegisterListenersPassTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * Tests that event subscribers not implementing EventSubscriberInterface
      * trigger an exception.
@@ -502,6 +506,26 @@ class RegisterListenersPassTest extends TestCase
             ],
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testEventDeprecations()
+    {
+        $container = new ContainerBuilder();
+        $pass = new RegisterListenersPass();
+        $pass->addDeprecatedEvent('event', 'symfony/event-dispatcher', '7.1', 'Event is deprecated');
+
+        $container->addCompilerPass($pass);
+        $container->register('event_dispatcher', EventDispatcher::class);
+        $container->register('listener', Event::class)
+            ->setPublic(true)
+            ->addTag('kernel.event_listener', ['event' => 'event'])
+        ;
+
+        $this->expectDeprecation('Since symfony/event-dispatcher 7.1: Event is deprecated');
+        $container->compile();
     }
 }
 

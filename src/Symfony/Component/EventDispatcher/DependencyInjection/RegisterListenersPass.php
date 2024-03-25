@@ -27,6 +27,7 @@ class RegisterListenersPass implements CompilerPassInterface
 {
     private array $hotPathEvents = [];
     private array $noPreloadEvents = [];
+    private array $deprecatedEvents = [];
 
     /**
      * @return $this
@@ -44,6 +45,13 @@ class RegisterListenersPass implements CompilerPassInterface
     public function setNoPreloadEvents(array $noPreloadEvents): static
     {
         $this->noPreloadEvents = array_flip($noPreloadEvents);
+
+        return $this;
+    }
+
+    public function addDeprecatedEvent(string $event, string $package, string $version, string $message, mixed ...$args): static
+    {
+        $this->deprecatedEvents[$event] = ['package' => $package, 'version' => $version, 'message' => $message, 'args' => $args];
 
         return $this;
     }
@@ -107,6 +115,10 @@ class RegisterListenersPass implements CompilerPassInterface
                 } elseif (isset($this->noPreloadEvents[$event['event']])) {
                     ++$noPreload;
                 }
+
+                if (isset($this->deprecatedEvents[$event['event']])) {
+                    trigger_deprecation(...array_values($this->deprecatedEvents[$event['event']]));
+                }
             }
 
             if ($noPreload && \count($events) === $noPreload) {
@@ -157,6 +169,10 @@ class RegisterListenersPass implements CompilerPassInterface
                     $container->getDefinition($id)->addTag('container.hot_path');
                 } elseif (isset($this->noPreloadEvents[$args[0]])) {
                     ++$noPreload;
+                }
+
+                if (isset($this->deprecatedEvents[$args[0]])) {
+                    trigger_deprecation(...array_values($this->deprecatedEvents[$args[0]]));
                 }
             }
             if ($noPreload && \count($extractingDispatcher->listeners) === $noPreload) {

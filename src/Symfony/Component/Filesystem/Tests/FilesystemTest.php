@@ -174,11 +174,6 @@ class FilesystemTest extends FilesystemTestCase
         $finder = new PhpExecutableFinder();
         $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', '127.0.0.1:8057']));
         $process->setWorkingDirectory(__DIR__.'/Fixtures/web');
-
-        register_shutdown_function(static function () use ($process) {
-            $process->stop();
-        });
-
         $process->start();
 
         do {
@@ -195,6 +190,8 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFileExists($targetFilePath);
         $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
+
+        $process->stop();
     }
 
     public function testMkdirCreatesDirectoriesRecursively()

@@ -165,7 +165,9 @@ class DataPartTest extends TestCase
             new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'logo_symfony_header.png', 'filename' => 'logo_symfony_header.png'])
         ), $p->getPreparedHeaders());
 
+        var_dump(get_debug_type(@fopen('http://127.0.0.1:8057', 'r')));
         $process->stop();
+        var_dump(get_debug_type(@fopen('http://127.0.0.1:8057', 'r')));
     }
 
     public function testHasContentId()

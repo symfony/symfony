@@ -83,34 +83,67 @@ class InputOptionTest extends TestCase
         $this->assertFalse($option->acceptValue(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
         $this->assertFalse($option->isValueRequired(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
         $this->assertFalse($option->isValueOptional(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
+        $this->assertFalse($option->isDeprecated(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        $this->assertFalse($option->isHidden(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
 
         $option = new InputOption('foo', 'f', null);
         $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
         $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
         $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        $this->assertFalse($option->isDeprecated(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        $this->assertFalse($option->isHidden(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
         $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
         $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
         $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        $this->assertFalse($option->isDeprecated(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        $this->assertFalse($option->isHidden(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_REQUIRED);
         $this->assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
         $this->assertTrue($option->isValueRequired(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
         $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
+        $this->assertFalse($option->isDeprecated(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
+        $this->assertFalse($option->isHidden(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL);
         $this->assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
         $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
         $this->assertTrue($option->isValueOptional(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+        $this->assertFalse($option->isDeprecated(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+        $this->assertFalse($option->isHidden(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+
+        $option = new InputOption('foo', 'f', InputOption::DEPRECATED);
+        $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::DEPRECATED" as its mode');
+        $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::DEPRECATED" as its mode');
+        $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::DEPRECATED" as its mode');
+        $this->assertTrue($option->isDeprecated(), '__construct() can take "InputOption::HIDDEN" as its mode');
+        $this->assertFalse($option->isHidden(), '__construct() can take "InputOption::HIDDEN" as its mode');
+
+        $option = new InputOption('foo', 'f', InputOption::HIDDEN);
+        $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::HIDDEN" as its mode');
+        $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::HIDDEN" as its mode');
+        $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::HIDDEN" as its mode');
+        $this->assertFalse($option->isDeprecated(), '__construct() can take "InputOption::HIDDEN" as its mode');
+        $this->assertTrue($option->isHidden(), '__construct() can take "InputOption::HIDDEN" as its mode');
     }
 
-    public function testInvalidModes()
+    /**
+     * @dataProvider privideInvalidModeData
+     */
+    public function testInvalidMode(?int $mode, string $message)
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Option mode "-1" is not valid.');
+        $this->expectExceptionMessage($message);
 
-        new InputOption('foo', 'f', '-1');
+        new InputOption('foo', 'f', $mode);
+    }
+
+    public static function privideInvalidModeData()
+    {
+        yield 'negative mode' => [-1, 'Option mode "-1" is not valid.'];
+        yield 'invalid bit mask value' => [InputOption::HIDDEN << 1, sprintf('Option mode "%d" is not valid.', InputOption::HIDDEN << 1)];
     }
 
     public function testEmptyNameIsInvalid()

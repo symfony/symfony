@@ -51,6 +51,7 @@ class OutputFormatterTest extends TestCase
         $this->assertTrue($formatter->hasStyle('info'));
         $this->assertTrue($formatter->hasStyle('comment'));
         $this->assertTrue($formatter->hasStyle('question'));
+        $this->assertTrue($formatter->hasStyle('text_error'));
 
         $this->assertEquals(
             "\033[37;41msome error\033[39;49m",
@@ -67,6 +68,10 @@ class OutputFormatterTest extends TestCase
         $this->assertEquals(
             "\033[30;46msome question\033[39;49m",
             $formatter->format('<question>some question</question>')
+        );
+        $this->assertEquals(
+            "\033[31msome text_error\033[39m",
+            $formatter->format('<text_error>some text_error</text_error>')
         );
     }
 
@@ -236,6 +241,7 @@ class OutputFormatterTest extends TestCase
         $formatter = new OutputFormatter(false);
 
         $this->assertTrue($formatter->hasStyle('error'));
+        $this->assertTrue($formatter->hasStyle('text_error'));
         $this->assertTrue($formatter->hasStyle('info'));
         $this->assertTrue($formatter->hasStyle('comment'));
         $this->assertTrue($formatter->hasStyle('question'));
@@ -292,6 +298,7 @@ class OutputFormatterTest extends TestCase
     {
         return [
             ['<error>some error</error>', 'some error', "\033[37;41msome error\033[39;49m"],
+            ['<text_error>some error</text_error>', 'some error', "\033[31msome error\033[39m"],
             ['<info>some info</info>', 'some info', "\033[32msome info\033[39m"],
             ['<comment>some comment</comment>', 'some comment', "\033[33msome comment\033[39m"],
             ['<question>some question</question>', 'some question', "\033[30;46msome question\033[39;49m"],

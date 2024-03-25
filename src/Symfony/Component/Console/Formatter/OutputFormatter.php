@@ -74,6 +74,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         $this->setStyle('info', new OutputFormatterStyle('green'));
         $this->setStyle('comment', new OutputFormatterStyle('yellow'));
         $this->setStyle('question', new OutputFormatterStyle('black', 'cyan'));
+        $this->setStyle('text_error', new OutputFormatterStyle('red'));
 
         foreach ($styles as $name => $style) {
             $this->setStyle($name, $style);

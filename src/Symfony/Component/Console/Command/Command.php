@@ -235,7 +235,8 @@ class Command
 
         // bind the input against the command specific arguments/options
         try {
-            $input->bind($this->getDefinition());
+            $inputDefinition = $this->getDefinition();
+            $input->bind($inputDefinition);
         } catch (ExceptionInterface $e) {
             if (!$this->ignoreValidationErrors) {
                 throw $e;
@@ -272,6 +273,10 @@ class Command
         }
 
         $input->validate();
+
+        if (isset($inputDefinition)) {
+            $this->printDeprecationMessages($inputDefinition, $input, $output);
+        }
 
         if ($this->code) {
             $statusCode = ($this->code)($input, $output);
@@ -646,6 +651,28 @@ class Command
         }
 
         return $this->helperSet->get($name);
+    }
+
+    private function printDeprecationMessages(InputDefinition $inputDefinition, InputInterface $input, OutputInterface $output): void
+    {
+        $deprecationMessages = [];
+        foreach ($inputDefinition->getOptions() as $inputOption) {
+            if ($inputOption->isDeprecated()) {
+                try {
+                    $optionName = $inputOption->getName();
+                    $optionValue = $input->getOption($optionName);
+                    if (isset($optionValue) && $optionValue !== $inputOption->getDefault()) {
+                        $deprecationMessages[] = sprintf('The option "--%s" is deprecated.', $optionName);
+                    }
+                } catch (\InvalidArgumentException $exception) {
+                    // option not used, ignore
+                }
+            }
+        }
+        if (!empty($deprecationMessages)) {
+            $formatter = $this->getHelper('formatter');
+            $output->writeln($formatter->formatBlock($deprecationMessages, 'fg=black;bg=yellow', true));
+        }
     }
 
     /**

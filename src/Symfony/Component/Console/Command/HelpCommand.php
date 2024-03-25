@@ -37,6 +37,7 @@ class HelpCommand extends Command
                 new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help', fn () => array_keys((new ApplicationDescription($this->getApplication()))->getCommands())),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt', fn () => (new DescriptorHelper())->getFormats()),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
+                new InputOption('show-hidden-options', null, InputOption::VALUE_NONE | InputOption::HIDDEN, 'Show hidden options'),
             ])
             ->setDescription('Display help for a command')
             ->setHelp(<<<'EOF'
@@ -67,6 +68,7 @@ EOF
         $helper->describe($output, $this->command, [
             'format' => $input->getOption('format'),
             'raw_text' => $input->getOption('raw'),
+            'show-hidden-options' => $input->getOption('show-hidden-options'),
         ]);
 
         unset($this->command);

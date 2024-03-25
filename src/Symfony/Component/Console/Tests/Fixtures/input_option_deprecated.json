@@ -1,0 +1,10 @@
+{
+  "name": "--option_name",
+  "shortcut": "-o",
+  "accept_value": "",
+  "is_value_required": "",
+  "is_multiple": "",
+  "is_deprecated": "1",
+  "description": "deprecated option description",
+  "default": ""
+}

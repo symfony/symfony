@@ -1,0 +1,1 @@
+<text_error>-o, --option_name</text_error>  deprecated option description

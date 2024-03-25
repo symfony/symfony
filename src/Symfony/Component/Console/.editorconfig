@@ -1,0 +1,7 @@
+; Unix-style newlines
+[Tests/Fixtures/*.{json,md,rst,txt}]
+trim_trailing_whitespace = false
+
+[Tests/Fixtures/*.xml]
+trim_trailing_whitespace = false
+indent_size = 2

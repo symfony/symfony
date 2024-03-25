@@ -70,6 +70,7 @@ class MarkdownDescriptor extends Descriptor
             .'* Accept value: '.($option->acceptValue() ? 'yes' : 'no')."\n"
             .'* Is value required: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
             .'* Is multiple: '.($option->isArray() ? 'yes' : 'no')."\n"
+            .($option->isDeprecated() ? ('* Is deprecated: yes'."\n") : '')
             .'* Is negatable: '.($option->isNegatable() ? 'yes' : 'no')."\n"
             .'* Default: `'.str_replace("\n", '', var_export($option->getDefault(), true)).'`'
         );
@@ -81,19 +82,20 @@ class MarkdownDescriptor extends Descriptor
             $this->write('### Arguments');
             foreach ($definition->getArguments() as $argument) {
                 $this->write("\n\n");
-                $this->describeInputArgument($argument);
+                $this->describeInputArgument($argument, $options);
             }
         }
 
-        if (\count($definition->getOptions()) > 0) {
+        $inputOptions = $this->removeHiddenOptions($definition->getOptions(), $options);
+        if (!empty($inputOptions)) {
             if ($showArguments) {
                 $this->write("\n\n");
             }
 
             $this->write('### Options');
-            foreach ($definition->getOptions() as $option) {
+            foreach ($inputOptions as $option) {
                 $this->write("\n\n");
-                $this->describeInputOption($option);
+                $this->describeInputOption($option, $options);
             }
         }
     }
@@ -128,9 +130,9 @@ class MarkdownDescriptor extends Descriptor
         }
 
         $definition = $command->getDefinition();
-        if ($definition->getOptions() || $definition->getArguments()) {
+        if ($this->removeHiddenOptions($definition->getOptions(), $options) || $definition->getArguments()) {
             $this->write("\n\n");
-            $this->describeInputDefinition($definition);
+            $this->describeInputDefinition($definition, $options);
         }
     }
 

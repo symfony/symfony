@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand5;
 
 abstract class AbstractDescriptorTestCase extends TestCase
 {
@@ -43,6 +44,13 @@ abstract class AbstractDescriptorTestCase extends TestCase
     public function testDescribeCommand(Command $command, $expectedDescription)
     {
         $this->assertDescription($expectedDescription, $command);
+    }
+
+    public function testDescribeCommandWithHiddenOptions()
+    {
+        [$command, $expectedDescription] = static::getDescriptionTestData(['command_5_with_hidden_options' => new DescriptorCommand5()])[0];
+
+        $this->assertDescription($expectedDescription, $command, ['show-hidden-options' =>true]);
     }
 
     /** @dataProvider getDescribeApplicationTestData */

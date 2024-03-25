@@ -1,0 +1,11 @@
+<comment>Description:</comment>
+  command 5 description
+
+<comment>Usage:</comment>
+  descriptor:command5 [options]
+
+<comment>Options:</comment>
+  <text_error>-y, --deprecated_option</text_error>  
+
+<comment>Help:</comment>
+  command 5 help

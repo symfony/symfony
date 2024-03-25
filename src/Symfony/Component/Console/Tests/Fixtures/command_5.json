@@ -1,0 +1,25 @@
+{
+    "name": "descriptor:command5",
+    "hidden": false,
+    "usage": [
+        "descriptor:command5 [-y|--deprecated_option]"
+    ],
+    "description": "command 5 description",
+    "help": "command 5 help",
+    "definition": {
+        "arguments": {
+        },
+        "options": {
+            "deprecated_option": {
+                "name": "--deprecated_option",
+                "shortcut": "-y",
+                "accept_value": false,
+                "is_value_required": false,
+                "is_multiple": false,
+                "description": "",
+                "default": false,
+                "is_deprecated": true
+            }
+        }
+    }
+}

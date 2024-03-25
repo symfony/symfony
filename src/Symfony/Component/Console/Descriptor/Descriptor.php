@@ -42,6 +42,24 @@ abstract class Descriptor implements DescriptorInterface
         };
     }
 
+    /**
+     * Filter hidden options from list.
+     * @param array<string,InputOption> $inputOptions
+     * @return array<string,InputOption>
+     */
+    protected function removeHiddenOptions(array $inputOptions, array $options = []): array
+    {
+        return array_filter($inputOptions, fn(InputOption $option) => !$this->skipHiddenOption($option, $options));
+    }
+
+    /**
+     * Should InputOption be skipped?
+     */
+    protected function skipHiddenOption(InputOption $inputOption, array $options = []): bool
+    {
+        return $inputOption->isHidden() && !($options['show-hidden-options'] ?? false);
+    }
+
     protected function write(string $content, bool $decorated = false): void
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);

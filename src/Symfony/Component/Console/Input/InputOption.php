@@ -50,6 +50,22 @@ class InputOption
      */
     public const VALUE_NEGATABLE = 16;
 
+    /**
+     * The option allows to deprecate command option.
+     * Option will be marked as deprecated in help output and a warning is printed when the command is executed.
+     */
+    public const DEPRECATED = 32;
+
+    /**
+     * The option allows to hide command option from help.
+     */
+    public const HIDDEN = 64;
+
+    /**
+     * The largest mode flag defined to validate mode limits.
+     */
+    private const LARGEST_MODE_FLAG = self::HIDDEN;
+
     private string $name;
     private ?string $shortcut;
     private int $mode;
@@ -98,7 +114,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif ($mode >= (self::VALUE_NEGATABLE << 1) || $mode < 1) {
+        } elseif ($mode >= (self::LARGEST_MODE_FLAG << 1) || $mode < 1) {
             throw new InvalidArgumentException(\sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -152,7 +168,7 @@ class InputOption
      */
     public function isValueRequired(): bool
     {
-        return self::VALUE_REQUIRED === (self::VALUE_REQUIRED & $this->mode);
+        return $this->hastMode(self::VALUE_REQUIRED);
     }
 
     /**
@@ -162,7 +178,7 @@ class InputOption
      */
     public function isValueOptional(): bool
     {
-        return self::VALUE_OPTIONAL === (self::VALUE_OPTIONAL & $this->mode);
+        return $this->hastMode(self::VALUE_OPTIONAL);
     }
 
     /**
@@ -172,7 +188,27 @@ class InputOption
      */
     public function isArray(): bool
     {
-        return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
+        return $this->hastMode(self::VALUE_IS_ARRAY);
+    }
+
+    /**
+     * Returns true if the option is deprecated.
+     *
+     * @return bool true if mode is self::DEPRECATED, false otherwise
+     */
+    public function isDeprecated():bool
+    {
+        return $this->hastMode(self::DEPRECATED);
+    }
+
+    /**
+     * Returns true if the option is hidden.
+     *
+     * @return bool true if mode is self::HIDDEN, false otherwise
+     */
+    public function isHidden():bool
+    {
+        return $this->hastMode(self::HIDDEN);
     }
 
     /**
@@ -182,7 +218,7 @@ class InputOption
      */
     public function isNegatable(): bool
     {
-        return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
+        return $this->hastMode(self::VALUE_NEGATABLE);
     }
 
     /**
@@ -258,5 +294,15 @@ class InputOption
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
         ;
+    }
+
+    /**
+     * Returns true if the option allows $mode.
+     *
+     * @return bool true if mode is $mode, false otherwise
+     */
+    protected function hastMode(int $mode): bool
+    {
+        return $mode === ($mode & $this->mode);
     }
 }

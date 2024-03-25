@@ -70,6 +70,21 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testConsumeLastToken()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->reset();
+        $limiter->consume(9);
+
+        $rateLimit = $limiter->consume(1);
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
+            $rateLimit->getRetryAfter()
+        );
+    }
+
     public function testReserve()
     {
         $limiter = $this->createLimiter();

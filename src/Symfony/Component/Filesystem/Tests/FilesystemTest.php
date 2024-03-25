@@ -166,6 +166,7 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy()
     {
+        var_dump(get_debug_type(@fopen('http://127.0.0.1:8057', 'r')));
         if (!\in_array('http', stream_get_wrappers())) {
             $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
@@ -183,6 +184,7 @@ class FilesystemTest extends FilesystemTestCase
         do {
             usleep(50000);
         } while (!@fopen('http://127.0.0.1:8057', 'r'));
+        var_dump(get_debug_type(fopen('http://127.0.0.1:8057', 'r')));
 
         $sourceFilePath = 'http://localhost:8057/logo_symfony_header.png';
         $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';

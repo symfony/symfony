@@ -17,7 +17,7 @@ class NestedConfig
     private $_usedProperties = [];
 
     /**
-     * @template TValue
+     * @template TValue of mixed
      * @param TValue $value
      * @default {"enabled":null}
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig|$this
@@ -43,7 +43,7 @@ class NestedConfig
     }
 
     /**
-     * @template TValue
+     * @template TValue of mixed
      * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|$this
      * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig : static)

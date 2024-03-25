@@ -289,7 +289,7 @@ class Connection implements ResetInterface
     {
         $configuration = $this->driverConnection->getConfiguration();
         $assetFilter = $configuration->getSchemaAssetsFilter();
-        $configuration->setSchemaAssetsFilter(static function () { return true; });
+        $configuration->setSchemaAssetsFilter(function (string $tableName) { return $tableName === $this->configuration['table_name']; });
         $this->updateSchema();
         $configuration->setSchemaAssetsFilter($assetFilter);
         $this->autoSetup = false;

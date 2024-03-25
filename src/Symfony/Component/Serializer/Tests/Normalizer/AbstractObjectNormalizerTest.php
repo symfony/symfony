@@ -1052,7 +1052,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 'property' => [
                     'object' => $object,
                 ],
-            ]
+            ],
         ];
 
         $context = [];

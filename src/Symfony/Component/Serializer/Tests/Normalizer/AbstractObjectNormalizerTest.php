@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -33,6 +34,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -1024,6 +1026,45 @@ class AbstractObjectNormalizerTest extends TestCase
         $serializer->normalize($foobar, null, ['cache_key' => false]);
 
         $this->assertFalse($normalizer->childContextCacheKey);
+    }
+
+    /**
+     * @see https://github.com/symfony/symfony/issues/54378
+     */
+    public function testNormalizationWithMaxDepthOnStdclassObjectDoesNotThrowWarning()
+    {
+        $object = new \stdClass();
+        $object->string = 'yes';
+
+        $loader = new LoaderChain([
+            new AttributeLoader(),
+        ]);
+        $classMetadataFactory = new ClassMetadataFactory($loader);
+
+        $serializer = new Serializer([
+            new ObjectNormalizer($classMetadataFactory),
+        ], [
+            new JsonEncoder(),
+        ]);
+
+        $page = [
+            'props' => [
+                'property' => [
+                    'object' => $object,
+                ],
+            ]
+        ];
+
+        $context = [];
+
+        $json = $serializer->serialize($page, 'json', array_merge([
+            'json_encode_options' => 15, // JsonResponse::DEFAULT_ENCODING_OPTIONS
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function () { return null; },
+            AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
+            AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
+        ], $context));
+
+        $this->assertSame('{"props":{"property":{"object":{"string":"yes"}}}}', $json);
     }
 }
 

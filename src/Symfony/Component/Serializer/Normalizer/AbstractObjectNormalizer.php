@@ -180,7 +180,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         foreach ($attributes as $attribute) {
             $maxDepthReached = false;
-            if (null !== $attributesMetadata && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$maxDepthHandler) {
+            if ($attributesMetadata && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$maxDepthHandler) {
                 continue;
             }
 

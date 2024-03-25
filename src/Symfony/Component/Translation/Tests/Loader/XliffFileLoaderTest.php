@@ -245,8 +245,15 @@ XLIFF;
         $this->assertCount(3, $domains['domain1']);
         $this->assertContainsOnly('string', $catalogue->all('domain1'));
 
+        $metadata = $catalogue->getMetadata('bar', 'domain1');
+
         // target attributes
-        $this->assertEquals(['target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));
+        $this->assertArrayHasKey('target-attributes', $metadata);
+        $this->assertEquals(['order' => 1], $metadata['target-attributes']);
+
+        // source metadata
+        $this->assertArrayHasKey('source', $metadata);
+        $this->assertEquals('bar', $metadata['source']);
     }
 
     public function testLoadVersion2WithNoteMeta()

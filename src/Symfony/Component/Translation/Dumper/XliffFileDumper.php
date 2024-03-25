@@ -96,14 +96,15 @@ class XliffFileDumper extends FileDumper
             $translation->setAttribute('id', strtr(substr(base64_encode(hash('xxh128', $source, true)), 0, 7), '/+', '._'));
             $translation->setAttribute('resname', $source);
 
+            $metadata = $messages->getMetadata($source, $domain);
+
             $s = $translation->appendChild($dom->createElement('source'));
-            $s->appendChild($dom->createTextNode($source));
+            $s->appendChild($dom->createTextNode($metadata['source'] ?? $source));
 
             // Does the target contain characters requiring a CDATA section?
             $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);
 
             $targetElement = $dom->createElement('target');
-            $metadata = $messages->getMetadata($source, $domain);
             if ($this->hasMetadataArrayInfo('target-attributes', $metadata)) {
                 foreach ($metadata['target-attributes'] as $name => $value) {
                     $targetElement->setAttribute($name, $value);
@@ -141,7 +142,6 @@ class XliffFileDumper extends FileDumper
     {
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
-
         $xliff = $dom->appendChild($dom->createElement('xliff'));
         $xliff->setAttribute('xmlns', 'urn:oasis:names:tc:xliff:document:2.0');
         $xliff->setAttribute('version', '2.0');
@@ -194,7 +194,7 @@ class XliffFileDumper extends FileDumper
             $segment = $translation->appendChild($dom->createElement('segment'));
 
             $s = $segment->appendChild($dom->createElement('source'));
-            $s->appendChild($dom->createTextNode($source));
+            $s->appendChild($dom->createTextNode($metadata['source'] ?? $source));
 
             // Does the target contain characters requiring a CDATA section?
             $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);

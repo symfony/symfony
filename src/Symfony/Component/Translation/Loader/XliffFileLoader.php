@@ -168,6 +168,9 @@ class XliffFileLoader implements LoaderInterface
                 $catalogue->set((string) $source, $target, $domain);
 
                 $metadata = [];
+
+                $metadata['source'] = (string) $segment->source;
+
                 if (isset($segment->target) && $segment->target->attributes()) {
                     $metadata['target-attributes'] = [];
                     foreach ($segment->target->attributes() as $key => $value) {

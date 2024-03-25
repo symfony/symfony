@@ -4,6 +4,7 @@ CHANGELOG
 7.1
 ---
 
+ * `XliffFileDumper` now uses the `source` metadata to create the `source` tag if available 
  * Mark class `DataCollectorTranslator` as `final`
 
 7.0

@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use function Symfony\Component\Clock\now;
 
 /**
  * Transport that stays in memory. Useful for testing purpose.
@@ -59,7 +60,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     public function get(): iterable
     {
         $envelopes = [];
-        $now = $this->clock?->now() ?? new \DateTimeImmutable();
+        $now = $this->clock?->now() ?? now();
         foreach ($this->decode($this->queue) as $id => $envelope) {
             if (!isset($this->availableAt[$id]) || $now > $this->availableAt[$id]) {
                 $envelopes[] = $envelope;
@@ -101,7 +102,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
 
         /** @var DelayStamp|null $delayStamp */
         if ($delayStamp = $envelope->last(DelayStamp::class)) {
-            $now = $this->clock?->now() ?? new \DateTimeImmutable();
+            $now = $this->clock?->now() ?? now();
             $this->availableAt[$id] = $now->modify(sprintf('+%d seconds', $delayStamp->getDelay() / 1000));
         }
 

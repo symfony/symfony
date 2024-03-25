@@ -16,6 +16,9 @@ use Symfony\Component\HttpFoundation\Exception\LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 
+/**
+ * @group time-sensitive
+ */
 class UriSignerTest extends TestCase
 {
     public function testSign()
@@ -71,8 +74,8 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
 
         $this->assertSame(
-            'http://example.com/foo?_expiration=4070908800&_hash=xfui5FoP0vbD9Cp7pI0tHnqR1Fmj2UARqkIUw7SZVfQ%3D&baz=bay&foo=bar',
-            $signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2099-01-01 00:00:00'))
+            'http://example.com/foo?_expiration=2145916800&_hash=xLhnPMzV3KqqHaaUffBUJvtRDAZ4%2FZ9Y8Sw%2BgmS%2B82Q%3D&baz=bay&foo=bar',
+            $signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2038-01-01 00:00:00', new \DateTimeZone('UTC')))
         );
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2099-01-01 00:00:00'))));
     }
@@ -101,8 +104,8 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
 
         $this->assertSame(
-            'http://example.com/foo?abc=4070908800&baz=bay&foo=bar&qux=hdhUhBVPpzKJdz5ZjC%2FkLvtOYdGKOvKVOczmmMIZK0A%3D',
-            $signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2099-01-01 00:00:00'))
+            'http://example.com/foo?abc=2145916800&baz=bay&foo=bar&qux=kE4rK2MzeiwrYAKy%2B%2FGKvKA6bnzqCbACBdpC3yGnPVU%3D',
+            $signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2038-01-01 00:00:00', new \DateTimeZone('UTC')))
         );
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2099-01-01 00:00:00'))));
     }
@@ -119,8 +122,8 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar')));
 
         $this->assertSame(
-            'http://example.com/foo?_expiration=4070908800&_hash=qHl626U5d7LMsVtBxPt9GNzysdSxyOQ1fHA59Y1ib0Y%3D&bar=foo&foo=bar#foobar',
-            $signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar', new \DateTimeImmutable('2099-01-01 00:00:00'))
+            'http://example.com/foo?_expiration=2145916800&_hash=jTdrIE9MJSorNpQmkX6tmOtocxXtHDzIJawcAW4IFYo%3D&bar=foo&foo=bar#foobar',
+            $signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar', new \DateTimeImmutable('2038-01-01 00:00:00', new \DateTimeZone('UTC')))
         );
 
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar', new \DateTimeImmutable('2099-01-01 00:00:00'))));
@@ -130,7 +133,7 @@ class UriSignerTest extends TestCase
     {
         $signer = new UriSigner('foobar');
 
-        $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo', new \DateTimeImmutable('2099-01-01 00:00:00')), $signer->sign('http://example.com/foo?bar=foo&foo=bar', 4070908800));
+        $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo', new \DateTimeImmutable('2038-01-01 00:00:00', new \DateTimeZone('UTC'))), $signer->sign('http://example.com/foo?bar=foo&foo=bar', 2145916800));
     }
 
     public function testSignWithoutExpirationAndWithReservedHashParameter()

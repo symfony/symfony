@@ -395,10 +395,6 @@ class IntegrationTest extends TestCase
 
     public function testLocatorConfiguredViaAttribute()
     {
-        if (!property_exists(SubscribedService::class, 'type')) {
-            $this->markTestSkipped('Requires symfony/service-contracts >= 3.2');
-        }
-
         $container = new ContainerBuilder();
         $container->setParameter('some.parameter', 'foo');
         $container->register(BarTagClass::class)

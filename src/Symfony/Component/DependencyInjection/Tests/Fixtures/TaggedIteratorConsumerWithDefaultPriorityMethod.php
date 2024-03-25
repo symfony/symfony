@@ -2,12 +2,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class TaggedIteratorConsumerWithDefaultPriorityMethod
 {
     public function __construct(
-        #[TaggedIterator(tag: 'foo_bar', defaultPriorityMethod: 'getPriority')]
+        #[AutowireIterator('foo_bar', defaultPriorityMethod: 'getPriority')]
         private iterable $param,
     ) {
     }

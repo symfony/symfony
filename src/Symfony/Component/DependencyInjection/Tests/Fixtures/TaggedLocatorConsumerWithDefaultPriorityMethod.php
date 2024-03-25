@@ -3,12 +3,13 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 
 final class TaggedLocatorConsumerWithDefaultPriorityMethod
 {
     public function __construct(
-        #[TaggedLocator(tag: 'foo_bar', defaultPriorityMethod: 'getPriority')]
+        #[AutowireLocator('foo_bar', defaultPriorityMethod: 'getPriority')]
         private ContainerInterface $locator,
     ) {
     }

@@ -502,17 +502,17 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * @throws NotEncodableValueException
      */
-    private function saveXml(\DOMDocument $DOMDocument, ?\DOMNode $node = null, ?int $options = null): string
+    private function saveXml(\DOMDocument $document, ?\DOMNode $node = null, ?int $options = null): string
     {
         $prevErrorHandler = set_error_handler(static function ($type, $message, $file, $line, $context = []) use (&$prevErrorHandler) {
-            if (\in_array($type, [\E_ERROR, \E_WARNING], true)) {
+            if (\E_ERROR === $type || \E_WARNING === $type) {
                 throw new NotEncodableValueException($message);
             }
 
             return $prevErrorHandler ? $prevErrorHandler($type, $message, $file, $line, $context) : false;
         });
         try {
-            return $DOMDocument->saveXML($node, $options);
+            return $document->saveXML($node, $options);
         } finally {
             restore_error_handler();
         }

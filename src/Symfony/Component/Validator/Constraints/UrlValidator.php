@@ -64,6 +64,15 @@ class UrlValidator extends ConstraintValidator
             return;
         }
 
+        if ($constraint->requireTld && !str_contains($value, '.')) {
+            $this->context->buildViolation($constraint->tldMessage)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Url::MISSING_TLD_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
         if (null !== $constraint->normalizer) {
             $value = ($constraint->normalizer)($value);
         }

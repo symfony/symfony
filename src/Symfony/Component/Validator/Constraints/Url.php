@@ -43,7 +43,7 @@ class Url extends Constraint
      * @param string[]|null            $protocols        The protocols considered to be valid for the URL (e.g. http, https, ftp, etc.) (defaults to ['http', 'https']
      * @param bool|null                $relativeProtocol Whether to accept URL without the protocol (i.e. //example.com) (defaults to false)
      * @param string[]|null            $groups
-     * @param bool|null                $requireTld Whether to require the URL to include a top-level domain (defaults to false)
+     * @param bool|null                $requireTld       Whether to require the URL to include a top-level domain (defaults to false)
      */
     public function __construct(
         ?array $options = null,

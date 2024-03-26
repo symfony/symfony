@@ -70,6 +70,7 @@ use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
 use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\Workflow\DependencyInjection\DefinitionValidatorPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
 
@@ -158,6 +159,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new CachePoolPrunerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $this->addCompilerPassIfExists($container, FormPass::class);
         $this->addCompilerPassIfExists($container, WorkflowGuardListenerPass::class);
+        $this->addCompilerPassIfExists($container, DefinitionValidatorPass::class);
         $container->addCompilerPass(new ResettableServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);

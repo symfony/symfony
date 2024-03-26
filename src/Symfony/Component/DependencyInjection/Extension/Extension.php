@@ -31,7 +31,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     /**
      * @return string|false
      */
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|bool
     {
         return false;
     }
@@ -39,7 +39,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     /**
      * @return string
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://example.org/schema/dic/'.$this->getAlias();
     }

@@ -1028,9 +1028,6 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertFalse($normalizer->childContextCacheKey);
     }
 
-    /**
-     * @see https://github.com/symfony/symfony/issues/54378
-     */
     public function testNormalizationWithMaxDepthOnStdclassObjectDoesNotThrowWarning()
     {
         $object = new \stdClass();

@@ -180,7 +180,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         foreach ($attributes as $attribute) {
             $maxDepthReached = false;
-            if ($attributesMetadata !== null && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$maxDepthHandler) {
+            if (null !== $attributesMetadata && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$maxDepthHandler) {
                 continue;
             }
 
@@ -287,7 +287,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * Gets the attribute value.
-     * 
+     *
      * @return mixed
      */
     abstract protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []);

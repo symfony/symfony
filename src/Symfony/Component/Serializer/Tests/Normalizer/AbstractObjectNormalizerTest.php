@@ -1033,35 +1033,16 @@ class AbstractObjectNormalizerTest extends TestCase
         $object = new \stdClass();
         $object->string = 'yes';
 
-        $loader = new LoaderChain([
-            new AttributeLoader(),
-        ]);
-        $classMetadataFactory = new ClassMetadataFactory($loader);
-
-        $serializer = new Serializer([
-            new ObjectNormalizer($classMetadataFactory),
-        ], [
-            new JsonEncoder(),
-        ]);
-
-        $page = [
-            'props' => [
-                'property' => [
-                    'object' => $object,
-                ],
-            ],
-        ];
-
-        $context = [];
-
-        $json = $serializer->serialize($page, 'json', array_merge([
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $normalized = $normalizer->normalize($object, 'json', [
             'json_encode_options' => 15, // JsonResponse::DEFAULT_ENCODING_OPTIONS
-            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function () { return null; },
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => static fn () => null,
             AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
             AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
-        ], $context));
+        ]);
 
-        $this->assertSame('{"props":{"property":{"object":{"string":"yes"}}}}', $json);
+        $this->assertSame(['string' => 'yes'], $normalized);
     }
 }
 

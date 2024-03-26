@@ -180,7 +180,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         foreach ($attributes as $attribute) {
             $maxDepthReached = false;
-            if ($attributesMetadata && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$maxDepthHandler) {
+            if ($attributesMetadata !== null && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$maxDepthHandler) {
                 continue;
             }
 
@@ -287,6 +287,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * Gets the attribute value.
+     * 
+     * @return mixed
      */
     abstract protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []);
 
@@ -300,6 +302,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
     }
 
+    /**
+     * @return mixed
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
@@ -698,7 +703,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
     {
         if (!($enableMaxDepth = $context[self::ENABLE_MAX_DEPTH] ?? $this->defaultContext[self::ENABLE_MAX_DEPTH] ?? false)
-            || null === $maxDepth = $attributesMetadata[$attribute]?->getMaxDepth()
+            || !isset($attributesMetadata[$attribute]) || null === $maxDepth = $attributesMetadata[$attribute]?->getMaxDepth()
         ) {
             return false;
         }

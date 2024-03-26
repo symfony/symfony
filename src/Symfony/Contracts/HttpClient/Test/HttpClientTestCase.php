@@ -28,6 +28,11 @@ abstract class HttpClientTestCase extends TestCase
         TestHttpServer::start();
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        TestHttpServer::stopAll();
+    }
+
     abstract protected function getHttpClient(string $testCase): HttpClientInterface;
 
     public function testGetRequest()

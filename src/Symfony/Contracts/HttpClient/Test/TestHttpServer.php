@@ -43,4 +43,18 @@ class TestHttpServer
 
         return $process;
     }
+
+    public static function stop(int $port = 8057)
+    {
+        if (isset(self::$process[$port])) {
+            self::$process[$port]->stop();
+        }
+    }
+
+    public static function stopAll()
+    {
+        foreach (self::$process as $process) {
+            $process->stop();
+        }
+    }
 }

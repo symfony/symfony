@@ -138,8 +138,8 @@ class DataPartTest extends TestCase
 
     public function testFromPathWithUrl()
     {
-        if (!\in_array('https', stream_get_wrappers())) {
-            $this->markTestSkipped('"https" stream wrapper is not enabled.');
+        if (!\in_array('http', stream_get_wrappers())) {
+            $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
 
         $finder = new PhpExecutableFinder();
@@ -164,6 +164,10 @@ class DataPartTest extends TestCase
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
             new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'logo_symfony_header.png', 'filename' => 'logo_symfony_header.png'])
         ), $p->getPreparedHeaders());
+
+        var_dump(get_debug_type(@fopen('http://127.0.0.1:8057', 'r')));
+        $process->stop();
+        var_dump(get_debug_type(@fopen('http://127.0.0.1:8057', 'r')));
     }
 
     public function testHasContentId()

@@ -52,17 +52,26 @@ class UrlTest extends TestCase
         self::assertSame(['http', 'https'], $aConstraint->protocols);
         self::assertFalse($aConstraint->relativeProtocol);
         self::assertNull($aConstraint->normalizer);
+        self::assertFalse($aConstraint->requireTld);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame(['ftp', 'gopher'], $bConstraint->protocols);
         self::assertSame('trim', $bConstraint->normalizer);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'UrlDummy'], $bConstraint->groups);
+        self::assertFalse($bConstraint->requireTld);
 
         [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertTrue($cConstraint->relativeProtocol);
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
+        self::assertFalse($cConstraint->requireTld);
+
+        [$dConstraint] = $metadata->properties['d']->getConstraints();
+        self::assertSame(['http', 'https'], $aConstraint->protocols);
+        self::assertFalse($aConstraint->relativeProtocol);
+        self::assertNull($aConstraint->normalizer);
+        self::assertTrue($dConstraint->requireTld);
     }
 }
 
@@ -76,4 +85,7 @@ class UrlDummy
 
     #[Url(relativeProtocol: true, groups: ['my_group'], payload: 'some attached data')]
     private $c;
+
+    #[Url(requireTld: true)]
+    private $d;
 }

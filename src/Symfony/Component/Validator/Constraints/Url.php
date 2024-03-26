@@ -23,14 +23,18 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 class Url extends Constraint
 {
     public const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
+    public const MISSING_TLD_ERROR = '8a5d387f-0716-46b4-844b-67367faf435a';
 
     protected const ERROR_NAMES = [
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',
+        self::MISSING_TLD_ERROR => 'MISSING_TLD_ERROR',
     ];
 
     public string $message = 'This value is not a valid URL.';
+    public string $tldMessage = 'This URL does not contain a TLD.';
     public array $protocols = ['http', 'https'];
     public bool $relativeProtocol = false;
+    public bool $requireTld = false;
     /** @var callable|null */
     public $normalizer;
 
@@ -39,6 +43,7 @@ class Url extends Constraint
      * @param string[]|null            $protocols        The protocols considered to be valid for the URL (e.g. http, https, ftp, etc.) (defaults to ['http', 'https']
      * @param bool|null                $relativeProtocol Whether to accept URL without the protocol (i.e. //example.com) (defaults to false)
      * @param string[]|null            $groups
+     * @param bool|null                $requireTld       Whether to require the URL to include a top-level domain (defaults to false)
      */
     public function __construct(
         ?array $options = null,
@@ -48,6 +53,7 @@ class Url extends Constraint
         ?callable $normalizer = null,
         ?array $groups = null,
         mixed $payload = null,
+        ?bool $requireTld = null,
     ) {
         parent::__construct($options, $groups, $payload);
 
@@ -55,6 +61,7 @@ class Url extends Constraint
         $this->protocols = $protocols ?? $this->protocols;
         $this->relativeProtocol = $relativeProtocol ?? $this->relativeProtocol;
         $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->requireTld = $requireTld ?? $this->requireTld;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));

@@ -183,6 +183,7 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
+use Symfony\Component\Workflow\Validator\ConfiguredDefinitionValidatorInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
@@ -1010,6 +1011,7 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument($transitions);
             $definitionDefinition->addArgument($initialMarking);
             $definitionDefinition->addArgument(new Reference(sprintf('%s.metadata_store', $workflowId)));
+            $definitionDefinition->addTag('workflow.definition', ['name' => $name]);
 
             // Create MarkingStore
             $markingStoreDefinition = null;
@@ -1104,6 +1106,9 @@ class FrameworkExtension extends Extension
                 $container->setParameter('workflow.has_guard_listeners', true);
             }
         }
+
+        $container->registerForAutoconfiguration(ConfiguredDefinitionValidatorInterface::class)
+            ->addTag('workflow.definition_validator');
     }
 
     private function registerDebugConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Workflow\CacheWarmer\DefinitionValidatorCacheWarmer;
 use Symfony\Component\Workflow\EventListener\ExpressionLanguage;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Registry;
@@ -42,5 +43,10 @@ return static function (ContainerConfigurator $container) {
         ->set('workflow.registry', Registry::class)
         ->alias(Registry::class, 'workflow.registry')
         ->set('workflow.security.expression_language', ExpressionLanguage::class)
+        ->set('workflow.cache_warmer.definition_validator', DefinitionValidatorCacheWarmer::class)
+            ->args([
+                abstract_arg('definition and validators'),
+            ])
+            ->tag('kernel.cache_warmer')
     ;
 };

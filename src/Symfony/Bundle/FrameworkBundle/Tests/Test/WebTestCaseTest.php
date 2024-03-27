@@ -19,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\DomCrawler;
 use Symfony\Component\HttpFoundation\Cookie as HttpFoundationCookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -192,126 +192,126 @@ class WebTestCaseTest extends TestCase
 
     public function testAssertSelectorExists()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><h1>'))->assertSelectorExists('body > h1');
+        $this->getCrawlerTester(new DomCrawler('<html><body><h1>'))->assertSelectorExists('body > h1');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "body > h1".');
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertSelectorExists('body > h1');
+        $this->getCrawlerTester(new DomCrawler('<html><head><title>Foo'))->assertSelectorExists('body > h1');
     }
 
     public function testAssertSelectorNotExists()
     {
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertSelectorNotExists('body > h1');
+        $this->getCrawlerTester(new DomCrawler('<html><head><title>Foo'))->assertSelectorNotExists('body > h1');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('does not match selector "body > h1".');
-        $this->getCrawlerTester(new Crawler('<html><body><h1>'))->assertSelectorNotExists('body > h1');
+        $this->getCrawlerTester(new DomCrawler('<html><body><h1>'))->assertSelectorNotExists('body > h1');
     }
 
     public function testAssertSelectorCount()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p></body></html>'))->assertSelectorCount(1, 'p');
-        $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p><p>Foo</p></body></html>'))->assertSelectorCount(2, 'p');
-        $this->getCrawlerTester(new Crawler('<html><body><h1>This is not a paragraph.</h1></body></html>'))->assertSelectorCount(0, 'p');
+        $this->getCrawlerTester(new DomCrawler('<html><body><p>Hello</p></body></html>'))->assertSelectorCount(1, 'p');
+        $this->getCrawlerTester(new DomCrawler('<html><body><p>Hello</p><p>Foo</p></body></html>'))->assertSelectorCount(2, 'p');
+        $this->getCrawlerTester(new DomCrawler('<html><body><h1>This is not a paragraph.</h1></body></html>'))->assertSelectorCount(0, 'p');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Crawler selector "p" was expected to be found 0 time(s) but was found 1 time(s).');
-        $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p></body></html>'))->assertSelectorCount(0, 'p');
+        $this->getCrawlerTester(new DomCrawler('<html><body><p>Hello</p></body></html>'))->assertSelectorCount(0, 'p');
     }
 
     public function testAssertSelectorTextNotContains()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Bar');
+        $this->getCrawlerTester(new DomCrawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Bar');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "body > h1" and the text "Foo" of the node matching selector "body > h1" does not contain "Foo".');
-        $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Foo');
+        $this->getCrawlerTester(new DomCrawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Foo');
     }
 
     public function testAssertAnySelectorTextContains()
     {
-        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Foo Baz'))->assertAnySelectorTextContains('ul li', 'Foo');
+        $this->getCrawlerTester(new DomCrawler('<ul><li>Bar</li><li>Foo Baz'))->assertAnySelectorTextContains('ul li', 'Foo');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "ul li" and the text of any node matching selector "ul li" contains "Foo".');
-        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextContains('ul li', 'Foo');
+        $this->getCrawlerTester(new DomCrawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextContains('ul li', 'Foo');
     }
 
     public function testAssertAnySelectorTextSame()
     {
-        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Foo'))->assertAnySelectorTextSame('ul li', 'Foo');
+        $this->getCrawlerTester(new DomCrawler('<ul><li>Bar</li><li>Foo'))->assertAnySelectorTextSame('ul li', 'Foo');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "ul li" and has at least a node matching selector "ul li" with content "Foo".');
-        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextSame('ul li', 'Foo');
+        $this->getCrawlerTester(new DomCrawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextSame('ul li', 'Foo');
     }
 
     public function testAssertAnySelectorTextNotContains()
     {
-        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextNotContains('ul li', 'Foo');
+        $this->getCrawlerTester(new DomCrawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextNotContains('ul li', 'Foo');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "ul li" and the text of any node matching selector "ul li" does not contain "Foo".');
-        $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Foo'))->assertAnySelectorTextNotContains('ul li', 'Foo');
+        $this->getCrawlerTester(new DomCrawler('<ul><li>Bar</li><li>Foo'))->assertAnySelectorTextNotContains('ul li', 'Foo');
     }
 
     public function testAssertPageTitleSame()
     {
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleSame('Foo');
+        $this->getCrawlerTester(new DomCrawler('<html><head><title>Foo'))->assertPageTitleSame('Foo');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "title" and has a node matching selector "title" with content "Bar".');
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleSame('Bar');
+        $this->getCrawlerTester(new DomCrawler('<html><head><title>Foo'))->assertPageTitleSame('Bar');
     }
 
     public function testAssertPageTitleContains()
     {
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foobar'))->assertPageTitleContains('Foo');
+        $this->getCrawlerTester(new DomCrawler('<html><head><title>Foobar'))->assertPageTitleContains('Foo');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "title" and the text "Foo" of the node matching selector "title" contains "Bar".');
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleContains('Bar');
+        $this->getCrawlerTester(new DomCrawler('<html><head><title>Foo'))->assertPageTitleContains('Bar');
     }
 
     public function testAssertInputValueSame()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="text" name="username" value="Fabien">'))->assertInputValueSame('username', 'Fabien');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form><input type="text" name="username" value="Fabien">'))->assertInputValueSame('username', 'Fabien');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "input[name="password"]" and has a node matching selector "input[name="password"]" with attribute "value" of value "pa$$".');
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertInputValueSame('password', 'pa$$');
+        $this->getCrawlerTester(new DomCrawler('<html><head><title>Foo'))->assertInputValueSame('password', 'pa$$');
     }
 
     public function testAssertInputValueNotSame()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><input type="text" name="username" value="Helene">'))->assertInputValueNotSame('username', 'Fabien');
+        $this->getCrawlerTester(new DomCrawler('<html><body><input type="text" name="username" value="Helene">'))->assertInputValueNotSame('username', 'Fabien');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "input[name="password"]" and does not have a node matching selector "input[name="password"]" with attribute "value" of value "pa$$".');
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="text" name="password" value="pa$$">'))->assertInputValueNotSame('password', 'pa$$');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form><input type="text" name="password" value="pa$$">'))->assertInputValueNotSame('password', 'pa$$');
     }
 
     public function testAssertCheckboxChecked()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
-        $this->getCrawlerTester(new Crawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
+        $this->getCrawlerTester(new DomCrawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "input[name="rememberMe"]:checked".');
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxChecked('rememberMe');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxChecked('rememberMe');
     }
 
     public function testAssertCheckboxNotChecked()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
-        $this->getCrawlerTester(new Crawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
+        $this->getCrawlerTester(new DomCrawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('does not match selector "input[name="rememberMe"]:checked".');
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxNotChecked('rememberMe');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxNotChecked('rememberMe');
     }
 
     public function testAssertFormValue()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Fabien');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Fabien');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that two strings are identical.');
-        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Jane');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Jane');
     }
 
     public function testAssertNoFormValue()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe">', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form id="form"><input type="checkbox" name="rememberMe">', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Field "rememberMe" has a value in form "#form".');
-        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe" checked>', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
+        $this->getCrawlerTester(new DomCrawler('<html><body><form id="form"><input type="checkbox" name="rememberMe" checked>', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
     }
 
     public function testAssertRequestAttributeValueSame()
@@ -357,7 +357,7 @@ class WebTestCaseTest extends TestCase
         return $this->getTester($client);
     }
 
-    private function getCrawlerTester(Crawler $crawler): WebTestCase
+    private function getCrawlerTester(DomCrawler $crawler): WebTestCase
     {
         $client = $this->createMock(KernelBrowser::class);
         $client->expects($this->any())->method('getCrawler')->willReturn($crawler);

@@ -25,10 +25,32 @@ class ImageTest extends TestCase
         new Image($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
+    /**
+     * @requires PHP 8.4
+     */
+    public function testConstructorWithANonImgTagFromHTMLDocument()
+    {
+        $this->expectException(\LogicException::class);
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><div><div></html>');
+
+        new Image($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
+    }
+
     public function testBaseUriIsOptionalWhenImageUrlIsAbsolute()
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><img alt="foo" src="https://example.com/foo" /></html>');
+
+        $image = new Image($dom->getElementsByTagName('img')->item(0));
+        $this->assertSame('https://example.com/foo', $image->getUri());
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testBaseUriIsOptionalWhenImageUrlIsAbsoluteFromHTMLDocument()
+    {
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><img alt="foo" src="https://example.com/foo"></html>');
 
         $image = new Image($dom->getElementsByTagName('img')->item(0));
         $this->assertSame('https://example.com/foo', $image->getUri());
@@ -45,12 +67,38 @@ class ImageTest extends TestCase
     }
 
     /**
+     * @requires PHP 8.4
+     */
+    public function testAbsoluteBaseUriIsMandatoryWhenImageUrlIsRelativeFromHTMLDocument()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><img alt="foo" src="/foo"></html>');
+
+        $image = new Image($dom->getElementsByTagName('img')->item(0), 'example.com');
+        $image->getUri();
+    }
+
+    /**
      * @dataProvider getGetUriTests
      */
     public function testGetUri($url, $currentUri, $expected)
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(sprintf('<html><img alt="foo" src="%s" /></html>', $url));
+        $image = new Image($dom->getElementsByTagName('img')->item(0), $currentUri);
+
+        $this->assertEquals($expected, $image->getUri());
+    }
+
+    /**
+     * @requires PHP 8.4
+     *
+     * @dataProvider getGetUriTests
+     */
+    public function testGetUriFromHTMLDocument($url, $currentUri, $expected)
+    {
+        $dom = \DOM\HTMLDocument::createFromString(sprintf('<!DOCTYPE html><html><img alt="foo" src="%s"></html>', $url));
+
         $image = new Image($dom->getElementsByTagName('img')->item(0), $currentUri);
 
         $this->assertEquals($expected, $image->getUri());

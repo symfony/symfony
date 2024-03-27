@@ -15,7 +15,8 @@ use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
 use Symfony\Component\BrowserKit\Exception\LogicException;
 use Symfony\Component\BrowserKit\Exception\RuntimeException;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\CrawlerInterface;
+use Symfony\Component\DomCrawler\DomCrawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\Process\PhpProcess;
@@ -39,7 +40,7 @@ abstract class AbstractBrowser
     protected object $request;
     protected Response $internalResponse;
     protected object $response;
-    protected Crawler $crawler;
+    protected CrawlerInterface $crawler;
     protected bool $useHtml5Parser = true;
     protected bool $insulated = false;
     protected ?string $redirect;
@@ -142,7 +143,7 @@ abstract class AbstractBrowser
         return $this->server[$key] ?? $default;
     }
 
-    public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], ?string $content = null, bool $changeHistory = true): Crawler
+    public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], ?string $content = null, bool $changeHistory = true): CrawlerInterface
     {
         $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
 
@@ -156,7 +157,7 @@ abstract class AbstractBrowser
     /**
      * Converts the request parameters into a JSON string and uses it as request content.
      */
-    public function jsonRequest(string $method, string $uri, array $parameters = [], array $server = [], bool $changeHistory = true): Crawler
+    public function jsonRequest(string $method, string $uri, array $parameters = [], array $server = [], bool $changeHistory = true): CrawlerInterface
     {
         $content = json_encode($parameters);
 
@@ -190,7 +191,7 @@ abstract class AbstractBrowser
     /**
      * Returns the current Crawler instance.
      */
-    public function getCrawler(): Crawler
+    public function getCrawler(): CrawlerInterface
     {
         return $this->crawler ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
     }
@@ -254,7 +255,7 @@ abstract class AbstractBrowser
      *
      * @param array $serverParameters An array of server parameters
      */
-    public function click(Link $link, array $serverParameters = []): Crawler
+    public function click(Link $link, array $serverParameters = []): CrawlerInterface
     {
         if ($link instanceof Form) {
             return $this->submit($link, [], $serverParameters);
@@ -269,7 +270,7 @@ abstract class AbstractBrowser
      * @param string $linkText         The text of the link or the alt attribute of the clickable image
      * @param array  $serverParameters An array of server parameters
      */
-    public function clickLink(string $linkText, array $serverParameters = []): Crawler
+    public function clickLink(string $linkText, array $serverParameters = []): CrawlerInterface
     {
         $crawler = $this->crawler ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
 
@@ -282,7 +283,7 @@ abstract class AbstractBrowser
      * @param array $values           An array of form field values
      * @param array $serverParameters An array of server parameters
      */
-    public function submit(Form $form, array $values = [], array $serverParameters = []): Crawler
+    public function submit(Form $form, array $values = [], array $serverParameters = []): CrawlerInterface
     {
         $form->setValues($values);
 
@@ -298,7 +299,7 @@ abstract class AbstractBrowser
      * @param string $method           The HTTP method used to submit the form
      * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include an HTTP_ prefix as PHP does)
      */
-    public function submitForm(string $button, array $fieldValues = [], string $method = 'POST', array $serverParameters = []): Crawler
+    public function submitForm(string $button, array $fieldValues = [], string $method = 'POST', array $serverParameters = []): CrawlerInterface
     {
         $crawler = $this->crawler ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
         $buttonNode = $crawler->selectButton($button);
@@ -323,7 +324,7 @@ abstract class AbstractBrowser
      * @param string $content       The raw body data
      * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      */
-    public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], ?string $content = null, bool $changeHistory = true): Crawler
+    public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], ?string $content = null, bool $changeHistory = true): CrawlerInterface
     {
         if ($this->isMainRequest) {
             $this->redirectCount = 0;
@@ -480,13 +481,20 @@ abstract class AbstractBrowser
      *
      * This method returns null if the DomCrawler component is not available.
      */
-    protected function createCrawlerFromContent(string $uri, string $content, string $type): ?Crawler
+    protected function createCrawlerFromContent(string $uri, string $content, string $type): ?CrawlerInterface
     {
-        if (!class_exists(Crawler::class)) {
+        if (!class_exists(DomCrawler::class)) {
             return null;
         }
 
-        $crawler = new Crawler(null, $uri, null, $this->useHtml5Parser);
+        $crawler = new DomCrawler(
+            null,
+            $uri,
+            null,
+            $this->useHtml5Parser ?
+                DomCrawler::CRAWLER_ENABLE_HTML5_PARSING | DomCrawler::CRAWLER_USE_EXTERNAL_PARSER
+                : 0
+        );
         $crawler->addContent($content, $type);
 
         return $crawler;
@@ -495,7 +503,7 @@ abstract class AbstractBrowser
     /**
      * Goes back in the browser history.
      */
-    public function back(): Crawler
+    public function back(): CrawlerInterface
     {
         do {
             $request = $this->history->back();
@@ -507,7 +515,7 @@ abstract class AbstractBrowser
     /**
      * Goes forward in the browser history.
      */
-    public function forward(): Crawler
+    public function forward(): CrawlerInterface
     {
         do {
             $request = $this->history->forward();
@@ -519,7 +527,7 @@ abstract class AbstractBrowser
     /**
      * Reloads the current browser.
      */
-    public function reload(): Crawler
+    public function reload(): CrawlerInterface
     {
         return $this->requestFromRequest($this->history->current(), false);
     }
@@ -529,7 +537,7 @@ abstract class AbstractBrowser
      *
      * @throws LogicException If request was not a redirect
      */
-    public function followRedirect(): Crawler
+    public function followRedirect(): CrawlerInterface
     {
         if (empty($this->redirect)) {
             throw new LogicException('The request was not redirected.');
@@ -646,7 +654,7 @@ abstract class AbstractBrowser
      *
      * @param bool $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      */
-    protected function requestFromRequest(Request $request, bool $changeHistory = true): Crawler
+    protected function requestFromRequest(Request $request, bool $changeHistory = true): CrawlerInterface
     {
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }

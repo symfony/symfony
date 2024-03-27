@@ -12,7 +12,7 @@
 namespace Symfony\Component\DomCrawler\Test\Constraint;
 
 use PHPUnit\Framework\Constraint\Constraint;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\DomCrawler;
 
 final class CrawlerSelectorTextContains extends Constraint
 {
@@ -37,7 +37,7 @@ final class CrawlerSelectorTextContains extends Constraint
     }
 
     /**
-     * @param Crawler $crawler
+     * @param DomCrawler $crawler
      */
     protected function matches($crawler): bool
     {
@@ -55,7 +55,7 @@ final class CrawlerSelectorTextContains extends Constraint
     }
 
     /**
-     * @param Crawler $crawler
+     * @param DomCrawler $crawler
      */
     protected function failureDescription($crawler): string
     {

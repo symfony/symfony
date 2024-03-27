@@ -11,6 +11,11 @@ Cache
 
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter` instead
 
+DomCrawler
+----------
+
+ * Deprecate `Crawler`, use `DomCrawler` instead
+
 ExpressionLanguage
 ------------------
 

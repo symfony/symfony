@@ -12,7 +12,7 @@
 namespace Symfony\Component\DomCrawler\Test\Constraint;
 
 use PHPUnit\Framework\Constraint\Constraint;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\CrawlerInterface;
 
 final class CrawlerAnySelectorTextSame extends Constraint
 {
@@ -32,8 +32,8 @@ final class CrawlerAnySelectorTextSame extends Constraint
 
     protected function matches($other): bool
     {
-        if (!$other instanceof Crawler) {
-            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, Crawler::class, get_debug_type($other)));
+        if (!$other instanceof CrawlerInterface) {
+            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, CrawlerInterface::class, get_debug_type($other)));
         }
 
         $other = $other->filter($this->selector);
@@ -41,15 +41,15 @@ final class CrawlerAnySelectorTextSame extends Constraint
             return false;
         }
 
-        $nodes = $other->each(fn (Crawler $node) => trim($node->text(null, true)));
+        $nodes = $other->each(fn (CrawlerInterface $node) => trim($node->text(null, true)));
 
         return \in_array($this->expectedText, $nodes, true);
     }
 
     protected function failureDescription($other): string
     {
-        if (!$other instanceof Crawler) {
-            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, Crawler::class, get_debug_type($other)));
+        if (!$other instanceof CrawlerInterface) {
+            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, CrawlerInterface::class, get_debug_type($other)));
         }
 
         return 'the Crawler '.$this->toString();

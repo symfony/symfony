@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\Constraint\LogicalAnd;
 use PHPUnit\Framework\Constraint\LogicalNot;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\DomCrawler;
 use Symfony\Component\DomCrawler\Test\Constraint as DomCrawlerConstraint;
 use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorExists;
 
@@ -140,7 +140,7 @@ trait DomCrawlerAssertionsTrait
         self::assertArrayNotHasKey($fieldName, $values, $message ?: sprintf('Field "%s" has a value in form "%s".', $fieldName, $formSelector));
     }
 
-    private static function getCrawler(): Crawler
+    private static function getCrawler(): DomCrawler
     {
         if (!$crawler = self::getClient()->getCrawler()) {
             static::fail('A client must have a crawler to make assertions. Did you forget to make an HTTP request?');

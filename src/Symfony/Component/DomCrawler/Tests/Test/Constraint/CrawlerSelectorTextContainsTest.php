@@ -14,7 +14,7 @@ namespace Symfony\Component\DomCrawler\Tests\Test\Constraint;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestFailure;
-use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\DomCrawler;
 use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorTextContains;
 
 class CrawlerSelectorTextContainsTest extends TestCase
@@ -22,12 +22,12 @@ class CrawlerSelectorTextContainsTest extends TestCase
     public function testConstraint()
     {
         $constraint = new CrawlerSelectorTextContains('title', 'Foo');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foobar'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head></head><body>Bar'), '', true));
+        $this->assertTrue($constraint->evaluate(new DomCrawler('<html><head><title>Foobar'), '', true));
+        $this->assertFalse($constraint->evaluate(new DomCrawler('<html><head><title>Bar'), '', true));
+        $this->assertFalse($constraint->evaluate(new DomCrawler('<html><head></head><body>Bar'), '', true));
 
         try {
-            $constraint->evaluate(new Crawler('<html><head><title>Bar'));
+            $constraint->evaluate(new DomCrawler('<html><head><title>Bar'));
 
             $this->fail();
         } catch (ExpectationFailedException $e) {
@@ -35,7 +35,7 @@ class CrawlerSelectorTextContainsTest extends TestCase
         }
 
         try {
-            $constraint->evaluate(new Crawler('<html><head></head><body>Bar'));
+            $constraint->evaluate(new DomCrawler('<html><head></head><body>Bar'));
 
             $this->fail();
         } catch (ExpectationFailedException $e) {

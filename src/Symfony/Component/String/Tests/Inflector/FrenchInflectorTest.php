@@ -124,6 +124,22 @@ class FrenchInflectorTest extends TestCase
             ['madame', 'mesdames'],
             ['mademoiselle', 'mesdemoiselles'],
             ['monseigneur', 'messeigneurs'],
+
+            // Doctrine words
+            ['ami', 'amis'],
+            ['chien', 'chiens'],
+            ['fidèle', 'fidèles'],
+            ['rapport', 'rapports'],
+            ['sain', 'sains'],
+            ['jouet', 'jouets'],
+            ['gaz', 'gaz'],
+            ['tuyau', 'tuyaux'],
+            ['nouveau', 'nouveaux'],
+            ['aveu', 'aveux'],
+            ['lieu', 'lieux'],
+            ['sarrau', 'sarraus'],
+            ['détail', 'détails'],
+            ['gemmail', 'gemmaux'],
         ];
     }
 

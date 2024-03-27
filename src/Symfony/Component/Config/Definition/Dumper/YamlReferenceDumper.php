@@ -18,7 +18,6 @@ use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
-use Symfony\Component\Config\Definition\VariableNode;
 use Symfony\Component\Yaml\Inline;
 
 /**
@@ -90,19 +89,12 @@ class YamlReferenceDumper
                 $children = $this->getPrototypeChildren($node);
             }
 
-            if (!$children) {
-                if ($node->hasDefaultValue() && \count($defaultArray = $node->getDefaultValue())) {
-                    $default = '';
-                } elseif (!\is_array($example)) {
-                    $default = '[]';
-                }
+            if (!$children && !($node->hasDefaultValue() && \count($defaultArray = $node->getDefaultValue()))) {
+                $default = '[]';
             }
         } elseif ($node instanceof EnumNode) {
             $comments[] = 'One of '.$node->getPermissibleValues('; ');
             $default = $node->hasDefaultValue() ? Inline::dump($node->getDefaultValue()) : '~';
-        } elseif (VariableNode::class === $node::class && \is_array($example)) {
-            // If there is an array example, we are sure we dont need to print a default value
-            $default = '';
         } else {
             $default = '~';
 
@@ -203,14 +195,16 @@ class YamlReferenceDumper
             }
             $prefix = $asComment ? '# ' : '';
 
+            $prefix = $asComment ? '# ' : '';
+
             if ($isIndexed) {
                 $this->writeLine($prefix.'- '.$val, $depth * 4);
             } else {
-                $this->writeLine($prefix.sprintf('%-20s %s', $key.':', $val), $depth * 4);
+                $this->writeLine(sprintf('%s%-20s %s', $prefix, $key.':', $val), $depth * 4);
             }
 
             if (\is_array($value)) {
-                $this->writeArray($value, $depth + 1);
+                $this->writeArray($value, $depth + 1, $asComment);
             }
         }
     }

@@ -28,6 +28,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     use LazyProxyTrait {
         resetLazyObject as reset;
     }
+    use Redis6ProxyTrait;
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 
@@ -94,11 +95,6 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function bgrewriteaof(): \Redis|bool
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->bgrewriteaof(...\func_get_args());
-    }
-
-    public function waitaof($numlocal, $numreplicas, $timeout): \Redis|array|false
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->waitaof(...\func_get_args());
     }
 
     public function bitcount($key, $start = 0, $end = -1, $bybit = false): \Redis|false|int
@@ -229,11 +225,6 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function discard(): \Redis|bool
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->discard(...\func_get_args());
-    }
-
-    public function dump($key): \Redis|string
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->dump(...\func_get_args());
     }
 
     public function echo($str): \Redis|false|string
@@ -654,11 +645,6 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function ltrim($key, $start, $end): \Redis|bool
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->ltrim(...\func_get_args());
-    }
-
-    public function mget($keys): \Redis|array
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->mget(...\func_get_args());
     }
 
     public function migrate($host, $port, $key, $dstdb, $timeout, $copy = false, $replace = false, #[\SensitiveParameter] $credentials = null): \Redis|bool

@@ -414,7 +414,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
     [@method="post"]
     [@action="http://example.com"]
-    [@class="my&class"]
+    [@id="form_name"]
 '
         );
     }

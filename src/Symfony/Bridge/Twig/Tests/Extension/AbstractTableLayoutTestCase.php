@@ -271,7 +271,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
     ]
     [@method="post"]
     [@action="http://example.com"]
-    [@class="my&class"]
+    [@id="form_name"]
 '
         );
     }

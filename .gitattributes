@@ -7,3 +7,5 @@
 /src/Symfony/Component/Translation/Bridge export-ignore
 /src/Symfony/Component/Emoji/Resources/data/* linguist-generated=true
 /src/Symfony/Component/Intl/Resources/data/*/* linguist-generated=true
+/src/Symfony/Component/JsonEncoder/Tests/Fixtures/encoder/* linguist-generated=true
+/src/Symfony/Component/JsonEncoder/Tests/Fixtures/decoder/* linguist-generated=true

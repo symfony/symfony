@@ -129,22 +129,28 @@ class YamlFileLoader extends FileLoader
             return null;
         }
 
-        $this->loadContent($content, $path);
+        ++$this->importing;
+        try {
+            $this->loadContent($content, $path);
 
-        // per-env configuration
-        if ($this->env && isset($content['when@'.$this->env])) {
-            if (!\is_array($content['when@'.$this->env])) {
-                throw new InvalidArgumentException(sprintf('The "when@%s" key should contain an array in "%s". Check your YAML syntax.', $this->env, $path));
-            }
+            // per-env configuration
+            if ($this->env && isset($content['when@'.$this->env])) {
+                if (!\is_array($content['when@'.$this->env])) {
+                    throw new InvalidArgumentException(sprintf('The "when@%s" key should contain an array in "%s". Check your YAML syntax.', $this->env, $path));
+                }
 
-            $env = $this->env;
-            $this->env = null;
-            try {
-                $this->loadContent($content['when@'.$env], $path);
-            } finally {
-                $this->env = $env;
+                $env = $this->env;
+                $this->env = null;
+                try {
+                    $this->loadContent($content['when@'.$env], $path);
+                } finally {
+                    $this->env = $env;
+                }
             }
+        } finally {
+            --$this->importing;
         }
+        $this->loadExtensionConfigs();
 
         return null;
     }
@@ -802,7 +808,7 @@ class YamlFileLoader extends FileLoader
                 continue;
             }
 
-            if (!$this->container->hasExtension($namespace)) {
+            if (!$this->prepend && !$this->container->hasExtension($namespace)) {
                 $extensionNamespaces = array_filter(array_map(fn (ExtensionInterface $ext) => $ext->getAlias(), $this->container->getExtensions()));
                 throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $namespace, $file, $namespace, $extensionNamespaces ? sprintf('"%s"', implode('", "', $extensionNamespaces)) : 'none'));
             }
@@ -941,12 +947,14 @@ class YamlFileLoader extends FileLoader
                 continue;
             }
 
-            if (!\is_array($values) && null !== $values) {
+            if (!\is_array($values)) {
                 $values = [];
             }
 
-            $this->container->loadFromExtension($namespace, $values);
+            $this->loadExtensionConfig($namespace, $values);
         }
+
+        $this->loadExtensionConfigs();
     }
 
     private function checkDefinition(string $id, array $definition, string $file): void

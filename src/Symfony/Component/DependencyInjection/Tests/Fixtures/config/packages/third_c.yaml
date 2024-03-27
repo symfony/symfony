@@ -1,0 +1,6 @@
+third:
+    foo: c1
+
+when@test:
+    third:
+        foo: c2

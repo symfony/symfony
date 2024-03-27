@@ -90,6 +90,7 @@ class SwitchUserListener extends AbstractListener
         }
 
         $request->attributes->set('_switch_user_username', $username);
+        $request->attributes->set('_switch_user_redirect_path', $request->query->get('_redirect_path'));
 
         return true;
     }
@@ -105,6 +106,9 @@ class SwitchUserListener extends AbstractListener
 
         $username = $request->attributes->get('_switch_user_username');
         $request->attributes->remove('_switch_user_username');
+
+        $redirectPath = $request->attributes->get('_switch_user_redirect_path');
+        $request->attributes->remove('_switch_user_redirect_path');
 
         if (null === $this->tokenStorage->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
@@ -124,7 +128,7 @@ class SwitchUserListener extends AbstractListener
         if (!$this->stateless) {
             $request->query->remove($this->usernameParameter);
             $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
-            $response = new RedirectResponse($this->urlGenerator && $this->targetRoute ? $this->urlGenerator->generate($this->targetRoute) : $request->getUri(), 302);
+            $response = new RedirectResponse((null !== $redirectPath) ? $redirectPath : ($this->urlGenerator && $this->targetRoute ? $this->urlGenerator->generate($this->targetRoute) : $request->getUri()), 302);
 
             $event->setResponse($response);
         }

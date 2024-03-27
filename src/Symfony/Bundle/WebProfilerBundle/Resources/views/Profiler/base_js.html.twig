@@ -11,30 +11,11 @@
 
     class SymfonyProfiler {
         constructor() {
-            this.#reorderMainMenuItems();
             this.#createTabs();
             this.#createTableSearchFields();
             this.#createToggles();
             this.#createCopyToClipboard();
             this.#convertDateTimesToUserTimezone();
-        }
-
-        #reorderMainMenuItems() {
-            /* reorder the main menu items to always display first the non-disabled items */
-            const mainMenuElement = document.querySelector('#menu-profiler');
-            const firstDisabledMenuItem = mainMenuElement.querySelector('li a > span.disabled')?.parentNode?.parentNode;
-
-            if (!firstDisabledMenuItem) {
-                return;
-            }
-
-            const mainMenuItems = mainMenuElement.querySelectorAll('li');
-            mainMenuItems.forEach(menuItem => {
-                const isDisabled = null !== menuItem.querySelector('a > span.disabled');
-                if (!isDisabled) {
-                    mainMenuElement.insertBefore(menuItem, firstDisabledMenuItem);
-                }
-            });
         }
 
         #createTabs() {

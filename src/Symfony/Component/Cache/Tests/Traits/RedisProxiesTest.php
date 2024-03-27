@@ -85,32 +85,31 @@ class RedisProxiesTest extends TestCase
      */
     public function testRedis6Proxy($class, $stub)
     {
-        $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
+        if (version_compare(phpversion('redis'), '6.0.2', '>')) {
+            $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
+        } else {
+            $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/6.0.2/{$stub}.stub.php");
+        }
+
         $stub = preg_replace('/^class /m', 'return; \0', $stub);
         $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);
         $stub = preg_replace('/^    public const .*/m', '', $stub);
         eval(substr($stub, 5));
-        $r = new \ReflectionClass($class.'StubInterface');
 
-        $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php");
-        $proxy = substr($proxy, 0, 4 + strpos($proxy, '[];'));
+        $this->assertEquals(self::dumpMethods(new \ReflectionClass($class.'StubInterface')), self::dumpMethods(new \ReflectionClass(sprintf('Symfony\Component\Cache\Traits\%s6Proxy', $class))));
+    }
+
+    private static function dumpMethods(\ReflectionClass $class): string
+    {
         $methods = [];
 
-        foreach ($r->getMethods() as $method) {
+        foreach ($class->getMethods() as $method) {
             if ('reset' === $method->name || method_exists(LazyProxyTrait::class, $method->name)) {
                 continue;
             }
+
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
             $signature = ProxyHelper::exportSignature($method, false, $args);
-
-            if ('Redis' === $class && 'mget' === $method->name) {
-                $signature = str_replace(': \Redis|array|false', ': \Redis|array', $signature);
-            }
-
-            if ('RedisCluster' === $class && 'publish' === $method->name) {
-                $signature = str_replace(': \RedisCluster|bool|int', ': \RedisCluster|bool', $signature);
-            }
-
             $methods[] = "\n    ".str_replace('timeout = 0.0', 'timeout = 0', $signature)."\n".<<<EOPHP
                 {
                     {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
@@ -119,9 +118,8 @@ class RedisProxiesTest extends TestCase
             EOPHP;
         }
 
-        uksort($methods, 'strnatcmp');
-        $proxy .= implode('', $methods)."}\n";
+        usort($methods, 'strnatcmp');
 
-        $this->assertStringEqualsFile(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php", $proxy);
+        return implode("\n", $methods);
     }
 }

@@ -212,6 +212,6 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('serializer.normalizer.backed_enum', BackedEnumNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -915])
+            ->tag('serializer.normalizer', ['priority' => -880])
     ;
 };

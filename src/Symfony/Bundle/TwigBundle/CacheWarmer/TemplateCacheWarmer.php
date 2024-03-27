@@ -26,20 +26,25 @@ use Twig\Error\Error;
  */
 class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
     private Environment $twig;
-    private iterable $iterator;
 
-    public function __construct(ContainerInterface $container, iterable $iterator)
+    public function __construct(private ContainerInterface $container, private iterable $iterator, private string $cacheFolder = 'twig')
     {
-        // As this cache warmer is optional, dependencies should be lazy-loaded, that's why a container should be injected.
-        $this->container = $container;
-        $this->iterator = $iterator;
+        if (\func_num_args() < 3) {
+            trigger_deprecation('symfony/twig-bundle', '7.1', 'The "string $cacheFolder" argument of "%s()" method will not be optional anymore in version 8.0, not defining it is deprecated.', __METHOD__);
+        }
     }
 
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
+        if (!$buildDir) {
+            return [];
+        }
+
         $this->twig ??= $this->container->get('twig');
+
+        $originalCache = $this->twig->getCache();
+        $this->twig->setCache($buildDir.\DIRECTORY_SEPARATOR.$this->cacheFolder);
 
         foreach ($this->iterator as $template) {
             try {
@@ -55,6 +60,8 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
                  */
             }
         }
+
+        $this->twig->setCache($originalCache);
 
         return [];
     }

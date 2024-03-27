@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Mark class `TemplateCacheWarmer` as `final`
+ * Create `ChainCache` to store warmed-up cache in `kernel.build_dir` and runtime cache in `cache_dir`
+ * Make `TemplateCacheWarmer` use `kernel.build_dir` instead of `cache_dir`
 
 7.0
 ---

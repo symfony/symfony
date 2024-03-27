@@ -44,13 +44,36 @@ class TwigExtensionTest extends TestCase
 
         // Twig options
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertEquals('%kernel.cache_dir%/twig', $options['cache'], '->load() sets default value for cache option');
+        $this->assertEquals(new Reference('twig.template_cache.chain'), $options['cache'], '->load() sets default value for cache option');
         $this->assertEquals('%kernel.charset%', $options['charset'], '->load() sets default value for charset option');
         $this->assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
 
         if (class_exists(Mailer::class)) {
             $this->assertCount(2, $container->getDefinition('twig.mime_body_renderer')->getArguments());
         }
+    }
+
+    /**
+     * @dataProvider getFormats
+     */
+    public function testLoadNoCacheConfiguration($format)
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'full', $format);
+        $this->loadFromFile($container, 'no-cache', $format);
+        $this->compileContainer($container);
+
+        $this->assertEquals(Environment::class, $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
+
+        $this->assertFalse($container->hasDefinition('twig.template_cache_warmer'), '->load() removes the CacheWarmer');
+        $this->assertFalse($container->hasDefinition('twig.template_cache.chain'), '->load() removes the CacheChain');
+        $this->assertFalse($container->hasDefinition('twig.template_cache.readonly_cache'), '->load() removes the read-only cache');
+        $this->assertFalse($container->hasDefinition('twig.template_cache.runtime_cache'), '->load() removes the runtime cache');
+
+        // Twig options
+        $options = $container->getDefinition('twig')->getArgument(1);
+        $this->assertFalse($options['cache'], '->load() sets default value for cache option');
     }
 
     /**
@@ -92,7 +115,7 @@ class TwigExtensionTest extends TestCase
         $this->assertTrue($options['auto_reload'], '->load() sets the auto_reload option');
         $this->assertSame('name', $options['autoescape'], '->load() sets the autoescape option');
         $this->assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
-        $this->assertEquals('/tmp', $options['cache'], '->load() sets the cache option');
+        $this->assertEquals(new Reference('twig.template_cache.chain'), $options['cache'], '->load() sets the cache option');
         $this->assertEquals('ISO-8859-1', $options['charset'], '->load() sets the charset option');
         $this->assertTrue($options['debug'], '->load() sets the debug option');
         $this->assertTrue($options['strict_variables'], '->load() sets the strict_variables option');

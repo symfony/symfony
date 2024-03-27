@@ -13,6 +13,7 @@
             <framework:audit-trail enabled="true"/>
             <framework:initial-marking>draft</framework:initial-marking>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
+            <framework:definition-validator>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Validator\DefinitionValidator</framework:definition-validator>
             <framework:place name="draft" />
             <framework:place name="wait_for_journalist" />
             <framework:place name="approved_by_journalist" />

@@ -386,6 +386,7 @@
             <xsd:element name="initial-marking" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="marking-store" type="marking_store" minOccurs="0" maxOccurs="1" />
             <xsd:element name="support" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="definition-validator" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="event-to-dispatch" type="event_to_dispatch" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="place" type="place" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="transition" type="transition" minOccurs="0" maxOccurs="unbounded" />

@@ -9,6 +9,8 @@ framework:
             type: workflow
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase
+            definition_validators:
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Validator\DefinitionValidator
             initial_marking: [draft]
             metadata:
                 title: article workflow

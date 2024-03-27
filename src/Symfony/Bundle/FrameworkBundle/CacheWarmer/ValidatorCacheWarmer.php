@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
@@ -34,13 +35,17 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
      */
     public function __construct(
         private ValidatorBuilder $validatorBuilder,
-        string $phpArrayFile,
+        private string $phpArrayFile,
     ) {
-        parent::__construct($phpArrayFile);
+        parent::__construct();
     }
 
     protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool
     {
+        if (!$buildDir) {
+            return false;
+        }
+
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), $arrayAdapter);
 
@@ -68,6 +73,19 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
         $values = array_filter($values, fn ($val) => null !== $val);
 
         return parent::warmUpPhpArrayAdapter($phpArrayAdapter, $values);
+    }
+
+    protected function getPhpArrayFile(string $cacheDir, ?string $buildDir = null): ?string
+    {
+        if (!$buildDir) {
+            return null;
+        }
+
+        if (Path::isRelative($this->phpArrayFile)) {
+            return Path::join($buildDir, $this->phpArrayFile);
+        }
+
+        return $this->phpArrayFile;
     }
 
     /**

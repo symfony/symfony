@@ -31,10 +31,57 @@ class ValidatorCacheWarmerTest extends TestCase
         $file = sys_get_temp_dir().'/cache-validator.php';
         @unlink($file);
 
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
-        $warmer->warmUp(\dirname($file));
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, basename($file));
+        $warmer->warmUp(\dirname($file), \dirname($file));
 
         $this->assertFileExists($file);
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
+        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
+    }
+
+    public function testWarmUpAbsoluteFilePath()
+    {
+        $validatorBuilder = new ValidatorBuilder();
+        $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
+        $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/author.yml');
+        $validatorBuilder->addMethodMapping('loadValidatorMetadata');
+        $validatorBuilder->enableAttributeMapping();
+
+        $file = sys_get_temp_dir().'/0/cache-validator.php';
+        @unlink($file);
+
+        $cacheDir = sys_get_temp_dir().'/1';
+
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
+        $warmer->warmUp($cacheDir, $cacheDir);
+
+        $this->assertFileExists($file);
+        $this->assertFileDoesNotExist($cacheDir.'/cache-validator.php');
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
+        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
+    }
+
+    public function testWarmUpWithoutBuilDir()
+    {
+        $validatorBuilder = new ValidatorBuilder();
+        $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
+        $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/author.yml');
+        $validatorBuilder->addMethodMapping('loadValidatorMetadata');
+        $validatorBuilder->enableAttributeMapping();
+
+        $file = sys_get_temp_dir().'/cache-validator.php';
+        @unlink($file);
+
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, basename($file));
+        $warmer->warmUp(\dirname($file));
+
+        $this->assertFileDoesNotExist($file);
 
         $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
 
@@ -51,8 +98,8 @@ class ValidatorCacheWarmerTest extends TestCase
         $file = sys_get_temp_dir().'/cache-validator-with-annotations.php';
         @unlink($file);
 
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
-        $warmer->warmUp(\dirname($file));
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, basename($file));
+        $warmer->warmUp(\dirname($file), \dirname($file));
 
         $this->assertFileExists($file);
 
@@ -71,8 +118,8 @@ class ValidatorCacheWarmerTest extends TestCase
         $file = sys_get_temp_dir().'/cache-validator-without-loaders.php';
         @unlink($file);
 
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
-        $warmer->warmUp(\dirname($file));
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, basename($file));
+        $warmer->warmUp(\dirname($file), \dirname($file));
 
         $this->assertFileExists($file);
     }
@@ -85,9 +132,12 @@ class ValidatorCacheWarmerTest extends TestCase
     {
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_ValidatorCacheWarmerTest', false));
 
+        $file = tempnam(sys_get_temp_dir(), __FUNCTION__);
+        @unlink($file);
+
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, tempnam(sys_get_temp_dir(), __FUNCTION__));
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, basename($file));
 
         spl_autoload_register($classloader = function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {
@@ -95,7 +145,9 @@ class ValidatorCacheWarmerTest extends TestCase
             }
         }, true, true);
 
-        $warmer->warmUp('foo');
+        $warmer->warmUp(\dirname($file), \dirname($file));
+
+        $this->assertFileExists($file);
 
         spl_autoload_unregister($classloader);
     }
@@ -109,11 +161,14 @@ class ValidatorCacheWarmerTest extends TestCase
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('This exception should not be caught by the warmer.');
 
+        $file = tempnam(sys_get_temp_dir(), __FUNCTION__);
+        @unlink($file);
+
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_ValidatorCacheWarmerTest', false));
 
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, tempnam(sys_get_temp_dir(), __FUNCTION__));
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, basename($file));
 
         spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {
@@ -122,8 +177,12 @@ class ValidatorCacheWarmerTest extends TestCase
             }
         }, true, true);
 
-        $warmer->warmUp('foo');
+        try {
+            $warmer->warmUp(\dirname($file), \dirname($file));
+        } finally {
+            $this->assertFileDoesNotExist($file);
 
-        spl_autoload_unregister($classLoader);
+            spl_autoload_unregister($classLoader);
+        }
     }
 }

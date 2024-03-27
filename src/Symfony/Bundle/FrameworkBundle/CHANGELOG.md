@@ -9,6 +9,9 @@ CHANGELOG
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
  * Move the Router `cache_dir` to `kernel.build_dir`
  * Deprecate the `router.cache_dir` config option
+ * Remove `AbstractPhpFileCacheWarmer`'s constructor argument, override new `getPhpArrayFile` method instead
+ * Make `ValidatorCacheWarmer` use `kernel.build_dir` instead of `cache_dir`
+ * Make `SerializeCacheWarmer` use `kernel.build_dir` instead of `cache_dir`
  * Add `rate_limiter` tags to rate limiter services
  * Add `secrets:reveal` command
  * Add `rate_limiter` option to `http_client.default_options` and `http_client.scoped_clients`

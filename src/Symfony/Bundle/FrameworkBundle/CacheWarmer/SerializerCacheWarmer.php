@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
@@ -34,13 +35,16 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
      */
     public function __construct(
         private array $loaders,
-        string $phpArrayFile,
+        private string $phpArrayFile,
     ) {
-        parent::__construct($phpArrayFile);
+        parent::__construct();
     }
 
     protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool
     {
+        if (!$buildDir) {
+            return false;
+        }
         if (!$this->loaders) {
             return true;
         }
@@ -58,6 +62,19 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
         }
 
         return true;
+    }
+
+    protected function getPhpArrayFile(string $cacheDir, ?string $buildDir = null): ?string
+    {
+        if (!$buildDir) {
+            return null;
+        }
+
+        if (Path::isRelative($this->phpArrayFile)) {
+            return Path::join($buildDir, $this->phpArrayFile);
+        }
+
+        return $this->phpArrayFile;
     }
 
     /**

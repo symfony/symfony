@@ -75,11 +75,6 @@ abstract class BaseType extends AbstractType
             $id = \is_string($options['form_attr']) ? $options['form_attr'] : $name;
             $fullName = $name;
             $uniqueBlockPrefix = '_'.$blockName;
-
-            // Strip leading underscores and digits. These are allowed in
-            // form names, but not in HTML4 ID attributes.
-            // https://www.w3.org/TR/html401/struct/global#adef-id
-            $id = ltrim($id, '_0123456789');
         }
 
         $blockPrefixes = [];

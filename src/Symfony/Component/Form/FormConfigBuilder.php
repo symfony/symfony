@@ -632,7 +632,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     final public static function validateName(?string $name): void
     {
         if (!self::isValidName($name)) {
-            throw new InvalidArgumentException(sprintf('The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").', $name));
+            throw new InvalidArgumentException(sprintf('The name "%s" contains illegal characters or equals to "isindex". Names should only contain letters, digits, underscores ("_"), hyphens ("-") and colons (":").', $name));
         }
     }
 
@@ -642,12 +642,12 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * A name is accepted if it
      *
      *   * is empty
-     *   * starts with a letter, digit or underscore
      *   * contains only letters, digits, numbers, underscores ("_"),
      *     hyphens ("-") and colons (":")
+     *   * is not equal to "isindex"
      */
     final public static function isValidName(?string $name): bool
     {
-        return '' === $name || null === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
+        return ('' === $name || null === $name || preg_match('/^[a-zA-Z0-9_\-:]*$/D', $name)) && 'isindex' !== $name;
     }
 }

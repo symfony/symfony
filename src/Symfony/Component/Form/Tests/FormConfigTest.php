@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\NativeRequestHandler;
 
@@ -21,26 +22,46 @@ use Symfony\Component\Form\NativeRequestHandler;
  */
 class FormConfigTest extends TestCase
 {
-    public static function getHtml4Ids()
+    public static function provideInvalidFormInputName(): iterable
+    {
+        return [
+            ['isindex'],
+            ['#'],
+            ['a#'],
+            ['a$'],
+            ['a%'],
+            ['a '],
+            ["a\t"],
+            ["a\n"],
+
+            // Periods are allowed by the HTML4 spec, but disallowed by us
+            // because they break the generated property paths
+            ['a.'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideInvalidFormInputName
+     */
+    public function testInvalidFormInputName(string $name)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The name "%s" contains illegal characters or equals to "isindex". Names should only contain letters, digits, underscores ("_"), hyphens ("-") and colons (":").', $name));
+
+        new FormConfigBuilder($name, null, new EventDispatcher());
+    }
+
+    public static function provideValidFormInputName(): iterable
     {
         return [
             ['z0'],
             ['A0'],
             ['A9'],
             ['Z0'],
-            ['#', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ['a#', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ['a$', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ['a%', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ['a ', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ["a\t", 'Symfony\Component\Form\Exception\InvalidArgumentException'],
-            ["a\n", 'Symfony\Component\Form\Exception\InvalidArgumentException'],
             ['a-'],
             ['a_'],
             ['a:'],
-            // Periods are allowed by the HTML4 spec, but disallowed by us
-            // because they break the generated property paths
-            ['a.', 'Symfony\Component\Form\Exception\InvalidArgumentException'],
+
             // Contrary to the HTML4 spec, we allow names starting with a
             // number, otherwise naming fields by collection indices is not
             // possible.
@@ -48,29 +69,39 @@ class FormConfigTest extends TestCase
             // "id" attribute to produce valid HTML4.
             ['0'],
             ['9'],
+
             // Contrary to the HTML4 spec, we allow names starting with an
             // underscore, since this is already a widely used practice in
             // Symfony.
             // For root forms, leading underscores will be stripped from the
             // "id" attribute to produce valid HTML4.
             ['_'],
+
             // Integers are allowed
             [0],
             [123],
+
             // NULL is allowed
             [null],
+
+            // Allowed in HTML 5 specification
+            // See: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fe-name
+            ['_charset_'],
+            ['-x'],
+            [':x'],
+            ['isINDEX'],
+
+            // This value shouldn't be allowed.
+            // However, many tests in Form component require empty name
+            [''],
         ];
     }
 
     /**
-     * @dataProvider getHtml4Ids
+     * @dataProvider provideValidFormInputName
      */
-    public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $expectedException = null)
+    public function testValidFormInputName(string|int|null $name)
     {
-        if (null !== $expectedException) {
-            $this->expectException($expectedException);
-        }
-
         $formConfigBuilder = new FormConfigBuilder($name, null, new EventDispatcher());
 
         $this->assertSame((string) $name, $formConfigBuilder->getName());

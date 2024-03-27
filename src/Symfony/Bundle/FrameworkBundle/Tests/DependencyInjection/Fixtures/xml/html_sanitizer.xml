@@ -10,6 +10,7 @@
         <php-errors log="true" />
         <html-sanitizer>
             <sanitizer name="custom"
+                block-body-elements="true"
                 allow-safe-elements="true"
                 allow-static-elements="true"
                 force-https-urls="true"

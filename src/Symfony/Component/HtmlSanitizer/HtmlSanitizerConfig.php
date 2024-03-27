@@ -152,6 +152,23 @@ class HtmlSanitizerConfig
     }
 
     /**
+     * Blocks all static body elements and remove attributes.
+     *
+     * All scripts will be removed.
+     */
+    public function blockBodyElements(): static
+    {
+        $elements = array_keys(W3CReference::BODY_ELEMENTS);
+
+        $clone = clone $this;
+        foreach ($elements as $element) {
+            $clone = $clone->blockElement($element, '*');
+        }
+
+        return $clone;
+    }
+
+    /**
      * Allows only a given list of schemes to be used in links href attributes.
      *
      * All other schemes will be dropped.

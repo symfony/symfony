@@ -73,7 +73,7 @@ final class ReflectionExtractableDummy extends AbstractDummy
         $this->nothing = $nothing;
     }
 
-    public function setOptional(int $optional = null): void
+    public function setOptional(?int $optional = null): void
     {
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\AccessToken\Oidc;
 
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
@@ -53,8 +54,8 @@ class OidcTokenHandlerTest extends TestCase
         $loggerMock->expects($this->never())->method('error');
 
         $userBadge = (new OidcTokenHandler(
-            new ES256(),
-            $this->getJWK(),
+            new AlgorithmManager([new ES256()]),
+            $this->getJWKSet(),
             self::AUDIENCE,
             ['https://www.example.com'],
             $claim,
@@ -87,8 +88,8 @@ class OidcTokenHandlerTest extends TestCase
         $this->expectExceptionMessage('Invalid credentials.');
 
         (new OidcTokenHandler(
-            new ES256(),
-            $this->getJWK(),
+            new AlgorithmManager([new ES256()]),
+            $this->getJWKSet(),
             self::AUDIENCE,
             ['https://www.example.com'],
             'sub',
@@ -146,8 +147,8 @@ class OidcTokenHandlerTest extends TestCase
         $this->expectExceptionMessage('Invalid credentials.');
 
         (new OidcTokenHandler(
-            new ES256(),
-            self::getJWK(),
+            new AlgorithmManager([new ES256()]),
+            self::getJWKSet(),
             self::AUDIENCE,
             ['https://www.example.com'],
             'email',
@@ -175,6 +176,20 @@ class OidcTokenHandlerTest extends TestCase
             'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
             'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
             'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
+        ]);
+    }
+
+    private static function getJWKSet(): JWKSet
+    {
+        return new JWKSet([
+            new JWK([
+                'kty' => 'EC',
+                'crv' => 'P-256',
+                'x' => 'FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars',
+                'y' => 'rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY',
+                'd' => '4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0',
+            ]),
+            self::getJWK(),
         ]);
     }
 }

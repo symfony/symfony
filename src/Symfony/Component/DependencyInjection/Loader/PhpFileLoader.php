@@ -183,7 +183,7 @@ class PhpFileLoader extends FileLoader
 
         if (!$this->container->hasExtension($alias)) {
             $extensions = array_filter(array_map(fn (ExtensionInterface $ext) => $ext->getAlias(), $this->container->getExtensions()));
-            throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s". Looked for namespace "%s", found "%s".', $namespace, $alias, $extensions ? implode('", "', $extensions) : 'none'));
+            throw new InvalidArgumentException(UndefinedExtensionHandler::getErrorMessage($namespace, null, $alias, $extensions));
         }
 
         $extension = $this->container->getExtension($alias);

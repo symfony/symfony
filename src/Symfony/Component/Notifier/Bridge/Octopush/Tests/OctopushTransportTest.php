@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class OctopushTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): OctopushTransport
+    public function createTransport(?HttpClientInterface $client = null): OctopushTransport
     {
         return new OctopushTransport('userLogin', 'apiKey', 'from', 'type', $client ?? $this->createMock(HttpClientInterface::class));
     }

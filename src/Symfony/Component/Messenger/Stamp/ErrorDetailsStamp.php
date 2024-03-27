@@ -25,7 +25,7 @@ final class ErrorDetailsStamp implements StampInterface
     private string $exceptionMessage;
     private $flattenException;
 
-    public function __construct(string $exceptionClass, int|string $exceptionCode, string $exceptionMessage, FlattenException $flattenException = null)
+    public function __construct(string $exceptionClass, int|string $exceptionCode, string $exceptionMessage, ?FlattenException $flattenException = null)
     {
         $this->exceptionClass = $exceptionClass;
         $this->exceptionCode = $exceptionCode;

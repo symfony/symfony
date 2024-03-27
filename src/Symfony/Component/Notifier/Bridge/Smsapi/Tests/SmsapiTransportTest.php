@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmsapiTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): SmsapiTransport
+    public function createTransport(?HttpClientInterface $client = null): SmsapiTransport
     {
         return (new SmsapiTransport('testToken', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host');
     }

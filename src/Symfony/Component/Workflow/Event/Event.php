@@ -29,7 +29,7 @@ class Event extends BaseEvent
     private $transition;
     private $workflow;
 
-    public function __construct(object $subject, Marking $marking, Transition $transition = null, WorkflowInterface $workflow = null, array $context = [])
+    public function __construct(object $subject, Marking $marking, ?Transition $transition = null, ?WorkflowInterface $workflow = null, array $context = [])
     {
         $this->subject = $subject;
         $this->marking = $marking;

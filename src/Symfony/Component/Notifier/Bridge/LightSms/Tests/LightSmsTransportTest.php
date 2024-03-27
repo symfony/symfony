@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class LightSmsTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): LightSmsTransport
+    public function createTransport(?HttpClientInterface $client = null): LightSmsTransport
     {
         return new LightSmsTransport('accountSid', 'authToken', 'from', $client ?? $this->createMock(HttpClientInterface::class));
     }

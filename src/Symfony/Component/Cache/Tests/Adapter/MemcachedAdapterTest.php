@@ -44,7 +44,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         }
     }
 
-    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null, string $namespace = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null, ?string $namespace = null): CacheItemPoolInterface
     {
         $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
 

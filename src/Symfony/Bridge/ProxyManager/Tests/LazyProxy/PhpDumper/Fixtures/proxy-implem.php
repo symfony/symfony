@@ -200,7 +200,7 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
     {
     }
 
-    public function setProxyInitializer(\Closure $initializer = null)%S
+    public function setProxyInitializer(?\Closure $initializer = null)%S
     {
         $this->initializer%s = $initializer;
     }

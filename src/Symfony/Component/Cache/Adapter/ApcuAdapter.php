@@ -25,7 +25,7 @@ class ApcuAdapter extends AbstractAdapter
     /**
      * @throws CacheException if APCu is not enabled
      */
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $version = null, MarshallerInterface $marshaller = null)
+    public function __construct(string $namespace = '', int $defaultLifetime = 0, ?string $version = null, ?MarshallerInterface $marshaller = null)
     {
         if (!static::isSupported()) {
             throw new CacheException('APCu is not enabled.');

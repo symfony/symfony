@@ -536,7 +536,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
         ]);
     }
 
-    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer
     {
         return new DateTimeToArrayTransformer($inputTimezone, $outputTimezone);
     }

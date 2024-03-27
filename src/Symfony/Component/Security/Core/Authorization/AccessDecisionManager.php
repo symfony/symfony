@@ -40,7 +40,7 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @param iterable<mixed, VoterInterface> $voters An array or an iterator of VoterInterface instances
      */
-    public function __construct(iterable $voters = [], AccessDecisionStrategyInterface $strategy = null)
+    public function __construct(iterable $voters = [], ?AccessDecisionStrategyInterface $strategy = null)
     {
         $this->voters = $voters;
         $this->strategy = $strategy ?? new AffirmativeStrategy();

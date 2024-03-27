@@ -73,7 +73,7 @@ class PdoAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideDsn
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsn(string $dsn, ?string $file = null)
     {
         try {
             $pool = new PdoAdapter($dsn);

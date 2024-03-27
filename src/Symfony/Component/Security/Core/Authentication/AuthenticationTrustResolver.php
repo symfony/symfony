@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AuthenticationTrustResolver implements AuthenticationTrustResolverInterface
 {
-    public function isAuthenticated(TokenInterface $token = null): bool
+    public function isAuthenticated(?TokenInterface $token = null): bool
     {
         return $token && $token->getUser();
     }
@@ -29,7 +29,7 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
     /**
      * {@inheritdoc}
      */
-    public function isRememberMe(TokenInterface $token = null): bool
+    public function isRememberMe(?TokenInterface $token = null): bool
     {
         return $token && $token instanceof RememberMeToken;
     }
@@ -37,7 +37,7 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
     /**
      * {@inheritdoc}
      */
-    public function isFullFledged(TokenInterface $token = null): bool
+    public function isFullFledged(?TokenInterface $token = null): bool
     {
         return $this->isAuthenticated($token) && !$this->isRememberMe($token);
     }

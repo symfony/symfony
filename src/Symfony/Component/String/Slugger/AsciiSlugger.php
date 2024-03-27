@@ -66,7 +66,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
      */
     private array $transliterators = [];
 
-    public function __construct(string $defaultLocale = null, array|\Closure $symbolsMap = null)
+    public function __construct(?string $defaultLocale = null, array|\Closure|null $symbolsMap = null)
     {
         $this->defaultLocale = $defaultLocale;
         $this->symbolsMap = $symbolsMap ?? $this->symbolsMap;
@@ -91,7 +91,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function slug(string $string, string $separator = '-', string $locale = null): AbstractUnicodeString
+    public function slug(string $string, string $separator = '-', ?string $locale = null): AbstractUnicodeString
     {
         $locale = $locale ?? $this->defaultLocale;
 

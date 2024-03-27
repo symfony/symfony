@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SlackTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $channel = null): SlackTransport
+    public function createTransport(?HttpClientInterface $client = null, ?string $channel = null): SlackTransport
     {
         return new SlackTransport('xoxb-TestToken', $channel, $client ?? $this->createMock(HttpClientInterface::class));
     }

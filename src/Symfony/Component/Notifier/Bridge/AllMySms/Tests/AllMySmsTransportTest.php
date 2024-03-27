@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class AllMySmsTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $from = null): AllMySmsTransport
+    public function createTransport(?HttpClientInterface $client = null, ?string $from = null): AllMySmsTransport
     {
         return new AllMySmsTransport('login', 'apiKey', $from, $client ?? $this->createMock(HttpClientInterface::class));
     }

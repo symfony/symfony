@@ -502,7 +502,7 @@ array:2 [
         Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
         ›     yield 1;
         › }
-        › 
+        ›
       }
 %A  }
     closed: false
@@ -664,6 +664,6 @@ EOTXT
     }
 }
 
-function reflectionParameterFixture(NotLoadableClass $arg1 = null, $arg2)
+function reflectionParameterFixture(?NotLoadableClass $arg1 = null, $arg2)
 {
 }

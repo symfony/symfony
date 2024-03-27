@@ -25,7 +25,7 @@ class ClosureLoader extends Loader
 {
     private $container;
 
-    public function __construct(ContainerBuilder $container, string $env = null)
+    public function __construct(ContainerBuilder $container, ?string $env = null)
     {
         $this->container = $container;
         parent::__construct($env);
@@ -34,7 +34,7 @@ class ClosureLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function load(mixed $resource, string $type = null): mixed
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         return $resource($this->container, $this->env);
     }
@@ -42,7 +42,7 @@ class ClosureLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return $resource instanceof \Closure;
     }

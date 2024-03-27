@@ -40,7 +40,7 @@ class CsrfValidationListener implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(string $fieldName, CsrfTokenManagerInterface $tokenManager, string $tokenId, string $errorMessage, TranslatorInterface $translator = null, string $translationDomain = null, ServerParams $serverParams = null)
+    public function __construct(string $fieldName, CsrfTokenManagerInterface $tokenManager, string $tokenId, string $errorMessage, ?TranslatorInterface $translator = null, ?string $translationDomain = null, ?ServerParams $serverParams = null)
     {
         $this->fieldName = $fieldName;
         $this->tokenManager = $tokenManager;

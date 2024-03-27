@@ -155,7 +155,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Returns a BinaryFileResponse object with original or customized file name and disposition header.
      */
-    protected function file(\SplFileInfo|string $file, string $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
+    protected function file(\SplFileInfo|string $file, ?string $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
     {
         $response = new BinaryFileResponse($file);
         $response->setContentDisposition($disposition, null === $fileName ? $response->getFile()->getFilename() : $fileName);
@@ -223,7 +223,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Renders a view.
      */
-    protected function render(string $view, array $parameters = [], Response $response = null): Response
+    protected function render(string $view, array $parameters = [], ?Response $response = null): Response
     {
         $content = $this->renderView($view, $parameters);
 
@@ -241,7 +241,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * If an invalid form is found in the list of parameters, a 422 status code is returned.
      */
-    protected function renderForm(string $view, array $parameters = [], Response $response = null): Response
+    protected function renderForm(string $view, array $parameters = [], ?Response $response = null): Response
     {
         if (null === $response) {
             $response = new Response();
@@ -269,7 +269,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Streams a view.
      */
-    protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse
+    protected function stream(string $view, array $parameters = [], ?StreamedResponse $response = null): StreamedResponse
     {
         if (!$this->container->has('twig')) {
             throw new \LogicException('You cannot use the "stream" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
@@ -297,7 +297,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      *     throw $this->createNotFoundException('Page not found!');
      */
-    protected function createNotFoundException(string $message = 'Not Found', \Throwable $previous = null): NotFoundHttpException
+    protected function createNotFoundException(string $message = 'Not Found', ?\Throwable $previous = null): NotFoundHttpException
     {
         return new NotFoundHttpException($message, $previous);
     }
@@ -311,7 +311,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @throws \LogicException If the Security component is not available
      */
-    protected function createAccessDeniedException(string $message = 'Access Denied.', \Throwable $previous = null): AccessDeniedException
+    protected function createAccessDeniedException(string $message = 'Access Denied.', ?\Throwable $previous = null): AccessDeniedException
     {
         if (!class_exists(AccessDeniedException::class)) {
             throw new \LogicException('You cannot use the "createAccessDeniedException" method if the Security component is not available. Try running "composer require symfony/security-bundle".');

@@ -86,7 +86,7 @@ class GenericRuntime implements RuntimeInterface
     /**
      * {@inheritdoc}
      */
-    public function getResolver(callable $callable, \ReflectionFunction $reflector = null): ResolverInterface
+    public function getResolver(callable $callable, ?\ReflectionFunction $reflector = null): ResolverInterface
     {
         if (!$callable instanceof \Closure) {
             $callable = \Closure::fromCallable($callable);

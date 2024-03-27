@@ -236,7 +236,7 @@ abstract class AdapterTestCase extends CachePoolTest
         /** @var PruneableInterface|CacheItemPoolInterface $cache */
         $cache = $this->createCachePool();
 
-        $doSet = function ($name, $value, \DateInterval $expiresAfter = null) use ($cache) {
+        $doSet = function ($name, $value, ?\DateInterval $expiresAfter = null) use ($cache) {
             $item = $cache->getItem($name);
             $item->set($value);
 

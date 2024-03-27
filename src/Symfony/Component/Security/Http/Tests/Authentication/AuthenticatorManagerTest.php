@@ -359,7 +359,7 @@ class AuthenticatorManagerTest extends TestCase
         return $authenticator;
     }
 
-    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true, array $requiredBadges = [], LoggerInterface $logger = null)
+    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true, array $requiredBadges = [], ?LoggerInterface $logger = null)
     {
         return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, $logger, $eraseCredentials, true, $requiredBadges);
     }

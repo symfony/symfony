@@ -25,7 +25,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
      * @param array|null $attributes     The list of attributes to rename or null for all attributes
      * @param bool       $lowerCamelCase Use lowerCamelCase style
      */
-    public function __construct(array $attributes = null, bool $lowerCamelCase = true)
+    public function __construct(?array $attributes = null, bool $lowerCamelCase = true)
     {
         $this->attributes = $attributes;
         $this->lowerCamelCase = $lowerCamelCase;

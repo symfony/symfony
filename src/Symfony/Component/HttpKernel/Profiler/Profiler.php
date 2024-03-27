@@ -37,7 +37,7 @@ class Profiler implements ResetInterface
     private bool $initiallyEnabled = true;
     private bool $enabled = true;
 
-    public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null, bool $enable = true)
+    public function __construct(ProfilerStorageInterface $storage, ?LoggerInterface $logger = null, bool $enable = true)
     {
         $this->storage = $storage;
         $this->logger = $logger;
@@ -116,7 +116,7 @@ class Profiler implements ResetInterface
      *
      * @see https://php.net/datetime.formats for the supported date/time formats
      */
-    public function find(?string $ip, ?string $url, ?string $limit, ?string $method, ?string $start, ?string $end, string $statusCode = null): array
+    public function find(?string $ip, ?string $url, ?string $limit, ?string $method, ?string $start, ?string $end, ?string $statusCode = null): array
     {
         return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end), $statusCode);
     }
@@ -124,7 +124,7 @@ class Profiler implements ResetInterface
     /**
      * Collects data for the given Response.
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null): ?Profile
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): ?Profile
     {
         if (false === $this->enabled) {
             return null;

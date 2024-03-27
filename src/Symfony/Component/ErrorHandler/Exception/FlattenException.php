@@ -37,12 +37,12 @@ class FlattenException
     private int $line;
     private ?string $asString = null;
 
-    public static function create(\Exception $exception, int $statusCode = null, array $headers = []): static
+    public static function create(\Exception $exception, ?int $statusCode = null, array $headers = []): static
     {
         return static::createFromThrowable($exception, $statusCode, $headers);
     }
 
-    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): static
+    public static function createFromThrowable(\Throwable $exception, ?int $statusCode = null, array $headers = []): static
     {
         $e = new static();
         $e->setMessage($exception->getMessage());

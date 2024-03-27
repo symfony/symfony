@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TurboSmsTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): TurboSmsTransport
+    public function createTransport(?HttpClientInterface $client = null): TurboSmsTransport
     {
         return new TurboSmsTransport('authToken', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
     }

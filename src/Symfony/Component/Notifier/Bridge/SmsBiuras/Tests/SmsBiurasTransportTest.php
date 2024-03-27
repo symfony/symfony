@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SmsBiurasTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): SmsBiurasTransport
+    public function createTransport(?HttpClientInterface $client = null): SmsBiurasTransport
     {
         return new SmsBiurasTransport('uid', 'api_key', 'from', true, $client ?? $this->createMock(HttpClientInterface::class));
     }

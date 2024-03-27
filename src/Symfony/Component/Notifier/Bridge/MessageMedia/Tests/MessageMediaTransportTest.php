@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class MessageMediaTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, string $from = null): MessageMediaTransport
+    public function createTransport(?HttpClientInterface $client = null, ?string $from = null): MessageMediaTransport
     {
         return new MessageMediaTransport('apiKey', 'apiSecret', $from, $client ?? $this->createMock(HttpClientInterface::class));
     }

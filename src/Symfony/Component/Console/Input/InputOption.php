@@ -59,7 +59,7 @@ class InputOption
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function __construct(string $name, string|array $shortcut = null, int $mode = null, string $description = '', string|bool|int|float|array $default = null)
+    public function __construct(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', string|bool|int|float|array|null $default = null)
     {
         if (str_starts_with($name, '--')) {
             $name = substr($name, 2);
@@ -168,7 +168,7 @@ class InputOption
         return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
     }
 
-    public function setDefault(string|bool|int|float|array $default = null)
+    public function setDefault(string|bool|int|float|array|null $default = null)
     {
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');

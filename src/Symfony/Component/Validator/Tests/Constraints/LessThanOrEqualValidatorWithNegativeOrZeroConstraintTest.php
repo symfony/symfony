@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanOrEqualValidatorTest
 {
-    protected function createConstraint(array $options = null): Constraint
+    protected function createConstraint(?array $options = null): Constraint
     {
         return new NegativeOrZero();
     }

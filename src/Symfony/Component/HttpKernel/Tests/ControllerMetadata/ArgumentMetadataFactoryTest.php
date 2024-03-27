@@ -158,7 +158,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
     }
 
-    private function signature2(self $foo = null, FakeClassThatDoesNotExist $bar = null, ImportedAndFake $baz = null)
+    private function signature2(?self $foo = null, ?FakeClassThatDoesNotExist $bar = null, ?ImportedAndFake $baz = null)
     {
     }
 
@@ -170,7 +170,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
     }
 
-    private function signature5(array $foo = null, $bar = null)
+    private function signature5(?array $foo = null, $bar = null)
     {
     }
 }

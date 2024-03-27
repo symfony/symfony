@@ -34,10 +34,7 @@ final class CachePoolClearCommand extends Command
     private $poolClearer;
     private ?array $poolNames;
 
-    /**
-     * @param string[]|null $poolNames
-     */
-    public function __construct(Psr6CacheClearer $poolClearer, array $poolNames = null)
+    public function __construct(Psr6CacheClearer $poolClearer, ?array $poolNames = null)
     {
         parent::__construct();
 

@@ -31,14 +31,14 @@ class AbstractNormalizerDummy extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null): bool
+    public function supportsNormalization(mixed $data, ?string $format = null): bool
     {
         return true;
     }
@@ -46,14 +46,14 @@ class AbstractNormalizerDummy extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null): bool
     {
         return true;
     }

@@ -43,7 +43,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * {@inheritdoc}
      */
-    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
+    public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         $trans = $this->translator->trans($id = (string) $id, $parameters, $domain, $locale);
         $this->collectMessage($locale, $domain, $id, $trans, $parameters);
@@ -70,7 +70,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * {@inheritdoc}
      */
-    public function getCatalogue(string $locale = null): MessageCatalogueInterface
+    public function getCatalogue(?string $locale = null): MessageCatalogueInterface
     {
         return $this->translator->getCatalogue($locale);
     }

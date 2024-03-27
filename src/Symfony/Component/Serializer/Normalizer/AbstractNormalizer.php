@@ -137,7 +137,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
+    public function __construct(?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, array $defaultContext = [])
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
@@ -193,7 +193,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @throws CircularReferenceException
      */
-    protected function handleCircularReference(object $object, string $format = null, array $context = []): mixed
+    protected function handleCircularReference(object $object, ?string $format = null, array $context = []): mixed
     {
         $circularReferenceHandler = $context[self::CIRCULAR_REFERENCE_HANDLER] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER];
         if ($circularReferenceHandler) {
@@ -262,7 +262,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return bool
      */
-    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = [])
+    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, ?string $format = null, array $context = [])
     {
         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
         if (\in_array($attribute, $ignoredAttributes)) {
@@ -313,7 +313,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @throws RuntimeException
      * @throws MissingConstructorArgumentsException
      */
-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, ?string $format = null)
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
             unset($context[self::OBJECT_TO_POPULATE]);
@@ -412,7 +412,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * @internal
      */
-    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, mixed $parameterData, array $context, string $format = null): mixed
+    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, mixed $parameterData, array $context, ?string $format = null): mixed
     {
         try {
             if (($parameterType = $parameter->getType()) instanceof \ReflectionNamedType && !$parameterType->isBuiltin()) {

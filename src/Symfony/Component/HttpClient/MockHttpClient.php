@@ -90,7 +90,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof ResponseInterface) {
             $responses = [$responses];

@@ -47,7 +47,7 @@ class ContainerAwareEventManager extends EventManager
     /**
      * {@inheritdoc}
      */
-    public function dispatchEvent($eventName, EventArgs $eventArgs = null): void
+    public function dispatchEvent($eventName, ?EventArgs $eventArgs = null): void
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();

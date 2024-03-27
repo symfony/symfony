@@ -31,7 +31,7 @@ class ServerDumpPlaceholderCommand extends Command
 {
     private $replacedCommand;
 
-    public function __construct(DumpServer $server = null, array $descriptors = [])
+    public function __construct(?DumpServer $server = null, array $descriptors = [])
     {
         $this->replacedCommand = new ServerDumpCommand((new \ReflectionClass(DumpServer::class))->newInstanceWithoutConstructor(), $descriptors);
 

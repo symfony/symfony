@@ -45,7 +45,7 @@ class FormError
      *
      * @see \Symfony\Component\Translation\Translator
      */
-    public function __construct(string $message, string $messageTemplate = null, array $messageParameters = [], int $messagePluralization = null, mixed $cause = null)
+    public function __construct(string $message, ?string $messageTemplate = null, array $messageParameters = [], ?int $messagePluralization = null, mixed $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate ?: $message;

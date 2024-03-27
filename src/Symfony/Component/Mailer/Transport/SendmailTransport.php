@@ -49,7 +49,7 @@ class SendmailTransport extends AbstractTransport
      *
      * -f<sender> flag will be appended automatically if one is not present.
      */
-    public function __construct(string $command = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(?string $command = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         parent::__construct($dispatcher, $logger);
 
@@ -68,7 +68,7 @@ class SendmailTransport extends AbstractTransport
         }
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if ($this->transport) {
             return $this->transport->send($message, $envelope);

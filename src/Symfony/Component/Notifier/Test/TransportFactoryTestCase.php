@@ -85,7 +85,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider unsupportedSchemeProvider
      */
-    public function testUnsupportedSchemeException(string $dsn, string $message = null)
+    public function testUnsupportedSchemeException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();
 
@@ -102,7 +102,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider incompleteDsnProvider
      */
-    public function testIncompleteDsnException(string $dsn, string $message = null)
+    public function testIncompleteDsnException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();
 
@@ -119,7 +119,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider missingRequiredOptionProvider
      */
-    public function testMissingRequiredOptionException(string $dsn, string $message = null)
+    public function testMissingRequiredOptionException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();
 

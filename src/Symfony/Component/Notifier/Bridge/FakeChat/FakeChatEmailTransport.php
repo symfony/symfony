@@ -33,7 +33,7 @@ final class FakeChatEmailTransport extends AbstractTransport
     private string $to;
     private string $from;
 
-    public function __construct(MailerInterface $mailer, string $to, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(MailerInterface $mailer, string $to, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->mailer = $mailer;
         $this->to = $to;

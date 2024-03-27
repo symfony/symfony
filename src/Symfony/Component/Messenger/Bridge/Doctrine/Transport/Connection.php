@@ -66,7 +66,7 @@ class Connection implements ResetInterface
     private $schemaSynchronizer;
     private bool $autoSetup;
 
-    public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
+    public function __construct(array $configuration, DBALConnection $driverConnection, ?SchemaSynchronizer $schemaSynchronizer = null)
     {
         $this->configuration = array_replace_recursive(static::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
@@ -295,7 +295,7 @@ class Connection implements ResetInterface
         return $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchOne() : $stmt->fetchColumn();
     }
 
-    public function findAll(int $limit = null): array
+    public function findAll(?int $limit = null): array
     {
         $queryBuilder = $this->createAvailableMessagesQueryBuilder();
         if (null !== $limit) {

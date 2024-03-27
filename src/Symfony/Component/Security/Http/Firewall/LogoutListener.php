@@ -41,7 +41,7 @@ class LogoutListener extends AbstractListener
     /**
      * @param array $options An array of options to process a logout attempt
      */
-    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, EventDispatcherInterface $eventDispatcher, array $options = [], CsrfTokenManagerInterface $csrfTokenManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, EventDispatcherInterface $eventDispatcher, array $options = [], ?CsrfTokenManagerInterface $csrfTokenManager = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->httpUtils = $httpUtils;

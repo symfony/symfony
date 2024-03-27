@@ -27,7 +27,7 @@ final class InMemoryMetadataStore implements MetadataStoreInterface
     /**
      * @param \SplObjectStorage<Transition, array>|null $transitionsMetadata
      */
-    public function __construct(array $workflowMetadata = [], array $placesMetadata = [], \SplObjectStorage $transitionsMetadata = null)
+    public function __construct(array $workflowMetadata = [], array $placesMetadata = [], ?\SplObjectStorage $transitionsMetadata = null)
     {
         $this->workflowMetadata = $workflowMetadata;
         $this->placesMetadata = $placesMetadata;

@@ -38,9 +38,9 @@ class Expression extends Constraint
 
     public function __construct(
         string|ExpressionObject|array|null $expression,
-        string $message = null,
-        array $values = null,
-        array $groups = null,
+        ?string $message = null,
+        ?array $values = null,
+        ?array $groups = null,
         mixed $payload = null,
         array $options = []
     ) {

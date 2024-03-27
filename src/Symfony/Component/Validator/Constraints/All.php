@@ -22,7 +22,7 @@ class All extends Composite
 {
     public $constraints = [];
 
-    public function __construct(mixed $constraints = null, array $groups = null, mixed $payload = null)
+    public function __construct(mixed $constraints = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($constraints ?? [], $groups, $payload);
     }

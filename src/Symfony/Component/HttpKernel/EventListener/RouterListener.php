@@ -54,7 +54,7 @@ class RouterListener implements EventSubscriberInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UrlMatcherInterface|RequestMatcherInterface $matcher, RequestStack $requestStack, RequestContext $context = null, LoggerInterface $logger = null, string $projectDir = null, bool $debug = true)
+    public function __construct(UrlMatcherInterface|RequestMatcherInterface $matcher, RequestStack $requestStack, ?RequestContext $context = null, ?LoggerInterface $logger = null, ?string $projectDir = null, bool $debug = true)
     {
         if (null === $context && !$matcher instanceof RequestContextAwareInterface) {
             throw new \InvalidArgumentException('You must either pass a RequestContext or the matcher must implement RequestContextAwareInterface.');
@@ -68,7 +68,7 @@ class RouterListener implements EventSubscriberInterface
         $this->debug = $debug;
     }
 
-    private function setCurrentRequest(Request $request = null)
+    private function setCurrentRequest(?Request $request = null)
     {
         if (null !== $request) {
             try {

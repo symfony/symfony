@@ -99,7 +99,7 @@ class Connection
      */
     private $lastActivityTime = 0;
 
-    public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, AmqpFactory $amqpFactory = null)
+    public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, ?AmqpFactory $amqpFactory = null)
     {
         if (!\extension_loaded('amqp')) {
             throw new LogicException(sprintf('You cannot use the "%s" as the "amqp" extension is not installed.', __CLASS__));
@@ -163,7 +163,7 @@ class Connection
      *     * verify: Enable or disable peer verification. If peer verification is enabled then the common name in the
      *       server certificate must match the server name. Peer verification is enabled by default.
      */
-    public static function fromDsn(string $dsn, array $options = [], AmqpFactory $amqpFactory = null): self
+    public static function fromDsn(string $dsn, array $options = [], ?AmqpFactory $amqpFactory = null): self
     {
         if (false === $parsedUrl = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
@@ -281,7 +281,7 @@ class Connection
     /**
      * @throws \AMQPException
      */
-    public function publish(string $body, array $headers = [], int $delayInMs = 0, AmqpStamp $amqpStamp = null): void
+    public function publish(string $body, array $headers = [], int $delayInMs = 0, ?AmqpStamp $amqpStamp = null): void
     {
         $this->clearWhenDisconnected();
 
@@ -317,7 +317,7 @@ class Connection
     /**
      * @throws \AMQPException
      */
-    private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null)
+    private function publishWithDelay(string $body, array $headers, int $delay, ?AmqpStamp $amqpStamp = null)
     {
         $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
         $isRetryAttempt = $amqpStamp ? $amqpStamp->isRetryAttempt() : false;
@@ -333,7 +333,7 @@ class Connection
         );
     }
 
-    private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $headers = [], AmqpStamp $amqpStamp = null)
+    private function publishOnExchange(\AMQPExchange $exchange, string $body, ?string $routingKey = null, array $headers = [], ?AmqpStamp $amqpStamp = null)
     {
         $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
         $attributes['headers'] = array_merge($attributes['headers'] ?? [], $headers);

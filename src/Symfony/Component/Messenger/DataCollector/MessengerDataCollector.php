@@ -35,7 +35,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         // Noop. Everything is collected live by the traceable buses & cloned as late as possible.
     }
@@ -121,7 +121,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         return $debugRepresentation;
     }
 
-    public function getExceptionsCount(string $bus = null): int
+    public function getExceptionsCount(?string $bus = null): int
     {
         $count = 0;
         foreach ($this->getMessages($bus) as $message) {
@@ -131,7 +131,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         return $count;
     }
 
-    public function getMessages(string $bus = null): array
+    public function getMessages(?string $bus = null): array
     {
         if (null === $bus) {
             return $this->data['messages'];

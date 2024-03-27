@@ -43,7 +43,7 @@ final class LazyCommand extends Command
         $this->getCommand()->ignoreValidationErrors();
     }
 
-    public function setApplication(Application $application = null): void
+    public function setApplication(?Application $application = null): void
     {
         if ($this->command instanceof parent) {
             $this->command->setApplication($application);
@@ -108,14 +108,14 @@ final class LazyCommand extends Command
         return $this->getCommand()->getNativeDefinition();
     }
 
-    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null): static
+    public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         $this->getCommand()->addArgument($name, $mode, $description, $default);
 
         return $this;
     }
 
-    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null): static
+    public function addOption(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         $this->getCommand()->addOption($name, $shortcut, $mode, $description, $default);
 

@@ -28,7 +28,7 @@ abstract class AbstractDoctrineMiddleware implements MiddlewareInterface
     protected $managerRegistry;
     protected $entityManagerName;
 
-    public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName = null)
+    public function __construct(ManagerRegistry $managerRegistry, ?string $entityManagerName = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->entityManagerName = $entityManagerName;

@@ -46,7 +46,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      * @param bool|callable   $debug        The debugging mode as a boolean or a callable that should return it
      * @param string|callable $outputBuffer The output buffer as a string or a callable that should return it
      */
-    public function __construct(bool|callable $debug = false, string $charset = null, string|FileLinkFormatter $fileLinkFormat = null, string $projectDir = null, string|callable $outputBuffer = '', LoggerInterface $logger = null)
+    public function __construct(bool|callable $debug = false, ?string $charset = null, string|FileLinkFormatter $fileLinkFormat = null, ?string $projectDir = null, string|callable $outputBuffer = '', ?LoggerInterface $logger = null)
     {
         $this->debug = \is_bool($debug) || $debug instanceof \Closure ? $debug : \Closure::fromCallable($debug);
         $this->charset = $charset ?: (\ini_get('default_charset') ?: 'UTF-8');
@@ -212,11 +212,11 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     /**
      * Formats a file path.
      *
-     * @param string $file An absolute file path
-     * @param int    $line The line number
-     * @param string $text Use this text for the link rather than the file path
+     * @param string      $file An absolute file path
+     * @param int         $line The line number
+     * @param string|null $text Use this text for the link rather than the file path
      */
-    private function formatFile(string $file, int $line, string $text = null): string
+    private function formatFile(string $file, int $line, ?string $text = null): string
     {
         $file = trim($file);
 

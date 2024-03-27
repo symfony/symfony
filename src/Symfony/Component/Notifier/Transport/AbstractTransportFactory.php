@@ -24,7 +24,7 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
     protected $dispatcher;
     protected $client;
 
-    public function __construct(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
+    public function __construct(?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
     {
         $this->dispatcher = $dispatcher;
         $this->client = $client;

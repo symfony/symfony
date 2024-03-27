@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SendinblueTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): SendinblueTransport
+    public function createTransport(?HttpClientInterface $client = null): SendinblueTransport
     {
         return (new SendinblueTransport('api-key', '0611223344', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

@@ -26,7 +26,7 @@ class DbalLogger implements SQLLogger
     protected $logger;
     protected $stopwatch;
 
-    public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
+    public function __construct(?LoggerInterface $logger = null, ?Stopwatch $stopwatch = null)
     {
         $this->logger = $logger;
         $this->stopwatch = $stopwatch;
@@ -35,7 +35,7 @@ class DbalLogger implements SQLLogger
     /**
      * {@inheritdoc}
      */
-    public function startQuery($sql, array $params = null, array $types = null): void
+    public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
         if (null !== $this->stopwatch) {
             $this->stopwatch->start('doctrine', 'doctrine');

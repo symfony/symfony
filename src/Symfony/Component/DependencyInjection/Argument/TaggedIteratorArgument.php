@@ -31,7 +31,7 @@ class TaggedIteratorArgument extends IteratorArgument
      * @param bool        $needsIndexes          Whether indexes are required and should be generated when computing the map
      * @param string|null $defaultPriorityMethod The static method that should be called to get each service's priority when their tag doesn't define the "priority" attribute
      */
-    public function __construct(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, bool $needsIndexes = false, string $defaultPriorityMethod = null)
+    public function __construct(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, bool $needsIndexes = false, ?string $defaultPriorityMethod = null)
     {
         parent::__construct([]);
 

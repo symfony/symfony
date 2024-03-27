@@ -105,7 +105,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getOutOfRangeNetmask
      */
-    public function testOutOfRangeNetmask(string $cidr, string $version = null, int $min = null, int $max = null)
+    public function testOutOfRangeNetmask(string $cidr, ?string $version = null, ?int $min = null, ?int $max = null)
     {
         $cidrConstraint = new Cidr([
             'version' => $version,

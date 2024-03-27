@@ -47,7 +47,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     private int $nextId = 1;
     private $serializer;
 
-    public function __construct(SerializerInterface $serializer = null)
+    public function __construct(?SerializerInterface $serializer = null)
     {
         $this->serializer = $serializer;
     }

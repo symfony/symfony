@@ -148,7 +148,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($controllerContainer, $controller->getContainer());
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null)
+    protected function createControllerResolver(?LoggerInterface $logger = null, ?Psr11ContainerInterface $container = null)
     {
         if (!$container) {
             $container = $this->createMockContainer();
@@ -172,7 +172,7 @@ class ContainerAwareController implements ContainerAwareInterface
 {
     private $container;
 
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }

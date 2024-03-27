@@ -34,7 +34,7 @@ final class OvhCloudTransport extends AbstractTransport
     private string $serviceName;
     private ?string $sender = null;
 
-    public function __construct(string $applicationKey, string $applicationSecret, string $consumerKey, string $serviceName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $applicationKey, string $applicationSecret, string $consumerKey, string $serviceName, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->applicationKey = $applicationKey;
         $this->applicationSecret = $applicationSecret;

@@ -34,7 +34,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     private $objectClassResolver;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyAccessorInterface $propertyAccessor = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null, ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, ?callable $objectClassResolver = null, array $defaultContext = [])
     {
         if (!class_exists(PropertyAccess::class)) {
             throw new LogicException('The ObjectNormalizer class requires the "PropertyAccess" component. Install "symfony/property-access" to use it.');
@@ -60,7 +60,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function extractAttributes(object $object, string $format = null, array $context = []): array
+    protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
     {
         if (\stdClass::class === \get_class($object)) {
             return array_keys((array) $object);
@@ -126,7 +126,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
     {
         $cacheKey = \get_class($object);
         if (!\array_key_exists($cacheKey, $this->discriminatorCache)) {
@@ -143,7 +143,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
     {
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);

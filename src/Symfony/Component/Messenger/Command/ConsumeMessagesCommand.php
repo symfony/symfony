@@ -49,7 +49,7 @@ class ConsumeMessagesCommand extends Command
     private $resetServicesListener;
     private array $busIds;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [])
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null, array $receiverNames = [], ?ResetServicesListener $resetServicesListener = null, array $busIds = [])
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;

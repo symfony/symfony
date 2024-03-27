@@ -29,7 +29,7 @@ class AnnotationLoader implements LoaderInterface
 {
     protected $reader;
 
-    public function __construct(Reader $reader = null)
+    public function __construct(?Reader $reader = null)
     {
         $this->reader = $reader;
     }

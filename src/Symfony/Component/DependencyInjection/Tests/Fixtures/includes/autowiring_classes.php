@@ -96,7 +96,7 @@ class D
 
 class E
 {
-    public function __construct(D $d = null)
+    public function __construct(?D $d = null)
     {
     }
 }
@@ -154,7 +154,7 @@ class LesTilleuls
 
 class OptionalParameter
 {
-    public function __construct(CollisionInterface $c = null, A $a, Foo $f = null)
+    public function __construct(?CollisionInterface $c = null, A $a, ?Foo $f = null)
     {
     }
 }
@@ -192,7 +192,7 @@ class MultipleArguments
 
 class MultipleArgumentsOptionalScalar
 {
-    public function __construct(A $a, $foo = 'default_val', Lille $lille = null)
+    public function __construct(A $a, $foo = 'default_val', ?Lille $lille = null)
     {
     }
 }
@@ -208,7 +208,7 @@ class MultipleArgumentsOptionalScalarLast
  */
 class ClassForResource
 {
-    public function __construct($foo, Bar $bar = null)
+    public function __construct($foo, ?Bar $bar = null)
     {
     }
 
@@ -343,7 +343,7 @@ class NotWireable
     {
     }
 
-    public function setOptionalNotAutowireable(NotARealClass $n = null)
+    public function setOptionalNotAutowireable(?NotARealClass $n = null)
     {
     }
 
@@ -392,7 +392,7 @@ class DecoratorImpl implements DecoratorInterface
 
 class Decorated implements DecoratorInterface
 {
-    public function __construct($quz = null, \NonExistent $nonExistent = null, DecoratorInterface $decorated = null, array $foo = [])
+    public function __construct($quz = null, ?\NonExistent $nonExistent = null, ?DecoratorInterface $decorated = null, array $foo = [])
     {
     }
 }

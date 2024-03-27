@@ -48,7 +48,7 @@ class DebugCommand extends Command
 
     private $fileLinkFormatter;
 
-    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, FileLinkFormatter $fileLinkFormatter = null)
+    public function __construct(Environment $twig, ?string $projectDir = null, array $bundlesMetadata = [], ?string $twigDefaultPath = null, ?FileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 
@@ -221,7 +221,7 @@ EOF
         $io->writeln(json_encode($data));
     }
 
-    private function displayGeneralText(SymfonyStyle $io, string $filter = null)
+    private function displayGeneralText(SymfonyStyle $io, ?string $filter = null)
     {
         $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];
@@ -283,7 +283,7 @@ EOF
         $io->writeln($decorated ? OutputFormatter::escape($data) : $data);
     }
 
-    private function getLoaderPaths(string $name = null): array
+    private function getLoaderPaths(?string $name = null): array
     {
         $loaderPaths = [];
         foreach ($this->getFilesystemLoaders() as $loader) {

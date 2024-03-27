@@ -29,7 +29,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $normalized = [
             'message' => $object->getMessage(),
@@ -51,7 +51,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof FlattenException && ($context[Serializer::MESSENGER_SERIALIZATION_CONTEXT] ?? false);
     }
@@ -59,7 +59,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): FlattenException
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): FlattenException
     {
         $object = new FlattenException();
 
@@ -90,7 +90,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return FlattenException::class === $type && ($context[Serializer::MESSENGER_SERIALIZATION_CONTEXT] ?? false);
     }

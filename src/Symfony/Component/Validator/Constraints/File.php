@@ -61,25 +61,25 @@ class File extends Constraint
     protected $maxSize;
 
     public function __construct(
-        array $options = null,
+        ?array $options = null,
         int|string $maxSize = null,
-        bool $binaryFormat = null,
+        ?bool $binaryFormat = null,
         array|string $mimeTypes = null,
-        string $notFoundMessage = null,
-        string $notReadableMessage = null,
-        string $maxSizeMessage = null,
-        string $mimeTypesMessage = null,
-        string $disallowEmptyMessage = null,
+        ?string $notFoundMessage = null,
+        ?string $notReadableMessage = null,
+        ?string $maxSizeMessage = null,
+        ?string $mimeTypesMessage = null,
+        ?string $disallowEmptyMessage = null,
 
-        string $uploadIniSizeErrorMessage = null,
-        string $uploadFormSizeErrorMessage = null,
-        string $uploadPartialErrorMessage = null,
-        string $uploadNoFileErrorMessage = null,
-        string $uploadNoTmpDirErrorMessage = null,
-        string $uploadCantWriteErrorMessage = null,
-        string $uploadExtensionErrorMessage = null,
-        string $uploadErrorMessage = null,
-        array $groups = null,
+        ?string $uploadIniSizeErrorMessage = null,
+        ?string $uploadFormSizeErrorMessage = null,
+        ?string $uploadPartialErrorMessage = null,
+        ?string $uploadNoFileErrorMessage = null,
+        ?string $uploadNoTmpDirErrorMessage = null,
+        ?string $uploadCantWriteErrorMessage = null,
+        ?string $uploadExtensionErrorMessage = null,
+        ?string $uploadErrorMessage = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);

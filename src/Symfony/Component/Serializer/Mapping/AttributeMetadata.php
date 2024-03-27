@@ -127,7 +127,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setSerializedName(string $serializedName = null)
+    public function setSerializedName(?string $serializedName = null)
     {
         $this->serializedName = $serializedName;
     }

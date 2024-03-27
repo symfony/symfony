@@ -93,7 +93,7 @@ class Command
      *
      * @throws LogicException When the command name is empty
      */
-    public function __construct(string $name = null)
+    public function __construct(?string $name = null)
     {
         $this->definition = new InputDefinition();
 
@@ -129,7 +129,7 @@ class Command
         $this->ignoreValidationErrors = true;
     }
 
-    public function setApplication(Application $application = null)
+    public function setApplication(?Application $application = null)
     {
         $this->application = $application;
         if ($application) {
@@ -418,7 +418,7 @@ class Command
      *
      * @return $this
      */
-    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null): static
+    public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
         if (null !== $this->fullDefinition) {
@@ -439,7 +439,7 @@ class Command
      *
      * @return $this
      */
-    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null): static
+    public function addOption(string $name, string|array $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
         if (null !== $this->fullDefinition) {

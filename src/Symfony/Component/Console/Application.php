@@ -134,7 +134,7 @@ class Application implements ResetInterface
      *
      * @throws \Exception When running fails. Bypass this when {@link setCatchExceptions()}.
      */
-    public function run(InputInterface $input = null, OutputInterface $output = null): int
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
         if (\function_exists('putenv')) {
             @putenv('LINES='.$this->terminal->getHeight());
@@ -752,7 +752,7 @@ class Application implements ResetInterface
      *
      * @return Command[]
      */
-    public function all(string $namespace = null)
+    public function all(?string $namespace = null)
     {
         $this->init();
 
@@ -1113,7 +1113,7 @@ class Application implements ResetInterface
      *
      * This method is not part of public API and should not be used directly.
      */
-    public function extractNamespace(string $name, int $limit = null): string
+    public function extractNamespace(string $name, ?int $limit = null): string
     {
         $parts = explode(':', $name, -1);
 

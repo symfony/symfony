@@ -29,7 +29,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
     protected $catch = false;
     protected $backendRequest;
 
-    public function __construct($body, $status, $headers, \Closure $customizer = null)
+    public function __construct($body, $status, $headers, ?\Closure $customizer = null)
     {
         $this->body = $body;
         $this->status = $status;

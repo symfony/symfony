@@ -50,7 +50,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
      */
     private $sessionOptions;
 
-    public function __construct(ContainerInterface $container = null, bool $debug = false, array $sessionOptions = [])
+    public function __construct(?ContainerInterface $container = null, bool $debug = false, array $sessionOptions = [])
     {
         $this->container = $container;
         $this->debug = $debug;

@@ -51,7 +51,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * Constructs a metadata for the given class.
      */
-    public function __construct(string $class, ClassDiscriminatorMapping $classDiscriminatorMapping = null)
+    public function __construct(string $class, ?ClassDiscriminatorMapping $classDiscriminatorMapping = null)
     {
         $this->name = $class;
         $this->classDiscriminatorMapping = $classDiscriminatorMapping;
@@ -118,7 +118,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null)
+    public function setClassDiscriminatorMapping(?ClassDiscriminatorMapping $mapping = null)
     {
         $this->classDiscriminatorMapping = $mapping;
     }

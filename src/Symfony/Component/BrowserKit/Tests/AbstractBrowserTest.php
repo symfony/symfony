@@ -20,7 +20,7 @@ use Symfony\Component\BrowserKit\Response;
 
 class AbstractBrowserTest extends TestCase
 {
-    public function getBrowser(array $server = [], History $history = null, CookieJar $cookieJar = null)
+    public function getBrowser(array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
         return new TestClient($server, $history, $cookieJar);
     }

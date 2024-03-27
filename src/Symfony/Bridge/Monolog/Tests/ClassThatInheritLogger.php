@@ -16,12 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ClassThatInheritLogger extends Logger
 {
-    public function getLogs(Request $request = null): array
+    public function getLogs(?Request $request = null): array
     {
         return parent::getLogs($request);
     }
 
-    public function countErrors(Request $request = null): int
+    public function countErrors(?Request $request = null): int
     {
         return parent::countErrors($request);
     }

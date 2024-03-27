@@ -440,7 +440,7 @@ class Response
      *
      * @final
      */
-    public function setStatusCode(int $code, string $text = null): static
+    public function setStatusCode(int $code, ?string $text = null): static
     {
         $this->statusCode = $code;
         if ($this->isInvalid()) {
@@ -714,7 +714,7 @@ class Response
      *
      * @final
      */
-    public function setExpires(\DateTimeInterface $date = null): static
+    public function setExpires(?\DateTimeInterface $date = null): static
     {
         if (null === $date) {
             $this->headers->remove('Expires');
@@ -861,7 +861,7 @@ class Response
      *
      * @final
      */
-    public function setLastModified(\DateTimeInterface $date = null): static
+    public function setLastModified(?\DateTimeInterface $date = null): static
     {
         if (null === $date) {
             $this->headers->remove('Last-Modified');
@@ -899,7 +899,7 @@ class Response
      *
      * @final
      */
-    public function setEtag(string $etag = null, bool $weak = false): static
+    public function setEtag(?string $etag = null, bool $weak = false): static
     {
         if (null === $etag) {
             $this->headers->remove('Etag');
@@ -1191,7 +1191,7 @@ class Response
      *
      * @final
      */
-    public function isRedirect(string $location = null): bool
+    public function isRedirect(?string $location = null): bool
     {
         return \in_array($this->statusCode, [201, 301, 302, 303, 307, 308]) && (null === $location ?: $location == $this->headers->get('Location'));
     }

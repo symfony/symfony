@@ -20,13 +20,13 @@ class TimeBasedUuidFactory
     private string $class;
     private $node;
 
-    public function __construct(string $class, Uuid $node = null)
+    public function __construct(string $class, ?Uuid $node = null)
     {
         $this->class = $class;
         $this->node = $node;
     }
 
-    public function create(\DateTimeInterface $time = null): UuidV6|UuidV1
+    public function create(?\DateTimeInterface $time = null): UuidV6|UuidV1
     {
         $class = $this->class;
 

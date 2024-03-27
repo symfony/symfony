@@ -22,10 +22,10 @@ class StaticVersionStrategy implements VersionStrategyInterface
     private string $format;
 
     /**
-     * @param string $version Version number
-     * @param string $format  Url format
+     * @param string      $version Version number
+     * @param string|null $format  Url format
      */
-    public function __construct(string $version, string $format = null)
+    public function __construct(string $version, ?string $format = null)
     {
         $this->version = $version;
         $this->format = $format ?: '%s?%s';

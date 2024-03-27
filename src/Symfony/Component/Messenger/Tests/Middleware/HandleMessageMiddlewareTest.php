@@ -173,7 +173,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
             use BatchHandlerTrait;
 
-            public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
             {
                 return $this->handle($message, $ack);
             }
@@ -198,7 +198,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ]));
 
         $ackedMessages = [];
-        $ack = static function (Envelope $envelope, \Throwable $e = null) use (&$ackedMessages) {
+        $ack = static function (Envelope $envelope, ?\Throwable $e = null) use (&$ackedMessages) {
             if (null !== $e) {
                 throw $e;
             }
@@ -227,7 +227,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $handler = new class() implements BatchHandlerInterface {
             use BatchHandlerTrait;
 
-            public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
             {
                 return $this->handle($message, $ack);
             }
@@ -247,7 +247,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ]));
 
         $error = null;
-        $ack = static function (Envelope $envelope, \Throwable $e = null) use (&$error) {
+        $ack = static function (Envelope $envelope, ?\Throwable $e = null) use (&$error) {
             $error = $e;
         };
 
@@ -264,7 +264,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
             use BatchHandlerTrait;
 
-            public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
             {
                 return $this->handle($message, $ack);
             }

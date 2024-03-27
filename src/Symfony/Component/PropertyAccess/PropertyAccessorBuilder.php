@@ -239,7 +239,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function setCacheItemPool(CacheItemPoolInterface $cacheItemPool = null): static
+    public function setCacheItemPool(?CacheItemPoolInterface $cacheItemPool = null): static
     {
         $this->cacheItemPool = $cacheItemPool;
 

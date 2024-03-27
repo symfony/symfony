@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class MessageBirdTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): MessageBirdTransport
+    public function createTransport(?HttpClientInterface $client = null): MessageBirdTransport
     {
         return new MessageBirdTransport('token', 'from', $client ?? $this->createMock(HttpClientInterface::class));
     }

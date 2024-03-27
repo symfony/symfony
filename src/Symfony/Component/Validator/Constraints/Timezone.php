@@ -43,10 +43,10 @@ class Timezone extends Constraint
 
     public function __construct(
         int|array $zone = null,
-        string $message = null,
-        string $countryCode = null,
-        bool $intlCompatible = null,
-        array $groups = null,
+        ?string $message = null,
+        ?string $countryCode = null,
+        ?bool $intlCompatible = null,
+        ?array $groups = null,
         mixed $payload = null,
         array $options = []
     ) {

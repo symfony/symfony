@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class EsendexTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): EsendexTransport
+    public function createTransport(?HttpClientInterface $client = null): EsendexTransport
     {
         return (new EsendexTransport('email', 'password', 'testAccountReference', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

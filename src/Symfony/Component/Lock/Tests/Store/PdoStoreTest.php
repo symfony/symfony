@@ -79,7 +79,7 @@ class PdoStoreTest extends AbstractStoreTest
     /**
      * @dataProvider provideDsn
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsn(string $dsn, ?string $file = null)
     {
         $key = new Key(uniqid(__METHOD__, true));
 

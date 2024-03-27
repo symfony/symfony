@@ -314,7 +314,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     /**
      * {@inheritdoc}
      */
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof CurlResponse) {
             $responses = [$responses];

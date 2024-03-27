@@ -67,7 +67,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerService(object $service, array $options = [], ?ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -120,7 +120,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']), $options);
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerAlias(Alias $alias, array $options = [], ?ContainerBuilder $builder = null)
     {
         if (!$builder) {
             $this->writeData($this->getContainerAliasData($alias), $options);

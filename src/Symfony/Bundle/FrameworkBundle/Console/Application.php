@@ -133,7 +133,7 @@ class Application extends BaseApplication
     /**
      * {@inheritdoc}
      */
-    public function all(string $namespace = null): array
+    public function all(?string $namespace = null): array
     {
         $this->registerCommands();
 

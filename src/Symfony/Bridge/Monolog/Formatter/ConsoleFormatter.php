@@ -183,7 +183,7 @@ class ConsoleFormatter implements FormatterInterface
         return $record;
     }
 
-    private function dumpData(mixed $data, bool $colors = null): string
+    private function dumpData(mixed $data, ?bool $colors = null): string
     {
         if (!isset($this->dumper)) {
             return '';

@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class FirebaseTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): FirebaseTransport
+    public function createTransport(?HttpClientInterface $client = null): FirebaseTransport
     {
         return new FirebaseTransport('username:password', $client ?? $this->createMock(HttpClientInterface::class));
     }

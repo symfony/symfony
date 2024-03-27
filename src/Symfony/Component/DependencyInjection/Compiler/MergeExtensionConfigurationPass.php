@@ -153,7 +153,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
 {
     private string $extensionClass;
 
-    public function __construct(ExtensionInterface $extension, ParameterBagInterface $parameterBag = null)
+    public function __construct(ExtensionInterface $extension, ?ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
 
@@ -187,7 +187,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
     /**
      * {@inheritdoc}
      */
-    public function resolveEnvPlaceholders(mixed $value, string|bool $format = null, array &$usedEnvs = null): mixed
+    public function resolveEnvPlaceholders(mixed $value, string|bool $format = null, ?array &$usedEnvs = null): mixed
     {
         if (true !== $format || !\is_string($value)) {
             return parent::resolveEnvPlaceholders($value, $format, $usedEnvs);

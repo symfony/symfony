@@ -92,11 +92,11 @@ abstract class Constraint
      * getRequiredOptions() to return the names of these options. If any
      * option is not set here, an exception is thrown.
      *
-     * @param mixed    $options The options (as associative array)
-     *                          or the value for the default
-     *                          option (any other type)
-     * @param string[] $groups  An array of validation groups
-     * @param mixed    $payload Domain-specific data attached to a constraint
+     * @param mixed         $options The options (as associative array)
+     *                               or the value for the default
+     *                               option (any other type)
+     * @param string[]|null $groups  An array of validation groups
+     * @param mixed         $payload Domain-specific data attached to a constraint
      *
      * @throws InvalidOptionsException       When you pass the names of non-existing
      *                                       options
@@ -106,7 +106,7 @@ abstract class Constraint
      *                                       array, but getDefaultOption() returns
      *                                       null
      */
-    public function __construct(mixed $options = null, array $groups = null, mixed $payload = null)
+    public function __construct(mixed $options = null, ?array $groups = null, mixed $payload = null)
     {
         unset($this->groups); // enable lazy initialization
 

@@ -21,7 +21,7 @@ class AutowiredServices
     private $dispatcher;
     private $cachePool;
 
-    public function __construct(Reader $annotationReader = null, EventDispatcherInterface $dispatcher, CacheItemPoolInterface $cachePool)
+    public function __construct(?Reader $annotationReader = null, EventDispatcherInterface $dispatcher, CacheItemPoolInterface $cachePool)
     {
         $this->annotationReader = $annotationReader;
         $this->dispatcher = $dispatcher;

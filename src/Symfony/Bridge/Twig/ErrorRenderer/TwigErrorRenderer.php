@@ -32,7 +32,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
     /**
      * @param bool|callable $debug The debugging mode as a boolean or a callable that should return it
      */
-    public function __construct(Environment $twig, HtmlErrorRenderer $fallbackErrorRenderer = null, bool|callable $debug = false)
+    public function __construct(Environment $twig, ?HtmlErrorRenderer $fallbackErrorRenderer = null, bool|callable $debug = false)
     {
         $this->twig = $twig;
         $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();

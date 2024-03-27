@@ -324,7 +324,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function attach($body, string $name = null, string $contentType = null): static
+    public function attach($body, ?string $name = null, ?string $contentType = null): static
     {
         if (!\is_string($body) && !\is_resource($body)) {
             throw new \TypeError(sprintf('The body must be a string or a resource (got "%s").', get_debug_type($body)));
@@ -339,7 +339,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function attachFromPath(string $path, string $name = null, string $contentType = null): static
+    public function attachFromPath(string $path, ?string $name = null, ?string $contentType = null): static
     {
         $this->cachedBody = null;
         $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => false];
@@ -352,7 +352,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function embed($body, string $name = null, string $contentType = null): static
+    public function embed($body, ?string $name = null, ?string $contentType = null): static
     {
         if (!\is_string($body) && !\is_resource($body)) {
             throw new \TypeError(sprintf('The body must be a string or a resource (got "%s").', get_debug_type($body)));
@@ -367,7 +367,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function embedFromPath(string $path, string $name = null, string $contentType = null): static
+    public function embedFromPath(string $path, ?string $name = null, ?string $contentType = null): static
     {
         $this->cachedBody = null;
         $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => true];

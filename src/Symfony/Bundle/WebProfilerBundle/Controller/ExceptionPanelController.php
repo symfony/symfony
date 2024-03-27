@@ -28,7 +28,7 @@ class ExceptionPanelController
     private $errorRenderer;
     private $profiler;
 
-    public function __construct(HtmlErrorRenderer $errorRenderer, Profiler $profiler = null)
+    public function __construct(HtmlErrorRenderer $errorRenderer, ?Profiler $profiler = null)
     {
         $this->errorRenderer = $errorRenderer;
         $this->profiler = $profiler;

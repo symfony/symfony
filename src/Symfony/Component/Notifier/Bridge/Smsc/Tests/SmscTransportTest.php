@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmscTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): SmscTransport
+    public function createTransport(?HttpClientInterface $client = null): SmscTransport
     {
         return new SmscTransport('login', 'password', 'MyApp', $client ?? $this->createMock(HttpClientInterface::class));
     }

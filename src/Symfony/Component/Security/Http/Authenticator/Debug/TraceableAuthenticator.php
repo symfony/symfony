@@ -78,7 +78,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
         return $this->authenticator->onAuthenticationFailure($request, $exception);
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if (!$this->authenticator instanceof AuthenticationEntryPointInterface) {
             throw new NotAnEntryPointException();

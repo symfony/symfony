@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SinchTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): SinchTransport
+    public function createTransport(?HttpClientInterface $client = null): SinchTransport
     {
         return new SinchTransport('accountSid', 'authToken', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
     }

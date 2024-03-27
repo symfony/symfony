@@ -50,7 +50,7 @@ abstract class AbstractBrowser
     /**
      * @param array $server The server parameters (equivalent of $_SERVER)
      */
-    public function __construct(array $server = [], History $history = null, CookieJar $cookieJar = null)
+    public function __construct(array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
         $this->setServerParameters($server);
         $this->history = $history ?? new History();
@@ -138,7 +138,7 @@ abstract class AbstractBrowser
         return $this->server[$key] ?? $default;
     }
 
-    public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): Crawler
+    public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], ?string $content = null, bool $changeHistory = true): Crawler
     {
         $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
 
@@ -316,15 +316,15 @@ abstract class AbstractBrowser
     /**
      * Calls a URI.
      *
-     * @param string $method        The request method
-     * @param string $uri           The URI to fetch
-     * @param array  $parameters    The Request parameters
-     * @param array  $files         The files
-     * @param array  $server        The server parameters (HTTP headers are referenced with an HTTP_ prefix as PHP does)
-     * @param string $content       The raw body data
-     * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param string      $method        The request method
+     * @param string      $uri           The URI to fetch
+     * @param array       $parameters    The Request parameters
+     * @param array       $files         The files
+     * @param array       $server        The server parameters (HTTP headers are referenced with an HTTP_ prefix as PHP does)
+     * @param string|null $content       The raw body data
+     * @param bool        $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      */
-    public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): Crawler
+    public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], ?string $content = null, bool $changeHistory = true): Crawler
     {
         if ($this->isMainRequest) {
             $this->redirectCount = 0;

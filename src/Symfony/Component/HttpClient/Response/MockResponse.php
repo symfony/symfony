@@ -93,7 +93,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
     /**
      * {@inheritdoc}
      */
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         return null !== $type ? $this->info[$type] ?? null : $this->info;
     }

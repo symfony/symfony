@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class LinkedInTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): LinkedInTransport
+    public function createTransport(?HttpClientInterface $client = null): LinkedInTransport
     {
         return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

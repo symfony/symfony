@@ -36,11 +36,11 @@ interface CacheInterface
      *                                              The default (or providing null) is implementation dependent but should
      *                                              typically be 1.0, which should provide optimal stampede protection.
      *                                              See https://en.wikipedia.org/wiki/Cache_stampede#Probabilistic_early_expiration
-     * @param array                      &$metadata The metadata of the cached item {@see ItemInterface::getMetadata()}
+     * @param array|null                 &$metadata The metadata of the cached item {@see ItemInterface::getMetadata()}
      *
      * @throws InvalidArgumentException When $key is not valid or when $beta is negative
      */
-    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null): mixed;
+    public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed;
 
     /**
      * Removes an item from the pool.

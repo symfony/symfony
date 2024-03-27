@@ -88,7 +88,7 @@ trait FilesystemCommonTrait
         return @unlink($file);
     }
 
-    private function write(string $file, string $data, int $expiresAt = null)
+    private function write(string $file, string $data, ?int $expiresAt = null)
     {
         set_error_handler(__CLASS__.'::throwError');
         try {
@@ -118,7 +118,7 @@ trait FilesystemCommonTrait
         }
     }
 
-    private function getFile(string $id, bool $mkdir = false, string $directory = null)
+    private function getFile(string $id, bool $mkdir = false, ?string $directory = null)
     {
         // Use MD5 to favor speed over security, which is not an issue here
         $hash = str_replace('/', '-', base64_encode(hash('md5', static::class.$id, true)));

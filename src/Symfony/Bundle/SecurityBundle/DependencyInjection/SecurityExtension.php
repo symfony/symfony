@@ -538,7 +538,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners(ContainerBuilder $container, string $id, array $firewall, array &$authenticationProviders, ?string $defaultProvider, array $providerIds, ?string $defaultEntryPoint, string $contextListenerId = null)
+    private function createAuthenticationListeners(ContainerBuilder $container, string $id, array $firewall, array &$authenticationProviders, ?string $defaultProvider, array $providerIds, ?string $defaultEntryPoint, ?string $contextListenerId = null)
     {
         $listeners = [];
         $entryPoints = [];
@@ -843,7 +843,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->expressions[$id] = new Reference($id);
     }
 
-    private function createRequestMatcher(ContainerBuilder $container, string $path = null, string $host = null, int $port = null, array $methods = [], array $ips = null, array $attributes = []): Reference
+    private function createRequestMatcher(ContainerBuilder $container, ?string $path = null, ?string $host = null, ?int $port = null, array $methods = [], ?array $ips = null, array $attributes = []): Reference
     {
         if ($methods) {
             $methods = array_map('strtoupper', $methods);

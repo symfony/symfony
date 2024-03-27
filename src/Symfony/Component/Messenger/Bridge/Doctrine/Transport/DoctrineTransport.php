@@ -72,7 +72,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
     /**
      * {@inheritdoc}
      */
-    public function all(int $limit = null): iterable
+    public function all(?int $limit = null): iterable
     {
         return ($this->receiver ?? $this->getReceiver())->all($limit);
     }

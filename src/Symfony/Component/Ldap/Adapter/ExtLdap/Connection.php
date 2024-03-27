@@ -67,9 +67,9 @@ class Connection extends AbstractConnection
     /**
      * {@inheritdoc}
      *
-     * @param string $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
+     * @param string|null $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
      */
-    public function bind(string $dn = null, string $password = null)
+    public function bind(?string $dn = null, ?string $password = null)
     {
         if (!$this->connection) {
             $this->connect();

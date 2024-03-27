@@ -89,7 +89,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * trans_sid_hosts, $_SERVER['HTTP_HOST']
      * trans_sid_tags, "a=href,area=href,frame=src,form="
      */
-    public function __construct(array $options = [], AbstractProxy|\SessionHandlerInterface $handler = null, MetadataBag $metaBag = null)
+    public function __construct(array $options = [], AbstractProxy|\SessionHandlerInterface $handler = null, ?MetadataBag $metaBag = null)
     {
         if (!\extension_loaded('session')) {
             throw new \LogicException('PHP extension "session" is required.');
@@ -216,7 +216,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function regenerate(bool $destroy = false, int $lifetime = null): bool
+    public function regenerate(bool $destroy = false, ?int $lifetime = null): bool
     {
         // Cannot regenerate the session ID for non-active sessions.
         if (\PHP_SESSION_ACTIVE !== session_status()) {
@@ -329,7 +329,7 @@ class NativeSessionStorage implements SessionStorageInterface
         return $this->bags[$name];
     }
 
-    public function setMetadataBag(MetadataBag $metaBag = null)
+    public function setMetadataBag(?MetadataBag $metaBag = null)
     {
         if (null === $metaBag) {
             $metaBag = new MetadataBag();
@@ -441,7 +441,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * PHP takes the return value from the read() handler, unserializes it
      * and populates $_SESSION with the result automatically.
      */
-    protected function loadSession(array &$session = null)
+    protected function loadSession(?array &$session = null)
     {
         if (null === $session) {
             $session = &$_SESSION;

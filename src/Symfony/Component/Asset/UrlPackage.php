@@ -41,7 +41,7 @@ class UrlPackage extends Package
     /**
      * @param string|string[] $baseUrls Base asset URLs
      */
-    public function __construct(string|array $baseUrls, VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
+    public function __construct(string|array $baseUrls, VersionStrategyInterface $versionStrategy, ?ContextInterface $context = null)
     {
         parent::__construct($versionStrategy, $context);
 

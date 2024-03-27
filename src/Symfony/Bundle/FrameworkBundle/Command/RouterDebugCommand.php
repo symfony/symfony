@@ -42,7 +42,7 @@ class RouterDebugCommand extends Command
     private $router;
     private $fileLinkFormatter;
 
-    public function __construct(RouterInterface $router, FileLinkFormatter $fileLinkFormatter = null)
+    public function __construct(RouterInterface $router, ?FileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 

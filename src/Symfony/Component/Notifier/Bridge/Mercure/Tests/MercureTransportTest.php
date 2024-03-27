@@ -34,7 +34,7 @@ use TypeError;
  */
 final class MercureTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, HubInterface $hub = null, string $hubId = 'hubId', $topics = null): MercureTransport
+    public function createTransport(?HttpClientInterface $client = null, ?HubInterface $hub = null, string $hubId = 'hubId', $topics = null): MercureTransport
     {
         $hub = $hub ?? $this->createMock(HubInterface::class);
 

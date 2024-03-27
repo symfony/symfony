@@ -21,7 +21,7 @@ class MissingConstructorArgumentsException extends RuntimeException
      */
     private $missingArguments;
 
-    public function __construct(string $message, int $code = 0, \Throwable $previous = null, array $missingArguments = [])
+    public function __construct(string $message, int $code = 0, ?\Throwable $previous = null, array $missingArguments = [])
     {
         $this->missingArguments = $missingArguments;
 

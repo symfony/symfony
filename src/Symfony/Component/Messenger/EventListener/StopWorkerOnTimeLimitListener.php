@@ -27,7 +27,7 @@ class StopWorkerOnTimeLimitListener implements EventSubscriberInterface
     private $logger;
     private float $endTime = 0;
 
-    public function __construct(int $timeLimitInSeconds, LoggerInterface $logger = null)
+    public function __construct(int $timeLimitInSeconds, ?LoggerInterface $logger = null)
     {
         $this->timeLimitInSeconds = $timeLimitInSeconds;
         $this->logger = $logger;

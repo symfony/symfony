@@ -215,7 +215,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @see addCasters
      */
-    public function __construct(array $casters = null)
+    public function __construct(?array $casters = null)
     {
         if (null === $casters) {
             $casters = static::$defaultCasters;

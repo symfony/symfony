@@ -40,7 +40,7 @@ abstract class FileLoader extends BaseFileLoader
     protected $singlyImplemented = [];
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
-    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null)
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, ?string $env = null)
     {
         $this->container = $container;
 
@@ -52,7 +52,7 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @param bool|string $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
      */
-    public function import(mixed $resource, string $type = null, bool|string $ignoreErrors = false, string $sourceResource = null, $exclude = null): mixed
+    public function import(mixed $resource, ?string $type = null, bool|string $ignoreErrors = false, ?string $sourceResource = null, $exclude = null): mixed
     {
         $args = \func_get_args();
 

@@ -146,7 +146,7 @@ trait TransportResponseTrait
      *
      * @internal
      */
-    public static function stream(iterable $responses, float $timeout = null): \Generator
+    public static function stream(iterable $responses, ?float $timeout = null): \Generator
     {
         $runningResponses = [];
 

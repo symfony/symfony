@@ -45,10 +45,10 @@ class Route
         array|string $schemes = [],
         private ?string $condition = null,
         private ?int $priority = null,
-        string $locale = null,
-        string $format = null,
-        bool $utf8 = null,
-        bool $stateless = null,
+        ?string $locale = null,
+        ?string $format = null,
+        ?bool $utf8 = null,
+        ?bool $stateless = null,
         private ?string $env = null
     ) {
         if (\is_array($path)) {

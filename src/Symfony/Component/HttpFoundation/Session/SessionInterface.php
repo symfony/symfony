@@ -53,12 +53,12 @@ interface SessionInterface
      * Clears all session attributes and flashes and regenerates the
      * session and deletes the old session from persistence.
      *
-     * @param int $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                      will leave the system settings unchanged, 0 sets the cookie
-     *                      to expire with browser session. Time is in seconds, and is
-     *                      not a Unix timestamp.
+     * @param int|null $lifetime Sets the cookie lifetime for the session cookie. A null value
+     *                           will leave the system settings unchanged, 0 sets the cookie
+     *                           to expire with browser session. Time is in seconds, and is
+     *                           not a Unix timestamp.
      */
-    public function invalidate(int $lifetime = null): bool;
+    public function invalidate(?int $lifetime = null): bool;
 
     /**
      * Migrates the current session to a new session id while maintaining all
@@ -70,7 +70,7 @@ interface SessionInterface
      *                       to expire with browser session. Time is in seconds, and is
      *                       not a Unix timestamp.
      */
-    public function migrate(bool $destroy = false, int $lifetime = null): bool;
+    public function migrate(bool $destroy = false, ?int $lifetime = null): bool;
 
     /**
      * Force the session to be saved and closed.

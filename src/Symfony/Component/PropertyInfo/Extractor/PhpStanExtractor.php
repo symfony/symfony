@@ -57,7 +57,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
      * @param list<string>|null $accessorPrefixes
      * @param list<string>|null $arrayMutatorPrefixes
      */
-    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
+    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null)
     {
         $this->phpStanTypeHelper = new PhpStanTypeHelper();
         $this->mutatorPrefixes = $mutatorPrefixes ?? ReflectionExtractor::$defaultMutatorPrefixes;

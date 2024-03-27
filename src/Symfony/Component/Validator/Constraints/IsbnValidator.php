@@ -169,7 +169,7 @@ class IsbnValidator extends ConstraintValidator
         return 0 === $checkSum % 10 ? true : Isbn::CHECKSUM_FAILED_ERROR;
     }
 
-    protected function getMessage(Isbn $constraint, string $type = null)
+    protected function getMessage(Isbn $constraint, ?string $type = null)
     {
         if (null !== $constraint->message) {
             return $constraint->message;

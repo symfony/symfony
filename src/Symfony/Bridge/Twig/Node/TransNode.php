@@ -24,7 +24,7 @@ use Twig\Node\TextNode;
  */
 final class TransNode extends Node
 {
-    public function __construct(Node $body, Node $domain = null, AbstractExpression $count = null, AbstractExpression $vars = null, AbstractExpression $locale = null, int $lineno = 0, string $tag = null)
+    public function __construct(Node $body, ?Node $domain = null, ?AbstractExpression $count = null, ?AbstractExpression $vars = null, ?AbstractExpression $locale = null, int $lineno = 0, ?string $tag = null)
     {
         $nodes = ['body' => $body];
         if (null !== $domain) {

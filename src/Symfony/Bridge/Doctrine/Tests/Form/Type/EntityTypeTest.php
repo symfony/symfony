@@ -785,7 +785,7 @@ class EntityTypeTest extends BaseTypeTest
             'em' => 'default',
             'class' => self::ITEM_GROUP_CLASS,
             'choice_label' => 'name',
-            'choice_value' => function (GroupableEntity $entity = null) {
+            'choice_value' => function (?GroupableEntity $entity = null) {
                 if (null === $entity) {
                     return '';
                 }

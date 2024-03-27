@@ -49,7 +49,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param bool           $scream           Enables/disables screaming mode, where even silenced errors are logged
      * @param bool           $scope            Enables/disables scoping mode
      */
-    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, array|int|null $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, bool $scope = true, LoggerInterface $deprecationLogger = null)
+    public function __construct(?callable $exceptionHandler = null, ?LoggerInterface $logger = null, array|int|null $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, bool $scope = true, ?LoggerInterface $deprecationLogger = null)
     {
         $handler = set_exception_handler('is_int');
         $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
@@ -67,7 +67,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     /**
      * Configures the error handler.
      */
-    public function configure(object $event = null)
+    public function configure(?object $event = null)
     {
         if ($event instanceof ConsoleEvent && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             return;

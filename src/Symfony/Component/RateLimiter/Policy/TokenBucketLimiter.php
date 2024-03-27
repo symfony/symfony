@@ -29,7 +29,7 @@ final class TokenBucketLimiter implements LimiterInterface
     private int $maxBurst;
     private $rate;
 
-    public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, LockInterface $lock = null)
+    public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, ?LockInterface $lock = null)
     {
         $this->id = $id;
         $this->maxBurst = $maxBurst;
@@ -45,13 +45,13 @@ final class TokenBucketLimiter implements LimiterInterface
      * future token consumptions. Do not use this method if you intend
      * to skip this process.
      *
-     * @param int   $tokens  the number of tokens required
-     * @param float $maxTime maximum accepted waiting time in seconds
+     * @param int        $tokens  the number of tokens required
+     * @param float|null $maxTime maximum accepted waiting time in seconds
      *
      * @throws MaxWaitDurationExceededException if $maxTime is set and the process needs to wait longer than its value (in seconds)
      * @throws \InvalidArgumentException        if $tokens is larger than the maximum burst size
      */
-    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
         if ($tokens > $this->maxBurst) {
             throw new \InvalidArgumentException(sprintf('Cannot reserve more tokens (%d) than the burst size of the rate limiter (%d).', $tokens, $this->maxBurst));

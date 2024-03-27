@@ -24,7 +24,7 @@ class JsonSerializableNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if ($this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object, $format, $context);
@@ -44,7 +44,7 @@ class JsonSerializableNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null): bool
+    public function supportsNormalization(mixed $data, ?string $format = null): bool
     {
         return $data instanceof \JsonSerializable;
     }
@@ -52,7 +52,7 @@ class JsonSerializableNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null): bool
     {
         return false;
     }
@@ -60,7 +60,7 @@ class JsonSerializableNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         throw new LogicException(sprintf('Cannot denormalize with "%s".', \JsonSerializable::class));
     }

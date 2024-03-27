@@ -333,7 +333,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         }
     }
 
-    public static function getUrlsForRequiredTld()
+    public static function getUrlsForRequiredTld(): iterable
     {
         yield ['https://aaa', true, false];
         yield ['https://aaa', false, true];

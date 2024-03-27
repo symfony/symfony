@@ -107,7 +107,7 @@ class AsDecoratorBar20 implements AsDecoratorInterface
 #[AsDecorator(decorates: \NonExistent::class, onInvalid: ContainerInterface::NULL_ON_INVALID_REFERENCE)]
 class AsDecoratorBaz implements AsDecoratorInterface
 {
-    public function __construct(#[AutowireDecorated] AsDecoratorInterface $inner = null)
+    public function __construct(#[AutowireDecorated] ?AsDecoratorInterface $inner = null)
     {
     }
 }

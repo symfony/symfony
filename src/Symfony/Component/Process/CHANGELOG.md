@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add support for `Fiber`
+
 6.4
 ---
 

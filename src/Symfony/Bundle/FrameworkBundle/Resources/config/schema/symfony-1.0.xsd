@@ -120,6 +120,7 @@
         <xsd:attribute name="utf8" type="xsd:boolean" />
         <xsd:attribute name="default-uri" type="xsd:string" />
         <xsd:attribute name="cache-dir" type="xsd:string" />
+        <xsd:attribute name="ignore-cache" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="session">

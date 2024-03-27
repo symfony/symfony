@@ -13,6 +13,7 @@ CHANGELOG
  * Add `secrets:reveal` command
  * Add `rate_limiter` option to `http_client.default_options` and `http_client.scoped_clients`
  * Attach the workflow's configuration to the `workflow` tag
+ * Add `router.ignore_cache` config option
 
 7.0
 ---

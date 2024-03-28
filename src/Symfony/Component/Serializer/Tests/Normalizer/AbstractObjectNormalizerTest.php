@@ -1025,6 +1025,23 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertFalse($normalizer->childContextCacheKey);
     }
+
+    public function testNormalizationWithMaxDepthOnStdclassObjectDoesNotThrowWarning()
+    {
+        $object = new \stdClass();
+        $object->string = 'yes';
+
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $normalized = $normalizer->normalize($object, 'json', [
+            'json_encode_options' => 15, // JsonResponse::DEFAULT_ENCODING_OPTIONS
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => static fn () => null,
+            AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
+            AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
+        ]);
+
+        $this->assertSame(['string' => 'yes'], $normalized);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer

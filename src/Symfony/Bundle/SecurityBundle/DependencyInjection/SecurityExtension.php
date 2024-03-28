@@ -98,6 +98,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         if (!array_filter($configs)) {
             trigger_deprecation('symfony/security-bundle', '6.3', 'Enabling bundle "%s" and not configuring it is deprecated.', SecurityBundle::class);
+
             // uncomment the following line in 7.0
             // throw new InvalidConfigurationException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
             return;
@@ -423,6 +424,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Register Firewall-specific chained user checker
         $container->register('security.user_checker.chain.'.$id, ChainUserChecker::class)
             ->addArgument(new TaggedIteratorArgument('security.user_checker.'.$id));
+
+        // Register Firewall-specific user checker for 'security.helper' login()
+        $securityUserCheckerLocator = $container->getDefinition('security.user_checker_locator');
+        $securityUserCheckerLocator
+            ->replaceArgument(0, array_merge($securityUserCheckerLocator->getArgument(0), [
+                'security.user_checker.'.$id => new ServiceClosureArgument(new Reference('security.user_checker.'.$id)),
+            ]))
+        ;
 
         // Register listeners
         $listeners = [];

@@ -143,6 +143,7 @@ class SecurityTest extends TestCase
                 ['security.firewall.map', $firewallMap],
                 ['security.authenticator.managers_locator', $this->createContainer('main', $userAuthenticator)],
                 ['security.user_checker', $userChecker],
+                ['security.user_checker_locator', $this->createContainer('security.user_checker.main', $userChecker)],
             ])
         ;
 
@@ -189,6 +190,7 @@ class SecurityTest extends TestCase
                 ['security.firewall.map', $firewallMap],
                 ['security.authenticator.managers_locator', $this->createContainer('main', $userAuthenticator)],
                 ['security.user_checker', $userChecker],
+                ['security.user_checker_locator', $this->createContainer('security.user_checker.main', $userChecker)],
             ])
         ;
 
@@ -238,6 +240,7 @@ class SecurityTest extends TestCase
                 ['request_stack', $requestStack],
                 ['security.firewall.map', $firewallMap],
                 ['security.user_checker', $userChecker],
+                ['security.user_checker_locator', $this->createContainer('security.user_checker.main', $userChecker)],
             ])
         ;
 

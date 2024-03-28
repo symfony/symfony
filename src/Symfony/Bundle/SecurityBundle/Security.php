@@ -127,7 +127,11 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
 
         $authenticator = $this->getAuthenticator($authenticatorName, $firewallName);
 
-        $this->container->get('security.user_checker')->checkPreAuth($user);
+        if ($this->container->get('security.user_checker_locator')->has('security.user_checker.'.$firewallName)) {
+            $this->container->get('security.user_checker_locator')->get('security.user_checker.'.$firewallName)->checkPreAuth($user);
+        } else {
+            $this->container->get('security.user_checker')->checkPreAuth($user);
+        }
 
         return $this->container->get('security.authenticator.managers_locator')->get($firewallName)->authenticateUser($user, $authenticator, $request, $badges);
     }

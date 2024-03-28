@@ -5,7 +5,7 @@
             them as JavaScript source code. Always use '/*' comments instead
             of '//' comments to avoid impossible-to-debug side-effects #}
 <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
-    window.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         new SymfonyProfiler();
     });
 
@@ -13,10 +13,29 @@
         constructor() {
             this.#reorderMainMenuItems();
             this.#createTabs();
-            this.#createTableSearchFields();
-            this.#createToggles();
-            this.#createCopyToClipboard();
-            this.#convertDateTimesToUserTimezone();
+
+            setTimeout(() => {
+                this.#createTableSearchFields();
+                this.#createToggles();
+                this.#createCopyToClipboard();
+                this.#convertDateTimesToUserTimezone();
+            }, 0);
+        }
+
+        #reorderMainMenuItems() {
+            /* reorder the main menu items to always display first the non-disabled items */
+            const mainMenuElement = document.querySelector('#menu-profiler');
+            const mainMenuItems = mainMenuElement.querySelectorAll('li');
+            const firstDisabledMenuItem = mainMenuElement.querySelector('li a > span.disabled')?.parentNode?.parentNode;
+            if (!firstDisabledMenuItem) {
+                return;
+            }
+            mainMenuItems.forEach(menuItem => {
+                const isDisabled = menuItem.querySelector('a > span.disabled');
+                if (!isDisabled) {
+                    mainMenuElement.insertBefore(menuItem, firstDisabledMenuItem);
+                }
+            });
         }
 
         #reorderMainMenuItems() {

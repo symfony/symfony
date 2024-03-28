@@ -28,14 +28,14 @@
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
-        "amphp/amp": "^2.5",
-        "amphp/http-client": "^4.2.1",
-        "amphp/http-tunnel": "^1.0",
+        "amphp/http-client": "^4.2.1|^5.0",
+        "amphp/http-tunnel": "^1.0|^2.0",
         "amphp/socket": "^1.1",
         "guzzlehttp/promises": "^1.4|^2.0",
         "nyholm/psr7": "^1.0",
         "php-http/httplug": "^1.0|^2.0",
         "psr/http-client": "^1.0",
+        "symfony/amphp-http-client-meta": "^1.0|^2.0",
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/messenger": "^6.4|^7.0",
@@ -44,6 +44,7 @@
         "symfony/stopwatch": "^6.4|^7.0"
     },
     "conflict": {
+        "amphp/amp": "<2.5",
         "php-http/discovery": "<1.15",
         "symfony/http-foundation": "<6.4"
     },

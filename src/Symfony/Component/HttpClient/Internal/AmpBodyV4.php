@@ -23,7 +23,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  *
  * @internal
  */
-class AmpBody implements RequestBody, InputStream
+class AmpBodyV4 implements RequestBody, InputStream
 {
     private ResourceInputStream|\Closure|string $body;
     private array $info;

@@ -442,7 +442,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString("\r\nContent-Length: ", $response->getInfo('debug'));
+        $this->assertStringContainsStringIgnoringCase("\r\nContent-Length: ", $response->getInfo('debug'));
     }
 
     public function testNullBody()

@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\HttpClient\Internal;
 
-use Amp\CancellationToken;
-use Amp\Deferred;
+use Amp\Cancellation;
+use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Http\Client\Connection\ConnectionLimitingPool;
 use Amp\Http\Client\Connection\DefaultConnectionFactory;
 use Amp\Http\Client\InterceptedHttpClient;
@@ -22,14 +23,13 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\Http\Tunnel\Http1TunnelConnector;
 use Amp\Http\Tunnel\Https1TunnelConnector;
-use Amp\Promise;
 use Amp\Socket\Certificate;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectContext;
-use Amp\Socket\Connector;
-use Amp\Socket\DnsConnector;
+use Amp\Socket\DnsSocketConnector;
+use Amp\Socket\Socket;
 use Amp\Socket\SocketAddress;
-use Amp\Success;
+use Amp\Socket\SocketConnector;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,7 +39,7 @@ use Psr\Log\LoggerInterface;
  *
  * @internal
  */
-final class AmpClientState extends ClientState
+final class AmpClientStateV5 extends ClientState
 {
     public array $dnsCache = [];
     public int $responseCount = 0;
@@ -54,14 +54,11 @@ final class AmpClientState extends ClientState
         private int $maxPendingPushes,
         private ?LoggerInterface &$logger,
     ) {
-        $clientConfigurator ??= static fn (PooledHttpClient $client) => new InterceptedHttpClient($client, new RetryRequests(2));
+        $clientConfigurator ??= static fn (PooledHttpClient $client) => new InterceptedHttpClient($client, new RetryRequests(2), []);
         $this->clientConfigurator = $clientConfigurator(...);
     }
 
-    /**
-     * @return Promise<Response>
-     */
-    public function request(array $options, Request $request, CancellationToken $cancellation, array &$info, \Closure $onProgress, &$handle): Promise
+    public function request(array $options, Request $request, Cancellation $cancellation, array &$info, \Closure $onProgress, &$handle): Response
     {
         if ($options['proxy']) {
             if ($request->hasHeader('proxy-authorization')) {
@@ -80,8 +77,6 @@ final class AmpClientState extends ClientState
             }
         }
 
-        $request = clone $request;
-
         if ($request->hasHeader('proxy-authorization')) {
             $request->removeHeader('proxy-authorization');
         }
@@ -90,23 +85,16 @@ final class AmpClientState extends ClientState
             $info['peer_certificate_chain'] = [];
         }
 
-        $request->addEventListener(new AmpListener($info, $options['peer_fingerprint']['pin-sha256'] ?? [], $onProgress, $handle));
-        $request->setPushHandler(fn ($request, $response): Promise => $this->handlePush($request, $response, $options));
+        $request->addEventListener(new AmpListenerV5($info, $options['peer_fingerprint']['pin-sha256'] ?? [], $onProgress, $handle));
+        $request->setPushHandler(fn ($request, $response) => $this->handlePush($request, $response, $options));
 
-        ($request->hasHeader('content-length') ? new Success((int) $request->getHeader('content-length')) : $request->getBody()->getBodyLength())
-            ->onResolve(static function ($e, $bodySize) use (&$info) {
-                if (null !== $bodySize && 0 <= $bodySize) {
-                    $info['upload_content_length'] = ((1 + $info['upload_content_length']) ?? 1) - 1 + $bodySize;
-                }
-            });
+        if (0 <= $bodySize = $request->hasHeader('content-length') ? (int) $request->getHeader('content-length') : $request->getBody()->getContentLength() ?? -1) {
+            $info['upload_content_length'] = ((1 + $info['upload_content_length']) ?? 1) - 1 + $bodySize;
+        }
 
         [$client, $connector] = $this->getClient($options);
         $response = $client->request($request, $cancellation);
-        $response->onResolve(static function ($e) use ($connector, &$handle) {
-            if (null === $e) {
-                $handle = $connector->handle;
-            }
-        });
+        $handle = $connector->handle;
 
         return $response;
     }
@@ -141,23 +129,21 @@ final class AmpClientState extends ClientState
         $options['capture_peer_cert_chain'] && $context = $context->withPeerCapturing();
         $options['crypto_method'] && $context = $context->withMinimumVersion($options['crypto_method']);
 
-        $connector = $handleConnector = new class() implements Connector {
-            public DnsConnector $connector;
+        $connector = $handleConnector = new class() implements SocketConnector {
+            public DnsSocketConnector $connector;
             public string $uri;
             /** @var resource|null */
             public $handle;
 
-            public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Promise
+            public function connect(SocketAddress|string $uri, ?ConnectContext $context = null, ?Cancellation $cancellation = null): Socket
             {
-                $result = $this->connector->connect($this->uri ?? $uri, $context, $token);
-                $result->onResolve(function ($e, $socket) {
-                    $this->handle = $socket?->getResource();
-                });
+                $socket = $this->connector->connect($this->uri ?? $uri, $context, $cancellation);
+                $this->handle = null !== $socket ? $socket->getResource() : false;
 
-                return $result;
+                return $socket;
             }
         };
-        $connector->connector = new DnsConnector(new AmpResolver($this->dnsCache));
+        $connector->connector = new DnsSocketConnector(new AmpResolverV5($this->dnsCache));
 
         $context = (new ConnectContext())
             ->withTcpNoDelay()
@@ -190,9 +176,9 @@ final class AmpClientState extends ClientState
         return $this->clients[$key] = [($this->clientConfigurator)(new PooledHttpClient($pool)), $handleConnector];
     }
 
-    private function handlePush(Request $request, Promise $response, array $options): Promise
+    private function handlePush(Request $request, Future $response, array $options): void
     {
-        $deferred = new Deferred();
+        $deferred = new DeferredFuture();
         $authority = $request->getUri()->getAuthority();
 
         if ($this->maxPendingPushes <= \count($this->pushedResponses[$authority] ?? [])) {
@@ -210,6 +196,6 @@ final class AmpClientState extends ClientState
             'local_pk' => $options['local_pk'],
         ]];
 
-        return $deferred->promise();
+        $deferred->getFuture()->await();
     }
 }

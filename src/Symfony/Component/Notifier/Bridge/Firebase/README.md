@@ -3,7 +3,7 @@ Firebase Notifier
 
 Provides [Firebase](https://firebase.google.com) integration for Symfony Notifier.
 
-DSN example
+Legacy DSN example
 -----------
 
 ```
@@ -11,8 +11,17 @@ FIREBASE_DSN=firebase://USERNAME:PASSWORD@default
 ```
 
 where:
- - `USERNAME` is your Firebase username
- - `PASSWORD` is your Firebase password
+- `USERNAME` is your Firebase username
+- `PASSWORD` is your Firebase password
+
+JWT DSN example (HTTP v1)
+-----------
+
+```
+FIREBASE_DSN=firebase-jwt://credentials_path:<json-file-path>@default
+FIREBASE_DSN=firebase-jwt://credentials_content:<base64-json-file-content>@default
+```
+
 
 Adding Interactions to a Message
 --------------------------------

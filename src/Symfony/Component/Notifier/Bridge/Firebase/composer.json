@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=8.2",
+        "ext-openssl": "*",
         "symfony/http-client": "^6.4|^7.0",
         "symfony/notifier": "^6.4|^7.0"
     },

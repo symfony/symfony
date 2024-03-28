@@ -20,9 +20,12 @@ use Symfony\Component\Notifier\Transport\Dsn;
  */
 final class FirebaseTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): FirebaseTransport
+    public function create(Dsn $dsn): FirebaseTransport|FirebaseJwtTransport
     {
         $scheme = $dsn->getScheme();
+        if ('firebase-jwt' === $scheme) {
+            return $this->createJwt($dsn);
+        }
 
         if ('firebase' !== $scheme) {
             throw new UnsupportedSchemeException($dsn, 'firebase', $this->getSupportedSchemes());
@@ -35,8 +38,18 @@ final class FirebaseTransportFactory extends AbstractTransportFactory
         return (new FirebaseTransport($token, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
+    public function createJwt(Dsn $dsn): FirebaseJwtTransport
+    {
+        $credentials = match ($this->getUser($dsn)) {
+            'credentials_path' => file_get_contents($this->getPassword($dsn)),
+            'credentials_content' => base64_decode($this->getPassword($dsn)),
+        };
+
+        return (new FirebaseJwtTransport(json_decode($credentials, true, 512, JSON_THROW_ON_ERROR), $this->client, $this->dispatcher));
+    }
+
     protected function getSupportedSchemes(): array
     {
-        return ['firebase'];
+        return ['firebase', 'firebase-jwt'];
     }
 }

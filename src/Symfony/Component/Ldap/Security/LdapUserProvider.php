@@ -44,8 +44,9 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     private string $defaultSearch;
     private ?string $passwordAttribute;
     private array $extraFields;
+    private ?RoleFetcherInterface $roleFetcher;
 
-    public function __construct(LdapInterface $ldap, string $baseDn, ?string $searchDn = null, #[\SensitiveParameter] ?string $searchPassword = null, array $defaultRoles = [], ?string $uidKey = null, ?string $filter = null, ?string $passwordAttribute = null, array $extraFields = [])
+    public function __construct(LdapInterface $ldap, string $baseDn, ?string $searchDn = null, #[\SensitiveParameter] ?string $searchPassword = null, array $defaultRoles = [], ?string $uidKey = null, ?string $filter = null, ?string $passwordAttribute = null, array $extraFields = [], RoleFetcherInterface $roleFetcher = null)
     {
         $uidKey ??= 'sAMAccountName';
         $filter ??= '({uid_key}={user_identifier})';
@@ -59,6 +60,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         $this->defaultSearch = str_replace('{uid_key}', $uidKey, $filter);
         $this->passwordAttribute = $passwordAttribute;
         $this->extraFields = $extraFields;
+        $this->roleFetcher = $roleFetcher;
     }
 
     public function loadUserByIdentifier(string $identifier): UserInterface
@@ -154,7 +156,13 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             $extraFields[$field] = $this->getAttributeValue($entry, $field);
         }
 
-        return new LdapUser($entry, $identifier, $password, $this->defaultRoles, $extraFields);
+        $roles = $this->defaultRoles;
+
+        if (null !== $this->roleFetcher) {
+            $roles = $this->roleFetcher->fetchRoles($entry);
+        }
+
+        return new LdapUser($entry, $identifier, $password, $roles, $extraFields);
     }
 
     private function getAttributeValue(Entry $entry, string $attribute): mixed

@@ -1,0 +1,3 @@
+login_check:
+    path: /login
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\JsonLdapLoginBundle\Controller\TestController::loginCheckAction }

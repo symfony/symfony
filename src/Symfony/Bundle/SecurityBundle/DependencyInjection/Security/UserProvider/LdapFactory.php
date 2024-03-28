@@ -37,6 +37,7 @@ class LdapFactory implements UserProviderFactoryInterface
             ->replaceArgument(6, $config['filter'])
             ->replaceArgument(7, $config['password_attribute'])
             ->replaceArgument(8, $config['extra_fields'])
+            ->replaceArgument(9, $config['role_fetcher'] ? new Reference($config['role_fetcher']) : null)
         ;
     }
 
@@ -63,6 +64,7 @@ class LdapFactory implements UserProviderFactoryInterface
                     ->requiresAtLeastOneElement()
                     ->prototype('scalar')->end()
                 ->end()
+                ->scalarNode('role_fetcher')->defaultNull()->end()
                 ->scalarNode('uid_key')->defaultValue('sAMAccountName')->end()
                 ->scalarNode('filter')->defaultValue('({uid_key}={user_identifier})')->end()
                 ->scalarNode('password_attribute')->defaultNull()->end()

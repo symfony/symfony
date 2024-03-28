@@ -94,7 +94,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesWithNoPrefixesProvider
      */
-    public function testExtractTypesWithNoPrefixes($property, array $type = null)
+    public function testExtractTypesWithNoPrefixes($property, ?array $type = null)
     {
         $noPrefixExtractor = new PhpDocExtractor(null, [], [], []);
 
@@ -216,7 +216,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesWithCustomPrefixesProvider
      */
-    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
+    public function testExtractTypesWithCustomPrefixes($property, ?array $type = null)
     {
         $customExtractor = new PhpDocExtractor(null, ['add', 'remove'], ['is', 'can']);
 
@@ -415,7 +415,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider constructorTypesProvider
      */
-    public function testExtractConstructorTypes($property, array $type = null)
+    public function testExtractConstructorTypes($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }

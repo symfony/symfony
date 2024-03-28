@@ -195,7 +195,6 @@ class ProfilerController
                 'end' => $request->query->get('end', $session?->get('_profiler_search_end')),
                 'limit' => $request->query->get('limit', $session?->get('_profiler_search_limit')),
                 'request' => $request,
-                'render_hidden_by_default' => false,
                 'profile_type' => $request->query->get('type', $session?->get('_profiler_search_type', 'request')),
             ]),
             200,

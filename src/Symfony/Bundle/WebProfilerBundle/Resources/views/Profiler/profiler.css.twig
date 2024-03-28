@@ -1416,7 +1416,7 @@ tr.status-warning td {
    ------------------------------------------------------------------------- #}
 #sidebar #sidebar-shortcuts {
     color: var(--gray-500);
-    padding: 10px 15px;
+    padding: 5px 8px;
 }
 #sidebar #sidebar-shortcuts .sf-tabs .tab-navigation {
     margin: 5px 0 15px;
@@ -1431,14 +1431,20 @@ tr.status-warning td {
     display: flex;
     align-items: center;
     font-size: 13px;
+    padding: 5px 7px;
 }
-#sidebar #sidebar-shortcuts:hover .btn-link {
-    color: var(--menu-color);
+#sidebar #sidebar-shortcuts .btn-link:hover {
+    background: var(--menu-active-background);
+    color: var(--menu-active-color);
+    text-decoration: none;
 }
 #sidebar-shortcuts .shortcuts svg {
     height: 16px;
     width: 16px;
     margin-right: 4px;
+}
+#sidebar #sidebar-shortcuts form {
+    padding: 5px 7px;
 }
 
 {# Sidebar Search (the colors of this element don't change based on the selected theme)

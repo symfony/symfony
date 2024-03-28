@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `emojify` twig filter
+
 7.0
 ---
 

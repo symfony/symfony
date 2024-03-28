@@ -27,6 +27,7 @@
         "symfony/asset": "^6.4|^7.0",
         "symfony/asset-mapper": "^6.4|^7.0",
         "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/emoji": "^7.1",
         "symfony/finder": "^6.4|^7.0",
         "symfony/form": "^6.4|^7.0",
         "symfony/html-sanitizer": "^6.4|^7.0",

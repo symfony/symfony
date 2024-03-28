@@ -33,6 +33,7 @@ use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
+use Symfony\Component\Messenger\ParallelMessageBus;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory;
@@ -54,6 +55,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('per message senders map'),
                 abstract_arg('senders service locator'),
             ])
+
         ->set('messenger.middleware.send_message', SendMessageMiddleware::class)
             ->abstract()
             ->args([
@@ -133,6 +135,15 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.routable_message_bus'),
             ])
             ->tag('messenger.transport_factory')
+
+        ->set('parallel_bus', ParallelMessageBus::class)
+            ->args([
+                [],
+                param('kernel.environment'),
+                param('kernel.debug'),
+                param('kernel.project_dir'),
+            ])
+            ->tag('messenger.bus')
 
         ->set('messenger.transport.in_memory.factory', InMemoryTransportFactory::class)
             ->tag('messenger.transport_factory')

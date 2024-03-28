@@ -27,14 +27,19 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Stamp\AckStamp;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
+use Symfony\Component\Messenger\Stamp\FutureStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
+
+use function Amp\Future\awaitAll;
+use function Amp\Future\awaitAny;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -48,6 +53,8 @@ class Worker
     private WorkerMetadata $metadata;
     private array $acks = [];
     private \SplObjectStorage $unacks;
+
+    private static $futures = [];
 
     /**
      * @param ReceiverInterface[] $receivers Where the key is the transport name
@@ -103,11 +110,16 @@ class Worker
                     $envelopes = $receiver->get();
                 }
 
+                if (!$envelopes) {
+                    // flush
+                    $this->handleFutures($transportName, $options['parallel-limit'] ?? 0);
+                }
+
                 foreach ($envelopes as $envelope) {
                     $envelopeHandled = true;
 
                     $this->rateLimit($transportName);
-                    $this->handleMessage($envelope, $transportName);
+                    $this->handleMessage($envelope, $transportName, $options['parallel-limit'] ?? 0);
                     $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
 
                     if ($this->shouldStop) {
@@ -142,7 +154,7 @@ class Worker
         $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
     }
 
-    private function handleMessage(Envelope $envelope, string $transportName): void
+    private function handleMessage(Envelope $envelope, string $transportName, int $parallelProcessesLimit): void
     {
         $event = new WorkerMessageReceivedEvent($envelope, $transportName);
         $this->eventDispatcher?->dispatch($event);
@@ -153,17 +165,49 @@ class Worker
         }
 
         $acked = false;
-        $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acked) {
-            $acked = true;
-            $this->acks[] = [$transportName, $envelope, $e];
-        };
+        $busNameStamp = $envelope->last(BusNameStamp::class);
 
         try {
             $e = null;
-            $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp(), new AckStamp($ack)));
+
+            $envelope = $envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp());
+
+            // "non concurrent" behaviour
+            if (!$busNameStamp || 'parallel_bus' !== $busNameStamp->getBusName()) {
+                $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acked) {
+                    $acked = true;
+                    $this->acks[] = [$transportName, $envelope, $e];
+                };
+
+                $envelope = $envelope->with(new AckStamp($ack));
+            }
+
+            $envelope = $this->bus->dispatch($envelope);
+
+            // "non concurrent" behaviour
+            if (null == $futureStamp = $envelope->last(FutureStamp::class)) {
+                $this->preAck($envelope, $transportName, $acked, $e);
+
+                return;
+            }
+
+            $envelope = $envelope->withoutStampsOfType(FutureStamp::class);
+            self::$futures[] = [$futureStamp->getFuture(), $envelope];
         } catch (\Throwable $e) {
+            $this->preAck($envelope, $transportName, $acked, $e);
+
+            return;
         }
 
+        if (\count(self::$futures) < $parallelProcessesLimit) {
+            return;
+        }
+
+        $this->handleFutures($transportName, $parallelProcessesLimit);
+    }
+
+    private function preAck(Envelope $envelope, string $transportName, bool $acked, $e): void
+    {
         $noAutoAckStamp = $envelope->last(NoAutoAckStamp::class);
 
         if (!$acked && !$noAutoAckStamp) {
@@ -281,5 +325,80 @@ class Worker
     public function getMetadata(): WorkerMetadata
     {
         return $this->metadata;
+    }
+
+    public function handleFutures(string $transportName, $parallelProcessLimit): void
+    {
+        $toHandle = self::$futures;
+        self::$futures = [];
+
+        if (!$toHandle) {
+            return;
+        }
+
+        $futuresReceived = [];
+        $envelopesAssociated = [];
+
+        foreach ($toHandle as $combo) {
+            $futuresReceived[] = $combo[0];
+            $envelopesAssociated[] = $combo[1];
+        }
+
+        [$errorsFromAwait, $executions] = awaitAll($futuresReceived);
+
+        foreach ($errorsFromAwait as $index => $error) {
+            try {
+                $execution = $futuresReceived[$index]->await();
+                $envelope = $execution->await();
+            } catch (\Throwable $e) {
+                $this->preAck($envelopesAssociated[$index]->withoutStampsOfType(FutureStamp::class), $transportName, false, $e);
+
+                continue;
+            }
+
+            $this->preAck($envelope, $transportName, false, null);
+        }
+
+        $futures = array_map(fn ($execution) => $execution->getFuture(), $executions);
+
+        $i = 0;
+
+        while ($executions) {
+            if ($i === $parallelProcessLimit) {
+                break;
+            }
+
+            try {
+                $envelope = awaitAny($futures);
+                $futures = [];
+
+                $executions = array_filter($executions, fn ($ex) => $ex->getTask()->getEnvelope()->last(TransportMessageIdStamp::class)->getId() !== $envelope->last(TransportMessageIdStamp::class)->getId());
+                $futures = array_map(fn ($execution) => $execution->getFuture(), $executions);
+
+                ++$i;
+            } catch (\Throwable $e) {
+                ++$i;
+                continue;
+            }
+
+            $this->preAck($envelope, $transportName, false, null);
+        }
+
+        if (!$executions) {
+            return;
+        }
+
+        foreach ($executions as $execution) {
+            try {
+                $envelope = $execution->await();
+            } catch (\Throwable $e) {
+                $envelope = $execution->getTask()->getEnvelope()->withoutStampsOfType(FutureStamp::class);
+                $this->preAck($envelope, $transportName, false, $e);
+
+                continue;
+            }
+            // It should not happen
+            $this->preAck($envelope, $transportName, false, null);
+        }
     }
 }

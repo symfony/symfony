@@ -11,12 +11,18 @@
 
 namespace Symfony\Component\Messenger\Tests;
 
+use Amp\Future;
+use Amp\Parallel\Worker\Execution;
+use Amp\Parallel\Worker\Worker as ParallelWorker;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Messenger\DispatchTask;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -36,6 +42,8 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\ParallelMessageBus;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -48,13 +56,19 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
-use Symfony\Contracts\Service\ResetInterface;
+
+use function Amp\async;
+use function Amp\Parallel\Worker\workerPool;
 
 /**
  * @group time-sensitive
  */
 class WorkerTest extends TestCase
 {
+    private string $env = 'dev';
+    private bool $debug = false;
+    private string $projectdir = __DIR__.'/Fixtures/App';
+
     public function testWorkerDispatchTheReceivedMessage()
     {
         $apiMessage = new DummyMessage('API');
@@ -101,6 +115,118 @@ class WorkerTest extends TestCase
         $this->assertSame('transport', $envelopes[0]->last(ReceivedStamp::class)->getTransportName());
 
         $this->assertSame(2, $receiver->getAcknowledgeCount());
+    }
+
+    public function testFlushAllFuturesFromParallelMessageBus()
+    {
+        if (!class_exists(ParallelWorker::class)) {
+            $this->markTestSkipped(sprintf('%s not available.', Worker::class));
+        }
+
+        $apiMessage = new DummyMessage('API');
+        $ipaMessage = new DummyMessage('IPA');
+
+        $receiver = new DummyReceiver([
+            [(new Envelope($apiMessage))->with(new BusNameStamp('parallel_bus')), (new Envelope($ipaMessage))->with(new BusNameStamp('parallel_bus'))],
+        ]);
+
+        $bus = new ParallelMessageBus([$receiver], $this->env, $this->debug, $this->projectdir);
+
+        $dispatcher = new class() implements EventDispatcherInterface {
+            private StopWorkerOnMessageLimitListener $listener;
+
+            public function __construct()
+            {
+                $this->listener = new StopWorkerOnMessageLimitListener(2);
+            }
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerRunningEvent) {
+                    $this->listener->onWorkerRunning($event);
+                }
+
+                return $event;
+            }
+        };
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, clock: new MockClock());
+
+        $worker->run();
+
+        $this->assertSame(2, $receiver->getAcknowledgeCount());
+    }
+
+    public function testFuturesReceived()
+    {
+        if (!class_exists(ParallelWorker::class)) {
+            $this->markTestSkipped(sprintf('%s not available.', Worker::class));
+        }
+
+        $apiMessage = new DummyMessage('API');
+        $ipaMessage = new DummyMessage('IPA');
+
+        $receiver = new DummyReceiver([
+            [(new Envelope($apiMessage))->with(new BusNameStamp('parallel_bus')), (new Envelope($ipaMessage))->with(new BusNameStamp('parallel_bus'))],
+        ]);
+
+        $bus = $this->createMock(ParallelMessageBus::class);
+        $futures = [];
+
+        $workerPool = workerPool();
+
+        $bus->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(function ($envelope) use (&$futures, $workerPool) {
+                return $futures[] = async(function () use ($workerPool, $envelope) {
+                    return $workerPool->submit(
+                        new DispatchTask($envelope, [], $this->env, $this->debug, $this->projectdir)
+                    );
+                });
+            });
+
+        $dispatcher = new class() implements EventDispatcherInterface {
+            private StopWorkerOnMessageLimitListener $listener;
+
+            public function __construct()
+            {
+                $this->listener = new StopWorkerOnMessageLimitListener(2);
+            }
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerRunningEvent) {
+                    $this->listener->onWorkerRunning($event);
+                }
+
+                return $event;
+            }
+        };
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, clock: new MockClock());
+
+        $worker->run();
+
+        $this->assertSame($futures[0]::class, Future::class);
+        $execution = $futures[0]->await();
+        $executionOther = $futures[1]->await();
+        $this->assertSame($execution::class, Execution::class);
+        $this->assertSame($executionOther::class, Execution::class);
+        $envelope = $execution->await();
+        $envelopeOther = $executionOther->await();
+
+        $this->assertSame($apiMessage->getMessage(), $envelope->getMessage()->getMessage());
+        $this->assertSame($ipaMessage->getMessage(), $envelopeOther->getMessage()->getMessage());
+        $this->assertCount(1, $envelope->all(ReceivedStamp::class));
+        $this->assertCount(1, $envelope->all(ConsumedByWorkerStamp::class));
+        $this->assertSame('transport', $envelope->last(ReceivedStamp::class)->getTransportName());
+
+        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/EmptyAppKernel')) {
+            return;
+        }
+
+        $fs = new Filesystem();
+        $fs->remove($dir);
     }
 
     public function testHandlingErrorCausesReject()

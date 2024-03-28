@@ -102,4 +102,9 @@ class TraceableMessageBus implements MessageBusInterface
             'line' => $line,
         ];
     }
+
+    public function getMessageBus(): MessageBusInterface
+    {
+        return $this->decoratedBus;
+    }
 }

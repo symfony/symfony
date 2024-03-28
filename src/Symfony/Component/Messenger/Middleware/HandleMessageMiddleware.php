@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Handler\Acknowledger;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Stamp\AckStamp;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
@@ -31,6 +32,8 @@ use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 class HandleMessageMiddleware implements MiddlewareInterface
 {
     use LoggerAwareTrait;
+
+    private const PARALLEL_BUS = 'parallel_bus';
 
     public function __construct(
         private HandlersLocatorInterface $handlersLocator,
@@ -64,6 +67,10 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
                 /** @var AckStamp $ackStamp */
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {
+                    if ($envelope->last(BusNameStamp::class) && self::PARALLEL_BUS === $envelope->last(BusNameStamp::class)->getBusName()) {
+                        throw new HandlerFailedException($envelope, [new LogicException("Parallel bus can't be used for batch messages")]);
+                    }
+
                     $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor) {
                         if (null !== $e) {
                             $e = new HandlerFailedException($envelope, [$handlerDescriptor->getName() => $e]);
@@ -75,7 +82,6 @@ class HandleMessageMiddleware implements MiddlewareInterface
                     });
 
                     $result = $this->callHandler($handler, $message, $ack, $envelope->last(HandlerArgumentsStamp::class));
-
                     if (!\is_int($result) || 0 > $result) {
                         throw new LogicException(sprintf('A handler implementing BatchHandlerInterface must return the size of the current batch as a positive integer, "%s" returned from "%s".', \is_int($result) ? $result : get_debug_type($result), get_debug_type($batchHandler)));
                     }

@@ -1649,6 +1649,28 @@ EOTXT
             $books,
         ];
 
+        yield 'With multibyte characters in some headers (the "í" in "Títle") and cells (the "í" in "Dívíne")' => [
+            <<<EOTXT
++-------------------------+
+|   ISBN: 99921-58-10-7   |
+|  Títle: Dívíne Comedy   |
+| Author: Dante Alighieri |
+|  Price: 9.95            |
++-------------------------+
+
+EOTXT
+            ,
+            ['ISBN', 'Títle', 'Author', 'Price'],
+            [
+                [
+                    '99921-58-10-7',
+                    'Dívíne Comedy',
+                    'Dante Alighieri',
+                    '9.95',
+                ],
+            ],
+        ];
+
         yield 'With header for some' => [
             <<<EOTXT
 +------------------------------+

@@ -12,15 +12,16 @@ export const addDiagrams = () => {
 };
 endef
 
-.PHONY: mermaid-flowchart-v2.min.js
-mermaid-flowchart-v2.min.js: | mermaid-$(if $(tag),$(tag),$(error missing “tag” variable))/node_modules
-	$(file >mermaid-$(tag)/packages/mermaid/src/diagram-api/diagram-orchestration.ts,$(diagram-orchestration))
-	pnpm -C mermaid-$(tag) run build
-	cp mermaid-$(tag)/packages/mermaid/dist/mermaid.min.js $@
+tag ?= v10.9.0
 
-mermaid-%/node_modules: | mermaid-%
+.PHONY: mermaid-flowchart-v2.min.js
+mermaid-flowchart-v2.min.js: | repo-$(tag)/node_modules
+	$(file >repo-$(tag)/packages/mermaid/src/diagram-api/diagram-orchestration.ts,$(diagram-orchestration))
+	pnpm -C repo-$(tag) run build
+	cp repo-$(tag)/packages/mermaid/dist/mermaid.min.js $@
+
+repo-%/node_modules: | repo-%
 	pnpm -C $(@D) install --ignore-scripts
 
-mermaid-%:
+repo-%:
 	curl -fL https://github.com/mermaid-js/mermaid/archive/refs/tags/$*.tar.gz | tar -xz --strip-components=1 --one-top-level=$@
-

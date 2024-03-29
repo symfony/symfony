@@ -201,6 +201,7 @@ final class CompletionInput extends ArgvInput
             if ($this->definition->hasOption($optionName) && !$this->definition->getOption($optionName)->isHidden()) {
                 return $this->definition->getOption($optionName);
             }
+
             return null;
         }
 
@@ -208,6 +209,7 @@ final class CompletionInput extends ArgvInput
         if ($this->definition->hasShortcut($optionName[0]) && !$this->definition->getOptionForShortcut($optionName[0])->isHidden()) {
             return $this->definition->getOptionForShortcut($optionName[0]);
         }
+
         return null;
     }
 

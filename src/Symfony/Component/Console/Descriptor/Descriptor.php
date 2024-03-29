@@ -44,12 +44,14 @@ abstract class Descriptor implements DescriptorInterface
 
     /**
      * Filter hidden options from list.
+     *
      * @param array<string,InputOption> $inputOptions
+     *
      * @return array<string,InputOption>
      */
     protected function removeHiddenOptions(array $inputOptions, array $options = []): array
     {
-        return array_filter($inputOptions, fn(InputOption $option) => !$this->skipHiddenOption($option, $options));
+        return array_filter($inputOptions, fn (InputOption $option) => !$this->skipHiddenOption($option, $options));
     }
 
     /**

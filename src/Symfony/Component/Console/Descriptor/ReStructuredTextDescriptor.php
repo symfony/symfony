@@ -106,7 +106,7 @@ class ReStructuredTextDescriptor extends Descriptor
                 $this->write("\n\n");
             }
 
-            $this->write("Options\n" . str_repeat($this->subsubsectionChar, 7) . "\n\n");
+            $this->write("Options\n".str_repeat($this->subsubsectionChar, 7)."\n\n");
             foreach ($inputOptions as $option) {
                 $this->describeInputOption($option, $options);
                 $this->write("\n");

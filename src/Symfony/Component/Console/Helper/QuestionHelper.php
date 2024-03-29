@@ -55,7 +55,7 @@ class QuestionHelper extends Helper
         }
 
         $inputStream = $input instanceof StreamableInputInterface ? $input->getStream() : null;
-        $inputStream ??= STDIN;
+        $inputStream ??= \STDIN;
 
         try {
             if (!$question->getValidator()) {

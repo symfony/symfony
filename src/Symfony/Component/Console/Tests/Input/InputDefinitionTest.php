@@ -387,7 +387,7 @@ class InputDefinitionTest extends TestCase
             [
                 new InputDefinition([new InputOption('foo'), new InputOption('deprecated', null, InputOption::DEPRECATED)]),
                 '[--foo] [--deprecated]',
-                'puts deprecated optional options in square brackets'
+                'puts deprecated optional options in square brackets',
             ],
 
             [new InputDefinition([new InputOption('hidden', null, InputOption::HIDDEN)]), '', 'hidden option is not visible'],
@@ -402,7 +402,7 @@ class InputDefinitionTest extends TestCase
             new InputOption('bar'),
             new InputOption('deprecated'),
             new InputOption('hidden'),
-            new InputArgument('cat')
+            new InputArgument('cat'),
         ]);
         $this->assertEquals('[options] [--] [<cat>]', $definition->getSynopsis(true), '->getSynopsis(true) groups options in [options]');
     }

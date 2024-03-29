@@ -27,9 +27,10 @@ class JsonDescriptorTest extends AbstractDescriptorTestCase
 
     protected function normalizeOutput($output)
     {
-        if (null === $output || !is_array($output = json_decode($output, true))) {
+        if (null === $output || !\is_array($output = json_decode($output, true))) {
             return $output;
         }
+
         return array_map($this->normalizeOutputRecursively(...), $output);
     }
 

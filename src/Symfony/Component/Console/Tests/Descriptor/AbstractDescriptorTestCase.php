@@ -50,7 +50,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     {
         [$command, $expectedDescription] = static::getDescriptionTestData(['command_5_with_hidden_options' => new DescriptorCommand5()])[0];
 
-        $this->assertDescription($expectedDescription, $command, ['show-hidden-options' =>true]);
+        $this->assertDescription($expectedDescription, $command, ['show-hidden-options' => true]);
     }
 
     /** @dataProvider getDescribeApplicationTestData */

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -8,14 +17,14 @@ use Symfony\Component\Console\SingleCommandApplication;
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
-    $vendor = \dirname($vendor);
+    $vendor = dirname($vendor);
 }
 require $vendor.'/vendor/autoload.php';
 
 (new class() extends SingleCommandApplication implements SignalableCommandInterface {
     public function getSubscribedSignals(): array
     {
-        return [SIGINT];
+        return [\SIGINT];
     }
 
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
@@ -23,7 +32,7 @@ require $vendor.'/vendor/autoload.php';
         exit(0);
     }
 })
-    ->setCode(function(InputInterface $input, OutputInterface $output) {
+    ->setCode(function (InputInterface $input, OutputInterface $output) {
         $this->getHelper('question')
              ->ask($input, $output, new ChoiceQuestion('😊', ['y']));
 

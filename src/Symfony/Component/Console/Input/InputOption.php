@@ -196,7 +196,7 @@ class InputOption
      *
      * @return bool true if mode is self::DEPRECATED, false otherwise
      */
-    public function isDeprecated():bool
+    public function isDeprecated(): bool
     {
         return $this->hastMode(self::DEPRECATED);
     }
@@ -206,7 +206,7 @@ class InputOption
      *
      * @return bool true if mode is self::HIDDEN, false otherwise
      */
-    public function isHidden():bool
+    public function isHidden(): bool
     {
         return $this->hastMode(self::HIDDEN);
     }

@@ -30,7 +30,16 @@ class DebugLoggerConfigurator
     public function pushDebugLogger(Logger $logger): void
     {
         if ($this->processor) {
+            $processors = $logger->getProcessors();
+            while ([] !== $logger->getProcessors()) {
+                $logger->popProcessor();
+            }
+
+            // Ensure the DebugLogger is the first processor as Monolog add processors in reverse order
             $logger->pushProcessor($this->processor);
+            foreach ($processors as $processor) {
+                $logger->pushProcessor($processor);
+            }
         }
     }
 

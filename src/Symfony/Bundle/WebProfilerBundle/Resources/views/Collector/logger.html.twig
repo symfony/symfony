@@ -540,6 +540,7 @@
 {% macro render_log_message(category, log_index, log) %}
     {% set has_context = log.context is defined and log.context is not empty %}
     {% set has_trace = log.context.exception.trace is defined %}
+    {% set has_extra = log.extra is defined and log.extra is not empty %}
 
     {% if not has_context %}
         {{ profiler_dump_log(log.message) }}
@@ -566,6 +567,11 @@
             <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ trace_id }}" data-toggle-alt-content="Hide trace">Show trace</button></span>
         {% endif %}
 
+        {% if has_extra %}
+            {% set extra_id = 'extra-data-' ~ category ~ '-' ~ log_index %}
+            <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ extra_id }}" data-toggle-alt-content="Hide extra data">Show extra data</button></span>
+        {% endif %}
+
         {% if has_context %}
             <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
                 {{ profiler_dump(log.context, maxDepth=1) }}
@@ -575,6 +581,12 @@
         {% if has_trace %}
             <div id="{{ trace_id }}" class="context sf-toggle-content sf-toggle-hidden">
                 {{ profiler_dump(log.context.exception.trace, maxDepth=1) }}
+            </div>
+        {% endif %}
+
+        {% if has_extra %}
+            <div id="{{ extra_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                {{ profiler_dump(log.extra, maxDepth=1) }}
             </div>
         {% endif %}
     </div>

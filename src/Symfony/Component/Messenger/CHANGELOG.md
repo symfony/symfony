@@ -1,11 +1,37 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add option `redis_sentinel` as an alias for `sentinel_master`
+ * Add `--all` option to the `messenger:consume` command
+ * Add parameter `$jitter` to `MultiplierRetryStrategy` in order to randomize delay and prevent the thundering herd effect
+
+7.0
+---
+
+ * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
+ * Remove `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+ * Remove `StopWorkerOnSigtermSignalListener` in favor of using the `SignalableCommandInterface`
+ * Remove `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+ * Remove `Symfony\Component\Messenger\Transport\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Remove `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
+   and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
+
 6.4
 ---
 
  * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
  * Add `HandlerDescriptor::getOptions`
+ * Add support for multiple Redis Sentinel hosts
+ * Add `--all` option to the `messenger:failed:remove` command
+ * Add `WrappedExceptionsInterface` interface for exceptions that hold multiple individual exceptions
+ * Deprecate `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
+   and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
 
 6.3
 ---
@@ -75,7 +101,6 @@ CHANGELOG
  * Added factory methods `DelayStamp::delayFor(\DateInterval)` and `DelayStamp::delayUntil(\DateTimeInterface)`.
  * Removed the exception when dispatching a message with a `DispatchAfterCurrentBusStamp` and not in a context of another dispatch call
  * Added `WorkerMessageRetriedEvent`
- * Added `WorkerMessageReceivedEvent::setEnvelope()` and made event mutable
 
 5.1.0
 -----

@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class MailjetTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): MailjetTransport
+    public static function createTransport(?HttpClientInterface $client = null): MailjetTransport
     {
         return (new MailjetTransport('authtoken', 'Mailjet', $client ?? new MockHttpClient()))->setHost('host.test');
     }

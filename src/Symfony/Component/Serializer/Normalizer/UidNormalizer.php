@@ -15,9 +15,8 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Uid\AbstractUid;
-use Symfony\Component\Uid\Uuid;
 
-final class UidNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     public const NORMALIZATION_FORMAT_KEY = 'uid_normalization_format';
 
@@ -51,7 +50,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * @param AbstractUid $object
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return match ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
             self::NORMALIZATION_FORMAT_CANONICAL => (string) $object,
@@ -62,50 +61,22 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
         };
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof AbstractUid;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         try {
-            if (AbstractUid::class === $type) {
-                trigger_deprecation('symfony/serializer', '6.1', 'Denormalizing to an abstract class in "%s" is deprecated.', __CLASS__);
-
-                return Uuid::fromString($data);
-            }
-
             return $type::fromString($data);
         } catch (\InvalidArgumentException|\TypeError) {
             throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The data is not a valid "%s" string representation.', $type), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
-        } catch (\Error $e) { // @deprecated remove this catch block in 7.0
-            if (str_starts_with($e->getMessage(), 'Cannot instantiate abstract class')) {
-                return $this->denormalize($data, AbstractUid::class, $format, $context);
-            }
-
-            throw $e;
         }
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        if (AbstractUid::class === $type) {
-            trigger_deprecation('symfony/serializer', '6.1', 'Supporting denormalization for the "%s" type in "%s" is deprecated, use one of "%s" child class instead.', AbstractUid::class, __CLASS__, AbstractUid::class);
-
-            return true;
-        }
-
         return is_subclass_of($type, AbstractUid::class, true);
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
-
-        return true;
     }
 }

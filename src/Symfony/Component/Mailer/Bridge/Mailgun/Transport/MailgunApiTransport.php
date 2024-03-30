@@ -33,16 +33,14 @@ class MailgunApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.%region_dot%mailgun.net';
 
-    private string $key;
-    private string $domain;
-    private ?string $region;
-
-    public function __construct(string $key, string $domain, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-        $this->domain = $domain;
-        $this->region = $region;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        private string $domain,
+        private ?string $region = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
@@ -87,6 +85,7 @@ class MailgunApiTransport extends AbstractApiTransport
     private function getPayload(Email $email, Envelope $envelope): array
     {
         $headers = $email->getHeaders();
+        $headers->addMailboxHeader('h:Sender', $envelope->getSender());
         $html = $email->getHtmlBody();
         if (null !== $html && \is_resource($html)) {
             if (stream_get_meta_data($html)['seekable'] ?? false) {

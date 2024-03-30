@@ -12,7 +12,6 @@
 namespace Symfony\Component\AssetMapper;
 
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactoryInterface;
-use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
 /**
  * Finds and returns assets in the pipeline.
@@ -28,7 +27,7 @@ class AssetMapper implements AssetMapperInterface
     public function __construct(
         private readonly AssetMapperRepository $mapperRepository,
         private readonly MappedAssetFactoryInterface $mappedAssetFactory,
-        private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
+        private readonly CompiledAssetMapperConfigReader $compiledConfigReader,
     ) {
     }
 
@@ -78,12 +77,10 @@ class AssetMapper implements AssetMapperInterface
     private function loadManifest(): array
     {
         if (null === $this->manifestData) {
-            $path = $this->assetsPathResolver->getPublicFilesystemPath().'/'.self::MANIFEST_FILE_NAME;
-
-            if (!is_file($path)) {
+            if (!$this->compiledConfigReader->configExists(self::MANIFEST_FILE_NAME)) {
                 $this->manifestData = [];
             } else {
-                $this->manifestData = json_decode(file_get_contents($path), true);
+                $this->manifestData = $this->compiledConfigReader->loadConfig(self::MANIFEST_FILE_NAME);
             }
         }
 

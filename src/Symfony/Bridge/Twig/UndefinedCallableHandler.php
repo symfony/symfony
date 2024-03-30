@@ -24,6 +24,8 @@ class UndefinedCallableHandler
 {
     private const FILTER_COMPONENTS = [
         'humanize' => 'form',
+        'form_encode_currency' => 'form',
+        'serialize' => 'serializer',
         'trans' => 'translation',
         'sanitize_html' => 'html-sanitizer',
         'yaml_encode' => 'yaml',
@@ -33,6 +35,7 @@ class UndefinedCallableHandler
     private const FUNCTION_COMPONENTS = [
         'asset' => 'asset',
         'asset_version' => 'asset',
+        'importmap' => 'asset-mapper',
         'dump' => 'debug-bundle',
         'encore_entry_link_tags' => 'webpack-encore-bundle',
         'encore_entry_script_tags' => 'webpack-encore-bundle',
@@ -47,9 +50,21 @@ class UndefinedCallableHandler
         'form_start' => 'form',
         'form_end' => 'form',
         'csrf_token' => 'form',
+        'form_parent' => 'form',
+        'field_name' => 'form',
+        'field_value' => 'form',
+        'field_label' => 'form',
+        'field_help' => 'form',
+        'field_errors' => 'form',
+        'field_choices' => 'form',
         'logout_url' => 'security-http',
         'logout_path' => 'security-http',
         'is_granted' => 'security-core',
+        'impersonation_path' => 'security-http',
+        'impersonation_url' => 'security-http',
+        'impersonation_exit_path' => 'security-http',
+        'impersonation_exit_url' => 'security-http',
+        't' => 'translation',
         'link' => 'web-link',
         'preload' => 'web-link',
         'dns_prefetch' => 'web-link',
@@ -58,8 +73,11 @@ class UndefinedCallableHandler
         'prerender' => 'web-link',
         'workflow_can' => 'workflow',
         'workflow_transitions' => 'workflow',
+        'workflow_transition' => 'workflow',
         'workflow_has_marked_place' => 'workflow',
         'workflow_marked_places' => 'workflow',
+        'workflow_metadata' => 'workflow',
+        'workflow_transition_blockers' => 'workflow',
     ];
 
     private const FULL_STACK_ENABLE = [

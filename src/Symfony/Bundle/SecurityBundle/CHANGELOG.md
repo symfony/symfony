@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Mark class `ExpressionCacheWarmer` as `final`
+
+7.0
+---
+
+ * Enabling SecurityBundle and not configuring it is not allowed
+ * Remove the `enable_authenticator_manager` config option
+ * Remove the `security.firewalls.logout.csrf_token_generator` config option, use `security.firewalls.logout.csrf_token_manager` instead
+ * Remove the `require_previous_session` config option from authenticators
+
 6.4
 ---
 
@@ -8,6 +21,7 @@ CHANGELOG
  * Allow an array of `pattern` in firewall configuration
  * Add `$badges` argument to `Security::login`
  * Deprecate the `require_previous_session` config option. Setting it has no effect anymore
+ * Add `LogoutRouteLoader`
 
 6.3
 ---

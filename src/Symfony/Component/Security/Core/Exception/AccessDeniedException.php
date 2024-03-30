@@ -27,7 +27,7 @@ class AccessDeniedException extends RuntimeException
     private mixed $subject = null;
     private ?AccessDecision $accessDecision = null;
 
-    public function __construct(string $message = 'Access Denied.', \Throwable $previous = null, int $code = 403)
+    public function __construct(string $message = 'Access Denied.', ?\Throwable $previous = null, int $code = 403)
     {
         parent::__construct($message, $code, $previous);
     }
@@ -37,10 +37,7 @@ class AccessDeniedException extends RuntimeException
         return $this->attributes;
     }
 
-    /**
-     * @return void
-     */
-    public function setAttributes(array|string $attributes)
+    public function setAttributes(array|string $attributes): void
     {
         $this->attributes = (array) $attributes;
     }
@@ -50,10 +47,7 @@ class AccessDeniedException extends RuntimeException
         return $this->subject;
     }
 
-    /**
-     * @return void
-     */
-    public function setSubject(mixed $subject)
+    public function setSubject(mixed $subject): void
     {
         $this->subject = $subject;
     }

@@ -186,7 +186,7 @@ class PropertyInfoLoaderTest extends TestCase
     /**
      * @dataProvider regexpProvider
      */
-    public function testClassValidator(bool $expected, string $classValidatorRegexp = null)
+    public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null)
     {
         $propertyInfoStub = $this->createMock(PropertyInfoExtractorInterface::class);
         $propertyInfoStub

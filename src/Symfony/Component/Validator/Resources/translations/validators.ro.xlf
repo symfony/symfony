@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="ro" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Acest fișier nu este o imagine validă.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Această valoare nu este o adresă IP validă.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>Această valoare nu este o adresă de IP validă.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Nu a fost încărcat nici un fișier.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Nu este configurat nici un director temporar in php.ini.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>Nu a fost configurat niciun folder temporar în php.ini, sau folderul configurat nu există.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Tipul sau numărul cardului nu sunt valide.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Acesta nu este un cod IBAN (International Bank Account Number) valid.</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>Această valoare nu este un Număr de Cont Bancar Internațional (IBAN) valid.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Această valoare nu corespunde setului de caractere {{ charset }} așteptat.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Codul BIC (Business Identifier Code) nu este valid.</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>Această valoare nu este un Cod de Identificare a Afacerilor (BIC) valid.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Eroare</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Identificatorul universal unic (UUID) nu este valid.</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Această valoare nu este un UUID valid.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -390,6 +390,10 @@
                 <source>This value should be a valid expression.</source>
                 <target>Această valoare ar trebui să fie o expresie validă.</target>
             </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Această valoare nu este o culoare CSS validă.</target>
+            </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
                 <target>Această valoare nu este o notație CIDR validă.</target>
@@ -397,6 +401,42 @@
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Valoarea netmask-ului trebuie sa fie intre {{ min }} si {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Denumirea fișierului este prea lungă. Ea trebuie să conțină {{ filename_max_length }} caractere sau mai puține.|Denumirea fișierului este prea lungă. Ea trebuie să conțină {{ filename_max_length }} caractere sau mai puține.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Complexitatea parolei este prea mică. Vă rugăm să folosiți o parolă mai puternică.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Această valoare conține caractere care nu sunt premise de nivelul de restricționare curent.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Folosirea caracterelor invizibile nu este permisă.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Combinarea numerelor din diferite script-uri nu este permisă.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Folosirea caracterelor invizibile suprapuse nu este permisă.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Extensia fișierului este invalidă ({{ extension }}). Extensiile permise sunt {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Codificarea caracterelor detectate nu este valabilă ({{ detected }}). Codificările permise sunt {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>Această valoare nu este o adresă MAC validă.</target>
             </trans-unit>
         </body>
     </file>

@@ -390,7 +390,7 @@ class ContextListenerTest extends TestCase
         return $session;
     }
 
-    private function handleEventWithPreviousSession($userProviders, UserInterface $user = null)
+    private function handleEventWithPreviousSession($userProviders, ?UserInterface $user = null)
     {
         $tokenUser = $user ?? new InMemoryUser('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
@@ -465,7 +465,7 @@ class SupportingUserProvider implements UserProviderInterface
 {
     private ?InMemoryUser $refreshedUser;
 
-    public function __construct(InMemoryUser $refreshedUser = null)
+    public function __construct(?InMemoryUser $refreshedUser = null)
     {
         $this->refreshedUser = $refreshedUser;
     }
@@ -550,11 +550,6 @@ class CustomToken implements TokenInterface
     public function setUser($user): void
     {
         $this->user = $user;
-    }
-
-    public function getUsername(): string
-    {
-        return $this->user->getUserIdentifier();
     }
 
     public function getUserIdentifier(): string

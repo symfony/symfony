@@ -18,10 +18,10 @@ namespace Symfony\Component\HttpFoundation\Session\Attribute;
  */
 class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Countable
 {
+    protected array $attributes = [];
+
     private string $name = 'attributes';
     private string $storageKey;
-
-    protected $attributes = [];
 
     /**
      * @param string $storageKey The key used to store attributes in the session
@@ -36,18 +36,12 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
         return $this->name;
     }
 
-    /**
-     * @return void
-     */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return void
-     */
-    public function initialize(array &$attributes)
+    public function initialize(array &$attributes): void
     {
         $this->attributes = &$attributes;
     }
@@ -67,10 +61,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
         return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
-    /**
-     * @return void
-     */
-    public function set(string $name, mixed $value)
+    public function set(string $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
     }
@@ -80,10 +71,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
         return $this->attributes;
     }
 
-    /**
-     * @return void
-     */
-    public function replace(array $attributes)
+    public function replace(array $attributes): void
     {
         $this->attributes = [];
         foreach ($attributes as $key => $value) {

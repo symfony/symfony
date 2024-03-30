@@ -163,7 +163,11 @@
             {% set render_preferred_choices = true %}
             {{- block('choice_widget_options') -}}
             {% if choices|length > 0 and separator is not none -%}
-                <option disabled="disabled">{{ separator }}</option>
+                {%- if separator_html is not defined or separator_html is same as(false) -%}
+                    <option disabled="disabled">{{ separator }}</option>
+                {% else %}
+                    {{ separator|raw }}
+                {% endif %}
             {%- endif %}
         {%- endif -%}
         {% set options = choices -%}
@@ -269,7 +273,9 @@
     {% endif %}
     <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
         {{ widget|raw }}
-        {{ translation_domain is same as(false) ? label : label|trans(label_translation_parameters, translation_domain) }}
+        {%- if label is not same as(false) -%}
+            {{- block('form_label_content') -}}
+        {%- endif -%}
     </label>
 {%- endblock checkbox_radio_label %}
 

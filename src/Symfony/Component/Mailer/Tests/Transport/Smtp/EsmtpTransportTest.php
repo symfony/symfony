@@ -192,6 +192,63 @@ class EsmtpTransportTest extends TestCase
             $stream->getCommands()
         );
     }
+
+    public function testConstructorWithEmptyAuthenticator()
+    {
+        $stream = new DummyStream();
+        $transport = new EsmtpTransport(stream: $stream);
+        $transport->setUsername('testuser');
+        $transport->setPassword('p4ssw0rd');
+        $transport->setAuthenticators([]); // if no authenticators defined, then there needs to be a TransportException
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        try {
+            $transport->send($message);
+            $this->fail('Symfony\Component\Mailer\Exception\TransportException to be thrown');
+        } catch (TransportException $e) {
+            $this->assertStringStartsWith('Failed to find an authenticator supported by the SMTP server, which currently supports: "plain", "login", "cram-md5", "xoauth2".', $e->getMessage());
+            $this->assertEquals(504, $e->getCode());
+        }
+    }
+
+    public function testSocketTimeout()
+    {
+        $stream = new DummyStream();
+        $transport = new EsmtpTransport(stream: $stream);
+        $transport->setUsername('testuser');
+        $transport->setPassword('timedout');
+        $transport->setAuthenticators([new LoginAuthenticator()]);
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        try {
+            $transport->send($message);
+            $this->fail('Symfony\Component\Mailer\Exception\TransportException to be thrown');
+        } catch (TransportException $e) {
+            $this->assertStringStartsWith('Connection to "localhost" timed out.', $e->getMessage());
+        }
+
+        $this->assertEquals(
+            [
+                "EHLO [127.0.0.1]\r\n",
+                // S: 250 localhost
+                // S: 250-AUTH PLAIN LOGIN CRAM-MD5 XOAUTH2
+                "AUTH LOGIN\r\n",
+                // S: 334 VXNlcm5hbWU6
+                "dGVzdHVzZXI=\r\n",
+                // S: 334 UGFzc3dvcmQ6
+                "dGltZWRvdXQ=\r\n",
+            ],
+            $stream->getCommands()
+        );
+    }
 }
 
 class CustomEsmtpTransport extends EsmtpTransport

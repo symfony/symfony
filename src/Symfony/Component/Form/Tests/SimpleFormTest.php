@@ -86,7 +86,7 @@ class SimpleFormTest extends TestCase
         $this->assertEquals($propertyPath, $form->getPropertyPath());
     }
 
-    public static function provideFormNames()
+    public static function provideFormNames(): iterable
     {
         yield [null, null];
         yield ['', null];
@@ -1128,7 +1128,7 @@ class SimpleFormTest extends TestCase
         return $this->getBuilder()->getForm();
     }
 
-    private function getBuilder(?string $name = 'name', string $dataClass = null, array $options = []): FormBuilder
+    private function getBuilder(?string $name = 'name', ?string $dataClass = null, array $options = []): FormBuilder
     {
         return new FormBuilder($name, $dataClass, new EventDispatcher(), new FormFactory(new FormRegistry([], new ResolvedFormTypeFactory())), $options);
     }

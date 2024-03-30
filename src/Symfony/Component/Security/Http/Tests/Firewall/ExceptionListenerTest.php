@@ -76,32 +76,9 @@ class ExceptionListenerTest extends TestCase
     }
 
     /**
-     * This test should be removed in Symfony 7.0 when adding native return types to AuthenticationEntryPointInterface::start().
-     *
-     * @group legacy
-     */
-    public function testExceptionWhenEntryPointReturnsBadValue()
-    {
-        if ((new \ReflectionMethod(AuthenticationEntryPointInterface::class, 'start'))->hasReturnType()) {
-            $this->markTestSkipped('Native return type found');
-        }
-
-        $event = $this->createEvent(new AuthenticationException());
-
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint->expects($this->once())->method('start')->willReturn('NOT A RESPONSE');
-
-        $listener = $this->createExceptionListener(null, null, null, $entryPoint);
-        $listener->onKernelException($event);
-        // the exception has been replaced by our LogicException
-        $this->assertInstanceOf(\LogicException::class, $event->getThrowable());
-        $this->assertStringEndsWith('start()" method must return a Response object ("string" returned).', $event->getThrowable()->getMessage());
-    }
-
-    /**
      * @dataProvider getAccessDeniedExceptionProvider
      */
-    public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, \Exception $eventException = null)
+    public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, ?\Exception $eventException = null)
     {
         $event = $this->createEvent($exception);
 
@@ -115,7 +92,7 @@ class ExceptionListenerTest extends TestCase
     /**
      * @dataProvider getAccessDeniedExceptionProvider
      */
-    public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithErrorPage(\Exception $exception, \Exception $eventException = null)
+    public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithErrorPage(\Exception $exception, ?\Exception $eventException = null)
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel->expects($this->once())->method('handle')->willReturn(new Response('Unauthorized', 401));
@@ -138,7 +115,7 @@ class ExceptionListenerTest extends TestCase
     /**
      * @dataProvider getAccessDeniedExceptionProvider
      */
-    public function testAccessDeniedExceptionFullFledgedAndWithAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, \Exception $eventException = null)
+    public function testAccessDeniedExceptionFullFledgedAndWithAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, ?\Exception $eventException = null)
     {
         $event = $this->createEvent($exception);
 
@@ -155,7 +132,7 @@ class ExceptionListenerTest extends TestCase
     /**
      * @dataProvider getAccessDeniedExceptionProvider
      */
-    public function testAccessDeniedExceptionNotFullFledged(\Exception $exception, \Exception $eventException = null)
+    public function testAccessDeniedExceptionNotFullFledged(\Exception $exception, ?\Exception $eventException = null)
     {
         $event = $this->createEvent($exception);
 
@@ -203,7 +180,7 @@ class ExceptionListenerTest extends TestCase
         ];
     }
 
-    private function createEntryPoint(Response $response = null)
+    private function createEntryPoint(?Response $response = null)
     {
         $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
         $entryPoint->expects($this->once())->method('start')->willReturn($response ?? new Response('OK'));
@@ -226,7 +203,7 @@ class ExceptionListenerTest extends TestCase
         return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $exception);
     }
 
-    private function createExceptionListener(TokenStorageInterface $tokenStorage = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)
+    private function createExceptionListener(?TokenStorageInterface $tokenStorage = null, ?AuthenticationTrustResolverInterface $trustResolver = null, ?HttpUtils $httpUtils = null, ?AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, ?AccessDeniedHandlerInterface $accessDeniedHandler = null)
     {
         return new ExceptionListener(
             $tokenStorage ?? $this->createMock(TokenStorageInterface::class),

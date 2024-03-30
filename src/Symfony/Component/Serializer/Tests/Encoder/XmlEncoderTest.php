@@ -234,13 +234,37 @@ XML;
     public function testEncodeCdataWrapping()
     {
         $array = [
-            'firstname' => 'Paul <or Me>',
+            'firstname' => 'Paul & Martha <or Me>',
         ];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response><firstname><![CDATA[Paul <or Me>]]></firstname></response>'."\n";
+            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+    }
+
+    public function testEnableCdataWrapping()
+    {
+        $array = [
+            'firstname' => 'Paul & Martha <or Me>',
+        ];
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml', ['cdata_wrapping' => true]));
+    }
+
+    public function testDisableCdataWrapping()
+    {
+        $array = [
+            'firstname' => 'Paul & Martha <or Me>',
+        ];
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><firstname>Paul &amp; Martha &lt;or Me&gt;</firstname></response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml', ['cdata_wrapping' => false]));
     }
 
     public function testEncodeScalarWithAttribute()
@@ -311,6 +335,21 @@ XML;
 XML;
 
         $this->assertSame(['@index' => 0.123, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
+    }
+
+    public function testNoTypeCastRootAttribute()
+    {
+        $source = <<<XML
+<?xml version="1.0"?>
+<document a="123"></document>
+XML;
+
+        $data = $this->encoder->decode($source, 'xml', ['xml_type_cast_attributes' => false]);
+        $expected = [
+            '@a' => '123',
+            '#' => '',
+        ];
+        $this->assertSame($expected, $data);
     }
 
     public function testNoTypeCastAttribute()
@@ -433,6 +472,17 @@ XML;
         $array = $this->getNamespacedArray();
 
         $this->assertEquals($array, $this->encoder->decode($source, 'xml'));
+
+        $source = '<?xml version="1.0"?>'."\n".
+            '<response xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" app:foo="bar">'.
+            '</response>'."\n";
+
+        $this->assertEquals([
+            '@xmlns' => 'http://www.w3.org/2005/Atom',
+            '@xmlns:app' => 'http://www.w3.org/2007/app',
+            '@app:foo' => 'bar',
+            '#' => '',
+        ], $this->encoder->decode($source, 'xml'));
     }
 
     public function testDecodeScalarWithAttribute()
@@ -930,7 +980,7 @@ XML;
 
     private function createMockDateTimeNormalizer(): MockObject&NormalizerInterface
     {
-        $mock = $this->createMock(CustomNormalizer::class);
+        $mock = $this->createMock(NormalizerInterface::class);
 
         $mock
             ->expects($this->once())

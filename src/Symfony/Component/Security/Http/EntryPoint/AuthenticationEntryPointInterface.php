@@ -39,8 +39,6 @@ interface AuthenticationEntryPointInterface
      * - For an API token authentication system, you return a 401 response
      *
      *     return new Response('Auth header required', 401);
-     *
-     * @return Response
      */
-    public function start(Request $request, AuthenticationException $authException = null);
+    public function start(Request $request, ?AuthenticationException $authException = null): Response;
 }

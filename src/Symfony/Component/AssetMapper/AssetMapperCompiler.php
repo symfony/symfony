@@ -42,4 +42,15 @@ class AssetMapperCompiler
 
         return $content;
     }
+
+    public function supports(MappedAsset $asset): bool
+    {
+        foreach ($this->assetCompilers as $compiler) {
+            if ($compiler->supports($asset)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

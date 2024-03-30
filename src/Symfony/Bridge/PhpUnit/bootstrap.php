@@ -29,9 +29,6 @@ if (isset($fileIdentifier)) {
     unset($GLOBALS['__composer_autoload_files'][$fileIdentifier]);
 }
 
-// Enforce a consistent locale
-setlocale(\LC_ALL, 'C');
-
 if (class_exists(Deprecation::class)) {
     Deprecation::withoutDeduplication();
 

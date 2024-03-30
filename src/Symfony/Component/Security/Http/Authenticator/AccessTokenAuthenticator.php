@@ -95,10 +95,7 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
         );
     }
 
-    /**
-     * @return void
-     */
-    public function setTranslator(?TranslatorInterface $translator)
+    public function setTranslator(?TranslatorInterface $translator): void
     {
         $this->translator = $translator;
     }
@@ -106,7 +103,7 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
     /**
      * @see https://datatracker.ietf.org/doc/html/rfc6750#section-3
      */
-    private function getAuthenticateHeader(string $errorDescription = null): string
+    private function getAuthenticateHeader(?string $errorDescription = null): string
     {
         $data = [
             'realm' => $this->realm,

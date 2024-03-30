@@ -62,14 +62,6 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return null;
     }
 
-    /**
-     * @internal for compatibility with Symfony 5.4
-     */
-    public function getUsername(): string
-    {
-        return $this->getUserIdentifier();
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->identifier;

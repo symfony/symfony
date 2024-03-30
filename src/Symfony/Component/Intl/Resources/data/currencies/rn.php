@@ -170,9 +170,13 @@ return [
             'SHP',
             'Ipawundi rya Sente Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'Ilewone',
+        ],
         'SLL' => [
             'SLL',
-            'Ilewone',
+            'Ilewone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

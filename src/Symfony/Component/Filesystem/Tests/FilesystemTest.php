@@ -167,7 +167,7 @@ class FilesystemTest extends FilesystemTestCase
      */
     public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy()
     {
-        if (!\in_array('https', stream_get_wrappers())) {
+        if (!\in_array('https', stream_get_wrappers(), true)) {
             $this->markTestSkipped('"https" stream wrapper is not enabled.');
         }
         $sourceFilePath = 'https://symfony.com/images/common/logo/logo_symfony_header.png';
@@ -1800,6 +1800,43 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->dumpFile($filename, 'bar');
 
         $this->assertFilePermissions(745, $filename);
+    }
+
+    public function testReadFile()
+    {
+        $licenseFile = \dirname(__DIR__).'/LICENSE';
+
+        $this->assertStringEqualsFile($licenseFile, $this->filesystem->readFile($licenseFile));
+    }
+
+    public function testReadNonExistentFile()
+    {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches(sprintf('#^Failed to read file ".+%1$sTests/invalid"\\: file_get_contents\\(.+%1$sTests/invalid\\)\\: Failed to open stream\\: No such file or directory$#', preg_quote(\DIRECTORY_SEPARATOR)));
+
+        $this->filesystem->readFile(__DIR__.'/invalid');
+    }
+
+    public function testReadDirectory()
+    {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches(sprintf('#^Failed to read file ".+%sTests"\\: File is a directory\\.$#', preg_quote(\DIRECTORY_SEPARATOR)));
+
+        $this->filesystem->readFile(__DIR__);
+    }
+
+    public function testReadUnreadableFile()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $filename = $this->workspace.'/unreadable.txt';
+        file_put_contents($filename, 'Hello World');
+        chmod($filename, 0o000);
+
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches('#^Failed to read file ".+/unreadable.txt"\\: file_get_contents\\(.+/unreadable.txt\\)\\: Failed to open stream\\: Permission denied$#');
+
+        $this->filesystem->readFile($filename);
     }
 
     public function testCopyShouldKeepExecutionPermission()

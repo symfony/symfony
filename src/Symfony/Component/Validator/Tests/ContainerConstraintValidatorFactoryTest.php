@@ -49,7 +49,6 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
 
     public function testGetInstanceInvalidValidatorClass()
     {
-        $this->expectException(ValidatorException::class);
         $constraint = $this->createMock(Constraint::class);
         $constraint
             ->expects($this->once())
@@ -57,6 +56,9 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
             ->willReturn('Fully\\Qualified\\ConstraintValidator\\Class\\Name');
 
         $factory = new ContainerConstraintValidatorFactory(new Container());
+
+        $this->expectException(ValidatorException::class);
+
         $factory->getInstance($constraint);
     }
 }

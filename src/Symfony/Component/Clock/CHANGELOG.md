@@ -1,9 +1,15 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `DatePoint::get/setMicrosecond()`
+
 6.4
 ---
 
+ * Add `DatePoint`: an immutable DateTime implementation with stricter error handling and return types
  * Throw `DateMalformedStringException`/`DateInvalidTimeZoneException` when appropriate
  * Add `$modifier` argument to the `now()` helper
 

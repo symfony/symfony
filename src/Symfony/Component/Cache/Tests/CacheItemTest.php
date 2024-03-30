@@ -76,22 +76,24 @@ class CacheItemTest extends TestCase
      */
     public function testInvalidTag($tag)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache tag');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'isTaggable');
         $r->setValue($item, true);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cache tag');
 
         $item->tag($tag);
     }
 
     public function testNonTaggableItem()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cache item "foo" comes from a non tag-aware pool: you cannot tag it.');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'key');
         $r->setValue($item, 'foo');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cache item "foo" comes from a non tag-aware pool: you cannot tag it.');
 
         $item->tag([]);
     }

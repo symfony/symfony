@@ -1,0 +1,41 @@
+{
+    "name": "symfony/smsbox-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Smsbox Notifier Bridge",
+    "keywords": ["sms", "smsbox", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alan Zarli",
+            "email": "azarli@smsbox.fr"
+        },
+        {
+            "name": "Farid Touil",
+            "email": "ftouil@smsbox.fr"
+        },
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^7.1",
+        "symfony/polyfill-php83": "^1.28"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\Smsbox\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

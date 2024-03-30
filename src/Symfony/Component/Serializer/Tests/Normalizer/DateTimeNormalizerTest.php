@@ -154,6 +154,72 @@ class DateTimeNormalizerTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider provideNormalizeUsingCastCases
+     */
+    public function testNormalizeUsingCastPassedInConstructor(\DateTimeInterface $value, string $format, ?string $cast, string|int|float $expectedResult)
+    {
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::CAST_KEY => $cast]);
+
+        $this->assertSame($normalizer->normalize($value, null, [DateTimeNormalizer::FORMAT_KEY => $format]), $expectedResult);
+    }
+
+    /**
+     * @dataProvider provideNormalizeUsingCastCases
+     */
+    public function testNormalizeUsingCastPassedInContext(\DateTimeInterface $value, string $format, ?string $cast, string|int|float $expectedResult)
+    {
+        $this->assertSame($this->normalizer->normalize($value, null, [DateTimeNormalizer::FORMAT_KEY => $format, DateTimeNormalizer::CAST_KEY => $cast]), $expectedResult);
+    }
+
+    /**
+     * @return iterable<array{0: \DateTimeImmutable, 1: non-empty-string, 2: 'int'|'float'|null, 3: 'int'|'float'|'string'}>
+     */
+    public static function provideNormalizeUsingCastCases(): iterable
+    {
+        yield [
+            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            'Y',
+            null,
+            '2023',
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            'Y',
+            'int',
+            2023,
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            'Ymd',
+            'int',
+            20231220,
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            'Y',
+            'int',
+            2023,
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U.v', '1703071202.388'),
+            'U.v',
+            'float',
+            1703071202.388,
+        ];
+
+        yield [
+            \DateTimeImmutable::createFromFormat('U.u', '1703071202.388811'),
+            'U.u',
+            'float',
+            1703071202.388811,
+        ];
+    }
+
     public function testNormalizeInvalidObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -275,6 +341,22 @@ class DateTimeNormalizerTest extends TestCase
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage("Parsing datetime string \"  2016.01.01  \" using format \"Y.m.d|\" resulted in 2 errors: \nat position 0: Unexpected data found.\nat position 12: Trailing data");
         $this->normalizer->denormalize('  2016.01.01  ', \DateTime::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']);
+    }
+
+    public function testDenormalizeTimestampWithFormatInContext()
+    {
+        $normalizer = new DateTimeNormalizer();
+        $denormalizedDate = $normalizer->denormalize(1698202249, \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'U']);
+
+        $this->assertSame('2023-10-25 02:50:49', $denormalizedDate->format('Y-m-d H:i:s'));
+    }
+
+    public function testDenormalizeTimestampWithFormatInDefaultContext()
+    {
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'U']);
+        $denormalizedDate = $normalizer->denormalize(1698202249, \DateTimeInterface::class);
+
+        $this->assertSame('2023-10-25 02:50:49', $denormalizedDate->format('Y-m-d H:i:s'));
     }
 
     public function testDenormalizeDateTimeStringWithDefaultContextFormat()

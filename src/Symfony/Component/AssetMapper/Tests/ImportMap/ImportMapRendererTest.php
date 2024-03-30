@@ -12,73 +12,197 @@
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapGenerator;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\WebLink\GenericLinkProvider;
 
 class ImportMapRendererTest extends TestCase
 {
-    public function testBasicRenderNoEntry()
+    public function testBasicRender()
     {
-        $renderer = new ImportMapRenderer($this->createImportMapManager());
-        $html = $renderer->render();
-        $this->assertStringContainsString(<<<EOF
-            <script type="importmap">
-            {"imports":{}}
-            </script>
-            EOF,
-            $html
-        );
-        $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims', $html);
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
+            ->method('getImportMapData')
+            ->with(['app'])
+            ->willReturn([
+                'app_js_preload' => [
+                    'path' => '/assets/app-preload-d1g35t.js',
+                    'type' => 'js',
+                    'preload' => true,
+                ],
+                'app_js_no_preload' => [
+                    'path' => '/assets/app-nopreload-d1g35t.js',
+                    'type' => 'js',
+                ],
+                'app_css_preload' => [
+                    'path' => '/assets/styles/app-preload-d1g35t.css',
+                    'type' => 'css',
+                    'preload' => true,
+                ],
+                'app_css_no_preload' => [
+                    'path' => '/assets/styles/app-nopreload-d1g35t.css',
+                    'type' => 'css',
+                ],
+                'remote_js' => [
+                    'path' => 'https://cdn.example.com/assets/remote-d1g35t.js',
+                    'type' => 'js',
+                ],
+                'es-module-shim' => [
+                    'path' => 'https://ga.jspm.io/npm:es-module-shims',
+                    'type' => 'js',
+                ],
+                '/assets/implicitly-added' => [
+                    'path' => '/assets/implicitly-added-d1g35t.js',
+                    'type' => 'js',
+                ],
+            ]);
+
+        $assetPackages = $this->createMock(Packages::class);
+        $assetPackages->expects($this->any())
+            ->method('getUrl')
+            ->willReturnCallback(function ($path) {
+                // try to imitate the behavior of the real service
+                if (str_starts_with($path, 'http') || str_starts_with($path, '/')) {
+                    return $path;
+                }
+
+                return '/subdirectory/'.$path;
+            });
+
+        $renderer = new ImportMapRenderer($importMapGenerator, $assetPackages, polyfillImportName: 'es-module-shim');
+        $html = $renderer->render(['app']);
+
+        $this->assertStringContainsString('<script type="importmap">', $html);
+        // polyfill is rendered as a normal script tag
+        $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims"></script>', $html);
+        // and is hidden from the import map
+        $this->assertStringNotContainsString('"es-module-shim"', $html);
+        $this->assertStringContainsString('import \'app\';', $html);
+
+        // preloaded js file
+        $this->assertStringContainsString('"app_js_preload": "/subdirectory/assets/app-preload-d1g35t.js",', $html);
+        $this->assertStringContainsString('<link rel="modulepreload" href="/subdirectory/assets/app-preload-d1g35t.js">', $html);
+        // non-preloaded js file
+        $this->assertStringContainsString('"app_js_no_preload": "/subdirectory/assets/app-nopreload-d1g35t.js",', $html);
+        $this->assertStringNotContainsString('<link rel="modulepreload" href="/assets/subdirectory/app-nopreload-d1g35t.js">', $html);
+        // preloaded css file
+        $this->assertStringContainsString('"app_css_preload": "data:application/javascript,', $html);
+        $this->assertStringContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-preload-d1g35t.css">', $html);
+        // non-preloaded CSS file
+        $this->assertStringContainsString('"app_css_no_preload": "data:application/javascript,document.head.appendChild%28Object.assign%28document.createElement%28%22link%22%29%2C%7Brel%3A%22stylesheet%22%2Chref%3A%22%2Fsubdirectory%2Fassets%2Fstyles%2Fapp-nopreload-d1g35t.css%22%7D', $html);
+        $this->assertStringNotContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-nopreload-d1g35t.css">', $html);
+        // remote js
+        $this->assertStringContainsString('"remote_js": "https://cdn.example.com/assets/remote-d1g35t.js"', $html);
+        // both the key and value are prefixed with the subdirectory
+        $this->assertStringContainsString('"/subdirectory/assets/implicitly-added": "/subdirectory/assets/implicitly-added-d1g35t.js"', $html);
     }
 
     public function testNoPolyfill()
     {
-        $renderer = new ImportMapRenderer($this->createImportMapManager(), 'UTF-8', false);
-        $this->assertStringNotContainsString('https://ga.jspm.io/npm:es-module-shims', $renderer->render());
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', false);
+        $this->assertStringNotContainsString('https://ga.jspm.io/npm:es-module-shims', $renderer->render([]));
+    }
+
+    public function testDefaultPolyfillUsedIfNotInImportmap()
+    {
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
+            ->method('getImportMapData')
+            ->with(['app'])
+            ->willReturn([]);
+
+        $renderer = new ImportMapRenderer(
+            $importMapGenerator,
+            $this->createMock(Packages::class),
+            polyfillImportName: 'es-module-shims',
+        );
+        $html = $renderer->render(['app']);
+        $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims@', $html);
+        $this->assertStringContainsString('es-module-shims.js" crossorigin="anonymous" integrity="sha384-', $html);
     }
 
     public function testCustomScriptAttributes()
     {
-        $renderer = new ImportMapRenderer($this->createImportMapManager(), 'UTF-8', 'https://polyfillUrl.example', [
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', 'es-module-shims', [
             'something' => true,
             'data-turbo-track' => 'reload',
         ]);
-        $html = $renderer->render();
+        $html = $renderer->render([]);
         $this->assertStringContainsString('<script type="importmap" something data-turbo-track="reload">', $html);
         $this->assertStringContainsString('<script async src="https://polyfillUrl.example" something data-turbo-track="reload"></script>', $html);
     }
 
     public function testWithEntrypoint()
     {
-        $renderer = new ImportMapRenderer($this->createImportMapManager());
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator());
         $this->assertStringContainsString("<script type=\"module\">import 'application';</script>", $renderer->render('application'));
 
-        $renderer = new ImportMapRenderer($this->createImportMapManager());
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator());
         $this->assertStringContainsString("<script type=\"module\">import 'application\'s';</script>", $renderer->render("application's"));
+
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator());
+        $html = $renderer->render(['foo', 'bar']);
+        $this->assertStringContainsString("import 'foo';", $html);
+        $this->assertStringContainsString("import 'bar';", $html);
     }
 
-    public function testWithPreloads()
+    private function createBasicImportMapGenerator(): ImportMapGenerator
     {
-        $renderer = new ImportMapRenderer($this->createImportMapManager([
-            '/assets/application.js',
-            'https://cdn.example.com/assets/foo.js',
-        ]));
-        $html = $renderer->render();
-        $this->assertStringContainsString('<link rel="modulepreload" href="/assets/application.js">', $html);
-        $this->assertStringContainsString('<link rel="modulepreload" href="https://cdn.example.com/assets/foo.js">', $html);
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
+            ->method('getImportMapData')
+            ->willReturn([
+                'app' => [
+                    'path' => 'app.js',
+                    'type' => 'js',
+                ],
+                'es-module-shims' => [
+                    'path' => 'https://polyfillUrl.example',
+                    'type' => 'js',
+                ],
+            ])
+        ;
+
+        return $importMapGenerator;
     }
 
-    private function createImportMapManager(array $urlsToPreload = []): ImportMapManager
+    public function testItAddsPreloadLinks()
     {
-        $importMapManager = $this->createMock(ImportMapManager::class);
-        $importMapManager->expects($this->once())
-            ->method('getImportMapJson')
-            ->willReturn('{"imports":{}}');
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
+            ->method('getImportMapData')
+            ->willReturn([
+                'app_js_preload' => [
+                    'path' => '/assets/app-preload-d1g35t.js',
+                    'type' => 'js',
+                    'preload' => true,
+                ],
+                'app_css_preload' => [
+                    'path' => '/assets/styles/app-preload-d1g35t.css',
+                    'type' => 'css',
+                    'preload' => true,
+                ],
+                'app_css_no_preload' => [
+                    'path' => '/assets/styles/app-nopreload-d1g35t.css',
+                    'type' => 'css',
+                ],
+            ]);
 
-        $importMapManager->expects($this->once())
-            ->method('getModulesToPreload')
-            ->willReturn($urlsToPreload);
+        $request = Request::create('/foo');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
 
-        return $importMapManager;
+        $renderer = new ImportMapRenderer($importMapGenerator, requestStack: $requestStack);
+        $renderer->render(['app']);
+
+        $linkProvider = $request->attributes->get('_links');
+        $this->assertInstanceOf(GenericLinkProvider::class, $linkProvider);
+        $this->assertCount(1, $linkProvider->getLinks());
+        $this->assertSame(['preload'], $linkProvider->getLinks()[0]->getRels());
+        $this->assertSame(['as' => 'style'], $linkProvider->getLinks()[0]->getAttributes());
+        $this->assertSame('/assets/styles/app-preload-d1g35t.css', $linkProvider->getLinks()[0]->getHref());
     }
 }

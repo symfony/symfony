@@ -25,6 +25,8 @@ Definitions
 - Tag: `tag1`
     - Attr3: val3
 - Tag: `tag2`
+- Tag: `tag3`
+    - Array_attr: ["foo","bar",[[[["ccc"]]]]]
 - Usages: none
 
 ### .definition_3

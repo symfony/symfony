@@ -24,6 +24,8 @@ abstract class Extension extends BaseExtension
 
     /**
      * Gets the annotated classes to cache.
+     *
+     * @return string[]
      */
     public function getAnnotatedClassesToCompile(): array
     {
@@ -33,11 +35,9 @@ abstract class Extension extends BaseExtension
     /**
      * Adds annotated classes to the class cache.
      *
-     * @param array $annotatedClasses An array of class patterns
-     *
-     * @return void
+     * @param string[] $annotatedClasses An array of class patterns
      */
-    public function addAnnotatedClassesToCompile(array $annotatedClasses)
+    public function addAnnotatedClassesToCompile(array $annotatedClasses): void
     {
         $this->annotatedClasses = array_merge($this->annotatedClasses, $annotatedClasses);
     }

@@ -86,7 +86,7 @@ class TraceableVoterTest extends TestCase
 
         $sut = new TraceableVoter($voter, $eventDispatcher);
 
-        $this->expectDeprecation('Since symfony/security-core 6.3: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
+        $this->expectDeprecation('Since symfony/security-core 7.1: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
         $result = $sut->vote($token, 'anysubject', ['attr1']);
 
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);

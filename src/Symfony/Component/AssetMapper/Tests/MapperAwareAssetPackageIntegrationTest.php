@@ -13,7 +13,7 @@ namespace Symfony\Component\AssetMapper\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\AssetMapper\Tests\fixtures\AssetMapperTestAppKernel;
+use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
 
 class MapperAwareAssetPackageIntegrationTest extends KernelTestCase
 {

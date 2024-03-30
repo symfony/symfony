@@ -25,8 +25,11 @@ final class ResponseFormatSame extends Constraint
     private Request $request;
     private ?string $format;
 
-    public function __construct(Request $request, ?string $format)
-    {
+    public function __construct(
+        Request $request,
+        ?string $format,
+        private readonly bool $verbose = true,
+    ) {
         $this->request = $request;
         $this->format = $format;
     }
@@ -57,6 +60,6 @@ final class ResponseFormatSame extends Constraint
      */
     protected function additionalFailureDescription($response): string
     {
-        return (string) $response;
+        return $this->verbose ? (string) $response : explode("\r\n\r\n", (string) $response)[0];
     }
 }

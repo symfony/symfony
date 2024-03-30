@@ -206,7 +206,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             ->expects($this->any())
             ->method('getVote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter1) {
-                $vote = \in_array('attr1', $attributes) ? Vote::createGranted() : Vote::createAbstain();
+                $vote = \in_array('attr1', $attributes, true) ? Vote::createGranted() : Vote::createAbstain();
                 $sut->addVoterVote($voter1, $attributes, $vote);
 
                 return $vote;
@@ -216,7 +216,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             ->expects($this->any())
             ->method('getVote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter2) {
-                if (\in_array('attr2', $attributes)) {
+                if (\in_array('attr2', $attributes, true)) {
                     $vote = null == $subject ? Vote::createGranted() : Vote::createDenied();
                 } else {
                     $vote = Vote::createAbstain();
@@ -231,7 +231,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             ->expects($this->any())
             ->method('getVote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter3) {
-                if (\in_array('attr2', $attributes) && $subject) {
+                if (\in_array('attr2', $attributes, true) && $subject) {
                     $vote = $sut->getDecision($token, $attributes)->isGranted() ? Vote::createGranted() : Vote::createDenied();
                 } else {
                     $vote = Vote::createAbstain();

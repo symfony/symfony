@@ -36,7 +36,7 @@ class LoginFailureEvent extends Event
     private string $firewallName;
     private ?Passport $passport;
 
-    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName, Passport $passport = null)
+    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName, ?Passport $passport = null)
     {
         $this->exception = $exception;
         $this->authenticator = $authenticator;
@@ -66,10 +66,7 @@ class LoginFailureEvent extends Event
         return $this->request;
     }
 
-    /**
-     * @return void
-     */
-    public function setResponse(?Response $response)
+    public function setResponse(?Response $response): void
     {
         $this->response = $response;
     }

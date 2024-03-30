@@ -39,7 +39,7 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.lazy.foo.gDmfket' => true,
+            '.lazy.foo.qFdMZVK' => true,
         ];
     }
 
@@ -55,7 +55,7 @@ class ProjectServiceContainer extends Container
      */
     protected static function getFooService($container)
     {
-        $a = ($container->privates['.lazy.foo.gDmfket'] ?? self::get_Lazy_Foo_GDmfketService($container));
+        $a = ($container->privates['.lazy.foo.qFdMZVK'] ?? self::get_Lazy_Foo_QFdMZVKService($container));
 
         if (isset($container->services['foo'])) {
             return $container->services['foo'];
@@ -65,21 +65,21 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the private '.lazy.foo.gDmfket' shared service.
+     * Gets the private '.lazy.foo.qFdMZVK' shared service.
      *
      * @return \object
      */
-    protected static function get_Lazy_Foo_GDmfketService($container, $lazyLoad = true)
+    protected static function get_Lazy_Foo_QFdMZVKService($container, $lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $container->privates['.lazy.foo.gDmfket'] = $container->createProxy('objectProxy8ac8e9a', static fn () => \objectProxy8ac8e9a::createLazyProxy(static fn () => self::get_Lazy_Foo_GDmfketService($container, false)));
+            return $container->privates['.lazy.foo.qFdMZVK'] = $container->createProxy('objectProxy1fd6daa', static fn () => \objectProxy1fd6daa::createLazyProxy(static fn () => self::get_Lazy_Foo_QFdMZVKService($container, false)));
         }
 
         return ($container->services['foo'] ?? self::getFooService($container));
     }
 }
 
-class objectProxy8ac8e9a implements \Symfony\Component\DependencyInjection\Tests\Compiler\AInterface, \Symfony\Component\DependencyInjection\Tests\Compiler\IInterface, \Symfony\Component\VarExporter\LazyObjectInterface
+class objectProxy1fd6daa implements \Symfony\Component\DependencyInjection\Tests\Compiler\AInterface, \Symfony\Component\DependencyInjection\Tests\Compiler\IInterface, \Symfony\Component\VarExporter\LazyObjectInterface
 {
     use \Symfony\Component\VarExporter\LazyProxyTrait;
 

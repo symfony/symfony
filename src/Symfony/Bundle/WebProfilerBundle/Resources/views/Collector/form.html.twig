@@ -97,14 +97,8 @@
 
         .toggle-icon {
             display: inline-block;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' data-icon-name='icon-tabler-square-plus' width='24' height='24' viewBox='0 0 24 24' stroke-width='2px' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'%3E%3C/path%3E%3Crect x='4' y='4' width='16' height='16' rx='2'%3E%3C/rect%3E%3Cline x1='9' y1='12' x2='15' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='9' x2='12' y2='15'%3E%3C/line%3E%3C/svg%3E") no-repeat;
-            background-size: 18px 18px;
         }
         .closed .toggle-icon, .closed.toggle-icon {
-            background-position: bottom left;
-        }
-        .toggle-icon.empty {
-            background-image: none;
         }
 
         .tree .tree-inner {
@@ -118,11 +112,19 @@
             width: 16px;
             height: 16px;
             margin-left: -18px;
+            display: inline-grid;
+            place-content: center;
+            background: none;
+            border: none;
+            transition: transform 200ms;
         }
-        .tree .toggle-icon {
-            width: 18px;
-            height: 18px;
-            vertical-align: bottom;
+        .tree .toggle-button.closed svg {
+            transform: rotate(-90deg);
+        }
+        .tree .toggle-button svg {
+            transform: rotate(0deg);
+            width: 16px;
+            height: 16px;
         }
         .tree .toggle-icon.empty {
             width: 5px;
@@ -392,7 +394,7 @@
         </div>
     {% else %}
         <div class="empty empty-panel">
-            <p>No forms were submitted for this request.</p>
+            <p>No forms were submitted.</p>
         </div>
     {% endif %}
 {% endblock %}
@@ -406,7 +408,9 @@
             {% endif %}
 
             {% if data.children is not empty %}
-                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-children" href="#"><span class="toggle-icon"></span></a>
+                <button class="toggle-button" data-toggle-target-id="{{ data.id }}-children">
+                    {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                </button>
             {% else %}
                 <div class="toggle-icon empty"></div>
             {% endif %}
@@ -496,12 +500,6 @@
 {% macro render_form_errors(data) %}
     {% if data.errors is defined and data.errors|length > 0 %}
         <div class="errors">
-            <h3>
-                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-errors" href="#">
-                    Errors <span class="toggle-icon"></span>
-                </a>
-            </h3>
-
             <table id="{{ data.id }}-errors">
                 <thead>
                 <tr>

@@ -47,13 +47,11 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
-use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
-use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
@@ -1546,37 +1544,6 @@ PHP
         $this->assertContains('bar', $service_ids);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testWitherAnnotation()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation::cloneFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo1()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo2()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-
-        $container = new ContainerBuilder();
-        $container->register(FooAnnotation::class)
-            ->setAutowired(true);
-
-        $container
-            ->register('wither', WitherAnnotation::class)
-            ->setPublic(true)
-            ->setAutowired(true);
-
-        $container->compile();
-        $dumper = new PhpDumper($container);
-        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Annotation']);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_annotation.php', $dump);
-        eval('?>'.$dump);
-
-        $container = new \Symfony_DI_PhpDumper_Service_Wither_Annotation();
-
-        $wither = $container->get('wither');
-        $this->assertInstanceOf(FooAnnotation::class, $wither->foo);
-    }
-
     public function testWitherAttribute()
     {
         $container = new ContainerBuilder();
@@ -1726,6 +1693,8 @@ PHP
     }
 
     /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
      * @group legacy
      */
     public function testDirectlyAccessingDeprecatedPublicService()
@@ -1975,6 +1944,110 @@ PHP
 
         $this->assertInstanceOf(SingleMethodInterface::class, $container->get('bar')->foo);
         $this->assertInstanceOf(Foo::class, $container->get('bar')->foo->theMethod());
+    }
+
+    /**
+     * @dataProvider getStripCommentsCodes
+     */
+    public function testStripComments(string $source, string $expected)
+    {
+        $reflection = new \ReflectionClass(PhpDumper::class);
+        $method = $reflection->getMethod('stripComments');
+
+        $output = $method->invoke(null, $source);
+
+        // Heredocs are preserved, making the output mixing Unix and Windows line
+        // endings, switching to "\n" everywhere on Windows to avoid failure.
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $expected = str_replace("\r\n", "\n", $expected);
+            $output = str_replace("\r\n", "\n", $output);
+        }
+
+        $this->assertEquals($expected, $output);
+    }
+
+    public static function getStripCommentsCodes(): array
+    {
+        return [
+            ['<?php echo foo();', '<?php echo foo();'],
+            ['<?php echo/**/foo();', '<?php echo foo();'],
+            ['<?php echo/** bar */foo();', '<?php echo foo();'],
+            ['<?php /**/echo foo();', '<?php echo foo();'],
+            ['<?php echo \foo();', '<?php echo \foo();'],
+            ['<?php echo/**/\foo();', '<?php echo \foo();'],
+            ['<?php echo/** bar */\foo();', '<?php echo \foo();'],
+            ['<?php /**/echo \foo();', '<?php echo \foo();'],
+            [<<<'EOF'
+<?php
+include_once \dirname(__DIR__).'/foo.php';
+
+$string = 'string should not be   modified';
+
+$string = 'string should not be
+
+modified';
+
+
+$heredoc = <<<HD
+
+
+Heredoc should not be   modified {$a[1+$b]}
+
+
+HD;
+
+$nowdoc = <<<'ND'
+
+
+Nowdoc should not be   modified
+
+
+ND;
+
+/**
+ * some class comments to strip
+ */
+class TestClass
+{
+    /**
+     * some method comments to strip
+     */
+    public function doStuff()
+    {
+        // inline comment
+    }
+}
+EOF
+                , <<<'EOF'
+<?php
+include_once \dirname(__DIR__).'/foo.php';
+$string = 'string should not be   modified';
+$string = 'string should not be
+
+modified';
+$heredoc = <<<HD
+
+
+Heredoc should not be   modified {$a[1+$b]}
+
+
+HD;
+$nowdoc = <<<'ND'
+
+
+Nowdoc should not be   modified
+
+
+ND;
+class TestClass
+{
+    public function doStuff()
+    {
+        }
+}
+EOF
+            ],
+        ];
     }
 }
 

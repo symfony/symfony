@@ -13,7 +13,11 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\Expression;
+use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\ToString;
@@ -303,5 +307,80 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ value }}', 2)
             ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
+    }
+
+    public function testIsValidExpression()
+    {
+        $constraints = [new NotNull(), new Range(['min' => 2])];
+
+        $constraint = new Expression(
+            ['expression' => 'is_valid(this.data, a)', 'values' => ['a' => $constraints]]
+        );
+
+        $object = new Entity();
+        $object->data = 7;
+
+        $this->setObject($object);
+
+        $this->expectValidateValue(0, $object->data, $constraints);
+
+        $this->validator->validate($object, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testIsValidExpressionInvalid()
+    {
+        $constraints = [new Range(['min' => 2, 'max' => 5])];
+
+        $constraint = new Expression(
+            ['expression' => 'is_valid(this.data, a)', 'values' => ['a' => $constraints]]
+        );
+
+        $object = new Entity();
+        $object->data = 7;
+
+        $this->setObject($object);
+
+        $this->expectFailingValueValidation(
+            0,
+            7,
+            $constraints,
+            null,
+            new ConstraintViolation('error_range', '', [], '', '', 7, null, 'range')
+        );
+
+        $this->validator->validate($object, $constraint);
+
+        $this->assertCount(2, $this->context->getViolations());
+    }
+
+    /**
+     * @dataProvider provideCompileIsValid
+     */
+    public function testCompileIsValid(string $expression, array $names, string $expected)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expressionLanguage->registerProvider(new ExpressionLanguageProvider());
+
+        $result = $expressionLanguage->compile($expression, $names);
+
+        $this->assertSame($expected, $result);
+    }
+
+    public static function provideCompileIsValid(): array
+    {
+        return [
+            [
+                'is_valid("foo", constraints)',
+                ['constraints'],
+                '0 === $context->getValidator()->inContext($context)->validate("foo", $constraints)->getViolations()->count()',
+            ],
+            [
+                'is_valid(this.data, constraints, groups)',
+                ['this', 'constraints', 'groups'],
+                '0 === $context->getValidator()->inContext($context)->validate($this->data, $constraints, $groups)->getViolations()->count()',
+            ],
+        ];
     }
 }

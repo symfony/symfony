@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -76,6 +77,26 @@ class SessionStrategyListenerTest extends TestCase
         $previousToken->expects($this->once())
             ->method('getUserIdentifier')
             ->willReturn('test');
+
+        $event = new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('test', function () {})), $token, $this->request, null, 'main_firewall', $previousToken);
+
+        $this->listener->onSuccessfulLogin($event);
+    }
+
+    public function testRequestWithSamePreviousUserButDifferentTokenType()
+    {
+        $this->configurePreviousSession();
+
+        $token = $this->createMock(NullToken::class);
+        $token->expects($this->once())
+            ->method('getUserIdentifier')
+            ->willReturn('test');
+        $previousToken = $this->createMock(UsernamePasswordToken::class);
+        $previousToken->expects($this->once())
+            ->method('getUserIdentifier')
+            ->willReturn('test');
+
+        $this->sessionAuthenticationStrategy->expects($this->once())->method('onAuthentication')->with($this->request, $token);
 
         $event = new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('test', function () {})), $token, $this->request, null, 'main_firewall', $previousToken);
 

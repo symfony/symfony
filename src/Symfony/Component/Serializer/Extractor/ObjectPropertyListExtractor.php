@@ -21,7 +21,7 @@ final class ObjectPropertyListExtractor implements ObjectPropertyListExtractorIn
     private PropertyListExtractorInterface $propertyListExtractor;
     private \Closure $objectClassResolver;
 
-    public function __construct(PropertyListExtractorInterface $propertyListExtractor, callable $objectClassResolver = null)
+    public function __construct(PropertyListExtractorInterface $propertyListExtractor, ?callable $objectClassResolver = null)
     {
         $this->propertyListExtractor = $propertyListExtractor;
         $this->objectClassResolver = ($objectClassResolver ?? 'get_class')(...);

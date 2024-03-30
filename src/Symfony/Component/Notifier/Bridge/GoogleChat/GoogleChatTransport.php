@@ -30,13 +30,8 @@ final class GoogleChatTransport extends AbstractTransport
 {
     protected const HOST = 'chat.googleapis.com';
 
-    private string $space;
-    private string $accessKey;
-    private string $accessToken;
-    private ?string $threadKey;
-
     /**
-     * @param string      $space       The space name the the webhook url "/v1/spaces/<space>/messages"
+     * @param string      $space       The space name of the webhook url "/v1/spaces/<space>/messages"
      * @param string      $accessKey   The "key" parameter of the webhook url
      * @param string      $accessToken The "token" parameter of the webhook url
      * @param string|null $threadKey   Opaque thread identifier string that can be specified to group messages into a single thread.
@@ -44,13 +39,14 @@ final class GoogleChatTransport extends AbstractTransport
      *                                 Subsequent messages with the same thread identifier will be posted into the same thread.
      *                                 {@see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters}
      */
-    public function __construct(string $space, string $accessKey, #[\SensitiveParameter] string $accessToken, string $threadKey = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->space = $space;
-        $this->accessKey = $accessKey;
-        $this->accessToken = $accessToken;
-        $this->threadKey = $threadKey;
-
+    public function __construct(
+        private string $space,
+        #[\SensitiveParameter] private string $accessKey,
+        #[\SensitiveParameter] private string $accessToken,
+        private ?string $threadKey = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

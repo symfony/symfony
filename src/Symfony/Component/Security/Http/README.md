@@ -8,14 +8,14 @@ provides authenticators to authenticate visitors.
 Getting Started
 ---------------
 
-```
-$ composer require symfony/security-http
+```bash
+composer require symfony/security-http
 ```
 
 Sponsor
 -------
 
-The Security component for Symfony 6.4 is [backed][1] by [SymfonyCasts][2].
+The Security component for Symfony 7.0 is [backed][1] by [SymfonyCasts][2].
 
 Learn Symfony faster by watching real projects being built and actively coding
 along with them. SymfonyCasts bridges that learning gap, bringing you video

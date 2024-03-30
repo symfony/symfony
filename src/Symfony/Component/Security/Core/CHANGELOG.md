@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-6.4
+
+7.1
 ---
 
- * Make `PersistentToken` immutable
- * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead
  * Add method `getDecision()` to `AccessDecisionStrategyInterface`
  * Deprecate `AccessDecisionStrategyInterface::decide()` in favor of `AccessDecisionStrategyInterface::getDecision()`
  * Add method `getVote()` to `VoterInterface`
@@ -16,6 +15,19 @@ CHANGELOG
  * Add method `getDecision()` to `AuthorizationCheckerInterface`
  * Add methods `setAccessDecision()` and `getAccessDecision()` to `AccessDeniedException`
  * Add method `getDecision()` to `Security`
+
+7.0
+---
+
+ * Remove the `Security` class, use `Symfony\Bundle\SecurityBundle\Security` instead
+ * Require explicit argument when calling `TokenStorage::setToken()`
+ * Change argument `$lastUsed` of `TokenProviderInterface::updateToken()` to accept `DateTimeInterface`
+
+6.4
+---
+
+ * Make `PersistentToken` immutable
+ * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead
 
 6.3
 ---

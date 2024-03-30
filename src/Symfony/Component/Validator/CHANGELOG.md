@@ -1,9 +1,38 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add support for `Stringable` values when using the `Cidr`, `CssColor`, `ExpressionSyntax` and `PasswordStrength` constraints
+ * Add `MacAddress` constraint
+ * Add `*_NO_PUBLIC`, `*_ONLY_PRIVATE` and `*_ONLY_RESERVED` versions to `Ip` constraint
+ * Possibility to use all `Ip` constraint versions for `Cidr` constraint
+ * Add `list` and `associative_array` types to `Type` constraint
+ * Add the `Charset` constraint
+
+7.0
+---
+
+ * Add methods `getConstraint()`, `getCause()` and `__toString()` to `ConstraintViolationInterface`
+ * Add method `__toString()` to `ConstraintViolationListInterface`
+ * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface`
+ * Remove static property `$errorNames` from all constraints, use const `ERROR_NAMES` instead
+ * Remove static property `$versions` from the `Ip` constraint, use the `VERSIONS` constant instead
+ * Remove `VALIDATION_MODE_LOOSE` from `Email` constraint, use `VALIDATION_MODE_HTML5` instead
+ * Remove constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove the annotation reader parameter from the constructor signature of `AnnotationLoader`
+ * Remove `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
+ * Remove `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
+
 6.4
 ---
 
+ * Add `is_valid` function to the `Expression` constraint, its behavior is the same as `ValidatorInterface::validate`
  * Allow single integer for the `versions` option of the `Uuid` constraint
  * Allow single constraint to be passed to the `constraints` option of the `When` constraint
  * Deprecate Doctrine annotations support in favor of native attributes
@@ -14,6 +43,7 @@ CHANGELOG
  * Deprecate `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
  * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
  * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Add `GroupProviderInterface` to implement validation group providers outside the underlying class
 
 6.3
 ---

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
@@ -30,7 +29,7 @@ class RelayAdapterTest extends AbstractRedisAdapterTestCase
         try {
             new Relay(...explode(':', getenv('REDIS_HOST')));
         } catch (\Relay\Exception $e) {
-            throw new SkippedTestSuiteError(getenv('REDIS_HOST').': '.$e->getMessage());
+            self::markTestSkipped(getenv('REDIS_HOST').': '.$e->getMessage());
         }
         self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'), ['lazy' => true, 'class' => Relay::class]);
         self::assertInstanceOf(RelayProxy::class, self::$redis);

@@ -83,7 +83,7 @@ final class ConsensusStrategy implements AccessDecisionStrategyInterface, \Strin
 
     public function decide(\Traversable $results): bool
     {
-        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '7.1', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
 
         $grant = 0;
         $deny = 0;

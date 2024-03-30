@@ -12,7 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Validator;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata as OrmClassMetadata;
+use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -33,13 +34,10 @@ final class DoctrineLoader implements LoaderInterface
 {
     use AutoMappingTrait;
 
-    private EntityManagerInterface $entityManager;
-    private ?string $classValidatorRegexp;
-
-    public function __construct(EntityManagerInterface $entityManager, string $classValidatorRegexp = null)
-    {
-        $this->entityManager = $entityManager;
-        $this->classValidatorRegexp = $classValidatorRegexp;
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ?string $classValidatorRegexp = null,
+    ) {
     }
 
     public function loadClassMetadata(ClassMetadata $metadata): bool
@@ -51,7 +49,7 @@ final class DoctrineLoader implements LoaderInterface
             return false;
         }
 
-        if (!$doctrineMetadata instanceof ClassMetadataInfo) {
+        if (!$doctrineMetadata instanceof OrmClassMetadata) {
             return false;
         }
 
@@ -72,7 +70,7 @@ final class DoctrineLoader implements LoaderInterface
         foreach ($doctrineMetadata->fieldMappings as $mapping) {
             $enabledForProperty = $enabledForClass;
             $lengthConstraint = null;
-            foreach ($metadata->getPropertyMetadata($mapping['fieldName']) as $propertyMetadata) {
+            foreach ($metadata->getPropertyMetadata(self::getFieldMappingValue($mapping, 'fieldName')) as $propertyMetadata) {
                 // Enabling or disabling auto-mapping explicitly always takes precedence
                 if (AutoMappingStrategy::DISABLED === $propertyMetadata->getAutoMappingStrategy()) {
                     continue 2;
@@ -92,26 +90,26 @@ final class DoctrineLoader implements LoaderInterface
                 continue;
             }
 
-            if (true === ($mapping['unique'] ?? false) && !isset($existingUniqueFields[$mapping['fieldName']])) {
-                $metadata->addConstraint(new UniqueEntity(['fields' => $mapping['fieldName']]));
+            if (true === (self::getFieldMappingValue($mapping, 'unique') ?? false) && !isset($existingUniqueFields[self::getFieldMappingValue($mapping, 'fieldName')])) {
+                $metadata->addConstraint(new UniqueEntity(['fields' => self::getFieldMappingValue($mapping, 'fieldName')]));
                 $loaded = true;
             }
 
-            if (null === ($mapping['length'] ?? null) || null !== ($mapping['enumType'] ?? null) || !\in_array($mapping['type'], ['string', 'text'], true)) {
+            if (null === (self::getFieldMappingValue($mapping, 'length') ?? null) || null !== (self::getFieldMappingValue($mapping, 'enumType') ?? null) || !\in_array(self::getFieldMappingValue($mapping, 'type'), ['string', 'text'], true)) {
                 continue;
             }
 
             if (null === $lengthConstraint) {
-                if (isset($mapping['originalClass']) && !str_contains($mapping['declaredField'], '.')) {
-                    $metadata->addPropertyConstraint($mapping['declaredField'], new Valid());
+                if (self::getFieldMappingValue($mapping, 'originalClass') && !str_contains(self::getFieldMappingValue($mapping, 'declaredField'), '.')) {
+                    $metadata->addPropertyConstraint(self::getFieldMappingValue($mapping, 'declaredField'), new Valid());
                     $loaded = true;
-                } elseif (property_exists($className, $mapping['fieldName']) && (!$doctrineMetadata->isMappedSuperclass || $metadata->getReflectionClass()->getProperty($mapping['fieldName'])->isPrivate())) {
-                    $metadata->addPropertyConstraint($mapping['fieldName'], new Length(['max' => $mapping['length']]));
+                } elseif (property_exists($className, self::getFieldMappingValue($mapping, 'fieldName')) && (!$doctrineMetadata->isMappedSuperclass || $metadata->getReflectionClass()->getProperty(self::getFieldMappingValue($mapping, 'fieldName'))->isPrivate())) {
+                    $metadata->addPropertyConstraint(self::getFieldMappingValue($mapping, 'fieldName'), new Length(['max' => self::getFieldMappingValue($mapping, 'length')]));
                     $loaded = true;
                 }
             } elseif (null === $lengthConstraint->max) {
                 // If a Length constraint exists and no max length has been explicitly defined, set it
-                $lengthConstraint->max = $mapping['length'];
+                $lengthConstraint->max = self::getFieldMappingValue($mapping, 'length');
             }
         }
 
@@ -134,5 +132,14 @@ final class DoctrineLoader implements LoaderInterface
         }
 
         return $fields;
+    }
+
+    private static function getFieldMappingValue(array|FieldMapping $mapping, string $key): mixed
+    {
+        if ($mapping instanceof FieldMapping) {
+            return $mapping->$key ?? null;
+        }
+
+        return $mapping[$key] ?? null;
     }
 }

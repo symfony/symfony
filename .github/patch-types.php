@@ -23,8 +23,10 @@ foreach ($loader->getClassMap() as $class => $file) {
             }
             // no break;
         case false !== strpos($file, '/vendor/'):
+        case false !== strpos($file, '/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php'):
+        case false !== strpos($file, '/src/Symfony/Bridge/Doctrine/Middleware/Debug/'):
+        case false !== strpos($file, '/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php'):
         case false !== strpos($file, '/src/Symfony/Bridge/PhpUnit/'):
-        case false !== strpos($file, '/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/ContainerAwareController.php'):
         case false !== strpos($file, '/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Validation/Article.php'):
         case false !== strpos($file, '/src/Symfony/Component/Cache/Tests/Fixtures/DriverWrapper.php'):
         case false !== strpos($file, '/src/Symfony/Component/Config/Tests/Fixtures/BadFileName.php'):

@@ -54,7 +54,6 @@ return [
         'America/Miquelon' => 'Àkókò Pierre & Miquelon (ìlú Mikulɔ́nì)',
         'America/Porto_Velho' => 'Àkókò Amásɔ́nì (Porto Velho)',
         'America/Punta_Arenas' => 'Àkókò Shílè (Punta Arenas)',
-        'America/Santa_Isabel' => 'Àkókò Apá Ìwɔ̀ Oorùn Mɛ́shíkò (Santa Isabel)',
         'America/Santiago' => 'Àkókò Shílè (Santiago)',
         'America/St_Johns' => 'Àkókò Newfoundland (ìlú St Jɔ́ɔ̀nù)',
         'America/St_Thomas' => 'Àkókò Àtìláńtíìkì (ìlú St Tɔ́màsì)',
@@ -83,7 +82,7 @@ return [
         'Europe/Samara' => 'Ìgbà Rɔshia (Samara)',
         'Indian/Mahe' => 'Àkókò Sèshɛ́ɛ̀lì (Mahe)',
         'Indian/Mauritius' => 'Àkókò Máríshúshì (Mauritius)',
-        'Indian/Reunion' => 'Àkókò Rɛ́yúníɔ́nì (Reunion)',
+        'Indian/Reunion' => 'Àkókò Rɛ́yúníɔ́nì (Réunion)',
     ],
     'Meta' => [],
 ];

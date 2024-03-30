@@ -17,8 +17,10 @@ namespace Symfony\Component\HttpKernel\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsTargetedValueResolver
 {
-    public function __construct(
-        public readonly ?string $name = null,
-    ) {
+    /**
+     * @param string|null $name The name with which the resolver can be targeted
+     */
+    public function __construct(public readonly ?string $name = null)
+    {
     }
 }

@@ -20,83 +20,63 @@ interface StyleInterface
 {
     /**
      * Formats a command title.
-     *
-     * @return void
      */
-    public function title(string $message);
+    public function title(string $message): void;
 
     /**
      * Formats a section title.
-     *
-     * @return void
      */
-    public function section(string $message);
+    public function section(string $message): void;
 
     /**
      * Formats a list.
-     *
-     * @return void
      */
-    public function listing(array $elements);
+    public function listing(array $elements): void;
 
     /**
      * Formats informational text.
-     *
-     * @return void
      */
-    public function text(string|array $message);
+    public function text(string|array $message): void;
 
     /**
      * Formats a success result bar.
-     *
-     * @return void
      */
-    public function success(string|array $message);
+    public function success(string|array $message): void;
 
     /**
      * Formats an error result bar.
-     *
-     * @return void
      */
-    public function error(string|array $message);
+    public function error(string|array $message): void;
 
     /**
      * Formats an warning result bar.
-     *
-     * @return void
      */
-    public function warning(string|array $message);
+    public function warning(string|array $message): void;
 
     /**
      * Formats a note admonition.
-     *
-     * @return void
      */
-    public function note(string|array $message);
+    public function note(string|array $message): void;
 
     /**
      * Formats a caution admonition.
-     *
-     * @return void
      */
-    public function caution(string|array $message);
+    public function caution(string|array $message): void;
 
     /**
      * Formats a table.
-     *
-     * @return void
      */
-    public function table(array $headers, array $rows);
+    public function table(array $headers, array $rows): void;
 
     /**
      * Asks a question.
      */
-    public function ask(string $question, string $default = null, callable $validator = null): mixed;
+    public function ask(string $question, ?string $default = null, ?callable $validator = null): mixed;
 
     /**
      * Asks a question with the user input hidden.
      */
-    public function askHidden(string $question, callable $validator = null): mixed;
+    public function askHidden(string $question, ?callable $validator = null): mixed;
 
     /**
      * Asks for confirmation.
@@ -110,29 +90,21 @@ interface StyleInterface
 
     /**
      * Add newline(s).
-     *
-     * @return void
      */
-    public function newLine(int $count = 1);
+    public function newLine(int $count = 1): void;
 
     /**
      * Starts the progress output.
-     *
-     * @return void
      */
-    public function progressStart(int $max = 0);
+    public function progressStart(int $max = 0): void;
 
     /**
      * Advances the progress output X steps.
-     *
-     * @return void
      */
-    public function progressAdvance(int $step = 1);
+    public function progressAdvance(int $step = 1): void;
 
     /**
      * Finishes the progress output.
-     *
-     * @return void
      */
-    public function progressFinish();
+    public function progressFinish(): void;
 }

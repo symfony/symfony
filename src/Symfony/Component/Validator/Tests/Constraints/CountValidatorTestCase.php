@@ -283,7 +283,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertEquals(5, $constraint->max);
     }
 
-    public function testConstraintAnnotationDefaultOption()
+    public function testConstraintAttributeDefaultOption()
     {
         $constraint = new Count(['value' => 5, 'exactMessage' => 'message']);
 

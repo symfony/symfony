@@ -27,7 +27,7 @@ final class SwitchUserEvent extends Event
     private UserInterface $targetUser;
     private ?TokenInterface $token;
 
-    public function __construct(Request $request, UserInterface $targetUser, TokenInterface $token = null)
+    public function __construct(Request $request, UserInterface $targetUser, ?TokenInterface $token = null)
     {
         $this->request = $request;
         $this->targetUser = $targetUser;

@@ -38,10 +38,8 @@ class RoleVoter implements CacheableVoterInterface
             }
 
             $result = Vote::createDenied();
-            foreach ($roles as $role) {
-                if ($attribute === $role) {
-                    return Vote::createGranted();
-                }
+            if (\in_array($attribute, $roles, true)) {
+                return Vote::createGranted();
             }
         }
 
@@ -50,7 +48,7 @@ class RoleVoter implements CacheableVoterInterface
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
-        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '7.1', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
 
         return $this->getVote($token, $subject, $attributes)->getAccess();
     }
@@ -65,10 +63,7 @@ class RoleVoter implements CacheableVoterInterface
         return true;
     }
 
-    /**
-     * @return array
-     */
-    protected function extractRoles(TokenInterface $token)
+    protected function extractRoles(TokenInterface $token): array
     {
         return $token->getRoleNames();
     }

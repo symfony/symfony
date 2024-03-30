@@ -27,7 +27,7 @@ final class VoteEvent extends Event
     private VoterInterface $voter;
     private mixed $subject;
     private array $attributes;
-    private Vote|int $vote;
+    private Vote $vote;
 
     public function __construct(VoterInterface $voter, mixed $subject, array $attributes, Vote|int $vote)
     {
@@ -36,7 +36,7 @@ final class VoteEvent extends Event
         $this->attributes = $attributes;
 
         if (!$vote instanceof Vote) {
-            trigger_deprecation('symfony/security-core', '6.3', 'Passing an int as the fourth argument to "%s::__construct" is deprecated, pass a "%s" instance instead.', __CLASS__, Vote::class);
+            trigger_deprecation('symfony/security-core', '7.1', 'Passing an int as the fourth argument to "%s::__construct" is deprecated, pass a "%s" instance instead.', __CLASS__, Vote::class);
 
             $vote = new Vote($vote);
         }
@@ -59,11 +59,11 @@ final class VoteEvent extends Event
     }
 
     /**
-     * @deprecated since Symfony 6.3, use {@see getVoteDecision()} instead.
+     * @deprecated since Symfony 7.1, use {@see getVoteDecision()} instead.
      */
     public function getVote(): int
     {
-        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::getVote()" has been deprecated, use "%s::getVoteDecision()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '7.1', 'Method "%s::getVote()" has been deprecated, use "%s::getVoteDecision()" instead.', __CLASS__, __CLASS__);
 
         return $this->vote->getAccess();
     }

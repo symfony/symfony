@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
  */
 abstract class AbstractCloner implements ClonerInterface
 {
-    public static $defaultCasters = [
+    public static array $defaultCasters = [
         '__PHP_Incomplete_Class' => ['Symfony\Component\VarDumper\Caster\Caster', 'castPhpIncompleteClass'],
 
         'Symfony\Component\VarDumper\Caster\CutStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castStub'],
@@ -54,23 +54,38 @@ abstract class AbstractCloner implements ClonerInterface
         'Doctrine\Persistence\ObjectManager' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'cutInternals'],
 
         'DOMException' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castException'],
+        'DOM\Exception' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castException'],
         'DOMStringList' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castLength'],
         'DOMNameList' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castLength'],
         'DOMImplementation' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castImplementation'],
+        'DOM\Implementation' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castImplementation'],
         'DOMImplementationList' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castLength'],
         'DOMNode' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castNode'],
+        'DOM\Node' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castNode'],
         'DOMNameSpaceNode' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castNameSpaceNode'],
         'DOMDocument' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castDocument'],
+        'DOM\XMLDocument' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castXMLDocument'],
+        'DOM\HTMLDocument' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castHTMLDocument'],
         'DOMNodeList' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castLength'],
+        'DOM\NodeList' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castLength'],
         'DOMNamedNodeMap' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castLength'],
+        'DOM\DTDNamedNodeMap' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castLength'],
         'DOMCharacterData' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castCharacterData'],
+        'DOM\CharacterData' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castCharacterData'],
         'DOMAttr' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castAttr'],
+        'DOM\Attr' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castAttr'],
         'DOMElement' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castElement'],
+        'DOM\Element' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castElement'],
         'DOMText' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castText'],
+        'DOM\Text' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castText'],
         'DOMDocumentType' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castDocumentType'],
+        'DOM\DocumentType' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castDocumentType'],
         'DOMNotation' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castNotation'],
+        'DOM\Notation' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castNotation'],
         'DOMEntity' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castEntity'],
+        'DOM\Entity' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castEntity'],
         'DOMProcessingInstruction' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castProcessingInstruction'],
+        'DOM\ProcessingInstruction' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castProcessingInstruction'],
         'DOMXPath' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castXPath'],
 
         'XMLReader' => ['Symfony\Component\VarDumper\Caster\XmlReaderCaster', 'castXmlReader'],
@@ -197,9 +212,9 @@ abstract class AbstractCloner implements ClonerInterface
         'FFI\CType' => ['Symfony\Component\VarDumper\Caster\FFICaster', 'castCTypeOrCData'],
     ];
 
-    protected $maxItems = 2500;
-    protected $maxString = -1;
-    protected $minDepth = 1;
+    protected int $maxItems = 2500;
+    protected int $maxString = -1;
+    protected int $minDepth = 1;
 
     /**
      * @var array<string, list<callable>>
@@ -219,7 +234,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @see addCasters
      */
-    public function __construct(array $casters = null)
+    public function __construct(?array $casters = null)
     {
         $this->addCasters($casters ?? static::$defaultCasters);
     }
@@ -233,10 +248,8 @@ abstract class AbstractCloner implements ClonerInterface
      * see e.g. static::$defaultCasters.
      *
      * @param callable[] $casters A map of casters
-     *
-     * @return void
      */
-    public function addCasters(array $casters)
+    public function addCasters(array $casters): void
     {
         foreach ($casters as $type => $callback) {
             $this->casters[$type][] = $callback;
@@ -245,20 +258,16 @@ abstract class AbstractCloner implements ClonerInterface
 
     /**
      * Sets the maximum number of items to clone past the minimum depth in nested structures.
-     *
-     * @return void
      */
-    public function setMaxItems(int $maxItems)
+    public function setMaxItems(int $maxItems): void
     {
         $this->maxItems = $maxItems;
     }
 
     /**
      * Sets the maximum cloned length for strings.
-     *
-     * @return void
      */
-    public function setMaxString(int $maxString)
+    public function setMaxString(int $maxString): void
     {
         $this->maxString = $maxString;
     }
@@ -266,10 +275,8 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Sets the minimum tree depth where we are guaranteed to clone all the items.  After this
      * depth is reached, only setMaxItems items will be cloned.
-     *
-     * @return void
      */
-    public function setMinDepth(int $minDepth)
+    public function setMinDepth(int $minDepth): void
     {
         $this->minDepth = $minDepth;
     }

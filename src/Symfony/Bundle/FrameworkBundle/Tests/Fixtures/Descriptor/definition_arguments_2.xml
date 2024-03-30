@@ -13,5 +13,8 @@
       <parameter name="attr3">val3</parameter>
     </tag>
     <tag name="tag2"/>
+    <tag name="tag3">
+      <parameter name="array_attr">["foo","bar",[[[["ccc"]]]]]</parameter>
+    </tag>
   </tags>
 </definition>

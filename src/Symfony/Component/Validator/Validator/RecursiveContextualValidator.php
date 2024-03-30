@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Validator;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\Existence;
@@ -44,26 +45,23 @@ use Symfony\Component\Validator\Util\PropertyPath;
  */
 class RecursiveContextualValidator implements ContextualValidatorInterface
 {
-    private ExecutionContextInterface $context;
     private string $defaultPropertyPath;
     private array $defaultGroups;
-    private MetadataFactoryInterface $metadataFactory;
-    private ConstraintValidatorFactoryInterface $validatorFactory;
-    private array $objectInitializers;
 
     /**
      * Creates a validator for the given context.
      *
      * @param ObjectInitializerInterface[] $objectInitializers The object initializers
      */
-    public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [])
-    {
-        $this->context = $context;
+    public function __construct(
+        private ExecutionContextInterface $context,
+        private MetadataFactoryInterface $metadataFactory,
+        private ConstraintValidatorFactoryInterface $validatorFactory,
+        private array $objectInitializers = [],
+        private ?ContainerInterface $groupProviderLocator = null,
+    ) {
         $this->defaultPropertyPath = $context->getPropertyPath();
         $this->defaultGroups = [$context->getGroup() ?: Constraint::DEFAULT_GROUP];
-        $this->metadataFactory = $metadataFactory;
-        $this->validatorFactory = $validatorFactory;
-        $this->objectInitializers = $objectInitializers;
     }
 
     public function atPath(string $path): static
@@ -73,7 +71,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
-    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null): static
+    public function validate(mixed $value, Constraint|array|null $constraints = null, string|GroupSequence|array|null $groups = null): static
     {
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
 
@@ -158,7 +156,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         throw new RuntimeException(sprintf('Cannot validate values of type "%s" automatically. Please provide a constraint.', get_debug_type($value)));
     }
 
-    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null): static
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array|null $groups = null): static
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
@@ -199,7 +197,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
-    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null): static
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array|null $groups = null): static
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($objectOrClass);
 
@@ -436,10 +434,18 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $group = $metadata->getGroupSequence();
                     $defaultOverridden = true;
                 } elseif ($metadata->isGroupSequenceProvider()) {
-                    // The group sequence is dynamically obtained from the validated
-                    // object
-                    /* @var \Symfony\Component\Validator\GroupSequenceProviderInterface $object */
-                    $group = $object->getGroupSequence();
+                    if (null !== $provider = $metadata->getGroupProvider()) {
+                        if (null === $this->groupProviderLocator) {
+                            throw new \LogicException('A group provider locator is required when using group provider.');
+                        }
+
+                        $group = $this->groupProviderLocator->get($provider)->getGroups($object);
+                    } else {
+                        // The group sequence is dynamically obtained from the validated
+                        // object
+                        /* @var \Symfony\Component\Validator\GroupSequenceProviderInterface $object */
+                        $group = $object->getGroupSequence();
+                    }
                     $defaultOverridden = true;
 
                     if (!$group instanceof GroupSequence) {

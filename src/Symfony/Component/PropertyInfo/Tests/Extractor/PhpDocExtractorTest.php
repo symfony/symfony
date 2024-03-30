@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
+use phpDocumentor\Reflection\DocBlock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
@@ -36,11 +37,24 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, array $type = null, $shortDescription, $longDescription)
+    public function testExtract($property, ?array $type, $shortDescription, $longDescription)
     {
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
-        $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
-        $this->assertSame($longDescription, $this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
+        $this->assertEquals($type, $this->extractor->getTypes(Dummy::class, $property));
+        $this->assertSame($shortDescription, $this->extractor->getShortDescription(Dummy::class, $property));
+        $this->assertSame($longDescription, $this->extractor->getLongDescription(Dummy::class, $property));
+    }
+
+    public function testGetDocBlock()
+    {
+        $docBlock = $this->extractor->getDocBlock(Dummy::class, 'g');
+        $this->assertInstanceOf(DocBlock::class, $docBlock);
+        $this->assertSame('Nullable array.', $docBlock->getSummary());
+
+        $docBlock = $this->extractor->getDocBlock(Dummy::class, 'noDocBlock;');
+        $this->assertNull($docBlock);
+
+        $docBlock = $this->extractor->getDocBlock(Dummy::class, 'notAvailable');
+        $this->assertNull($docBlock);
     }
 
     public function testParamTagTypeIsOmitted()
@@ -53,7 +67,6 @@ class PhpDocExtractorTest extends TestCase
         return [
             'pub' => ['pub', null, null],
             'stat' => ['stat', null, null],
-            'foo' => ['foo', 'Foo.', null],
             'bar' => ['bar', 'Bar.', null],
         ];
     }
@@ -69,13 +82,23 @@ class PhpDocExtractorTest extends TestCase
     }
 
     /**
+     * @group legacy
+     */
+    public function testEmptyParamAnnotation()
+    {
+        $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', 'foo'));
+        $this->assertSame('Foo.', $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', 'foo'));
+        $this->assertNull($this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', 'foo'));
+    }
+
+    /**
      * @dataProvider typesWithNoPrefixesProvider
      */
-    public function testExtractTypesWithNoPrefixes($property, array $type = null)
+    public function testExtractTypesWithNoPrefixes($property, ?array $type = null)
     {
         $noPrefixExtractor = new PhpDocExtractor(null, [], [], []);
 
-        $this->assertEquals($type, $noPrefixExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
+        $this->assertEquals($type, $noPrefixExtractor->getTypes(Dummy::class, $property));
     }
 
     public static function typesProvider()
@@ -131,7 +154,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider provideCollectionTypes
      */
-    public function testExtractCollection($property, array $type = null, $shortDescription, $longDescription)
+    public function testExtractCollection($property, ?array $type, $shortDescription, $longDescription)
     {
         $this->testExtract($property, $type, $shortDescription, $longDescription);
     }
@@ -193,11 +216,11 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesWithCustomPrefixesProvider
      */
-    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
+    public function testExtractTypesWithCustomPrefixes($property, ?array $type = null)
     {
         $customExtractor = new PhpDocExtractor(null, ['add', 'remove'], ['is', 'can']);
 
-        $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
+        $this->assertEquals($type, $customExtractor->getTypes(Dummy::class, $property));
     }
 
     public static function typesWithCustomPrefixesProvider()
@@ -392,7 +415,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider constructorTypesProvider
      */
-    public function testExtractConstructorTypes($property, array $type = null)
+    public function testExtractConstructorTypes($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }
@@ -458,8 +481,6 @@ class OmittedParamTagTypeDocBlock
 {
     /**
      * The type is omitted here to ensure that the extractor doesn't choke on missing types.
-     *
-     * @param $omittedTagType
      */
     public function setOmittedType(array $omittedTagType)
     {

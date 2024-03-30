@@ -24,8 +24,6 @@ class AddSecurityVotersPassTest extends TestCase
 {
     public function testNoVoters()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('No security voters found. You need to tag at least one with "security.voter".');
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
@@ -33,6 +31,10 @@ class AddSecurityVotersPassTest extends TestCase
         ;
 
         $compilerPass = new AddSecurityVotersPass();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('No security voters found. You need to tag at least one with "security.voter".');
+
         $compilerPass->process($container);
     }
 

@@ -70,7 +70,7 @@ class LengthTest extends TestCase
         self::assertEquals(5, $constraint->max);
     }
 
-    public function testConstraintAnnotationDefaultOption()
+    public function testConstraintAttributeDefaultOption()
     {
         $constraint = new Length(['value' => 5, 'exactMessage' => 'message']);
 

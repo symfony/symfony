@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+* Add support for `X-SES-LIST-MANAGEMENT-OPTIONS`
+
 6.1
 ---
 

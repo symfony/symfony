@@ -109,6 +109,8 @@ class XmlReferenceDumperTest extends TestCase
 
     </pipou>
 
+    <array-with-array-example-and-no-default-value />
+
 </config>
 
 EOL

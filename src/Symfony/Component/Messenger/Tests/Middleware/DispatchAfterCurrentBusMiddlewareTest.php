@@ -299,11 +299,9 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
 
 class DummyEvent
 {
-    private string $message;
-
-    public function __construct(string $message)
-    {
-        $this->message = $message;
+    public function __construct(
+        private string $message,
+    ) {
     }
 
     public function getMessage(): string
@@ -314,13 +312,10 @@ class DummyEvent
 
 class DispatchingMiddleware implements MiddlewareInterface
 {
-    private MessageBusInterface $bus;
-    private array $messages;
-
-    public function __construct(MessageBusInterface $bus, array $messages)
-    {
-        $this->bus = $bus;
-        $this->messages = $messages;
+    public function __construct(
+        private MessageBusInterface $bus,
+        private array $messages,
+    ) {
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

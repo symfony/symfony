@@ -14,10 +14,17 @@ namespace Symfony\Component\Scheduler\Trigger;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class AbstractDecoratedTrigger implements TriggerInterface
+abstract class AbstractDecoratedTrigger implements StatefulTriggerInterface
 {
     public function __construct(private TriggerInterface $inner)
     {
+    }
+
+    public function continue(\DateTimeImmutable $startedAt): void
+    {
+        if ($this->inner instanceof StatefulTriggerInterface) {
+            $this->inner->continue($startedAt);
+        }
     }
 
     final public function inner(): TriggerInterface

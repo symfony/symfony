@@ -43,7 +43,28 @@ class PdoCasterTest extends TestCase
         $this->assertSame('NATURAL', $attr['CASE']->class);
         $this->assertSame('BOTH', $attr['DEFAULT_FETCH_MODE']->class);
 
-        $xDump = <<<'EODUMP'
+        if (\PHP_VERSION_ID >= 80215 && \PHP_VERSION_ID < 80300 || \PHP_VERSION_ID >= 80302) {
+            $xDump = <<<'EODUMP'
+array:2 [
+  "\x00~\x00inTransaction" => false
+  "\x00~\x00attributes" => array:10 [
+    "CASE" => NATURAL
+    "ERRMODE" => EXCEPTION
+    "PERSISTENT" => false
+    "DRIVER_NAME" => "sqlite"
+    "ORACLE_NULLS" => NATURAL
+    "CLIENT_VERSION" => "%s"
+    "SERVER_VERSION" => "%s"
+    "STATEMENT_CLASS" => array:%d [
+      0 => "PDOStatement"%A
+    ]
+    "STRINGIFY_FETCHES" => false
+    "DEFAULT_FETCH_MODE" => BOTH
+  ]
+]
+EODUMP;
+        } else {
+            $xDump = <<<'EODUMP'
 array:2 [
   "\x00~\x00inTransaction" => false
   "\x00~\x00attributes" => array:9 [
@@ -61,6 +82,7 @@ array:2 [
   ]
 ]
 EODUMP;
+        }
 
         $this->assertDumpMatchesFormat($xDump, $cast);
     }

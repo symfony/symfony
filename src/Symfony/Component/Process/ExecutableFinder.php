@@ -23,20 +23,16 @@ class ExecutableFinder
 
     /**
      * Replaces default suffixes of executable.
-     *
-     * @return void
      */
-    public function setSuffixes(array $suffixes)
+    public function setSuffixes(array $suffixes): void
     {
         $this->suffixes = $suffixes;
     }
 
     /**
      * Adds new possible suffix to check for executable.
-     *
-     * @return void
      */
-    public function addSuffix(string $suffix)
+    public function addSuffix(string $suffix): void
     {
         $this->suffixes[] = $suffix;
     }
@@ -48,7 +44,7 @@ class ExecutableFinder
      * @param string|null $default   The default to return if no executable is found
      * @param array       $extraDirs Additional dirs to check into
      */
-    public function find(string $name, string $default = null, array $extraDirs = []): ?string
+    public function find(string $name, ?string $default = null, array $extraDirs = []): ?string
     {
         $dirs = array_merge(
             explode(\PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
@@ -72,8 +68,8 @@ class ExecutableFinder
             }
         }
 
-        $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v';
-        if (\function_exists('exec') && ($executablePath = strtok(@exec($command.' '.escapeshellarg($name)), \PHP_EOL)) && is_executable($executablePath)) {
+        $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v --';
+        if (\function_exists('exec') && ($executablePath = strtok(@exec($command.' '.escapeshellarg($name)), \PHP_EOL)) && @is_executable($executablePath)) {
             return $executablePath;
         }
 

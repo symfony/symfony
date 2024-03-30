@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\String;
+namespace Symfony\Component\String\Tests\Slugger;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -19,7 +19,7 @@ class AsciiSluggerTest extends TestCase
     /**
      * @dataProvider provideSlugTests
      */
-    public function testSlug(string $expected, string $string, string $separator = '-', string $locale = null)
+    public function testSlug(string $expected, string $string, string $separator = '-', ?string $locale = null)
     {
         $slugger = new AsciiSlugger();
 

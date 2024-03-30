@@ -29,10 +29,7 @@ class FormValidator extends ConstraintValidator
      */
     private \SplObjectStorage $resolvedGroups;
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $form, Constraint $formConstraint)
+    public function validate(mixed $form, Constraint $formConstraint): void
     {
         if (!$formConstraint instanceof Form) {
             throw new UnexpectedTypeException($formConstraint, Form::class);
@@ -123,7 +120,7 @@ class FormValidator extends ConstraintValidator
                     // Otherwise validate a constraint only once for the first
                     // matching group
                     foreach ($groups as $group) {
-                        if (\in_array($group, $constraint->groups)) {
+                        if (\in_array($group, $constraint->groups, true)) {
                             $groupedConstraints[$group][] = $constraint;
 
                             // Prevent duplicate validation

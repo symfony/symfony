@@ -14,6 +14,7 @@ namespace Symfony\Component\Clock\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Clock\NativeClock;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
@@ -35,7 +36,7 @@ class ClockTest extends TestCase
 
     public function testNativeClock()
     {
-        $this->assertInstanceOf(\DateTimeImmutable::class, now());
+        $this->assertInstanceOf(DatePoint::class, now());
         $this->assertInstanceOf(NativeClock::class, Clock::get());
     }
 

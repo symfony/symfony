@@ -30,7 +30,7 @@ class ServerDumper implements DataDumperInterface
      * @param DataDumperInterface|null   $wrappedDumper    A wrapped instance used whenever we failed contacting the server
      * @param ContextProviderInterface[] $contextProviders Context providers indexed by context name
      */
-    public function __construct(string $host, DataDumperInterface $wrappedDumper = null, array $contextProviders = [])
+    public function __construct(string $host, ?DataDumperInterface $wrappedDumper = null, array $contextProviders = [])
     {
         $this->connection = new Connection($host, $contextProviders);
         $this->wrappedDumper = $wrappedDumper;
@@ -41,10 +41,7 @@ class ServerDumper implements DataDumperInterface
         return $this->connection->getContextProviders();
     }
 
-    /**
-     * @return string|null
-     */
-    public function dump(Data $data)
+    public function dump(Data $data): ?string
     {
         if (!$this->connection->write($data) && $this->wrappedDumper) {
             return $this->wrappedDumper->dump($data);

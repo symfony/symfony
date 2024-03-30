@@ -20,17 +20,17 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  * Denormalizes a date string to an instance of {@see \DateTime} or {@see \DateTimeImmutable}.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final since Symfony 6.3
  */
-class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     public const FORMAT_KEY = 'datetime_format';
     public const TIMEZONE_KEY = 'datetime_timezone';
+    public const CAST_KEY = 'datetime_cast';
 
     private array $defaultContext = [
         self::FORMAT_KEY => \DateTimeInterface::RFC3339,
         self::TIMEZONE_KEY => null,
+        self::CAST_KEY => null,
     ];
 
     private const SUPPORTED_TYPES = [
@@ -51,19 +51,17 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
     public function getSupportedTypes(?string $format): array
     {
-        $isCacheable = __CLASS__ === static::class || $this->hasCacheableSupportsMethod();
-
         return [
-            \DateTimeInterface::class => $isCacheable,
-            \DateTimeImmutable::class => $isCacheable,
-            \DateTime::class => $isCacheable,
+            \DateTimeInterface::class => true,
+            \DateTimeImmutable::class => true,
+            \DateTime::class => true,
         ];
     }
 
     /**
      * @throws InvalidArgumentException
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): int|float|string
     {
         if (!$object instanceof \DateTimeInterface) {
             throw new InvalidArgumentException('The object must implement the "\DateTimeInterface".');
@@ -77,13 +75,14 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
             $object = $object->setTimezone($timezone);
         }
 
-        return $object->format($dateTimeFormat);
+        return match ($context[self::CAST_KEY] ?? $this->defaultContext[self::CAST_KEY] ?? false) {
+            'int' => (int) $object->format($dateTimeFormat),
+            'float' => (float) $object->format($dateTimeFormat),
+            default => $object->format($dateTimeFormat),
+        };
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof \DateTimeInterface;
     }
@@ -91,15 +90,16 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     /**
      * @throws NotNormalizableValueException
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): \DateTimeInterface
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): \DateTimeInterface
     {
-        $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
-        $timezone = $this->getTimezone($context);
-
         if (\is_int($data) || \is_float($data)) {
-            switch ($dateTimeFormat) {
-                case 'U': $data = sprintf('%d', $data); break;
-                case 'U.u': $data = sprintf('%.6F', $data); break;
+            switch ($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY] ?? null) {
+                case 'U':
+                    $data = sprintf('%d', $data);
+                    break;
+                case 'U.u':
+                    $data = sprintf('%.6F', $data);
+                    break;
             }
         }
 
@@ -111,6 +111,9 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
             if (\DateTimeInterface::class === $type) {
                 $type = \DateTimeImmutable::class;
             }
+
+            $timezone = $this->getTimezone($context);
+            $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
 
             if (null !== $dateTimeFormat) {
                 if (false !== $object = $type::createFromFormat($dateTimeFormat, $data, $timezone)) {
@@ -138,22 +141,9 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         }
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return isset(self::SUPPORTED_TYPES[$type]);
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this));
-
-        return __CLASS__ === static::class;
     }
 
     /**

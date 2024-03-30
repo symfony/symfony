@@ -498,9 +498,13 @@ return [
             'SHP',
             'Libra de Santa Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone de Sierra Leona',
+        ],
         'SLL' => [
             'SLL',
-            'Leone de Sierra Leona',
+            'Leone de Sierra Leona (1964—2022)',
         ],
         'SOS' => [
             'SOS',

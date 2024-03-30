@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AsyncDecoratorTraitTest extends NativeHttpClientTest
 {
-    protected function getHttpClient(string $testCase, \Closure $chunkFilter = null, HttpClientInterface $decoratedClient = null): HttpClientInterface
+    protected function getHttpClient(string $testCase, ?\Closure $chunkFilter = null, ?HttpClientInterface $decoratedClient = null): HttpClientInterface
     {
         if ('testHandleIsRemovedOnException' === $testCase) {
             $this->markTestSkipped("AsyncDecoratorTrait doesn't cache handles");
@@ -43,7 +43,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
             private ?\Closure $chunkFilter;
 
-            public function __construct(HttpClientInterface $client, \Closure $chunkFilter = null)
+            public function __construct(HttpClientInterface $client, ?\Closure $chunkFilter = null)
             {
                 $this->chunkFilter = $chunkFilter;
                 $this->client = $client;

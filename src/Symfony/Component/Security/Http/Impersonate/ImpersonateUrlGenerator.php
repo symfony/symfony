@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 
 /**
- * Provides generator functions for the impersonate url exit.
+ * Provides generator functions for the impersonation urls.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Damien Fayet <damienf1521@gmail.com>
@@ -36,18 +36,32 @@ class ImpersonateUrlGenerator
         $this->firewallMap = $firewallMap;
     }
 
-    public function generateExitPath(string $targetUri = null): string
+    public function generateImpersonationPath(string $identifier): string
     {
-        return $this->buildExitPath($targetUri);
+        return $this->buildPath(null, $identifier);
     }
 
-    public function generateExitUrl(string $targetUri = null): string
+    public function generateImpersonationUrl(string $identifier): string
     {
         if (null === $request = $this->requestStack->getCurrentRequest()) {
             return '';
         }
 
-        return $request->getUriForPath($this->buildExitPath($targetUri));
+        return $request->getUriForPath($this->buildPath(null, $identifier));
+    }
+
+    public function generateExitPath(?string $targetUri = null): string
+    {
+        return $this->buildPath($targetUri);
+    }
+
+    public function generateExitUrl(?string $targetUri = null): string
+    {
+        if (null === $request = $this->requestStack->getCurrentRequest()) {
+            return '';
+        }
+
+        return $request->getUriForPath($this->buildPath($targetUri));
     }
 
     private function isImpersonatedUser(): bool
@@ -55,19 +69,23 @@ class ImpersonateUrlGenerator
         return $this->tokenStorage->getToken() instanceof SwitchUserToken;
     }
 
-    private function buildExitPath(string $targetUri = null): string
+    private function buildPath(?string $targetUri = null, string $identifier = SwitchUserListener::EXIT_VALUE): string
     {
-        if (null === ($request = $this->requestStack->getCurrentRequest()) || !$this->isImpersonatedUser()) {
+        if (null === ($request = $this->requestStack->getCurrentRequest())) {
+            return '';
+        }
+
+        if (!$this->isImpersonatedUser() && SwitchUserListener::EXIT_VALUE == $identifier) {
             return '';
         }
 
         if (null === $switchUserConfig = $this->firewallMap->getFirewallConfig($request)->getSwitchUser()) {
-            throw new \LogicException('Unable to generate the impersonate exit URL without a firewall configured for the user switch.');
+            throw new \LogicException('Unable to generate the impersonate URLs without a firewall configured for the user switch.');
         }
 
         $targetUri ??= $request->getRequestUri();
 
-        $targetUri .= (parse_url($targetUri, \PHP_URL_QUERY) ? '&' : '?').http_build_query([$switchUserConfig['parameter'] => SwitchUserListener::EXIT_VALUE], '', '&');
+        $targetUri .= (parse_url($targetUri, \PHP_URL_QUERY) ? '&' : '?').http_build_query([$switchUserConfig['parameter'] => $identifier], '', '&');
 
         return $targetUri;
     }

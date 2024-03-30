@@ -6,8 +6,8 @@ The Mailer component helps sending emails.
 Getting Started
 ---------------
 
-```
-$ composer require symfony/mailer
+```bash
+composer require symfony/mailer
 ```
 
 ```php

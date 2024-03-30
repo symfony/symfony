@@ -13,15 +13,16 @@ namespace Symfony\Component\AssetMapper\Command;
 
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
-use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
+use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
+use Symfony\Component\AssetMapper\Event\PreAssetsCompileEvent;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapGenerator;
+use Symfony\Component\AssetMapper\Path\PublicAssetsFilesystemInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Compiles the assets in the asset mapper to the final output directory.
@@ -30,17 +31,17 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-#[AsCommand(name: 'asset-map:compile', description: 'Compiles all mapped assets and writes them to the final public output directory.')]
+#[AsCommand(name: 'asset-map:compile', description: 'Compile all mapped assets and writes them to the final public output directory')]
 final class AssetMapperCompileCommand extends Command
 {
     public function __construct(
-        private readonly PublicAssetsPathResolverInterface $publicAssetsPathResolver,
+        private readonly CompiledAssetMapperConfigReader $compiledConfigReader,
         private readonly AssetMapperInterface $assetMapper,
-        private readonly ImportMapManager $importMapManager,
-        private readonly Filesystem $filesystem,
+        private readonly ImportMapGenerator $importMapGenerator,
+        private readonly PublicAssetsFilesystemInterface $assetsFilesystem,
         private readonly string $projectDir,
-        private readonly string $publicDirName,
         private readonly bool $isDebug,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         parent::__construct();
     }
@@ -48,7 +49,6 @@ final class AssetMapperCompileCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('clean', null, null, 'Whether to clean the public directory before compiling assets')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command compiles and dumps all the assets in
 the asset mapper into the final public directory (usually <comment>public/assets</comment>).
@@ -61,46 +61,36 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $publicDir = $this->projectDir.'/'.$this->publicDirName;
-        if (!is_dir($publicDir)) {
-            throw new InvalidArgumentException(sprintf('The public directory "%s" does not exist.', $publicDir));
+
+        $this->eventDispatcher?->dispatch(new PreAssetsCompileEvent($io));
+
+        // remove existing config files
+        $this->compiledConfigReader->removeConfig(AssetMapper::MANIFEST_FILE_NAME);
+        $this->compiledConfigReader->removeConfig(ImportMapGenerator::IMPORT_MAP_CACHE_FILENAME);
+        $entrypointFiles = [];
+        foreach ($this->importMapGenerator->getEntrypointNames() as $entrypointName) {
+            $path = sprintf(ImportMapGenerator::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entrypointName);
+            $this->compiledConfigReader->removeConfig($path);
+            $entrypointFiles[$entrypointName] = $path;
         }
 
-        $outputDir = $this->publicAssetsPathResolver->getPublicFilesystemPath();
-        if ($input->getOption('clean')) {
-            $io->comment(sprintf('Cleaning <info>%s</info>', $outputDir));
-            $this->filesystem->remove($outputDir);
-            $this->filesystem->mkdir($outputDir);
-        }
-
-        $manifestPath = $outputDir.'/'.AssetMapper::MANIFEST_FILE_NAME;
-        if (is_file($manifestPath)) {
-            $this->filesystem->remove($manifestPath);
-        }
-        $manifest = $this->createManifestAndWriteFiles($io, $publicDir);
-        $this->filesystem->dumpFile($manifestPath, json_encode($manifest, \JSON_PRETTY_PRINT));
+        $manifest = $this->createManifestAndWriteFiles($io);
+        $manifestPath = $this->compiledConfigReader->saveConfig(AssetMapper::MANIFEST_FILE_NAME, $manifest);
         $io->comment(sprintf('Manifest written to <info>%s</info>', $this->shortenPath($manifestPath)));
 
-        $importMapPath = $outputDir.'/'.ImportMapManager::IMPORT_MAP_FILE_NAME;
-        if (is_file($importMapPath)) {
-            $this->filesystem->remove($importMapPath);
-        }
-        $this->filesystem->dumpFile($importMapPath, $this->importMapManager->getImportMapJson());
+        $importMapPath = $this->compiledConfigReader->saveConfig(ImportMapGenerator::IMPORT_MAP_CACHE_FILENAME, $this->importMapGenerator->getRawImportMapData());
+        $io->comment(sprintf('Import map data written to <info>%s</info>.', $this->shortenPath($importMapPath)));
 
-        $importMapPreloadPath = $outputDir.'/'.ImportMapManager::IMPORT_MAP_PRELOAD_FILE_NAME;
-        if (is_file($importMapPreloadPath)) {
-            $this->filesystem->remove($importMapPreloadPath);
+        foreach ($entrypointFiles as $entrypointName => $path) {
+            $this->compiledConfigReader->saveConfig($path, $this->importMapGenerator->findEagerEntrypointImports($entrypointName));
         }
-        $this->filesystem->dumpFile(
-            $importMapPreloadPath,
-            json_encode($this->importMapManager->getModulesToPreload(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)
-        );
-        $io->comment(sprintf('Import map written to <info>%s</info> and <info>%s</info> for quick importmap dumping onto the page.', $this->shortenPath($importMapPath), $this->shortenPath($importMapPreloadPath)));
+        $styledEntrypointNames = array_map(fn (string $entrypointName) => sprintf('<info>%s</>', $entrypointName), array_keys($entrypointFiles));
+        $io->comment(sprintf('Entrypoint metadata written for <comment>%d</> entrypoints (%s).', \count($entrypointFiles), implode(', ', $styledEntrypointNames)));
 
         if ($this->isDebug) {
             $io->warning(sprintf(
-                'You are compiling assets in development. Symfony will not serve any changed assets until you delete the "%s" directory.',
-                $this->shortenPath($outputDir)
+                'Debug mode is enabled in your project: Symfony will not serve any changed assets until you delete the files in the "%s" directory again.',
+                $this->shortenPath(\dirname($manifestPath))
             ));
         }
 
@@ -112,21 +102,18 @@ EOT
         return str_replace($this->projectDir.'/', '', $path);
     }
 
-    private function createManifestAndWriteFiles(SymfonyStyle $io, string $publicDir): array
+    private function createManifestAndWriteFiles(SymfonyStyle $io): array
     {
-        $allAssets = $this->assetMapper->allAssets();
-
-        $io->comment(sprintf('Compiling assets to <info>%s%s</info>', $publicDir, $this->publicAssetsPathResolver->resolvePublicPath('')));
+        $io->comment(sprintf('Compiling and writing asset files to <info>%s</info>', $this->shortenPath($this->assetsFilesystem->getDestinationPath())));
         $manifest = [];
-        foreach ($allAssets as $asset) {
-            // $asset->getPublicPath() will start with a "/"
-            $targetPath = $publicDir.$asset->publicPath;
-
-            if (!is_dir($dir = \dirname($targetPath))) {
-                $this->filesystem->mkdir($dir);
+        foreach ($this->assetMapper->allAssets() as $asset) {
+            if (null !== $asset->content) {
+                // The original content has been modified by the AssetMapperCompiler
+                $this->assetsFilesystem->write($asset->publicPath, $asset->content);
+            } else {
+                $this->assetsFilesystem->copy($asset->sourcePath, $asset->publicPath);
             }
 
-            $this->filesystem->dumpFile($targetPath, $asset->content);
             $manifest[$asset->logicalPath] = $asset->publicPath;
         }
         ksort($manifest);

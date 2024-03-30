@@ -13,14 +13,17 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class RetryableHttpClientTest extends TestCase
 {
@@ -243,6 +246,39 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('Test out content', $response->getContent());
         self::assertSame('Test out content', $response->getContent(), 'Content should be buffered');
+    }
+
+    public function testRetryOnTimeout()
+    {
+        $client = HttpClient::create();
+
+        TestHttpServer::start();
+
+        $strategy = new class() implements RetryStrategyInterface {
+            public $isCalled = false;
+
+            public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
+            {
+                $this->isCalled = true;
+
+                return false;
+            }
+
+            public function getDelay(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): int
+            {
+                return 0;
+            }
+        };
+        $client = new RetryableHttpClient($client, $strategy);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
+
+        try {
+            $response->getStatusCode();
+            $this->fail(TransportException::class.' expected');
+        } catch (TransportException $e) {
+        }
+
+        $this->assertTrue($strategy->isCalled, 'The HTTP retry strategy should be called');
     }
 
     public function testRetryWithMultipleBaseUris()

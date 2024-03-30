@@ -103,7 +103,7 @@
             <div class="metric-group">
                 <div class="metric">
                     <span class="value">{{ profile.children|length }}</span>
-                    <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }}</span>
+                    <span class="label">Sub-{{ profile_type|title }}{{ profile.children|length > 1 ? 's' }}</span>
                 </div>
 
                 {% set subrequests_time = has_time_events
@@ -112,7 +112,7 @@
 
                 <div class="metric">
                     <span class="value">{{ subrequests_time }} <span class="unit">ms</span></span>
-                    <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }} time</span>
+                    <span class="label">Sub-{{ profile_type|title }}{{ profile.children|length > 1 ? 's' }} time</span>
                 </div>
             </div>
         {% endif %}
@@ -143,24 +143,24 @@
 
     {% if profile.parent %}
         <h3 class="dump-inline">
-            Sub-Request {{ profiler_dump(profile.getcollector('request').requestattributes.get('_controller')) }}
+            Sub-{{ profile_type|title }} {{ profiler_dump(profile.getcollector('request').requestattributes.get('_controller')) }}
             <small>
                 {{ collector.events.__section__.duration }} ms
-                <a class="newline" href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent request</a>
+                <a class="newline" href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent {{ profile_type }}</a>
             </small>
         </h3>
     {% elseif profile.children|length > 0 %}
         <h3>
-            Main Request <small>{{ collector.events.__section__.duration }} ms</small>
+            Main {{ profile_type|title }} <small>{{ collector.events.__section__.duration }} ms</small>
         </h3>
     {% endif %}
 
     {{ _self.display_timeline(token, collector.events, collector.events.__section__.origin) }}
 
     {% if profile.children|length %}
-        <p class="help">Note: sections with a striped background correspond to sub-requests.</p>
+        <p class="help">Note: sections with a striped background correspond to sub-{{ profile_type }}s.</p>
 
-        <h3>Sub-requests <small>({{ profile.children|length }})</small></h3>
+        <h3>Sub-{{ profile_type }}s <small>({{ profile.children|length }})</small></h3>
 
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}

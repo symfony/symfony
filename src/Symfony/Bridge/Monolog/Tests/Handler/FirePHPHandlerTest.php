@@ -98,11 +98,6 @@ class FirePHPHandlerTest extends TestCase
 
     private function createHandler(): FirePHPHandler
     {
-        // Monolog 1
-        if (!method_exists(FirePHPHandler::class, 'isWebRequest')) {
-            return new FirePHPHandler();
-        }
-
         $handler = $this->getMockBuilder(FirePHPHandler::class)
             ->onlyMethods(['isWebRequest'])
             ->getMock();

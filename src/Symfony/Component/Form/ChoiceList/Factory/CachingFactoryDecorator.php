@@ -145,7 +145,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->lists[$hash];
     }
 
-    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []): ChoiceListView
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView
     {
         $cache = true;
 
@@ -193,11 +193,12 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
                 $index,
                 $groupBy,
                 $attr,
-                $labelTranslationParameters
+                $labelTranslationParameters,
+                $duplicatePreferredChoices,
             );
         }
 
-        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr, $labelTranslationParameters]);
+        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr, $labelTranslationParameters, $duplicatePreferredChoices]);
 
         if (!isset($this->views[$hash])) {
             $this->views[$hash] = $this->decoratedFactory->createView(
@@ -207,17 +208,15 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
                 $index,
                 $groupBy,
                 $attr,
-                $labelTranslationParameters
+                $labelTranslationParameters,
+                $duplicatePreferredChoices,
             );
         }
 
         return $this->views[$hash];
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->lists = [];
         $this->views = [];

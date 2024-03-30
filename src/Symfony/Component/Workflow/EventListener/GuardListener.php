@@ -32,7 +32,7 @@ class GuardListener
     private ?RoleHierarchyInterface $roleHierarchy;
     private ?ValidatorInterface $validator;
 
-    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
+    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, ?RoleHierarchyInterface $roleHierarchy = null, ?ValidatorInterface $validator = null)
     {
         $this->configuration = $configuration;
         $this->expressionLanguage = $expressionLanguage;
@@ -43,10 +43,7 @@ class GuardListener
         $this->validator = $validator;
     }
 
-    /**
-     * @return void
-     */
-    public function onTransition(GuardEvent $event, string $eventName)
+    public function onTransition(GuardEvent $event, string $eventName): void
     {
         if (!isset($this->configuration[$eventName])) {
             return;

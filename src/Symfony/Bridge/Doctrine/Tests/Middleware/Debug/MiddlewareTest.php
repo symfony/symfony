@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Statement;
@@ -51,12 +52,8 @@ class MiddlewareTest extends TestCase
         $this->stopwatch = $withStopwatch ? new Stopwatch() : null;
 
         $config = ORMSetup::createConfiguration(true);
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
-        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
-            $config->setLazyGhostObjectEnabled(true);
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        $config->setLazyGhostObjectEnabled(true);
         $this->debugDataHolder = new DebugDataHolder();
         $config->setMiddlewares([new Middleware($this->debugDataHolder, $this->stopwatch)]);
 
@@ -191,7 +188,10 @@ EOT;
     {
         $this->init();
 
-        $this->conn->setNestTransactionsWithSavepoints(true);
+        if (\defined('Doctrine\DBAL\Connection::PARAM_STR_ARRAY')) {
+            // DBAL < 4
+            $this->conn->setNestTransactionsWithSavepoints(true);
+        }
         $this->conn->beginTransaction();
         $this->conn->beginTransaction();
         $this->conn->executeStatement('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)');
@@ -205,11 +205,11 @@ EOT;
         $this->assertCount(9, $debug);
         $this->assertSame('"START TRANSACTION"', $debug[1]['sql']);
         $this->assertGreaterThan(0, $debug[1]['executionMS']);
-        $this->assertSame('SAVEPOINT DOCTRINE2_SAVEPOINT_2', $debug[2]['sql']);
+        $this->assertSame(method_exists(QueryBuilder::class, 'resetOrderBy') ? 'SAVEPOINT DOCTRINE_2' : 'SAVEPOINT DOCTRINE2_SAVEPOINT_2', $debug[2]['sql']);
         $this->assertGreaterThan(0, $debug[2]['executionMS']);
         $this->assertSame('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)', $debug[3]['sql']);
         $this->assertGreaterThan(0, $debug[3]['executionMS']);
-        $this->assertSame(('"ROLLBACK"' === $expectedEndTransactionDebug ? 'ROLLBACK TO' : 'RELEASE').' SAVEPOINT DOCTRINE2_SAVEPOINT_2', $debug[4]['sql']);
+        $this->assertSame(('"ROLLBACK"' === $expectedEndTransactionDebug ? 'ROLLBACK TO' : 'RELEASE').' '.(method_exists(QueryBuilder::class, 'resetOrderBy') ? 'SAVEPOINT DOCTRINE_2' : 'SAVEPOINT DOCTRINE2_SAVEPOINT_2'), $debug[4]['sql']);
         $this->assertGreaterThan(0, $debug[4]['executionMS']);
         $this->assertSame($expectedEndTransactionDebug, $debug[5]['sql']);
         $this->assertGreaterThan(0, $debug[5]['executionMS']);
@@ -225,20 +225,16 @@ EOT;
     {
         return [
             'commit and exec' => [
-                static fn (Connection $conn, string $sql) => $conn->executeStatement($sql),
-                static fn (Connection $conn) => $conn->commit(),
+                static fn (Connection $conn, string $sql): int|string => $conn->executeStatement($sql),
+                static fn (Connection $conn): ?bool => $conn->commit(),
             ],
             'rollback and query' => [
-                static fn (Connection $conn, string $sql) => $conn->executeQuery($sql),
-                static fn (Connection $conn) => $conn->rollBack(),
+                static fn (Connection $conn, string $sql): Result => $conn->executeQuery($sql),
+                static fn (Connection $conn): ?bool => $conn->rollBack(),
             ],
             'prepared statement' => [
-                static function (Connection $conn, string $sql): Result {
-                    return $conn->prepare($sql)->executeQuery();
-                },
-                static function (Connection $conn): bool {
-                    return $conn->commit();
-                },
+                static fn (Connection $conn, string $sql): Result => $conn->prepare($sql)->executeQuery(),
+                static fn (Connection $conn): ?bool => $conn->commit(),
             ],
         ];
     }

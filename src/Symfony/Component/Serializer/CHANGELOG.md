@@ -1,13 +1,40 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `DateTimeNormalizer::CAST_KEY` context option
+ * Add `Default` and "class name" default groups
+ * Add `AbstractNormalizer::FILTER_BOOL` context option
+ * Add `CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES` context option
+
+7.0
+---
+
+ * Add method `getSupportedTypes()` to `DenormalizerInterface` and `NormalizerInterface`
+ * Remove denormalization support for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
+ * Denormalizing to an abstract class in `UidNormalizer` now throws an `\Error`
+ * Remove `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
+ * Remove `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
+ * Remove `CacheableSupportsMethodInterface`, use `NormalizerInterface` and `DenormalizerInterface` instead
+ * Require explicit argument when calling `AttributeMetadata::setSerializedName()` and `ClassMetadata::setClassDiscriminatorMapping()`
+ * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
+
 6.4
 ---
 
+ * Add `TranslatableNormalizer`
+ * Allow `Context` attribute to target classes
  * Deprecate Doctrine annotations support in favor of native attributes
- * Deprecate passing an annotation reader to the constructor of `AnnotationLoader`
  * Allow the `Groups` attribute/annotation on classes
  * JsonDecode: Add `json_decode_detailed_errors` option
+ * Make `ProblemNormalizer` give details about Messenger's `ValidationFailedException`
+ * Add `XmlEncoder::CDATA_WRAPPING` context option
+ * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Add aliases for all classes in the `Annotation` namespace to `Attribute`
 
 6.3
 ---

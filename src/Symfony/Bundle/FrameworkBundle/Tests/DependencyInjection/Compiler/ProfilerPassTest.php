@@ -34,13 +34,15 @@ class ProfilerPassTest extends TestCase
      */
     public function testTemplateNoIdThrowsException()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $builder = new ContainerBuilder();
         $builder->register('profiler', 'ProfilerClass');
         $builder->register('my_collector_service')
             ->addTag('data_collector', ['template' => 'foo']);
 
         $profilerPass = new ProfilerPass();
+
+        $this->expectException(\InvalidArgumentException::class);
+
         $profilerPass->process($builder);
     }
 
@@ -65,7 +67,7 @@ class ProfilerPassTest extends TestCase
     public static function provideValidCollectorWithTemplateUsingAutoconfigure(): \Generator
     {
         yield [new class() implements TemplateAwareDataCollectorInterface {
-            public function collect(Request $request, Response $response, \Throwable $exception = null): void
+            public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
             {
             }
 
@@ -85,7 +87,7 @@ class ProfilerPassTest extends TestCase
         }];
 
         yield [new class() extends AbstractDataCollector {
-            public function collect(Request $request, Response $response, \Throwable $exception = null): void
+            public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
             {
             }
 

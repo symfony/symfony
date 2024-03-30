@@ -28,7 +28,7 @@ class SchedulerTest extends TestCase
         $scheduler = new Scheduler([Message::class => $handler], [$schedule], $clock);
         $handler->scheduler = $scheduler;
 
-        $scheduler->run(['sleep' => 1]);
+        $scheduler->run(['sleep' => 100]);
 
         $this->assertSame(3, $handler->count);
     }

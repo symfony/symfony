@@ -22,7 +22,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -39,15 +39,11 @@ class RouterDebugCommand extends Command
 {
     use BuildDebugContainerTrait;
 
-    private RouterInterface $router;
-    private ?FileLinkFormatter $fileLinkFormatter;
-
-    public function __construct(RouterInterface $router, FileLinkFormatter $fileLinkFormatter = null)
-    {
+    public function __construct(
+        private RouterInterface $router,
+        private ?FileLinkFormatter $fileLinkFormatter = null,
+    ) {
         parent::__construct();
-
-        $this->router = $router;
-        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     protected function configure(): void
@@ -56,6 +52,7 @@ class RouterDebugCommand extends Command
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
+                new InputOption('show-aliases', null, InputOption::VALUE_NONE, 'Show aliases in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
             ])
@@ -92,6 +89,7 @@ EOF
                     'format' => $input->getOption('format'),
                     'raw_text' => $input->getOption('raw'),
                     'show_controllers' => $input->getOption('show-controllers'),
+                    'show_aliases' => $input->getOption('show-aliases'),
                     'output' => $io,
                 ]);
 
@@ -120,6 +118,7 @@ EOF
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
+                'show_aliases' => $input->getOption('show-aliases'),
                 'output' => $io,
                 'container' => $container,
             ]);

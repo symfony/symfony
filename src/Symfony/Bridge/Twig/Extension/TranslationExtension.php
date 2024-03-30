@@ -34,13 +34,10 @@ class_exists(TranslatorTrait::class);
  */
 final class TranslationExtension extends AbstractExtension
 {
-    private ?TranslatorInterface $translator;
-    private ?TranslationNodeVisitor $translationNodeVisitor;
-
-    public function __construct(TranslatorInterface $translator = null, TranslationNodeVisitor $translationNodeVisitor = null)
-    {
-        $this->translator = $translator;
-        $this->translationNodeVisitor = $translationNodeVisitor;
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+        private ?TranslationNodeVisitor $translationNodeVisitor = null,
+    ) {
     }
 
     public function getTranslator(): TranslatorInterface
@@ -96,7 +93,7 @@ final class TranslationExtension extends AbstractExtension
     /**
      * @param array|string $arguments Can be the locale as a string when $message is a TranslatableInterface
      */
-    public function trans(string|\Stringable|TranslatableInterface|null $message, array|string $arguments = [], string $domain = null, string $locale = null, int $count = null): string
+    public function trans(string|\Stringable|TranslatableInterface|null $message, array|string $arguments = [], ?string $domain = null, ?string $locale = null, ?int $count = null): string
     {
         if ($message instanceof TranslatableInterface) {
             if ([] !== $arguments && !\is_string($arguments)) {
@@ -125,7 +122,7 @@ final class TranslationExtension extends AbstractExtension
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
     }
 
-    public function createTranslatable(string $message, array $parameters = [], string $domain = null): TranslatableMessage
+    public function createTranslatable(string $message, array $parameters = [], ?string $domain = null): TranslatableMessage
     {
         if (!class_exists(TranslatableMessage::class)) {
             throw new \LogicException(sprintf('You cannot use the "%s" as the Translation Component is not installed. Try running "composer require symfony/translation".', __CLASS__));

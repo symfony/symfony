@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Webhook\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 /**
@@ -41,8 +42,12 @@ class RequestParser extends AbstractRequestParser
         ]);
     }
 
-    protected function doParse(Request $request, string $secret): RemoteEvent
+    protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent
     {
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
+
         $body = $request->toArray();
 
         foreach ([$this->signatureHeaderName, $this->eventHeaderName, $this->idHeaderName] as $header) {
@@ -60,7 +65,7 @@ class RequestParser extends AbstractRequestParser
         );
     }
 
-    private function validateSignature(HeaderBag $headers, string $body, $secret): void
+    private function validateSignature(HeaderBag $headers, string $body, #[\SensitiveParameter] string $secret): void
     {
         $signature = $headers->get($this->signatureHeaderName);
         $event = $headers->get($this->eventHeaderName);

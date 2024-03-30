@@ -44,9 +44,13 @@ final class Clock implements ClockInterface
         self::$globalClock = $clock instanceof ClockInterface ? $clock : new self($clock);
     }
 
-    public function now(): \DateTimeImmutable
+    public function now(): DatePoint
     {
         $now = ($this->clock ?? self::get())->now();
+
+        if (!$now instanceof DatePoint) {
+            $now = DatePoint::createFromInterface($now);
+        }
 
         return isset($this->timezone) ? $now->setTimezone($this->timezone) : $now;
     }

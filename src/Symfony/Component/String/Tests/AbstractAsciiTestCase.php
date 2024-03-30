@@ -46,7 +46,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideBytesAt
      */
-    public function testBytesAt(array $expected, string $string, int $offset, int $form = null)
+    public function testBytesAt(array $expected, string $string, int $offset, ?int $form = null)
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
             $this->markTestSkipped('Skipping due to issue ICU-21661.');
@@ -319,7 +319,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideSplit
      */
-    public function testSplit(string $string, string $delimiter, array $chunks, ?int $limit, int $flags = null)
+    public function testSplit(string $string, string $delimiter, array $chunks, ?int $limit, ?int $flags = null)
     {
         $this->assertEquals($chunks, static::createFromString($string)->split($delimiter, $limit, $flags));
     }
@@ -595,7 +595,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideSlice
      */
-    public function testSlice(string $expected, string $origin, int $start, int $length = null)
+    public function testSlice(string $expected, string $origin, int $start, ?int $length = null)
     {
         $this->assertEquals(
             static::createFromString($expected),
@@ -623,7 +623,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideSplice
      */
-    public function testSplice(string $expected, int $start, int $length = null)
+    public function testSplice(string $expected, int $start, ?int $length = null)
     {
         $this->assertEquals(
             static::createFromString($expected),
@@ -1081,7 +1081,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideStartsWith
      */
-    public function testStartsWith(bool $expected, string $origin, $prefix, int $form = null)
+    public function testStartsWith(bool $expected, string $origin, $prefix, ?int $form = null)
     {
         $instance = static::createFromString($origin);
         $instance = $form ? $instance->normalize($form) : $instance;
@@ -1135,7 +1135,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideEndsWith
      */
-    public function testEndsWith(bool $expected, string $origin, $suffix, int $form = null)
+    public function testEndsWith(bool $expected, string $origin, $suffix, ?int $form = null)
     {
         $instance = static::createFromString($origin);
         $instance = $form ? $instance->normalize($form) : $instance;
@@ -1579,6 +1579,24 @@ abstract class AbstractAsciiTestCase extends TestCase
             [1, "\u{00AD}"],
             [14, "\u{007f}\u{007f}f\u{001b}[0moo\u{0001}bar\u{007f}cccïf\u{008e}cy\u{0005}1"], // foobarcccïfcy1
             [17, "\u{007f}\u{007f}f\u{001b}[0moo\u{0001}bar\u{007f}cccïf\u{008e}cy\u{0005}1", false], // f[0moobarcccïfcy1
+        ];
+    }
+
+    /**
+     * @dataProvider provideToByteString
+     */
+    public function testToByteString(string $origin, string $encoding)
+    {
+        $instance = static::createFromString($origin)->toByteString($encoding);
+        $this->assertInstanceOf(ByteString::class, $instance);
+    }
+
+    public static function provideToByteString(): array
+    {
+        return [
+            ['žsžsý', 'UTF-8'],
+            ['žsžsý', 'windows-1250'],
+            ['žsžsý', 'Windows-1252'],
         ];
     }
 }

@@ -18,7 +18,6 @@
         </xsd:sequence>
 
         <xsd:attribute name="auto-reload" type="xsd:string" />
-        <xsd:attribute name="autoescape" type="xsd:string" />
         <xsd:attribute name="autoescape-service" type="xsd:string" />
         <xsd:attribute name="autoescape-service-method" type="xsd:string" />
         <xsd:attribute name="base-template-class" type="xsd:string" />

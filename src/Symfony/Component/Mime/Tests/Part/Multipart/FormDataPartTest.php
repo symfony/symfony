@@ -199,6 +199,22 @@ class FormDataPartTest extends TestCase
         $f->getParts();
     }
 
+    public function testExceptionOnFormFieldsWithDisallowedTypesInsideArray()
+    {
+        $f = new FormDataPart([
+            'foo' => [
+                'bar' => 'baz',
+                'qux' => [
+                    'quux' => 1,
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value of the form field "foo[qux][quux]" can only be a string, an array, or an instance of TextPart, "int" given.');
+        $f->getParts();
+    }
+
     public function testToString()
     {
         $p = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');

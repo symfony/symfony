@@ -99,11 +99,12 @@ class VoterTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getTestsLegacy
      */
     public function testVoteLegacy(VoterInterface $voter, array $attributes, $expectedVote, $object, $message)
     {
-        $this->expectDeprecation('Since symfony/security-core 6.3: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
+        $this->expectDeprecation('Since symfony/security-core 7.1: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
         $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
 
@@ -125,8 +126,7 @@ class VoterTest extends TestCase
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Should error');
-        $voter = new TypeErrorVoterTest_Voter();
-        $voter->getVote($this->token, new \stdClass(), ['EDIT']);
+        (new TypeErrorVoterTest_Voter())->getVote($this->token, new \stdClass(), ['EDIT']);
     }
 }
 

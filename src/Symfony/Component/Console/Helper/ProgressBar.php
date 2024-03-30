@@ -183,9 +183,9 @@ final class ProgressBar
         $this->messages[$name] = $message;
     }
 
-    public function getMessage(string $name = 'message'): string
+    public function getMessage(string $name = 'message'): ?string
     {
-        return $this->messages[$name];
+        return $this->messages[$name] ?? null;
     }
 
     public function getStartTime(): int
@@ -195,7 +195,7 @@ final class ProgressBar
 
     public function getMaxSteps(): int
     {
-        return $this->max;
+        return $this->max ?? 0;
     }
 
     public function getProgress(): int
@@ -215,7 +215,7 @@ final class ProgressBar
 
     public function getBarOffset(): float
     {
-        return floor($this->max ? $this->percent * $this->barWidth : (null === $this->redrawFreq ? (int) (min(5, $this->barWidth / 15) * $this->writeCount) : $this->step) % $this->barWidth);
+        return floor(null !== $this->max ? $this->percent * $this->barWidth : (null === $this->redrawFreq ? (int) (min(5, $this->barWidth / 15) * $this->writeCount) : $this->step) % $this->barWidth);
     }
 
     public function getEstimated(): float
@@ -253,7 +253,7 @@ final class ProgressBar
 
     public function getBarCharacter(): string
     {
-        return $this->barChar ?? ($this->max ? '=' : $this->emptyBarChar);
+        return $this->barChar ?? (null !== $this->max ? '=' : $this->emptyBarChar);
     }
 
     public function setEmptyBarCharacter(string $char): void
@@ -313,9 +313,23 @@ final class ProgressBar
      *
      * @return iterable<TKey, TValue>
      */
-    public function iterate(iterable $iterable, int $max = null): iterable
+    public function iterate(iterable $iterable, ?int $max = null): iterable
     {
-        $this->start($max ?? (is_countable($iterable) ? \count($iterable) : 0));
+        if (0 === $max) {
+            $max = null;
+        }
+
+        $max ??= is_countable($iterable) ? \count($iterable) : null;
+
+        if (0 === $max) {
+            $this->max = 0;
+            $this->stepWidth = 2;
+            $this->finish();
+
+            return;
+        }
+
+        $this->start($max);
 
         foreach ($iterable as $key => $value) {
             yield $key => $value;
@@ -332,7 +346,7 @@ final class ProgressBar
      * @param int|null $max     Number of steps to complete the bar (0 if indeterminate), null to leave unchanged
      * @param int      $startAt The starting point of the bar (useful e.g. when resuming a previously started bar)
      */
-    public function start(int $max = null, int $startAt = 0): void
+    public function start(?int $max = null, int $startAt = 0): void
     {
         $this->startTime = time();
         $this->step = $startAt;
@@ -373,11 +387,15 @@ final class ProgressBar
             $step = 0;
         }
 
-        $redrawFreq = $this->redrawFreq ?? (($this->max ?: 10) / 10);
-        $prevPeriod = (int) ($this->step / $redrawFreq);
-        $currPeriod = (int) ($step / $redrawFreq);
+        $redrawFreq = $this->redrawFreq ?? (($this->max ?? 10) / 10);
+        $prevPeriod = $redrawFreq ? (int) ($this->step / $redrawFreq) : 0;
+        $currPeriod = $redrawFreq ? (int) ($step / $redrawFreq) : 0;
         $this->step = $step;
-        $this->percent = $this->max ? (float) $this->step / $this->max : 0;
+        $this->percent = match ($this->max) {
+            null => 0,
+            0 => 1,
+            default => (float) $this->step / $this->max,
+        };
         $timeInterval = microtime(true) - $this->lastWriteTime;
 
         // Draw regardless of other limits
@@ -398,11 +416,20 @@ final class ProgressBar
         }
     }
 
-    public function setMaxSteps(int $max): void
+    public function setMaxSteps(?int $max): void
     {
+        if (0 === $max) {
+            $max = null;
+        }
+
         $this->format = null;
-        $this->max = max(0, $max);
-        $this->stepWidth = $this->max ? Helper::width((string) $this->max) : 4;
+        if (null === $max) {
+            $this->max = null;
+            $this->stepWidth = 4;
+        } else {
+            $this->max = max(0, $max);
+            $this->stepWidth = Helper::width((string) $this->max);
+        }
     }
 
     /**
@@ -410,16 +437,16 @@ final class ProgressBar
      */
     public function finish(): void
     {
-        if (!$this->max) {
+        if (null === $this->max) {
             $this->max = $this->step;
         }
 
-        if ($this->step === $this->max && !$this->overwrite) {
+        if (($this->step === $this->max || null === $this->max) && !$this->overwrite) {
             // prevent double 100% output
             return;
         }
 
-        $this->setProgress($this->max);
+        $this->setProgress($this->max ?? $this->step);
     }
 
     /**
@@ -540,20 +567,20 @@ final class ProgressBar
 
                 return $display;
             },
-            'elapsed' => fn (self $bar) => Helper::formatTime(time() - $bar->getStartTime()),
+            'elapsed' => fn (self $bar) => Helper::formatTime(time() - $bar->getStartTime(), 2),
             'remaining' => function (self $bar) {
-                if (!$bar->getMaxSteps()) {
+                if (null === $bar->getMaxSteps()) {
                     throw new LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
                 }
 
-                return Helper::formatTime($bar->getRemaining());
+                return Helper::formatTime($bar->getRemaining(), 2);
             },
             'estimated' => function (self $bar) {
-                if (!$bar->getMaxSteps()) {
+                if (null === $bar->getMaxSteps()) {
                     throw new LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
                 }
 
-                return Helper::formatTime($bar->getEstimated());
+                return Helper::formatTime($bar->getEstimated(), 2);
             },
             'memory' => fn (self $bar) => Helper::formatMemory(memory_get_usage(true)),
             'current' => fn (self $bar) => str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', \STR_PAD_LEFT),

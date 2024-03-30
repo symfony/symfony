@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -155,6 +155,8 @@ class Dummy extends ParentDummy
      */
     public $arrayOfMixed;
 
+    public $noDocBlock;
+
     /**
      * @var list<string>
      */
@@ -194,7 +196,7 @@ class Dummy extends ParentDummy
      *
      * @param ParentDummy|null $parent
      */
-    public function setB(ParentDummy $parent = null)
+    public function setB(?ParentDummy $parent = null)
     {
     }
 

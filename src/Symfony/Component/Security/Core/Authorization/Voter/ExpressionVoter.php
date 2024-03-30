@@ -31,7 +31,7 @@ class ExpressionVoter implements CacheableVoterInterface
     private AuthorizationCheckerInterface $authChecker;
     private ?RoleHierarchyInterface $roleHierarchy;
 
-    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, AuthorizationCheckerInterface $authChecker, RoleHierarchyInterface $roleHierarchy = null)
+    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, AuthorizationCheckerInterface $authChecker, ?RoleHierarchyInterface $roleHierarchy = null)
     {
         $this->expressionLanguage = $expressionLanguage;
         $this->trustResolver = $trustResolver;
@@ -71,7 +71,7 @@ class ExpressionVoter implements CacheableVoterInterface
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
-        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '7.1', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
 
         return $this->getVote($token, $subject, $attributes)->getAccess();
     }

@@ -48,7 +48,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
-use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
@@ -57,7 +56,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherAnnotationStaticReturnType;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -241,8 +239,7 @@ class ContainerBuilderTest extends TestCase
     {
         $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('You have requested a non-existent service "foo".');
-        $builder = new ContainerBuilder();
-        $builder->get('foo');
+        (new ContainerBuilder())->get('foo');
     }
 
     public function testGetReturnsNullIfServiceDoesNotExistAndInvalidReferenceIsUsed()
@@ -254,9 +251,11 @@ class ContainerBuilderTest extends TestCase
 
     public function testGetThrowsCircularReferenceExceptionIfServiceHasReferenceToItself()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
         $builder = new ContainerBuilder();
         $builder->register('baz', 'stdClass')->setArguments([new Reference('baz')]);
+
+        $this->expectException(ServiceCircularReferenceException::class);
+
         $builder->get('baz');
     }
 
@@ -307,8 +306,7 @@ class ContainerBuilderTest extends TestCase
     public function testBadAliasId($id)
     {
         $this->expectException(InvalidArgumentException::class);
-        $builder = new ContainerBuilder();
-        $builder->setAlias($id, 'foo');
+        (new ContainerBuilder())->setAlias($id, 'foo');
     }
 
     /**
@@ -317,11 +315,10 @@ class ContainerBuilderTest extends TestCase
     public function testBadDefinitionId($id)
     {
         $this->expectException(InvalidArgumentException::class);
-        $builder = new ContainerBuilder();
-        $builder->setDefinition($id, new Definition('Foo'));
+        (new ContainerBuilder())->setDefinition($id, new Definition('Foo'));
     }
 
-    public static function provideBadId()
+    public static function provideBadId(): array
     {
         return [
             [''],
@@ -643,9 +640,11 @@ class ContainerBuilderTest extends TestCase
 
     public function testCreateSyntheticService()
     {
-        $this->expectException(\RuntimeException::class);
         $builder = new ContainerBuilder();
         $builder->register('foo', 'Bar\FooClass')->setSynthetic(true);
+
+        $this->expectException(\RuntimeException::class);
+
         $builder->get('foo');
     }
 
@@ -690,15 +689,15 @@ class ContainerBuilderTest extends TestCase
 
     public function testCreateServiceWithAbstractArgument()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Argument "$baz" of service "foo" is abstract: should be defined by Pass.');
-
         $builder = new ContainerBuilder();
         $builder->register('foo', FooWithAbstractArgument::class)
             ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
             ->setPublic(true);
 
         $builder->compile();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Argument "$baz" of service "foo" is abstract: should be defined by Pass.');
 
         $builder->get('foo');
     }
@@ -714,12 +713,13 @@ class ContainerBuilderTest extends TestCase
 
     public function testResolveServicesWithDecoratedDefinition()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Constructing service "foo" from a parent definition is not supported at build time.');
         $builder = new ContainerBuilder();
         $builder->setDefinition('grandpa', new Definition('stdClass'));
         $builder->setDefinition('parent', new ChildDefinition('grandpa'));
         $builder->setDefinition('foo', new ChildDefinition('parent'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Constructing service "foo" from a parent definition is not supported at build time.');
 
         $builder->get('foo');
     }
@@ -808,12 +808,14 @@ class ContainerBuilderTest extends TestCase
 
     public function testMergeThrowsExceptionForDuplicateAutomaticInstanceofDefinitions()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('"AInterface" has already been autoconfigured and merge() does not support merging autoconfiguration for the same class/interface.');
         $container = new ContainerBuilder();
         $config = new ContainerBuilder();
         $container->registerForAutoconfiguration('AInterface');
         $config->registerForAutoconfiguration('AInterface');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"AInterface" has already been autoconfigured and merge() does not support merging autoconfiguration for the same class/interface.');
+
         $container->merge($config);
     }
 
@@ -913,12 +915,14 @@ class ContainerBuilderTest extends TestCase
 
     public function testCompileWithArrayInStringResolveEnv()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A string value must be composed of strings and/or numbers, but found parameter "env(json:ARRAY)" of type "array" inside string value "ABC %env(json:ARRAY)%".');
         putenv('ARRAY={"foo":"bar"}');
 
         $container = new ContainerBuilder();
         $container->setParameter('foo', 'ABC %env(json:ARRAY)%');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('A string value must be composed of strings and/or numbers, but found parameter "env(json:ARRAY)" of type "array" inside string value "ABC %env(json:ARRAY)%".');
+
         $container->compile(true);
 
         putenv('ARRAY');
@@ -926,10 +930,12 @@ class ContainerBuilderTest extends TestCase
 
     public function testCompileWithResolveMissingEnv()
     {
-        $this->expectException(EnvNotFoundException::class);
-        $this->expectExceptionMessage('Environment variable not found: "FOO".');
         $container = new ContainerBuilder();
         $container->setParameter('foo', '%env(FOO)%');
+
+        $this->expectException(EnvNotFoundException::class);
+        $this->expectExceptionMessage('Environment variable not found: "FOO".');
+
         $container->compile(true);
     }
 
@@ -1037,10 +1043,12 @@ class ContainerBuilderTest extends TestCase
 
     public function testMergeLogicException()
     {
-        $this->expectException(\LogicException::class);
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
         $container->compile();
+
+        $this->expectException(\LogicException::class);
+
         $container->merge(new ContainerBuilder());
     }
 
@@ -1272,11 +1280,13 @@ class ContainerBuilderTest extends TestCase
 
     public function testThrowsExceptionWhenSetServiceOnACompiledContainer()
     {
-        $this->expectException(\BadMethodCallException::class);
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
         $container->register('a', 'stdClass')->setPublic(true);
         $container->compile();
+
+        $this->expectException(\BadMethodCallException::class);
+
         $container->set('a', new \stdClass());
     }
 
@@ -1301,10 +1311,12 @@ class ContainerBuilderTest extends TestCase
 
     public function testThrowsExceptionWhenSetDefinitionOnACompiledContainer()
     {
-        $this->expectException(\BadMethodCallException::class);
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
         $container->compile();
+
+        $this->expectException(\BadMethodCallException::class);
+
         $container->setDefinition('a', new Definition());
     }
 
@@ -1394,8 +1406,6 @@ class ContainerBuilderTest extends TestCase
 
     public function testThrowsCircularExceptionForCircularAliases()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for service "app.test_class", path: "app.test_class -> App\TestClass -> app.test_class".');
         $builder = new ContainerBuilder();
 
         $builder->setAliases([
@@ -1403,6 +1413,9 @@ class ContainerBuilderTest extends TestCase
             'app.test_class' => new Alias('App\\TestClass'),
             'App\\TestClass' => new Alias('app.test_class'),
         ]);
+
+        $this->expectException(ServiceCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for service "app.test_class", path: "app.test_class -> App\TestClass -> app.test_class".');
 
         $builder->findDefinition('foo');
     }
@@ -1450,59 +1463,64 @@ class ContainerBuilderTest extends TestCase
 
     public function testNoClassFromGlobalNamespaceClassId()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The definition for "DateTimeImmutable" has no class attribute, and appears to reference a class or interface in the global namespace.');
         $container = new ContainerBuilder();
 
         $container->register(\DateTimeImmutable::class);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The definition for "DateTimeImmutable" has no class attribute, and appears to reference a class or interface in the global namespace.');
+
         $container->compile();
     }
 
     public function testNoClassFromGlobalNamespaceClassIdWithLeadingSlash()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The definition for "\DateTimeImmutable" has no class attribute, and appears to reference a class or interface in the global namespace.');
         $container = new ContainerBuilder();
 
         $container->register('\\'.\DateTimeImmutable::class);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The definition for "\DateTimeImmutable" has no class attribute, and appears to reference a class or interface in the global namespace.');
+
         $container->compile();
     }
 
     public function testNoClassFromNamespaceClassIdWithLeadingSlash()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The definition for "\Symfony\Component\DependencyInjection\Tests\FooClass" has no class attribute, and appears to reference a class or interface. Please specify the class attribute explicitly or remove the leading backslash by renaming the service to "Symfony\Component\DependencyInjection\Tests\FooClass" to get rid of this error.');
         $container = new ContainerBuilder();
 
         $container->register('\\'.FooClass::class);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The definition for "\Symfony\Component\DependencyInjection\Tests\FooClass" has no class attribute, and appears to reference a class or interface. Please specify the class attribute explicitly or remove the leading backslash by renaming the service to "Symfony\Component\DependencyInjection\Tests\FooClass" to get rid of this error.');
+
         $container->compile();
     }
 
     public function testNoClassFromNonClassId()
     {
+        $container = new ContainerBuilder();
+        $container->register('123_abc');
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The definition for "123_abc" has no class.');
-        $container = new ContainerBuilder();
 
-        $container->register('123_abc');
         $container->compile();
     }
 
     public function testNoClassFromNsSeparatorId()
     {
+        $container = new ContainerBuilder();
+        $container->register('\\foo');
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The definition for "\foo" has no class.');
-        $container = new ContainerBuilder();
 
-        $container->register('\\foo');
         $container->compile();
     }
 
     public function testGetThrownServiceNotFoundExceptionWithCorrectServiceId()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The service "child_service" has a dependency on a non-existent service "non_existent_service".');
-
         $container = new ContainerBuilder();
         $container->register('child_service', \stdClass::class)
             ->addArgument([
@@ -1515,6 +1533,9 @@ class ContainerBuilderTest extends TestCase
                 'child_service' => new Reference('child_service'),
             ])
         ;
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The service "child_service" has a dependency on a non-existent service "non_existent_service".');
 
         $container->compile();
     }
@@ -1678,8 +1699,8 @@ class ContainerBuilderTest extends TestCase
 
         $container->compile();
 
-        $this->assertNotSame($container->get('foo'), $container->get('fOO'), '->get() returns the service for the given id, case sensitively');
-        $this->assertSame($container->get('fOO')->Foo->foo, $container->get('foo'), '->get() returns the service for the given id, case sensitively');
+        $this->assertNotSame($container->get('foo'), $container->get('fOO'), '->get() returns the service for the given id, case-sensitively');
+        $this->assertSame($container->get('fOO')->Foo->foo, $container->get('foo'), '->get() returns the service for the given id, case-sensitively');
     }
 
     public function testParameterWithMixedCase()
@@ -1753,13 +1774,14 @@ class ContainerBuilderTest extends TestCase
 
     public function testErroredDefinition()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Service "errored_definition" is broken.');
         $container = new ContainerBuilder();
 
         $container->register('errored_definition', 'stdClass')
             ->addError('Service "errored_definition" is broken.')
             ->setPublic(true);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Service "errored_definition" is broken.');
 
         $container->get('errored_definition');
     }
@@ -1855,28 +1877,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertInstanceOf(Wither::class, $wither->withFoo1($wither->foo));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testWitherAnnotationWithStaticReturnType()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Fixtures\WitherAnnotationStaticReturnType::withFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Fixtures\WitherAnnotationStaticReturnType::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-
-        $container = new ContainerBuilder();
-        $container->register(FooAnnotation::class);
-
-        $container
-            ->register('wither', WitherAnnotationStaticReturnType::class)
-            ->setPublic(true)
-            ->setAutowired(true);
-
-        $container->compile();
-
-        $wither = $container->get('wither');
-        $this->assertInstanceOf(FooAnnotation::class, $wither->foo);
-    }
-
     public function testWitherWithStaticReturnType()
     {
         $container = new ContainerBuilder();
@@ -1912,6 +1912,8 @@ class ContainerBuilderTest extends TestCase
     }
 
     /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
      * @group legacy
      */
     public function testDirectlyAccessingDeprecatedPublicService()

@@ -22,8 +22,6 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
 
-class_exists(\Doctrine\DBAL\Platforms\PostgreSqlPlatform::class);
-
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
@@ -40,9 +38,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
 
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $store = new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config));
         $store->createTable();
@@ -74,9 +70,9 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
     }
 
     /**
-     * @dataProvider provideDsn
+     * @dataProvider provideDsnWithSQLite
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -92,15 +88,41 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         }
     }
 
-    public static function provideDsn()
+    public static function provideDsnWithSQLite()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
-        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
-        yield ['sqlite://localhost/:memory:'];
+        yield 'SQLite file' => ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
+        yield 'SQLite3 file' => ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
+        yield 'SQLite in memory' => ['sqlite://localhost/:memory:'];
     }
 
     /**
+     * @requires extension pdo_pgsql
+     *
+     * @group integration
+     */
+    public function testDsnWithPostgreSQL()
+    {
+        if (!$host = getenv('POSTGRES_HOST')) {
+            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+        }
+
+        $key = new Key(uniqid(__METHOD__, true));
+
+        try {
+            $store = new DoctrineDbalStore('pgsql://postgres:password@'.$host);
+
+            $store->save($key);
+            $this->assertTrue($store->exists($key));
+        } finally {
+            $pdo = new \PDO('pgsql:host='.$host.';user=postgres;password=password');
+            $pdo->exec('DROP TABLE IF EXISTS lock_keys');
+        }
+    }
+
+    /**
+     * @param class-string<AbstractPlatform>
+     *
      * @dataProvider providePlatforms
      */
     public function testCreatesTableInTransaction(string $platform)
@@ -132,7 +154,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             ->willReturn(true);
 
         $platform = $this->createMock($platform);
-        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
+        $platform->method('getCreateTablesSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')
@@ -145,13 +167,22 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $store->save($key);
     }
 
-    public static function providePlatforms()
+    public static function providePlatforms(): \Generator
     {
         yield [\Doctrine\DBAL\Platforms\PostgreSQLPlatform::class];
-        yield [\Doctrine\DBAL\Platforms\PostgreSQL94Platform::class];
+
+        // DBAL < 4
+        if (class_exists(\Doctrine\DBAL\Platforms\PostgreSQL94Platform::class)) {
+            yield [\Doctrine\DBAL\Platforms\PostgreSQL94Platform::class];
+        }
+
         yield [\Doctrine\DBAL\Platforms\SqlitePlatform::class];
         yield [\Doctrine\DBAL\Platforms\SQLServerPlatform::class];
-        yield [\Doctrine\DBAL\Platforms\SQLServer2012Platform::class];
+
+        // DBAL < 4
+        if (class_exists(\Doctrine\DBAL\Platforms\SQLServer2012Platform::class)) {
+            yield [\Doctrine\DBAL\Platforms\SQLServer2012Platform::class];
+        }
     }
 
     public function testTableCreationInTransactionNotSupported()
@@ -182,7 +213,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             ->willReturn(true);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
+        $platform->method('getCreateTablesSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->expects($this->atLeast(2))
@@ -224,7 +255,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             ->willReturn(false);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
+        $platform->method('getCreateTablesSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')

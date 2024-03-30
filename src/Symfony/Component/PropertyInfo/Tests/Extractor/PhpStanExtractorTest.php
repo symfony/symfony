@@ -17,6 +17,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyPropertyAndGetterWithDifferentTypes;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
@@ -44,7 +45,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, array $type = null)
+    public function testExtract($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
@@ -75,7 +76,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider typesWithNoPrefixesProvider
      */
-    public function testExtractTypesWithNoPrefixes($property, array $type = null)
+    public function testExtractTypesWithNoPrefixes($property, ?array $type = null)
     {
         $noPrefixExtractor = new PhpStanExtractor([], [], []);
 
@@ -130,7 +131,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider provideCollectionTypes
      */
-    public function testExtractCollection($property, array $type = null)
+    public function testExtractCollection($property, ?array $type = null)
     {
         $this->testExtract($property, $type);
     }
@@ -186,7 +187,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider typesWithCustomPrefixesProvider
      */
-    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
+    public function testExtractTypesWithCustomPrefixes($property, ?array $type = null)
     {
         $customExtractor = new PhpStanExtractor(['add', 'remove'], ['is', 'can']);
 
@@ -344,7 +345,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider constructorTypesProvider
      */
-    public function testExtractConstructorTypes($property, array $type = null)
+    public function testExtractConstructorTypes($property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }
@@ -459,7 +460,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider php80TypesProvider
      */
-    public function testExtractPhp80Type(string $class, $property, array $type = null)
+    public function testExtractPhp80Type(string $class, $property, ?array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
     }
@@ -467,11 +468,33 @@ class PhpStanExtractorTest extends TestCase
     public static function php80TypesProvider()
     {
         return [
+            [Php80Dummy::class, 'promotedWithDocCommentAndType', [new Type(Type::BUILTIN_TYPE_INT)]],
+            [Php80Dummy::class, 'promotedWithDocComment', [new Type(Type::BUILTIN_TYPE_STRING)]],
             [Php80Dummy::class, 'promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
             [Php80Dummy::class, 'promoted', null],
             [Php80Dummy::class, 'collection', [new Type(Type::BUILTIN_TYPE_ARRAY, collection: true, collectionValueType: new Type(Type::BUILTIN_TYPE_STRING))]],
             [Php80PromotedDummy::class, 'promoted', null],
         ];
+    }
+
+    public static function allowPrivateAccessProvider(): array
+    {
+        return [
+            [true, [new Type(Type::BUILTIN_TYPE_STRING)]],
+            [false, [new Type(Type::BUILTIN_TYPE_ARRAY, collection: true, collectionKeyType: new Type('int'), collectionValueType: new Type('string'))]],
+        ];
+    }
+
+    /**
+     * @dataProvider allowPrivateAccessProvider
+     */
+    public function testAllowPrivateAccess(bool $allowPrivateAccess, array $expectedTypes)
+    {
+        $extractor = new PhpStanExtractor(allowPrivateAccess: $allowPrivateAccess);
+        $this->assertEquals(
+            $expectedTypes,
+            $extractor->getTypes(DummyPropertyAndGetterWithDifferentTypes::class, 'foo')
+        );
     }
 }
 
@@ -479,8 +502,6 @@ class PhpStanOmittedParamTagTypeDocBlock
 {
     /**
      * The type is omitted here to ensure that the extractor doesn't choke on missing types.
-     *
-     * @param $omittedTagType
      */
     public function setOmittedType(array $omittedTagType)
     {

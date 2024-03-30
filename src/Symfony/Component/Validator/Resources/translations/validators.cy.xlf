@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="cy" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Nid yw'r ffeil hon yn ddelwedd dilys.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Nid yw hwn yn gyfeiriad IP dilys.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn gyfeiriad IP dilys.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Ni uwchlwythwyd unrhyw ffeil.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Nid oes ffolder dros-dro wedi'i gosod yn php.ini.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target state="needs-review-translation">Nid oedd ffolder dros dro wedi'i ffurfweddu yn php.ini, neu nid yw'r ffolder a ffurfweddiwyd yn bodoli.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Unai ni dderbynir y math yna o gerdyn, neu nid yw rhif y cerdyn yn ddilys.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Nid yw hwn yn Rhif Cyfrif Banc Rhyngwladol (IBAN) dilys.</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn Rhif Cyfrif Banc Rhyngwladol (IBAN) dilys.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Nid yw'r gwerth hwn yn cyfateb â'r {{ charset }} set nodau ddisgwyliedig.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Nid yw hwn yn God Adnabod Busnes (BIC) dilys.</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn God Adnabod Busnes (BIC) dilys.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Gwall</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Nid yw hyn yn UUID dilys.</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn UUID dilys.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -329,6 +329,114 @@
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>Nid yw'r Cod Adnabod Busnes (BIC) hwn yn gysylltiedig ag IBAN {{ iban }}.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target state="needs-review-translation">Dylai'r gwerth hwn fod yn JSON dilys.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target state="needs-review-translation">Dylai'r casgliad hwn gynnwys elfennau unigryw yn unig.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target state="needs-review-translation">Dylai'r gwerth hwn fod yn gadarnhaol.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target state="needs-review-translation">Dylai'r gwerth hwn fod yn gadarnhaol neu sero.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target state="needs-review-translation">Dylai'r gwerth hwn fod yn negyddol.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target state="needs-review-translation">Dylai'r gwerth hwn fod yn negyddol neu sero.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn gyfnod parth amser dilys.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target state="needs-review-translation">Mae'r cyfrinair hwn wedi'i ddatgelu mewn toriad data, ni ddylid ei ddefnyddio. Defnyddiwch gyfrinair arall.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target state="needs-review-translation">Dylai'r gwerth hwn fod rhwng {{ min }} a {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn enw gwesteiwr dilys.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target state="needs-review-translation">Dylai nifer yr elfennau yn y casgliad hwn fod yn luosrif o {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target state="needs-review-translation">Dylai'r gwerth hwn fodloni o leiaf un o'r cyfyngiadau canlynol:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target state="needs-review-translation">Dylai pob elfen o'r casgliad hwn fodloni ei gyfres ei hun o gyfyngiadau.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn Rhif Adnabod Diogelwch Rhyngwladol (ISIN) dilys.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target state="needs-review-translation">Dylai'r gwerth hwn fod yn fynegiant dilys.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn lliw CSS dilys.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn nodiant CIDR dilys.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target state="needs-review-translation">Dylai gwerth y mwgwd rhwydwaith fod rhwng {{ min }} a {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target state="needs-review-translation">Mae'r enw ffeil yn rhy hir. Dylai fod â {{ filename_max_length }} cymeriad neu lai.|Mae'r enw ffeil yn rhy hir. Dylai fod â {{ filename_max_length }} nodau neu lai.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target state="needs-review-translation">Mae cryfder y cyfrinair yn rhy isel. Defnyddiwch gyfrinair cryfach os gwelwch yn dda.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target state="needs-review-translation">Mae'r gwerth hwn yn cynnwys cymeriadau nad ydynt yn cael eu caniatáu gan y lefel cyfyngu presennol.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target state="needs-review-translation">Ni chaniateir defnyddio cymeriadau anweledig.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target state="needs-review-translation">Ni chaniateir cymysgu rhifau o sgriptiau gwahanol.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target state="needs-review-translation">Ni chaniateir defnyddio cymeriadau goruwchlwytho cudd.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target state="needs-review-translation">Mae estyniad y ffeil yn annilys ({{ extension }}). Mae'r estyniadau a ganiateir yn {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-review-translation">Mae'r codio cymeriadau a ganfuwyd yn annilys ({{ detected }}). Mae'r codiadau a ganiateir yn {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">Nid yw'r gwerth hwn yn gyfeiriad MAC dilys.</target>
             </trans-unit>
         </body>
     </file>

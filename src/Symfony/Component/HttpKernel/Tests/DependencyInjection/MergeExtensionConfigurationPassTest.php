@@ -48,7 +48,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $configPass = new MergeExtensionConfigurationPass(['loaded', 'acme_foo']);
         $configPass->process($container);
 
-        $this->assertSame([[], ['bar' => 'baz']], $container->getExtensionConfig('loaded'), '->prependExtension() prepends an extension config');
+        $this->assertSame([['bar' => 'baz'], []], $container->getExtensionConfig('loaded'), '->prependExtension() prepends an extension config');
         $this->assertTrue($container->hasDefinition('acme_foo.foo'), '->loadExtension() registers a service');
         $this->assertTrue($container->hasDefinition('acme_foo.bar'), '->loadExtension() imports a service');
         $this->assertTrue($container->hasParameter('acme_foo.config'), '->loadExtension() sets a parameter');

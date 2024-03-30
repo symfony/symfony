@@ -23,25 +23,17 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
  */
 class DoctrineClearEntityManagerWorkerSubscriber implements EventSubscriberInterface
 {
-    private ManagerRegistry $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
-    {
-        $this->managerRegistry = $managerRegistry;
+    public function __construct(
+        private readonly ManagerRegistry $managerRegistry,
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function onWorkerMessageHandled()
+    public function onWorkerMessageHandled(): void
     {
         $this->clearEntityManagers();
     }
 
-    /**
-     * @return void
-     */
-    public function onWorkerMessageFailed()
+    public function onWorkerMessageFailed(): void
     {
         $this->clearEntityManagers();
     }

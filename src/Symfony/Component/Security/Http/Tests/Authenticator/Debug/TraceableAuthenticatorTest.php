@@ -36,4 +36,14 @@ class TraceableAuthenticatorTest extends TestCase
         $this->assertSame($passport, $traceable->authenticate($request));
         $this->assertSame($passport, $traceable->getInfo()['passport']);
     }
+
+    public function testGetInfoWithoutAuth()
+    {
+        $authenticator = $this->createMock(AuthenticatorInterface::class);
+
+        $traceable = new TraceableAuthenticator($authenticator);
+        $this->assertNull($traceable->getInfo()['passport']);
+        $this->assertIsArray($traceable->getInfo()['badges']);
+        $this->assertSame([], $traceable->getInfo()['badges']);
+    }
 }

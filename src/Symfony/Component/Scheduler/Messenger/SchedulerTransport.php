@@ -54,4 +54,9 @@ class SchedulerTransport implements TransportInterface
     {
         throw new LogicException(sprintf('"%s" cannot send messages.', __CLASS__));
     }
+
+    public function getMessageGenerator(): MessageGeneratorInterface
+    {
+        return $this->messageGenerator;
+    }
 }

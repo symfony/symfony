@@ -32,7 +32,7 @@ final class Definition
      * @param Transition[]         $transitions
      * @param string|string[]|null $initialPlaces
      */
-    public function __construct(array $places, array $transitions, string|array $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
+    public function __construct(array $places, array $transitions, string|array|null $initialPlaces = null, ?MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -76,11 +76,8 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlaces(string|array $places = null): void
+    private function setInitialPlaces(string|array|null $places): void
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/workflow', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if (!$places) {
             return;
         }
@@ -107,17 +104,15 @@ final class Definition
 
     private function addTransition(Transition $transition): void
     {
-        $name = $transition->getName();
-
         foreach ($transition->getFroms() as $from) {
-            if (!isset($this->places[$from])) {
-                throw new LogicException(sprintf('Place "%s" referenced in transition "%s" does not exist.', $from, $name));
+            if (!\array_key_exists($from, $this->places)) {
+                $this->addPlace($from);
             }
         }
 
         foreach ($transition->getTos() as $to) {
-            if (!isset($this->places[$to])) {
-                throw new LogicException(sprintf('Place "%s" referenced in transition "%s" does not exist.', $to, $name));
+            if (!\array_key_exists($to, $this->places)) {
+                $this->addPlace($to);
             }
         }
 

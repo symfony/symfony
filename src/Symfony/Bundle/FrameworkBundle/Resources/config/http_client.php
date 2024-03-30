@@ -59,8 +59,6 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->alias(HttpAsyncClient::class, 'httplug.http_client')
-        ->alias(\Http\Client\HttpClient::class, 'httplug.http_client')
-            ->deprecate('symfony/framework-bundle', '6.3', 'The "%alias_id%" service is deprecated, use "'.ClientInterface::class.'" instead.')
 
         ->set('http_client.abstract_retry_strategy', GenericRetryStrategy::class)
             ->abstract()

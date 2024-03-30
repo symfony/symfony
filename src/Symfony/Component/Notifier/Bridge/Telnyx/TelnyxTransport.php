@@ -29,16 +29,13 @@ final class TelnyxTransport extends AbstractTransport
 {
     protected const HOST = 'api.telnyx.com';
 
-    private string $apiKey;
-    private string $from;
-    private ?string $messagingProfileId;
-
-    public function __construct(#[\SensitiveParameter] string $apiKey, string $from, ?string $messagingProfileId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-        $this->messagingProfileId = $messagingProfileId;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $apiKey,
+        private string $from,
+        private ?string $messagingProfileId,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -67,7 +64,7 @@ final class TelnyxTransport extends AbstractTransport
         if (!preg_match('/^[+]+[1-9][0-9]{9,14}$/', $from)) {
             if ('' === $from) {
                 throw new IncompleteDsnException('This phone number is invalid.');
-            } elseif ('' !== $from && null === $this->messagingProfileId) {
+            } elseif (null === $this->messagingProfileId) {
                 throw new IncompleteDsnException('The sending messaging profile must be specified.');
             }
 

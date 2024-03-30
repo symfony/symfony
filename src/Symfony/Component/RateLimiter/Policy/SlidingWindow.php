@@ -84,9 +84,26 @@ final class SlidingWindow implements LimiterStateInterface
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
     }
 
-    public function getRetryAfter(): \DateTimeImmutable
+    public function calculateTimeForTokens(int $maxSize, int $tokens): float
     {
-        return \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $this->windowEndAt));
+        $remaining = $maxSize - $this->getHitCount();
+        if ($remaining >= $tokens) {
+            return 0;
+        }
+
+        $time = microtime(true);
+        $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
+        $timePassed = $time - $startOfWindow;
+        $windowPassed = min($timePassed / $this->intervalInSeconds, 1);
+        $releasable = max(1, $maxSize - floor($this->hitCountForLastWindow * (1 - $windowPassed)));
+        $remainingWindow = $this->intervalInSeconds - $timePassed;
+        $needed = $tokens - $remaining;
+
+        if ($releasable >= $needed) {
+            return $needed * ($remainingWindow / max(1, $releasable));
+        }
+
+        return ($this->windowEndAt - $time) + ($needed - $releasable) * ($this->intervalInSeconds / $maxSize);
     }
 
     public function __serialize(): array

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
@@ -24,8 +23,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class RequestTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     protected function tearDown(): void
     {
         Request::setTrustedProxies([], -1);
@@ -79,19 +76,6 @@ class RequestTest extends TestCase
         $isNoCache = $request->isNoCache();
 
         $this->assertFalse($isNoCache);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetContentType()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 6.2: The "Symfony\Component\HttpFoundation\Request::getContentType()" method is deprecated, use "getContentTypeFormat()" instead.');
-        $request = new Request();
-
-        $contentType = $request->getContentType();
-
-        $this->assertNull($contentType);
     }
 
     public function testGetContentTypeFormat()
@@ -2213,6 +2197,23 @@ class RequestTest extends TestCase
         Request::setFactory(null);
     }
 
+    public function testFactoryCallable()
+    {
+        $requestFactory = new class {
+            public function createRequest(): Request
+            {
+                return new NewRequest();
+            }
+        };
+
+        Request::setFactory([$requestFactory, 'createRequest']);
+
+        $this->assertEquals('foo', Request::create('/')->getFoo());
+
+        Request::setFactory(null);
+
+    }
+
     /**
      * @dataProvider getLongHostNames
      */
@@ -2550,6 +2551,23 @@ class RequestTest extends TestCase
         $this->assertSame($result, Request::getTrustedProxies());
     }
 
+    public function testTrustedValuesCache()
+    {
+        $request = Request::create('http://example.com/');
+        $request->server->set('REMOTE_ADDR', '3.3.3.3');
+        $request->headers->set('X_FORWARDED_FOR', '1.1.1.1, 2.2.2.2');
+        $request->headers->set('X_FORWARDED_PROTO', 'https');
+
+        $this->assertFalse($request->isSecure());
+
+        Request::setTrustedProxies(['3.3.3.3', '2.2.2.2'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
+        $this->assertTrue($request->isSecure());
+
+        // Header is changed, cache must not be hit now
+        $request->headers->set('X_FORWARDED_PROTO', 'http');
+        $this->assertFalse($request->isSecure());
+    }
+
     public static function trustedProxiesRemoteAddr()
     {
         return [
@@ -2625,12 +2643,10 @@ class RequestTest extends TestCase
         }
     }
 
-    /**
-     * @group legacy
-     */
-    public function testInvalidUriCreationDeprecated()
+    public function testMalformedUriCreationException()
     {
-        $this->expectDeprecation('Since symfony/http-foundation 6.3: Calling "Symfony\Component\HttpFoundation\Request::create()" with an invalid URI is deprecated.');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Malformed URI "/invalid-path:123".');
         Request::create('/invalid-path:123');
     }
 }

@@ -26,17 +26,13 @@ use Symfony\Component\Dotenv\Dotenv;
  * @internal
  */
 #[Autoconfigure(bind: ['$projectDir' => '%kernel.project_dir%', '$defaultEnv' => '%kernel.environment%'])]
-#[AsCommand(name: 'dotenv:dump', description: 'Compiles .env files to .env.local.php')]
+#[AsCommand(name: 'dotenv:dump', description: 'Compile .env files to .env.local.php')]
 final class DotenvDumpCommand extends Command
 {
-    private string $projectDir;
-    private string|null $defaultEnv;
-
-    public function __construct(string $projectDir, string $defaultEnv = null)
-    {
-        $this->projectDir = $projectDir;
-        $this->defaultEnv = $defaultEnv;
-
+    public function __construct(
+        private string $projectDir,
+        private ?string $defaultEnv = null,
+    ) {
         parent::__construct();
     }
 
@@ -95,9 +91,10 @@ EOF;
 
     private function loadEnv(string $dotenvPath, string $env, array $config): array
     {
-        $dotenv = new Dotenv();
         $envKey = $config['env_var_name'] ?? 'APP_ENV';
         $testEnvs = $config['test_envs'] ?? ['test'];
+
+        $dotenv = new Dotenv($envKey);
 
         $globalsBackup = [$_SERVER, $_ENV];
         unset($_SERVER[$envKey]);
@@ -107,6 +104,7 @@ EOF;
         try {
             $dotenv->loadEnv($dotenvPath, null, 'dev', $testEnvs);
             unset($_ENV['SYMFONY_DOTENV_VARS']);
+            unset($_ENV['SYMFONY_DOTENV_PATH']);
 
             return $_ENV;
         } finally {

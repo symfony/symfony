@@ -139,6 +139,21 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogs('warning'));
     }
 
+    public function testHandleClassImplementingInterfaceWithLogLevelAttribute()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new ImplementingInterfaceWithLogLevelAttribute());
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger);
+
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('critical'));
+        $this->assertCount(1, $logger->getLogs('warning'));
+    }
+
     public function testHandleWithLogLevelAttributeAndCustomConfiguration()
     {
         $request = new Request();
@@ -244,6 +259,19 @@ class ErrorListenerTest extends TestCase
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
     }
 
+    public function testTerminating()
+    {
+        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel->expects($this->never())->method('handle');
+
+        $request = Request::create('/');
+
+        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'), true);
+        $listener->onKernelException($event);
+    }
+
     /**
      * @dataProvider controllerProvider
      */
@@ -285,12 +313,13 @@ class ErrorListenerTest extends TestCase
         yield [new WithCustomUserProvidedAttribute(), 208, ['name' => 'value']];
         yield [new WithGeneralAttribute(), 412, ['some' => 'thing']];
         yield [new ChildOfWithGeneralAttribute(), 412, ['some' => 'thing']];
+        yield [new ImplementingInterfaceWithGeneralAttribute(), 412, ['some' => 'thing']];
     }
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface
 {
-    public function countErrors(Request $request = null): int
+    public function countErrors(?Request $request = null): int
     {
         return \count($this->logs['critical']);
     }
@@ -346,6 +375,20 @@ class WithGeneralAttribute extends \Exception
 {
 }
 
+#[WithHttpStatus(
+    statusCode: Response::HTTP_PRECONDITION_FAILED,
+    headers: [
+        'some' => 'thing',
+    ]
+)]
+interface InterfaceWithGeneralAttribute
+{
+}
+
+class ImplementingInterfaceWithGeneralAttribute extends \Exception implements InterfaceWithGeneralAttribute
+{
+}
+
 class ChildOfWithGeneralAttribute extends WithGeneralAttribute
 {
 }
@@ -356,5 +399,14 @@ class WarningWithLogLevelAttribute extends \Exception
 }
 
 class ChildOfWarningWithLogLevelAttribute extends WarningWithLogLevelAttribute
+{
+}
+
+#[WithLogLevel(LogLevel::WARNING)]
+interface InterfaceWithLogLevelAttribute
+{
+}
+
+class ImplementingInterfaceWithLogLevelAttribute extends \Exception implements InterfaceWithLogLevelAttribute
 {
 }

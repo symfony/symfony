@@ -57,7 +57,7 @@ class MermaidDumper implements DumperInterface
         $this->transitionType = $transitionType;
     }
 
-    public function dump(Definition $definition, Marking $marking = null, array $options = []): string
+    public function dump(Definition $definition, ?Marking $marking = null, array $options = []): string
     {
         $this->linkCount = 0;
         $placeNameMap = [];
@@ -72,7 +72,7 @@ class MermaidDumper implements DumperInterface
                 $placeId,
                 $place,
                 $meta->getPlaceMetadata($place),
-                \in_array($place, $definition->getInitialPlaces()),
+                \in_array($place, $definition->getInitialPlaces(), true),
                 $marking?->has($place) ?? false
             );
 

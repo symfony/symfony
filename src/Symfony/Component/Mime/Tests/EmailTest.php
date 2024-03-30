@@ -15,6 +15,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
@@ -61,6 +62,13 @@ class EmailTest extends TestCase
 
         $e->sender($fabien = new Address('fabien@symfony.com'));
         $this->assertSame($fabien, $e->getSender());
+    }
+
+    public function testFromWithNoAddress()
+    {
+        $e = new Email();
+        $this->expectException(LogicException::class);
+        $e->from();
     }
 
     public function testFrom()
@@ -556,8 +564,7 @@ class EmailTest extends TestCase
             }
         ]
     },
-    "body": null,
-    "message": null
+    "body": null
 }
 EOF;
 
@@ -657,5 +664,35 @@ EOF;
         $email->html('<b>bar</b>'); // We change a part to reset the body cache.
         $body2 = $email->getBody();
         $this->assertNotSame($body1, $body2, 'The two bodies must not reference the same object, so the body cache does not ensure that the hash for the DKIM signature is unique.');
+    }
+
+    public function testAttachmentBodyIsPartOfTheSerializationEmailPayloadWhenUsingAttachMethod()
+    {
+        $email = new Email();
+        $email->attach(file_get_contents(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'foo_attachment.txt') ?: '');
+
+        $this->assertTrue(str_contains(serialize($email), 'foo_bar_xyz_123'));
+    }
+
+    public function testAttachmentBodyIsNotPartOfTheSerializationEmailPayloadWhenUsingAttachFromPathMethod()
+    {
+        $email = new Email();
+        $email->attachFromPath(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'foo_attachment.txt');
+
+        $this->assertFalse(str_contains(serialize($email), 'foo_bar_xyz_123'));
+    }
+
+    public function testEmailsWithAttachmentsWhichAreAFileInstanceCanBeUnserialized()
+    {
+        $email = new Email();
+        $email->attachFromPath(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'foo_attachment.txt');
+
+        $email = unserialize(serialize($email));
+        $this->assertInstanceOf(Email::class, $email);
+
+        $attachments = $email->getAttachments();
+
+        $this->assertCount(1, $attachments);
+        $this->assertStringContainsString('foo_bar_xyz_123', $attachments[0]->getBody());
     }
 }

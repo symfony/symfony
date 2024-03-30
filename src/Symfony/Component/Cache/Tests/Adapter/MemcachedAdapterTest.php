@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
@@ -33,18 +32,18 @@ class MemcachedAdapterTest extends AdapterTestCase
     public static function setUpBeforeClass(): void
     {
         if (!MemcachedAdapter::isSupported()) {
-            throw new SkippedTestSuiteError('Extension memcached > 3.1.5 required.');
+            self::markTestSkipped('Extension memcached > 3.1.5 required.');
         }
         self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['binary_protocol' => false]);
         self::$client->get('foo');
         $code = self::$client->getResultCode();
 
         if (\Memcached::RES_SUCCESS !== $code && \Memcached::RES_NOTFOUND !== $code) {
-            throw new SkippedTestSuiteError('Memcached error: '.strtolower(self::$client->getResultMessage()));
+            self::markTestSkipped('Memcached error: '.strtolower(self::$client->getResultMessage()));
         }
     }
 
-    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null, string $namespace = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null, ?string $namespace = null): CacheItemPoolInterface
     {
         $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
 
@@ -102,11 +101,12 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function testOptionSerializer()
     {
-        $this->expectException(CacheException::class);
-        $this->expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
         if (!\Memcached::HAVE_JSON) {
             $this->markTestSkipped('Memcached::HAVE_JSON required');
         }
+
+        $this->expectException(CacheException::class);
+        $this->expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
 
         new MemcachedAdapter(MemcachedAdapter::createConnection([], ['serializer' => 'json']));
     }

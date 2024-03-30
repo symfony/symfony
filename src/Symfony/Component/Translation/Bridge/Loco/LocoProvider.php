@@ -31,21 +31,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LocoProvider implements ProviderInterface
 {
-    private HttpClientInterface $client;
-    private LoaderInterface $loader;
-    private LoggerInterface $logger;
-    private string $defaultLocale;
-    private string $endpoint;
-    private ?TranslatorBagInterface $translatorBag = null;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, TranslatorBagInterface $translatorBag = null)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
-        $this->translatorBag = $translatorBag;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private string $endpoint,
+        private ?TranslatorBagInterface $translatorBag = null,
+    ) {
     }
 
     public function __toString(): string
@@ -57,10 +50,6 @@ final class LocoProvider implements ProviderInterface
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
-
         foreach ($catalogue->all() as $domain => $messages) {
             $createdIds = $this->createAssets(array_keys($messages), $domain);
             if ($createdIds) {
@@ -71,7 +60,7 @@ final class LocoProvider implements ProviderInterface
         foreach ($translatorBag->getCatalogues() as $catalogue) {
             $locale = $catalogue->getLocale();
 
-            if (!\in_array($locale, $this->getLocales())) {
+            if (!\in_array($locale, $this->getLocales(), true)) {
                 $this->createLocale($locale);
             }
 
@@ -174,10 +163,6 @@ final class LocoProvider implements ProviderInterface
     public function delete(TranslatorBagInterface $translatorBag): void
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
 
         $responses = [];
 

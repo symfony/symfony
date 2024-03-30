@@ -8,8 +8,9 @@
         .message-item tbody tr td:first-child { width: 170px; }
 
         .message-item .label { float: right; padding: 1px 5px; opacity: .75; margin-left: 5px; }
-        .message-item .toggle-button { position: absolute; right: 6px; top: 6px; opacity: .5; pointer-events: none }
+        .message-item .toggle-button { position: absolute; right: 6px; top: 6px; opacity: .5; pointer-events: none; color: inherit; }
         .message-item .icon svg { height: 24px; width: 24px; }
+        .message-item .icon-close svg { transform: rotate(180deg); }
 
         .message-item .sf-toggle-off .icon-close, .sf-toggle-on .icon-open { display: none; }
         .message-item .sf-toggle-off .icon-open, .sf-toggle-on .icon-close { display: block; }
@@ -131,10 +132,10 @@
                     {% if dispatchCall.exception is defined %}
                         <span class="label status-error">exception</span>
                     {% endif %}
-                    <a class="toggle-button">
-                        <span class="icon icon-close">{{ source('@WebProfiler/images/icon-minus-square.svg') }}</span>
-                        <span class="icon icon-open">{{ source('@WebProfiler/images/icon-plus-square.svg') }}</span>
-                    </a>
+                    <button class="btn btn-link toggle-button" type="button">
+                        <span class="icon icon-close">{{ source('@WebProfiler/Icon/chevron-down.svg') }}</span>
+                        <span class="icon icon-open">{{ source('@WebProfiler/Icon/chevron-down.svg') }}</span>
+                    </button>
                 </th>
             </tr>
         </thead>

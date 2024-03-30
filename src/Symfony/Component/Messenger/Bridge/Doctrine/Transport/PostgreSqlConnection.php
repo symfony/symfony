@@ -16,6 +16,8 @@ use Doctrine\DBAL\Schema\Table;
 /**
  * Uses PostgreSQL LISTEN/NOTIFY to push messages to workers.
  *
+ * If you do not want to use the LISTEN mechanism, set the `use_notify` option to `false` when calling DoctrineTransportFactory::createTransport.
+ *
  * @internal
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -23,12 +25,10 @@ use Doctrine\DBAL\Schema\Table;
 final class PostgreSqlConnection extends Connection
 {
     /**
-     * * use_notify: Set to false to disable the use of LISTEN/NOTIFY. Default: true
      * * check_delayed_interval: The interval to check for delayed messages, in milliseconds. Set to 0 to disable checks. Default: 60000 (1 minute)
      * * get_notify_timeout: The length of time to wait for a response when calling PDO::pgsqlGetNotify, in milliseconds. Default: 0.
      */
     protected const DEFAULT_OPTIONS = parent::DEFAULT_OPTIONS + [
-        'use_notify' => true,
         'check_delayed_interval' => 60000,
         'get_notify_timeout' => 0,
     ];
@@ -38,10 +38,7 @@ final class PostgreSqlConnection extends Connection
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -67,16 +64,10 @@ final class PostgreSqlConnection extends Connection
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
         $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
 
-        if (method_exists($this->driverConnection, 'getNativeConnection')) {
-            $wrappedConnection = $this->driverConnection->getNativeConnection();
-        } else {
-            $wrappedConnection = $this->driverConnection;
-            while (method_exists($wrappedConnection, 'getWrappedConnection')) {
-                $wrappedConnection = $wrappedConnection->getWrappedConnection();
-            }
-        }
+        /** @var \PDO $nativeConnection */
+        $nativeConnection = $this->driverConnection->getNativeConnection();
 
-        $notification = $wrappedConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
+        $notification = $nativeConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
         if (
             // no notifications, or for another table or queue
             (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name'])

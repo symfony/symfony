@@ -17,29 +17,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
-use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\ParameterBagUtils;
-use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Service\ServiceProviderInterface;
-
-if (class_exists(LegacySecurity::class)) {
-    class_alias(LegacySecurity::class, InternalSecurity::class);
-} else {
-    /**
-     * @internal
-     */
-    class InternalSecurity
-    {
-    }
-}
 
 /**
  * Helper class for commonly-needed security tasks.
@@ -50,23 +38,8 @@ if (class_exists(LegacySecurity::class)) {
  *
  * @final
  */
-class Security extends InternalSecurity implements AuthorizationCheckerInterface
+class Security implements AuthorizationCheckerInterface
 {
-    /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
-     */
-    public const ACCESS_DENIED_ERROR = SecurityRequestAttributes::ACCESS_DENIED_ERROR;
-
-    /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
-     */
-    public const AUTHENTICATION_ERROR = SecurityRequestAttributes::AUTHENTICATION_ERROR;
-
-    /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
-     */
-    public const LAST_USERNAME = SecurityRequestAttributes::LAST_USERNAME;
-
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly array $authenticators = [],
@@ -87,8 +60,20 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
      */
     public function isGranted(mixed $attributes, mixed $subject = null): bool
     {
-        return $this->container->get('security.authorization_checker')
-            ->isGranted($attributes, $subject);
+        return $this->getDecision($attributes, $subject)->isGranted();
+    }
+
+    /**
+     * Get the access decision against the current authentication token and optionally supplied subject.
+     */
+    public function getDecision(mixed $attribute, mixed $subject = null): AccessDecision
+    {
+        $checker = $this->container->get('security.authorization_checker');
+        if (method_exists($checker, 'getDecision')) {
+            return $checker->getDecision($attribute, $subject);
+        }
+
+        return $checker->isGranted($attribute, $subject) ? AccessDecision::createGranted() : AccessDecision::createDenied();
     }
 
     public function getToken(): ?TokenInterface
@@ -109,9 +94,13 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
      *
      * @return Response|null The authenticator success response if any
      */
-    public function login(UserInterface $user, string $authenticatorName = null, string $firewallName = null, array $badges = []): ?Response
+    public function login(UserInterface $user, ?string $authenticatorName = null, ?string $firewallName = null, array $badges = []): ?Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
+        if (null === $request) {
+            throw new LogicException('Unable to login without a request context.');
+        }
+
         $firewallName ??= $this->getFirewallConfig($request)?->getName();
 
         if (!$firewallName) {
@@ -136,14 +125,17 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
      */
     public function logout(bool $validateCsrfToken = true): ?Response
     {
+        $request = $this->container->get('request_stack')->getMainRequest();
+        if (null === $request) {
+            throw new LogicException('Unable to logout without a request context.');
+        }
+
         /** @var TokenStorageInterface $tokenStorage */
         $tokenStorage = $this->container->get('security.token_storage');
 
         if (!($token = $tokenStorage->getToken()) || !$token->getUser()) {
             throw new LogicException('Unable to logout as there is no logged-in user.');
         }
-
-        $request = $this->container->get('request_stack')->getMainRequest();
 
         if (!$firewallConfig = $this->container->get('security.firewall.map')->getFirewallConfig($request)) {
             throw new LogicException('Unable to logout as the request is not behind a firewall.');

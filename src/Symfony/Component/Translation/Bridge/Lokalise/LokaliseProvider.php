@@ -32,19 +32,13 @@ final class LokaliseProvider implements ProviderInterface
 {
     private const LOKALISE_GET_KEYS_LIMIT = 5000;
 
-    private HttpClientInterface $client;
-    private LoaderInterface $loader;
-    private LoggerInterface $logger;
-    private string $defaultLocale;
-    private string $endpoint;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private string $endpoint,
+    ) {
     }
 
     public function __toString(): string
@@ -60,10 +54,6 @@ final class LokaliseProvider implements ProviderInterface
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$defaultCatalogue) {
-            $defaultCatalogue = $translatorBag->getCatalogues()[0];
-        }
 
         $this->ensureAllLocalesAreCreated($translatorBag);
         $existingKeysByDomain = [];
@@ -111,10 +101,6 @@ final class LokaliseProvider implements ProviderInterface
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
-
         $keysIds = [];
 
         foreach ($catalogue->getDomains() as $domain) {
@@ -145,7 +131,6 @@ final class LokaliseProvider implements ProviderInterface
             'json' => [
                 'format' => 'symfony_xliff',
                 'original_filenames' => true,
-                'directory_prefix' => '%LANG_ISO%',
                 'filter_langs' => array_values($locales),
                 'filter_filenames' => array_map($this->getLokaliseFilenameFromDomain(...), $domains),
                 'export_empty_as' => 'skip',
@@ -165,7 +150,12 @@ final class LokaliseProvider implements ProviderInterface
             throw new ProviderException(sprintf('Unable to export translations from Lokalise: "%s".', $response->getContent(false)), $response);
         }
 
-        return $responseContent['files'];
+        // Lokalise returns languages with "-" separator, we need to reformat them to "_" separator.
+        $reformattedLanguages = array_map(function ($language) {
+            return str_replace('-', '_', $language);
+        }, array_keys($responseContent['files']));
+
+        return array_combine($reformattedLanguages, $responseContent['files']);
     }
 
     private function createKeys(array $keys, string $domain): array

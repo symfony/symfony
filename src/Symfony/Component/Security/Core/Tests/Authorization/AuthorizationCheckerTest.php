@@ -68,12 +68,13 @@ class AuthorizationCheckerTest extends TestCase
 
         $this->accessDecisionManager->expects($this->once())->method('decide')->with($this->isInstanceOf(NullToken::class))->willReturn(false);
 
-        $this->expectDeprecation('Since symfony/security-core 6.3: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
+        $this->expectDeprecation('Since symfony/security-core 7.1: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
         $authorizationChecker->isGranted('ROLE_FOO');
     }
 
     /**
      * @group legacy
+     *
      * @dataProvider isGrantedProvider
      */
     public function testIsGranted($decide)
@@ -102,6 +103,7 @@ class AuthorizationCheckerTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider isGrantedProvider
      */
     public function testIsGrantedLegacy($decide)
@@ -114,7 +116,7 @@ class AuthorizationCheckerTest extends TestCase
             ->willReturn($decide);
         $this->tokenStorage->setToken($token);
 
-        $this->expectDeprecation('Since symfony/security-core 6.3: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
+        $this->expectDeprecation('Since symfony/security-core 7.1: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
         $this->assertSame($decide, $this->authorizationChecker->isGranted('ROLE_FOO'));
     }
 
@@ -165,7 +167,7 @@ class AuthorizationCheckerTest extends TestCase
             ->willReturn(true);
         $this->tokenStorage->setToken($token);
 
-        $this->expectDeprecation('Since symfony/security-core 6.3: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
+        $this->expectDeprecation('Since symfony/security-core 7.1: Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.');
         $this->assertTrue($this->authorizationChecker->isGranted($attribute));
     }
 }

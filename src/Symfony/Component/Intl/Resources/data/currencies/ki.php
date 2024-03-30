@@ -170,9 +170,13 @@ return [
             'SHP',
             'Pauni ya Santahelena',
         ],
+        'SLE' => [
+            'SLE',
+            'Leoni',
+        ],
         'SLL' => [
             'SLL',
-            'Leoni',
+            'Leoni (1964—2022)',
         ],
         'SOS' => [
             'SOS',

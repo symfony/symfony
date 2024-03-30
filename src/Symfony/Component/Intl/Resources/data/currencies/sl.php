@@ -826,9 +826,13 @@ return [
             'SKK',
             'slovaška krona',
         ],
+        'SLE' => [
+            'SLE',
+            'sieraleonski leone',
+        ],
         'SLL' => [
             'SLL',
-            'sieraleonski leone',
+            'sieraleonski leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',
@@ -988,7 +992,7 @@ return [
         ],
         'XAF' => [
             'FCFA',
-            'CFA frank BEAC',
+            'srednjeafriški frank CFA',
         ],
         'XCD' => [
             'XCD',
@@ -1012,7 +1016,7 @@ return [
         ],
         'XPF' => [
             'CFPF',
-            'CFP frank',
+            'frank CFP',
         ],
         'YDD' => [
             'YDD',

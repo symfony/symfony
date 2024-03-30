@@ -19,14 +19,14 @@
         "psr/link-implementation": "1.0|2.0"
     },
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "psr/link": "^1.1|^2.0"
     },
     "require-dev": {
-        "symfony/http-kernel": "^5.4|^6.0|^7.0"
+        "symfony/http-kernel": "^6.4|^7.0"
     },
     "conflict": {
-        "symfony/http-kernel": "<5.4"
+        "symfony/http-kernel": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\WebLink\\": "" },

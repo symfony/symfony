@@ -169,7 +169,7 @@ class Dumper
         // http://www.yaml.org/spec/1.2/spec.html#id2793979
         foreach ($lines as $line) {
             if ('' !== trim($line, ' ')) {
-                return (' ' === substr($line, 0, 1)) ? (string) $this->indentation : '';
+                return str_starts_with($line, ' ') ? (string) $this->indentation : '';
             }
         }
 

@@ -42,16 +42,16 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         self::INVERT => 'r',
     ];
     private array $fields;
-    private bool $pad;
 
     /**
      * @param string[]|null $fields The date fields
      * @param bool          $pad    Whether to use padding
      */
-    public function __construct(array $fields = null, bool $pad = false)
-    {
+    public function __construct(
+        ?array $fields = null,
+        private bool $pad = false,
+    ) {
         $this->fields = $fields ?? ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'invert'];
-        $this->pad = $pad;
     }
 
     /**

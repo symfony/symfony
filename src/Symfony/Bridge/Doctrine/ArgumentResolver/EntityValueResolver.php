@@ -73,7 +73,7 @@ final class EntityValueResolver implements ValueResolverInterface
         }
 
         if (null === $object && !$argument->isNullable()) {
-            throw new NotFoundHttpException(sprintf('"%s" object not found by "%s".', $options->class, self::class).$message);
+            throw new NotFoundHttpException($options->message ?? (sprintf('"%s" object not found by "%s".', $options->class, self::class).$message));
         }
 
         return [$object];
@@ -199,7 +199,10 @@ final class EntityValueResolver implements ValueResolverInterface
         }
 
         $repository = $manager->getRepository($options->class);
-        $variables = array_merge($request->attributes->all(), ['repository' => $repository]);
+        $variables = array_merge($request->attributes->all(), [
+            'repository' => $repository,
+            'request' => $request,
+        ]);
 
         try {
             return $this->expressionLanguage->evaluate($options->expr, $variables);

@@ -69,6 +69,7 @@ class HeadersTest extends TestCase
     {
         $headers = new Headers();
         $headers->addHeader('from', ['from@example.com']);
+        $headers->addHeader('reply-to', 'reply@example.com');
         $headers->addHeader('return-path', 'return@example.com');
         $headers->addHeader('foo', 'bar');
         $headers->addHeader('date', $now = new \DateTimeImmutable());
@@ -76,6 +77,9 @@ class HeadersTest extends TestCase
 
         $this->assertInstanceOf(MailboxListHeader::class, $headers->get('from'));
         $this->assertEquals([new Address('from@example.com')], $headers->get('from')->getBody());
+
+        $this->assertInstanceOf(MailboxListHeader::class, $headers->get('reply-to'));
+        $this->assertEquals([new Address('reply@example.com')], $headers->get('reply-to')->getBody());
 
         $this->assertInstanceOf(PathHeader::class, $headers->get('return-path'));
         $this->assertEquals(new Address('return@example.com'), $headers->get('return-path')->getBody());

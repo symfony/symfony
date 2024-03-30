@@ -28,22 +28,48 @@ class RedisTransportFactoryTest extends TestCase
 
         $this->assertTrue($factory->supports('redis://localhost', []));
         $this->assertTrue($factory->supports('rediss://localhost', []));
+        $this->assertTrue($factory->supports('redis:?host[host1:5000]&host[host2:5000]&host[host3:5000]&sentinel_master=test&dbindex=0', []));
         $this->assertFalse($factory->supports('sqs://localhost', []));
         $this->assertFalse($factory->supports('invalid-dsn', []));
     }
 
     /**
      * @group integration
+     *
+     * @dataProvider createTransportProvider
      */
-    public function testCreateTransport()
+    public function testCreateTransport(string $dsn, array $options = [])
     {
         $this->skipIfRedisUnavailable();
 
         $factory = new RedisTransportFactory();
         $serializer = $this->createMock(SerializerInterface::class);
-        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar', 'delete_after_ack' => true]), $serializer);
 
-        $this->assertEquals($expectedTransport, $factory->createTransport('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar', 'delete_after_ack' => true], $serializer));
+        $this->assertEquals(
+            new RedisTransport(Connection::fromDsn($dsn, $options), $serializer),
+            $factory->createTransport($dsn, $options, $serializer)
+        );
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: array}>
+     */
+    public static function createTransportProvider(): iterable
+    {
+        yield 'scheme "redis" without options' => [
+            'redis://'.getenv('REDIS_HOST'),
+            [],
+        ];
+
+        yield 'scheme "redis" with options' => [
+            'redis://'.getenv('REDIS_HOST'),
+            ['stream' => 'bar', 'delete_after_ack' => true],
+        ];
+
+        yield 'redis_sentinel' => [
+            'redis:?host['.str_replace(' ', ']&host[', getenv('REDIS_SENTINEL_HOSTS')).']',
+            ['sentinel_master' => getenv('REDIS_SENTINEL_SERVICE')],
+        ];
     }
 
     private function skipIfRedisUnavailable()

@@ -21,10 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class CleanRememberMeVerifierPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('cache.system')) {
             $container->removeDefinition('cache.security_token_verifier');

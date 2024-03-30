@@ -18,8 +18,7 @@ use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a given number or DateTime object is between some minimum and maximum.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -38,34 +37,39 @@ class Range extends Constraint
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
     ];
 
+    public string $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
+    public string $minMessage = 'This value should be {{ limit }} or more.';
+    public string $maxMessage = 'This value should be {{ limit }} or less.';
+    public string $invalidMessage = 'This value should be a valid number.';
+    public string $invalidDateTimeMessage = 'This value should be a valid datetime.';
+    public mixed $min = null;
+    public ?string $minPropertyPath = null;
+    public mixed $max = null;
+    public ?string $maxPropertyPath = null;
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param array<string,mixed>|null $options
+     * @param string|null              $invalidMessage         The message if min and max values are numeric but the given value is not
+     * @param string|null              $invalidDateTimeMessage The message if min and max values are PHP datetimes but the given value is not
+     * @param int|float|string|null    $min                    The minimum value, either numeric or a datetime string representation
+     * @param string|null              $minPropertyPath        Property path to the min value
+     * @param int|float|string|null    $max                    The maximum value, either numeric or a datetime string representation
+     * @param string|null              $maxPropertyPath        Property path to the max value
+     * @param string[]|null            $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
-    public $minMessage = 'This value should be {{ limit }} or more.';
-    public $maxMessage = 'This value should be {{ limit }} or less.';
-    public $invalidMessage = 'This value should be a valid number.';
-    public $invalidDateTimeMessage = 'This value should be a valid datetime.';
-    public $min;
-    public $minPropertyPath;
-    public $max;
-    public $maxPropertyPath;
-
     public function __construct(
-        array $options = null,
-        string $notInRangeMessage = null,
-        string $minMessage = null,
-        string $maxMessage = null,
-        string $invalidMessage = null,
-        string $invalidDateTimeMessage = null,
+        ?array $options = null,
+        ?string $notInRangeMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
+        ?string $invalidMessage = null,
+        ?string $invalidDateTimeMessage = null,
         mixed $min = null,
-        string $minPropertyPath = null,
+        ?string $minPropertyPath = null,
         mixed $max = null,
-        string $maxPropertyPath = null,
-        array $groups = null,
-        mixed $payload = null
+        ?string $maxPropertyPath = null,
+        ?array $groups = null,
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

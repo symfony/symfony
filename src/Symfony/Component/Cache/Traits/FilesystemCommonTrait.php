@@ -77,16 +77,14 @@ trait FilesystemCommonTrait
         return $ok;
     }
 
-    /**
-     * @return bool
-     */
-    protected function doUnlink(string $file)
+    protected function doUnlink(string $file): bool
     {
         return @unlink($file);
     }
 
-    private function write(string $file, string $data, int $expiresAt = null): bool
+    private function write(string $file, string $data, ?int $expiresAt = null): bool
     {
+        $unlink = false;
         set_error_handler(static fn ($type, $message, $file, $line) => throw new \ErrorException($message, 0, $type, $file, $line));
         try {
             $tmp = $this->directory.$this->tmpSuffix ??= str_replace('/', '-', base64_encode(random_bytes(6)));
@@ -102,18 +100,26 @@ trait FilesystemCommonTrait
             }
             fwrite($h, $data);
             fclose($h);
+            $unlink = true;
 
             if (null !== $expiresAt) {
                 touch($tmp, $expiresAt ?: time() + 31556952); // 1 year in seconds
             }
 
-            return rename($tmp, $file);
+            $success = rename($tmp, $file);
+            $unlink = !$success;
+
+            return $success;
         } finally {
             restore_error_handler();
+
+            if ($unlink) {
+                @unlink($tmp);
+            }
         }
     }
 
-    private function getFile(string $id, bool $mkdir = false, string $directory = null): string
+    private function getFile(string $id, bool $mkdir = false, ?string $directory = null): string
     {
         // Use xxh128 to favor speed over security, which is not an issue here
         $hash = str_replace('/', '-', base64_encode(hash('xxh128', static::class.$id, true)));
@@ -163,10 +169,7 @@ trait FilesystemCommonTrait
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }

@@ -11,17 +11,16 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateTypeTest extends BaseTypeTestCase
 {
-    use ExpectDeprecationTrait;
-
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
 
     private string $defaultTimezone;
@@ -94,6 +93,10 @@ class DateTypeTest extends BaseTypeTestCase
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
 
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
+        }
+
         \Locale::setDefault('de_DE');
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -115,6 +118,10 @@ class DateTypeTest extends BaseTypeTestCase
     {
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
+
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
+        }
 
         \Locale::setDefault('de_DE');
 
@@ -139,6 +146,10 @@ class DateTypeTest extends BaseTypeTestCase
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
 
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
+        }
+
         \Locale::setDefault('de_DE');
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -160,6 +171,10 @@ class DateTypeTest extends BaseTypeTestCase
     {
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
+
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
+        }
 
         \Locale::setDefault('de_DE');
 
@@ -184,6 +199,10 @@ class DateTypeTest extends BaseTypeTestCase
     {
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
+
+        if (\in_array(Intl::getIcuVersion(), ['71.1', '72.1'], true)) {
+            $this->markTestSkipped('Skipping test due to a bug in ICU 71.1/72.1.');
+        }
 
         \Locale::setDefault('de_DE');
 
@@ -1074,6 +1093,7 @@ class DateTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => $widget,
             'empty_data' => $emptyData,
+            'years' => range(2018, (int) date('Y')),
         ]);
         $form->submit(null);
 
@@ -1115,28 +1135,20 @@ class DateTypeTest extends BaseTypeTestCase
         $this->assertSame('14/01/2018', $form->getData());
     }
 
-    /**
-     * @group legacy
-     */
     public function testDateTimeInputTimezoneNotMatchingModelTimezone()
     {
-        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
-        // $this->expectException(LogicException::class);
-        // $this->expectExceptionMessage('Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
 
         $this->factory->create(static::TESTED_TYPE, new \DateTime('now', new \DateTimeZone('UTC')), [
             'model_timezone' => 'Europe/Berlin',
         ]);
     }
 
-    /**
-     * @group legacy
-     */
     public function testDateTimeImmutableInputTimezoneNotMatchingModelTimezone()
     {
-        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
-        // $this->expectException(LogicException::class);
-        // $this->expectExceptionMessage('Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
 
         $this->factory->create(static::TESTED_TYPE, new \DateTimeImmutable('now', new \DateTimeZone('UTC')), [
             'input' => 'datetime_immutable',

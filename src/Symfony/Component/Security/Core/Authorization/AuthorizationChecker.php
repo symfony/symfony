@@ -24,17 +24,10 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {
-    private TokenStorageInterface $tokenStorage;
-    private AccessDecisionManagerInterface $accessDecisionManager;
-
-    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, bool $exceptionOnNoToken = false)
-    {
-        if ($exceptionOnNoToken) {
-            throw new \LogicException(sprintf('Argument $exceptionOnNoToken of "%s()" must be set to "false".', __METHOD__));
-        }
-
-        $this->tokenStorage = $tokenStorage;
-        $this->accessDecisionManager = $accessDecisionManager;
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private AccessDecisionManagerInterface $accessDecisionManager,
+    ) {
     }
 
     final public function isGranted(mixed $attribute, mixed $subject = null): bool
@@ -51,7 +44,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         }
 
         if (!method_exists($this->accessDecisionManager, 'getDecision')) {
-            trigger_deprecation('symfony/security-core', '6.3', 'Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.', \get_class($this->accessDecisionManager));
+            trigger_deprecation('symfony/security-core', '7.1', 'Not implementing "%s::getDecision()" method is deprecated, and would be required in 7.0.', \get_class($this->accessDecisionManager));
 
             return $this->accessDecisionManager->decide($token, [$attribute], $subject) ? AccessDecision::createGranted() : AccessDecision::createDenied();
         }

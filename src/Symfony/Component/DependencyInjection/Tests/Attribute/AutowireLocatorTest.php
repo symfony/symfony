@@ -15,33 +15,33 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 class AutowireLocatorTest extends TestCase
 {
     public function testSimpleLocator()
     {
-        $locator = new AutowireLocator('foo', 'bar');
+        $locator = new AutowireLocator(['foo', 'bar']);
 
         $this->assertEquals(
-            new ServiceLocatorArgument(['foo' => new Reference('foo'), 'bar' => new Reference('bar')]),
+            new ServiceLocatorArgument(['foo' => new TypedReference('foo', 'foo'), 'bar' => new TypedReference('bar', 'bar')]),
             $locator->value,
         );
     }
 
     public function testComplexLocator()
     {
-        $locator = new AutowireLocator(
+        $locator = new AutowireLocator([
             '?qux',
-            foo: 'bar',
-            bar: '?baz',
-        );
+            'foo' => 'bar',
+            'bar' => '?baz',
+        ]);
 
         $this->assertEquals(
             new ServiceLocatorArgument([
-                'qux' => new Reference('qux', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
-                'foo' => new Reference('bar'),
-                'bar' => new Reference('baz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+                'qux' => new TypedReference('qux', 'qux', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+                'foo' => new TypedReference('bar', 'bar', name: 'foo'),
+                'bar' => new TypedReference('baz', 'baz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'bar'),
             ]),
             $locator->value,
         );

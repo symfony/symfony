@@ -35,7 +35,7 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @param iterable<mixed, VoterInterface> $voters An array or an iterator of VoterInterface instances
      */
-    public function __construct(iterable $voters = [], AccessDecisionStrategyInterface $strategy = null)
+    public function __construct(iterable $voters = [], ?AccessDecisionStrategyInterface $strategy = null)
     {
         $this->voters = $voters;
         $this->strategy = $strategy ?? new AffirmativeStrategy();
@@ -64,11 +64,11 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @param bool $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
      *
-     * @deprecated since Symfony 6.3, use {@see getDecision()} instead.
+     * @deprecated since Symfony 7.1, use {@see getDecision()} instead.
      */
     public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): bool
     {
-        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '7.1', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
 
         // Special case for AccessListener, do not remove the right side of the condition before 6.0
         if (\count($attributes) > 1 && !$allowMultipleAttributes) {

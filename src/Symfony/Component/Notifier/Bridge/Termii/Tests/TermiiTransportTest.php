@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TermiiTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): TermiiTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'from'): TermiiTransport
     {
         return new TermiiTransport('apiKey', $from, 'generic', $client ?? new MockHttpClient());
     }

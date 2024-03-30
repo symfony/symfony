@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -18,19 +19,16 @@ use Doctrine\ORM\Mapping\Id;
 #[Entity]
 class SingleIntIdEntity
 {
-    #[Id, Column(type: 'integer')]
-    protected $id;
+    #[Column(type: Types::JSON, nullable: true)]
+    public mixed $phoneNumbers = [];
 
-    #[Column(type: 'string', nullable: true)]
-    public $name;
+    public function __construct(
+        #[Id, Column(type: 'integer')]
+        protected int $id,
 
-    #[Column(type: 'array', nullable: true)]
-    public $phoneNumbers = [];
-
-    public function __construct($id, $name)
-    {
-        $this->id = $id;
-        $this->name = $name;
+        #[Column(type: 'string', nullable: true)]
+        public ?string $name,
+    ) {
     }
 
     public function __toString(): string

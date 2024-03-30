@@ -28,8 +28,6 @@ final class MailerTestCommand extends Command
 {
     public function __construct(private TransportInterface $transport)
     {
-        $this->transport = $transport;
-
         parent::__construct();
     }
 

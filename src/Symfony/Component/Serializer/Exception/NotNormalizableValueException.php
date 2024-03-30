@@ -27,7 +27,7 @@ class NotNormalizableValueException extends UnexpectedValueException
      *                                    safely to your user. In other words, avoid catching other exceptions and
      *                                    passing their message directly to this class.
      */
-    public static function createForUnexpectedDataType(string $message, mixed $data, array $expectedTypes, string $path = null, bool $useMessageForUser = false, int $code = 0, \Throwable $previous = null): self
+    public static function createForUnexpectedDataType(string $message, mixed $data, array $expectedTypes, ?string $path = null, bool $useMessageForUser = false, int $code = 0, ?\Throwable $previous = null): self
     {
         $self = new self($message, $code, $previous);
 

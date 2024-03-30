@@ -18,8 +18,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Ensures that the value is valid against the BIC format.
+ *
+ * @see https://en.wikipedia.org/wiki/ISO_9362
  *
  * @author Michael Hirschler <michael.vhirsch@gmail.com>
  */
@@ -41,17 +42,18 @@ class Bic extends Constraint
         self::INVALID_CASE_ERROR => 'INVALID_CASE_ERROR',
     ];
 
+    public string $message = 'This is not a valid Business Identifier Code (BIC).';
+    public string $ibanMessage = 'This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.';
+    public ?string $iban = null;
+    public ?string $ibanPropertyPath = null;
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param array<string,mixed>|null $options
+     * @param string|null              $iban             An IBAN value to validate that its country code is the same as the BIC's one
+     * @param string|null              $ibanPropertyPath Property path to the IBAN value when validating objects
+     * @param string[]|null            $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This is not a valid Business Identifier Code (BIC).';
-    public $ibanMessage = 'This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.';
-    public $iban;
-    public $ibanPropertyPath;
-
-    public function __construct(array $options = null, string $message = null, string $iban = null, string $ibanPropertyPath = null, string $ibanMessage = null, array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?string $iban = null, ?string $ibanPropertyPath = null, ?string $ibanMessage = null, ?array $groups = null, mixed $payload = null)
     {
         if (!class_exists(Countries::class)) {
             throw new LogicException('The Intl component is required to use the Bic constraint. Try running "composer require symfony/intl".');

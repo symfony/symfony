@@ -35,7 +35,7 @@ class TaggedIteratorArgument extends IteratorArgument
      * @param array       $exclude               Services to exclude from the iterator
      * @param bool        $excludeSelf           Whether to automatically exclude the referencing service from the iterator
      */
-    public function __construct(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, bool $needsIndexes = false, string $defaultPriorityMethod = null, array $exclude = [], bool $excludeSelf = true)
+    public function __construct(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, bool $needsIndexes = false, ?string $defaultPriorityMethod = null, array $exclude = [], bool $excludeSelf = true)
     {
         parent::__construct([]);
 
@@ -52,10 +52,7 @@ class TaggedIteratorArgument extends IteratorArgument
         $this->excludeSelf = $excludeSelf;
     }
 
-    /**
-     * @return string
-     */
-    public function getTag()
+    public function getTag(): string
     {
         return $this->tag;
     }

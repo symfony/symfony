@@ -14,9 +14,9 @@
       validation constraints.
     ]]></xsd:documentation>
   </xsd:annotation>
-  
+
   <xsd:element name="constraint-mapping" type="constraint-mapping" />
-  
+
   <xsd:complexType name="constraint-mapping">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
@@ -28,7 +28,7 @@
       <xsd:element name="class" type="class" maxOccurs="unbounded" />
     </xsd:sequence>
   </xsd:complexType>
-  
+
   <xsd:complexType name="namespace">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
@@ -41,13 +41,13 @@
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="class">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
         Contains constraints for a single class.
-        
-        Nested elements may be class constraints, property and/or getter 
+
+        Nested elements may be class constraints, property and/or getter
         definitions.
       ]]></xsd:documentation>
     </xsd:annotation>
@@ -72,15 +72,18 @@
       <xsd:element name="value" type="value" minOccurs="1" maxOccurs="unbounded" />
     </xsd:sequence>
   </xsd:complexType>
-  
+
   <xsd:complexType name="group-sequence-provider">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
         Defines the name of the group sequence provider for a class.
       ]]></xsd:documentation>
     </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="value" type="value" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
   </xsd:complexType>
-  
+
   <xsd:complexType name="property">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
@@ -93,7 +96,7 @@
     </xsd:sequence>
     <xsd:attribute name="name" type="xsd:string" use="required" />
   </xsd:complexType>
-  
+
   <xsd:complexType name="getter">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
@@ -106,14 +109,14 @@
     </xsd:sequence>
     <xsd:attribute name="property" type="xsd:string" use="required" />
   </xsd:complexType>
-  
+
   <xsd:complexType name="constraint" mixed="true">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
         Contains a constraint definition. The name of the constraint should be
         given in the "name" option.
-        
-        May contain a single value, multiple "constraint" elements, 
+
+        May contain a single value, multiple "constraint" elements,
         multiple "value" elements or multiple "option" elements.
       ]]></xsd:documentation>
     </xsd:annotation>
@@ -122,15 +125,15 @@
       <xsd:element name="option" type="option" minOccurs="1" maxOccurs="unbounded" />
       <xsd:element name="value" type="value" minOccurs="1" maxOccurs="unbounded" />
     </xsd:choice>
-    <xsd:attribute name="name" type="xsd:string" use="required" />    
+    <xsd:attribute name="name" type="xsd:string" use="required" />
   </xsd:complexType>
-  
+
   <xsd:complexType name="option" mixed="true">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
         Contains a constraint option definition. The name of the option
         should be given in the "name" option.
-        
+
         May contain a single value, multiple "value" elements or multiple
         "constraint" elements.
       ]]></xsd:documentation>
@@ -139,14 +142,14 @@
       <xsd:element name="constraint" type="constraint" minOccurs="1" maxOccurs="unbounded" />
       <xsd:element name="value" type="value" minOccurs="1" maxOccurs="unbounded" />
     </xsd:choice>
-    <xsd:attribute name="name" type="xsd:string" use="required" />  
+    <xsd:attribute name="name" type="xsd:string" use="required" />
   </xsd:complexType>
-  
+
   <xsd:complexType name="value" mixed="true">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
         A value of an element.
-        
+
         May contain a single value, multiple "value" elements or multiple
         "constraint" elements.
       ]]></xsd:documentation>
@@ -155,6 +158,6 @@
       <xsd:element name="constraint" type="constraint" minOccurs="1" maxOccurs="unbounded" />
       <xsd:element name="value" type="value" minOccurs="1" maxOccurs="unbounded" />
     </xsd:choice>
-    <xsd:attribute name="key" type="xsd:string" use="optional" /> 
+    <xsd:attribute name="key" type="xsd:string" use="optional" />
   </xsd:complexType>
 </xsd:schema>

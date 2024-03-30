@@ -233,11 +233,9 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     public function testInvalidMaxSize()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        $constraint = new File([
+        new File([
             'maxSize' => '1abc',
         ]);
-
-        $this->validator->validate($this->path, $constraint);
     }
 
     public static function provideBinaryFormatTests()
@@ -521,10 +519,11 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
 
     public function testNegativeMaxSize()
     {
+        $file = new File();
+
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('"-1" is not a valid maximum size.');
 
-        $file = new File();
         $file->maxSize = -1;
     }
 

@@ -50,13 +50,13 @@ final class MailgunPayloadConverter implements PayloadConverterInterface
             };
             $event = new MailerEngagementEvent($name, $payload['id'], $payload);
         }
-        if (!$date = \DateTimeImmutable::createFromFormat('U.u', $payload['timestamp'])) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payload['timestamp']));
+        if (!$date = \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $payload['timestamp']))) {
+            throw new ParseException(sprintf('Invalid date "%s".', sprintf('%.6F', $payload['timestamp'])));
         }
         $event->setDate($date);
         $event->setRecipientEmail($payload['recipient']);
-        $event->setMetadata($payload['user-variables']);
-        $event->setTags($payload['tags']);
+        $event->setMetadata($payload['user-variables'] ?? []);
+        $event->setTags($payload['tags'] ?? []);
 
         return $event;
     }
@@ -75,13 +75,13 @@ final class MailgunPayloadConverter implements PayloadConverterInterface
 
     private function getReason(array $payload): string
     {
-        if ('' !== $payload['delivery-status']['description']) {
+        if ('' !== ($payload['delivery-status']['description'] ?? '')) {
             return $payload['delivery-status']['description'];
         }
-        if ('' !== $payload['delivery-status']['message']) {
+        if ('' !== ($payload['delivery-status']['message'] ?? '')) {
             return $payload['delivery-status']['message'];
         }
-        if ('' !== $payload['reason']) {
+        if ('' !== ($payload['reason'] ?? '')) {
             return $payload['reason'];
         }
 

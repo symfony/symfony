@@ -11,35 +11,21 @@
 
 namespace Symfony\Bridge\Monolog\Tests;
 
+use Monolog\Level;
 use Monolog\Logger;
 use Monolog\LogRecord;
 
 class RecordFactory
 {
-    public static function create(int|string $level = 'warning', string|\Stringable $message = 'test', string $channel = 'test', array $context = [], \DateTimeImmutable $datetime = new \DateTimeImmutable(), array $extra = []): LogRecord|array
+    public static function create(int|string|Level $level = 'warning', string|\Stringable $message = 'test', string $channel = 'test', array $context = [], \DateTimeImmutable $datetime = new \DateTimeImmutable(), array $extra = []): LogRecord
     {
-        $level = Logger::toMonologLevel($level);
-
-        if (Logger::API >= 3) {
-            return new LogRecord(
-                message: (string) $message,
-                context: $context,
-                level: $level,
-                channel: $channel,
-                datetime: $datetime,
-                extra: $extra,
-            );
-        }
-
-        return [
-            'message' => $message,
-            'context' => $context,
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'channel' => $channel,
-            // Monolog 1 had no support for DateTimeImmutable
-            'datetime' => Logger::API >= 2 ? $datetime : \DateTime::createFromImmutable($datetime),
-            'extra' => $extra,
-        ];
+        return new LogRecord(
+            message: (string) $message,
+            context: $context,
+            level: Logger::toMonologLevel($level),
+            channel: $channel,
+            datetime: $datetime,
+            extra: $extra,
+        );
     }
 }

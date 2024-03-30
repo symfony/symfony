@@ -90,6 +90,16 @@ class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
+    public function postAt(\DateTime $timestamp): static
+    {
+        $this->options['post_at'] = $timestamp->getTimestamp();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function block(SlackBlockInterface $block): static
     {
         if (\count($this->options['blocks'] ?? []) >= self::MAX_BLOCKS) {

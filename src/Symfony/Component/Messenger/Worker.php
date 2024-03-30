@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
@@ -30,6 +31,7 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -117,6 +119,8 @@ class Worker
                 // this should prevent multiple lower priority receivers from
                 // blocking too long before the higher priority are checked
                 if ($envelopeHandled) {
+                    gc_collect_cycles();
+
                     break;
                 }
             }
@@ -149,7 +153,7 @@ class Worker
         }
 
         $acked = false;
-        $ack = function (Envelope $envelope, \Throwable $e = null) use ($transportName, &$acked) {
+        $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acked) {
             $acked = true;
             $this->acks[] = [$transportName, $envelope, $e];
         };
@@ -186,7 +190,7 @@ class Worker
                     $receiver->reject($envelope);
                 }
 
-                if ($e instanceof HandlerFailedException) {
+                if ($e instanceof HandlerFailedException || ($e instanceof DelayedMessageHandlingException && null !== $e->getEnvelope())) {
                     $envelope = $e->getEnvelope();
                 }
 
@@ -210,6 +214,7 @@ class Worker
                 $message = $envelope->getMessage();
                 $context = [
                     'class' => $message::class,
+                    'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
                 ];
                 $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
             }

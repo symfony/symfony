@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class ResponseFunctionalTest extends TestCase
 {
@@ -26,7 +27,7 @@ class ResponseFunctionalTest extends TestCase
             2 => ['file', '/dev/null', 'w'],
         ];
         if (!self::$server = @proc_open('exec '.\PHP_BINARY.' -S localhost:8054', $spec, $pipes, __DIR__.'/Fixtures/response-functional')) {
-            throw new SkippedTestSuiteError('PHP server unable to start.');
+            self::markTestSkipped('PHP server unable to start.');
         }
         sleep(1);
     }
@@ -52,7 +53,31 @@ class ResponseFunctionalTest extends TestCase
     public static function provideCookie()
     {
         foreach (glob(__DIR__.'/Fixtures/response-functional/*.php') as $file) {
-            yield [pathinfo($file, \PATHINFO_FILENAME)];
+            if (str_contains($file, 'cookie')) {
+                yield [pathinfo($file, \PATHINFO_FILENAME)];
+            }
         }
+    }
+
+    /**
+     * @group integration
+     */
+    public function testInformationalResponse()
+    {
+        if (!(new ExecutableFinder())->find('curl')) {
+            $this->markTestSkipped('curl is not installed');
+        }
+
+        if (!($fp = @fsockopen('localhost', 80, $errorCode, $errorMessage, 2))) {
+            $this->markTestSkipped('FrankenPHP is not running');
+        }
+        fclose($fp);
+
+        $p = new Process(['curl', '-v', 'http://localhost/early_hints.php']);
+        $p->run();
+        $output = $p->getErrorOutput();
+
+        $this->assertSame(3, preg_match_all('#Link: </css/style\.css>; rel="preload"; as="style"#', $output));
+        $this->assertSame(2, preg_match_all('#Link: </js/app\.js>; rel="preload"; as="script"#', $output));
     }
 }

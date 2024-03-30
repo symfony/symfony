@@ -45,7 +45,7 @@ class LinkTest extends TestCase
             ->withoutRel('next');
 
         $this->assertEquals('http://www.google.com', $link->getHref());
-        $this->assertFalse(\in_array('next', $link->getRels()));
+        $this->assertFalse(\in_array('next', $link->getRels(), true));
         $this->assertArrayNotHasKey('me', $link->getAttributes());
     }
 

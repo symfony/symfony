@@ -58,15 +58,12 @@ class BicValidator extends ConstraintValidator
 
     private ?PropertyAccessor $propertyAccessor;
 
-    public function __construct(PropertyAccessor $propertyAccessor = null)
+    public function __construct(?PropertyAccessor $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Bic) {
             throw new UnexpectedTypeException($constraint, Bic::class);
@@ -97,16 +94,6 @@ class BicValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Bic::INVALID_CHARACTERS_ERROR)
-                ->addViolation();
-
-            return;
-        }
-
-        // first 4 letters must be alphabetic (bank code)
-        if (!ctype_alpha(substr($canonicalize, 0, 4))) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Bic::INVALID_BANK_CODE_ERROR)
                 ->addViolation();
 
             return;

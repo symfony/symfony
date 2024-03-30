@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\PagerDuty;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -29,8 +28,11 @@ final class PagerDutyTransport extends AbstractTransport
 {
     protected const HOST = 'events.pagerduty.com';
 
-    public function __construct(#[\SensitiveParameter] private readonly string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] private readonly string $token,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -44,7 +46,7 @@ final class PagerDutyTransport extends AbstractTransport
         return $message instanceof PushMessage && (null === $message->getOptions() || $message->getOptions() instanceof PagerDutyOptions);
     }
 
-    protected function doSend(MessageInterface $message = null): SentMessage
+    protected function doSend(?MessageInterface $message = null): SentMessage
     {
         if (!$message instanceof PushMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);

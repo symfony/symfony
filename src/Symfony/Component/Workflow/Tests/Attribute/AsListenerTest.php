@@ -20,7 +20,7 @@ class AsListenerTest extends TestCase
     /**
      * @dataProvider provideOkTests
      */
-    public function testOk(string $class, string $expectedEvent, string $workflow = null, string $node = null)
+    public function testOk(string $class, string $expectedEvent, ?string $workflow = null, ?string $node = null)
     {
         $attribute = new $class($workflow, $node);
 

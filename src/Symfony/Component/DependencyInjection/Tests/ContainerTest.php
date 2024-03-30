@@ -14,11 +14,13 @@ namespace Symfony\Component\DependencyInjection\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Service\ResetInterface;
 
 class ContainerTest extends TestCase
@@ -221,8 +223,8 @@ class ContainerTest extends TestCase
         $sc->set('Foo', $foo2 = new \stdClass());
 
         $this->assertSame(['service_container', 'foo', 'Foo'], $sc->getServiceIds());
-        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case sensitively');
-        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case sensitively');
+        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case-sensitively');
+        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case-sensitively');
     }
 
     public function testGetThrowServiceNotFoundException()
@@ -262,21 +264,25 @@ class ContainerTest extends TestCase
 
     public function testGetSyntheticServiceThrows()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The "request" service is synthetic, it needs to be set at boot time before it can be used.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The "request" service is synthetic, it needs to be set at boot time before it can be used.');
+
         $container->get('request');
     }
 
     public function testGetRemovedServiceThrows()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.');
+
         $container->get('inlined');
     }
 
@@ -398,11 +404,38 @@ class ContainerTest extends TestCase
 
     public function testRequestAnInternalSharedPrivateService()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('You have requested a non-existent service "internal".');
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('You have requested a non-existent service "internal".');
+
         $c->get('internal');
+    }
+
+    public function testGetEnvDoesNotAutoCastNullWithDefaultEnvVarProcessor()
+    {
+        $container = new Container();
+        $container->setParameter('env(FOO)', null);
+        $container->compile();
+
+        $r = new \ReflectionMethod($container, 'getEnv');
+        $this->assertNull($r->invoke($container, 'FOO'));
+    }
+
+    public function testGetEnvDoesNotAutoCastNullWithEnvVarProcessorsLocatorReturningDefaultEnvVarProcessor()
+    {
+        $container = new Container();
+        $container->setParameter('env(FOO)', null);
+        $container->set('container.env_var_processors_locator', new ServiceLocator([
+            'string' => static function () use ($container): EnvVarProcessor {
+                return new EnvVarProcessor($container);
+            },
+        ]));
+        $container->compile();
+
+        $r = new \ReflectionMethod($container, 'getEnv');
+        $this->assertNull($r->invoke($container, 'FOO'));
     }
 }
 

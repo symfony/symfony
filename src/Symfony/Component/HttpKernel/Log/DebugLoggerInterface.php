@@ -33,19 +33,15 @@ interface DebugLoggerInterface
      *     timestamp_rfc3339: string,
      * }>
      */
-    public function getLogs(Request $request = null);
+    public function getLogs(?Request $request = null): array;
 
     /**
      * Returns the number of errors.
-     *
-     * @return int
      */
-    public function countErrors(Request $request = null);
+    public function countErrors(?Request $request = null): int;
 
     /**
      * Removes all log records.
-     *
-     * @return void
      */
-    public function clear();
+    public function clear(): void;
 }

@@ -116,7 +116,7 @@ error',
     /**
      * @dataProvider payloadFieldsProvider
      */
-    public function testNormalizePayloadFields($fields, array $expected = null)
+    public function testNormalizePayloadFields($fields, ?array $expected = null)
     {
         $constraint = new NotNull();
         $constraint->payload = ['severity' => 'warning', 'anotherField2' => 'aValue'];

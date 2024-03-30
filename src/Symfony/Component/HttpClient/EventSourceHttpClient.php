@@ -33,15 +33,15 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
 
     private float $reconnectionTime;
 
-    public function __construct(HttpClientInterface $client = null, float $reconnectionTime = 10.0)
+    public function __construct(?HttpClientInterface $client = null, float $reconnectionTime = 10.0)
     {
         $this->client = $client ?? HttpClient::create();
         $this->reconnectionTime = $reconnectionTime;
     }
 
-    public function connect(string $url, array $options = []): ResponseInterface
+    public function connect(string $url, array $options = [], string $method = 'GET'): ResponseInterface
     {
-        return $this->request('GET', $url, self::mergeDefaultOptions($options, [
+        return $this->request($method, $url, self::mergeDefaultOptions($options, [
             'buffer' => false,
             'headers' => [
                 'Accept' => 'text/event-stream',

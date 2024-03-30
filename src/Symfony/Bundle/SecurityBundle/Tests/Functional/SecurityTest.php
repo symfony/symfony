@@ -76,7 +76,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
-    public static function userWillBeMarkedAsChangedIfRolesHasChangedProvider()
+    public static function userWillBeMarkedAsChangedIfRolesHasChangedProvider(): array
     {
         return [
             [
@@ -205,11 +205,6 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
     public function getSalt(): string
     {
         return '';
-    }
-
-    public function getUsername(): string
-    {
-        return $this->username;
     }
 
     public function getUserIdentifier(): string

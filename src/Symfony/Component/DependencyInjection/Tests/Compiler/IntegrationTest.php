@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -50,11 +51,14 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedLocatorConsumerWi
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedLocatorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedLocatorConsumerWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedLocatorConsumerWithoutIndex;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedLocatorConsumerWithServiceSubscriber;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3Configurator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService4;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService5;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -245,7 +249,7 @@ class IntegrationTest extends TestCase
     /**
      * @dataProvider getYamlCompileTests
      */
-    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ContainerBuilder $mainContainer = null)
+    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ?ContainerBuilder $mainContainer = null)
     {
         // allow a container to be passed in, which might have autoconfigure settings
         $container = $mainContainer ?? new ContainerBuilder();
@@ -391,7 +395,12 @@ class IntegrationTest extends TestCase
 
     public function testLocatorConfiguredViaAttribute()
     {
+        if (!property_exists(SubscribedService::class, 'type')) {
+            $this->markTestSkipped('Requires symfony/service-contracts >= 3.2');
+        }
+
         $container = new ContainerBuilder();
+        $container->setParameter('some.parameter', 'foo');
         $container->register(BarTagClass::class)
             ->setPublic(true)
         ;
@@ -411,6 +420,8 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(BarTagClass::class), $s->locator->get(BarTagClass::class));
         self::assertSame($container->get(FooTagClass::class), $s->locator->get('with_key'));
         self::assertFalse($s->locator->has('nullable'));
+        self::assertSame('foo', $s->locator->get('subscribed'));
+        self::assertSame('foo', $s->locator->get('subscribed1'));
     }
 
     public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute()
@@ -613,7 +624,7 @@ class IntegrationTest extends TestCase
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
 
-        self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
+        self::assertSame([BarTagClass::class, FooTagClass::class], array_keys($factories->getValue($locator)));
     }
 
     public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
@@ -642,7 +653,7 @@ class IntegrationTest extends TestCase
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
 
-        self::assertSame(['foo_tag_class', 'bar_tag_class'], array_keys($factories->getValue($locator)));
+        self::assertSame(['bar_tag_class', 'foo_tag_class'], array_keys($factories->getValue($locator)));
         self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }
@@ -983,6 +994,10 @@ class IntegrationTest extends TestCase
             ->setPublic(true)
             ->setAutoconfigured(true);
 
+        $container->register(TaggedService5::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
         $container->register('failing_factory', \stdClass::class);
         $container->register('ccc', TaggedService4::class)
             ->setFactory([new Reference('failing_factory'), 'create'])
@@ -1007,6 +1022,12 @@ class IntegrationTest extends TestCase
                 ['someAttribute' => 'on barAction', 'priority' => 0, 'method' => 'barAction'],
                 ['property' => 'name'],
                 ['someAttribute' => 'on name', 'priority' => 0, 'property' => 'name'],
+            ],
+            TaggedService5::class => [
+                ['class' => TaggedService5::class],
+                ['parameter' => 'param1'],
+                ['method' => 'fooAction'],
+                ['property' => 'name'],
             ],
             'ccc' => [
                 ['class' => TaggedService4::class],
@@ -1109,6 +1130,66 @@ class IntegrationTest extends TestCase
         $this->assertTrue($locator->has(AutoconfiguredService1::class));
         $this->assertTrue($locator->has(AutoconfiguredService2::class));
         $this->assertFalse($locator->has(TaggedConsumerWithExclude::class));
+    }
+
+    public function testAutowireAttributeHasPriorityOverBindings()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['key' => 'tagged_service'])
+        ;
+        $container->register(TaggedLocatorConsumerWithServiceSubscriber::class)
+            ->setBindings([
+                '$locator' => new BoundArgument(new Reference('service_container'), false),
+            ])
+            ->setPublic(true)
+            ->setAutowired(true)
+            ->addTag('container.service_subscriber')
+        ;
+        $container->register('subscribed_service', \stdClass::class)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var TaggedLocatorConsumerWithServiceSubscriber $s */
+        $s = $container->get(TaggedLocatorConsumerWithServiceSubscriber::class);
+
+        self::assertInstanceOf(ContainerInterface::class, $subscriberLocator = $s->getContainer());
+        self::assertTrue($subscriberLocator->has('subscribed_service'));
+        self::assertNotSame($subscriberLocator, $taggedLocator = $s->getLocator());
+        self::assertInstanceOf(ContainerInterface::class, $taggedLocator);
+        self::assertTrue($taggedLocator->has('tagged_service'));
+    }
+
+    public function testBindingsWithAutowireAttributeAndAutowireFalse()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['key' => 'tagged_service'])
+        ;
+        $container->register(TaggedLocatorConsumerWithServiceSubscriber::class)
+            ->setBindings([
+                '$locator' => new BoundArgument(new Reference('service_container'), false),
+            ])
+            ->setPublic(true)
+            ->setAutowired(false)
+            ->addTag('container.service_subscriber')
+        ;
+        $container->register('subscribed_service', \stdClass::class)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var TaggedLocatorConsumerWithServiceSubscriber $s */
+        $s = $container->get(TaggedLocatorConsumerWithServiceSubscriber::class);
+
+        self::assertNull($s->getContainer());
+        self::assertInstanceOf(ContainerInterface::class, $taggedLocator = $s->getLocator());
+        self::assertSame($container, $taggedLocator);
     }
 }
 

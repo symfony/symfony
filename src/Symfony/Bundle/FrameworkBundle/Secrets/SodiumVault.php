@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Secrets;
 
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
+use Symfony\Component\String\LazyString;
 use Symfony\Component\VarExporter\VarExporter;
 
 /**
@@ -30,7 +31,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
      * @param $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault
      *                       or null to store generated keys in the provided $secretsDir
      */
-    public function __construct(string $secretsDir, #[\SensitiveParameter] string|\Stringable $decryptionKey = null)
+    public function __construct(string $secretsDir, #[\SensitiveParameter] string|\Stringable|null $decryptionKey = null)
     {
         $this->pathPrefix = rtrim(strtr($secretsDir, '/', \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR.basename($secretsDir).'.';
         $this->decryptionKey = $decryptionKey;
@@ -169,7 +170,14 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
     public function loadEnvVars(): array
     {
-        return $this->list(true);
+        $envs = [];
+        $reveal = $this->reveal(...);
+
+        foreach ($this->list() as $name => $value) {
+            $envs[$name] = LazyString::fromCallable($reveal, $name);
+        }
+
+        return $envs;
     }
 
     private function loadKeys(): void

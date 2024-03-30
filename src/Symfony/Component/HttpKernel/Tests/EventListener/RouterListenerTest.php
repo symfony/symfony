@@ -37,13 +37,6 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends TestCase
 {
-    private RequestStack $requestStack;
-
-    protected function setUp(): void
-    {
-        $this->requestStack = $this->createMock(RequestStack::class);
-    }
-
     /**
      * @dataProvider getPortData
      */
@@ -58,7 +51,7 @@ class RouterListenerTest extends TestCase
             ->method('getContext')
             ->willReturn($context);
 
-        $listener = new RouterListener($urlMatcher, $this->requestStack);
+        $listener = new RouterListener($urlMatcher, new RequestStack());
         $event = $this->createRequestEventForUri($uri);
         $listener->onKernelRequest($event);
 
@@ -98,7 +91,7 @@ class RouterListenerTest extends TestCase
                        ->with($this->isInstanceOf(Request::class))
                        ->willReturn([]);
 
-        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
         $listener->onKernelRequest($event);
     }
 
@@ -116,7 +109,7 @@ class RouterListenerTest extends TestCase
 
         $context = new RequestContext();
 
-        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
         $listener->onKernelRequest($event);
 
         // sub-request with another HTTP method
@@ -147,7 +140,7 @@ class RouterListenerTest extends TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/');
 
-        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext(), $logger);
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext(), $logger);
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
@@ -185,7 +178,7 @@ class RouterListenerTest extends TestCase
 
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('matchRequest')
             ->willThrowException(new NoConfigurationException())
         ;
@@ -196,6 +189,11 @@ class RouterListenerTest extends TestCase
         $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
 
         $request = Request::create('http://localhost/');
+
+        $response = $kernel->handle($request);
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertStringContainsString('Welcome', $response->getContent());
+
         $response = $kernel->handle($request);
         $this->assertSame(404, $response->getStatusCode());
         $this->assertStringContainsString('Welcome', $response->getContent());
@@ -210,7 +208,7 @@ class RouterListenerTest extends TestCase
 
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
 
-        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
         $listener->onKernelRequest($event);
     }
 
@@ -237,7 +235,7 @@ class RouterListenerTest extends TestCase
 
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $listener = new RouterListener($urlMatcher, $this->requestStack);
+        $listener = new RouterListener($urlMatcher, new RequestStack());
         $listener->onKernelRequest($event);
     }
 
@@ -263,7 +261,7 @@ class RouterListenerTest extends TestCase
 
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $listener = new RouterListener($urlMatcher, $this->requestStack);
+        $listener = new RouterListener($urlMatcher, new RequestStack());
         $listener->onKernelRequest($event);
     }
 }

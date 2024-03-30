@@ -226,7 +226,7 @@ class ReStructuredTextDescriptor extends Descriptor
         $nonDefaultOptions = [];
         foreach ($definition->getOptions() as $option) {
             // Skip global options.
-            if (!\in_array($option->getName(), $globalOptions)) {
+            if (!\in_array($option->getName(), $globalOptions, true)) {
                 $nonDefaultOptions[] = $option;
             }
         }

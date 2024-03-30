@@ -44,7 +44,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         private array $issuers,
         private string $claim = 'sub',
         private ?LoggerInterface $logger = null,
-        private ClockInterface $clock = new Clock()
+        private ClockInterface $clock = new Clock(),
     ) {
     }
 

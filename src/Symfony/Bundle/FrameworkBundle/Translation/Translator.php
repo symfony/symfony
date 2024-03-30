@@ -21,13 +21,12 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 7.1
  */
 class Translator extends BaseTranslator implements WarmableInterface
 {
-    protected $container;
-    protected $loaderIds;
-
-    protected $options = [
+    protected array $options = [
         'cache_dir' => null,
         'debug' => false,
         'resource_files' => [],
@@ -59,11 +58,6 @@ class Translator extends BaseTranslator implements WarmableInterface
     private array $scannedDirectories;
 
     /**
-     * @var string[]
-     */
-    private array $enabledLocales;
-
-    /**
      * Constructor.
      *
      * Available options:
@@ -73,14 +67,18 @@ class Translator extends BaseTranslator implements WarmableInterface
      *   * resource_files: List of translation resources available grouped by locale.
      *   * cache_vary:     An array of data that is serialized to generate the cached catalogue name.
      *
+     * @param string[] $enabledLocales
+     *
      * @throws InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageFormatterInterface $formatter, string $defaultLocale, array $loaderIds = [], array $options = [], array $enabledLocales = [])
-    {
-        $this->container = $container;
-        $this->loaderIds = $loaderIds;
-        $this->enabledLocales = $enabledLocales;
-
+    public function __construct(
+        protected ContainerInterface $container,
+        MessageFormatterInterface $formatter,
+        string $defaultLocale,
+        protected array $loaderIds = [],
+        array $options = [],
+        private array $enabledLocales = [],
+    ) {
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
             throw new InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
@@ -94,10 +92,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug'], $this->options['cache_vary']);
     }
 
-    /**
-     * @return string[]
-     */
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         // skip warmUp when translator doesn't use cache
         if (null === $this->options['cache_dir']) {
@@ -118,7 +113,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         return [];
     }
 
-    public function addResource(string $format, mixed $resource, string $locale, string $domain = null): void
+    public function addResource(string $format, mixed $resource, string $locale, ?string $domain = null): void
     {
         if ($this->resourceFiles) {
             $this->addResourceFiles();
@@ -145,10 +140,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    protected function initialize()
+    protected function initialize(): void
     {
         if ($this->resourceFiles) {
             $this->addResourceFiles();

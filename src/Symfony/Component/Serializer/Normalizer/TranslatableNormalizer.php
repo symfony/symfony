@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -33,16 +34,16 @@ final class TranslatableNormalizer implements NormalizerInterface
     /**
      * @throws InvalidArgumentException
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         if (!$object instanceof TranslatableInterface) {
-            throw new InvalidArgumentException(sprintf('The object must implement the "%s".', TranslatableInterface::class));
+            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The object must implement the "%s".', TranslatableInterface::class), $object, [TranslatableInterface::class]);
         }
 
         return $object->trans($this->translator, $context[self::NORMALIZATION_LOCALE_KEY] ?? $this->defaultContext[self::NORMALIZATION_LOCALE_KEY]);
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof TranslatableInterface;
     }

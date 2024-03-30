@@ -52,13 +52,14 @@ class RoleVoterTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getVoteTests
      */
     public function testVoteUsingTokenThatReturnsRoleNamesLegacy($roles, $attributes, $expected)
     {
         $voter = new RoleVoter();
 
-        $this->expectDeprecation('Since symfony/security-core 6.3: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
+        $this->expectDeprecation('Since symfony/security-core 7.1: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
         $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 

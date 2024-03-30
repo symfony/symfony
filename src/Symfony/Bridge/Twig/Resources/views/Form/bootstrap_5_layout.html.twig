@@ -361,12 +361,12 @@
 {# Help #}
 
 {%- block form_help -%}
-    {% set row_class = row_attr.class|default('') %}
-    {% set help_class = ' form-text' %}
-    {% if 'input-group' in row_class %}
+    {%- set row_class = row_attr.class|default('') -%}
+    {%- set help_class = ' form-text' -%}
+    {%- if 'input-group' in row_class -%}
         {#- Hack to properly display help with input group -#}
-        {% set help_class = ' input-group-text' %}
-    {% endif %}
+        {%- set help_class = ' input-group-text' -%}
+    {%- endif -%}
     {%- if help is not empty -%}
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ help_class ~ ' mb-0')|trim}) -%}
     {%- endif -%}

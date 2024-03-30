@@ -9,6 +9,5 @@ return [
         'en_001' => 'English (World)',
         'eo_001' => 'Esperanto (World)',
         'ia_001' => 'Interlingua (World)',
-        'yi_001' => 'Yiddish (World)',
     ],
 ];

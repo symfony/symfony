@@ -24,33 +24,33 @@ class PriorityStrategyTest extends AccessDecisionStrategyTestCase
         $strategy = new PriorityStrategy();
 
         yield [$strategy, [
-             self::getVoter(VoterInterface::ACCESS_ABSTAIN),
-             self::getVoter(VoterInterface::ACCESS_GRANTED),
-             self::getVoter(VoterInterface::ACCESS_DENIED),
-             self::getVoter(VoterInterface::ACCESS_DENIED),
+            self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+            self::getVoter(VoterInterface::ACCESS_GRANTED),
+            self::getVoter(VoterInterface::ACCESS_DENIED),
+            self::getVoter(VoterInterface::ACCESS_DENIED),
         ], AccessDecision::createGranted([
             Vote::createAbstain(),
             Vote::createGranted(),
         ])];
 
         yield [$strategy, [
-             self::getVoter(VoterInterface::ACCESS_ABSTAIN),
-             self::getVoter(VoterInterface::ACCESS_DENIED),
-             self::getVoter(VoterInterface::ACCESS_GRANTED),
-             self::getVoter(VoterInterface::ACCESS_GRANTED),
+            self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+            self::getVoter(VoterInterface::ACCESS_DENIED),
+            self::getVoter(VoterInterface::ACCESS_GRANTED),
+            self::getVoter(VoterInterface::ACCESS_GRANTED),
         ], AccessDecision::createDenied([
             Vote::createAbstain(),
             Vote::createDenied(),
         ])];
 
-        yield [$strategy,  self::getVoters(0, 0, 2), AccessDecision::createDenied([
+        yield [$strategy, self::getVoters(0, 0, 2), AccessDecision::createDenied([
             Vote::createAbstain(),
             Vote::createAbstain(),
         ])];
 
         $strategy = new PriorityStrategy(true);
 
-        yield [$strategy,  self::getVoters(0, 0, 2), AccessDecision::createGranted([
+        yield [$strategy, self::getVoters(0, 0, 2), AccessDecision::createGranted([
             Vote::createAbstain(),
             Vote::createAbstain(),
         ])];

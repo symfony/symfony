@@ -41,6 +41,8 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
+use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
@@ -578,56 +580,24 @@ class WorkerTest extends TestCase
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
     }
-}
 
-class DummyReceiver implements ReceiverInterface
-{
-    private array $deliveriesOfEnvelopes;
-    private array $acknowledgedEnvelopes = [];
-    private array $rejectedEnvelopes = [];
-    private int $acknowledgeCount = 0;
-    private int $rejectCount = 0;
-
-    /**
-     * @param Envelope[][] $deliveriesOfEnvelopes
-     */
-    public function __construct(array $deliveriesOfEnvelopes)
+    public function testGcCollectCyclesIsCalledOnMessageHandle()
     {
-        $this->deliveriesOfEnvelopes = $deliveriesOfEnvelopes;
-    }
+        $apiMessage = new DummyMessage('API');
 
-    public function get(): iterable
-    {
-        $val = array_shift($this->deliveriesOfEnvelopes);
+        $receiver = new DummyReceiver([[new Envelope($apiMessage)]]);
 
-        return $val ?? [];
-    }
+        $bus = $this->createMock(MessageBusInterface::class);
 
-    public function ack(Envelope $envelope): void
-    {
-        ++$this->acknowledgeCount;
-        $this->acknowledgedEnvelopes[] = $envelope;
-    }
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
-    public function reject(Envelope $envelope): void
-    {
-        ++$this->rejectCount;
-        $this->rejectedEnvelopes[] = $envelope;
-    }
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
+        $worker->run();
 
-    public function getAcknowledgeCount(): int
-    {
-        return $this->acknowledgeCount;
-    }
+        $gcStatus = gc_status();
 
-    public function getRejectCount(): int
-    {
-        return $this->rejectCount;
-    }
-
-    public function getAcknowledgedEnvelopes(): array
-    {
-        return $this->acknowledgedEnvelopes;
+        $this->assertGreaterThan(0, $gcStatus['runs']);
     }
 }
 
@@ -645,7 +615,7 @@ class DummyBatchHandler implements BatchHandlerInterface
 
     public array $processedMessages;
 
-    public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+    public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
     {
         return $this->handle($message, $ack);
     }
@@ -662,20 +632,5 @@ class DummyBatchHandler implements BatchHandlerInterface
         foreach ($jobs as [$job, $ack]) {
             $ack->ack($job);
         }
-    }
-}
-
-class ResettableDummyReceiver extends DummyReceiver implements ResetInterface
-{
-    private bool $hasBeenReset = false;
-
-    public function reset(): void
-    {
-        $this->hasBeenReset = true;
-    }
-
-    public function hasBeenReset(): bool
-    {
-        return $this->hasBeenReset;
     }
 }

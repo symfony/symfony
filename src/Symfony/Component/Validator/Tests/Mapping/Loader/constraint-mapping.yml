@@ -60,3 +60,6 @@ Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
 
 Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity:
   group_sequence_provider: true
+
+Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto:
+  group_sequence_provider: Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider

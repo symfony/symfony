@@ -69,7 +69,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 
     public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): bool
     {
-        trigger_deprecation('symfony/security-core', '6.3', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '7.1', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
 
         $currentDecisionLog = [
             'attributes' => $attributes,
@@ -97,7 +97,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     public function addVoterVote(VoterInterface $voter, array $attributes, Vote|int $vote): void
     {
         if (!$vote instanceof Vote) {
-            trigger_deprecation('symfony/security-core', '6.3', 'Passing an int as the third argument to "%s::addVoterVote()" is deprecated, pass an instance of "%s" instead.', __CLASS__, Vote::class);
+            trigger_deprecation('symfony/security-core', '7.1', 'Passing an int as the third argument to "%s::addVoterVote()" is deprecated, pass an instance of "%s" instead.', __CLASS__, Vote::class);
             $vote = new Vote($vote);
         }
 

@@ -47,18 +47,15 @@ final class AmpClientState extends ClientState
 
     private array $clients = [];
     private \Closure $clientConfigurator;
-    private int $maxHostConnections;
-    private int $maxPendingPushes;
-    private ?LoggerInterface $logger;
 
-    public function __construct(?callable $clientConfigurator, int $maxHostConnections, int $maxPendingPushes, ?LoggerInterface &$logger)
-    {
+    public function __construct(
+        ?callable $clientConfigurator,
+        private int $maxHostConnections,
+        private int $maxPendingPushes,
+        private ?LoggerInterface &$logger,
+    ) {
         $clientConfigurator ??= static fn (PooledHttpClient $client) => new InterceptedHttpClient($client, new RetryRequests(2));
         $this->clientConfigurator = $clientConfigurator(...);
-
-        $this->maxHostConnections = $maxHostConnections;
-        $this->maxPendingPushes = $maxPendingPushes;
-        $this->logger = &$logger;
     }
 
     /**
@@ -150,7 +147,7 @@ final class AmpClientState extends ClientState
             /** @var resource|null */
             public $handle;
 
-            public function connect(string $uri, ConnectContext $context = null, CancellationToken $token = null): Promise
+            public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Promise
             {
                 $result = $this->connector->connect($this->uri ?? $uri, $context, $token);
                 $result->onResolve(function ($e, $socket) {

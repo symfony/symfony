@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="af" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Hierdie lêer is nie 'n geldige beeld nie.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Hierdie is nie 'n geldige IP-adres nie.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target state="needs-review-translation">Hierdie waarde is nie 'n geldige IP-adres nie.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Geen lêer is opgelaai nie.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Geen tydelike lêer is ingestel in php.ini nie.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target state="needs-review-translation">Geen tydelike gids is in php.ini opgestel nie, of die opgestelde gids bestaan nie.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Nie-ondersteunde tipe kaart of ongeldige kredietkaart nommer.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Hierdie is nie 'n geldige Internationale Bank Rekening Nommer (IBAN) nie.</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target state="needs-review-translation">Hierdie waarde is nie 'n geldige Internasionale Bankrekeningnommer (IBAN) nie.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Die waarde stem nie ooreen met die verwagte {{ charset }} karakterstel nie.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Hierdie is nie 'n geldige Besigheids Identifikasie Kode (BIC) nie.</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target state="needs-review-translation">Hierdie waarde is nie 'n geldige Besigheid Identifiseerder Kode (BIC) nie.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Fout</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Hierdie is nie 'n geldige UUID nie.</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">Hierdie waarde is nie 'n geldige UUID nie.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -357,6 +357,10 @@
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
                 <target>Hierdie waarde is nie 'n geldige tydsone nie.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target state="needs-review-translation">Hierdie wagwoord is in 'n data-oortreding uitgelek, dit mag nie gebruik word nie. Gebruik asseblief 'n ander wagwoord.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -397,6 +401,42 @@
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Die waarde van die netmasker moet tussen {{ min }} en {{ max }} wees.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target state="needs-review-translation">Die lêernaam is te lank. Dit moet {{ filename_max_length }} karakter of minder hê.|Die lêernaam is te lank. Dit moet {{ filename_max_length }} karakters of minder hê.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target state="needs-review-translation">Die wagwoordsterkte is te laag. Gebruik asseblief 'n sterker wagwoord.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target state="needs-review-translation">Hierdie waarde bevat karakters wat nie toegelaat word deur die huidige beperkingsvlak nie.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target state="needs-review-translation">Die gebruik van onsigbare karakters word nie toegelaat nie.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target state="needs-review-translation">Die meng van nommers van verskillende skrifte word nie toegelaat nie.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target state="needs-review-translation">Die gebruik van verborge oorvleuelende karakters word nie toegelaat nie.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target state="needs-review-translation">Die uitbreiding van die lêer is ongeldig ({{ extension }}). Toegelate uitbreidings is {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target state="needs-review-translation">Die opgespoorde karakterkodering is ongeldig ({{ detected }}). Toegelate koderings is {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target state="needs-review-translation">Hierdie waarde is nie 'n geldige MAC-adres nie.</target>
             </trans-unit>
         </body>
     </file>

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -105,7 +105,7 @@ class Psr4DirectoryLoaderTest extends TestCase
         return new DelegatingLoader(
             new LoaderResolver([
                 new Psr4DirectoryLoader($locator),
-                new class() extends AnnotationClassLoader {
+                new class() extends AttributeClassLoader {
                     protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
                     {
                         $route->setDefault('_controller', $class->getName().'::'.$method->getName());

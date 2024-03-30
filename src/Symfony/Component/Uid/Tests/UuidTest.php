@@ -240,7 +240,7 @@ class UuidTest extends TestCase
         $this->assertFalse((new UuidV4(self::A_UUID_V4))->equals($other));
     }
 
-    public static function provideInvalidEqualType()
+    public static function provideInvalidEqualType(): iterable
     {
         yield [null];
         yield [self::A_UUID_V1];
@@ -317,7 +317,7 @@ class UuidTest extends TestCase
         Uuid::fromBinary($ulid);
     }
 
-    public static function provideInvalidBinaryFormat()
+    public static function provideInvalidBinaryFormat(): array
     {
         return [
             ['01EW2RYKDCT2SAK454KBR2QG08'],
@@ -344,7 +344,7 @@ class UuidTest extends TestCase
         Uuid::fromBase58($ulid);
     }
 
-    public static function provideInvalidBase58Format()
+    public static function provideInvalidBase58Format(): array
     {
         return [
             ["\x41\x4C\x08\x92\x57\x1B\x11\xEB\xBF\x70\x93\xF9\xB0\x82\x2C\x57"],
@@ -371,7 +371,7 @@ class UuidTest extends TestCase
         Uuid::fromBase32($ulid);
     }
 
-    public static function provideInvalidBase32Format()
+    public static function provideInvalidBase32Format(): array
     {
         return [
             ["\x5B\xA8\x32\x72\x45\x6D\x5A\xC0\xAB\xE3\xAA\x8B\xF7\x01\x96\x73"],
@@ -398,7 +398,7 @@ class UuidTest extends TestCase
         Uuid::fromRfc4122($ulid);
     }
 
-    public static function provideInvalidRfc4122Format()
+    public static function provideInvalidRfc4122Format(): array
     {
         return [
             ["\x1E\xB5\x71\xB4\x14\xC0\x68\x93\xBF\x70\x2D\x4C\x83\xCF\x75\x5A"],
@@ -426,5 +426,54 @@ class UuidTest extends TestCase
     public function testFromStringBase58Padding()
     {
         $this->assertInstanceOf(Uuid::class, Uuid::fromString('111111111u9QRyVM94rdmZ'));
+    }
+
+    public function testV1ToV6()
+    {
+        $uuidV1 = new UuidV1('8189d3de-9670-11ee-b9d1-0242ac120002');
+        $uuidV6 = $uuidV1->toV6();
+
+        $this->assertEquals($uuidV1->getDateTime(), $uuidV6->getDateTime());
+        $this->assertSame($uuidV1->getNode(), $uuidV6->getNode());
+        $this->assertEquals($uuidV6, $uuidV1->toV6());
+    }
+
+    public function testV1ToV7BeforeUnixEpochThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot convert UUID to v7: its timestamp is before the Unix epoch.');
+
+        (new UuidV1('9aba8000-ff00-11b0-b3db-3b3fc83afdfc'))->toV7(); // Timestamp is 1969-01-01 00:00:00.0000000
+    }
+
+    public function testV1ToV7()
+    {
+        $uuidV1 = new UuidV1('eb248d80-ea4f-11ec-9d2a-839425e6fb88');
+        $sameUuidV1100NanosecondsLater = new UuidV1('eb248d81-ea4f-11ec-9d2a-839425e6fb88');
+        $uuidV7 = $uuidV1->toV7();
+        $sameUuidV7100NanosecondsLater = $sameUuidV1100NanosecondsLater->toV7();
+
+        $this->assertSame($uuidV1->getDateTime()->format('Uv'), $uuidV7->getDateTime()->format('Uv'));
+        $this->assertEquals($uuidV7, $uuidV1->toV7());
+        $this->assertNotEquals($uuidV7, $sameUuidV7100NanosecondsLater);
+        $this->assertSame(hexdec('0'.substr($uuidV7, -2)) + 1, hexdec('0'.substr($sameUuidV7100NanosecondsLater, -2)));
+    }
+
+    public function testV1ToV7WhenExtraTimeEntropyOverflows()
+    {
+        $uuidV1 = new UuidV1('10e7718f-2d4f-11be-bfed-cdd35907e584');
+        $sameUuidV1100NanosecondsLater = new UuidV1('10e77190-2d4f-11be-bfed-cdd35907e584');
+        $uuidV7 = $uuidV1->toV7();
+        $sameUuidV7100NanosecondsLater = $sameUuidV1100NanosecondsLater->toV7();
+
+        $this->assertSame($uuidV1->getDateTime()->format('Uv'), $uuidV7->getDateTime()->format('Uv'));
+        $this->assertEquals($uuidV7, $uuidV1->toV7());
+        $this->assertNotEquals($uuidV7, $sameUuidV7100NanosecondsLater);
+        $this->assertSame(hexdec('0'.substr($uuidV7, -2)) + 1, hexdec('0'.substr($sameUuidV7100NanosecondsLater, -2)));
+    }
+
+    public function testToString()
+    {
+        $this->assertSame('a45a8538-77a9-4335-bd30-236f59b81b81', (new UuidV4('a45a8538-77a9-4335-bd30-236f59b81b81'))->toString());
     }
 }

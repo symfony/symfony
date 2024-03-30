@@ -21,7 +21,7 @@ final class EnglishInflector implements InflectorInterface
     private const PLURAL_MAP = [
         // First entry: plural suffix, reversed
         // Second entry: length of plural suffix
-        // Third entry: Whether the suffix may succeed a vocal
+        // Third entry: Whether the suffix may succeed a vowel
         // Fourth entry: Whether the suffix may succeed a consonant
         // Fifth entry: singular suffix, normal
 
@@ -162,9 +162,12 @@ final class EnglishInflector implements InflectorInterface
     private const SINGULAR_MAP = [
         // First entry: singular suffix, reversed
         // Second entry: length of singular suffix
-        // Third entry: Whether the suffix may succeed a vocal
+        // Third entry: Whether the suffix may succeed a vowel
         // Fourth entry: Whether the suffix may succeed a consonant
         // Fifth entry: plural suffix, normal
+
+        // axes (axis)
+        ['sixa', 4, false, false, 'axes'],
 
         // criterion (criteria)
         ['airetirc', 8, false, false, 'criterion'],
@@ -253,6 +256,9 @@ final class EnglishInflector implements InflectorInterface
         // seasons (season), treasons (treason), poisons (poison), lessons (lesson)
         ['nos', 3, true, true, 'sons'],
 
+        // icons (icon)
+        ['noc', 3, true, true, 'cons'],
+
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
         ['no', 2, true, true, 'a'],
 
@@ -284,6 +290,12 @@ final class EnglishInflector implements InflectorInterface
 
         // circuses (circus)
         ['suc', 3, true, true, 'cuses'],
+
+        // hippocampi (hippocampus)
+        ['supmacoppih', 11, false, false, 'hippocampi'],
+
+        // campuses (campus)
+        ['sup', 3, true, true, 'puses'],
 
         // status (status)
         ['sutats', 6, true, true, ['status', 'statuses']],
@@ -343,14 +355,29 @@ final class EnglishInflector implements InflectorInterface
         // deer
         'reed',
 
+        // equipment
+        'tnempiuqe',
+
         // feedback
         'kcabdeef',
 
         // fish
         'hsif',
 
+        // health
+        'htlaeh',
+
+        // history
+        'yrotsih',
+
         // info
         'ofni',
+
+        // information
+        'noitamrofni',
+
+        // money
+        'yenom',
 
         // moose
         'esoom',
@@ -363,6 +390,12 @@ final class EnglishInflector implements InflectorInterface
 
         // species
         'seiceps',
+
+        // traffic
+        'ciffart',
+
+        // aircraft
+        'tfarcria',
     ];
 
     public function singularize(string $plural): array
@@ -396,14 +429,14 @@ final class EnglishInflector implements InflectorInterface
                 if ($j === $suffixLength) {
                     // Is there any character preceding the suffix in the plural string?
                     if ($j < $pluralLength) {
-                        $nextIsVocal = str_contains('aeiou', $lowerPluralRev[$j]);
+                        $nextIsVowel = str_contains('aeiou', $lowerPluralRev[$j]);
 
-                        if (!$map[2] && $nextIsVocal) {
-                            // suffix may not succeed a vocal but next char is one
+                        if (!$map[2] && $nextIsVowel) {
+                            // suffix may not succeed a vowel but next char is one
                             break;
                         }
 
-                        if (!$map[3] && !$nextIsVocal) {
+                        if (!$map[3] && !$nextIsVowel) {
                             // suffix may not succeed a consonant but next char is one
                             break;
                         }
@@ -473,14 +506,14 @@ final class EnglishInflector implements InflectorInterface
                 if ($j === $suffixLength) {
                     // Is there any character preceding the suffix in the plural string?
                     if ($j < $singularLength) {
-                        $nextIsVocal = str_contains('aeiou', $lowerSingularRev[$j]);
+                        $nextIsVowel = str_contains('aeiou', $lowerSingularRev[$j]);
 
-                        if (!$map[2] && $nextIsVocal) {
-                            // suffix may not succeed a vocal but next char is one
+                        if (!$map[2] && $nextIsVowel) {
+                            // suffix may not succeed a vowel but next char is one
                             break;
                         }
 
-                        if (!$map[3] && !$nextIsVocal) {
+                        if (!$map[3] && !$nextIsVowel) {
                             // suffix may not succeed a consonant but next char is one
                             break;
                         }

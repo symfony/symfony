@@ -23,22 +23,14 @@ use Symfony\Component\Mime\Part\TextPart;
  */
 final class FormDataPart extends AbstractMultipartPart
 {
-    private array $fields = [];
-
     /**
      * @param array<string|array|DataPart> $fields
      */
-    public function __construct(array $fields = [])
-    {
+    public function __construct(
+        private array $fields = [],
+    ) {
         parent::__construct();
 
-        foreach ($fields as $name => $value) {
-            if (!\is_string($value) && !\is_array($value) && !$value instanceof TextPart) {
-                throw new InvalidArgumentException(sprintf('The value of the form field "%s" can only be a string, an array, or an instance of TextPart ("%s" given).', $name, get_debug_type($value)));
-            }
-
-            $this->fields[$name] = $value;
-        }
         // HTTP does not support \r\n in header values
         $this->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
     }
@@ -73,6 +65,10 @@ final class FormDataPart extends AbstractMultipartPart
                 array_walk($item, $prepare, $fieldName);
 
                 return;
+            }
+
+            if (!\is_string($item) && !$item instanceof TextPart) {
+                throw new InvalidArgumentException(sprintf('The value of the form field "%s" can only be a string, an array, or an instance of TextPart, "%s" given.', $fieldName, get_debug_type($item)));
             }
 
             $values[] = $this->preparePart($fieldName, $item);

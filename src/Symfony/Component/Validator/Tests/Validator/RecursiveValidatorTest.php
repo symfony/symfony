@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\All;
@@ -44,19 +45,22 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\ChildA;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\ChildB;
-use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
-use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
+use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
+use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto;
 use Symfony\Component\Validator\Tests\Fixtures\CascadedChild;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
 use Symfony\Component\Validator\Tests\Fixtures\EntityWithGroupedConstraintOnMethods;
 use Symfony\Component\Validator\Tests\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\LazyProperty;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class RecursiveValidatorTest extends TestCase
 {
@@ -527,11 +531,12 @@ class RecursiveValidatorTest extends TestCase
 
     public function testFailOnScalarReferences()
     {
-        $this->expectException(NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = 'string';
 
         $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $this->expectException(NoSuchMetadataException::class);
 
         $this->validate($entity);
     }
@@ -782,13 +787,14 @@ class RecursiveValidatorTest extends TestCase
 
     public function testMetadataMustExistIfTraversalIsDisabled()
     {
-        $this->expectException(NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = new \ArrayIterator();
 
         $this->metadata->addPropertyConstraint('reference', new Valid([
             'traverse' => false,
         ]));
+
+        $this->expectException(NoSuchMetadataException::class);
 
         $this->validate($entity);
     }
@@ -1262,6 +1268,22 @@ class RecursiveValidatorTest extends TestCase
         }
     }
 
+    public function testGroupProvider()
+    {
+        $dto = new GroupProviderDto();
+
+        $metadata = new ClassMetadata($dto::class);
+        $metadata->addPropertyConstraint('firstName', new NotBlank(groups: ['foo']));
+        $metadata->addPropertyConstraint('lastName', new NotBlank(groups: ['foo']));
+        $metadata->setGroupProvider(DummyGroupProvider::class);
+        $metadata->setGroupSequenceProvider(true);
+        $this->metadataFactory->addMetadata($metadata);
+
+        $violations = $this->validate($dto, null, 'Default');
+
+        $this->assertCount(2, $violations);
+    }
+
     public static function getConstraintMethods()
     {
         return [
@@ -1650,12 +1672,11 @@ class RecursiveValidatorTest extends TestCase
 
     public function testExpectTraversableIfTraversalEnabledOnClass()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $entity = new Entity();
-
         $this->metadata->addConstraint(new Traverse(true));
 
-        $this->validator->validate($entity);
+        $this->expectException(ConstraintDefinitionException::class);
+
+        $this->validator->validate(new Entity());
     }
 
     public function testReferenceTraversalDisabledOnClass()
@@ -2040,8 +2061,14 @@ class RecursiveValidatorTest extends TestCase
 
         $contextFactory = new ExecutionContextFactory($translator);
         $validatorFactory = new ConstraintValidatorFactory();
+        $factories = [
+            DummyGroupProvider::class => static fn () => new DummyGroupProvider(),
+        ];
+        $groupProviderLocator = new class($factories) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
 
-        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $objectInitializers);
+        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $objectInitializers, $groupProviderLocator);
     }
 
     public function testEmptyGroupsArrayDoesNotTriggerDeprecation()

@@ -11,35 +11,43 @@
 
 namespace Symfony\Component\Cache\Tests\Traits;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
+/**
+ * @requires extension redis
+ */
 class RedisTraitTest extends TestCase
 {
-    public static function setUpBeforeClass(): void
-    {
-        if (!getenv('REDIS_CLUSTER_HOSTS')) {
-            throw new SkippedTestSuiteError('REDIS_CLUSTER_HOSTS env var is not defined.');
-        }
-    }
-
     /**
      * @dataProvider provideCreateConnection
      */
     public function testCreateConnection(string $dsn, string $expectedClass)
     {
         if (!class_exists($expectedClass)) {
-            throw new SkippedTestSuiteError(sprintf('The "%s" class is required.', $expectedClass));
+            self::markTestSkipped(sprintf('The "%s" class is required.', $expectedClass));
         }
         if (!getenv('REDIS_CLUSTER_HOSTS')) {
-            throw new SkippedTestSuiteError('REDIS_CLUSTER_HOSTS env var is not defined.');
+            self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
 
         $mock = self::getObjectForTrait(RedisTrait::class);
         $connection = $mock::createConnection($dsn);
 
         self::assertInstanceOf($expectedClass, $connection);
+    }
+
+    public function testUrlDecodeParameters()
+    {
+        if (!getenv('REDIS_AUTHENTICATED_HOST')) {
+            self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
+        }
+
+        $mock = self::getObjectForTrait(RedisTrait::class);
+        $connection = $mock::createConnection('redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST'));
+
+        self::assertInstanceOf(\Redis::class, $connection);
+        self::assertSame('p@ssword', $connection->getAuth());
     }
 
     public static function provideCreateConnection(): array

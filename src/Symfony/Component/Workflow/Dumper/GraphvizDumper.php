@@ -27,7 +27,7 @@ use Symfony\Component\Workflow\Marking;
 class GraphvizDumper implements DumperInterface
 {
     // All values should be strings
-    protected static $defaultOptions = [
+    protected static array $defaultOptions = [
         'graph' => ['ratio' => 'compress', 'rankdir' => 'LR'],
         'node' => ['fontsize' => '9', 'fontname' => 'Arial', 'color' => '#333333', 'fillcolor' => 'lightblue', 'fixedsize' => 'false', 'width' => '1'],
         'edge' => ['fontsize' => '9', 'fontname' => 'Arial', 'color' => '#333333', 'arrowhead' => 'normal', 'arrowsize' => '0.5'],
@@ -42,7 +42,7 @@ class GraphvizDumper implements DumperInterface
      *  * node: The default options for nodes (places + transitions)
      *  * edge: The default options for edges
      */
-    public function dump(Definition $definition, Marking $marking = null, array $options = []): string
+    public function dump(Definition $definition, ?Marking $marking = null, array $options = []): string
     {
         $withMetadata = $options['with-metadata'] ?? false;
 
@@ -64,7 +64,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function findPlaces(Definition $definition, bool $withMetadata, Marking $marking = null): array
+    protected function findPlaces(Definition $definition, bool $withMetadata, ?Marking $marking = null): array
     {
         $workflowMetadata = $definition->getMetadataStore();
 

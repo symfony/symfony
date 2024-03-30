@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
 
 class AbstractSessionHandlerTest extends TestCase
@@ -26,7 +25,7 @@ class AbstractSessionHandlerTest extends TestCase
             2 => ['file', '/dev/null', 'w'],
         ];
         if (!self::$server = @proc_open('exec '.\PHP_BINARY.' -S localhost:8053', $spec, $pipes, __DIR__.'/Fixtures')) {
-            throw new SkippedTestSuiteError('PHP server unable to start.');
+            self::markTestSkipped('PHP server unable to start.');
         }
         sleep(1);
     }

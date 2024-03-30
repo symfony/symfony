@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**
@@ -28,23 +29,22 @@ class NativeRequestHandler implements RequestHandlerInterface
      */
     private const FILE_KEYS = [
         'error',
+        'full_path',
         'name',
         'size',
         'tmp_name',
         'type',
     ];
 
-    public function __construct(ServerParams $params = null)
+    public function __construct(?ServerParams $params = null)
     {
         $this->serverParams = $params ?? new ServerParams();
     }
 
     /**
-     * @return void
-     *
-     * @throws Exception\UnexpectedTypeException If the $request is not null
+     * @throws UnexpectedTypeException If the $request is not null
      */
-    public function handleRequest(FormInterface $form, mixed $request = null)
+    public function handleRequest(FormInterface $form, mixed $request = null): void
     {
         if (null !== $request) {
             throw new UnexpectedTypeException($request, 'null');
@@ -106,7 +106,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             }
 
             if (\is_array($params) && \is_array($files)) {
-                $data = array_replace_recursive($params, $files);
+                $data = FormUtil::mergeParamsAndFiles($params, $files);
             } else {
                 $data = $params ?: $files;
             }
@@ -187,9 +187,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             return $data;
         }
 
-        // Remove extra key added by PHP 8.1.
-        unset($data['full_path']);
-        $keys = array_keys($data);
+        $keys = array_keys($data + ['full_path' => null]);
         sort($keys);
 
         if (self::FILE_KEYS !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
@@ -208,7 +206,9 @@ class NativeRequestHandler implements RequestHandlerInterface
                 'type' => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
                 'size' => $data['size'][$key],
-            ]);
+            ] + (isset($data['full_path'][$key]) ? [
+                'full_path' => $data['full_path'][$key],
+            ] : []));
         }
 
         return $files;
@@ -220,7 +220,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             return $data;
         }
 
-        $keys = array_keys($data);
+        $keys = array_keys($data + ['full_path' => null]);
         sort($keys);
 
         if (self::FILE_KEYS === $keys) {

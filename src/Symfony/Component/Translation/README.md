@@ -6,8 +6,8 @@ The Translation component provides tools to internationalize your application.
 Getting Started
 ---------------
 
-```
-$ composer require symfony/translation
+```bash
+composer require symfony/translation
 ```
 
 ```php

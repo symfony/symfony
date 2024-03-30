@@ -56,11 +56,6 @@ return static function (ContainerConfigurator $container) {
             ->private()
             ->tag('cache.pool')
 
-        ->set('cache.annotations')
-            ->parent('cache.system')
-            ->private()
-            ->tag('cache.pool')
-
         ->set('cache.property_info')
             ->parent('cache.system')
             ->private()

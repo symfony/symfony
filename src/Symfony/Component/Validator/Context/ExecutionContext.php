@@ -37,16 +37,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ExecutionContext implements ExecutionContextInterface
 {
-    private ValidatorInterface $validator;
-
-    /**
-     * The root value of the validated object graph.
-     */
-    private mixed $root;
-
-    private TranslatorInterface $translator;
-    private ?string $translationDomain;
-
     /**
      * The violations generated in the current context.
      */
@@ -110,18 +100,20 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * @internal Called by {@link ExecutionContextFactory}. Should not be used in user code.
+     *
+     * @param mixed $root the root value of the validated object graph
      */
-    public function __construct(ValidatorInterface $validator, mixed $root, TranslatorInterface $translator, string $translationDomain = null)
-    {
-        $this->validator = $validator;
-        $this->root = $root;
-        $this->translator = $translator;
-        $this->translationDomain = $translationDomain;
+    public function __construct(
+        private ValidatorInterface $validator,
+        private mixed $root,
+        private TranslatorInterface $translator,
+        private ?string $translationDomain = null,
+    ) {
         $this->violations = new ConstraintViolationList();
         $this->cachedObjectsRefs = new \SplObjectStorage();
     }
 
-    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath): void
+    public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata, string $propertyPath): void
     {
         $this->value = $value;
         $this->object = $object;
@@ -142,7 +134,7 @@ class ExecutionContext implements ExecutionContextInterface
     public function addViolation(string $message, array $parameters = []): void
     {
         $this->violations->add(new ConstraintViolation(
-            false === $this->translationDomain ? strtr($message, $parameters) : $this->translator->trans($message, $parameters, $this->translationDomain),
+            $this->translator->trans($message, $parameters, $this->translationDomain),
             $message,
             $parameters,
             $this->root,

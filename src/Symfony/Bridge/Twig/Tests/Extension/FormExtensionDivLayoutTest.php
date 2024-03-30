@@ -24,34 +24,6 @@ use Twig\Loader\FilesystemLoader;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 {
-    use RuntimeLoaderProvider;
-
-    private FormRenderer $renderer;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $loader = new FilesystemLoader([
-            __DIR__.'/../../Resources/views/Form',
-            __DIR__.'/Fixtures/templates/form',
-        ]);
-
-        $environment = new Environment($loader, ['strict_variables' => true]);
-        $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addGlobal('global', '');
-        // the value can be any template that exists
-        $environment->addGlobal('dynamic_template_name', 'child_label');
-        $environment->addExtension(new FormExtension());
-
-        $rendererEngine = new TwigRendererEngine([
-            'form_div_layout.html.twig',
-            'custom_widgets.html.twig',
-        ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
-        $this->registerTwigRuntimeLoader($environment, $this->renderer);
-    }
-
     public function testThemeBlockInheritanceUsingUse()
     {
         $view = $this->factory
@@ -96,7 +68,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
-    public static function isSelectedChoiceProvider()
+    public static function isSelectedChoiceProvider(): array
     {
         return [
             [true, '0', '0'],
@@ -146,7 +118,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
-    public static function isRootFormProvider()
+    public static function isRootFormProvider(): array
     {
         return [
             [true, new FormView()],
@@ -184,7 +156,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
             ->createView()
         ;
 
-        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required">', $this->renderWidget($view));
+        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
     }
 
     public function testHelpAttr()
@@ -323,12 +295,12 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"]/b[.="Bolded label"]');
     }
 
-    protected function renderForm(FormView $view, array $vars = [])
+    protected function renderForm(FormView $view, array $vars = []): string
     {
         return $this->renderer->renderBlock($view, 'form', $vars);
     }
 
-    protected function renderLabel(FormView $view, $label = null, array $vars = [])
+    protected function renderLabel(FormView $view, $label = null, array $vars = []): string
     {
         if (null !== $label) {
             $vars += ['label' => $label];
@@ -337,57 +309,90 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         return $this->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
-    protected function renderHelp(FormView $view)
+    protected function renderHelp(FormView $view): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'help');
     }
 
-    protected function renderErrors(FormView $view)
+    protected function renderErrors(FormView $view): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
-    protected function renderWidget(FormView $view, array $vars = [])
+    protected function renderWidget(FormView $view, array $vars = []): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
-    protected function renderRow(FormView $view, array $vars = [])
+    protected function renderRow(FormView $view, array $vars = []): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
-    protected function renderRest(FormView $view, array $vars = [])
+    protected function renderRest(FormView $view, array $vars = []): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
-    protected function renderStart(FormView $view, array $vars = [])
+    protected function renderStart(FormView $view, array $vars = []): string
     {
         return $this->renderer->renderBlock($view, 'form_start', $vars);
     }
 
-    protected function renderEnd(FormView $view, array $vars = [])
+    protected function renderEnd(FormView $view, array $vars = []): string
     {
         return $this->renderer->renderBlock($view, 'form_end', $vars);
     }
 
-    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
+    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true): void
     {
         $this->renderer->setTheme($view, $themes, $useDefaultThemes);
     }
 
-    public static function themeBlockInheritanceProvider()
+    public static function themeBlockInheritanceProvider(): array
     {
         return [
             [['theme.html.twig']],
         ];
     }
 
-    public static function themeInheritanceProvider()
+    public static function themeInheritanceProvider(): array
     {
         return [
             [['parent_label.html.twig'], ['child_label.html.twig']],
+        ];
+    }
+
+    protected function getTemplatePaths(): array
+    {
+        return [
+            __DIR__.'/../../Resources/views/Form',
+            __DIR__.'/Fixtures/templates/form',
+        ];
+    }
+
+    protected function getTwigExtensions(): array
+    {
+        return [
+            new TranslationExtension(new StubTranslator()),
+            new FormExtension(),
+        ];
+    }
+
+    protected function getTwigGlobals(): array
+    {
+        return [
+            'global' => '',
+            // the value can be any template that exists
+            'dynamic_template_name' => 'child_label',
+        ];
+    }
+
+    protected function getThemes(): array
+    {
+        return [
+            'form_div_layout.html.twig',
+            'custom_widgets.html.twig',
         ];
     }
 }

@@ -19,20 +19,17 @@ use Doctrine\ORM\Mapping\OneToOne;
 #[Entity]
 class SingleAssociationToIntIdEntity
 {
-    #[Id, OneToOne(targetEntity: SingleIntIdNoToStringEntity::class, cascade: ['ALL'])]
-    protected $entity;
+    public function __construct(
+        #[Id, OneToOne(cascade: ['ALL'])]
+        protected SingleIntIdNoToStringEntity $entity,
 
-    #[Column(type: 'string', nullable: true)]
-    public $name;
-
-    public function __construct(SingleIntIdNoToStringEntity $entity, $name)
-    {
-        $this->entity = $entity;
-        $this->name = $name;
+        #[Column(nullable: true)]
+        public ?string $name,
+    ) {
     }
 
     public function __toString(): string
     {
-        return (string) $this->name;
+        return $this->name;
     }
 }

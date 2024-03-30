@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class ExpoTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): ExpoTransport
+    public static function createTransport(?HttpClientInterface $client = null): ExpoTransport
     {
         return new ExpoTransport('token', $client ?? new MockHttpClient());
     }

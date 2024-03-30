@@ -29,10 +29,11 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\AllMySms\AllMySmsTransportFactory::class => false,
             Bridge\AmazonSns\AmazonSnsTransportFactory::class => false,
             Bridge\Bandwidth\BandwidthTransportFactory::class => false,
+            Bridge\Bluesky\BlueskyTransportFactory::class => false,
             Bridge\Brevo\BrevoTransportFactory::class => false,
             Bridge\Chatwork\ChatworkTransportFactory::class => false,
-            Bridge\Clickatell\ClickatellTransportFactory::class => false,
             Bridge\ClickSend\ClickSendTransportFactory::class => false,
+            Bridge\Clickatell\ClickatellTransportFactory::class => false,
             Bridge\ContactEveryone\ContactEveryoneTransportFactory::class => false,
             Bridge\Discord\DiscordTransportFactory::class => false,
             Bridge\Engagespot\EngagespotTransportFactory::class => false,
@@ -71,20 +72,24 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\PagerDuty\PagerDutyTransportFactory::class => false,
             Bridge\Plivo\PlivoTransportFactory::class => false,
             Bridge\Pushover\PushoverTransportFactory::class => false,
-            Bridge\RingCentral\RingCentralTransportFactory::class => false,
+            Bridge\Pushy\PushyTransportFactory::class => false,
             Bridge\Redlink\RedlinkTransportFactory::class => false,
+            Bridge\RingCentral\RingCentralTransportFactory::class => false,
             Bridge\RocketChat\RocketChatTransportFactory::class => false,
             Bridge\Sendberry\SendberryTransportFactory::class => false,
-            Bridge\Sendinblue\SendinblueTransportFactory::class => false,
+            Bridge\Sevenio\SevenIoTransportFactory::class => false,
             Bridge\SimpleTextin\SimpleTextinTransportFactory::class => false,
             Bridge\Sinch\SinchTransportFactory::class => false,
             Bridge\Slack\SlackTransportFactory::class => false,
             Bridge\Sms77\Sms77TransportFactory::class => false,
-            Bridge\Smsapi\SmsapiTransportFactory::class => false,
             Bridge\SmsBiuras\SmsBiurasTransportFactory::class => false,
-            Bridge\Smsc\SmscTransportFactory::class => false,
             Bridge\SmsFactor\SmsFactorTransportFactory::class => false,
+            Bridge\Smsapi\SmsapiTransportFactory::class => false,
+            Bridge\Smsbox\SmsboxTransportFactory::class => false,
+            Bridge\Smsc\SmscTransportFactory::class => false,
+            Bridge\Smsense\SmsenseTransportFactory::class => false,
             Bridge\Smsmode\SmsmodeTransportFactory::class => false,
+            Bridge\SmsSluzba\SmsSluzbaTransportFactory::class => false,
             Bridge\SpotHit\SpotHitTransportFactory::class => false,
             Bridge\Telegram\TelegramTransportFactory::class => false,
             Bridge\Telnyx\TelnyxTransportFactory::class => false,
@@ -92,6 +97,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\TurboSms\TurboSmsTransportFactory::class => false,
             Bridge\Twilio\TwilioTransportFactory::class => false,
             Bridge\Twitter\TwitterTransportFactory::class => false,
+            Bridge\Unifonic\UnifonicTransportFactory::class => false,
             Bridge\Vonage\VonageTransportFactory::class => false,
             Bridge\Yunpian\YunpianTransportFactory::class => false,
             Bridge\Zendesk\ZendeskTransportFactory::class => false,
@@ -117,6 +123,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['allmysms', 'symfony/all-my-sms-notifier'];
         yield ['sns', 'symfony/amazon-sns-notifier'];
         yield ['bandwidth', 'symfony/bandwidth-notifier'];
+        yield ['bluesky', 'symfony/bluesky-notifier'];
         yield ['brevo', 'symfony/brevo-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
         yield ['clicksend', 'symfony/click-send-notifier'];
@@ -154,7 +161,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['ringcentral', 'symfony/ring-central-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
         yield ['sendberry', 'symfony/sendberry-notifier'];
-        yield ['sendinblue', 'symfony/sendinblue-notifier'];
+        yield ['sevenio', 'symfony/sevenio-notifier'];
         yield ['simpletextin', 'symfony/simple-textin-notifier'];
         yield ['sinch', 'symfony/sinch-notifier'];
         yield ['slack', 'symfony/slack-notifier'];
@@ -171,6 +178,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['turbosms', 'symfony/turbo-sms-notifier'];
         yield ['twilio', 'symfony/twilio-notifier'];
         yield ['twitter', 'symfony/twitter-notifier'];
+        yield ['unifonic', 'symfony/unifonic-notifier'];
         yield ['zendesk', 'symfony/zendesk-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
         yield ['goip', 'symfony/go-ip-notifier'];

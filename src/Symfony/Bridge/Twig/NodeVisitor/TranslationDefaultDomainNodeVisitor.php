@@ -114,6 +114,6 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 
     private function getVarName(): string
     {
-        return sprintf('__internal_%s', hash('sha256', uniqid(mt_rand(), true), false));
+        return sprintf('__internal_%s', hash('xxh128', uniqid(mt_rand(), true)));
     }
 }

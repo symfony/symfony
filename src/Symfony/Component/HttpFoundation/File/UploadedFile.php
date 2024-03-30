@@ -35,6 +35,7 @@ class UploadedFile extends File
     private string $originalName;
     private string $mimeType;
     private int $error;
+    private string $originalPath;
 
     /**
      * Accepts the information of the uploaded file as provided by the PHP global $_FILES.
@@ -60,9 +61,10 @@ class UploadedFile extends File
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct(string $path, string $originalName, string $mimeType = null, int $error = null, bool $test = false)
+    public function __construct(string $path, string $originalName, ?string $mimeType = null, ?int $error = null, bool $test = false)
     {
         $this->originalName = $this->getName($originalName);
+        $this->originalPath = strtr($originalName, '\\', '/');
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->error = $error ?: \UPLOAD_ERR_OK;
         $this->test = $test;
@@ -90,6 +92,21 @@ class UploadedFile extends File
     public function getClientOriginalExtension(): string
     {
         return pathinfo($this->originalName, \PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Returns the original file full path.
+     *
+     * It is extracted from the request from which the file has been uploaded.
+     * This should not be considered as a safe value to use for a file name/path on your servers.
+     *
+     * If this file was uploaded with the "webkitdirectory" upload directive, this will contain
+     * the path of the file relative to the uploaded root directory. Otherwise this will be identical
+     * to getClientOriginalName().
+     */
+    public function getClientOriginalPath(): string
+    {
+        return $this->originalPath;
     }
 
     /**
@@ -158,7 +175,7 @@ class UploadedFile extends File
      *
      * @throws FileException if, for any reason, the file could not have been moved
      */
-    public function move(string $directory, string $name = null): File
+    public function move(string $directory, ?string $name = null): File
     {
         if ($this->isValid()) {
             if ($this->test) {

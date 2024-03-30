@@ -32,8 +32,8 @@ final class SmsmodeTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiKey,
         private readonly ?string $from = null,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }
@@ -69,7 +69,10 @@ final class SmsmodeTransport extends AbstractTransport
         }
 
         $response = $this->client->request('POST', $endpoint, [
-            'headers' => ['X-Api-Key' => $this->apiKey],
+            'headers' => [
+                'X-Api-Key' => $this->apiKey,
+                'Accept' => 'application/json',
+            ],
             'json' => array_filter($options),
         ]);
 

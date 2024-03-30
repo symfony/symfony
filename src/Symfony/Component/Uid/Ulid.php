@@ -26,7 +26,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
     private static string $time = '';
     private static array $rand = [];
 
-    public function __construct(string $ulid = null)
+    public function __construct(?string $ulid = null)
     {
         if (null === $ulid) {
             $this->uid = static::generate();
@@ -59,7 +59,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
     public static function fromString(string $ulid): static
     {
         if (36 === \strlen($ulid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $ulid)) {
-            $ulid = uuid_parse($ulid);
+            $ulid = hex2bin(str_replace('-', '', $ulid));
         } elseif (22 === \strlen($ulid) && 22 === strspn($ulid, BinaryUtil::BASE58[''])) {
             $ulid = str_pad(BinaryUtil::fromBase($ulid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
         }
@@ -148,7 +148,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         return \DateTimeImmutable::createFromFormat('U.u', substr_replace($time, '.', -3, 0));
     }
 
-    public static function generate(\DateTimeInterface $time = null): string
+    public static function generate(?\DateTimeInterface $time = null): string
     {
         if (null === $mtime = $time) {
             $time = microtime(false);

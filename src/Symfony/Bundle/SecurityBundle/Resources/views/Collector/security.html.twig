@@ -28,6 +28,25 @@
             border: 0;
             padding: 0 0 8px 0;
         }
+
+        #collector-content .authenticators .badge {
+            color: var(--white);
+            display: inline-block;
+            text-align: center;
+        }
+        #collector-content .authenticators .badge.badge-resolved {
+            background-color: var(--green-500);
+        }
+        #collector-content .authenticators .badge.badge-not_resolved {
+            background-color: var(--yellow-500);
+        }
+
+        #collector-content .authenticators svg[data-icon-name="icon-tabler-check"] {
+            color: var(--green-500);
+        }
+        #collector-content .authenticators svg[data-icon-name="icon-tabler-x"] {
+            color: var(--red-500);
+        }
     </style>
 {% endblock %}
 
@@ -316,13 +335,15 @@
                 <h3 class="tab-title">Authenticators</h3>
                 <div class="tab-content">
                     {% if collector.authenticators|default([]) is not empty %}
-                        <table>
+                        <table class="authenticators">
                             <thead>
                             <tr>
                                 <th>Authenticator</th>
                                 <th>Supports</th>
+                                <th>Authenticated</th>
                                 <th>Duration</th>
                                 <th>Passport</th>
+                                <th>Badges</th>
                             </tr>
                             </thead>
 
@@ -340,8 +361,18 @@
                                 <tr>
                                     <td class="font-normal">{{ profiler_dump(authenticator.stub) }}</td>
                                     <td class="no-wrap">{{ source('@WebProfiler/Icon/' ~ (authenticator.supports ? 'yes' : 'no') ~ '.svg') }}</td>
+                                    <td class="no-wrap">{{ authenticator.authenticated is not null ? source('@WebProfiler/Icon/' ~ (authenticator.authenticated ? 'yes' : 'no') ~ '.svg') : '' }}</td>
                                     <td class="no-wrap">{{ '%0.2f'|format(authenticator.duration * 1000) }} ms</td>
                                     <td class="font-normal">{{ authenticator.passport ? profiler_dump(authenticator.passport) : '(none)' }}</td>
+                                    <td class="font-normal">
+                                        {% for badge in authenticator.badges ?? [] %}
+                                            <span class="badge badge-{{ badge.resolved ? 'resolved' : 'not_resolved' }}">
+                                            {{ badge.stub|abbr_class }}
+                                            </span>
+                                        {% else %}
+                                            (none)
+                                        {% endfor %}
+                                    </td>
                                 </tr>
 
                                 {% if loop.last %}

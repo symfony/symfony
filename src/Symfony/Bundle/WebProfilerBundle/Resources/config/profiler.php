@@ -16,8 +16,9 @@ use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
 use Symfony\Bundle\WebProfilerBundle\Controller\RouterController;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator;
+use Symfony\Bundle\WebProfilerBundle\Profiler\CodeExtension;
 use Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 return static function (ContainerConfigurator $container) {
@@ -79,5 +80,9 @@ return static function (ContainerConfigurator $container) {
                 '_profiler_open_file',
                 '?file=%%f&line=%%l#line%%l',
             ])
+
+        ->set('twig.extension.code', CodeExtension::class)
+            ->args([service('debug.file_link_formatter'), param('kernel.project_dir'), param('kernel.charset')])
+            ->tag('twig.extension')
     ;
 };

@@ -28,16 +28,14 @@ final class ScalewayApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.scaleway.com';
 
-    private string $projectId;
-    private string $token;
-    private ?string $region;
-
-    public function __construct(string $projectId, string $token, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->projectId = $projectId;
-        $this->token = $token;
-        $this->region = $region;
-
+    public function __construct(
+        private string $projectId,
+        #[\SensitiveParameter] private string $token,
+        private ?string $region = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
@@ -99,7 +97,7 @@ final class ScalewayApiTransport extends AbstractApiTransport
             $payload['html'] = $email->getHtmlBody();
         }
         if ($attachements = $this->prepareAttachments($email)) {
-            $payload['attachment'] = $attachements;
+            $payload['attachments'] = $attachements;
         }
 
         return $payload;
@@ -115,7 +113,7 @@ final class ScalewayApiTransport extends AbstractApiTransport
             $attachments[] = [
                 'name' => $filename,
                 'type' => $headers->get('Content-Type')->getBody(),
-                'content' => base64_encode($attachment->bodyToString()),
+                'content' => str_replace("\r\n", '', $attachment->bodyToString()),
             ];
         }
 

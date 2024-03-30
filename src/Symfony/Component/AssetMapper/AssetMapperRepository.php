@@ -33,6 +33,8 @@ class AssetMapperRepository
         private readonly array $paths,
         private readonly string $projectRootDir,
         private readonly array $excludedPathPatterns = [],
+        private readonly bool $excludeDotFiles = true,
+        private readonly bool $debug = true,
     ) {
     }
 
@@ -103,11 +105,17 @@ class AssetMapperRepository
         foreach ($this->getDirectories() as $path => $namespace) {
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
             foreach ($iterator as $file) {
+                /** @var \SplFileInfo $file */
                 if (!$file->isFile()) {
                     continue;
                 }
 
                 if ($this->isExcluded($file->getPathname())) {
+                    continue;
+                }
+
+                // avoid potentially exposing PHP files
+                if ('php' === $file->getExtension()) {
                     continue;
                 }
 
@@ -140,7 +148,7 @@ class AssetMapperRepository
         $this->absolutePaths = [];
         foreach ($this->paths as $path => $namespace) {
             if ($filesystem->isAbsolutePath($path)) {
-                if (!file_exists($path)) {
+                if (!file_exists($path) && $this->debug) {
                     throw new \InvalidArgumentException(sprintf('The asset mapper directory "%s" does not exist.', $path));
                 }
                 $this->absolutePaths[realpath($path)] = $namespace;
@@ -154,7 +162,9 @@ class AssetMapperRepository
                 continue;
             }
 
-            throw new \InvalidArgumentException(sprintf('The asset mapper directory "%s" does not exist.', $path));
+            if ($this->debug) {
+                throw new \InvalidArgumentException(sprintf('The asset mapper directory "%s" does not exist.', $path));
+            }
         }
 
         return $this->absolutePaths;
@@ -177,6 +187,10 @@ class AssetMapperRepository
             if (preg_match($pattern, $filesystemPath)) {
                 return true;
             }
+        }
+
+        if ($this->excludeDotFiles && str_starts_with(basename($filesystemPath), '.')) {
+            return true;
         }
 
         return false;

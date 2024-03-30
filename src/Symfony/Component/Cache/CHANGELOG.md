@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add option `sentinel_master` as an alias for `redis_sentinel`
+ * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter`
+ * Add support for URL encoded characters in Couchbase DSN
+ * Add support for using DSN with PDOAdapter
+
+7.0
+---
+
+ * Add parameter `$isSameDatabase` to `DoctrineDbalAdapter::configureSchema()`
+ * Drop support for Postgres < 9.5 and SQL Server < 2008 in `DoctrineDbalAdapter`
+
 6.4
 ---
 

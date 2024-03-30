@@ -42,7 +42,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         $bundle = new ExtensionPresentBundle();
 
@@ -67,7 +67,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandCompletionTester($extractedMessages = [], $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandCompletionTester
+    private function createCommandCompletionTester($extractedMessages = [], $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandCompletionTester
     {
         $translator = $this->createMock(Translator::class);
         $translator

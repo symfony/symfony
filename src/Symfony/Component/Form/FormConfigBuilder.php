@@ -26,15 +26,13 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
+    protected bool $locked = false;
+
     /**
      * Caches a globally unique {@link NativeRequestHandler} instance.
      */
     private static NativeRequestHandler $nativeRequestHandler;
 
-    /** @var bool */
-    protected $locked = false;
-
-    private EventDispatcherInterface $dispatcher;
     private string $name;
     private ?PropertyPathInterface $propertyPath = null;
     private bool $mapped = true;
@@ -58,7 +56,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private string $method = 'POST';
     private RequestHandlerInterface $requestHandler;
     private bool $autoInitialize = false;
-    private array $options;
     private ?\Closure $isEmptyCallback = null;
 
     /**
@@ -70,8 +67,12 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws InvalidArgumentException if the data class is not a valid class or if
      *                                  the name contains invalid characters
      */
-    public function __construct(?string $name, ?string $dataClass, EventDispatcherInterface $dispatcher, array $options = [])
-    {
+    public function __construct(
+        ?string $name,
+        ?string $dataClass,
+        private EventDispatcherInterface $dispatcher,
+        private array $options = [],
+    ) {
         self::validateName($name);
 
         if (null !== $dataClass && !class_exists($dataClass) && !interface_exists($dataClass, false)) {
@@ -80,8 +81,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
         $this->name = (string) $name;
         $this->dataClass = $dataClass;
-        $this->dispatcher = $dispatcher;
-        $this->options = $options;
     }
 
     public function addEventListener(string $eventName, callable $listener, int $priority = 0): static
@@ -347,11 +346,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @return $this
      */
-    public function setDataMapper(DataMapperInterface $dataMapper = null): static
+    public function setDataMapper(?DataMapperInterface $dataMapper): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
@@ -536,7 +532,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @return $this
      */
-    public function setFormFactory(FormFactoryInterface $formFactory)
+    public function setFormFactory(FormFactoryInterface $formFactory): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');

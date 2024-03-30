@@ -23,9 +23,9 @@ class PeriodicalTriggerTest extends TestCase
      */
     public function testConstructor(PeriodicalTrigger $trigger, bool $optimizable = true)
     {
-        $run = new \DateTimeImmutable('2922-02-22 13:34:00+00:00');
+        $run = new \DateTimeImmutable('2922-02-22 12:34:00+00:00');
 
-        $this->assertSame('2922-02-23 13:34:00+00:00', $trigger->getNextRunDate($run)->format('Y-m-d H:i:sP'));
+        $this->assertSame('2922-02-23 13:34:00+01:00', $trigger->getNextRunDate($run)->format('Y-m-d H:i:sP'));
 
         if ($optimizable) {
             // test that we are using the fast algorithm for short period of time
@@ -36,7 +36,7 @@ class PeriodicalTriggerTest extends TestCase
 
     public static function provideForConstructor(): iterable
     {
-        $from = new \DateTimeImmutable($now = '2022-02-22 13:34:00+00:00');
+        $from = new \DateTimeImmutable($now = '2022-02-22 13:34:00+01:00');
         $until = new \DateTimeImmutable($farFuture = '3000-01-01');
 
         yield [new PeriodicalTrigger(86400, $from, $until)];
@@ -73,6 +73,8 @@ class PeriodicalTriggerTest extends TestCase
         yield ['3600.5'];
         yield ['-3600'];
         yield [-3600];
+        yield ['0'];
+        yield [0];
     }
 
     /**
@@ -96,10 +98,7 @@ class PeriodicalTriggerTest extends TestCase
         yield ['every 2 hours', new PeriodicalTrigger('2 hours', $from, $until)];
         yield ['every 2 seconds', new PeriodicalTrigger(new \DateInterval('PT2S'), $from, $until)];
         yield ['DateInterval', new PeriodicalTrigger(new \DateInterval('P1D'), $from, $until)];
-
-        if (\PHP_VERSION_ID >= 80200) {
-            yield ['last day of next month', new PeriodicalTrigger(\DateInterval::createFromDateString('last day of next month'), $from, $until)];
-        }
+        yield ['last day of next month', new PeriodicalTrigger(\DateInterval::createFromDateString('last day of next month'), $from, $until)];
     }
 
     /**
@@ -184,7 +183,7 @@ class PeriodicalTriggerTest extends TestCase
         yield [
             $trigger,
             new \DateTimeImmutable('2020-02-20T01:59:00+02:00'),
-            new \DateTimeImmutable('2020-02-20T02:09:00+02:00'),
+            new \DateTimeImmutable('2020-02-20T02:00:00+02:00'),
         ];
         yield [
             $trigger,

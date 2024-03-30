@@ -33,7 +33,7 @@ final class GoIpTransportTest extends TransportTestCase
         yield ['goip://host.test:4000?sim_slot=4', self::createTransport()];
     }
 
-    public static function createTransport(HttpClientInterface $client = null): GoIpTransport
+    public static function createTransport(?HttpClientInterface $client = null): GoIpTransport
     {
         return (new GoIpTransport('user', 'pass', 4, $client ?? new MockHttpClient()))
             ->setHost('host.test')

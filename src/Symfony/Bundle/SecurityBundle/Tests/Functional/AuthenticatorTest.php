@@ -14,21 +14,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class AuthenticatorTest extends AbstractWebTestCase
 {
     /**
-     * @group legacy
-     *
-     * @dataProvider provideEmails
-     */
-    public function testLegacyGlobalUserProvider($email)
-    {
-        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'implicit_user_provider.yml']);
-
-        $client->request('GET', '/profile', [], [], [
-            'HTTP_X-USER-EMAIL' => $email,
-        ]);
-        $this->assertJsonStringEqualsJsonString('{"email":"'.$email.'"}', $client->getResponse()->getContent());
-    }
-
-    /**
      * @dataProvider provideEmails
      */
     public function testFirewallUserProvider($email, $withinFirewall)
@@ -60,7 +45,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         $this->assertJsonStringEqualsJsonString('{"email":"'.$email.'"}', $client->getResponse()->getContent());
     }
 
-    public static function provideEmails()
+    public static function provideEmails(): iterable
     {
         yield ['jane@example.org', true];
         yield ['john@example.org', false];
@@ -84,7 +69,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         $this->assertEquals('Welcome '.$username.'!', $client->getResponse()->getContent());
     }
 
-    public static function provideEmailsWithFirewalls()
+    public static function provideEmailsWithFirewalls(): iterable
     {
         yield ['jane@example.org', 'main'];
         yield ['john@example.org', 'custom'];
@@ -126,13 +111,13 @@ class AuthenticatorTest extends AbstractWebTestCase
 
         $client->request('POST', '/firewall1/login', [
             '_username' => 'jane@example.org',
-            '_password' => '',
+            '_password' => 'wrong',
         ]);
         $this->assertResponseRedirects('http://localhost/firewall1/login');
 
         $client->request('POST', '/firewall1/dummy_login', [
             '_username' => 'jane@example.org',
-            '_password' => '',
+            '_password' => 'wrong',
         ]);
         $this->assertResponseRedirects('http://localhost/firewall1/dummy_login');
     }

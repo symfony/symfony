@@ -15,6 +15,8 @@ interface CheckpointInterface
 {
     public function acquire(\DateTimeImmutable $now): bool;
 
+    public function from(): \DateTimeImmutable;
+
     public function time(): \DateTimeImmutable;
 
     public function index(): int;

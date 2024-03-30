@@ -66,10 +66,11 @@ class LocaleSwitcherTest extends TestCase
         $this->assertSame('en', $service->getLocale());
         $this->assertSame('en', $switcher->getLocale());
 
-        $switcher->runWithLocale('fr', function () use ($switcher, $service) {
+        $switcher->runWithLocale('fr', function (string $locale) use ($switcher, $service) {
             $this->assertSame('fr', \Locale::getDefault());
             $this->assertSame('fr', $service->getLocale());
             $this->assertSame('fr', $switcher->getLocale());
+            $this->assertSame('fr', $locale);
         });
 
         $this->assertSame('en', \Locale::getDefault());

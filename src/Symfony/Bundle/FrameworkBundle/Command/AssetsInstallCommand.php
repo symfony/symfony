@@ -41,15 +41,11 @@ class AssetsInstallCommand extends Command
     public const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
     public const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
-    private Filesystem $filesystem;
-    private string $projectDir;
-
-    public function __construct(Filesystem $filesystem, string $projectDir)
-    {
+    public function __construct(
+        private Filesystem $filesystem,
+        private string $projectDir,
+    ) {
         parent::__construct();
-
-        $this->filesystem = $filesystem;
-        $this->projectDir = $projectDir;
     }
 
     protected function configure(): void
@@ -264,7 +260,7 @@ EOT
             return $defaultPublicDir;
         }
 
-        $composerConfig = json_decode(file_get_contents($composerFilePath), true);
+        $composerConfig = json_decode($this->filesystem->readFile($composerFilePath), true, flags: \JSON_THROW_ON_ERROR);
 
         return $composerConfig['extra']['public-dir'] ?? $defaultPublicDir;
     }

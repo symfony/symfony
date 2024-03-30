@@ -49,7 +49,7 @@ final class OutputWrapper
     private const URL_PATTERN = 'https?://\S+';
 
     public function __construct(
-        private bool $allowCutUrls = false
+        private bool $allowCutUrls = false,
     ) {
     }
 

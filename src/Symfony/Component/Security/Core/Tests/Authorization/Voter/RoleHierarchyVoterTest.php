@@ -37,6 +37,7 @@ class RoleHierarchyVoterTest extends RoleVoterTest
 
     /**
      * @group legacy
+     *
      * @dataProvider getVoteTests
      */
     public function testVoteUsingTokenThatReturnsRoleNamesLegacy($roles, $attributes, $expected)

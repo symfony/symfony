@@ -28,20 +28,17 @@ final class OvhCloudTransport extends AbstractTransport
 {
     protected const HOST = 'eu.api.ovh.com';
 
-    private string $applicationKey;
-    private string $applicationSecret;
-    private string $consumerKey;
-    private string $serviceName;
     private ?string $sender = null;
     private bool $noStopClause = false;
 
-    public function __construct(string $applicationKey, #[\SensitiveParameter] string $applicationSecret, #[\SensitiveParameter] string $consumerKey, string $serviceName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->applicationKey = $applicationKey;
-        $this->applicationSecret = $applicationSecret;
-        $this->consumerKey = $consumerKey;
-        $this->serviceName = $serviceName;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $applicationKey,
+        #[\SensitiveParameter] private string $applicationSecret,
+        #[\SensitiveParameter] private string $consumerKey,
+        private string $serviceName,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

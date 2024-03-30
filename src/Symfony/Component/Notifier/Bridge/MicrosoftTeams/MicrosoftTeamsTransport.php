@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -30,12 +29,11 @@ final class MicrosoftTeamsTransport extends AbstractTransport
 {
     protected const ENDPOINT = 'outlook.office.com';
 
-    private string $path;
-
-    public function __construct(string $path, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->path = $path;
-
+    public function __construct(
+        private string $path,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

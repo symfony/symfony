@@ -26,12 +26,9 @@ use Symfony\Component\Uid\Uuid;
 #[AsCommand(name: 'uuid:generate', description: 'Generate a UUID')]
 class GenerateUuidCommand extends Command
 {
-    private UuidFactory $factory;
-
-    public function __construct(UuidFactory $factory = null)
-    {
-        $this->factory = $factory ?? new UuidFactory();
-
+    public function __construct(
+        private UuidFactory $factory = new UuidFactory(),
+    ) {
         parent::__construct();
     }
 
@@ -168,7 +165,7 @@ EOF
 
         $formatOption = $input->getOption('format');
 
-        if (\in_array($formatOption, $this->getAvailableFormatOptions())) {
+        if (\in_array($formatOption, $this->getAvailableFormatOptions(), true)) {
             $format = 'to'.ucfirst($formatOption);
         } else {
             $io->error(sprintf('Invalid format "%s", supported formats are "%s".', $formatOption, implode('", "', $this->getAvailableFormatOptions())));

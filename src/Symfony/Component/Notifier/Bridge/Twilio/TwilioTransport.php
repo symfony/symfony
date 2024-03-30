@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\Twilio;
 
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -30,16 +29,13 @@ final class TwilioTransport extends AbstractTransport
 {
     protected const HOST = 'api.twilio.com';
 
-    private string $accountSid;
-    private string $authToken;
-    private string $from;
-
-    public function __construct(string $accountSid, #[\SensitiveParameter] string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->accountSid = $accountSid;
-        $this->authToken = $authToken;
-        $this->from = $from;
-
+    public function __construct(
+        private string $accountSid,
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

@@ -48,7 +48,7 @@ final class CronExpressionTrigger implements TriggerInterface
 
     public function __construct(
         private readonly CronExpression $expression = new CronExpression('* * * * *'),
-        \DateTimeZone|string $timezone = null,
+        \DateTimeZone|string|null $timezone = null,
     ) {
         $this->timezone = $timezone instanceof \DateTimeZone ? $timezone->getName() : $timezone;
     }
@@ -58,7 +58,7 @@ final class CronExpressionTrigger implements TriggerInterface
         return $this->expression->getExpression();
     }
 
-    public static function fromSpec(string $expression = '* * * * *', string $context = null, \DateTimeZone|string $timezone = null): self
+    public static function fromSpec(string $expression = '* * * * *', ?string $context = null, \DateTimeZone|string|null $timezone = null): self
     {
         if (!class_exists(CronExpression::class)) {
             throw new LogicException(sprintf('You cannot use "%s" as the "cron expression" package is not installed. Try running "composer require dragonmantank/cron-expression".', __CLASS__));
@@ -89,11 +89,11 @@ final class CronExpressionTrigger implements TriggerInterface
             return $expression;
         }
 
-        $hashEngine = self::hashEngine($context);
+        $randomizer = new Randomizer(new Xoshiro256StarStar(hash('sha256', $context, true)));
 
         foreach ($parts as $position => $part) {
             if (preg_match('#^\#(\((\d+)-(\d+)\))?$#', $part, $matches)) {
-                $parts[$position] = $hashEngine(
+                $parts[$position] = $randomizer->getInt(
                     (int) ($matches[2] ?? self::HASH_RANGES[$position][0]),
                     (int) ($matches[3] ?? self::HASH_RANGES[$position][1]),
                 );
@@ -101,26 +101,5 @@ final class CronExpressionTrigger implements TriggerInterface
         }
 
         return implode(' ', $parts);
-    }
-
-    /**
-     * @return callable(int,int):int
-     */
-    private static function hashEngine(string $context): callable
-    {
-        if (class_exists(Randomizer::class)) {
-            $randomizer = new Randomizer(new Xoshiro256StarStar(hash('sha256', $context, true)));
-
-            return static fn ($start, $end) => $randomizer->getInt($start, $end);
-        }
-
-        $counter = 0;
-
-        return static function ($start, $end) use ($context, &$counter) {
-            $possibleValues = range($start, $end);
-            ++$counter;
-
-            return $possibleValues[(int) fmod(hexdec(substr(md5($context.'-'.$counter), 0, 10)), \count($possibleValues))];
-        };
     }
 }

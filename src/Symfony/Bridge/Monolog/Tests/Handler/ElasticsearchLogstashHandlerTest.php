@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LogstashFormatter;
-use Monolog\Logger;
+use Monolog\Level;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
@@ -51,7 +51,7 @@ EOBODY;
         $handler = new ElasticsearchLogstashHandler('http://es:9200', 'log', new MockHttpClient($responseFactory));
         $handler->setFormatter($this->getDefaultFormatter());
 
-        $record = RecordFactory::create(Logger::INFO, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00'));
+        $record = RecordFactory::create(Level::Info, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00'));
 
         $handler->handle($record);
 
@@ -84,10 +84,10 @@ EOBODY;
             return new MockResponse();
         };
 
-        $handler = new ElasticsearchLogstashHandler('http://es:9200', 'log', new MockHttpClient($responseFactory), Logger::DEBUG, true, '8.0.0');
+        $handler = new ElasticsearchLogstashHandler('http://es:9200', 'log', new MockHttpClient($responseFactory), Level::Debug, true, '8.0.0');
         $handler->setFormatter($this->getDefaultFormatter());
 
-        $record = RecordFactory::create(Logger::INFO, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00'));
+        $record = RecordFactory::create(Level::Info, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00'));
 
         $handler->handle($record);
 
@@ -127,8 +127,8 @@ EOBODY;
         $handler->setFormatter($this->getDefaultFormatter());
 
         $records = [
-            RecordFactory::create(Logger::INFO, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00')),
-            RecordFactory::create(Logger::WARNING, 'My second message', 'php', datetime: new \DateTimeImmutable('2020-01-01T00:00:01+01:00')),
+            RecordFactory::create(Level::Info, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00')),
+            RecordFactory::create(Level::Warning, 'My second message', 'php', datetime: new \DateTimeImmutable('2020-01-01T00:00:01+01:00')),
         ];
 
         $handler->handleBatch($records);

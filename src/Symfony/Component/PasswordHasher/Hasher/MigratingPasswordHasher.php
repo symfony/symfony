@@ -24,21 +24,21 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
  */
 final class MigratingPasswordHasher implements PasswordHasherInterface
 {
-    private PasswordHasherInterface $bestHasher;
     private array $extraHashers;
 
-    public function __construct(PasswordHasherInterface $bestHasher, PasswordHasherInterface ...$extraHashers)
-    {
-        $this->bestHasher = $bestHasher;
+    public function __construct(
+        private PasswordHasherInterface $bestHasher,
+        PasswordHasherInterface ...$extraHashers,
+    ) {
         $this->extraHashers = $extraHashers;
     }
 
-    public function hash(#[\SensitiveParameter] string $plainPassword, string $salt = null): string
+    public function hash(#[\SensitiveParameter] string $plainPassword, ?string $salt = null): string
     {
         return $this->bestHasher->hash($plainPassword, $salt);
     }
 
-    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword, string $salt = null): bool
+    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword, ?string $salt = null): bool
     {
         if ($this->bestHasher->verify($hashedPassword, $plainPassword, $salt)) {
             return true;

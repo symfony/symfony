@@ -12,6 +12,9 @@
 namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
@@ -26,6 +29,7 @@ final class IsCsrfTokenValidAttributeListener implements EventSubscriberInterfac
 {
     public function __construct(
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
+        private ?ExpressionLanguage $expressionLanguage = null,
     ) {
     }
 
@@ -37,9 +41,12 @@ final class IsCsrfTokenValidAttributeListener implements EventSubscriberInterfac
         }
 
         $request = $event->getRequest();
+        $arguments = $event->getNamedArguments();
 
         foreach ($attributes as $attribute) {
-            if (!$this->csrfTokenManager->isTokenValid(new CsrfToken($attribute->id, $request->request->getString($attribute->tokenKey)))) {
+            $id = $this->getTokenId($attribute->id, $request, $arguments);
+
+            if (!$this->csrfTokenManager->isTokenValid(new CsrfToken($id, $request->request->getString($attribute->tokenKey)))) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
             }
         }
@@ -48,5 +55,19 @@ final class IsCsrfTokenValidAttributeListener implements EventSubscriberInterfac
     public static function getSubscribedEvents(): array
     {
         return [KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', 25]];
+    }
+
+    private function getTokenId(string|Expression $id, Request $request, array $arguments): string
+    {
+        if (!$id instanceof Expression) {
+            return $id;
+        }
+
+        $this->expressionLanguage ??= new ExpressionLanguage();
+
+        return (string) $this->expressionLanguage->evaluate($id, [
+            'request' => $request,
+            'args' => $arguments,
+        ]);
     }
 }

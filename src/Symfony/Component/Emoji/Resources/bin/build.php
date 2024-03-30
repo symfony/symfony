@@ -21,6 +21,7 @@ $emojisCodePoints = Builder::getEmojisCodePoints();
 Builder::saveRules(Builder::buildRules($emojisCodePoints));
 Builder::saveRules(Builder::buildStripRules($emojisCodePoints));
 Builder::saveRules(Builder::buildGitHubRules($emojisCodePoints));
+Builder::saveRules(Builder::buildGitlabRules($emojisCodePoints));
 Builder::saveRules(Builder::buildSlackRules($emojisCodePoints));
 
 final class Builder
@@ -154,6 +155,35 @@ final class Builder
         $maps = self::createRules($maps);
 
         return ['emoji-github' => $maps, 'github-emoji' => array_flip($maps)];
+    }
+
+    public static function buildGitlabRules(array $emojisCodePoints): iterable
+    {
+        $emojis = json_decode((new Filesystem())->readFile(__DIR__.'/vendor/gitlab-emojis.json'), true, flags: JSON_THROW_ON_ERROR);
+
+        $ignored = [];
+        $maps = [];
+
+        foreach ($emojis as $emojiItem) {
+            $emojiCodePoints = strtolower($emojiItem['unicode']);
+            if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
+                $ignored[] = [
+                    'emojiCodePoints' => $emojiCodePoints,
+                    'name' => $emojiItem['name'],
+                ];
+                continue;
+            }
+            $emoji = $emojisCodePoints[$emojiCodePoints];
+            if (!self::testEmoji($emoji, 'gitlab', $emojiCodePoints)) {
+                continue;
+            }
+            $codePointsCount = mb_strlen($emoji);
+            $maps[$codePointsCount][$emoji] = $emojiItem['shortname'];
+        }
+
+        $maps = self::createRules($maps);
+
+        return ['emoji-gitlab' => $maps, 'gitlab-emoji' => array_flip($maps)];
     }
 
     public static function buildSlackRules(array $emojisCodePoints): iterable

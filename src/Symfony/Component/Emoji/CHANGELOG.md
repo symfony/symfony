@@ -5,3 +5,4 @@ CHANGELOG
 ---
 
  * Add the component
+ * Add the `gitlab` locale to `EmojiTransliterator`

@@ -102,7 +102,7 @@ class TextDescriptor extends Descriptor
         }
 
         if ($inputOptions) {
-            if ($showArguments) {
+            if ($inputArguments) {
                 $this->writeText("\n");
             }
             $laterOptions = [];

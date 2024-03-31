@@ -494,7 +494,7 @@ class Parser
             $data = $object;
         }
 
-        return empty($data) ? null : $data;
+        return $data ?: null;
     }
 
     private function parseBlock(int $offset, string $yaml, int $flags): mixed

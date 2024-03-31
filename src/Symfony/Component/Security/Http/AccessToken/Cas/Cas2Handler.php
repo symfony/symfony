@@ -74,7 +74,7 @@ final class Cas2Handler implements AccessTokenHandlerInterface
             throw new AuthenticationException('No ticket found in request.');
         }
         unset($query['ticket']);
-        $queryString = empty($query) ? '' : '?'.http_build_query($query);
+        $queryString = $query ? '?'.http_build_query($query) : '';
 
         return sprintf('%s?ticket=%s&service=%s',
             $this->validationUrl,

@@ -178,7 +178,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
         $headers = $symfonyResponse->headers->all();
         $cookies = $symfonyResponse->headers->getCookies();
-        if (!empty($cookies)) {
+        if ($cookies) {
             $headers['Set-Cookie'] = [];
 
             foreach ($cookies as $cookie) {

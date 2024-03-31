@@ -101,7 +101,7 @@ class Cookie
             throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
         }
 
-        if (empty($name)) {
+        if (!$name) {
             throw new \InvalidArgumentException('The cookie name cannot be empty.');
         }
 
@@ -109,7 +109,7 @@ class Cookie
         $this->value = $value;
         $this->domain = $domain;
         $this->expire = self::expiresTimestamp($expire);
-        $this->path = empty($path) ? '/' : $path;
+        $this->path = $path ?: '/';
         $this->secure = $secure;
         $this->httpOnly = $httpOnly;
         $this->raw = $raw;

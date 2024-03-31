@@ -726,7 +726,7 @@ class Table
             } else {
                 $row = $this->copyRow($rows, $unmergedRowKey - 1);
                 foreach ($unmergedRow as $column => $cell) {
-                    if (!empty($cell)) {
+                    if ($cell) {
                         $row[$column] = $cell;
                     }
                 }

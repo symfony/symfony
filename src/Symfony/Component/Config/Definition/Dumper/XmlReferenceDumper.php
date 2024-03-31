@@ -280,7 +280,7 @@ class XmlReferenceDumper
             return 'null';
         }
 
-        if (empty($value)) {
+        if (!$value) {
             return '';
         }
 

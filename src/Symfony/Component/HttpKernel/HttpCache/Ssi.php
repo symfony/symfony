@@ -41,7 +41,7 @@ class Ssi extends AbstractSurrogate
     public function process(Request $request, Response $response): Response
     {
         $type = $response->headers->get('Content-Type');
-        if (empty($type)) {
+        if (!$type) {
             $type = 'text/html';
         }
 

@@ -136,7 +136,7 @@ class FormFieldRegistry
     private function walk(array $array, ?string $base = '', array &$output = []): array
     {
         foreach ($array as $k => $v) {
-            $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);
+            $path = $base ? sprintf('%s[%s]', $base, $k) : $k;
             if (\is_array($v)) {
                 $this->walk($v, $path, $output);
             } else {

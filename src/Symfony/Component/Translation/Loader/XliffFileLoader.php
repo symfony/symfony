@@ -197,7 +197,7 @@ class XliffFileLoader implements LoaderInterface
      */
     private function utf8ToCharset(string $content, ?string $encoding = null): string
     {
-        if ('UTF-8' !== $encoding && !empty($encoding)) {
+        if ('UTF-8' !== $encoding && $encoding) {
             return mb_convert_encoding($content, $encoding, 'UTF-8');
         }
 

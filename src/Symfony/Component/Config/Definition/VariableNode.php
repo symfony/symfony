@@ -112,6 +112,6 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function isValueEmpty(mixed $value): bool
     {
-        return empty($value);
+        return !$value;
     }
 }

@@ -112,7 +112,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
 
             unset($options['username'], $options['password']);
             foreach ($options as $option => $value) {
-                if (!empty($value)) {
+                if ($value) {
                     $bucket->$option = $value;
                 }
             }

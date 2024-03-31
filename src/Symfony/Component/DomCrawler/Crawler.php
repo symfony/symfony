@@ -130,7 +130,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function addContent(string $content, ?string $type = null): void
     {
-        if (empty($type)) {
+        if (!$type) {
             $type = str_starts_with($content, '<?xml') ? 'application/xml' : 'text/html';
         }
 
@@ -176,7 +176,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $base = $this->filterRelativeXPath('descendant-or-self::base')->extract(['href']);
 
         $baseHref = current($base);
-        if (\count($base) && !empty($baseHref)) {
+        if (\count($base) && $baseHref) {
             if ($this->baseHref) {
                 $linkNode = $dom->createElement('a');
                 $linkNode->setAttribute('href', $baseHref);

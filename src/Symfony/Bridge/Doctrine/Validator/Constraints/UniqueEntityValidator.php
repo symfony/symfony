@@ -116,7 +116,7 @@ class UniqueEntityValidator extends ConstraintValidator
 
         // skip validation if there are no criteria (this can happen when the
         // "ignoreNull" option is enabled and fields to be checked are null
-        if (empty($criteria)) {
+        if (!$criteria) {
             return;
         }
 

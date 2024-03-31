@@ -82,7 +82,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         $shortDescription = $docBlock->getSummary();
 
-        if (!empty($shortDescription)) {
+        if ($shortDescription) {
             return $shortDescription;
         }
 
@@ -90,7 +90,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             if ($var && !$var instanceof InvalidTag) {
                 $varDescription = $var->getDescription()->render();
 
-                if (!empty($varDescription)) {
+                if ($varDescription) {
                     return $varDescription;
                 }
             }

@@ -24,6 +24,11 @@ class HttpClientDataCollectorTest extends TestCase
         TestHttpServer::start();
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        TestHttpServer::stop();
+    }
+
     public function testItCollectsRequestCount()
     {
         $httpClient1 = $this->httpClientThatHasTracedRequests([

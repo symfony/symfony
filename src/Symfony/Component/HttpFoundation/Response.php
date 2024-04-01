@@ -84,6 +84,80 @@ class Response
     public const HTTP_LOOP_DETECTED = 508;                                               // RFC5842
     public const HTTP_NOT_EXTENDED = 510;                                                // RFC2774
     public const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;                             // RFC6585
+    public const HTTP_MEH = 701;                                                         // https://github.com/joho/7XX-rfc
+    public const HTTP_EMACS = 702;                                                       // https://github.com/joho/7XX-rfc
+    public const HTTP_EXPLOSION = 703;                                                   // https://github.com/joho/7XX-rfc
+    public const HTTP_GOTO_FAIL = 704;                                                   // https://github.com/joho/7XX-rfc
+    public const HTTP_SEE_795 = 705;                                                     // https://github.com/joho/7XX-rfc
+    public const HTTP_DELETE_YOUR_ACCOUNT = 706;                                         // https://github.com/joho/7XX-rfc
+    public const HTTP_CAN_T_QUIT_VI = 707;                                               // https://github.com/joho/7XX-rfc
+    public const HTTP_PHP = 710;                                                         // https://github.com/joho/7XX-rfc
+    public const HTTP_CONVENIENCE_STORE = 711;                                           // https://github.com/joho/7XX-rfc
+    public const HTTP_NOSQL = 712;                                                       // https://github.com/joho/7XX-rfc
+    public const HTTP_I_AM_NOT_A_TEAPOT = 718;                                           // https://github.com/joho/7XX-rfc
+    public const HTTP_HASKELL = 719;                                                     // https://github.com/joho/7XX-rfc
+    public const HTTP_UNPOSSIBLE = 720;                                                  // https://github.com/joho/7XX-rfc
+    public const HTTP_KNOWN_UNKNOWNS = 721;                                              // https://github.com/joho/7XX-rfc
+    public const HTTP_UNKNOWN_UNKNOWNS = 722;                                            // https://github.com/joho/7XX-rfc
+    public const HTTP_TRICKY = 723;                                                      // https://github.com/joho/7XX-rfc
+    public const HTTP_THIS_LINE_SHOULD_BE_UNREACHABLE = 724;                             // https://github.com/joho/7XX-rfc
+    public const HTTP_IT_WORKS_ON_MY_MACHINE = 725;                                      // https://github.com/joho/7XX-rfc
+    public const HTTP_IT_S_A_FEATURE_NOT_A_BUG = 726;                                    // https://github.com/joho/7XX-rfc
+    public const HTTP_32_BITS_IS_PLENTY = 727;                                           // https://github.com/joho/7XX-rfc
+    public const HTTP_IT_WORKS_IN_MY_TIMEZONE = 728;                                     // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKING_NPM = 730;                                                 // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKING_RUBYGEMS = 731;                                            // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKING_UNIC_128169_DE = 732;                                      // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKING_DEADLOCKS = 733;                                           // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKING_DEFERREDS = 734;                                           // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKING_IE = 735;                                                  // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKING_RACE_CONDITIONS = 736;                                     // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKTHREADSING = 737;                                              // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKING_EXACTLY_ONCE_DELIVERY = 738;                               // https://github.com/joho/7XX-rfc
+    public const HTTP_FUCKING_WINDOWS = 739;                                             // https://github.com/joho/7XX-rfc
+    public const HTTP_DIDN_T_BOTHER_TO_COMPILE_IT = 750;                                 // https://github.com/joho/7XX-rfc
+    public const HTTP_SYNTAX_ERROR = 753;                                                // https://github.com/joho/7XX-rfc
+    public const HTTP_TOO_MANY_SEMI_COLONS = 754;                                        // https://github.com/joho/7XX-rfc
+    public const HTTP_NOT_ENOUGH_SEMI_COLONS = 755;                                      // https://github.com/joho/7XX-rfc
+    public const HTTP_INSUFFICIENTLY_POLITE = 756;                                       // https://github.com/joho/7XX-rfc
+    public const HTTP_EXCESSIVELY_POLITE = 757;                                          // https://github.com/joho/7XX-rfc
+    public const HTTP_UNEXPECTED_T_PAAMAYIM_NEKUDOTAYIM = 759;                           // https://github.com/joho/7XX-rfc
+    public const HTTP_HUNGOVER = 761;                                                    // https://github.com/joho/7XX-rfc
+    public const HTTP_STONED = 762;                                                      // https://github.com/joho/7XX-rfc
+    public const HTTP_UNDER_CAFFEINATED = 763;                                           // https://github.com/joho/7XX-rfc
+    public const HTTP_OVER_CAFFEINATED = 764;                                            // https://github.com/joho/7XX-rfc
+    public const HTTP_RAILSCAMP = 765;                                                   // https://github.com/joho/7XX-rfc
+    public const HTTP_SOBER = 766;                                                       // https://github.com/joho/7XX-rfc
+    public const HTTP_DRUNK = 767;                                                       // https://github.com/joho/7XX-rfc
+    public const HTTP_ACCIDENTALLY_TOOK_SLEEPING_PILLS_INSTEAD_OF_MIGRAINE_PILLS_DURING_CRUNCH_WEEK = 768; // https://github.com/joho/7XX-rfc
+    public const HTTP_CACHED_FOR_TOO_LONG = 771;                                         // https://github.com/joho/7XX-rfc
+    public const HTTP_NOT_CACHED_LONG_ENOUGH = 772;                                      // https://github.com/joho/7XX-rfc
+    public const HTTP_NOT_CACHED_AT_ALL = 773;                                           // https://github.com/joho/7XX-rfc
+    public const HTTP_WHY_WAS_THIS_CACHED = 774;                                         // https://github.com/joho/7XX-rfc
+    public const HTTP_OUT_OF_CASH = 775;                                                 // https://github.com/joho/7XX-rfc
+    public const HTTP_ERROR_ON_THE_EXCEPTION = 776;                                      // https://github.com/joho/7XX-rfc
+    public const HTTP_COINCIDENCE = 777;                                                 // https://github.com/joho/7XX-rfc
+    public const HTTP_OFF_BY_ONE_ERROR = 778;                                            // https://github.com/joho/7XX-rfc
+    public const HTTP_OFF_BY_TOO_MANY_TO_COUNT_ERROR = 779;                              // https://github.com/joho/7XX-rfc
+    public const HTTP_PROJECT_OWNER_NOT_RESPONDING = 780;                                // https://github.com/joho/7XX-rfc
+    public const HTTP_OPERATIONS = 781;                                                  // https://github.com/joho/7XX-rfc
+    public const HTTP_QA = 782;                                                          // https://github.com/joho/7XX-rfc
+    public const HTTP_IT_WAS_A_CUSTOMER_REQUEST_HONESTLY = 783;                          // https://github.com/joho/7XX-rfc
+    public const HTTP_MANAGEMENT_OBVIOUSLY = 784;                                        // https://github.com/joho/7XX-rfc
+    public const HTTP_TPS_COVER_SHEET_NOT_ATTACHED = 785;                                // https://github.com/joho/7XX-rfc
+    public const HTTP_TRY_IT_NOW = 786;                                                  // https://github.com/joho/7XX-rfc
+    public const HTTP_FURTHER_FUNDING_REQUIRED = 787;                                    // https://github.com/joho/7XX-rfc
+    public const HTTP_DESIGNER_S_FINAL_DESIGNS_WEREN_T = 788;                            // https://github.com/joho/7XX-rfc
+    public const HTTP_NOT_MY_DEPARTMENT = 789;                                           // https://github.com/joho/7XX-rfc
+    public const HTTP_THE_INTERNET_SHUT_DOWN_DUE_TO_COPYRIGHT_RESTRICTIONS = 791;        // https://github.com/joho/7XX-rfc
+    public const HTTP_CLIMATE_CHANGE_DRIVEN_CATASTROPHIC_WEATHER_EVENT = 792;            // https://github.com/joho/7XX-rfc
+    public const HTTP_ZOMBIE_APOCALYPSE = 793;                                           // https://github.com/joho/7XX-rfc
+    public const HTTP_SOMEONE_LET_PG_NEAR_A_REPL = 794;                                  // https://github.com/joho/7XX-rfc
+    public const HTTP_SEE_705 = 795;                                                     // https://github.com/joho/7XX-rfc
+    public const HTTP_SOME_DNS_FUCKERY_IDNO = 796;                                       // https://github.com/joho/7XX-rfc
+    public const HTTP_THIS_IS_THE_LAST_PAGE_OF_THE_INTERNET_GO_BACK = 797;               // https://github.com/joho/7XX-rfc
+    public const HTTP_I_CHECKED_THE_DB_BACKUPS_CUPBOARD_AND_THE_CUPBOARD_WAS_BARE = 798; // https://github.com/joho/7XX-rfc
+    public const HTTP_END_OF_THE_WORLD = 799;                                            // https://github.com/joho/7XX-rfc
 
     /**
      * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
@@ -185,6 +259,80 @@ class Response
         508 => 'Loop Detected',                                               // RFC5842
         510 => 'Not Extended',                                                // RFC2774
         511 => 'Network Authentication Required',                             // RFC6585
+        701 => 'Meh',                                                         // https://github.com/joho/7XX-rfc
+        702 => 'Emacs',                                                       // https://github.com/joho/7XX-rfc
+        703 => 'Explosion',                                                   // https://github.com/joho/7XX-rfc
+        704 => 'Goto Fail',                                                   // https://github.com/joho/7XX-rfc
+        705 => 'I wrote the code and missed the necessary validation by an oversight (see 795)', // https://github.com/joho/7XX-rfc
+        706 => 'Delete Your Account',                                         // https://github.com/joho/7XX-rfc
+        707 => 'Can\'t quit vi',                                              // https://github.com/joho/7XX-rfc
+        710 => 'PHP',                                                         // https://github.com/joho/7XX-rfc
+        711 => 'Convenience Store',                                           // https://github.com/joho/7XX-rfc
+        712 => 'NoSQL',                                                       // https://github.com/joho/7XX-rfc
+        718 => 'I am not a teapot',                                           // https://github.com/joho/7XX-rfc
+        719 => 'Haskell',                                                     // https://github.com/joho/7XX-rfc
+        720 => 'Unpossible',                                                  // https://github.com/joho/7XX-rfc
+        721 => 'Known Unknowns',                                              // https://github.com/joho/7XX-rfc
+        722 => 'Unknown Unknowns',                                            // https://github.com/joho/7XX-rfc
+        723 => 'Tricky',                                                      // https://github.com/joho/7XX-rfc
+        724 => 'This line should be unreachable',                             // https://github.com/joho/7XX-rfc
+        725 => 'It works on my machine',                                      // https://github.com/joho/7XX-rfc
+        726 => 'It\'s a feature, not a bug',                                  // https://github.com/joho/7XX-rfc
+        727 => '32 bits is plenty',                                           // https://github.com/joho/7XX-rfc
+        728 => 'It works in my timezone',                                     // https://github.com/joho/7XX-rfc
+        730 => 'Fucking npm',                                                 // https://github.com/joho/7XX-rfc
+        731 => 'Fucking Rubygems',                                            // https://github.com/joho/7XX-rfc
+        732 => 'Fucking Unic&#128169;de',                                     // https://github.com/joho/7XX-rfc
+        733 => 'Fucking Deadlocks',                                           // https://github.com/joho/7XX-rfc
+        734 => 'Fucking Deferreds',                                           // https://github.com/joho/7XX-rfc
+        735 => 'Fucking IE',                                                  // https://github.com/joho/7XX-rfc
+        736 => 'Fucking Race Conditions',                                     // https://github.com/joho/7XX-rfc
+        737 => 'FuckThreadsing',                                              // https://github.com/joho/7XX-rfc
+        738 => 'Fucking Exactly-once Delivery',                               // https://github.com/joho/7XX-rfc
+        739 => 'Fucking Windows',                                             // https://github.com/joho/7XX-rfc
+        750 => 'Didn\'t bother to compile it',                                // https://github.com/joho/7XX-rfc
+        753 => 'Syntax Error',                                                // https://github.com/joho/7XX-rfc
+        754 => 'Too many semi-colons',                                        // https://github.com/joho/7XX-rfc
+        755 => 'Not enough semi-colons',                                      // https://github.com/joho/7XX-rfc
+        756 => 'Insufficiently polite',                                       // https://github.com/joho/7XX-rfc
+        757 => 'Excessively polite',                                          // https://github.com/joho/7XX-rfc
+        759 => 'Unexpected "T_PAAMAYIM_NEKUDOTAYIM"',                         // https://github.com/joho/7XX-rfc
+        761 => 'Hungover',                                                    // https://github.com/joho/7XX-rfc
+        762 => 'Stoned',                                                      // https://github.com/joho/7XX-rfc
+        763 => 'Under-Caffeinated',                                           // https://github.com/joho/7XX-rfc
+        764 => 'Over-Caffeinated',                                            // https://github.com/joho/7XX-rfc
+        765 => 'Railscamp',                                                   // https://github.com/joho/7XX-rfc
+        766 => 'Sober',                                                       // https://github.com/joho/7XX-rfc
+        767 => 'Drunk',                                                       // https://github.com/joho/7XX-rfc
+        768 => 'Accidentally Took Sleeping Pills Instead Of Migraine Pills During Crunch Week', // https://github.com/joho/7XX-rfc
+        771 => 'Cached for too long',                                         // https://github.com/joho/7XX-rfc
+        772 => 'Not cached long enough',                                      // https://github.com/joho/7XX-rfc
+        773 => 'Not cached at all',                                           // https://github.com/joho/7XX-rfc
+        774 => 'Why was this cached?',                                        // https://github.com/joho/7XX-rfc
+        775 => 'Out of cash',                                                 // https://github.com/joho/7XX-rfc
+        776 => 'Error on the Exception',                                      // https://github.com/joho/7XX-rfc
+        777 => 'Coincidence',                                                 // https://github.com/joho/7XX-rfc
+        778 => 'Off By One Error',                                            // https://github.com/joho/7XX-rfc
+        779 => 'Off By Too Many To Count Error',                              // https://github.com/joho/7XX-rfc
+        780 => 'Project owner not responding',                                // https://github.com/joho/7XX-rfc
+        781 => 'Operations',                                                  // https://github.com/joho/7XX-rfc
+        782 => 'QA',                                                          // https://github.com/joho/7XX-rfc
+        783 => 'It was a customer request, honestly',                         // https://github.com/joho/7XX-rfc
+        784 => 'Management, obviously',                                       // https://github.com/joho/7XX-rfc
+        785 => 'TPS Cover Sheet not attached',                                // https://github.com/joho/7XX-rfc
+        786 => 'Try it now',                                                  // https://github.com/joho/7XX-rfc
+        787 => 'Further Funding Required',                                    // https://github.com/joho/7XX-rfc
+        788 => 'Designer\'s final designs weren\'t',                          // https://github.com/joho/7XX-rfc
+        789 => 'Not my department',                                           // https://github.com/joho/7XX-rfc
+        791 => 'The Internet shut down due to copyright restrictions',        // https://github.com/joho/7XX-rfc
+        792 => 'Climate change driven catastrophic weather event',            // https://github.com/joho/7XX-rfc
+        793 => 'Zombie Apocalypse',                                           // https://github.com/joho/7XX-rfc
+        794 => 'Someone let PG near a REPL',                                  // https://github.com/joho/7XX-rfc
+        795 => '#heartbleed (see 705)',                                       // https://github.com/joho/7XX-rfc
+        796 => 'Some DNS fuckery idno',                                       // https://github.com/joho/7XX-rfc
+        797 => 'This is the last page of the Internet.  Go back',             // https://github.com/joho/7XX-rfc
+        798 => 'I checked the db backups cupboard and the cupboard was bare', // https://github.com/joho/7XX-rfc
+        799 => 'End of the world',                                            // https://github.com/joho/7XX-rfc
     ];
 
     /**
@@ -540,7 +688,7 @@ class Response
      */
     public function isCacheable(): bool
     {
-        if (!\in_array($this->statusCode, [200, 203, 300, 301, 302, 404, 410])) {
+        if (!\in_array($this->statusCode, [200, 203, 300, 301, 302, 404, 410, 774, 799])) {
             return false;
         }
 
@@ -1249,7 +1397,7 @@ class Response
      */
     public function isRedirect(?string $location = null): bool
     {
-        return \in_array($this->statusCode, [201, 301, 302, 303, 307, 308]) && (null === $location ?: $location == $this->headers->get('Location'));
+        return \in_array($this->statusCode, [201, 301, 302, 303, 307, 308, 704, 718, 789, 797]) && (null === $location ?: $location == $this->headers->get('Location'));
     }
 
     /**
@@ -1259,7 +1407,127 @@ class Response
      */
     public function isEmpty(): bool
     {
-        return \in_array($this->statusCode, [204, 304]);
+        return \in_array($this->statusCode, [204, 304, 791]);
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isInexcusable(): bool
+    {
+        return $this->statusCode >= 700 && $this->statusCode < 710;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isNoveltyImplementations(): bool
+    {
+        return $this->statusCode >= 710 && $this->statusCode < 720;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isEdgeCase(): bool
+    {
+        return $this->statusCode >= 720 && $this->statusCode < 730;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isMmeritocracyRelatedBullshit(): bool
+    {
+        return $this->statusCode >= 740 && $this->statusCode < 750;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isFucking(): bool
+    {
+        return $this->statusCode >= 730 && $this->statusCode < 740;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isSyntaxError(): bool
+    {
+        return $this->statusCode >= 750 && $this->statusCode < 760;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isSubstanceAffectedDeveloper(): bool
+    {
+        return $this->statusCode >= 760 && $this->statusCode < 770;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isPredictableProblem(): bool
+    {
+        return $this->statusCode >= 770 && $this->statusCode < 780;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isSomebodyElsesProblem(): bool
+    {
+        return $this->statusCode >= 780 && $this->statusCode < 790;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isInternetCrashed(): bool
+    {
+        return $this->statusCode >= 790 && $this->statusCode < 800;
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function isPhp(): bool
+    {
+        return \in_array($this->statusCode, [710, 759]);
+    }
+
+    /**
+     * @see https://github.com/joho/7XX-rfc
+     *
+     * @final
+     */
+    public function giveUsMoreMoney(): bool
+    {
+        return \in_array($this->statusCode, [775, 787]);
     }
 
     /**

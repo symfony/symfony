@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-04-01T10:16:10Z
+
+I like it very very much! Any way to enforce that at the PHP CS Fixer level?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2024-04-01T10:28:34Z
+
+Before I wrote rector rule (which uses [nikic/php-parser](https://github.com/nikic/PHP-Parser)), I was looking into writing a PHP-CS-Fixer rule first, but unfortunately complexity of fixers are much higher, since they operate on tokens that are much lower level. So I quite quickly abandoned it, thinking time would be better spent on rector.  I would be glad if there was a php-cs-fixer rule for this, but I don't plan to spend effort on writing it myself anytime soon. Frankly, If thinking about future, I think collectively as community we should abandon trying to write rules like these on token level. We should continue to use token fixer rules only in case we need to operate on whitespace level (formatting).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-04-01T10:50:35Z
+
+> I like it very very much! Any way to enforce that at the PHP CS Fixer level?
+
+In this particular case, we could have Psalm report the usage of `empty()` as an error.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2024-04-01T11:36:24Z
+
+Ah looks like this is already the case and there was even another sweep of these calls before, in https://github.com/symfony/symfony/commit/026edbe6014fe7bd013f30acd5ae57b21e0826e2

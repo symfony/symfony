@@ -26,7 +26,7 @@
         "psr/log": "^1|^2|^3",
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/http-client-contracts": "^3",
-        "symfony/service-contracts": "^2.5|^3"
+        "symfony/service-contracts": "^2.5.3|^3.4.2"
     },
     "require-dev": {
         "amphp/amp": "^2.5",

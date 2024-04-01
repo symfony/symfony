@@ -25,8 +25,8 @@
         "php": ">=8.1",
         "psr/log": "^1|^2|^3",
         "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/http-client-contracts": "^3",
-        "symfony/service-contracts": "^2.5.3|^3.4.2"
+        "symfony/http-client-contracts": "^3.4.1",
+        "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
         "amphp/amp": "^2.5",

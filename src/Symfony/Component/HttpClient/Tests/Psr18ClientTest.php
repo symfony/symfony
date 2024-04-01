@@ -28,6 +28,11 @@ class Psr18ClientTest extends TestCase
         TestHttpServer::start();
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        TestHttpServer::stop();
+    }
+
     public function testSendRequest()
     {
         $factory = new Psr17Factory();

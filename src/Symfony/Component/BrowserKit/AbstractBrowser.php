@@ -531,7 +531,7 @@ abstract class AbstractBrowser
      */
     public function followRedirect(): Crawler
     {
-        if (empty($this->redirect)) {
+        if (!$this->redirect) {
             throw new LogicException('The request was not redirected.');
         }
 

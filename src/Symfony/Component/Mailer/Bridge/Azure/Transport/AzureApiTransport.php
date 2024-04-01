@@ -115,7 +115,7 @@ final class AzureApiTransport extends AbstractApiTransport
             'senderAddress' => $envelope->getSender()->getAddress(),
             'attachments' => $this->getMessageAttachments($email),
             'userEngagementTrackingDisabled' => $this->disableTracking,
-            'headers' => empty($headers = $this->getMessageCustomHeaders($email)) ? null : $headers,
+            'headers' => ($headers = $this->getMessageCustomHeaders($email)) ? $headers : null,
             'importance' => $this->getPriorityLevel($email->getPriority()),
         ];
 
@@ -167,7 +167,7 @@ final class AzureApiTransport extends AbstractApiTransport
      */
     private function getAzureCSEndpoint(): string
     {
-        return !empty($this->host) ? $this->host : sprintf(self::HOST, $this->resourceName);
+        return $this->host ?: sprintf(self::HOST, $this->resourceName);
     }
 
     private function generateContentHash(string $content): string

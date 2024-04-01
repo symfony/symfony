@@ -71,7 +71,7 @@ class Cookie
             $this->value = $value ?? '';
             $this->rawValue = rawurlencode($this->value);
         }
-        $this->path = empty($path) ? '/' : $path;
+        $this->path = $path ?: '/';
 
         if (null !== $expires) {
             $timestampAsDateTime = \DateTimeImmutable::createFromFormat('U', $expires);

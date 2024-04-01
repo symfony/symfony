@@ -156,7 +156,7 @@ class Connection
         }
 
         $parsedPath = explode('/', ltrim($params['path'] ?? '/', '/'));
-        if (\count($parsedPath) > 0 && !empty($queueName = end($parsedPath))) {
+        if (\count($parsedPath) > 0 && ($queueName = end($parsedPath))) {
             $configuration['queue_name'] = $queueName;
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
@@ -202,7 +202,7 @@ class Connection
      */
     private function getPendingMessages(): \Generator
     {
-        while (!empty($this->buffer)) {
+        while ($this->buffer) {
             yield array_shift($this->buffer);
         }
     }

@@ -121,7 +121,7 @@ class Form extends Link implements \ArrayAccess
         $values = [];
         foreach ($this->getValues() as $name => $value) {
             $qs = http_build_query([$name => $value], '', '&');
-            if (!empty($qs)) {
+            if ($qs) {
                 parse_str($qs, $expandedValue);
                 $varName = substr($name, 0, \strlen(key($expandedValue)));
                 $values[] = [$varName => current($expandedValue)];
@@ -146,7 +146,7 @@ class Form extends Link implements \ArrayAccess
         $values = [];
         foreach ($this->getFiles() as $name => $value) {
             $qs = http_build_query([$name => $value], '', '&');
-            if (!empty($qs)) {
+            if ($qs) {
                 parse_str($qs, $expandedValue);
                 $varName = substr($name, 0, \strlen(key($expandedValue)));
 

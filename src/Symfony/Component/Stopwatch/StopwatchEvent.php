@@ -103,7 +103,7 @@ class StopwatchEvent
      */
     public function isStarted(): bool
     {
-        return !empty($this->started);
+        return (bool) $this->started;
     }
 
     /**

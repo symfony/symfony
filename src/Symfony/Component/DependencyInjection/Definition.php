@@ -328,7 +328,7 @@ class Definition
      */
     public function addMethodCall(string $method, array $arguments = [], bool $returnsClone = false): static
     {
-        if (empty($method)) {
+        if (!$method) {
             throw new InvalidArgumentException('Method name cannot be empty.');
         }
         $this->calls[] = $returnsClone ? [$method, $arguments, true] : [$method, $arguments];

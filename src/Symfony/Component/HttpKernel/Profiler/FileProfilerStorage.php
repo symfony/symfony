@@ -74,11 +74,11 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            if (!empty($start) && $csvTime < $start) {
+            if ($start && $csvTime < $start) {
                 continue;
             }
 
-            if (!empty($end) && $csvTime > $end) {
+            if ($end && $csvTime > $end) {
                 continue;
             }
 

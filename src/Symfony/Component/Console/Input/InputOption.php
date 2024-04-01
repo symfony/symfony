@@ -75,7 +75,7 @@ class InputOption
             $name = substr($name, 2);
         }
 
-        if (empty($name)) {
+        if (!$name) {
             throw new InvalidArgumentException('An option name cannot be empty.');
         }
 

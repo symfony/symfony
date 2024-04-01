@@ -100,7 +100,7 @@ class ExprBuilder
      */
     public function ifEmpty(): static
     {
-        $this->ifPart = static fn ($v) => empty($v);
+        $this->ifPart = static fn ($v) => !$v;
         $this->allowedTypes = self::TYPE_ANY;
 
         return $this;

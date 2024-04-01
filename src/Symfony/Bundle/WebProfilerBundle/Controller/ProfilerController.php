@@ -275,7 +275,7 @@ class ProfilerController
             $session->set('_profiler_search_type', $profileType);
         }
 
-        if (!empty($token)) {
+        if ($token) {
             return new RedirectResponse($this->generator->generate('_profiler', ['token' => $token]), 302, ['Content-Type' => 'text/html']);
         }
 

@@ -62,7 +62,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         if (!is_iterable($data)) {
             $data = [[$data]];
-        } elseif (empty($data)) {
+        } elseif (!$data) {
             $data = [[]];
         } else {
             // Sequential arrays of arrays are considered as collections
@@ -191,7 +191,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             return $result;
         }
 
-        if (empty($result) || isset($result[1])) {
+        if (!$result || isset($result[1])) {
             return $result;
         }
 

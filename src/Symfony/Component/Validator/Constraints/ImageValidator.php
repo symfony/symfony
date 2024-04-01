@@ -52,7 +52,7 @@ class ImageValidator extends FileValidator
 
         $size = @getimagesize($value);
 
-        if (empty($size) || (0 === $size[0]) || (0 === $size[1])) {
+        if (!$size || (0 === $size[0]) || (0 === $size[1])) {
             $this->context->buildViolation($constraint->sizeNotDetectedMessage)
                 ->setCode(Image::SIZE_NOT_DETECTED_ERROR)
                 ->addViolation();

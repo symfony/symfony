@@ -100,14 +100,14 @@ final class ConsoleFormatter implements FormatterInterface
     {
         $record = $this->replacePlaceHolder($record);
 
-        if (!$this->options['ignore_empty_context_and_extra'] || !empty($record->context)) {
+        if (!$this->options['ignore_empty_context_and_extra'] || $record->context) {
             $context = $record->context;
             $context = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($context);
         } else {
             $context = '';
         }
 
-        if (!$this->options['ignore_empty_context_and_extra'] || !empty($record->extra)) {
+        if (!$this->options['ignore_empty_context_and_extra'] || $record->extra) {
             $extra = $record->extra;
             $extra = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($extra);
         } else {

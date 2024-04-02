@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-04-02T08:38:27Z
+
+@nicolas-grekas as the data has been extracted in a standalone component in 7.1, I think it is easier to keep this update in 7.1.

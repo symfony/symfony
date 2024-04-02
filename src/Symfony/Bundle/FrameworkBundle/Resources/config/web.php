@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeVal
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionParameterValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
@@ -100,6 +101,9 @@ return static function (ContainerConfigurator $container) {
 
         ->set('argument_resolver.query_parameter_value_resolver', QueryParameterValueResolver::class)
             ->tag('controller.targeted_value_resolver', ['name' => QueryParameterValueResolver::class])
+
+        ->set('argument_resolver.session_parameter_value_resolver', SessionParameterValueResolver::class)
+            ->tag('controller.targeted_value_resolver', ['name' => SessionParameterValueResolver::class])
 
         ->set('response_listener', ResponseListener::class)
             ->args([

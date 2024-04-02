@@ -8,7 +8,8 @@ CHANGELOG
  * Support `Uid` in `#[MapQueryParameter]`
  * Add `ServicesResetterInterface`, implemented by `ServicesResetter`
  * Allow configuring the logging channel per type of exceptions in ErrorListener
- 
+ * Add `#[MapSessionParameter]` to pass a session parameter to a controller argument
+
 7.2
 ---
 

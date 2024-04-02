@@ -752,7 +752,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->publish(...\func_get_args());
     }
 
-    public function pubsub($command, $arg = null): mixed
+    public function pubsub($command, ...$args): mixed
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->pubsub(...\func_get_args());
     }

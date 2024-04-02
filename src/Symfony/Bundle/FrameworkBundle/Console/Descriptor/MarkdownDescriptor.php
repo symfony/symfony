@@ -232,7 +232,17 @@ class MarkdownDescriptor extends Descriptor
         }
 
         if (isset($options['show_arguments']) && $options['show_arguments']) {
-            $output .= "\n".'- Arguments: '.($definition->getArguments() ? 'yes' : 'no');
+            if ($definition->getArguments()) {
+                foreach ($definition->getArguments() as $argument) {
+                    $output .= "\n".'- Argument: `'.$argument.'`';
+                    if (isset($options['with_aliases']) && $options['with_aliases']) {
+                        $node = $container?->getCompiler()?->getServiceReferenceGraph()?->getNode((string) $argument);
+                        $output .= "\n".'    - Alias: '.$node?->getValue()?->getClass();
+                    }
+                }
+            } else {
+                $output .= "\n".'- Arguments: no';
+            }
         }
 
         if ($definition->getFile()) {

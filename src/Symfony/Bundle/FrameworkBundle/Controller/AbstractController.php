@@ -321,9 +321,9 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      *     throw $this->createUnauthorizedException('Unauthorized!');
      */
-    protected function createUnauthorizedException(string $message = 'Unauthorized', ?\Throwable $previous = null): UnauthorizedHttpException
+    protected function createUnauthorizedException(string $challenge = '', string $message = 'Unauthorized', ?\Throwable $previous = null): UnauthorizedHttpException
     {
-        return new UnauthorizedHttpException($message, $previous);
+        return new UnauthorizedHttpException($challenge, $message, $previous);
     }
 
     /**

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
+use Symfony\Component\Security\Core\Event\ProgrammaticLoginEvent;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
@@ -52,11 +53,17 @@ class UserCheckerListener implements EventSubscriberInterface
         $this->userChecker->checkPostAuth($user);
     }
 
+    public function onProgrammaticLoginEvent(ProgrammaticLoginEvent $event): void
+    {
+        $this->userChecker->checkPreAuth($event->getUser());
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
             CheckPassportEvent::class => ['preCheckCredentials', 256],
             AuthenticationSuccessEvent::class => ['postCheckCredentials', 256],
+            ProgrammaticLoginEvent::class => ['onProgrammaticLoginEvent', 256],
         ];
     }
 }

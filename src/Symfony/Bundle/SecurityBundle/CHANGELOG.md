@@ -9,6 +9,7 @@ CHANGELOG
  * Add `$badges` argument to `Security::login`
  * Deprecate the `require_previous_session` config option. Setting it has no effect anymore
  * Add `LogoutRouteLoader`
+ * Add `ProgrammaticLoginEvent` event to handle user checks on programmatic login.
 
 6.3
 ---

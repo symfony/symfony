@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Event\ProgrammaticLoginEvent;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\Security as LegacySecurity;
@@ -127,7 +128,7 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
 
         $authenticator = $this->getAuthenticator($authenticatorName, $firewallName);
 
-        $this->container->get('security.user_checker')->checkPreAuth($user);
+        $this->container->get('event_dispatcher')->dispatch(new ProgrammaticLoginEvent($user));
 
         return $this->container->get('security.authenticator.managers_locator')->get($firewallName)->authenticateUser($user, $authenticator, $request, $badges);
     }

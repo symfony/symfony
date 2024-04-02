@@ -88,7 +88,7 @@ return static function (ContainerConfigurator $container) {
                     'security.authenticator.managers_locator' => service('security.authenticator.managers_locator')->ignoreOnInvalid(),
                     'request_stack' => service('request_stack'),
                     'security.firewall.map' => service('security.firewall.map'),
-                    'security.user_checker' => service('security.user_checker'),
+                    'event_dispatcher' => service('event_dispatcher'),
                     'security.firewall.event_dispatcher_locator' => service('security.firewall.event_dispatcher_locator'),
                     'security.csrf.token_manager' => service('security.csrf.token_manager')->ignoreOnInvalid(),
                 ]),

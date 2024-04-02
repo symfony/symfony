@@ -35,7 +35,12 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -576,6 +581,41 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
 
         $this->assertInstanceOf(NotFoundHttpException::class, $controller->createNotFoundException());
+    }
+
+    public function testBadRequestException()
+    {
+        $controller = $this->createController();
+
+        $this->assertInstanceOf(BadRequestHttpException::class, $controller->createBadRequestException());
+    }
+
+    public function testUnauthorizedException()
+    {
+        $controller = $this->createController();
+
+        $this->assertInstanceOf(UnauthorizedHttpException::class, $controller->createUnauthorizedException());
+    }
+
+    public function testConflictException()
+    {
+        $controller = $this->createController();
+
+        $this->assertInstanceOf(ConflictHttpException::class, $controller->createConflictException());
+    }
+
+    public function testGoneException()
+    {
+        $controller = $this->createController();
+
+        $this->assertInstanceOf(GoneHttpException::class, $controller->createGoneException());
+    }
+
+    public function testUnprocessableEntityException()
+    {
+        $controller = $this->createController();
+
+        $this->assertInstanceOf(UnprocessableEntityHttpException::class, $controller->createUnprocessableEntityException());
     }
 
     public function testCreateForm()

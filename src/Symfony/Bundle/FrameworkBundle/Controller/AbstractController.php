@@ -30,7 +30,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -295,6 +300,66 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function createNotFoundException(string $message = 'Not Found', ?\Throwable $previous = null): NotFoundHttpException
     {
         return new NotFoundHttpException($message, $previous);
+    }
+
+    /**
+     * Returns a BadRequestHttpException.
+     *
+     * This will result in a 400 response code. Usage example:
+     *
+     *     throw $this->createBadRequestException('Bad request!');
+     */
+    protected function createBadRequestException(string $message = 'Bad request', ?\Throwable $previous = null): BadRequestHttpException
+    {
+        return new BadRequestHttpException($message, $previous);
+    }
+
+    /**
+     * Returns an UnauthorizedHttpException.
+     *
+     * This will result in a 401 response code. Usage example:
+     *
+     *     throw $this->createUnauthorizedException('Unauthorized!');
+     */
+    protected function createUnauthorizedException(string $message = 'Unauthorized', ?\Throwable $previous = null): UnauthorizedHttpException
+    {
+        return new UnauthorizedHttpException($message, $previous);
+    }
+
+    /**
+     * Returns an ConflictHttpException.
+     *
+     * This will result in a 409 response code. Usage example:
+     *
+     *     throw $this->createConflictException('Conflict!');
+     */
+    protected function createConflictException(string $message = 'Conflict', ?\Throwable $previous = null): ConflictHttpException
+    {
+        return new ConflictHttpException($message, $previous);
+    }
+
+    /**
+     * Returns an GoneHttpException.
+     *
+     * This will result in a 410 response code. Usage example:
+     *
+     *     throw $this->createConflictException('Gone!');
+     */
+    protected function createGoneException(string $message = 'Gone', ?\Throwable $previous = null): GoneHttpException
+    {
+        return new GoneHttpException($message, $previous);
+    }
+
+    /**
+     * Returns an UnprocessableEntityHttpException.
+     *
+     * This will result in a 422 response code. Usage example:
+     *
+     *     throw $this->createUnprocessableEntityException('Unprocessable entity!');
+     */
+    protected function createUnprocessableEntityException(string $message = 'Unprocessable entity', ?\Throwable $previous = null): UnprocessableEntityHttpException
+    {
+        return new UnprocessableEntityHttpException($message, $previous);
     }
 
     /**

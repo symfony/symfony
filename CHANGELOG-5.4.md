@@ -7,6 +7,28 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.38 (2024-04-02)
+
+ * bug #54400 [HttpClient] stop all server processes after tests have run (xabbuh)
+ * bug #54425 [TwigBridge] Remove whitespaces from block form_help output (rosier)
+ * bug #54372 [Config] Fix `YamlReferenceDumper` handling of array examples (MatTheCat)
+ * bug #54362 [Filesystem] preserve the file modification time when mirroring directories (xabbuh)
+ * bug #54121 [Messenger] Catch TableNotFoundException in MySQL delete (acbramley)
+ * bug #54271 [DoctrineBridge] Fix deprecation warning with ORM 3 when guessing field lengths (eltharin)
+ * bug #54306 Throw TransformationFailedException when there is a null bytes injection (sormes)
+ * bug #54148 [Serializer] Fix object normalizer when properties has the same name as their accessor (NeilPeyssard)
+ * bug #54305 [Cache][Lock] Identify missing table in pgsql correctly and address failing integration tests (arifszn)
+ * bug #54292 [FrameworkBundle] Fix mailer config with XML (lyrixx)
+ * bug #54298 [Filesystem] Fix str_contains deprecation (NeilPeyssard)
+ * bug #54248 [Security] Correctly initialize the voter property (aschempp)
+ * bug #54201 [Lock] Check the correct SQLSTATE error code for MySQL (edomato)
+ * bug #54252 [Lock] compatiblity with redis cluster 7 (bastnic)
+ * bug #54219 [Validator] Allow BICs’ first four characters to be digits (MatTheCat)
+ * bug #54239 [Mailer] Fix sendmail transport not handling failure  (aboks)
+ * bug #54207 [HttpClient] Lazily initialize CurlClientState (arjenm)
+ * bug #53865 [Workflow]Fix Marking when it must contains more than one tokens (lyrixx)
+ * bug #54187 [FrameworkBundle] Fix PHP 8.4 deprecation on `ReflectionMethod` (alexandre-daubois)
+
 * 5.4.37 (2024-03-04)
 
  * bug #54102 [HttpClient] Fix deprecation on PHP 8.3 (nicolas-grekas)

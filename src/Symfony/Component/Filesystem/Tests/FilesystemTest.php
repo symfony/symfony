@@ -14,6 +14,8 @@ namespace Symfony\Component\Filesystem\Tests;
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 /**
  * Test class for Filesystem.
@@ -162,23 +164,32 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringEqualsFile($targetFilePath, 'SOURCE FILE');
     }
 
-    /**
-     * @group network
-     */
     public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy()
     {
-        if (!\in_array('https', stream_get_wrappers(), true)) {
-            $this->markTestSkipped('"https" stream wrapper is not enabled.');
+        if (!\in_array('http', stream_get_wrappers(), true)) {
+            $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
-        $sourceFilePath = 'https://symfony.com/images/common/logo/logo_symfony_header.png';
-        $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';
 
-        file_put_contents($targetFilePath, 'TARGET FILE');
+        $finder = new PhpExecutableFinder();
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', '127.0.0.1:8057']));
+        $process->setWorkingDirectory(__DIR__.'/Fixtures/web');
 
-        $this->filesystem->copy($sourceFilePath, $targetFilePath, false);
+        $process->start();
 
-        $this->assertFileExists($targetFilePath);
-        $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
+        do {
+            usleep(50000);
+        } while (!@fopen('http://127.0.0.1:8057', 'r'));
+
+        try {
+            $sourceFilePath = 'http://localhost:8057/logo_symfony_header.png';
+            $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';
+            file_put_contents($targetFilePath, 'TARGET FILE');
+            $this->filesystem->copy($sourceFilePath, $targetFilePath, false);
+            $this->assertFileExists($targetFilePath);
+            $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
+        } finally {
+            $process->stop();
+        }
     }
 
     public function testMkdirCreatesDirectoriesRecursively()

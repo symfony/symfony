@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by alamirault at 2024-04-01T13:12:51Z
+
+> Support for `gitlab` should also be added in the `emojify` Twig filter
+
+With actual PR https://github.com/symfony/symfony/pull/54432, no change is required in filter to support new "locale"

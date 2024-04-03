@@ -814,6 +814,7 @@ return [
     '👨‍👦' => 'familie: mann, gut',
     '👩‍👦' => 'familie: kvinne, gut',
     '😮‍💨' => 'pustar ut',
+    '🙂‍↔' => 'ristande hovud',
     '🙂‍↕' => 'nikkande hovud',
     '😵‍💫' => 'fjes med spiralauge',
     '❤‍🔥' => 'hjarte i brann',

@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'keluarga: perempuan dan budak perempuan',
     '😶‍🌫' => 'muka dikepung awan',
     '😮‍💨' => 'muka menghembuskan nafas',
+    '🙂‍↔' => 'menggeleng kepala',
     '🙂‍↕' => 'mengangguk kepala',
     '😵‍💫' => 'muka dengan mata berpusar',
     '❤‍🔥' => 'hati membara',

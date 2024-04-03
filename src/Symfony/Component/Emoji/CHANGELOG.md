@@ -4,5 +4,6 @@ CHANGELOG
 7.1
 ---
 
- * Add the component
+ * Extract the component from symfony/intl
  * Add the `gitlab` locale to `EmojiTransliterator`
+ * Add the `text` locale to `EmojiTransliterator`

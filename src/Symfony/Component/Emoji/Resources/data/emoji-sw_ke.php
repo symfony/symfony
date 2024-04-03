@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'familia: mwanamke na msichana',
     '😶‍🌫' => 'uso kwenye mawingu',
     '😮‍💨' => 'uso unaopumua',
+    '🙂‍↔' => 'kutikisa kichwa kimlalo',
     '🙂‍↕' => 'kutikisa kichwa juu chini',
     '😵‍💫' => 'uso wenye macho yanayozunguka',
     '❤‍🔥' => 'moyo unaochomeka',

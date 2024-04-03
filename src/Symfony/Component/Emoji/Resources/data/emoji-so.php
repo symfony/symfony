@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'Qooys caruur ah: naag, gabar',
     '😶‍🌫' => 'waji daruuro ku jira',
     '😮‍💨' => 'waji afka kala qaday',
+    '🙂‍↔' => 'madax u luxida sida jiifsan',
     '🙂‍↕' => 'madax u luxida sida toosan',
     '😵‍💫' => 'waji indho wareegsan leh',
     '❤‍🔥' => 'wadne ololaya',

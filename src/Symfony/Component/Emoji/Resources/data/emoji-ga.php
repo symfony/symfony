@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'teaghlach: bean, cailín',
     '😶‍🌫' => 'aghaidh sna scamaill',
     '😮‍💨' => 'aghaidh ag análú',
+    '🙂‍↔' => 'ceann ag croitheadh go cothrománach',
     '🙂‍↕' => 'croitheadh ceann go hingearach',
     '😵‍💫' => 'aghaidh le súile bíse',
     '❤‍🔥' => 'croí trí thine',

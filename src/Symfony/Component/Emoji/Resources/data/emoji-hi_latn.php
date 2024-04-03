@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'परिवार: महिला, लड़की',
     '😶‍🌫' => 'baadlon mein face',
     '😮‍💨' => 'exhale karta face',
+    '🙂‍↔' => 'left right head shaking',
     '🙂‍↕' => 'oopar-neeche sir hilaana',
     '😵‍💫' => 'spiral eyes wala face',
     '❤‍🔥' => 'burning heart',

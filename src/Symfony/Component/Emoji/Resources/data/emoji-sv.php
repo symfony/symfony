@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'familj: kvinna, flicka',
     '😶‍🌫' => 'ansikte i moln',
     '😮‍💨' => 'ansikte andas ut',
+    '🙂‍↔' => 'huvud skakar horisontellt',
     '🙂‍↕' => 'huvud skakar vertikalt',
     '😵‍💫' => 'ansikte med spiralögon',
     '❤‍🔥' => 'brinnande hjärta',

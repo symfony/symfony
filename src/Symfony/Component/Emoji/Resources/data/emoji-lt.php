@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'šeima: moteris mergaitė',
     '😶‍🌫' => 'veidas debesyse',
     '😮‍💨' => 'veidas su garu',
+    '🙂‍↔' => 'purtantis galvą',
     '🙂‍↕' => 'linksintis galva',
     '😵‍💫' => 'veidas su spiralinėmis akimis',
     '❤‍🔥' => 'deganti širdis',

@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'familje: grua e vajzë',
     '😶‍🌫' => 'fytyrë në re',
     '😮‍💨' => 'fytyrë me shfryrje',
+    '🙂‍↔' => 'kokë që tundet horizontalisht',
     '🙂‍↕' => 'kokë që tundet vertikalisht',
     '😵‍💫' => 'fytyrë me sy spiralë',
     '❤‍🔥' => 'zemër në flakë',

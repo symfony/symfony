@@ -20,9 +20,15 @@ Builder::cleanTarget();
 $emojisCodePoints = Builder::getEmojisCodePoints();
 Builder::saveRules(Builder::buildRules($emojisCodePoints));
 Builder::saveRules(Builder::buildStripRules($emojisCodePoints));
-Builder::saveRules(Builder::buildGitHubRules($emojisCodePoints));
-Builder::saveRules(Builder::buildGitlabRules($emojisCodePoints));
-Builder::saveRules(Builder::buildSlackRules($emojisCodePoints));
+
+$emojiMaps = ['slack', 'github', 'gitlab'];
+
+foreach ($emojiMaps as $map) {
+    $maps = Builder::{"build{$map}Maps"}($emojisCodePoints);
+    Builder::saveRules(array_combine(["emoji-$map", "$map-emoji"], Builder::createRules($maps, true)));
+}
+
+Builder::saveRules(Builder::buildTextRules($emojisCodePoints, $emojiMaps));
 
 final class Builder
 {
@@ -45,10 +51,10 @@ final class Builder
                 throw new \DomainException("Could not parse line: \"$line\".");
             }
 
-            $codePoints = strtolower(trim($matches['codePoints']));
+            $codePoints = str_replace(' ', '-', trim($matches['codePoints']));
             $emojisCodePoints[$codePoints] = $matches['emoji'];
             // We also add a version without the "Zero Width Joiner"
-            $codePoints = str_replace('200d ', '', $codePoints);
+            $codePoints = str_replace('-200D-', '-', $codePoints);
             $emojisCodePoints[$codePoints] = $matches['emoji'];
         }
 
@@ -67,7 +73,6 @@ final class Builder
             ->name('*.xml')
         ;
 
-        $ignored = [];
         $mapsByLocale = [];
 
         foreach ($files as $file) {
@@ -89,16 +94,8 @@ final class Builder
                     continue;
                 }
                 $parts = preg_split('//u', $emoji, -1, \PREG_SPLIT_NO_EMPTY);
-                $emojiCodePoints = implode(' ', array_map('dechex', array_map('mb_ord', $parts)));
+                $emojiCodePoints = strtoupper(implode('-', array_map('dechex', array_map('mb_ord', $parts))));
                 if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
-                    $ignored[] = [
-                        'locale' => $locale,
-                        'emoji' => $emoji,
-                        'name' => $name,
-                    ];
-                    continue;
-                }
-                if (!self::testEmoji($emoji, $locale, $emojiCodePoints)) {
                     continue;
                 }
                 $codePointsCount = mb_strlen($emoji);
@@ -128,108 +125,83 @@ final class Builder
         }
     }
 
-    public static function buildGitHubRules(array $emojisCodePoints): iterable
+    public static function buildGitHubMaps(array $emojisCodePoints): array
     {
         $emojis = json_decode((new Filesystem())->readFile(__DIR__.'/vendor/github-emojis.json'), true, flags: JSON_THROW_ON_ERROR);
-
-        $ignored = [];
         $maps = [];
 
         foreach ($emojis as $shortCode => $url) {
-            $emojiCodePoints = str_replace('-', ' ', strtolower(basename(parse_url($url, \PHP_URL_PATH), '.png')));
+            $emojiCodePoints = strtoupper(basename(parse_url($url, \PHP_URL_PATH), '.png'));
+
             if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
-                $ignored[] = [
-                    'emojiCodePoints' => $emojiCodePoints,
-                    'shortCode' => $shortCode,
-                ];
                 continue;
             }
             $emoji = $emojisCodePoints[$emojiCodePoints];
-            if (!self::testEmoji($emoji, 'github', $emojiCodePoints)) {
-                continue;
-            }
-            $codePointsCount = mb_strlen($emoji);
-            $maps[$codePointsCount][$emoji] = ":$shortCode:";
+            $emojiPriority = mb_strlen($emoji) << 1;
+            $maps[$emojiPriority + 1][":$shortCode:"] = $emoji;
         }
 
-        $maps = self::createRules($maps);
-
-        return ['emoji-github' => $maps, 'github-emoji' => array_flip($maps)];
+        return $maps;
     }
 
-    public static function buildGitlabRules(array $emojisCodePoints): iterable
+    public static function buildGitlabMaps(array $emojisCodePoints): array
     {
         $emojis = json_decode((new Filesystem())->readFile(__DIR__.'/vendor/gitlab-emojis.json'), true, flags: JSON_THROW_ON_ERROR);
-
-        $ignored = [];
         $maps = [];
 
         foreach ($emojis as $emojiItem) {
-            $emojiCodePoints = strtolower($emojiItem['unicode']);
-            if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
-                $ignored[] = [
-                    'emojiCodePoints' => $emojiCodePoints,
-                    'name' => $emojiItem['name'],
-                ];
-                continue;
+            $emoji = $emojiItem['moji'];
+            $emojiPriority = mb_strlen($emoji) << 1;
+            $maps[$emojiPriority + 1][$emojiItem['shortname']] = $emoji;
+
+            foreach ($emojiItem['aliases'] as $alias) {
+                $maps[$emojiPriority][$alias] = $emoji;
             }
-            $emoji = $emojisCodePoints[$emojiCodePoints];
-            if (!self::testEmoji($emoji, 'gitlab', $emojiCodePoints)) {
-                continue;
-            }
-            $codePointsCount = mb_strlen($emoji);
-            $maps[$codePointsCount][$emoji] = $emojiItem['shortname'];
         }
 
-        $maps = self::createRules($maps);
-
-        return ['emoji-gitlab' => $maps, 'gitlab-emoji' => array_flip($maps)];
+        return $maps;
     }
 
-    public static function buildSlackRules(array $emojisCodePoints): iterable
+    public static function buildSlackMaps(array $emojisCodePoints): array
     {
         $emojis = json_decode((new Filesystem())->readFile(__DIR__.'/vendor/slack-emojis.json'), true, flags: JSON_THROW_ON_ERROR);
-
-        $ignored = [];
-        $emojiSlackMaps = [];
-        $slackEmojiMaps = [];
+        $maps = [];
 
         foreach ($emojis as $data) {
-            $emojiCodePoints = str_replace('-', ' ', strtolower($data['unified']));
-            $shortCode = $data['short_name'];
-            $shortCodes = $data['short_names'];
-            $shortCodes = array_map(fn ($v) => ":$v:", $shortCodes);
+            $emoji = $emojisCodePoints[$data['unified']];
+            $emojiPriority = mb_strlen($emoji) << 1;
+            $maps[$emojiPriority + 1][":{$data['short_name']}:"] = $emoji;
 
-            if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
-                $ignored[] = [
-                    'emojiCodePoints' => $emojiCodePoints,
-                    'shortCode' => $shortCode,
-                ];
-                continue;
-            }
-            $emoji = $emojisCodePoints[$emojiCodePoints];
-            if (!self::testEmoji($emoji, 'slack', $emojiCodePoints)) {
-                continue;
-            }
-            $codePointsCount = mb_strlen($emoji);
-            $emojiSlackMaps[$codePointsCount][$emoji] = ":$shortCode:";
-            foreach ($shortCodes as $short_name) {
-                $slackEmojiMaps[$codePointsCount][$short_name] = $emoji;
+            foreach ($data['short_names'] as $shortName) {
+                $maps[$emojiPriority][":$shortName:"] = $emoji;
             }
         }
 
-        return ['emoji-slack' => self::createRules($emojiSlackMaps), 'slack-emoji' => self::createRules($slackEmojiMaps)];
+        return $maps;
+    }
+
+    public static function buildTextRules(array $emojiCodePoints, array $locales): iterable
+    {
+        $maps = [];
+
+        foreach ($locales as $locale) {
+            foreach (self::{"build{$locale}Maps"}($emojiCodePoints) as $emojiPriority => $map) {
+                foreach ($map as $text => $emoji) {
+                    $maps[$emojiPriority][str_replace('_', '-', $text)] ??= $emoji;
+                }
+            }
+        }
+
+        [$map, $reverse] = self::createRules($maps, true);
+
+        return ['emoji-text' => $map, 'text-emoji' => $reverse];
     }
 
     public static function buildStripRules(array $emojisCodePoints): iterable
     {
         $maps = [];
-        foreach ($emojisCodePoints as $codePoints => $emoji) {
-            if (!self::testEmoji($emoji, 'strip', $codePoints)) {
-                continue;
-            }
-            $codePointsCount = mb_strlen($emoji);
-            $maps[$codePointsCount][$emoji] = '';
+        foreach ($emojisCodePoints as $emoji) {
+            $maps[mb_strlen($emoji)][$emoji] = '';
         }
 
         return ['emoji-strip' => self::createRules($maps)];
@@ -269,24 +241,26 @@ final class Builder
         $fs->dumpFile($file, preg_replace('/QUICK_CHECK = .*;/m', "QUICK_CHECK = {$quickCheck};", $fs->readFile($file)));
     }
 
-    private static function testEmoji(string $emoji, string $locale, string $codePoints): bool
-    {
-        if (!Transliterator::createFromRules("\\$emoji > test ;")) {
-            printf('Could not create transliterator for "%s" in "%s" locale. Code Point: "%s". Error: "%s".'."\n", $emoji, $locale, $codePoints, intl_get_error_message());
-
-            return false;
-        }
-
-        return true;
-    }
-
-    private static function createRules(array $maps): array
+    public static function createRules(array $maps, bool $reverse = false): array
     {
         // We must sort the maps by the number of code points, because the order really matters:
         // 🫶🏼 must be before 🫶
         krsort($maps);
-        $maps = array_merge(...$maps);
 
-        return $maps;
+        if (!$reverse) {
+            return array_merge(...$maps);
+        }
+
+        $emojiText = $textEmoji = [];
+
+        foreach ($maps as $map) {
+            uksort($map, static fn ($a, $b) => strnatcmp(substr($a, 1, -1), substr($b, 1, -1)));
+            $textEmoji = array_merge($map, $textEmoji);
+
+            $map = array_flip($map);
+            $emojiText += $map;
+        }
+
+        return [$emojiText, $textEmoji];
     }
 }

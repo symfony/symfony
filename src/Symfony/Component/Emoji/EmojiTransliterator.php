@@ -24,9 +24,11 @@ final class EmojiTransliterator extends \Transliterator
         'emoji-github' => 'github-emoji',
         'emoji-gitlab' => 'gitlab-emoji',
         'emoji-slack' => 'slack-emoji',
+        'emoji-text' => 'text-emoji',
         'github-emoji' => 'emoji-github',
         'gitlab-emoji' => 'emoji-gitlab',
         'slack-emoji' => 'emoji-slack',
+        'text-emoji' => 'emoji-text',
     ];
 
     public readonly string $id;
@@ -119,7 +121,7 @@ final class EmojiTransliterator extends \Transliterator
         }
 
         // Here we rely on intl to validate the $string, $start and $end arguments
-        // and to slice the string. Slicing is done by replacing the part if $string
+        // and to slice the string. Slicing is done by replacing the part of $string
         // between $start and $end by a unique cookie that can be reliably used to
         // identify which part of $string should be transliterated.
 

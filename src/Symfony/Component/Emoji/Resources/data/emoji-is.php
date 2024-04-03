@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'fjölskylda: kona og stúlka',
     '😶‍🌫' => 'andlit í skýjum',
     '😮‍💨' => 'andlit að anda frá sér',
+    '🙂‍↔' => 'hristir höfuðið lárétt',
     '🙂‍↕' => 'hristir höfuðið lóðrétt',
     '😵‍💫' => 'andlit með gormaugu',
     '❤‍🔥' => 'logandi hjarta',

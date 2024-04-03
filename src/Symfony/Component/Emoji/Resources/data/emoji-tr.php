@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'aile: kadın kız çocuk',
     '😶‍🌫' => 'bulutlardaki yüz',
     '😮‍💨' => 'nefes veren yüz',
+    '🙂‍↔' => 'yatay olarak sallanan yüz',
     '🙂‍↕' => 'dikey olarak sallanan yüz',
     '😵‍💫' => 'sarmal gözlü yüz',
     '❤‍🔥' => 'ateşli kalp',

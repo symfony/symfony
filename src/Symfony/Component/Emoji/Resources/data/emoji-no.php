@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'familie: kvinne, jente',
     '😶‍🌫' => 'fjes i skyer',
     '😮‍💨' => 'puster ut',
+    '🙂‍↔' => 'ristende hode',
     '🙂‍↕' => 'nikkende hode',
     '😵‍💫' => 'fjes med spiraløyne',
     '❤‍🔥' => 'hjerte i brann',

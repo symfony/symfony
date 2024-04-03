@@ -1267,4 +1267,11 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             stream_get_contents($output->getStream())
         );
     }
+
+    public function testGetNotSetMessage()
+    {
+        $progressBar = new ProgressBar($this->getOutputStream());
+
+        $this->assertNull($progressBar->getMessage());
+    }
 }

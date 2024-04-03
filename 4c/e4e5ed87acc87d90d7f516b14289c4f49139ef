@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2023-12-01T14:13:52Z
+
+> I'm just wondering about recursive imports: are they also reversed?
+
+The behavior is set up for the whole process, so yes, all extension configs imported recursively will be prepended too. However, unless there are split configs of the same extension distributed into several files matching the same config key, it doesn't matter.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-12-01T14:14:58Z
+
+> The behavior is set up for the whole process, so yes, all extension configs imported recursively will be prepended too.
+
+Which is expected if you're importing from the prepend method.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-04T14:12:52Z
+
+Maybe you already answered but just to be sure: if I have a yaml file that imports two other files, I'd expect them to be loaded in top-down order, is that going to be the case?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-12-04T14:28:50Z
+
+> Maybe you already answered but just to be sure: if I have a yaml file that imports two other files, I'd expect them to be loaded in top-down order, is that going to be the case?
+
+I will confirm with a test case to ensure we know what the behavior will be.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-01-02T17:41:35Z
+
+Thanks Nicolas! rebased done.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-01-14T12:34:53Z
+
+Friendly ping @symfony/mergers, there is a BC behavior break on the table here; it would be great to have a double check in case we miss something.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-03-16T16:18:53Z
+
+Hey @nicolas-grekas, I rebased, rechecked, and updated another part where `when@env` wasn't working as expected. I added another test case to cover it. So, after a while, this looks ready to me. Wdyt?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-25T17:34:40Z
+
+Anyone @symfony/mergers ? (after a small rebase)

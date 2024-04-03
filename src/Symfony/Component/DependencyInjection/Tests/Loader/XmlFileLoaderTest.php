@@ -604,6 +604,20 @@ class XmlFileLoaderTest extends TestCase
         }
     }
 
+    public function testPrependExtensionConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->prependExtensionConfig('http://www.example.com/schema/project', ['foo' => 'bar']);
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), prepend: true);
+        $loader->load('extensions/services1.xml');
+
+        $expected = [
+            ['foo' => 'ping'],
+            ['foo' => 'bar'],
+        ];
+        $this->assertSame($expected, $container->getExtensionConfig('http://www.example.com/schema/project'));
+    }
+
     public function testExtensionInPhar()
     {
         if (\extension_loaded('suhosin') && !str_contains(\ini_get('suhosin.executor.include.whitelist'), 'phar')) {

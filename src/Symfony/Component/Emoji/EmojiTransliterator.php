@@ -22,8 +22,10 @@ final class EmojiTransliterator extends \Transliterator
     private const QUICK_CHECK = "\xA9\xAE\xE2\xE3\xF0";
     private const REVERSEABLE_IDS = [
         'emoji-github' => 'github-emoji',
+        'emoji-gitlab' => 'gitlab-emoji',
         'emoji-slack' => 'slack-emoji',
         'github-emoji' => 'emoji-github',
+        'gitlab-emoji' => 'emoji-gitlab',
         'slack-emoji' => 'emoji-slack',
     ];
 

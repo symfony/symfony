@@ -11,7 +11,7 @@ CHANGELOG
  * Add `#[AutowireMethodOf]` attribute to autowire a method of a service as a callable
  * Make `ContainerBuilder::registerAttributeForAutoconfiguration()` propagate to attribute classes that extend the registered class
  * Add argument `$prepend` to `FileLoader::construct()` to prepend loaded configuration instead of appending it
- * [BC BREAK] When used in the `prependExtension()` methods, the `ContainerConfigurator::import()` method now prepends the configuration instead of appending it
+ * [BC BREAK] When used in the `prependExtension()` method, the `ContainerConfigurator::import()` method now prepends the configuration instead of appending it
 
 7.0
 ---

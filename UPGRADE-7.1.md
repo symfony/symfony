@@ -11,6 +11,11 @@ Cache
 
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter` instead
 
+DependencyInjection
+-------------------
+
+ * [BC BREAK] When used in the `prependExtension()` method, the `ContainerConfigurator::import()` method now prepends the configuration instead of appending it
+
 DoctrineBridge
 --------------
 

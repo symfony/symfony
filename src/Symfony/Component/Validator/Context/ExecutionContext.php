@@ -33,7 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @see ExecutionContextInterface
  *
- * @internal since version 2.5. Code against ExecutionContextInterface instead.
+ * @internal
  */
 class ExecutionContext implements ExecutionContextInterface
 {

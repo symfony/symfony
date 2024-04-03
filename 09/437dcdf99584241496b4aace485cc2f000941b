@@ -1,0 +1,240 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2024-02-01T05:52:07Z
+
+Hi,
+
+Is it possible to put this PR on hold?
+The reason is that algorithms from the `web-token/` suite will be grouped and, very soon, with `web-token/jwt-library` you will have all at once (including encryption to help #50441)
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-02-01T19:17:03Z
+
+Hi @louismariegaborit,
+
+Can you test with `"web-token/jwt-library": "3.3.0@dev"` adn `"ext-openssl": "*"`?
+Both ` web-token/jwt-signature-algorithm-ecdsa` and `web-token/jwt-signature-algorithm-rsa` dependencies can be removed.
+
+Also, because the new `web-token/jwt-library` contains more than `ESxxx` and `RSxxx` algorithms, I am wondering if this PR could be renamed to `[Security] Support any signature algorithms for OIDC tokens` and allow developers picking the algorthims they need.
+
+Note: `web-token/jwt-library` will be tagged in a couple of days.
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2024-02-01T20:03:48Z
+
+Hi @Spomky
+
+This seems ok. I removed also `web-token/jwt-checker`.
+For the `ext-openssl`, I added it in the require-dev but it's in suggest like in your repository that you want that be added ?
+
+I will look so that developers picked the algorithms they need.
+
+I will update the PR title when we validate the work.
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2024-02-01T21:44:07Z
+
+@Spomky I did a try. WDYT ?
+I don't know if I can delete old algorithm services without deprecations. And if I keep the services with deprecations, could you tell me how do it ?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-02-02T07:07:12Z
+
+> This seems ok. I removed also web-token/jwt-checker.
+> For the ext-openssl, I added it in the require-dev but it's in suggest like in your repository that you want that be added ?
+
+Indeed, most of `jwt-*` packages are now under `jwt-library`.
+OK for `ext-openssl` in the `required-dev` section. I'll make sure the algorithms complain if it's missing.
+
+---
+
+@vincentchalamon do you have any recommendation to have a better algorithm support architecture.
+What could be interesting is to allow multiple algorithms
+
+```yaml
+# config/packages/security.yaml
+security:
+    firewalls:
+        main:
+            access_token:
+                token_handler:
+                    oidc:
+                        # Algorithms used to sign the JWS
+                        algorithms:
+                            - 'ES256'
+                            - 'RS256'
+                            - 'PS256'
+                        # A JSON-encoded JWK
+                        key: '{"kty":"...","k":"..."}'
+```
+
+From my understanding, it will require:
+* If the configuraition key `algorithm` is present: to normaliwe the current configuration fro; `["algorithm" => $alg]` to `["algorithms" => [$alg]]`
+* Change the `OidcTokenHandler` first argument to accept an algorithm manager object instead a single algorithm
+* Use the [algorithm manager factory](https://github.com/web-token/jwt-framework/blob/3.3.x/src/Library/Core/AlgorithmManagerFactory.php#L54) to create the algorithm manager according to the configuration
+
+Any ideas on this?
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2024-02-02T09:17:25Z
+
+> @vincentchalamon do you have any recommendation to have a better algorithm support architecture. What could be interesting is to allow multiple algorithms
+>
+> ```yaml
+> # config/packages/security.yaml
+> security:
+>     firewalls:
+>         main:
+>             access_token:
+>                 token_handler:
+>                     oidc:
+>                         # Algorithms used to sign the JWS
+>                         algorithms:
+>                             - 'ES256'
+>                             - 'RS256'
+>                             - 'PS256'
+>                         # A JSON-encoded JWK
+>                         key: '{"kty":"...","k":"..."}'
+> ```
+>
+> From my understanding, it will require:
+>
+> * If the configuraition key `algorithm` is present: to normaliwe the current configuration fro; `["algorithm" => $alg]` to `["algorithms" => [$alg]]`
+> * Change the `OidcTokenHandler` first argument to accept an algorithm manager object instead a single algorithm
+> * Use the [algorithm manager factory](https://github.com/web-token/jwt-framework/blob/3.3.x/src/Library/Core/AlgorithmManagerFactory.php#L54) to create the algorithm manager according to the configuration
+>
+> Any ideas on this?
+
+@Spomky I started this work in another PR (https://github.com/symfony/symfony/pull/51665).
+I still need to support an array for the algorithms.
+I think, we must decide what is the responsability of each PR.
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2024-02-02T09:22:21Z
+
+@Spomky on an OIDC server (e.g.: Keycloak), is it possible to allow multiple algorithms on a single realm?
+
+If true, multiple algorithms configuration could be interesting, indeed. I'm just wondering if the `key` configuration (JWK) shouldn't be associated to the corresponding algorithm, as I think they're linked (cf. JWA).
+
+If false, I don't think we should allow multiple algorithms configuration as multiple realms are not supported.
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2024-02-02T10:57:12Z
+
+> @Spomky on an OIDC server (e.g.: Keycloak), is it possible to allow multiple algorithms on a single realm?
+>
+> If true, multiple algorithms configuration could be interesting, indeed. I'm just wondering if the `key` configuration (JWK) shouldn't be associated to the corresponding algorithm, as I think they're linked (cf. JWA).
+>
+> If false, I don't think we should allow multiple algorithms configuration as multiple realms are not supported.
+
+When we use JWKSet, we can have multiple jwk for multiple algorithms. The `kty` and `alg` parameter in the JWK define the algorithm for each key.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-02-02T14:11:34Z
+
+> @Spomky on an OIDC server (e.g.: Keycloak), is it possible to allow multiple algorithms on a single realm?
+>
+> If true, multiple algorithms configuration could be interesting, indeed. I'm just wondering if the key configuration (JWK) shouldn't be associated to the corresponding algorithm, as I think they're linked (cf. JWA).
+>
+> If false, I don't think we should allow multiple algorithms configuration as multiple realms are not supported.
+
+To be honest, I am not sure how Keycloak uses algorithms. Same for other OIDC servers (AFAIK Auth0 uses either ES256 or RS256).
+I read again the [OIDC Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html) specification and the `id_token_signing_alg_values_supported` returns a list of algorithm values. Even if it is not that common, it seems acceptable for identity servers to support other algs than only RS256.
+
+You are right to mention that a single JWK cannot be used for different algs. In this case, a JWKSet is needed.
+Having JWKSet can be a nice addition, not only for supporting several signing algorithms, but also for supporting key rotation feature without service interuption.
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2024-02-02T21:03:38Z
+
+> You are right to mention that a single JWK cannot be used for different algs. In this case, a JWKSet is needed. Having JWKSet can be a nice addition, not only for supporting several signing algorithms, but also for supporting key rotation feature without service interuption.
+
+@Spomky I suggest that we keep this PR do support of the new `web-token/jwt-library` and do the refactoring on JWKSet/AlgorithmManager in the https://github.com/symfony/symfony/pull/51665.
+I am also opening a discussion about the future of the SecurityBundle configuration for the OidcTokenHandler.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-02-02T23:17:05Z
+
+Hi,
+
+I added tests to make sure nothing is impacted by the changes.
+* Multiple algorithms are supported.
+    * They shall be explicitely listed in the token handler configuration file.
+    * If you want to use a custom algorithm, it just has to be tagged as `security.access_token_handler.oidc.signature_algorithm` to be used.
+* JWK or JWKSet are supported
+
+---------------------------------------------------------------------------
+
+by louismariegaborit at 2024-02-03T07:17:07Z
+
+Good job @Spomky but finally you decide to merge my dedicated PR which support JWKSet where @nicolas-grekas asked me to split in two PRs the support of others algorthms and the support of JWKSet.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-02-03T11:08:23Z
+
+Hi,
+
+I addressed your comments and the configuration file will be as follows:
+
+```yaml
+# config/packages/security.yaml
+security:
+    firewalls:
+        main:
+            access_token:
+                token_handler:
+                    oidc:
+                        algorithms: # Algorithms used to verify the JWS
+                            - 'ES256'
+                            - 'RS256'
+                            - 'PS256'
+                        keyset: '{"keys":[{"kty":"...","k":"..."}]}' # A JSON-encoded JWKSet (acceptable keys)
+```
+
+The previous configuration will be normalized and deprecations are triggered.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-02-22T13:35:43Z
+
+> Hi,
+>
+> Is it possible to put this PR on hold? The reason is that algorithms from the `web-token/` suite will be grouped and, very soon, with `web-token/jwt-library` you will have all at once (including encryption to help #50441)
+
+`web-token/jwt-library` is now released
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-03-22T06:14:06Z
+
+> LGTM. @Spomky can you please rebase from symfony:7.1 to fix the CI?
+
+I am working on it. Some tests are failing due to the changes here.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-03-22T14:35:23Z
+
+The CI seems to be fixed. Errors are not related to the changes.
+fabbot is asking me to apply an empty patch. Not sure what is causing this error.
+Any advice for the next step?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-03-24T21:11:22Z
+
+Hi @chalasr,
+
+It seems to be fine now.
+I corrected one of the tests without the `@group legacy`. Other errors are not related to this PR.

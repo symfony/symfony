@@ -116,7 +116,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('serializer.normalizer.translatable', TranslatableNormalizer::class)
             ->args(['$translator' => service('translator')])
-            ->tag('serializer.normalizer', ['priority' => -890])
+            ->tag('serializer.normalizer', ['priority' => -920])
 
         ->set('serializer.normalizer.form_error', FormErrorNormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -915])
@@ -219,6 +219,6 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('serializer.normalizer.backed_enum', BackedEnumNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -880])
+            ->tag('serializer.normalizer', ['priority' => -915])
     ;
 };

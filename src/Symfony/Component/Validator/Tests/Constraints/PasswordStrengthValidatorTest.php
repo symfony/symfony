@@ -40,6 +40,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('The password strength is too low. Please use a stronger password.')
             ->setCode(PasswordStrength::PASSWORD_STRENGTH_ERROR)
+            ->setParameter('{{ strength }}', $expectedStrength)
             ->assertRaised();
     }
 
@@ -55,13 +56,15 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider provideInvalidConstraints
      */
-    public function testThePasswordIsWeak(PasswordStrength $constraint, string $password, string $expectedMessage, string $expectedCode, array $parameters = [])
+    public function testThePasswordIsWeak(PasswordStrength $constraint, string $password, string $expectedMessage, string $expectedCode, string $strength)
     {
         $this->validator->validate($password, $constraint);
 
         $this->buildViolation($expectedMessage)
             ->setCode($expectedCode)
-            ->setParameters($parameters)
+            ->setParameters([
+                '{{ strength }}' => $strength,
+            ])
             ->assertRaised();
     }
 
@@ -72,18 +75,21 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
             'password',
             'The password strength is too low. Please use a stronger password.',
             PasswordStrength::PASSWORD_STRENGTH_ERROR,
+            '0',
         ];
         yield [
             new PasswordStrength(minScore: PasswordStrength::STRENGTH_VERY_STRONG),
             'Good password?',
             'The password strength is too low. Please use a stronger password.',
             PasswordStrength::PASSWORD_STRENGTH_ERROR,
+            '1',
         ];
         yield [
             new PasswordStrength(message: 'This password should be strong.'),
             'password',
             'This password should be strong.',
             PasswordStrength::PASSWORD_STRENGTH_ERROR,
+            '0',
         ];
     }
 }

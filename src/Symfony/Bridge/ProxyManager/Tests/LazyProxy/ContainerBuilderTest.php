@@ -37,7 +37,7 @@ class ContainerBuilderTest extends TestCase
 
         $builder->compile();
 
-        /* @var $foo1 \ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface */
+        /* @var \ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface $foo1 */
         $foo1 = $builder->get('foo1');
 
         $foo1->__destruct();

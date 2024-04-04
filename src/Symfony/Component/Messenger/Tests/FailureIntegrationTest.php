@@ -158,7 +158,6 @@ class FailureIntegrationTest extends TestCase
         // handling fails again, message is sent to failure transport
         $this->assertCount(0, $transport1->getMessagesWaitingToBeReceived());
         $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
-        /** @var Envelope $failedEnvelope */
         $failedEnvelope = $failureTransport->getMessagesWaitingToBeReceived()[0];
         /** @var SentToFailureTransportStamp $sentToFailureStamp */
         $sentToFailureStamp = $failedEnvelope->last(SentToFailureTransportStamp::class);
@@ -347,7 +346,6 @@ class FailureIntegrationTest extends TestCase
         // handling fails again, message is sent to failure transport
         $this->assertCount(0, $transport1->getMessagesWaitingToBeReceived());
         $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
-        /** @var Envelope $failedEnvelope */
         $failedEnvelope = $failureTransport->getMessagesWaitingToBeReceived()[0];
         /** @var SentToFailureTransportStamp $sentToFailureStamp */
         $sentToFailureStamp = $failedEnvelope->last(SentToFailureTransportStamp::class);

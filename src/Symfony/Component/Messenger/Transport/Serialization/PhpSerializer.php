@@ -66,7 +66,7 @@ class PhpSerializer implements SerializerInterface
         });
 
         try {
-            /** @var Envelope */
+            /** @var Envelope $envelope */
             $envelope = unserialize($contents);
         } catch (\Throwable $e) {
             if ($e instanceof MessageDecodingFailedException) {

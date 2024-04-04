@@ -553,9 +553,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     final protected function applyCallbacks($value, $object, string $attribute, ?string $format, array $context)
     {
-        /**
-         * @var callable|null
-         */
+        /** @var callable|null $callback */
         $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? null;
 
         return $callback ? $callback($value, $object, $attribute, $format, $context) : $value;

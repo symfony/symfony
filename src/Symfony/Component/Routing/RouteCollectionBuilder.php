@@ -61,7 +61,6 @@ class RouteCollectionBuilder
      */
     public function import($resource, string $prefix = '/', ?string $type = null)
     {
-        /** @var RouteCollection[] $collections */
         $collections = $this->load($resource, $type);
 
         // create a builder from the RouteCollection

@@ -44,7 +44,6 @@ trait ExpiringStoreTestTrait
         $key = new Key(uniqid(__METHOD__, true));
         $clockDelay = $this->getClockDelay();
 
-        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
 
         $store->save($key);
@@ -63,7 +62,6 @@ trait ExpiringStoreTestTrait
         $this->expectException(LockExpiredException::class);
         $key = new Key(uniqid(__METHOD__, true));
 
-        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
 
         $store->save($key);
@@ -82,7 +80,6 @@ trait ExpiringStoreTestTrait
 
         $key = new Key(uniqid(__METHOD__, true));
 
-        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
 
         $store->save($key);
@@ -97,7 +94,6 @@ trait ExpiringStoreTestTrait
     {
         $key = new Key(uniqid(__METHOD__, true));
 
-        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
 
         $store->save($key);
@@ -113,7 +109,6 @@ trait ExpiringStoreTestTrait
         $key1 = new Key($resource);
         $key2 = new Key($resource);
 
-        /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
         $key1->reduceLifetime(0);
 

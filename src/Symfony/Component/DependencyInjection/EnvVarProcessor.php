@@ -25,7 +25,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     private $loadedVars = [];
 
     /**
-     * @param EnvVarLoaderInterface[] $loaders
+     * @param EnvVarLoaderInterface[]|null $loaders
      */
     public function __construct(ContainerInterface $container, ?\Traversable $loaders = null)
     {

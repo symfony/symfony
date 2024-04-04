@@ -42,7 +42,6 @@ class FormValidator extends ConstraintValidator
             return;
         }
 
-        /* @var FormInterface $form */
         $config = $form->getConfig();
 
         $validator = $this->context->getValidator()->inContext($this->context);

@@ -47,7 +47,7 @@ class RuntimeInstantiatorTest extends TestCase
             return $instance;
         };
 
-        /* @var $proxy LazyLoadingInterface|ValueHolderInterface */
+        /* @var LazyLoadingInterface|ValueHolderInterface $proxy */
         $proxy = $this->instantiator->instantiateProxy($container, $definition, 'foo', $instantiator);
 
         $this->assertInstanceOf(LazyLoadingInterface::class, $proxy);

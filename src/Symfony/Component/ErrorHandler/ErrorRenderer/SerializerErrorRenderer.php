@@ -30,9 +30,9 @@ class SerializerErrorRenderer implements ErrorRendererInterface
     private $debug;
 
     /**
-     * @param string|callable(FlattenException) $format The format as a string or a callable that should return it
-     *                                                  formats not supported by Request::getMimeTypes() should be given as mime types
-     * @param bool|callable                     $debug  The debugging mode as a boolean or a callable that should return it
+     * @param string|callable(FlattenException): string $format The format as a string or a callable that should return it
+     *                                                          formats not supported by Request::getMimeTypes() should be given as mime types
+     * @param bool|callable                             $debug  The debugging mode as a boolean or a callable that should return it
      */
     public function __construct(SerializerInterface $serializer, $format, ?ErrorRendererInterface $fallbackErrorRenderer = null, $debug = false)
     {

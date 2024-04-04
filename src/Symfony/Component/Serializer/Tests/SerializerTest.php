@@ -1632,7 +1632,7 @@ class DummyUnionType
     public $changed = false;
 
     /**
-     * @param \DateTime|bool|null
+     * @param \DateTime|bool|null $changed
      *
      * @return $this
      */

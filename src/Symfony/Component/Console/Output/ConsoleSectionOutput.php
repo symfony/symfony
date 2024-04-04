@@ -41,7 +41,7 @@ class ConsoleSectionOutput extends StreamOutput
     /**
      * Clears previous output for this section.
      *
-     * @param int $lines Number of lines to clear. If null, then the entire output of this section is cleared
+     * @param int|null $lines Number of lines to clear. If null, then the entire output of this section is cleared
      */
     public function clear(?int $lines = null)
     {

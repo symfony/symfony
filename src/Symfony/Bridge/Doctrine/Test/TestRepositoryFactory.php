@@ -84,7 +84,6 @@ class TestRepositoryFactory implements RepositoryFactory
 
     private function createRepository(EntityManagerInterface $entityManager, string $entityName): ObjectRepository
     {
-        /* @var $metadata ClassMetadata */
         $metadata = $entityManager->getClassMetadata($entityName);
         $repositoryClassName = $metadata->customRepositoryClassName ?: $entityManager->getConfiguration()->getDefaultRepositoryClassName();
 

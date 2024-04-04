@@ -18,9 +18,6 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
     {
     }
 
-    /**
-     * @return string
-     */
     abstract public function realReturnTypeMustBeThere(): string;
 
     /**

@@ -72,7 +72,7 @@ class SymfonyRuntime extends GenericRuntime
     private $command;
 
     /**
-     * @param array {
+     * @param array{
      *   debug?: ?bool,
      *   env?: ?string,
      *   disable_dotenv?: ?bool,

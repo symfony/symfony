@@ -131,7 +131,6 @@ EOT
         $copyUsed = false;
         $exitCode = 0;
         $validAssetDirs = [];
-        /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
             if (!is_dir($originDir = $bundle->getPath().'/Resources/public') && !is_dir($originDir = $bundle->getPath().'/public')) {
                 continue;

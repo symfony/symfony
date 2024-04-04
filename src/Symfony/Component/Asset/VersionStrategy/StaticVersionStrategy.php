@@ -22,8 +22,8 @@ class StaticVersionStrategy implements VersionStrategyInterface
     private $format;
 
     /**
-     * @param string $version Version number
-     * @param string $format  Url format
+     * @param string      $version Version number
+     * @param string|null $format  Url format
      */
     public function __construct(string $version, ?string $format = null)
     {

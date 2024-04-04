@@ -231,9 +231,9 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     /**
      * Formats a file path.
      *
-     * @param string $file An absolute file path
-     * @param int    $line The line number
-     * @param string $text Use this text for the link rather than the file path
+     * @param string      $file An absolute file path
+     * @param int         $line The line number
+     * @param string|null $text Use this text for the link rather than the file path
      */
     private function formatFile(string $file, int $line, ?string $text = null): string
     {

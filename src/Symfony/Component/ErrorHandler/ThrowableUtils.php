@@ -19,7 +19,7 @@ use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 class ThrowableUtils
 {
     /**
-     * @param SilencedErrorContext|\Throwable
+     * @param SilencedErrorContext|\Throwable $throwable
      */
     public static function getSeverity($throwable): int
     {

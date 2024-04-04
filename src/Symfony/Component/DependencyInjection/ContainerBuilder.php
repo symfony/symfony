@@ -1389,7 +1389,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string|true|null $format    A sprintf() format returning the replacement for each env var name or
      *                                    null to resolve back to the original "%env(VAR)%" format or
      *                                    true to resolve to the actual values of the referenced env vars
-     * @param array            &$usedEnvs Env vars found while resolving are added to this array
+     * @param array|null       &$usedEnvs Env vars found while resolving are added to this array
      *
      * @return mixed The value with env parameters resolved if a string or an array is passed
      */

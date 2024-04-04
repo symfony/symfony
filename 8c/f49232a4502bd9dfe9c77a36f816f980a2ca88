@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-04-04T08:31:11Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GwendolenLynch at 2024-04-04T10:06:03Z
+
+Added test per https://github.com/symfony/symfony/issues/54478#issuecomment-2036703630

@@ -1663,6 +1663,36 @@ class ProcessTest extends TestCase
         $this->assertFalse($process->isRunning());
     }
 
+    public function testIgnoringSignal()
+    {
+        if (!\function_exists('pcntl_signal')) {
+            $this->markTestSkipped('pnctl extension is required.');
+        }
+
+        $process = $this->getProcess('sleep 10');
+        $process->setIgnoredSignals([\SIGTERM]);
+
+        $process->start();
+        $process->stop(timeout: 0.2);
+
+        $this->assertNotSame(\SIGTERM, $process->getTermSignal());
+    }
+
+    // This test ensure that the previous test is reliable, in case of the sleep command ignoring the SIGTERM signal
+    public function testNotIgnoringSignal()
+    {
+        if (!\function_exists('pcntl_signal')) {
+            $this->markTestSkipped('pnctl extension is required.');
+        }
+
+        $process = $this->getProcess('sleep 10');
+
+        $process->start();
+        $process->stop(timeout: 0.2);
+
+        $this->assertSame(\SIGTERM, $process->getTermSignal());
+    }
+
     private function getProcess(string|array $commandline, ?string $cwd = null, ?array $env = null, mixed $input = null, ?int $timeout = 60): Process
     {
         if (\is_string($commandline)) {

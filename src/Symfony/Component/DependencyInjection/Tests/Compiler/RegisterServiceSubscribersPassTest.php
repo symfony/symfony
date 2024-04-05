@@ -43,8 +43,8 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberUn
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberUnionWithTrait;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
+use Symfony\Contracts\Service\ServiceMethodsSubscriberTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
 require_once __DIR__.'/../Fixtures/includes/classes.php';
 
@@ -221,7 +221,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container->compile();
     }
 
-    public function testServiceSubscriberTraitWithSubscribedServiceAttribute()
+    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttribute()
     {
         if (!class_exists(SubscribedService::class)) {
             $this->markTestSkipped('SubscribedService attribute not available.');
@@ -251,14 +251,14 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testServiceSubscriberTraitWithSubscribedServiceAttributeOnStaticMethod()
+    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttributeOnStaticMethod()
     {
         if (!class_exists(SubscribedService::class)) {
             $this->markTestSkipped('SubscribedService attribute not available.');
         }
 
         $subscriber = new class() implements ServiceSubscriberInterface {
-            use ServiceSubscriberTrait;
+            use ServiceMethodsSubscriberTrait;
 
             #[SubscribedService]
             public static function method(): TestDefinition1
@@ -271,14 +271,14 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $subscriber::getSubscribedServices();
     }
 
-    public function testServiceSubscriberTraitWithSubscribedServiceAttributeOnMethodWithRequiredParameters()
+    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttributeOnMethodWithRequiredParameters()
     {
         if (!class_exists(SubscribedService::class)) {
             $this->markTestSkipped('SubscribedService attribute not available.');
         }
 
         $subscriber = new class() implements ServiceSubscriberInterface {
-            use ServiceSubscriberTrait;
+            use ServiceMethodsSubscriberTrait;
 
             #[SubscribedService]
             public function method($param1, $param2 = null): TestDefinition1
@@ -291,14 +291,14 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $subscriber::getSubscribedServices();
     }
 
-    public function testServiceSubscriberTraitWithSubscribedServiceAttributeOnMethodMissingReturnType()
+    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttributeOnMethodMissingReturnType()
     {
         if (!class_exists(SubscribedService::class)) {
             $this->markTestSkipped('SubscribedService attribute not available.');
         }
 
         $subscriber = new class() implements ServiceSubscriberInterface {
-            use ServiceSubscriberTrait;
+            use ServiceMethodsSubscriberTrait;
 
             #[SubscribedService]
             public function method()
@@ -311,7 +311,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $subscriber::getSubscribedServices();
     }
 
-    public function testServiceSubscriberTraitWithUnionReturnType()
+    public function testServiceMethodsSubscriberTraitWithUnionReturnType()
     {
         if (!class_exists(SubscribedService::class)) {
             $this->markTestSkipped('SubscribedService attribute not available.');
@@ -338,7 +338,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testServiceSubscriberTraitWithIntersectionReturnType()
+    public function testServiceMethodsSubscriberTraitWithIntersectionReturnType()
     {
         if (!class_exists(SubscribedService::class)) {
             $this->markTestSkipped('SubscribedService attribute not available.');

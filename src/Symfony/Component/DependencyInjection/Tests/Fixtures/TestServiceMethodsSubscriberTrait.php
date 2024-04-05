@@ -4,7 +4,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 
-trait TestServiceSubscriberTrait
+trait TestServiceMethodsSubscriberTrait
 {
     protected function protectedFunction1(): SomeClass
     {

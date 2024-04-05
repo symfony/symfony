@@ -9,9 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace EventListener;
+namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -83,6 +85,37 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
         );
 
         $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testIsCsrfTokenValidCalledCorrectlyWithCustomExpressionId()
+    {
+        $request = new Request(query: ['id' => '123'], request: ['_token' => 'bar']);
+
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->expects($this->once())
+            ->method('isTokenValid')
+            ->with(new CsrfToken('foo_123', 'bar'))
+            ->willReturn(true);
+
+        $expressionLanguage = $this->createMock(ExpressionLanguage::class);
+        $expressionLanguage->expects($this->once())
+            ->method('evaluate')
+            ->with(new Expression('"foo_" ~ args.id'), [
+                'args' => ['id' => '123'],
+                'request' => $request,
+            ])
+            ->willReturn('foo_123');
+
+        $event = new ControllerArgumentsEvent(
+            $this->createMock(HttpKernelInterface::class),
+            [new IsCsrfTokenValidAttributeMethodsController(), 'withCustomExpressionId'],
+            ['123'],
+            $request,
+            null
+        );
+
+        $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager, $expressionLanguage);
         $listener->onKernelControllerArguments($event);
     }
 

@@ -123,6 +123,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
             $container->removeDefinition('security.is_granted_attribute_expression_language');
+            $container->removeDefinition('security.is_csrf_token_valid_attribute_expression_language');
         }
 
         if (!class_exists(PasswordHasherExtension::class)) {

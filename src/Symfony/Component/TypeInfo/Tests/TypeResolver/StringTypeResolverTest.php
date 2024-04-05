@@ -50,7 +50,7 @@ class StringTypeResolverTest extends TestCase
         yield [Type::callable(), 'callable(string, int): mixed'];
 
         // array
-        yield [Type::array(Type::bool()), 'bool[]'];
+        yield [Type::list(Type::bool()), 'bool[]'];
 
         // array shape
         yield [Type::array(), 'array{0: true, 1: false}'];

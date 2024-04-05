@@ -14,7 +14,8 @@ namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\ConstructorExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Dmitrii Poddubnyi <dpoddubny@gmail.com>
@@ -33,11 +34,28 @@ class ConstructorExtractorTest extends TestCase
         $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface::class, $this->extractor);
     }
 
-    public function testGetTypes()
+    public function testGetType()
     {
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_STRING)], $this->extractor->getTypes('Foo', 'bar', []));
+        $this->assertEquals(Type::string(), $this->extractor->getType('Foo', 'bar', []));
     }
 
+    public function testGetTypeIfNoExtractors()
+    {
+        $extractor = new ConstructorExtractor([]);
+        $this->assertNull($extractor->getType('Foo', 'bar', []));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testGetTypes()
+    {
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)], $this->extractor->getTypes('Foo', 'bar', []));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testGetTypesIfNoExtractors()
     {
         $extractor = new ConstructorExtractor([]);

@@ -11,6 +11,11 @@ Cache
 
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter` instead
 
+DoctrineBridge
+--------------
+
+ * The `DoctrineExtractor::getTypes()` method is deprecated, use `DoctrineExtractor::getType()` instead
+
 ExpressionLanguage
 ------------------
 
@@ -21,6 +26,11 @@ FrameworkBundle
 ---------------
 
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
+
+PropertyInfo
+------------
+
+ * The `PropertyTypeExtractorInterface::getTypes()` method is deprecated, use `PropertyTypeExtractorInterface::getType()` instead
 
 SecurityBundle
 --------------

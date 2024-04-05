@@ -166,13 +166,12 @@ abstract class AttributeLoaderTestCase extends TestCase
     {
         $class = $this->getNamespace().'\Entity45016';
 
-        $this->expectException(MappingException::class);
-        $this->expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', $class));
-
         $metadata = new ClassMetadata($class);
         $loader = $this->getLoaderForContextMapping();
 
         $loader->loadClassMetadata($metadata);
+
+        $this->assertSame(['id'], array_keys($metadata->getAttributesMetadata()));
     }
 
     public function testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsUsed()

@@ -27,9 +27,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class EventSourceHttpClientTest extends TestCase
 {
-    public function testGetServerSentEvents()
+    /**
+     * @testWith ["\n"]
+     *           ["\r"]
+     *           ["\r\n"]
+     */
+    public function testGetServerSentEvents(string $sep)
     {
-        $data = <<<TXT
+        $rawData = <<<TXT
 event: builderror
 id: 46
 data: {"foo": "bar"}
@@ -58,6 +63,7 @@ data: </tag>
 id: 60
 data
 TXT;
+        $data = str_replace("\n", $sep, $rawData);
 
         $chunk = new DataChunk(0, $data);
         $response = new MockResponse('', ['canceled' => false, 'http_method' => 'GET', 'url' => 'http://localhost:8080/events', 'response_headers' => ['content-type: text/event-stream']]);
@@ -83,11 +89,11 @@ TXT;
 
         $expected = [
             new FirstChunk(),
-            new ServerSentEvent("event: builderror\nid: 46\ndata: {\"foo\": \"bar\"}\n\n"),
-            new ServerSentEvent("event: reload\nid: 47\ndata: {}\n\n"),
-            new ServerSentEvent("event: reload\nid: 48\ndata: {}\n\n"),
-            new ServerSentEvent("data: test\ndata:test\nid: 49\nevent: testEvent\n\n\n"),
-            new ServerSentEvent("id: 50\ndata: <tag>\ndata\ndata:   <foo />\ndata\ndata: </tag>\n\n"),
+            new ServerSentEvent(str_replace("\n", $sep, "event: builderror\nid: 46\ndata: {\"foo\": \"bar\"}\n\n")),
+            new ServerSentEvent(str_replace("\n", $sep, "event: reload\nid: 47\ndata: {}\n\n")),
+            new ServerSentEvent(str_replace("\n", $sep, "event: reload\nid: 48\ndata: {}\n\n")),
+            new ServerSentEvent(str_replace("\n", $sep, "data: test\ndata:test\nid: 49\nevent: testEvent\n\n\n")),
+            new ServerSentEvent(str_replace("\n", $sep, "id: 50\ndata: <tag>\ndata\ndata:   <foo />\ndata\ndata: </tag>\n\n")),
         ];
         $i = 0;
 

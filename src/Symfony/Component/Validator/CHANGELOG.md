@@ -11,6 +11,7 @@ CHANGELOG
  * Possibility to use all `Ip` constraint versions for `Cidr` constraint
  * Add `list` and `associative_array` types to `Type` constraint
  * Add the `Charset` constraint
+ * Add the `requireTld` option to the `Url` constraint
 
 7.0
 ---

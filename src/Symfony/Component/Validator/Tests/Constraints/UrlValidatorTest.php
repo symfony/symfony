@@ -311,6 +311,45 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['git://[::1]/'],
         ];
     }
+
+    /**
+     * @dataProvider getUrlsForRequiredTld
+     */
+    public function testRequiredTld(string $url, bool $requireTld, bool $isValid)
+    {
+        $constraint = new Url([
+            'requireTld' => $requireTld,
+        ]);
+
+        $this->validator->validate($url, $constraint);
+
+        if ($isValid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation($constraint->tldMessage)
+                ->setParameter('{{ value }}', '"'.$url.'"')
+                ->setCode(Url::MISSING_TLD_ERROR)
+                ->assertRaised();
+        }
+    }
+
+    public static function getUrlsForRequiredTld(): iterable
+    {
+        yield ['https://aaa', true, false];
+        yield ['https://aaa', false, true];
+        yield ['https://localhost', true, false];
+        yield ['https://localhost', false, true];
+        yield ['http://127.0.0.1', false, true];
+        yield ['http://127.0.0.1', true, false];
+        yield ['http://user.pass@local', false, true];
+        yield ['http://user.pass@local', true, false];
+        yield ['https://example.com', true, true];
+        yield ['https://example.com', false, true];
+        yield ['http://foo/bar.png', false, true];
+        yield ['http://foo/bar.png', true, false];
+        yield ['https://example.com.org', true, true];
+        yield ['https://example.com.org', false, true];
+    }
 }
 
 class EmailProvider

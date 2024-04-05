@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-03-20T10:47:29Z
+
+Others failure (especially lint) are unrelated.
+I don't touch them to minize the conflict with up-merge.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-20T15:37:40Z
+
+Don't we get an exception from ErrorHandler in debug mode at the moment?
+Let's do this on 7.1 so that we're confident we won't break any existing apps?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-03-20T16:14:24Z
+
+> Don't we get an exception from ErrorHandler in debug mode at the moment?
+
+Yes, but not in production. So it silently return a wrong xml in prod.
+
+> Let's do this on 7.1 so that we're confident we won't break any existing apps?
+
+Ok for 7.1. Should I do the PR like this or with an option to passe to the encoder @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-20T16:17:48Z
+
+No options on my side.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-03-20T21:28:27Z
+
+> Let's do this on 7.1 so that we're confident we won't break any existing apps?
+
+Done @nicolas-grekas :)

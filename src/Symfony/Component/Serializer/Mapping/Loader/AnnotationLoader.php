@@ -138,11 +138,9 @@ class AnnotationLoader implements LoaderInterface
 
                     $attributeMetadata->setSerializedName($annotation->getSerializedName());
                 } elseif ($annotation instanceof Ignore) {
-                    if (!$accessorOrMutator) {
-                        throw new MappingException(sprintf('Ignore on "%s::%s()" cannot be added. Ignore can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                    if ($accessorOrMutator) {
+                        $attributeMetadata->setIgnore(true);
                     }
-
-                    $attributeMetadata->setIgnore(true);
                 } elseif ($annotation instanceof Context) {
                     if (!$accessorOrMutator) {
                         throw new MappingException(sprintf('Context on "%s::%s()" cannot be added. Context can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));

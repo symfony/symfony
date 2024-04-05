@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-04-04T04:45:18Z
+
+You are right, I picked the wrong one 😅
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-04-05T05:43:03Z
+
+Sorry, I'm late in the game here, but what is the rationale behind doing a BC break in 7.1?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-04-05T12:18:57Z
+
+> Sorry, I'm late in the game here, but what is the rationale behind doing a BC break in 7.1?
+
+Hey Fabien, we published this as a BC break because technically it is (we changed the behavior of the `import()` method under certain context/scope without deprecation path). However, actually, nobody can/should use the `import()` method in the `prependExtension()` because it's defective, appending config instead of prepending. That's why we were using the `ContainerBuilder::prependExtensionConfig()` until now (which is limited to an `array` of config).
+
+Honestly, this BC break, in the end, doesn't feel like a real BC break to me, as the previous behavior was faulty and unwanted. However, it applies to the BC break rules, so we are documenting it as such.
+
+More details can be found here https://github.com/symfony/symfony/issues/52789 and here https://github.com/symfony/symfony/pull/52843
+
+Hope it's ok for you🤞
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-04-05T14:00:02Z
+
+> > Sorry, I'm late in the game here, but what is the rationale behind doing a BC break in 7.1?
+>
+> Hey Fabien, we published this as a BC break because technically it is (we changed the behavior of the `import()` method under certain context/scope without deprecation path). However, actually, nobody can/should use the `import()` method in the `prependExtension()` because it's defective, appending config instead of prepending. That's why we were using the `ContainerBuilder::prependExtensionConfig()` until now (which is limited to an `array` of config).
+>
+> Honestly, this BC break, in the end, doesn't feel like a real BC break to me, as the previous behavior was faulty and unwanted. However, it applies to the BC break rules, so we are documenting it as such.
+>
+> More details can be found here #52789 and here #52843
+>
+> Hope it's ok for you🤞
+
+Thank you for the clear explanation, that makes sense to me now.

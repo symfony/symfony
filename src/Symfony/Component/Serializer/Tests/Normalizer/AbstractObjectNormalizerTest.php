@@ -1040,12 +1040,12 @@ class AbstractObjectNormalizerTest extends TestCase
                 return [];
             }
 
-            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
             {
                 return null;
             }
 
-            protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+            protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
             {
                 $object->$attribute = $value;
             }

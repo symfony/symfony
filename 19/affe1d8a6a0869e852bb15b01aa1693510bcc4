@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-03T16:30:54Z
+
+@mtarld Can you rebase this one now that the dependent one has been merged? Thank you.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-02-04T20:14:55Z
+
+Rebase needed again
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-03-30T15:40:11Z
+
+@mtarld as discussed at SymfonyLive, could you also try to update API Platform to use this patch? As we do extensive use of PropertyInfo (the component has initially be created as part of API Platform), this will validate that all use cases are covered and that we have a good migration path. Thanks!
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-04-02T10:07:55Z
+
+@dunglas, I tried to use the type from TypeInfo component within API Platform, and so far I don't see any blocker. Indeed, the same BC/deprecation tricks in this PR can be done as well in API Platform.
+
+But, it is plenty of work, I'll try to send a draft PR soon.

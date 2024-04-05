@@ -293,6 +293,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return null;
         }
 
+        if (XmlEncoder::FORMAT === $format && !\is_array($data)) {
+            $data = ['#' => $data];
+        }
+
         $allowedAttributes = $this->getAllowedAttributes($type, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
         $extraAttributes = [];

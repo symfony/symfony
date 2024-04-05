@@ -66,6 +66,7 @@ use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -1539,8 +1540,22 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $tag = $definition->getTag('serializer.normalizer');
 
         $this->assertSame(TranslatableNormalizer::class, $definition->getClass());
-        $this->assertSame(-890, $tag[0]['priority']);
+        $this->assertSame(-920, $tag[0]['priority']);
         $this->assertEquals(new Reference('translator'), $definition->getArgument('$translator'));
+    }
+
+    /**
+     * @see https://github.com/symfony/symfony/issues/54478
+     */
+    public function testBackedEnumNormalizerRegistered()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('serializer.normalizer.backed_enum');
+        $tag = $definition->getTag('serializer.normalizer');
+
+        $this->assertSame(BackedEnumNormalizer::class, $definition->getClass());
+        $this->assertSame(-915, $tag[0]['priority']);
     }
 
     public function testSerializerCacheActivated()

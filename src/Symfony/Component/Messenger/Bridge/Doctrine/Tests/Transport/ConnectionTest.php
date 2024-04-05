@@ -20,6 +20,7 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
+use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -95,6 +96,82 @@ class ConnectionTest extends TestCase
             ->willReturn($stmt);
 
         $connection = new Connection([], $driverConnection);
+        $doctrineEnvelope = $connection->get();
+        $this->assertNull($doctrineEnvelope);
+    }
+
+    public function testGetWithSkipLockedWithForUpdateMethod()
+    {
+        if (!method_exists(QueryBuilder::class, 'forUpdate')) {
+            $this->markTestSkipped('This test is for when forUpdate method exists.');
+        }
+
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+        $stmt = $this->getResultMock(false);
+
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('forUpdate')
+            ->with(ConflictResolutionMode::SKIP_LOCKED)
+            ->willReturn($queryBuilder);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('SELECT FOR UPDATE SKIP LOCKED');
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $driverConnection->expects($this->never())
+            ->method('update');
+        $driverConnection
+            ->method('executeQuery')
+            ->with($this->callback(function ($sql) {
+                return str_contains($sql, 'SKIP LOCKED');
+            }))
+            ->willReturn($stmt);
+
+        $connection = new Connection(['skip_locked' => true], $driverConnection);
+        $doctrineEnvelope = $connection->get();
+        $this->assertNull($doctrineEnvelope);
+    }
+
+    public function testGetWithSkipLockedWithoutForUpdateMethod()
+    {
+        if (method_exists(QueryBuilder::class, 'forUpdate')) {
+            $this->markTestSkipped('This test is for when forUpdate method does not exist.');
+        }
+
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+        $stmt = $this->getResultMock(false);
+
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('SELECT');
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $driverConnection->expects($this->never())
+            ->method('update');
+        $driverConnection
+            ->method('executeQuery')
+            ->with($this->callback(function ($sql) {
+                return str_contains($sql, 'SKIP LOCKED');
+            }))
+            ->willReturn($stmt);
+
+        $connection = new Connection(['skip_locked' => true], $driverConnection);
         $doctrineEnvelope = $connection->get();
         $this->assertNull($doctrineEnvelope);
     }
@@ -496,20 +573,20 @@ class ConnectionTest extends TestCase
 
         yield 'SQL Server' => [
             class_exists(SQLServerPlatform::class) && !class_exists(SQLServer2012Platform::class) ? new SQLServerPlatform() : new SQLServer2012Platform(),
-            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK, READPAST) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
         ];
 
         if (!class_exists(MySQL57Platform::class)) {
             // DBAL >= 4
             yield 'Oracle' => [
                 new OraclePlatform(),
-                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC FETCH NEXT 1 ROWS ONLY) FOR UPDATE',
+                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC FETCH NEXT 1 ROWS ONLY) FOR UPDATE SKIP LOCKED',
             ];
         } else {
             // DBAL < 4
             yield 'Oracle' => [
                 new OraclePlatform(),
-                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE',
+                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE SKIP LOCKED',
             ];
         }
     }

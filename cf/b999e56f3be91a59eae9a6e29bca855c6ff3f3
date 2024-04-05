@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-03-11T18:03:04Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "5.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2024-03-11T18:08:20Z
+
+There's another regex line 147 but I didn't modify it for safety (since we're on 5.4). It's untested, so its goal is unclear. Judging from the pattern, the intention might be to yield SSE comments (line starting with a colon) as `DataChunk`. If that's the case, then it's not working at all and it's another bug :sweat_smile:
+
+cc @nicolas-grekas @dunglas @soyuka since you worked on the initial implementation and you might remember something :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-13T12:29:13Z
+
+> when the line starts with a colon we need to skip
+
+yep, that's what we do on L147
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2024-03-13T12:57:18Z
+
+> yep, that's what we do on L147
+
+It's not working as expected. I'll propose a patch, but on 7.1 because it's going to change the behavior heavily. Is that OK for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-13T15:14:04Z
+
+> on 7.1 because it's going to change the behavior heavily
+
+Not sure: if we don't follow the spec, that's a bug and we need to fix it in 5.4.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2024-03-13T15:23:06Z
+
+We don't follow the spec but we've been yielding comments as SSE for more than 3 years :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-13T15:32:13Z
+
+It doesn't matter, we don't want to preserve BC for a private buggy protocol :)

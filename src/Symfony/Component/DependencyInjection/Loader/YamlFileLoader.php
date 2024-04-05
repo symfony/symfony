@@ -810,7 +810,7 @@ class YamlFileLoader extends FileLoader
 
             if (!$this->prepend && !$this->container->hasExtension($namespace)) {
                 $extensionNamespaces = array_filter(array_map(fn (ExtensionInterface $ext) => $ext->getAlias(), $this->container->getExtensions()));
-                throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $namespace, $file, $namespace, $extensionNamespaces ? sprintf('"%s"', implode('", "', $extensionNamespaces)) : 'none'));
+                throw new InvalidArgumentException(UndefinedExtensionHandler::getErrorMessage($namespace, $file, $namespace, $extensionNamespaces));
             }
         }
 

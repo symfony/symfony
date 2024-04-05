@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jwage at 2024-03-05T21:06:17Z
+
+After discussing this with Nicolas, I am going to remove the `skip_locked` option. We will always use `FOR UPDATE SKIP LOCKED`. In addition to that, I will make a change to add a delay to the retries and a jitter since we are getting deadlocks caused by contention, immediately retrying with no delay may cause more contention and cause us to repeatedly get deadlocks.

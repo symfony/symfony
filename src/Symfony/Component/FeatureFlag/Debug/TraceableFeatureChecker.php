@@ -38,7 +38,6 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface
 
             return $isEnabled;
         }
-        $this->expectedValues[$featureName] ??= [];
         $this->expectedValues[$featureName][] = $expectedValue;
 
         // Force logging value. It has no cost since value is cached by the decorated FeatureChecker.

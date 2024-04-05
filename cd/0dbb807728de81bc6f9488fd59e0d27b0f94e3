@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-29T08:14:24Z
+
+Do you plan to handle locale and emoji data ? How would the method change ? Should we implement all at once ?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-29T08:17:45Z
+
+`emojify` should be added in the `UndefinedCallableHandler` i think
+
+--
+
+Will you make the change in TwigBundle in a following PR or want to release both at same time ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-29T08:47:24Z
+
+> Do you plan to handle locale and emoji data ?
+
+No need I guess...
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-29T14:25:02Z
+
+> Shouldn't this have a change in TwigBundle to register the new extension when the symfony/emoji component is installed ?
+
+Done 👍🏼
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-29T14:26:53Z
+
+> `emojify` should be added in the `UndefinedCallableHandler` i think
+
+Good idea. 👍🏼 Thanks
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-29T14:28:25Z
+
+> Do you plan to handle locale and emoji data ? How would the method change ? Should we implement all at once ?
+
+I now allows all catalog, and let the Emoji transliterator do all the checks.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-29T16:06:29Z
+
+Maybe a minor doubt about the name... as the slug filter is just "slug" and not "slugify" ... maybe "|`emoji`" ?
+
+Nice "most important PR of the year" ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-04-05T08:54:32Z
+
+Pr rebased, and updated

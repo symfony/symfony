@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'oila: ayol qiz bola',
     '😶‍🌫' => 'bulutdagi yuz',
     '😮‍💨' => 'nafas chiqarayotgan yuz',
+    '🙂‍↔' => 'gorizontal yo‘nalishda tebranayotgan yuz',
     '🙂‍↕' => 'vertikal yo‘nalishda tebranayotgan yuz',
     '😵‍💫' => 'spiral koʻzli yuz',
     '❤‍🔥' => 'olovdagi yurak',

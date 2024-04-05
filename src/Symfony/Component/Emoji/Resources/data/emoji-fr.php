@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'famille : femme et fille',
     '😶‍🌫' => 'visage dans les nuages',
     '😮‍💨' => 'visage expirant',
+    '🙂‍↔' => 'tête secouée horizontalement',
     '🙂‍↕' => 'tête secouée verticalement',
     '😵‍💫' => 'visage aux yeux en spirales',
     '❤‍🔥' => 'cœur enflammé',

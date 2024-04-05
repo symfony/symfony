@@ -1180,6 +1180,7 @@ return [
     '👩‍👧' => 'familija: žeńska, źowćo',
     '😶‍🌫' => 'woblico w mrokawach',
     '😮‍💨' => 'wudychajuce woblico',
+    '🙂‍↔' => 'woblico, kenž z głowu wijo',
     '🙂‍↕' => 'woblico, kenž nyga',
     '😵‍💫' => 'woblico ze špiralojtyma wócyma',
     '❤‍🔥' => 'wutšobka se pali',

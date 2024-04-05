@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'ģimene: sieviete un meitene',
     '😶‍🌫' => 'seja mākoņos',
     '😮‍💨' => 'nopūta',
+    '🙂‍↔' => 'krata galvu horizontāli',
     '🙂‍↕' => 'krata galvu vertikāli',
     '😵‍💫' => 'seja ar spirālēm acu vietā',
     '❤‍🔥' => 'degoša sirds',

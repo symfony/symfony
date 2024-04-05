@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'teulu: menyw, merch',
     '😶‍🌫' => 'wyneb mewn cymylau',
     '😮‍💨' => 'wyneb anadlu allan',
+    '🙂‍↔' => 'pen yn ysgwyd o ochr i ochr',
     '🙂‍↕' => 'pen yn ysgwyd i fyny ac i lawr',
     '😵‍💫' => 'wyneb â llygaid troellog',
     '❤‍🔥' => 'calon ar dân',

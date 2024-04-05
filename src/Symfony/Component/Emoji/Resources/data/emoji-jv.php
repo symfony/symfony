@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'kluwarga: wong wadon, bocah wadon',
     '😶‍🌫' => 'rai ora dong',
     '😮‍💨' => 'rai ambegan lego',
+    '🙂‍↔' => 'gedheg',
     '🙂‍↕' => 'manthuk',
     '😵‍💫' => 'rai ngelu',
     '❤‍🔥' => 'ati kasmaran',

@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'teaghlach: boireannach ’s caileag',
     '😶‍🌫' => 'aodan sna neòil',
     '😮‍💨' => 'aodan a’ leigeil anail',
+    '🙂‍↔' => 'crathadh-cinn',
     '🙂‍↕' => 'cromadh-cinn',
     '😵‍💫' => 'aodann le sùilean snìomhanach',
     '❤‍🔥' => 'cridhe air theine',

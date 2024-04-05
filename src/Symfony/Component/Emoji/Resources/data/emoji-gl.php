@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'familia: muller, nena',
     '😶‍🌫' => 'cara nas nubes',
     '😮‍💨' => 'cara exhalando',
+    '🙂‍↔' => 'cabeza abaneándose horizontalmente',
     '🙂‍↕' => 'cabeza abaneándose verticalmente',
     '😵‍💫' => 'cara con ollos de espiral',
     '❤‍🔥' => 'corazón en chamas',

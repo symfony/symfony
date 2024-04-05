@@ -1180,6 +1180,7 @@ return [
     '👩‍👧' => 'kuraq ayllu: warmi, warmi warma',
     '😶‍🌫' => 'uya phuyukunapi',
     '😮‍💨' => 'uya samachkan',
+    '🙂‍↔' => 'tapsiy umata hanaqmanta urayman',
     '🙂‍↕' => 'vertical tapsiy umata',
     '😵‍💫' => 'uya espiral ñawikunawan',
     '❤‍🔥' => 'sunqu ninapi',

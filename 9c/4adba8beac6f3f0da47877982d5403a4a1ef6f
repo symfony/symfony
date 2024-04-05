@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-04T11:25:40Z
+
+Just to be sure: this matters only when strict types are enabled, right? Looking at the `@param` in the interface, I'd say we might have forgotten to change the type there in 7.0. Let's do it on 7.0 as a bugfix?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-04-04T11:38:45Z
+
+Indeed! It works as-is when strict types are disabled. I guess we have to wait for the next major to update the interface, even if it's a bug?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-04T11:42:24Z
+
+Ah no sorry, the change was fine for 6.4.
+For 7.0, that'd be on the interface.
+We might want to check other `@param` in case we forgot to update a few others. Not sure how.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-04-04T11:51:13Z
+
+Got back to 6.4. 👍
+
+I think this is something that may be doable with some custom PHPStan rule? I didn't play with this yet, that's an interesting case. I'll try something when I have some time.

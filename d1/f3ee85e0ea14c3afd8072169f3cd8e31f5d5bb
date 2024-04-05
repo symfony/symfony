@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2023-12-11T16:00:28Z
+
+Maybe for another PR, but shouldn't we add support for `q=` parameter? https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language#directives
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-12-11T16:31:32Z
+
+Many thanks for your comments. Indeed there is something wrong with some cases [such as this one](https://github.com/symfony/symfony/blob/48c8c981851580b877c3b82c7980fc55350a886d/src/Symfony/Component/HttpFoundation/Tests/RequestTest.php#L1529) where `en` is selected when `en-us` is preferred just because of the order of the array values.
+I will add use cases and make sure `q` is understood.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-12-11T19:57:48Z
+
+Hi,
+
+I updated the PR and changed the comparison logic:
+* If an exact match exists, it is returned
+* Else if a similar locale exists, the corresponding language is returned
+* If nothing is acceptable, the first supported locale is returned
+
+Please note that the `q` parameter is already used. The [test with a reversed order priority](https://github.com/symfony/symfony/pull/52986/files#diff-a6e313421b40e37ad1c1a23ad66131c48790cb435dc1d040ac33a4800e243780R1553) returns the expected language.
+
+In addition, the returned locale value is always `xx_XX` to make it consistant with the value used internally.
+Also, it accepts locales such as `hi_Latn_IN` to be compared.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-12-17T16:05:35Z
+
+In your exemple, what would happen if the default locale were defined as « fr, en » ?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-12-18T08:37:22Z
+
+> In your exemple, what would happen if the default locale were defined as « fr, en » ?
+
+You mean if the supported locales are `['fr', 'en']` instead of `['fr-FR', 'en-US']`? In this case it will match as `accept-language: ja-JP,fr_CA;q=0.7,fr;q=0.5` contains the exact match `fr`.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-02-01T19:46:20Z
+
+Many thanks for the last suggestions.
+The PR is now rebased, squashed and ready for other reviewers comments
+
+---------------------------------------------------------------------------
+
+by stof at 2024-04-03T19:05:52Z
+
+PHP already has a locale matching algorithm in ext-intl: https://www.php.net/manual/fr/locale.lookup.php (or maybe some of the other methods there)
+
+Would this algorithm help for this PR ? If yes, the proper way to solve it might be to implement them in the polyfill in https://github.com/symfony/polyfill/blob/1.x/src/Intl/Icu/Locale.php (where it currently throw an exception saying it is not implemented) and to use it.

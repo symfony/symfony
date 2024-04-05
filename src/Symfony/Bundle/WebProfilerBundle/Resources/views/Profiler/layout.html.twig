@@ -28,16 +28,10 @@
                             <div id="sidebar-shortcuts">
                                 {% block sidebar_shortcuts_links %}
                                     <div class="shortcuts">
-                                        <a class="btn btn-link" href="{{ path('_profiler_search', { limit: 10, type: profile_type }) }}">Last 10</a>
+                                        <a class="btn btn-link" href="{{ path('_profiler_search', { limit: 10, type: profile_type }) }}">{{ source('@WebProfiler/Icon/search.svg') }} Search profiles</a>
                                         <a class="btn btn-link" href="{{ path('_profiler', { token: 'latest', type: profile_type }|merge(request.query.all)) }}">Latest</a>
-
-                                        <a class="sf-toggle btn btn-link" data-toggle-selector="#sidebar-search" {% if tokens is defined or about is defined %}data-toggle-initial="display"{% endif %}>
-                                            {{ source('@WebProfiler/Icon/search.svg') }} <span class="hidden-small">Search</span>
-                                        </a>
                                     </div>
                                 {% endblock sidebar_shortcuts_links %}
-
-                                {{ render(controller('web_profiler.controller.profiler::searchBarAction', query={type: profile_type }|merge(request.query.all))) }}
                             </div>
 
                             {% if templates is defined %}

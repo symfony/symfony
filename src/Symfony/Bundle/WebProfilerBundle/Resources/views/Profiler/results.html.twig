@@ -35,7 +35,9 @@
 {% endblock %}
 
 {% block sidebar_search_css_class %}{% endblock %}
-{% block sidebar_shortcuts_links %}{% endblock %}
+{% block sidebar_shortcuts_links %}
+    {{ render(controller('web_profiler.controller.profiler::searchBarAction', query={type: profile_type }|merge(request.query.all))) }}
+{% endblock %}
 
 {% block panel %}
     <div class="sf-tabs" data-processed="true">

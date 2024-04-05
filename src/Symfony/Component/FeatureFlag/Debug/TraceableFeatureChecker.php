@@ -60,7 +60,7 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface
     }
 
     /**
-     * @return array<string, list<array{expectedValue: mixed, isEnabled: bool}>>
+     * @return array<string, list<array{expectedValue: mixed, isEnabled: bool, calls: int}>>
      */
     public function getChecks(): array
     {

@@ -14,7 +14,7 @@ Cache
 DoctrineBridge
 --------------
 
- * The `DoctrineExtractor::getTypes()` method is deprecated, use `DoctrineExtractor::getType()` instead
+ * Deprecated `DoctrineExtractor::getTypes()`, use `DoctrineExtractor::getType()` instead
 
 ExpressionLanguage
 ------------------
@@ -30,7 +30,7 @@ FrameworkBundle
 PropertyInfo
 ------------
 
- * The `PropertyTypeExtractorInterface::getTypes()` method is deprecated, use `PropertyTypeExtractorInterface::getType()` instead
+ * Deprecate `PropertyTypeExtractorInterface::getTypes()`, use `PropertyTypeExtractorInterface::getType()` instead
 
 SecurityBundle
 --------------

@@ -34,7 +34,7 @@ class EventSourceHttpClientTest extends TestCase
      */
     public function testGetServerSentEvents(string $sep)
     {
-        $data = str_replace("\n", $sep, <<<TXT
+        $rawData = <<<TXT
 event: builderror
 id: 46
 data: {"foo": "bar"}
@@ -62,7 +62,8 @@ data: </tag>
 
 id: 60
 data
-TXT);
+TXT;
+        $data = str_replace("\n", $sep, $rawData);
 
         $chunk = new DataChunk(0, $data);
         $response = new MockResponse('', ['canceled' => false, 'http_method' => 'GET', 'url' => 'http://localhost:8080/events', 'response_headers' => ['content-type: text/event-stream']]);

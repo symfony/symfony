@@ -1502,27 +1502,43 @@ class RequestTest extends TestCase
     {
         $request = new Request();
         $this->assertNull($request->getPreferredLanguage());
-        $this->assertNull($request->getPreferredLanguage([]));
-        $this->assertEquals('fr', $request->getPreferredLanguage(['fr']));
-        $this->assertEquals('fr', $request->getPreferredLanguage(['fr', 'en']));
-        $this->assertEquals('en', $request->getPreferredLanguage(['en', 'fr']));
-        $this->assertEquals('fr-ch', $request->getPreferredLanguage(['fr-ch', 'fr-fr']));
+    }
 
+    /**
+     * @dataProvider providePreferredLanguage
+     */
+    public function testPreferredLanguageWithLocales(?string $expectedLocale, ?string $acceptLanguage, array $locales)
+    {
         $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
-        $this->assertEquals('en', $request->getPreferredLanguage(['en', 'en-us']));
+        if ($acceptLanguage) {
+            $request->headers->set('Accept-language', $acceptLanguage);
+        }
+        $this->assertSame($expectedLocale, $request->getPreferredLanguage($locales));
+    }
 
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
-        $this->assertEquals('en', $request->getPreferredLanguage(['fr', 'en']));
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en-us; q=0.8');
-        $this->assertEquals('en', $request->getPreferredLanguage(['fr', 'en']));
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, fr-fr; q=0.6, fr; q=0.5');
-        $this->assertEquals('en', $request->getPreferredLanguage(['fr', 'en']));
+    public static function providePreferredLanguage(): iterable
+    {
+        yield '"es_PA" is selected as no supported locale is set' => ['es_PA', 'es-pa, en-us; q=0.8, en; q=0.6', []];
+        yield 'No supported locales' => [null, null, []];
+        yield '"fr" selected as first choice when no header is present' => ['fr', null, ['fr', 'en']];
+        yield '"en" selected as first choice when no header is present' => ['en', null, ['en', 'fr']];
+        yield '"fr_CH" selected as first choice when no header is present' => ['fr_CH', null, ['fr-ch', 'fr-fr']];
+        yield '"en_US" is selected as an exact match is found (1)' => ['en_US', 'zh, en-us; q=0.8, en; q=0.6', ['en', 'en-us']];
+        yield '"en_US" is selected as an exact match is found (2)' => ['en_US', 'ja-JP,fr_CA;q=0.7,fr;q=0.5,en_US;q=0.3', ['en_US', 'fr_FR']];
+        yield '"en" is selected as an exact match is found' => ['en', 'zh, en-us; q=0.8, en; q=0.6', ['fr', 'en']];
+        yield '"fr" is selected as an exact match is found' => ['fr', 'zh, en-us; q=0.8, fr-fr; q=0.6, fr; q=0.5', ['fr', 'en']];
+        yield '"en" is selected as "en-us" is a similar dialect' => ['en', 'zh, en-us; q=0.8', ['fr', 'en']];
+        yield '"fr_FR" is selected as "fr_CA" is a similar dialect (1)' => ['fr_FR', 'ja-JP,fr_CA;q=0.7,fr;q=0.5', ['en_US', 'fr_FR']];
+        yield '"fr_FR" is selected as "fr_CA" is a similar dialect (2)' => ['fr_FR', 'ja-JP,fr_CA;q=0.7', ['en_US', 'fr_FR']];
+        yield '"fr_FR" is selected as "fr" is a similar dialect' => ['fr_FR', 'ja-JP,fr;q=0.5', ['en_US', 'fr_FR']];
+        yield '"fr_FR" is selected as "fr_CA" is a similar dialect and has a greater "q" compared to "en_US" (2)' => ['fr_FR', 'ja-JP,fr_CA;q=0.7,ru-ru;q=0.3', ['en_US', 'fr_FR']];
+        yield '"en_US" is selected it is an exact match' => ['en_US', 'ja-JP,fr;q=0.5,en_US;q=0.3', ['en_US', 'fr_FR']];
+        yield '"fr_FR" is selected as "fr_CA" is a similar dialect and has a greater "q" compared to "en"' => ['fr_FR', 'ja-JP,fr_CA;q=0.7,en;q=0.5', ['en_US', 'fr_FR']];
+        yield '"fr_FR" is selected as is is an exact match as well as "en_US", but with a greater "q" parameter' => ['fr_FR', 'en-us;q=0.5,fr-fr', ['en_US', 'fr_FR']];
+        yield '"hi_IN" is selected as "hi_Latn_IN" is a similar dialect' => ['hi_IN', 'fr-fr,hi_Latn_IN;q=0.5', ['hi_IN', 'en_US']];
+        yield '"hi_Latn_IN" is selected as "hi_IN" is a similar dialect' => ['hi_Latn_IN', 'fr-fr,hi_IN;q=0.5', ['hi_Latn_IN', 'en_US']];
+        yield '"en_US" is selected as "en_Latn_US+variants+extensions" is a similar dialect' => ['en_US', 'en-latn-us-fonapi-u-nu-numerical-x-private,fr;q=0.5', ['fr_FR', 'en_US']];
+        yield '"zh_Hans" is selected over "zh_TW" as the script as a greater priority over the region' => ['zh_Hans', 'zh-hans-tw, zh-hant-tw', ['zh_Hans', 'zh_tw']];
     }
 
     public function testIsXmlHttpRequest()
@@ -1601,30 +1617,28 @@ class RequestTest extends TestCase
         $this->assertEquals(['application/vnd.wap.wmlscriptc', 'text/vnd.wap.wml', 'application/vnd.wap.xhtml+xml', 'application/xhtml+xml', 'text/html', 'multipart/mixed', '*/*'], $request->getAcceptableContentTypes());
     }
 
-    public function testGetLanguages()
+    /**
+     * @dataProvider provideLanguages
+     */
+    public function testGetLanguages(array $expectedLocales, ?string $acceptLanguage)
     {
         $request = new Request();
-        $this->assertEquals([], $request->getLanguages());
+        if ($acceptLanguage) {
+            $request->headers->set('Accept-language', $acceptLanguage);
+        }
+        $this->assertEquals($expectedLocales, $request->getLanguages());
+    }
 
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
-        $this->assertEquals(['zh', 'en_US', 'en'], $request->getLanguages());
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en-us; q=0.6, en; q=0.8');
-        $this->assertEquals(['zh', 'en', 'en_US'], $request->getLanguages()); // Test out of order qvalues
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en, en-us');
-        $this->assertEquals(['zh', 'en', 'en_US'], $request->getLanguages()); // Test equal weighting without qvalues
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh; q=0.6, en, en-us; q=0.6');
-        $this->assertEquals(['en', 'zh', 'en_US'], $request->getLanguages()); // Test equal weighting with qvalues
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, i-cherokee; q=0.6');
-        $this->assertEquals(['zh', 'cherokee'], $request->getLanguages());
+    public static function provideLanguages(): iterable
+    {
+        yield 'empty' => [[], null];
+        yield [['zh', 'en_US', 'en'], 'zh, en-us; q=0.8, en; q=0.6'];
+        yield 'Test out of order qvalues' => [['zh', 'en', 'en_US'], 'zh, en-us; q=0.6, en; q=0.8'];
+        yield 'Test equal weighting without qvalues' => [['zh', 'en', 'en_US'], 'zh, en, en-us'];
+        yield 'Test equal weighting with qvalues' => [['en', 'zh', 'en_US'], 'zh; q=0.6, en, en-us; q=0.6'];
+        yield 'Test irregular locale' => [['zh', 'cherokee'], 'zh, i-cherokee; q=0.6'];
+        yield 'Test with variants, unicode extensions and private information' => [['pt_BR', 'hy_Latn_IT', 'zh_Hans_TW'], 'pt-BR-u-ca-gregory-nu-latn, hy-Latn-IT-arevela, zh-Hans-TW-fonapi-u-islamcal-x-AZE-derbend; q=0.6'];
+        yield 'Test multiple regions' => [['en_US', 'en_CA', 'en_GB', 'en'], 'en-us, en-ca, en-gb, en'];
     }
 
     public function testGetAcceptHeadersReturnString()
@@ -2199,7 +2213,7 @@ class RequestTest extends TestCase
 
     public function testFactoryCallable()
     {
-        $requestFactory = new class {
+        $requestFactory = new class() {
             public function createRequest(): Request
             {
                 return new NewRequest();
@@ -2211,7 +2225,6 @@ class RequestTest extends TestCase
         $this->assertEquals('foo', Request::create('/')->getFoo());
 
         Request::setFactory(null);
-
     }
 
     /**

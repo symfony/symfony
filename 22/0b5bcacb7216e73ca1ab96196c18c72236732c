@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-04T08:30:51Z
+
+PR updated to add a new "text" locale, which uses a map resulting from merging slack+github+gitlab maps.
+This also fixes the gitlab maps, which were missing combined emojis and aliases.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-04-04T08:55:33Z
+
+> PR updated to add a new "text" locale, which uses a map resulting from merging slack+github+gitlab maps.
+
+love it!

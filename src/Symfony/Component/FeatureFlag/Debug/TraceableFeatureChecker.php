@@ -15,10 +15,12 @@ use Symfony\Component\FeatureFlag\FeatureCheckerInterface;
 
 final class TraceableFeatureChecker implements FeatureCheckerInterface
 {
-    /** @var array<string, bool> */
+    /** @var array<string, list<array{expectedValue: mixed, isEnabled: bool, calls: int}>> */
     private array $checks = [];
     /** @var array<string, mixed> */
-    private array $values = [];
+    private array $resolvedValues = [];
+    /** @var array<string, mixed> */
+    private array $expectedValues = [];
 
     public function __construct(
         private readonly FeatureCheckerInterface $decorated,
@@ -27,9 +29,23 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface
 
     public function isEnabled(string $featureName, mixed $expectedValue = true): bool
     {
-        $isEnabled = $this->checks[$featureName] = $this->decorated->isEnabled($featureName, $expectedValue);
-        // Force logging value. It has no cost since value is cached by decorated FeatureChecker.
+        $isEnabled = $this->decorated->isEnabled($featureName, $expectedValue);
+
+        // Check duplicates
+        $this->expectedValues[$featureName] ??= [];
+        if (false !== ($i = array_search($expectedValue, $this->expectedValues[$featureName] ?? [], true))) {
+            $this->checks[$featureName][$i]['calls']++;
+
+            return $isEnabled;
+        }
+        $this->expectedValues[$featureName] ??= [];
+        $this->expectedValues[$featureName][] = $expectedValue;
+
+        // Force logging value. It has no cost since value is cached by the decorated FeatureChecker.
         $this->getValue($featureName);
+
+        $this->checks[$featureName] ??= [];
+        $this->checks[$featureName][] = ['expectedValue' => $expectedValue, 'isEnabled' => $isEnabled, 'calls' => 1];
 
         return $isEnabled;
     }
@@ -41,16 +57,22 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface
 
     public function getValue(string $featureName): mixed
     {
-        return $this->values[$featureName] = $this->decorated->getValue($featureName);
+        return $this->resolvedValues[$featureName] = $this->decorated->getValue($featureName);
     }
 
+    /**
+     * @return array<string, list<array{expectedValue: mixed, isEnabled: bool}>>
+     */
     public function getChecks(): array
     {
         return $this->checks;
     }
 
-    public function getValues(): array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getResolvedValues(): array
     {
-        return $this->values;
+        return $this->resolvedValues;
     }
 }

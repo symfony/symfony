@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 final class FeatureFlagDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -32,21 +33,48 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
 
     public function lateCollect(): void
     {
-        $checks = $this->featureChecker->getChecks();
-        $values = $this->featureChecker->getValues();
-
-        $this->data['features'] = [];
-        foreach ($this->featureRegistry->getNames() as $featureName) {
-            $this->data['features'][$featureName] = [
-                'is_enabled' => $checks[$featureName] ?? null,
-                'value' => $this->cloneVar($values[$featureName] ?? null),
-            ];
+        $this->data['resolvedValues'] = [];
+        foreach ($this->featureChecker->getResolvedValues() as $featureName => $resolvedValue) {
+            $this->data['resolvedValues'][$featureName] = $this->cloneVar($resolvedValue);
         }
+
+        $this->data['checks'] = [];
+        foreach ($this->featureChecker->getChecks() as $featureName => $checks) {
+            $this->data['checks'][$featureName] = array_map(
+                fn (array $check): array => [
+                    'expected_value' => $this->cloneVar($check['expectedValue']),
+                    'is_enabled' => $check['isEnabled'],
+                    'calls' => $check['calls'],
+                ],
+                $checks,
+            );
+        }
+
+        $this->data['not_resolved'] = array_diff($this->featureRegistry->getNames(), array_keys($this->data['resolvedValues']));
     }
 
-    public function getFeatures(): array
+    /**
+     * @return array<string, Data>
+     */
+    public function getResolvedValues(): array
     {
-        return $this->data['features'] ?? [];
+        return $this->data['resolvedValues'] ?? [];
+    }
+
+    /**
+     * @return array<string, array{expected_value: Data, is_enabled: bool, calls: int}>
+     */
+    public function getChecks(): array
+    {
+        return $this->data['checks'] ?? [];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getNotResolved(): array
+    {
+        return $this->data['not_resolved'] ?? [];
     }
 
     public function getName(): string

@@ -3,20 +3,22 @@
 {% block page_title 'Feature Flag' %}
 
 {% block toolbar %}
-    {% if 0 < collector.features|length %}
+    {% if 0 < collector.resolvedValues|length %}
         {% set icon %}
             <img alt="Feature Flag" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABVElEQVRIie2UO0oEURBFzxM/YGroAgQNxETUwEzwiytQ8/GzAhfhEnQNYqaJ4IyCv1QjERQjB1HEQDkGU8qzmRkHNJwLTcOtqtNVr6sb2mrrX6X2qOvqsfpi63qJmjW1O2emDN4P7AHDQAW4BpaznEpcCRgHxsLfAR4z7xKYTyndFTu/VKvqtNqnXkR3VXW6zrQzETtTuwre+Y9J1I2AFeHWg2d1s5Gz2sxDPVHLGfxVfVLLjeBZ7XExL7wKQEd4g8AVsA8MAIvAB/DrA4AjYKiR15mZK8BbwA+A3hbg3003j9ZGelen1A51O86x8iu5VntUxyvnxnoAlzL4YdxnmsDnIqfUzPta0wv1I4Kbapf6EGs32wBeVU/VzoJ39rWmxQ9tFxgBboBbYDJjnlB76QmYAEapnf1WwTsHFlJK9/VG7lZXY2WfbV3PUVOy8Ktoq62/6xORLdg+h+zBmgAAAABJRU5ErkJggg==" />
-            <span class="sf-toolbar-value">{{ collector.features|length }}</span>
+            <span class="sf-toolbar-value">{{ collector.resolvedValues|length }}</span>
         {% endset %}
 
         {% set text %}
             <div class="sf-toolbar-info-group">
-                {% for feature_name, data in collector.features|filter(d => d.is_enabled is not null) %}
+                {% for feature_name, checks in collector.checks %}
                     <div class="sf-toolbar-info-piece">
                         <b>{{ loop.first ? 'Resolved features' : '' }}</b>
-                        <span class="sf-toolbar-status sf-toolbar-status-{{ data['is_enabled'] ? 'green' : 'red' }}">
-                            {{ feature_name }}
-                        </span>
+                        {% for check in checks %}
+                            <span class="sf-toolbar-status sf-toolbar-status-{{ check.is_enabled ? 'green' : 'red' }}">
+                                {{ feature_name }}
+                            </span>
+                        {% endfor %}
                         <br />
                     </div>
                 {% endfor %}
@@ -28,7 +30,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ collector.features|length is same as(0) ? 'disabled' }}">
+    <span class="label {{ collector.resolvedValues|length is same as(0) ? 'disabled' }}">
         <span class="icon"><img alt="Feature Flag" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABVElEQVRIie2UO0oEURBFzxM/YGroAgQNxETUwEzwiytQ8/GzAhfhEnQNYqaJ4IyCv1QjERQjB1HEQDkGU8qzmRkHNJwLTcOtqtNVr6sb2mrrX6X2qOvqsfpi63qJmjW1O2emDN4P7AHDQAW4BpaznEpcCRgHxsLfAR4z7xKYTyndFTu/VKvqtNqnXkR3VXW6zrQzETtTuwre+Y9J1I2AFeHWg2d1s5Gz2sxDPVHLGfxVfVLLjeBZ7XExL7wKQEd4g8AVsA8MAIvAB/DrA4AjYKiR15mZK8BbwA+A3hbg3003j9ZGelen1A51O86x8iu5VntUxyvnxnoAlzL4YdxnmsDnIqfUzPta0wv1I4Kbapf6EGs32wBeVU/VzoJ39rWmxQ9tFxgBboBbYDJjnlB76QmYAEapnf1WwTsHFlJK9/VG7lZXY2WfbV3PUVOy8Ktoq62/6xORLdg+h+zBmgAAAABJRU5ErkJggg==" /></span>
         <strong>Feature Flag</strong>
     </span>
@@ -37,27 +39,6 @@
 {% block head %}
     {{ parent() }}
     <style>
-        tr.feature-check {
-            position: relative;
-        }
-        tr.feature-check > td:first-child:before {
-            border-radius: 0;
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-        }
-        tr.feature-check-enabled > td:first-child:before {
-            background: var(--green-500);
-        }
-        tr.feature-check-disabled > td:first-child:before {
-            background: var(--red-500);
-        }
-        tr.feature-check-unknown > td:first-child:before {
-            background: var(--gray-400);
-        }
         .badge {
             color: var(--white);
             display: inline-block;
@@ -70,53 +51,98 @@
         .badge.badge-disabled {
             background-color: var(--red-500);
         }
-        .badge.badge-unknown {
-            background-color: var(--gray-400);
-        }
     </style>
 {% endblock %}
 
 {% block panel %}
-    <h2>Features</h2>
-    {% if collector.features|length > 0 %}
-        <table>
-            <thead>
-            <tr>
-                <th>Feature</th>
-                <th>Resolved value</th>
-                <th>Enabled</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for feature_name, data in collector.features %}
-                {% set result = data['is_enabled'] is not null ? (data['is_enabled'] ? 'enabled' : 'disabled') : 'unknown' %}
-                <tr class="feature-check feature-check-{{ result }}">
-                    <td>{{ feature_name }}</td>
-                    <td>
-                        {% if data['value'].value is not null %}
-                            {{ profiler_dump(data['value'], maxDepth=2) }}
-                        {% else %}
-                            <span class="text-muted">Not resolved</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if data['is_enabled'] is not null %}
-                            <span class="badge badge-{{ result }}">
-                                {{ result|capitalize }}
-                            </span>
-                        {% else %}
-                            <span class="badge badge-unknown">
-                                Not resolved
-                            </span>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="empty">
-            <p>No features checked</p>
+    <h2>Feature Flag</h2>
+    <div class="sf-tabs">
+        <div class="tab">
+            <h3 class="tab-title">Resolved <span class="badge">{{ collector.resolvedValues|length }}</span></h3>
+
+            <div class="tab-content">
+                {% if collector.resolvedValues|length > 0 %}
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Feature name</th>
+                            <th>Enabled</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for feature_name, value in collector.resolvedValues %}
+                            <tr>
+                                <td>
+                                    {{ feature_name }}
+                                </td>
+                                <td>
+                                    {% for check in collector.checks[feature_name] %}
+                                        {% set context_id = 'context-' ~ loop.parent.loop.index ~ '-' ~ loop.index %}
+                                        <div>
+                                            {% set result = check['is_enabled'] ? 'enabled' : 'disabled' %}
+                                            <span class="badge badge-{{ result }}">{{ result|capitalize }}</span>
+                                            <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide details">Show details</button></span>
+                                        </div>
+
+                                        <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                                            <table>
+                                                <tr>
+                                                    <th>Resolved</th>
+                                                    <td>{{ profiler_dump(value, maxDepth=2) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Expected</th>
+                                                    <td>{{ profiler_dump(check['expected_value'], maxDepth=2) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Calls</th>
+                                                    <td>{{ check['calls'] }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <span class="badge badge-unknown">Not resolved</span>
+                                    {% endfor %}
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty">
+                        <p>No features checked</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-    {% endif %}
+        <div class="tab">
+            <h3 class="tab-title">Not resolved <span class="badge">{{ collector.notResolved|length }}</span></h3>
+
+            <div class="tab-content">
+                {% if collector.notResolved|length > 0 %}
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Feature name</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for feature_name in collector.notResolved %}
+                            <tr>
+                                <td>
+                                    {{ feature_name }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty">
+                        <p>All features resolved</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

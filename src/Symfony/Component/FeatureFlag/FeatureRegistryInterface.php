@@ -11,20 +11,19 @@
 
 namespace Symfony\Component\FeatureFlag;
 
-use Psr\Container\ContainerInterface;
 use Symfony\Component\FeatureFlag\Exception\FeatureNotFoundException;
 
-interface FeatureRegistryInterface extends ContainerInterface
+interface FeatureRegistryInterface
 {
-    public function has(string $id): bool;
+    public function has(string $featureName): bool;
 
     /**
      * @throws FeatureNotFoundException When the feature is not registered
      */
-    public function get(string $id): callable;
+    public function get(string $featureName): callable;
 
     /**
-     * @return array<string> An array of all registered feature names
+     * @return list<string> A list of all registered feature names
      */
     public function getNames(): array;
 }

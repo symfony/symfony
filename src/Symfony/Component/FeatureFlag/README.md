@@ -2,11 +2,12 @@ FeatureFlag Component
 =====================
 
 The FeatureFlag component allows you to split the code execution flow by
-enabling some features depending on context.
+enabling features depending on context.
 
-It provides a service that checks if a feature is enabled. A feature is a
-callable which returns a value compared to the expected one to determine is the
-feature is enabled (mostly a boolean but not limited to).
+It provides a service that checks if a feature is enabled. Each feature is
+defined by a callable function that returns a value.
+The feature is enabled if the value matches the expected one (mostly a boolean
+but not limited to).
 
 **This Component is experimental**.
 [Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)

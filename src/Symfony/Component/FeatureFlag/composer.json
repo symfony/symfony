@@ -1,8 +1,8 @@
 {
     "name": "symfony/feature-flag",
     "type": "library",
-    "description": "Provide a feature flag mechanism.",
-    "keywords": [],
+    "description": "Provides a feature flag mechanism",
+    "keywords": ["feature", "flag", "flags", "toggle"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

@@ -28,7 +28,6 @@ return static function (ContainerConfigurator $container) {
         ->set('feature_flag.feature_checker', FeatureChecker::class)
             ->args([
                 '$featureRegistry' => service('feature_flag.feature_registry'),
-                '$default' => false,
             ])
             ->alias(FeatureCheckerInterface::class, 'feature_flag.feature_checker')
     ;

@@ -1054,6 +1054,11 @@ class AbstractObjectNormalizerTest extends TestCase
             {
                 $object->$attribute = $value;
             }
+
+            public function getSupportedTypes(?string $format): array
+            {
+                return ['*' => false];
+            }
         };
 
         $this->assertSame('scalar', $normalizer->denormalize('scalar', XmlScalarDummy::class, 'xml')->value);

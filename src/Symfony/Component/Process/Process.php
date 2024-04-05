@@ -350,7 +350,7 @@ class Process implements \IteratorAggregate
 
         $oldMask = [];
 
-        if (\function_exists('pcntl_sigprocmask')) {
+        if ($this->ignoredSignals && \function_exists('pcntl_sigprocmask')) {
             // we block signals we want to ignore, as proc_open will use fork / posix_spawn which will copy the signal mask this allow to block
             // signals in the child process
             pcntl_sigprocmask(\SIG_BLOCK, $this->ignoredSignals, $oldMask);
@@ -359,7 +359,7 @@ class Process implements \IteratorAggregate
         try {
             $process = @proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
         } finally {
-            if (\function_exists('pcntl_sigprocmask')) {
+            if ($this->ignoredSignals && \function_exists('pcntl_sigprocmask')) {
                 // we restore the signal mask here to avoid any side effects
                 pcntl_sigprocmask(\SIG_SETMASK, $oldMask);
             }

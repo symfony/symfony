@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2024-03-30T19:45:41Z
+
+will this works with for example an object in the controller action ?
+
+Expression (delete item « post.slug »)
+__invoke(Post $post)
+
+---------------------------------------------------------------------------
+
+by yguedidi at 2024-03-30T20:38:29Z
+
+> will this works with for example an object in the controller action ?
+
+@94noni yes it should as it used the ExpressionLanguage component, like in `IsGranted` you can set `subject="post.author"`
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-30T20:56:18Z
+
+I'm curious what is the problem this scenario help to solve ?  You still have to write manually this id on the template right ?
+
+---------------------------------------------------------------------------
+
+by yguedidi at 2024-03-30T21:09:04Z
+
+> I'm curious what is the problem this scenario help to solve ? You still have to write manually this id on the template right ?
+
+@smnandre it's for example on a list page with delete action per item, and you want a CSRF token per item, so in the template you have something like the following:
+
+```twig
+{# in a loop over multiple posts #}
+<form action="{{ path('post_delete', {post: post.id}) }}" method="POST">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete-post-' ~ post.id) }}">
+    ...
+</form>
+```
+
+---------------------------------------------------------------------------
+
+by yguedidi at 2024-03-31T16:42:48Z
+
+> The code snippet in the description is also wrong. Accessing a key in an array will be args["post"], not args.post. In ExpressionLanguage, the . operator is a strict equivalent of the -> operator in PHP. It does not have the Twig magic.
+
+good catch! was written from memory without checking, thank you, description updated

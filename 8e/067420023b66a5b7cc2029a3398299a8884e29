@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-11-09T12:23:43Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-12-04T07:30:31Z
+
+@javiereguiluz Do you like this change?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-02-02T07:25:52Z
+
+@jkrzefski thanks for this proposal.
+
+The problem with exception messages is that they usually include super-long "words" (e.g. FQCN) that don't fit the available space. If we don't force breaking them, the result is that the message shows big blank spaces.
+
+**Example of current exception design:**
+
+![image](https://github.com/symfony/symfony/assets/73419/9c145ea7-348f-4d75-ae19-509425afcc3d)
+
+**Same exception after this PR:**
+
+![image](https://github.com/symfony/symfony/assets/73419/bee9d06c-7051-4b14-8a77-eaf9767194e9)
+
+-----
+
+In any case, I agree with you that the extra `-` character could be confusing for some people. I looked for if the hyphens could be customized ... and I learned about [hyphenate-character CSS property](https://developer.mozilla.org/en-US/docs/Web/CSS/hyphenate-character).
+
+So, instead of removing this CSS class, could you please change it to add the following?
+
+```css
+.break-long-words {
+    /* ... */
+    hyphenate-character: '';
+}
+```
+
+This way, it'd look like this:
+
+![image](https://github.com/symfony/symfony/assets/73419/4cb0b499-caa0-4617-bf5e-2b505d475f4c)
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-03-26T14:40:27Z
+
+I've added a commit here to make this PR mergeable. Symfony 7.1 enters "feature freeze" period next Monday and I'd like to have this included in it. Thanks!

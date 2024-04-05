@@ -50,7 +50,7 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
             );
         }
 
-        $this->data['not_resolved'] = array_diff($this->featureRegistry->getNames(), array_keys($this->data['resolvedValues']));
+        $this->data['not_resolved'] = array_values(array_diff($this->featureRegistry->getNames(), array_keys($this->data['resolvedValues'])));
     }
 
     /**

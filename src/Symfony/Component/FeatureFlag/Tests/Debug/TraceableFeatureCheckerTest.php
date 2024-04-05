@@ -32,8 +32,8 @@ class TraceableFeatureCheckerTest extends TestCase
 
         $this->assertSame(
             [
-                'feature_true' => true,
-                'feature_integer' => false,
+                'feature_true' => [['expectedValue' => true, 'isEnabled' => true, 'calls' => 1]],
+                'feature_integer' => [['expectedValue' => 1, 'isEnabled' => false, 'calls' => 1]],
             ],
             $traceableFeatureChecker->getChecks(),
         );
@@ -42,7 +42,7 @@ class TraceableFeatureCheckerTest extends TestCase
                 'feature_true' => true,
                 'feature_integer' => 42,
             ],
-            $traceableFeatureChecker->getValues(),
+            $traceableFeatureChecker->getResolvedValues(),
         );
     }
 }

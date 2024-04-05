@@ -32,27 +32,47 @@ class FeatureFlagDataCollectorTest extends TestCase
         $traceableFeatureChecker->isEnabled('feature_true');
         $traceableFeatureChecker->isEnabled('feature_integer', 1);
 
-        $this->assertSame([], $dataCollector->getFeatures());
+        $this->assertSame([], $dataCollector->getChecks());
 
         $dataCollector->lateCollect();
 
-        $data = array_map(fn ($a) => array_merge($a, ['value' => $a['value']->getValue()]), $dataCollector->getFeatures());
+        $data = array_map(fn ($v) => $v->getValue(), $dataCollector->getResolvedValues());
+        $this->assertSame(
+            [
+                'feature_true' => true,
+                'feature_integer' => 42,
+            ],
+            $data,
+        );
+
+        $data = array_map(
+            fn ($checks) => array_map(function ($a) {
+                $a['expected_value'] = $a['expected_value']->getValue();
+
+                return $a;
+            }, $checks),
+            $dataCollector->getChecks(),
+        );
         $this->assertSame(
             [
                 'feature_true' => [
-                    'is_enabled' => true,
-                    'value' => true,
+                    [
+                        'expected_value' => true,
+                        'is_enabled' => true,
+                        'calls' => 1,
+                    ],
                 ],
                 'feature_integer' => [
-                    'is_enabled' => false,
-                    'value' => 42,
-                ],
-                'feature_random' => [
-                    'is_enabled' => null,
-                    'value' => null,
+                    [
+                        'expected_value' => 1,
+                        'is_enabled' => false,
+                        'calls' => 1,
+                    ],
                 ],
             ],
             $data,
         );
+
+        $this->assertSame(['feature_random'], $dataCollector->getNotResolved());
     }
 }

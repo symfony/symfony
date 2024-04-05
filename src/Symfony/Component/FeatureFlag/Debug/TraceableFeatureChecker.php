@@ -34,7 +34,7 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface
         // Check duplicates
         $this->expectedValues[$featureName] ??= [];
         if (false !== ($i = array_search($expectedValue, $this->expectedValues[$featureName] ?? [], true))) {
-            $this->checks[$featureName][$i]['calls']++;
+            ++$this->checks[$featureName][$i]['calls'];
 
             return $isEnabled;
         }

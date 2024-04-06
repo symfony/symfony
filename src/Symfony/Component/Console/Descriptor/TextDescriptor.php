@@ -74,7 +74,7 @@ class TextDescriptor extends Descriptor
         $spacingWidth = $totalWidth - Helper::width($synopsis);
 
         $this->writeText(\sprintf('  %s  %s%s%s%s',
-            \sprintf('<%1$s>%2$s</%1$s>', $option->isDeprecated() ? 'text_error' : 'info', $synopsis),
+            \sprintf('<%1$s>%2$s</%1$s>', $option->isDeprecated() ? 'fg=gray;' : 'info', $synopsis),
             str_repeat(' ', $spacingWidth),
             // + 4 = 2 spaces before <info>, 2 spaces after </info>
             preg_replace('/\s*[\r\n]\s*/', "\n".str_repeat(' ', $totalWidth + 4), $option->getDescription()),

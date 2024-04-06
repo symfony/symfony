@@ -19,6 +19,7 @@ use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputArgument;
@@ -275,7 +276,7 @@ class Command
         $input->validate();
 
         if (isset($inputDefinition)) {
-            $this->printDeprecationMessages($inputDefinition, $input, $output);
+            $this->writeDeprecationMessages($inputDefinition, $input, $output);
         }
 
         if ($this->code) {
@@ -653,7 +654,7 @@ class Command
         return $this->helperSet->get($name);
     }
 
-    private function printDeprecationMessages(InputDefinition $inputDefinition, InputInterface $input, OutputInterface $output): void
+    private function writeDeprecationMessages(InputDefinition $inputDefinition, InputInterface $input, OutputInterface $output): void
     {
         $deprecationMessages = [];
         foreach ($inputDefinition->getOptions() as $inputOption) {
@@ -670,6 +671,7 @@ class Command
             }
         }
         if (!empty($deprecationMessages)) {
+            /** @var FormatterHelper $formatter */
             $formatter = $this->getHelper('formatter');
             $output->writeln($formatter->formatBlock($deprecationMessages, 'fg=black;bg=yellow', true));
         }

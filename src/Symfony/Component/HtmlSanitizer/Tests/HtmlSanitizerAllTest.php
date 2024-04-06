@@ -309,6 +309,12 @@ class HtmlSanitizerAllTest extends TestCase
                 'Lorem ipsum  ',
             ],
 
+            // Processing instructions
+            [
+                'Lorem ipsum<?div x?>foo',
+                'Lorem ipsumfoo',
+            ],
+
             // Normal tags
             [
                 '<abbr>Lorem ipsum</abbr>',

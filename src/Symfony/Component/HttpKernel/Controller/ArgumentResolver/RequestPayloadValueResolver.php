@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
@@ -76,6 +77,16 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
         if ($argument->isVariadic()) {
             throw new \LogicException(sprintf('Mapping variadic argument "$%s" is not supported.', $argument->getName()));
+        }
+
+        if ($attribute instanceof MapRequestPayload) {
+            if ('array' === $argument->getType()) {
+                if (!$attribute->type) {
+                    throw new NearMissValueResolverException(sprintf('Please set the $type argument of the #[%s] attribute to the type of the objects in the expected array.', MapRequestPayload::class));
+                }
+            } elseif ($attribute->type) {
+                throw new NearMissValueResolverException(sprintf('Please set its type to "array" when using argument $type of #[%s].', MapRequestPayload::class));
+            }
         }
 
         $attribute->metadata = $argument;
@@ -170,7 +181,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         return $this->serializer->denormalize($data, $type, null, $attribute->serializationContext + self::CONTEXT_DENORMALIZE + ['filter_bool' => true]);
     }
 
-    private function mapRequestPayload(Request $request, string $type, MapRequestPayload $attribute): ?object
+    private function mapRequestPayload(Request $request, string $type, MapRequestPayload $attribute): object|array|null
     {
         if (null === $format = $request->getContentTypeFormat()) {
             throw new UnsupportedMediaTypeHttpException('Unsupported format.');
@@ -178,6 +189,10 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
         if ($attribute->acceptFormat && !\in_array($format, (array) $attribute->acceptFormat, true)) {
             throw new UnsupportedMediaTypeHttpException(sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
+        }
+
+        if ('array' === $type && null !== $attribute->type) {
+            $type = $attribute->type.'[]';
         }
 
         if ($data = $request->request->all()) {

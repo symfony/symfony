@@ -885,6 +885,16 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertSame($expected, $this->normalizer->normalize($object));
     }
+
+    public function testNormalizeWithoutSerializerSet()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "foo" because the injected serializer is not a normalizer.');
+
+        $normalizer->normalize(new ObjectConstructorDummy([], [], []));
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy

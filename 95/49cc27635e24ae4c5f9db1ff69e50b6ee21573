@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-25T07:24:14Z
+
+Couple of questions there:
+* Would this work with forms, or XML ?
+* Does the validation still work ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-03-25T13:12:37Z
+
+>Couple of questions there:
+>Would this work with forms, or XML ?
+
+The feature behind this improvement is completely agnostic to the request format. It will work with any data format supported by the Serializer component. See more here: https://symfony.com/doc/current/components/serializer.html#handling-arrays
+
+>Does the validation still work ?
+
+Yes, the validator component does support any iterable value.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-25T14:32:58Z
+
+I did not see how a form could send data as flat array at first... hence my question. But i'm indeed not aware of all the possibilties offered by the serializer there.
+
+(for the validation i was referring to the `validationGroups` attribute.. just to know how this would compare to the nested array of DTOs for instance)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-03-25T15:21:32Z
+
+>(for the validation i was referring to the validationGroups attribute.. just to know how this would compare to the nested array of DTOs for instance)
+
+If set, it will be applied to each element of the collection as implemented here:
+https://github.com/symfony/symfony/blob/78c6ceb5cd0560346b6765849f142c1c451fd1a8/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php#L332
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-03-30T17:56:03Z
+
+At some point, the new TypeInfo component could certainly help guessing what `$type` is (when possible)

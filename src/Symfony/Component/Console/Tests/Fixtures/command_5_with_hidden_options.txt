@@ -5,7 +5,7 @@
   descriptor:command5 [options]
 
 <comment>Options:</comment>
-  <text_error>-y, --deprecated_option</text_error>  
+  <fg=gray;>-y, --deprecated_option</fg=gray;>  
   <info>-z, --hidden_option</info>      
 
 <comment>Help:</comment>

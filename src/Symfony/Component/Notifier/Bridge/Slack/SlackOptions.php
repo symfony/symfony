@@ -200,4 +200,19 @@ class SlackOptions implements MessageOptionsInterface
 
         return $this;
     }
+
+    public function getConversationsId(): ?string
+    {
+        return $this->options['conversations_id'] ?? null;
+    }
+
+    /**
+     * @return $this
+     */
+    public function conversations(string|array|callable $id): static
+    {
+        $this->options['conversations_id'] = $id;
+
+        return $this;
+    }
 }

@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2023-12-06T17:28:44Z
+
+fabbot errors aren't related to that PR.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-12-12T14:01:18Z
+
+Once this PR will be upmerged to 7.1, I'll create a new one to trigger the proper deprecations.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-01-26T13:23:30Z
+
+That read/write mode do need to be passed throughout method calls to fix the bug at hand, so the plan here is to make it a parameter that's hidden at first on 5.4, then make it virtual on 7.1 and finally make it real on 8.0.
+The only alternative I can think of is to put the info in `$context` instead.
+
+@mtarld would that work conceptually and technically?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-02-08T08:22:07Z
+
+It appears that it works indeed, and it is much better thanks!
+
+I'm wondering if we should make that read/write information explicit in 7.1, maybe a context value like here is enough (but it is less secure).
+
+---------------------------------------------------------------------------
+
+by nesl247 at 2024-02-08T13:04:07Z
+
+Is there a chance this merges soon? We're actually stuck on an older version of api platform that accidentally stopped this bug from happening but the newer version removed that code.
+
+If not we may move forward with applying the changes via a patch in our project. Just trying to figure out the right path for us.
+
+Thanks!

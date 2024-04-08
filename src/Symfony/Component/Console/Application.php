@@ -97,7 +97,7 @@ class Application implements ResetInterface
         $this->defaultCommand = 'list';
         if (\defined('SIGINT') && SignalRegistry::isSupported()) {
             $this->signalRegistry = new SignalRegistry();
-            $this->signalsToDispatchEvent = [\SIGINT, \SIGTERM, \SIGUSR1, \SIGUSR2];
+            $this->signalsToDispatchEvent = [\SIGINT, \SIGQUIT, \SIGTERM, \SIGUSR1, \SIGUSR2];
         }
     }
 
@@ -984,7 +984,7 @@ class Application implements ResetInterface
             if (Terminal::hasSttyAvailable()) {
                 $sttyMode = shell_exec('stty -g');
 
-                foreach ([\SIGINT, \SIGTERM] as $signal) {
+                foreach ([\SIGINT, \SIGQUIT, \SIGTERM] as $signal) {
                     $this->signalRegistry->register($signal, static fn () => shell_exec('stty '.$sttyMode));
                 }
             }

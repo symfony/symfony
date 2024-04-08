@@ -42,11 +42,11 @@ class GenericRetryStrategy implements RetryStrategyInterface
     private float $jitter;
 
     /**
-     * @param array $statusCodes List of HTTP status codes that trigger a retry
-     * @param int   $delayMs     Amount of time to delay (or the initial value when multiplier is used)
-     * @param float $multiplier  Multiplier to apply to the delay each time a retry occurs
-     * @param int   $maxDelayMs  Maximum delay to allow (0 means no maximum)
-     * @param float $jitter      Probability of randomness int delay (0 = none, 1 = 100% random)
+     * @param $statusCodes List of HTTP status codes that trigger a retry
+     * @param $delayMs     Amount of time to delay (or the initial value when multiplier is used)
+     * @param $multiplier  Multiplier to apply to the delay each time a retry occurs
+     * @param $maxDelayMs  Maximum delay to allow (0 means no maximum)
+     * @param $jitter      Probability of randomness int delay (0 = none, 1 = 100% random)
      */
     public function __construct(
         private array $statusCodes = self::DEFAULT_RETRY_STATUS_CODES,

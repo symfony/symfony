@@ -66,7 +66,7 @@ final class Key
     }
 
     /**
-     * @param float $ttl the expiration delay of locks in seconds
+     * @param $ttl the expiration delay of locks in seconds
      */
     public function reduceLifetime(float $ttl): void
     {

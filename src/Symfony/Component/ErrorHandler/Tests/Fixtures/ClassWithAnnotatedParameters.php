@@ -5,7 +5,7 @@ namespace Symfony\Component\ErrorHandler\Tests\Fixtures;
 class ClassWithAnnotatedParameters
 {
     /**
-     * @param string $foo this is a foo parameter
+     * @param $foo this is a foo parameter
      */
     public function fooMethod(string $foo)
     {

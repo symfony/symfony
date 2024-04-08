@@ -112,8 +112,8 @@ final class TwitterOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param File|null $subtitles   File should be named as "display_name.language_code.srt"
-     * @param string[]  $extraOwners
+     * @param          $subtitles   File should be named as "display_name.language_code.srt"
+     * @param string[] $extraOwners
      *
      * @return $this
      */

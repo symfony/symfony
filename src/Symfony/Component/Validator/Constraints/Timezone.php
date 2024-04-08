@@ -42,8 +42,8 @@ class Timezone extends Constraint
 
     /**
      * @param int|array<string,mixed>|null $zone           Restrict valid timezones to this geographical zone (defaults to {@see \DateTimeZone::ALL})
-     * @param string|null                  $countryCode    Restrict the valid timezones to this country if the zone option is {@see \DateTimeZone::PER_COUNTRY}
-     * @param bool|null                    $intlCompatible Whether to restrict valid timezones to ones available in PHP's intl (defaults to false)
+     * @param                              $countryCode    Restrict the valid timezones to this country if the zone option is {@see \DateTimeZone::PER_COUNTRY}
+     * @param                              $intlCompatible Whether to restrict valid timezones to ones available in PHP's intl (defaults to false)
      * @param string[]|null                $groups
      * @param array<string,mixed>          $options
      *

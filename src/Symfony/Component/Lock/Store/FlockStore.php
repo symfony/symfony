@@ -33,7 +33,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     private ?string $lockPath;
 
     /**
-     * @param string|null $lockPath the directory to store the lock, defaults to the system's temporary directory
+     * @param $lockPath the directory to store the lock, defaults to the system's temporary directory
      *
      * @throws LockStorageException If the lock directory doesn’t exist or is not writable
      */

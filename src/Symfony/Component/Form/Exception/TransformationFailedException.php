@@ -31,8 +31,8 @@ class TransformationFailedException extends RuntimeException
     /**
      * Sets the message that will be shown to the user.
      *
-     * @param string|null $invalidMessage           The message or message key
-     * @param array       $invalidMessageParameters Data to be passed into the translator
+     * @param $invalidMessage           The message or message key
+     * @param $invalidMessageParameters Data to be passed into the translator
      */
     public function setInvalidMessage(?string $invalidMessage, array $invalidMessageParameters = []): void
     {

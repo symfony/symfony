@@ -22,7 +22,7 @@ interface MessageBusInterface
     /**
      * Dispatches the given message.
      *
-     * @param object|Envelope  $message The message or the message pre-wrapped in an envelope
+     * @param                  $message The message or the message pre-wrapped in an envelope
      * @param StampInterface[] $stamps
      *
      * @throws ExceptionInterface

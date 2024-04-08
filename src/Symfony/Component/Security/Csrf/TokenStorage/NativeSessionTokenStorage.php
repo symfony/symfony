@@ -31,7 +31,7 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
     /**
      * Initializes the storage with a session namespace.
      *
-     * @param string $namespace The namespace under which the token is stored in the session
+     * @param $namespace The namespace under which the token is stored in the session
      */
     public function __construct(string $namespace = self::SESSION_NAMESPACE)
     {

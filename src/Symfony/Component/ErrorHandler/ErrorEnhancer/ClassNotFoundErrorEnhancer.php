@@ -61,7 +61,7 @@ class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
      * By default, it looks for PSR-0 and PSR-4 classes registered via a Symfony or a Composer
      * autoloader (that should cover all common cases).
      *
-     * @param string $class A class name (without its namespace)
+     * @param $class A class name (without its namespace)
      *
      * Returns an array of possible fully qualified class names
      */

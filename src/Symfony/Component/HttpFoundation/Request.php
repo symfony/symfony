@@ -197,12 +197,12 @@ class Request
     private $isIisRewrite = false;
 
     /**
-     * @param array                $query      The GET parameters
-     * @param array                $request    The POST parameters
-     * @param array                $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-     * @param array                $cookies    The COOKIE parameters
-     * @param array                $files      The FILES parameters
-     * @param array                $server     The SERVER parameters
+     * @param                      $query      The GET parameters
+     * @param                      $request    The POST parameters
+     * @param                      $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param                      $cookies    The COOKIE parameters
+     * @param                      $files      The FILES parameters
+     * @param                      $server     The SERVER parameters
      * @param string|resource|null $content    The raw body data
      */
     public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
@@ -215,12 +215,12 @@ class Request
      *
      * This method also re-initializes all properties.
      *
-     * @param array                $query      The GET parameters
-     * @param array                $request    The POST parameters
-     * @param array                $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-     * @param array                $cookies    The COOKIE parameters
-     * @param array                $files      The FILES parameters
-     * @param array                $server     The SERVER parameters
+     * @param                      $query      The GET parameters
+     * @param                      $request    The POST parameters
+     * @param                      $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param                      $cookies    The COOKIE parameters
+     * @param                      $files      The FILES parameters
+     * @param                      $server     The SERVER parameters
      * @param string|resource|null $content    The raw body data
      */
     public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
@@ -269,12 +269,12 @@ class Request
      * The information contained in the URI always take precedence
      * over the other information (server and parameters).
      *
-     * @param string               $uri        The URI
-     * @param string               $method     The HTTP method
-     * @param array                $parameters The query (GET) or request (POST) parameters
-     * @param array                $cookies    The request cookies ($_COOKIE)
-     * @param array                $files      The request files ($_FILES)
-     * @param array                $server     The server parameters ($_SERVER)
+     * @param                      $uri        The URI
+     * @param                      $method     The HTTP method
+     * @param                      $parameters The query (GET) or request (POST) parameters
+     * @param                      $cookies    The request cookies ($_COOKIE)
+     * @param                      $files      The request files ($_FILES)
+     * @param                      $server     The server parameters ($_SERVER)
      * @param string|resource|null $content    The raw body data
      */
     public static function create(string $uri, string $method = 'GET', array $parameters = [], array $cookies = [], array $files = [], array $server = [], $content = null): static
@@ -388,12 +388,12 @@ class Request
     /**
      * Clones a request and overrides some of its parameters.
      *
-     * @param array|null $query      The GET parameters
-     * @param array|null $request    The POST parameters
-     * @param array|null $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-     * @param array|null $cookies    The COOKIE parameters
-     * @param array|null $files      The FILES parameters
-     * @param array|null $server     The SERVER parameters
+     * @param $query      The GET parameters
+     * @param $request    The POST parameters
+     * @param $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param $cookies    The COOKIE parameters
+     * @param $files      The FILES parameters
+     * @param $server     The SERVER parameters
      */
     public function duplicate(?array $query = null, ?array $request = null, ?array $attributes = null, ?array $cookies = null, ?array $files = null, ?array $server = null): static
     {
@@ -521,8 +521,8 @@ class Request
      *
      * You should only list the reverse proxies that you manage directly.
      *
-     * @param array $proxies          A list of trusted proxies, the string 'REMOTE_ADDR' will be replaced with $_SERVER['REMOTE_ADDR']
-     * @param int   $trustedHeaderSet A bit field of Request::HEADER_*, to set which headers to trust from your proxies
+     * @param $proxies          A list of trusted proxies, the string 'REMOTE_ADDR' will be replaced with $_SERVER['REMOTE_ADDR']
+     * @param $trustedHeaderSet A bit field of Request::HEADER_*, to set which headers to trust from your proxies
      */
     public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
     {
@@ -563,7 +563,7 @@ class Request
      *
      * You should only list the hosts you manage using regexs.
      *
-     * @param array $hostPatterns A list of trusted host patterns
+     * @param $hostPatterns A list of trusted host patterns
      */
     public static function setTrustedHosts(array $hostPatterns): void
     {
@@ -688,7 +688,7 @@ class Request
      * like whether the session is started or not. It is just a way to check if this Request
      * is associated with a Session instance.
      *
-     * @param bool $skipIfUninitialized When true, ignores factories injected by `setSessionFactory`
+     * @param $skipIfUninitialized When true, ignores factories injected by `setSessionFactory`
      */
     public function hasSession(bool $skipIfUninitialized = false): bool
     {
@@ -961,7 +961,7 @@ class Request
     /**
      * Generates a normalized URI for the given path.
      *
-     * @param string $path A path to use instead of the current one
+     * @param $path A path to use instead of the current one
      */
     public function getUriForPath(string $path): string
     {
@@ -1321,7 +1321,7 @@ class Request
     /**
      * Checks if the request method is of specified type.
      *
-     * @param string $method Uppercase request method (GET, POST etc)
+     * @param $method Uppercase request method (GET, POST etc)
      */
     public function isMethod(string $method): bool
     {
@@ -1381,7 +1381,7 @@ class Request
     /**
      * Returns the request body content.
      *
-     * @param bool $asResource If true, a resource will be returned
+     * @param $asResource If true, a resource will be returned
      *
      * @return string|resource
      *

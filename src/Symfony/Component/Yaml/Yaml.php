@@ -44,8 +44,8 @@ class Yaml
      *     $array = Yaml::parseFile('config.yml');
      *     print_r($array);
      *
-     * @param string $filename The path to the YAML file to be parsed
-     * @param int    $flags    A bit field of PARSE_* constants to customize the YAML parser behavior
+     * @param $filename The path to the YAML file to be parsed
+     * @param $flags    A bit field of PARSE_* constants to customize the YAML parser behavior
      *
      * @throws ParseException If the file could not be read or the YAML is not valid
      */
@@ -65,8 +65,8 @@ class Yaml
      *   print_r($array);
      *  </code>
      *
-     * @param string $input A string containing YAML
-     * @param int    $flags A bit field of PARSE_* constants to customize the YAML parser behavior
+     * @param $input A string containing YAML
+     * @param $flags A bit field of PARSE_* constants to customize the YAML parser behavior
      *
      * @throws ParseException If the YAML is not valid
      */
@@ -83,10 +83,10 @@ class Yaml
      * The dump method, when supplied with an array, will do its best
      * to convert the array into friendly YAML.
      *
-     * @param mixed $input  The PHP value
-     * @param int   $inline The level where you switch to inline YAML
-     * @param int   $indent The amount of spaces to use for indentation of nested nodes
-     * @param int   $flags  A bit field of DUMP_* constants to customize the dumped YAML string
+     * @param $input  The PHP value
+     * @param $inline The level where you switch to inline YAML
+     * @param $indent The amount of spaces to use for indentation of nested nodes
+     * @param $flags  A bit field of DUMP_* constants to customize the dumped YAML string
      */
     public static function dump(mixed $input, int $inline = 2, int $indent = 4, int $flags = 0): string
     {

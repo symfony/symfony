@@ -54,7 +54,7 @@ final class FakeSmsEmailTransport extends AbstractTransport
     }
 
     /**
-     * @param MessageInterface|SmsMessage $message
+     * @param $message
      *
      * @throws TransportExceptionInterface
      */

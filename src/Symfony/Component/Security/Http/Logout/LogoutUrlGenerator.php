@@ -41,11 +41,11 @@ class LogoutUrlGenerator
     /**
      * Registers a firewall's LogoutListener, allowing its URL to be generated.
      *
-     * @param string      $key           The firewall key
-     * @param string      $logoutPath    The path that starts the logout process
-     * @param string|null $csrfTokenId   The ID of the CSRF token
-     * @param string|null $csrfParameter The CSRF token parameter name
-     * @param string|null $context       The listener context
+     * @param $key           The firewall key
+     * @param $logoutPath    The path that starts the logout process
+     * @param $csrfTokenId   The ID of the CSRF token
+     * @param $csrfParameter The CSRF token parameter name
+     * @param $context       The listener context
      */
     public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, ?CsrfTokenManagerInterface $csrfTokenManager = null, ?string $context = null): void
     {

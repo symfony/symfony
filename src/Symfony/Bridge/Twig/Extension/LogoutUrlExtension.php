@@ -38,7 +38,7 @@ final class LogoutUrlExtension extends AbstractExtension
     /**
      * Generates the relative logout URL for the firewall.
      *
-     * @param string|null $key The firewall key or null to use the current firewall key
+     * @param $key The firewall key or null to use the current firewall key
      */
     public function getLogoutPath(?string $key = null): string
     {
@@ -48,7 +48,7 @@ final class LogoutUrlExtension extends AbstractExtension
     /**
      * Generates the absolute logout URL for the firewall.
      *
-     * @param string|null $key The firewall key or null to use the current firewall key
+     * @param $key The firewall key or null to use the current firewall key
      */
     public function getLogoutUrl(?string $key = null): string
     {

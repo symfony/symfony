@@ -179,7 +179,7 @@ abstract class AbstractOperation implements OperationInterface
      * Performs operation on source and target catalogues for the given domain and
      * stores the results.
      *
-     * @param string $domain The domain which the operation will be performed for
+     * @param $domain The domain which the operation will be performed for
      */
     abstract protected function processDomain(string $domain): void;
 }

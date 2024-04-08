@@ -112,10 +112,10 @@ class Profiler implements ResetInterface
     /**
      * Finds profiler tokens for the given criteria.
      *
-     * @param int|null      $limit  The maximum number of tokens to return
-     * @param string|null   $start  The start date to search from
-     * @param string|null   $end    The end date to search to
-     * @param \Closure|null $filter A filter to apply on the list of tokens
+     * @param $limit  The maximum number of tokens to return
+     * @param $start  The start date to search from
+     * @param $end    The end date to search to
+     * @param $filter A filter to apply on the list of tokens
      *
      * @see https://php.net/datetime.formats for the supported date/time formats
      */
@@ -204,7 +204,7 @@ class Profiler implements ResetInterface
     /**
      * Returns true if a Collector for the given name exists.
      *
-     * @param string $name A collector name
+     * @param $name A collector name
      */
     public function has(string $name): bool
     {
@@ -214,7 +214,7 @@ class Profiler implements ResetInterface
     /**
      * Gets a Collector by name.
      *
-     * @param string $name A collector name
+     * @param $name A collector name
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */

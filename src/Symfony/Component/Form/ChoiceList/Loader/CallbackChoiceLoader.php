@@ -21,7 +21,7 @@ class CallbackChoiceLoader extends AbstractChoiceLoader
     private \Closure $callback;
 
     /**
-     * @param callable $callback The callable returning iterable choices
+     * @param $callback The callable returning iterable choices
      */
     public function __construct(callable $callback)
     {

@@ -45,7 +45,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
     private array $aliases;
 
     /**
-     * @param bool $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
+     * @param $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
      */
     public function __construct(bool $onlyConstructorArguments = false, bool $hasProxyDumper = true)
     {

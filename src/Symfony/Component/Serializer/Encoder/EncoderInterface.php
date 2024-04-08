@@ -21,9 +21,9 @@ interface EncoderInterface
     /**
      * Encodes data into the given format.
      *
-     * @param mixed  $data    Data to encode
-     * @param string $format  Format name
-     * @param array  $context Options that normalizers/encoders have access to
+     * @param $data    Data to encode
+     * @param $format  Format name
+     * @param $context Options that normalizers/encoders have access to
      *
      * @throws UnexpectedValueException
      */
@@ -32,7 +32,7 @@ interface EncoderInterface
     /**
      * Checks whether the serializer can encode to given format.
      *
-     * @param string $format Format name
+     * @param $format Format name
      */
     public function supportsEncoding(string $format): bool;
 }

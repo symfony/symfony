@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 class SerializedName
 {
     /**
-     * @param string $serializedName The name of the property as it will be serialized
+     * @param $serializedName The name of the property as it will be serialized
      */
     public function __construct(private readonly string $serializedName)
     {

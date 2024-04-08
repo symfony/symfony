@@ -104,8 +104,8 @@ class ZookeeperStore implements PersistingStoreInterface
     /**
      * Creates a zookeeper node.
      *
-     * @param string $node  The node which needs to be created
-     * @param string $value The value to be assigned to a zookeeper node
+     * @param $node  The node which needs to be created
+     * @param $value The value to be assigned to a zookeeper node
      *
      * @throws LockConflictedException
      * @throws LockAcquiringException

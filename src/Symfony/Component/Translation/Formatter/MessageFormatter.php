@@ -26,7 +26,7 @@ class MessageFormatter implements MessageFormatterInterface, IntlFormatterInterf
     private IntlFormatterInterface $intlFormatter;
 
     /**
-     * @param TranslatorInterface|null $translator An identity translator to use as selector for pluralization
+     * @param $translator An identity translator to use as selector for pluralization
      */
     public function __construct(?TranslatorInterface $translator = null, ?IntlFormatterInterface $intlFormatter = null)
     {

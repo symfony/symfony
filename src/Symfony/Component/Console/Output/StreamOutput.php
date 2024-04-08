@@ -33,10 +33,10 @@ class StreamOutput extends Output
     private $stream;
 
     /**
-     * @param resource                      $stream    A stream resource
-     * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
-     * @param bool|null                     $decorated Whether to decorate messages (null for auto-guessing)
-     * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
+     * @param resource $stream    A stream resource
+     * @param          $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
+     * @param          $decorated Whether to decorate messages (null for auto-guessing)
+     * @param          $formatter Output formatter instance (null to use default OutputFormatter)
      *
      * @throws InvalidArgumentException When first argument is not a real stream
      */

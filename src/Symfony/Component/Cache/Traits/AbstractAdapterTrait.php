@@ -50,36 +50,36 @@ trait AbstractAdapterTrait
     /**
      * Fetches several cache items.
      *
-     * @param array $ids The cache identifiers to fetch
+     * @param $ids The cache identifiers to fetch
      */
     abstract protected function doFetch(array $ids): iterable;
 
     /**
      * Confirms if the cache contains specified cache item.
      *
-     * @param string $id The identifier for which to check existence
+     * @param $id The identifier for which to check existence
      */
     abstract protected function doHave(string $id): bool;
 
     /**
      * Deletes all items in the pool.
      *
-     * @param string $namespace The prefix used for all identifiers managed by this pool
+     * @param $namespace The prefix used for all identifiers managed by this pool
      */
     abstract protected function doClear(string $namespace): bool;
 
     /**
      * Removes multiple items from the pool.
      *
-     * @param array $ids An array of identifiers that should be removed from the pool
+     * @param $ids An array of identifiers that should be removed from the pool
      */
     abstract protected function doDelete(array $ids): bool;
 
     /**
      * Persists several cache items immediately.
      *
-     * @param array $values   The values to cache, indexed by their cache identifier
-     * @param int   $lifetime The lifetime of the cached values, 0 for persisting until manual cleaning
+     * @param $values   The values to cache, indexed by their cache identifier
+     * @param $lifetime The lifetime of the cached values, 0 for persisting until manual cleaning
      *
      * @return array|bool The identifiers that failed to be cached or a boolean stating if caching succeeded or not
      */

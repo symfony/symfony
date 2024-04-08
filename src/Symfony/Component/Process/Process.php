@@ -135,10 +135,10 @@ class Process implements \IteratorAggregate
     ];
 
     /**
-     * @param array          $command The command to run and its arguments listed as separate entries
-     * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
-     * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
-     * @param mixed          $input   The input as stream resource, scalar or \Traversable, or null for no input
+     * @param                $command The command to run and its arguments listed as separate entries
+     * @param                $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param                $env     The environment variables or null to use the same environment as the current PHP process
+     * @param                $input   The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout The timeout in seconds or null to disable
      *
      * @throws LogicException When proc_open is not installed
@@ -181,10 +181,10 @@ class Process implements \IteratorAggregate
      *   $process = Process::fromShellCommandline('my_command "${:MY_VAR}"');
      *   $process->run(null, ['MY_VAR' => $theValue]);
      *
-     * @param string         $command The command line to pass to the shell of the OS
-     * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
-     * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
-     * @param mixed          $input   The input as stream resource, scalar or \Traversable, or null for no input
+     * @param                $command The command line to pass to the shell of the OS
+     * @param                $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param                $env     The environment variables or null to use the same environment as the current PHP process
+     * @param                $input   The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout The timeout in seconds or null to disable
      *
      * @throws LogicException When proc_open is not installed
@@ -231,8 +231,8 @@ class Process implements \IteratorAggregate
      * The STDOUT and STDERR are also available after the process is finished
      * via the getOutput() and getErrorOutput() methods.
      *
-     * @param callable|null $callback A PHP callback to run whenever there is some
-     *                                output available on STDOUT or STDERR
+     * @param $callback A PHP callback to run whenever there is some
+     *                  output available on STDOUT or STDERR
      *
      * @return int The exit status code
      *
@@ -284,8 +284,8 @@ class Process implements \IteratorAggregate
      * the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
      *
-     * @param callable|null $callback A PHP callback to run whenever there is some
-     *                                output available on STDOUT or STDERR
+     * @param $callback A PHP callback to run whenever there is some
+     *                  output available on STDOUT or STDERR
      *
      * @throws ProcessStartFailedException When process can't be launched
      * @throws RuntimeException            When process is already running
@@ -390,8 +390,8 @@ class Process implements \IteratorAggregate
      *
      * Be warned that the process is cloned before being started.
      *
-     * @param callable|null $callback A PHP callback to run whenever there is some
-     *                                output available on STDOUT or STDERR
+     * @param $callback A PHP callback to run whenever there is some
+     *                  output available on STDOUT or STDERR
      *
      * @throws ProcessStartFailedException When process can't be launched
      * @throws RuntimeException            When process is already running
@@ -419,7 +419,7 @@ class Process implements \IteratorAggregate
      * from the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
      *
-     * @param callable|null $callback A valid PHP callback
+     * @param $callback A valid PHP callback
      *
      * @return int The exitcode of the process
      *
@@ -518,7 +518,7 @@ class Process implements \IteratorAggregate
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param int $signal A valid POSIX signal (see https://php.net/pcntl.constants)
+     * @param $signal A valid POSIX signal (see https://php.net/pcntl.constants)
      *
      * @return $this
      *
@@ -624,7 +624,7 @@ class Process implements \IteratorAggregate
     /**
      * Returns an iterator to the output of the process, with the output type as keys (Process::OUT/ERR).
      *
-     * @param int $flags A bit field of Process::ITER_* flags
+     * @param $flags A bit field of Process::ITER_* flags
      *
      * @return \Generator<string, string>
      *
@@ -895,8 +895,8 @@ class Process implements \IteratorAggregate
     /**
      * Stops the process.
      *
-     * @param int|float $timeout The timeout in seconds
-     * @param int|null  $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL (9)
+     * @param $timeout The timeout in seconds
+     * @param $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL (9)
      *
      * @return int|null The exit-code of the process or null if it's not running
      */
@@ -1286,7 +1286,7 @@ class Process implements \IteratorAggregate
      * The callbacks adds all occurred output to the specific buffer and calls
      * the user callback (if present) with the received output.
      *
-     * @param callable|null $callback The user defined PHP callback
+     * @param $callback The user defined PHP callback
      */
     protected function buildCallback(?callable $callback = null): \Closure
     {
@@ -1310,7 +1310,7 @@ class Process implements \IteratorAggregate
     /**
      * Updates the status of the process, reads pipes.
      *
-     * @param bool $blocking Whether to use a blocking read call
+     * @param $blocking Whether to use a blocking read call
      */
     protected function updateStatus(bool $blocking): void
     {
@@ -1367,8 +1367,8 @@ class Process implements \IteratorAggregate
     /**
      * Reads pipes for the freshest output.
      *
-     * @param string $caller   The name of the method that needs fresh outputs
-     * @param bool   $blocking Whether to use blocking calls or not
+     * @param $caller   The name of the method that needs fresh outputs
+     * @param $blocking Whether to use blocking calls or not
      *
      * @throws LogicException in case output has been disabled or process is not started
      */
@@ -1404,8 +1404,8 @@ class Process implements \IteratorAggregate
     /**
      * Reads pipes, executes callback.
      *
-     * @param bool $blocking Whether to use blocking calls or not
-     * @param bool $close    Whether to close file handles or not
+     * @param $blocking Whether to use blocking calls or not
+     * @param $close    Whether to close file handles or not
      */
     private function readPipes(bool $blocking, bool $close): void
     {
@@ -1475,8 +1475,8 @@ class Process implements \IteratorAggregate
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param int  $signal         A valid POSIX signal (see https://php.net/pcntl.constants)
-     * @param bool $throwException Whether to throw exception in case signal failed
+     * @param $signal         A valid POSIX signal (see https://php.net/pcntl.constants)
+     * @param $throwException Whether to throw exception in case signal failed
      *
      * @throws LogicException   In case the process is not running
      * @throws RuntimeException In case --enable-sigchild is activated and the process can't be killed

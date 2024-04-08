@@ -26,9 +26,9 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     private string $metaFile;
 
     /**
-     * @param string                                    $file             The absolute cache path
+     * @param                                           $file             The absolute cache path
      * @param iterable<mixed, ResourceCheckerInterface> $resourceCheckers The ResourceCheckers to use for the freshness check
-     * @param string|null                               $metaFile         The absolute path to the meta file, defaults to $file.meta if null
+     * @param                                           $metaFile         The absolute path to the meta file, defaults to $file.meta if null
      */
     public function __construct(
         private string $file,
@@ -100,7 +100,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     /**
      * Writes cache.
      *
-     * @param string              $content  The content to write in the cache
+     * @param                     $content  The content to write in the cache
      * @param ResourceInterface[] $metadata An array of metadata
      *
      * @throws \RuntimeException When cache file can't be written

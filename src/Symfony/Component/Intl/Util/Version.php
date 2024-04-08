@@ -33,8 +33,8 @@ class Version
      *     Version::compare('1.2.3', '1.2.4', '==', 2)
      *     // => true
      *
-     * @param int|null $precision The number of components to compare. Pass
-     *                            NULL to compare the versions unchanged.
+     * @param $precision The number of components to compare. Pass
+     *                   NULL to compare the versions unchanged.
      *
      * @see normalize()
      */
@@ -58,8 +58,8 @@ class Version
      *     Version::normalize('1.2.3', 2);
      *     // => '1.2'
      *
-     * @param int|null $precision The number of components to include. Pass
-     *                            NULL to return the version unchanged.
+     * @param $precision The number of components to include. Pass
+     *                   NULL to return the version unchanged.
      */
     public static function normalize(string $version, ?int $precision): ?string
     {

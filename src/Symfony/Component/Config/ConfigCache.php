@@ -26,9 +26,9 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 class ConfigCache extends ResourceCheckerConfigCache
 {
     /**
-     * @param string      $file     The absolute cache path
-     * @param bool        $debug    Whether debugging is enabled or not
-     * @param string|null $metaFile The absolute path to the meta file
+     * @param $file     The absolute cache path
+     * @param $debug    Whether debugging is enabled or not
+     * @param $metaFile The absolute path to the meta file
      */
     public function __construct(
         string $file,

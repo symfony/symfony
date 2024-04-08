@@ -92,11 +92,11 @@ abstract class Constraint
      * getRequiredOptions() to return the names of these options. If any
      * option is not set here, an exception is thrown.
      *
-     * @param mixed    $options The options (as associative array)
-     *                          or the value for the default
-     *                          option (any other type)
+     * @param          $options The options (as associative array)
+     *                         or the value for the default
+     *                         option (any other type)
      * @param string[] $groups  An array of validation groups
-     * @param mixed    $payload Domain-specific data attached to a constraint
+     * @param          $payload Domain-specific data attached to a constraint
      *
      * @throws InvalidOptionsException       When you pass the names of non-existing
      *                                       options

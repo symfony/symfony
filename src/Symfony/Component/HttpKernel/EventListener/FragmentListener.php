@@ -34,7 +34,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class FragmentListener implements EventSubscriberInterface
 {
     /**
-     * @param string $fragmentPath The path that triggers this listener
+     * @param $fragmentPath The path that triggers this listener
      */
     public function __construct(
         private UriSigner $signer,

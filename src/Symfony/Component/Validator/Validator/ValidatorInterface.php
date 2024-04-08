@@ -43,7 +43,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * Validates a property of an object against the constraints specified
      * for this property.
      *
-     * @param string                                                $propertyName The name of the validated property
+     * @param                                                       $propertyName The name of the validated property
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups       The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return ConstraintViolationListInterface A list of constraint violations
@@ -56,9 +56,9 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * Validates a value against the constraints specified for an object's
      * property.
      *
-     * @param object|string                                         $objectOrClass The object or its class name
-     * @param string                                                $propertyName  The name of the property
-     * @param mixed                                                 $value         The value to validate against the property's constraints
+     * @param                                                       $objectOrClass The object or its class name
+     * @param                                                       $propertyName  The name of the property
+     * @param                                                       $value         The value to validate against the property's constraints
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups        The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return ConstraintViolationListInterface A list of constraint violations

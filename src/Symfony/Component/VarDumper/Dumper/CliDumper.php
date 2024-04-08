@@ -105,7 +105,7 @@ class CliDumper extends AbstractDumper
     /**
      * Configures styles.
      *
-     * @param array $styles A map of style names to style definitions
+     * @param $styles A map of style names to style definitions
      */
     public function setStyles(array $styles): void
     {
@@ -115,7 +115,7 @@ class CliDumper extends AbstractDumper
     /**
      * Configures display options.
      *
-     * @param array $displayOptions A map of display options to customize the behavior
+     * @param $displayOptions A map of display options to customize the behavior
      */
     public function setDisplayOptions(array $displayOptions): void
     {
@@ -322,8 +322,8 @@ class CliDumper extends AbstractDumper
     /**
      * Dumps an ellipsis for cut children.
      *
-     * @param bool $hasChild When the dump of the hash has child item
-     * @param int  $cut      The number of items the hash has been cut by
+     * @param $hasChild When the dump of the hash has child item
+     * @param $cut      The number of items the hash has been cut by
      */
     protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut): void
     {
@@ -423,9 +423,9 @@ class CliDumper extends AbstractDumper
     /**
      * Decorates a value with some style.
      *
-     * @param string $style The type of style being applied
-     * @param string $value The value being styled
-     * @param array  $attr  Optional context information
+     * @param $style The type of style being applied
+     * @param $value The value being styled
+     * @param $attr  Optional context information
      */
     protected function style(string $style, string $value, array $attr = []): string
     {

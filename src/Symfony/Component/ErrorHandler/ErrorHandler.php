@@ -198,9 +198,9 @@ class ErrorHandler
     /**
      * Sets a logger to non assigned errors levels.
      *
-     * @param LoggerInterface $logger  A PSR-3 logger to put as default for the given levels
-     * @param array|int|null  $levels  An array map of E_* to LogLevel::* or an integer bit field of E_* constants
-     * @param bool            $replace Whether to replace or not any existing logger
+     * @param $logger  A PSR-3 logger to put as default for the given levels
+     * @param $levels  An array map of E_* to LogLevel::* or an integer bit field of E_* constants
+     * @param $replace Whether to replace or not any existing logger
      */
     public function setDefaultLogger(LoggerInterface $logger, array|int|null $levels = \E_ALL, bool $replace = false): void
     {
@@ -228,7 +228,7 @@ class ErrorHandler
     /**
      * Sets a logger for each error level.
      *
-     * @param array $loggers Error levels to [LoggerInterface|null, LogLevel::*] map
+     * @param $loggers Error levels to [LoggerInterface|null, LogLevel::*] map
      *
      * @throws \InvalidArgumentException
      */
@@ -287,8 +287,8 @@ class ErrorHandler
     /**
      * Sets the PHP error levels that throw an exception when a PHP error occurs.
      *
-     * @param int  $levels  A bit field of E_* constants for thrown errors
-     * @param bool $replace Replace or amend the previous value
+     * @param $levels  A bit field of E_* constants for thrown errors
+     * @param $replace Replace or amend the previous value
      */
     public function throwAt(int $levels, bool $replace = false): int
     {
@@ -305,8 +305,8 @@ class ErrorHandler
     /**
      * Sets the PHP error levels for which local variables are preserved.
      *
-     * @param int  $levels  A bit field of E_* constants for scoped errors
-     * @param bool $replace Replace or amend the previous value
+     * @param $levels  A bit field of E_* constants for scoped errors
+     * @param $replace Replace or amend the previous value
      */
     public function scopeAt(int $levels, bool $replace = false): int
     {
@@ -322,8 +322,8 @@ class ErrorHandler
     /**
      * Sets the PHP error levels for which the stack trace is preserved.
      *
-     * @param int  $levels  A bit field of E_* constants for traced errors
-     * @param bool $replace Replace or amend the previous value
+     * @param $levels  A bit field of E_* constants for traced errors
+     * @param $replace Replace or amend the previous value
      */
     public function traceAt(int $levels, bool $replace = false): int
     {
@@ -339,8 +339,8 @@ class ErrorHandler
     /**
      * Sets the error levels where the @-operator is ignored.
      *
-     * @param int  $levels  A bit field of E_* constants for screamed errors
-     * @param bool $replace Replace or amend the previous value
+     * @param $levels  A bit field of E_* constants for screamed errors
+     * @param $replace Replace or amend the previous value
      */
     public function screamAt(int $levels, bool $replace = false): int
     {
@@ -559,7 +559,7 @@ class ErrorHandler
     /**
      * Shutdown registered function for handling PHP fatal errors.
      *
-     * @param array|null $error An array as returned by error_get_last()
+     * @param $error An array as returned by error_get_last()
      *
      * @internal
      */

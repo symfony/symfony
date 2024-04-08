@@ -306,8 +306,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * - "/a/b/c/other" -> "other"
      * - "/a/x/y"       -> "../../x/y"
      *
-     * @param string $basePath   The base path
-     * @param string $targetPath The target path
+     * @param $basePath   The base path
+     * @param $targetPath The target path
      */
     public static function getRelativePath(string $basePath, string $targetPath): string
     {

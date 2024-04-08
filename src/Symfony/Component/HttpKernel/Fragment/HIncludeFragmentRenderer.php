@@ -25,7 +25,7 @@ use Twig\Environment;
 class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {
     /**
-     * @param string|null $globalDefaultTemplate The global default content (it can be a template name or the content)
+     * @param $globalDefaultTemplate The global default content (it can be a template name or the content)
      */
     public function __construct(
         private ?Environment $twig = null,

@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 class MaxDepth
 {
     /**
-     * @param int $maxDepth The maximum serialization depth
+     * @param $maxDepth The maximum serialization depth
      */
     public function __construct(private readonly int $maxDepth)
     {

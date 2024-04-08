@@ -251,7 +251,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Forwards the Request to the backend without storing the Response in the cache.
      *
-     * @param bool $catch Whether to process exceptions
+     * @param $catch Whether to process exceptions
      */
     protected function pass(Request $request, bool $catch = false): Response
     {
@@ -263,7 +263,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Invalidates non-safe methods (like POST, PUT, and DELETE).
      *
-     * @param bool $catch Whether to process exceptions
+     * @param $catch Whether to process exceptions
      *
      * @throws \Exception
      *
@@ -309,7 +309,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * the backend using conditional GET. When no matching cache entry is found,
      * it triggers "miss" processing.
      *
-     * @param bool $catch Whether to process exceptions
+     * @param $catch Whether to process exceptions
      *
      * @throws \Exception
      */
@@ -356,7 +356,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * The original request is used as a template for a conditional
      * GET request with the backend.
      *
-     * @param bool $catch Whether to process exceptions
+     * @param $catch Whether to process exceptions
      */
     protected function validate(Request $request, Response $entry, bool $catch = false): Response
     {
@@ -417,7 +417,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Unconditionally fetches a fresh response from the backend and
      * stores it in the cache if is cacheable.
      *
-     * @param bool $catch Whether to process exceptions
+     * @param $catch Whether to process exceptions
      */
     protected function fetch(Request $request, bool $catch = false): Response
     {
@@ -447,8 +447,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * All backend requests (cache passes, fetches, cache validations)
      * run through this method.
      *
-     * @param bool          $catch Whether to catch exceptions or not
-     * @param Response|null $entry A Response instance (the stale entry if present, null otherwise)
+     * @param $catch Whether to catch exceptions or not
+     * @param $entry A Response instance (the stale entry if present, null otherwise)
      */
     protected function forward(Request $request, bool $catch = false, ?Response $entry = null): Response
     {

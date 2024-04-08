@@ -30,12 +30,12 @@ class Autowire
     /**
      * Use only ONE of the following.
      *
-     * @param string|array|ArgumentInterface|null $value      Value to inject (ie "%kernel.project_dir%/some/path")
-     * @param string|null                         $service    Service ID (ie "some.service")
-     * @param string|null                         $expression Expression (ie 'service("some.service").someMethod()')
-     * @param string|null                         $env        Environment variable name (ie 'SOME_ENV_VARIABLE')
-     * @param string|null                         $param      Parameter name (ie 'some.parameter.name')
-     * @param bool|class-string|class-string[]    $lazy       Whether to use lazy-loading for this argument
+     * @param                                  $value      Value to inject (ie "%kernel.project_dir%/some/path")
+     * @param                                  $service    Service ID (ie "some.service")
+     * @param                                  $expression Expression (ie 'service("some.service").someMethod()')
+     * @param                                  $env        Environment variable name (ie 'SOME_ENV_VARIABLE')
+     * @param                                  $param      Parameter name (ie 'some.parameter.name')
+     * @param bool|class-string|class-string[] $lazy       Whether to use lazy-loading for this argument
      */
     public function __construct(
         string|array|ArgumentInterface|null $value = null,

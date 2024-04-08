@@ -27,8 +27,8 @@ class UpdateOperation
     ];
 
     /**
-     * @param int    $operationType An LDAP_MODIFY_BATCH_* constant
-     * @param string $attribute     The attribute to batch modify on
+     * @param $operationType An LDAP_MODIFY_BATCH_* constant
+     * @param $attribute     The attribute to batch modify on
      *
      * @throws UpdateOperationException on consistency errors during construction
      */

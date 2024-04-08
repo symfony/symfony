@@ -23,7 +23,7 @@ abstract class FileLoader implements LoaderInterface
     protected string $file;
 
     /**
-     * @param string $file The mapping file to load
+     * @param $file The mapping file to load
      *
      * @throws MappingException if the mapping file does not exist or is not readable
      */

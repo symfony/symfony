@@ -82,15 +82,15 @@ class Cookie
     }
 
     /**
-     * @param string                        $name     The name of the cookie
-     * @param string|null                   $value    The value of the cookie
-     * @param int|string|\DateTimeInterface $expire   The time the cookie expires
-     * @param string|null                   $path     The path on the server in which the cookie will be available on
-     * @param string|null                   $domain   The domain that the cookie is available to
-     * @param bool|null                     $secure   Whether the client should send back the cookie only over HTTPS or null to auto-enable this when the request is already using HTTPS
-     * @param bool                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
-     * @param bool                          $raw      Whether the cookie value should be sent with no url encoding
-     * @param self::SAMESITE_*|''|null      $sameSite Whether the cookie will be available for cross-site requests
+     * @param                          $name     The name of the cookie
+     * @param                          $value    The value of the cookie
+     * @param                          $expire   The time the cookie expires
+     * @param                          $path     The path on the server in which the cookie will be available on
+     * @param                          $domain   The domain that the cookie is available to
+     * @param                          $secure   Whether the client should send back the cookie only over HTTPS or null to auto-enable this when the request is already using HTTPS
+     * @param                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
+     * @param                          $raw      Whether the cookie value should be sent with no url encoding
+     * @param self::SAMESITE_*|''|null $sameSite Whether the cookie will be available for cross-site requests
      *
      * @throws \InvalidArgumentException
      */
@@ -400,7 +400,7 @@ class Cookie
     }
 
     /**
-     * @param bool $default The default value of the "secure" flag when it is set to null
+     * @param $default The default value of the "secure" flag when it is set to null
      */
     public function setSecureDefault(bool $default): void
     {

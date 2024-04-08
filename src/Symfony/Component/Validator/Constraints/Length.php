@@ -59,10 +59,10 @@ class Length extends Constraint
 
     /**
      * @param int|array<string,mixed>|null $exactly    The exact expected length
-     * @param int|null                     $min        The minimum expected length
-     * @param int|null                     $max        The maximum expected length
-     * @param string|null                  $charset    The charset to be used when computing value's length (defaults to UTF-8)
-     * @param callable|null                $normalizer A callable to normalize value before it is validated
+     * @param                              $min        The minimum expected length
+     * @param                              $max        The maximum expected length
+     * @param                              $charset    The charset to be used when computing value's length (defaults to UTF-8)
+     * @param                              $normalizer A callable to normalize value before it is validated
      * @param self::COUNT_*|null           $countUnit  The character count unit for the length check (defaults to {@see Length::COUNT_CODEPOINTS})
      * @param string[]|null                $groups
      * @param array<string,mixed>          $options

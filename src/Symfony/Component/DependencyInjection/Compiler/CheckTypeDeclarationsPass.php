@@ -67,9 +67,9 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     private ExpressionLanguage $expressionLanguage;
 
     /**
-     * @param bool  $autoload   Whether services who's class in not loaded should be checked or not.
-     *                          Defaults to false to save loading code during compilation.
-     * @param array $skippedIds An array indexed by the service ids to skip
+     * @param $autoload   Whether services who's class in not loaded should be checked or not.
+     *                    Defaults to false to save loading code during compilation.
+     * @param $skippedIds An array indexed by the service ids to skip
      */
     public function __construct(bool $autoload = false, array $skippedIds = [])
     {

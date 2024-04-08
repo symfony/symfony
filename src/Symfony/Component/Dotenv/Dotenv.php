@@ -55,8 +55,8 @@ final class Dotenv
     }
 
     /**
-     * @param bool $usePutenv If `putenv()` should be used to define environment variables or not.
-     *                        Beware that `putenv()` is not thread safe, that's why it's not enabled by default
+     * @param $usePutenv If `putenv()` should be used to define environment variables or not.
+     *                   Beware that `putenv()` is not thread safe, that's why it's not enabled by default
      *
      * @return $this
      */
@@ -70,8 +70,8 @@ final class Dotenv
     /**
      * Loads one or several .env files.
      *
-     * @param string $path          A file to load
-     * @param string ...$extraPaths A list of additional files to load
+     * @param $path          A file to load
+     * @param ...$extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
@@ -87,11 +87,11 @@ final class Dotenv
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
      * .env.dist is loaded when it exists and .env is not found.
      *
-     * @param string      $path                 A file to load
-     * @param string|null $envKey               The name of the env vars that defines the app env
-     * @param string      $defaultEnv           The app env to use when none is defined
-     * @param array       $testEnvs             A list of app envs for which .env.local should be ignored
-     * @param bool        $overrideExistingVars Whether existing environment variables set by the system should be overridden
+     * @param $path                 A file to load
+     * @param $envKey               The name of the env vars that defines the app env
+     * @param $defaultEnv           The app env to use when none is defined
+     * @param $testEnvs             A list of app envs for which .env.local should be ignored
+     * @param $overrideExistingVars Whether existing environment variables set by the system should be overridden
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
@@ -160,8 +160,8 @@ final class Dotenv
     /**
      * Loads one or several .env files and enables override existing vars.
      *
-     * @param string $path          A file to load
-     * @param string ...$extraPaths A list of additional files to load
+     * @param $path          A file to load
+     * @param ...$extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
@@ -174,8 +174,8 @@ final class Dotenv
     /**
      * Sets values as environment variables (via putenv, $_ENV, and $_SERVER).
      *
-     * @param array $values               An array of env variables
-     * @param bool  $overrideExistingVars Whether existing environment variables set by the system should be overridden
+     * @param $values               An array of env variables
+     * @param $overrideExistingVars Whether existing environment variables set by the system should be overridden
      */
     public function populate(array $values, bool $overrideExistingVars = false): void
     {
@@ -221,8 +221,8 @@ final class Dotenv
     /**
      * Parses the contents of an .env file.
      *
-     * @param string $data The data to be parsed
-     * @param string $path The original file name where data where stored (used for more meaningful error messages)
+     * @param $data The data to be parsed
+     * @param $path The original file name where data where stored (used for more meaningful error messages)
      *
      * @throws FormatException when a file has a syntax error
      */

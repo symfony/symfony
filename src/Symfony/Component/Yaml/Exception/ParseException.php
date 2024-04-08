@@ -19,10 +19,10 @@ namespace Symfony\Component\Yaml\Exception;
 class ParseException extends RuntimeException
 {
     /**
-     * @param string      $rawMessage The error message
-     * @param int         $parsedLine The line where the error occurred
-     * @param string|null $snippet    The snippet of code near the problem
-     * @param string|null $parsedFile The file name where the error occurred
+     * @param $rawMessage The error message
+     * @param $parsedLine The line where the error occurred
+     * @param $snippet    The snippet of code near the problem
+     * @param $parsedFile The file name where the error occurred
      */
     public function __construct(
         private string $rawMessage,

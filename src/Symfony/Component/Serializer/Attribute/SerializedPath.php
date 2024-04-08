@@ -24,7 +24,7 @@ class SerializedPath
     private PropertyPath $serializedPath;
 
     /**
-     * @param string $serializedPath A path using a valid PropertyAccess syntax where the value is stored in a normalized representation
+     * @param $serializedPath A path using a valid PropertyAccess syntax where the value is stored in a normalized representation
      */
     public function __construct(string $serializedPath)
     {

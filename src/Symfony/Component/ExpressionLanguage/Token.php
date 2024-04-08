@@ -27,7 +27,7 @@ class Token
 
     /**
      * @param self::*_TYPE $type
-     * @param int|null     $cursor The cursor position in the source
+     * @param              $cursor The cursor position in the source
      */
     public function __construct(
         public string $type,

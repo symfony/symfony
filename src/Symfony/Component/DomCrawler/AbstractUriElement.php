@@ -23,9 +23,9 @@ abstract class AbstractUriElement
     protected ?string $currentUri;
 
     /**
-     * @param \DOMElement $node       A \DOMElement instance
-     * @param string|null $currentUri The URI of the page where the link is embedded (or the base href)
-     * @param string|null $method     The method to use for the link (GET by default)
+     * @param $node       A \DOMElement instance
+     * @param $currentUri The URI of the page where the link is embedded (or the base href)
+     * @param $method     The method to use for the link (GET by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
@@ -74,7 +74,7 @@ abstract class AbstractUriElement
     /**
      * Returns the canonicalized URI path (see RFC 3986, section 5.2.4).
      *
-     * @param string $path URI path
+     * @param $path URI path
      */
     protected function canonicalizePath(string $path): string
     {
@@ -102,7 +102,7 @@ abstract class AbstractUriElement
     /**
      * Sets current \DOMElement instance.
      *
-     * @param \DOMElement $node A \DOMElement instance
+     * @param $node A \DOMElement instance
      *
      * @throws \LogicException If given node is not an anchor
      */

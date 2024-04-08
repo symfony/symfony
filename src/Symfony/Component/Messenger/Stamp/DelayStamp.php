@@ -17,7 +17,7 @@ namespace Symfony\Component\Messenger\Stamp;
 final class DelayStamp implements StampInterface
 {
     /**
-     * @param int $delay The delay in milliseconds
+     * @param $delay The delay in milliseconds
      */
     public function __construct(
         private int $delay,

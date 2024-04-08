@@ -18,12 +18,12 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 class TaggedLocator extends AutowireLocator
 {
     /**
-     * @param string          $tag                   The tag to look for to populate the locator
-     * @param string|null     $indexAttribute        The name of the attribute that defines the key referencing each service in the tagged collection
-     * @param string|null     $defaultIndexMethod    The static method that should be called to get each service's key when their tag doesn't define the previous attribute
-     * @param string|null     $defaultPriorityMethod The static method that should be called to get each service's priority when their tag doesn't define the "priority" attribute
+     * @param                 $tag                   The tag to look for to populate the locator
+     * @param                 $indexAttribute        The name of the attribute that defines the key referencing each service in the tagged collection
+     * @param                 $defaultIndexMethod    The static method that should be called to get each service's key when their tag doesn't define the previous attribute
+     * @param                 $defaultPriorityMethod The static method that should be called to get each service's priority when their tag doesn't define the "priority" attribute
      * @param string|string[] $exclude               A service id or a list of service ids to exclude
-     * @param bool            $excludeSelf           Whether to automatically exclude the referencing service from the locator
+     * @param                 $excludeSelf           Whether to automatically exclude the referencing service from the locator
      */
     public function __construct(
         public string $tag,

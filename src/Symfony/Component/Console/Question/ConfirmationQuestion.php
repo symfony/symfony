@@ -19,9 +19,9 @@ namespace Symfony\Component\Console\Question;
 class ConfirmationQuestion extends Question
 {
     /**
-     * @param string $question        The question to ask to the user
-     * @param bool   $default         The default answer to return, true or false
-     * @param string $trueAnswerRegex A regex to match the "yes" answer
+     * @param $question        The question to ask to the user
+     * @param $default         The default answer to return, true or false
+     * @param $trueAnswerRegex A regex to match the "yes" answer
      */
     public function __construct(
         string $question,

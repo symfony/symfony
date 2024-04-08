@@ -115,7 +115,7 @@ class ValidatorBuilder
     /**
      * Adds a YAML constraint mapping file to the validator.
      *
-     * @param string $path The path to the mapping file
+     * @param $path The path to the mapping file
      *
      * @return $this
      */

@@ -47,7 +47,7 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * @param bool $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
+     * @param $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
      */
     public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): bool
     {

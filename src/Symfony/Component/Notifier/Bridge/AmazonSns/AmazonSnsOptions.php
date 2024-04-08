@@ -39,7 +39,7 @@ final class AmazonSnsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param string $topic The Topic ARN for SNS message
+     * @param $topic The Topic ARN for SNS message
      *
      * @return $this
      */

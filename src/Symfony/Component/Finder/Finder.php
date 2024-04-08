@@ -320,7 +320,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      *     $finder->in(__DIR__)->exclude('ruby');
      *
-     * @param string|array $dirs A directory path or an array of directories
+     * @param $dirs A directory path or an array of directories
      *
      * @return $this
      *
@@ -580,7 +580,7 @@ class Finder implements \IteratorAggregate, \Countable
      * to remove files.
      *
      * @param \Closure(SplFileInfo): bool $closure
-     * @param bool                        $prune   Whether to skip traversing directories further
+     * @param                             $prune   Whether to skip traversing directories further
      *
      * @return $this
      *

@@ -289,7 +289,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds the object class hierarchy as resources.
      *
-     * @param object|string $object An object instance or class name
+     * @param $object An object instance or class name
      *
      * @return $this
      */
@@ -380,9 +380,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Checks whether the requested file or directory exists and registers the result for resource tracking.
      *
-     * @param string      $path          The file or directory path for which to check the existence
-     * @param bool|string $trackContents Whether to track contents of the given resource. If a string is passed,
-     *                                   it will be used as pattern for tracking contents of the requested directory
+     * @param $path          The file or directory path for which to check the existence
+     * @param $trackContents Whether to track contents of the given resource. If a string is passed,
+     *                       it will be used as pattern for tracking contents of the requested directory
      *
      * @final
      */
@@ -416,7 +416,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Loads the configuration for an extension.
      *
-     * @param string                    $extension The extension alias or namespace
+     * @param                           $extension The extension alias or namespace
      * @param array<string, mixed>|null $values    An array of values that customizes the extension
      *
      * @return $this
@@ -440,8 +440,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds a compiler pass.
      *
-     * @param string $type     The type of compiler pass
-     * @param int    $priority Used to sort the passes
+     * @param $type     The type of compiler pass
+     * @param $priority Used to sort the passes
      *
      * @return $this
      */
@@ -727,10 +727,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *  * The parameter bag is frozen;
      *  * Extension loading is disabled.
      *
-     * @param bool $resolveEnvPlaceholders Whether %env()% parameters should be resolved using the current
-     *                                     env vars or be replaced by uniquely identifiable placeholders.
-     *                                     Set to "true" when you want to use the current ContainerBuilder
-     *                                     directly, keep to "false" when the container is dumped instead.
+     * @param $resolveEnvPlaceholders Whether %env()% parameters should be resolved using the current
+     *                                env vars or be replaced by uniquely identifiable placeholders.
+     *                                Set to "true" when you want to use the current ContainerBuilder
+     *                                directly, keep to "false" when the container is dumped instead.
      */
     public function compile(bool $resolveEnvPlaceholders = false): void
     {

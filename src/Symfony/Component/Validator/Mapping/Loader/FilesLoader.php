@@ -25,7 +25,7 @@ abstract class FilesLoader extends LoaderChain
     /**
      * Creates a new loader.
      *
-     * @param array $paths An array of file paths
+     * @param $paths An array of file paths
      */
     public function __construct(array $paths)
     {

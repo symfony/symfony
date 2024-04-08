@@ -34,9 +34,9 @@ class ExpressionFunction
     private \Closure $evaluator;
 
     /**
-     * @param string   $name      The function name
-     * @param callable $compiler  A callable able to compile the function
-     * @param callable $evaluator A callable able to evaluate the function
+     * @param $name      The function name
+     * @param $compiler  A callable able to compile the function
+     * @param $evaluator A callable able to evaluate the function
      */
     public function __construct(
         private string $name,
@@ -65,7 +65,7 @@ class ExpressionFunction
     /**
      * Creates an ExpressionFunction from a PHP function name.
      *
-     * @param string|null $expressionFunctionName The expression function name (default: same than the PHP function name)
+     * @param $expressionFunctionName The expression function name (default: same than the PHP function name)
      *
      * @throws \InvalidArgumentException if given PHP function name does not exist
      * @throws \InvalidArgumentException if given PHP function name is in namespace

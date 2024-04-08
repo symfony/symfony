@@ -20,7 +20,7 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 class AutoconfigureTag extends Autoconfigure
 {
     /**
-     * @param string|null             $name       The tag name to add
+     * @param                         $name       The tag name to add
      * @param array<array-key, mixed> $attributes The tag attributes to attach to the tag
      */
     public function __construct(?string $name = null, array $attributes = [])

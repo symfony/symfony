@@ -24,7 +24,7 @@ interface RebootableInterface
      * The getBuildDir() method of a rebootable kernel should not be called
      * while building the container. Use the %kernel.build_dir% parameter instead.
      *
-     * @param string|null $warmupDir pass null to reboot in the regular build directory
+     * @param $warmupDir pass null to reboot in the regular build directory
      */
     public function reboot(?string $warmupDir): void;
 }

@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpKernel\Attribute;
 class WithHttpStatus
 {
     /**
-     * @param int                   $statusCode The HTTP status code to use
+     * @param                       $statusCode The HTTP status code to use
      * @param array<string, string> $headers    The HTTP headers to add to the response
      */
     public function __construct(

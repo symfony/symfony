@@ -21,8 +21,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class UnexpectedTypeException extends RuntimeException
 {
     /**
-     * @param mixed $value     The unexpected value found while traversing property path
-     * @param int   $pathIndex The property path index when the unexpected value was found
+     * @param $value     The unexpected value found while traversing property path
+     * @param $pathIndex The property path index when the unexpected value was found
      */
     public function __construct(mixed $value, PropertyPathInterface $path, int $pathIndex)
     {

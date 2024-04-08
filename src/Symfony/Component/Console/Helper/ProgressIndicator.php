@@ -45,8 +45,8 @@ class ProgressIndicator
     private static array $formatters;
 
     /**
-     * @param int        $indicatorChangeInterval Change interval in milliseconds
-     * @param array|null $indicatorValues         Animated indicator characters
+     * @param $indicatorChangeInterval Change interval in milliseconds
+     * @param $indicatorValues         Animated indicator characters
      */
     public function __construct(
         private OutputInterface $output,

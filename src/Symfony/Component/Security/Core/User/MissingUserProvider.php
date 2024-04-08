@@ -24,7 +24,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 class MissingUserProvider implements UserProviderInterface
 {
     /**
-     * @param string $firewall the firewall missing a provider
+     * @param $firewall the firewall missing a provider
      */
     public function __construct(string $firewall)
     {

@@ -42,10 +42,10 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @see \DateTime::format() for supported formats
      *
-     * @param string|null $inputTimezone  The name of the input timezone
-     * @param string|null $outputTimezone The name of the output timezone
-     * @param string      $format         The date format
-     * @param string|null $parseFormat    The parse format when different from $format
+     * @param $inputTimezone  The name of the input timezone
+     * @param $outputTimezone The name of the output timezone
+     * @param $format         The date format
+     * @param $parseFormat    The parse format when different from $format
      */
     public function __construct(?string $inputTimezone = null, ?string $outputTimezone = null, string $format = 'Y-m-d H:i:s', ?string $parseFormat = null)
     {

@@ -25,8 +25,8 @@ interface CsrfTokenManagerInterface
      * generated. Otherwise the existing token is returned (with the same value,
      * not the same instance).
      *
-     * @param string $tokenId The token ID. You may choose an arbitrary value
-     *                        for the ID
+     * @param $tokenId The token ID. You may choose an arbitrary value
+     *                 for the ID
      */
     public function getToken(string $tokenId): CsrfToken;
 
@@ -37,8 +37,8 @@ interface CsrfTokenManagerInterface
      * of whether a token value previously existed or not. It can be used to
      * enforce once-only tokens in environments with high security needs.
      *
-     * @param string $tokenId The token ID. You may choose an arbitrary value
-     *                        for the ID
+     * @param $tokenId The token ID. You may choose an arbitrary value
+     *                 for the ID
      */
     public function refreshToken(string $tokenId): CsrfToken;
 

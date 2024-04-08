@@ -40,9 +40,9 @@ class ExecutableFinder
     /**
      * Finds an executable by name.
      *
-     * @param string      $name      The executable name (without the extension)
-     * @param string|null $default   The default to return if no executable is found
-     * @param array       $extraDirs Additional dirs to check into
+     * @param $name      The executable name (without the extension)
+     * @param $default   The default to return if no executable is found
+     * @param $extraDirs Additional dirs to check into
      */
     public function find(string $name, ?string $default = null, array $extraDirs = []): ?string
     {

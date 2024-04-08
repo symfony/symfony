@@ -557,8 +557,8 @@ class KernelTest extends TestCase
     /**
      * Returns a mock for the abstract kernel.
      *
-     * @param array $methods Additional methods to mock (besides the abstract ones)
-     * @param array $bundles Bundles to register
+     * @param $methods Additional methods to mock (besides the abstract ones)
+     * @param $bundles Bundles to register
      */
     protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, array $methodsToAdd = []): Kernel
     {

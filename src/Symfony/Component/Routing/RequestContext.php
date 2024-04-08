@@ -257,7 +257,7 @@ class RequestContext
     /**
      * Sets the parameters.
      *
-     * @param array $parameters The parameters
+     * @param $parameters The parameters
      *
      * @return $this
      */

@@ -25,11 +25,11 @@ final class SMimeSigner extends SMime
     private ?string $extraCerts;
 
     /**
-     * @param string      $certificate          The path of the file containing the signing certificate (in PEM format)
-     * @param string      $privateKey           The path of the file containing the private key (in PEM format)
-     * @param string|null $privateKeyPassphrase A passphrase of the private key (if any)
-     * @param string|null $extraCerts           The path of the file containing intermediate certificates (in PEM format) needed by the signing certificate
-     * @param int|null    $signOptions          Bitwise operator options for openssl_pkcs7_sign() (@see https://secure.php.net/manual/en/openssl.pkcs7.flags.php)
+     * @param $certificate          The path of the file containing the signing certificate (in PEM format)
+     * @param $privateKey           The path of the file containing the private key (in PEM format)
+     * @param $privateKeyPassphrase A passphrase of the private key (if any)
+     * @param $extraCerts           The path of the file containing intermediate certificates (in PEM format) needed by the signing certificate
+     * @param $signOptions          Bitwise operator options for openssl_pkcs7_sign() (@see https://secure.php.net/manual/en/openssl.pkcs7.flags.php)
      */
     public function __construct(string $certificate, string $privateKey, ?string $privateKeyPassphrase = null, ?string $extraCerts = null, ?int $signOptions = null)
     {

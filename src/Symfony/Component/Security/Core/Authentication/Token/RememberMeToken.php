@@ -25,7 +25,7 @@ class RememberMeToken extends AbstractToken
     private string $firewallName;
 
     /**
-     * @param string $secret A secret used to make sure the token is created by the app and not by a malicious client
+     * @param $secret A secret used to make sure the token is created by the app and not by a malicious client
      *
      * @throws \InvalidArgumentException
      */

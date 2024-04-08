@@ -45,8 +45,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * Adds or replaces a child to the form.
      *
      * @param FormInterface|string $child   The FormInterface instance or the name of the child
-     * @param string|null          $type    The child's type, if a name was passed
-     * @param array                $options The child's options, if a name was passed
+     * @param                      $type    The child's type, if a name was passed
+     * @param                      $options The child's options, if a name was passed
      *
      * @return $this
      *
@@ -87,16 +87,16 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the errors of this form.
      *
-     * @param bool $deep    Whether to include errors of child forms as well
-     * @param bool $flatten Whether to flatten the list of errors in case
-     *                      $deep is set to true
+     * @param $deep    Whether to include errors of child forms as well
+     * @param $flatten Whether to flatten the list of errors in case
+     *                 $deep is set to true
      */
     public function getErrors(bool $deep = false, bool $flatten = true): FormErrorIterator;
 
     /**
      * Updates the form with default model data.
      *
-     * @param mixed $modelData The data formatted as expected for the underlying object
+     * @param $modelData The data formatted as expected for the underlying object
      *
      * @return $this
      *
@@ -263,11 +263,11 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Submits data to the form.
      *
-     * @param string|array|null $submittedData The submitted data
-     * @param bool              $clearMissing  Whether to set fields to NULL
-     *                                         when they are missing in the
-     *                                         submitted data. This argument
-     *                                         is only used in compound form
+     * @param $submittedData The submitted data
+     * @param $clearMissing  Whether to set fields to NULL
+     *                       when they are missing in the
+     *                       submitted data. This argument
+     *                       is only used in compound form
      *
      * @return $this
      *

@@ -27,8 +27,8 @@ class GenrbCompiler implements BundleCompilerInterface
     /**
      * Creates a new compiler based on the "genrb" executable.
      *
-     * @param string $genrb   Optional. The path to the "genrb" executable
-     * @param string $envVars Optional. Environment variables to be loaded when running "genrb".
+     * @param $genrb   Optional. The path to the "genrb" executable
+     * @param $envVars Optional. Environment variables to be loaded when running "genrb".
      *
      * @throws RuntimeException if the "genrb" cannot be found
      */

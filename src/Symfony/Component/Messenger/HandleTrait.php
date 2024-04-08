@@ -29,7 +29,7 @@ trait HandleTrait
      * This behavior is useful for both synchronous command & query buses,
      * the last one usually returning the handler result.
      *
-     * @param object|Envelope $message The message or the message pre-wrapped in an envelope
+     * @param $message The message or the message pre-wrapped in an envelope
      */
     private function handle(object $message): mixed
     {

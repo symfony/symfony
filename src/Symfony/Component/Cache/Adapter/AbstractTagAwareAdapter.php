@@ -123,8 +123,8 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     /**
      * Persists several cache items immediately.
      *
-     * @param array   $values        The values to cache, indexed by their cache identifier
-     * @param int     $lifetime      The lifetime of the cached values, 0 for persisting until manual cleaning
+     * @param         $values        The values to cache, indexed by their cache identifier
+     * @param         $lifetime      The lifetime of the cached values, 0 for persisting until manual cleaning
      * @param array[] $addTagData    Hash where key is tag id, and array value is list of cache id's to add to tag
      * @param array[] $removeTagData Hash where key is tag id, and array value is list of cache id's to remove to tag
      *
@@ -135,14 +135,14 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     /**
      * Removes multiple items from the pool and their corresponding tags.
      *
-     * @param array $ids An array of identifiers that should be removed from the pool
+     * @param $ids An array of identifiers that should be removed from the pool
      */
     abstract protected function doDelete(array $ids): bool;
 
     /**
      * Removes relations between tags and deleted items.
      *
-     * @param array $tagData Array of tag => key identifiers that should be removed from the pool
+     * @param $tagData Array of tag => key identifiers that should be removed from the pool
      */
     abstract protected function doDeleteTagRelations(array $tagData): bool;
 

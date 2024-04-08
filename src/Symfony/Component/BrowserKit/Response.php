@@ -24,9 +24,9 @@ final class Response
      * The headers array is a set of key/value pairs. If a header is present multiple times
      * then the value is an array of all the values.
      *
-     * @param string $content The content of the response
-     * @param int    $status  The response status code (302 "Found" by default)
-     * @param array  $headers An array of headers
+     * @param $content The content of the response
+     * @param $status  The response status code (302 "Found" by default)
+     * @param $headers An array of headers
      */
     public function __construct(
         private string $content = '',

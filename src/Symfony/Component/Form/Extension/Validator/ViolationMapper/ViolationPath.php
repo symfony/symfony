@@ -32,7 +32,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * Creates a new violation path from a string.
      *
-     * @param string $violationPath The property path of a {@link \Symfony\Component\Validator\ConstraintViolation} object
+     * @param $violationPath The property path of a {@link \Symfony\Component\Validator\ConstraintViolation} object
      */
     public function __construct(string $violationPath)
     {

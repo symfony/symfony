@@ -50,8 +50,8 @@ class Inline
     /**
      * Converts a YAML string to a PHP value.
      *
-     * @param int   $flags      A bit field of Yaml::PARSE_* constants to customize the YAML parser behavior
-     * @param array $references Mapping of variable names to values
+     * @param $flags      A bit field of Yaml::PARSE_* constants to customize the YAML parser behavior
+     * @param $references Mapping of variable names to values
      *
      * @throws ParseException
      */
@@ -95,8 +95,8 @@ class Inline
     /**
      * Dumps a given PHP variable to a YAML string.
      *
-     * @param mixed $value The PHP variable to convert
-     * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
+     * @param $value The PHP variable to convert
+     * @param $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      *
      * @throws DumpException When trying to dump PHP resource
      */
@@ -215,8 +215,8 @@ class Inline
     /**
      * Dumps a PHP array to a YAML string.
      *
-     * @param array $value The PHP array to dump
-     * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
+     * @param $value The PHP array to dump
+     * @param $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      */
     private static function dumpArray(array $value, int $flags): string
     {
@@ -236,8 +236,8 @@ class Inline
     /**
      * Dumps hash array to a YAML string.
      *
-     * @param array|\ArrayObject|\stdClass $value The hash array to dump
-     * @param int                          $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
+     * @param $value The hash array to dump
+     * @param $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      */
     private static function dumpHashArray(array|\ArrayObject|\stdClass $value, int $flags): string
     {

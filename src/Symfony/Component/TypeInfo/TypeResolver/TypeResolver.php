@@ -27,7 +27,7 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 final readonly class TypeResolver implements TypeResolverInterface
 {
     /**
-     * @param ContainerInterface $resolvers Locator of type resolvers, keyed by supported subject type
+     * @param $resolvers Locator of type resolvers, keyed by supported subject type
      */
     public function __construct(
         private ContainerInterface $resolvers,

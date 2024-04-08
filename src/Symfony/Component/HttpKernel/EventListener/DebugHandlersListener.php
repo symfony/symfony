@@ -38,8 +38,8 @@ class DebugHandlersListener implements EventSubscriberInterface
     private bool $hasTerminatedWithException = false;
 
     /**
-     * @param bool          $webMode
-     * @param callable|null $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
+     * @param bool $webMode
+     * @param      $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
      */
     public function __construct(?callable $exceptionHandler = null, bool|LoggerInterface|null $webMode = null)
     {

@@ -193,7 +193,7 @@ class Response
     private array $sentHeaders;
 
     /**
-     * @param int $status The HTTP status code (200 "OK" by default)
+     * @param $status The HTTP status code (200 "OK" by default)
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      */
@@ -388,7 +388,7 @@ class Response
     /**
      * Sends HTTP headers and content.
      *
-     * @param bool $flush Whether output buffers should be flushed
+     * @param $flush Whether output buffers should be flushed
      *
      * @return $this
      */
@@ -940,8 +940,8 @@ class Response
     /**
      * Sets the ETag value.
      *
-     * @param string|null $etag The ETag unique identifier or null to remove the header
-     * @param bool        $weak Whether you want a weak ETag or not
+     * @param $etag The ETag unique identifier or null to remove the header
+     * @param $weak Whether you want a weak ETag or not
      *
      * @return $this
      *
@@ -1089,7 +1089,7 @@ class Response
     /**
      * Sets the Vary header.
      *
-     * @param bool $replace Whether to replace the actual value or not (true by default)
+     * @param $replace Whether to replace the actual value or not (true by default)
      *
      * @return $this
      *

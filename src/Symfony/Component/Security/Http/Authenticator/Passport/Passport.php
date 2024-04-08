@@ -33,9 +33,9 @@ class Passport
     private array $attributes = [];
 
     /**
-     * @param CredentialsInterface $credentials The credentials to check for this authentication, use
-     *                                          SelfValidatingPassport if no credentials should be checked
-     * @param BadgeInterface[]     $badges
+     * @param                  $credentials The credentials to check for this authentication, use
+     *                                     SelfValidatingPassport if no credentials should be checked
+     * @param BadgeInterface[] $badges
      */
     public function __construct(UserBadge $userBadge, CredentialsInterface $credentials, array $badges = [])
     {
@@ -66,9 +66,9 @@ class Passport
      * This method replaces the current badge if it is already set on this
      * passport.
      *
-     * @param string|null $badgeFqcn A FQCN to which the badge should be mapped to.
-     *                               This allows replacing a built-in badge by a custom one using
-     *                               e.g. addBadge(new MyCustomUserBadge(), UserBadge::class)
+     * @param $badgeFqcn A FQCN to which the badge should be mapped to.
+     *                   This allows replacing a built-in badge by a custom one using
+     *                   e.g. addBadge(new MyCustomUserBadge(), UserBadge::class)
      *
      * @return $this
      */

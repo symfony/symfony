@@ -334,7 +334,7 @@ class GraphvizDumper implements DumperInterface
     }
 
     /**
-     * @param bool $lineBreakFirstIfNotEmpty Whether to add a separator in the first place when metadata is not empty
+     * @param $lineBreakFirstIfNotEmpty Whether to add a separator in the first place when metadata is not empty
      */
     private function addMetadata(array $metadata, bool $lineBreakFirstIfNotEmpty = true): string
     {

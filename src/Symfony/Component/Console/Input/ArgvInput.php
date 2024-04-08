@@ -348,7 +348,7 @@ class ArgvInput extends Input
     /**
      * Returns un-parsed and not validated tokens.
      *
-     * @param bool $strip Whether to return the raw parameters (false) or the values after the command name (true)
+     * @param $strip Whether to return the raw parameters (false) or the values after the command name (true)
      *
      * @return list<string>
      */

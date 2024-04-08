@@ -256,9 +256,9 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * Returns a matching normalizer.
      *
-     * @param mixed       $data    Data to get the serializer for
-     * @param string|null $format  Format name, present to give the option to normalizers to act differently based on formats
-     * @param array       $context Options available to the normalizer
+     * @param $data    Data to get the serializer for
+     * @param $format  Format name, present to give the option to normalizers to act differently based on formats
+     * @param $context Options available to the normalizer
      */
     private function getNormalizer(mixed $data, ?string $format, array $context): ?NormalizerInterface
     {
@@ -319,10 +319,10 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * Returns a matching denormalizer.
      *
-     * @param mixed       $data    Data to restore
-     * @param string      $class   The expected class to instantiate
-     * @param string|null $format  Format name, present to give the option to normalizers to act differently based on formats
-     * @param array       $context Options available to the denormalizer
+     * @param $data    Data to restore
+     * @param $class   The expected class to instantiate
+     * @param $format  Format name, present to give the option to normalizers to act differently based on formats
+     * @param $context Options available to the denormalizer
      */
     private function getDenormalizer(mixed $data, string $class, ?string $format, array $context): ?DenormalizerInterface
     {

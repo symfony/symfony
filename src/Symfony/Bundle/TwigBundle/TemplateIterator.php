@@ -32,9 +32,9 @@ class TemplateIterator implements \IteratorAggregate
     private array $namePatterns;
 
     /**
-     * @param array       $paths        Additional Twig paths to warm
-     * @param string|null $defaultPath  The directory where global templates can be stored
-     * @param string[]    $namePatterns Pattern of file names
+     * @param          $paths        Additional Twig paths to warm
+     * @param          $defaultPath  The directory where global templates can be stored
+     * @param string[] $namePatterns Pattern of file names
      */
     public function __construct(KernelInterface $kernel, array $paths = [], ?string $defaultPath = null, array $namePatterns = [])
     {

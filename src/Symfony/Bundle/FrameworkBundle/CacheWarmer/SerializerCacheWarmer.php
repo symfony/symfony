@@ -30,7 +30,7 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     /**
      * @param LoaderInterface[] $loaders      The serializer metadata loaders
-     * @param string            $phpArrayFile The PHP file where metadata are cached
+     * @param                   $phpArrayFile The PHP file where metadata are cached
      */
     public function __construct(
         private array $loaders,

@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpKernel\Attribute;
 class AsTargetedValueResolver
 {
     /**
-     * @param string|null $name The name with which the resolver can be targeted
+     * @param $name The name with which the resolver can be targeted
      */
     public function __construct(public readonly ?string $name = null)
     {

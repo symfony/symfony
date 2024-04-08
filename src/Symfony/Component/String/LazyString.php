@@ -21,7 +21,7 @@ class LazyString implements \Stringable, \JsonSerializable
     private \Closure|string $value;
 
     /**
-     * @param callable|array $callback A callable or a [Closure, method] lazy-callable
+     * @param $callback A callable or a [Closure, method] lazy-callable
      */
     public static function fromCallable(callable|array $callback, mixed ...$arguments): static
     {

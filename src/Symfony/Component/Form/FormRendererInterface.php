@@ -26,19 +26,19 @@ interface FormRendererInterface
     /**
      * Sets the theme(s) to be used for rendering a view and its children.
      *
-     * @param FormView $view             The view to assign the theme(s) to
-     * @param mixed    $themes           The theme(s). The type of these themes
-     *                                   is open to the implementation.
-     * @param bool     $useDefaultThemes If true, will use default themes specified
-     *                                   in the renderer
+     * @param $view             The view to assign the theme(s) to
+     * @param $themes           The theme(s). The type of these themes
+     *                          is open to the implementation.
+     * @param $useDefaultThemes If true, will use default themes specified
+     *                          in the renderer
      */
     public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true): void;
 
     /**
      * Renders a named block of the form theme.
      *
-     * @param FormView $view      The view for which to render the block
-     * @param array    $variables The variables to pass to the template
+     * @param $view      The view for which to render the block
+     * @param $variables The variables to pass to the template
      */
     public function renderBlock(FormView $view, string $blockName, array $variables = []): string;
 
@@ -52,8 +52,8 @@ interface FormRendererInterface
      * If this method is called recursively, the block search is continued
      * where a block was found before.
      *
-     * @param FormView $view      The view for which to render the block
-     * @param array    $variables The variables to pass to the template
+     * @param $view      The view for which to render the block
+     * @param $variables The variables to pass to the template
      */
     public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = []): string;
 

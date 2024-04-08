@@ -50,7 +50,7 @@ abstract class FileLoader extends BaseFileLoader
     protected int $importing = 0;
 
     /**
-     * @param bool $prepend Whether to prepend extension config instead of appending them
+     * @param $prepend Whether to prepend extension config instead of appending them
      */
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, ?string $env = null, bool $prepend = false)
     {
@@ -61,7 +61,7 @@ abstract class FileLoader extends BaseFileLoader
     }
 
     /**
-     * @param bool|string $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
+     * @param $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
      */
     public function import(mixed $resource, ?string $type = null, bool|string $ignoreErrors = false, ?string $sourceResource = null, $exclude = null): mixed
     {
@@ -100,11 +100,11 @@ abstract class FileLoader extends BaseFileLoader
     /**
      * Registers a set of classes as services using PSR-4 for discovery.
      *
-     * @param Definition           $prototype A definition to use as template
-     * @param string               $namespace The namespace prefix of classes in the scanned directory
-     * @param string               $resource  The directory to look for classes, glob-patterns allowed
+     * @param                      $prototype A definition to use as template
+     * @param                      $namespace The namespace prefix of classes in the scanned directory
+     * @param                      $resource  The directory to look for classes, glob-patterns allowed
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
-     * @param string|null          $source    The path to the file that defines the auto-discovery rule
+     * @param                      $source    The path to the file that defines the auto-discovery rule
      */
     public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array|null $exclude = null, ?string $source = null): void
     {

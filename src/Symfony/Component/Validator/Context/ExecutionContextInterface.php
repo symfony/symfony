@@ -65,7 +65,7 @@ interface ExecutionContextInterface
      * Adds a violation at the current node of the validation graph.
      *
      * @param string|\Stringable $message The error message as a string or a stringable object
-     * @param array              $params  The parameters substituted in the error message
+     * @param                    $params  The parameters substituted in the error message
      */
     public function addViolation(string $message, array $params = []): void;
 
@@ -82,7 +82,7 @@ interface ExecutionContextInterface
      *         ->addViolation();
      *
      * @param string|\Stringable $message    The error message as a string or a stringable object
-     * @param array              $parameters The parameters substituted in the error message
+     * @param                    $parameters The parameters substituted in the error message
      */
     public function buildViolation(string $message, array $parameters = []): ConstraintViolationBuilderInterface;
 
@@ -119,15 +119,15 @@ interface ExecutionContextInterface
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
      *
-     * @param object|null $object       The currently validated object
-     * @param string      $propertyPath The property path to the current value
+     * @param $object       The currently validated object
+     * @param $propertyPath The property path to the current value
      */
     public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata, string $propertyPath): void;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
      *
-     * @param string|null $group The validated group
+     * @param $group The validated group
      */
     public function setGroup(?string $group): void;
 
@@ -139,41 +139,41 @@ interface ExecutionContextInterface
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
      *
-     * @param string $cacheKey  The hash of the object
-     * @param string $groupHash The group's name or hash, if it is group
-     *                          sequence
+     * @param $cacheKey  The hash of the object
+     * @param $groupHash The group's name or hash, if it is group
+     *                   sequence
      */
     public function markGroupAsValidated(string $cacheKey, string $groupHash): void;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
      *
-     * @param string $cacheKey  The hash of the object
-     * @param string $groupHash The group's name or hash, if it is group
-     *                          sequence
+     * @param $cacheKey  The hash of the object
+     * @param $groupHash The group's name or hash, if it is group
+     *                   sequence
      */
     public function isGroupValidated(string $cacheKey, string $groupHash): bool;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
      *
-     * @param string $cacheKey       The hash of the object
-     * @param string $constraintHash The hash of the constraint
+     * @param $cacheKey       The hash of the object
+     * @param $constraintHash The hash of the constraint
      */
     public function markConstraintAsValidated(string $cacheKey, string $constraintHash): void;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
      *
-     * @param string $cacheKey       The hash of the object
-     * @param string $constraintHash The hash of the constraint
+     * @param $cacheKey       The hash of the object
+     * @param $constraintHash The hash of the constraint
      */
     public function isConstraintValidated(string $cacheKey, string $constraintHash): bool;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
      *
-     * @param string $cacheKey The hash of the object
+     * @param $cacheKey The hash of the object
      *
      * @see ObjectInitializerInterface
      */
@@ -182,7 +182,7 @@ interface ExecutionContextInterface
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
      *
-     * @param string $cacheKey The hash of the object
+     * @param $cacheKey The hash of the object
      *
      * @see ObjectInitializerInterface
      */
@@ -274,8 +274,8 @@ interface ExecutionContextInterface
      * <tt>$street</tt> property of one of these addresses is for example
      * "addresses[0].street".
      *
-     * @param string $subPath Optional. The suffix appended to the current
-     *                        property path.
+     * @param $subPath Optional. The suffix appended to the current
+     *                 property path.
      *
      * @return string The current property path. The result may be an empty
      *                string if the validator is currently validating the

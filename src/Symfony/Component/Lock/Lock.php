@@ -31,8 +31,8 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
     private bool $dirty = false;
 
     /**
-     * @param float|null $ttl         Maximum expected lock duration in seconds
-     * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
+     * @param $ttl         Maximum expected lock duration in seconds
+     * @param $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      */
     public function __construct(
         private Key $key,

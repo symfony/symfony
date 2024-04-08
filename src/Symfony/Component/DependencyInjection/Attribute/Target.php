@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 final class Target
 {
     /**
-     * @param string|null $name The name of the target autowiring alias
+     * @param $name The name of the target autowiring alias
      */
     public function __construct(public ?string $name = null)
     {

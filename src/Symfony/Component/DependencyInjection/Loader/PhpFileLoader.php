@@ -161,7 +161,7 @@ class PhpFileLoader extends FileLoader
     }
 
     /**
-     * @param string $namespace FQCN string for a class implementing ConfigBuilderInterface
+     * @param $namespace FQCN string for a class implementing ConfigBuilderInterface
      */
     private function configBuilder(string $namespace): ConfigBuilderInterface
     {

@@ -17,9 +17,9 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 final class JavaScriptImport
 {
     /**
-     * @param string $importName               The name of the import needed in the importmap, e.g. "/foo.js" or "react"
-     * @param string $assetLogicalPath         Logical path to the mapped ass that was imported
-     * @param bool   $addImplicitlyToImportMap Whether this import should be added to the importmap automatically
+     * @param $importName               The name of the import needed in the importmap, e.g. "/foo.js" or "react"
+     * @param $assetLogicalPath         Logical path to the mapped ass that was imported
+     * @param $addImplicitlyToImportMap Whether this import should be added to the importmap automatically
      */
     public function __construct(
         public readonly string $importName,

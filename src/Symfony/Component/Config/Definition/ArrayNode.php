@@ -76,7 +76,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets the xml remappings that should be performed.
      *
-     * @param array $remappings An array of the form [[string, string]]
+     * @param $remappings An array of the form [[string, string]]
      */
     public function setXmlRemappings(array $remappings): void
     {
@@ -129,8 +129,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Whether extra keys should just be ignored without an exception.
      *
-     * @param bool $boolean To allow extra keys
-     * @param bool $remove  To remove extra keys
+     * @param $boolean To allow extra keys
+     * @param $remove  To remove extra keys
      */
     public function setIgnoreExtraKeys(bool $boolean, bool $remove = true): void
     {

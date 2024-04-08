@@ -41,8 +41,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     private static array $valuesCache = [];
 
     /**
-     * @param string           $file         The PHP file were values are cached
-     * @param AdapterInterface $fallbackPool A pool to fallback on when an item is not hit
+     * @param $file         The PHP file were values are cached
+     * @param $fallbackPool A pool to fallback on when an item is not hit
      */
     public function __construct(
         private string $file,
@@ -66,8 +66,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     /**
      * This adapter takes advantage of how PHP stores arrays in its latest versions.
      *
-     * @param string                 $file         The PHP file were values are cached
-     * @param CacheItemPoolInterface $fallbackPool A pool to fallback on when an item is not hit
+     * @param $file         The PHP file were values are cached
+     * @param $fallbackPool A pool to fallback on when an item is not hit
      */
     public static function create(string $file, CacheItemPoolInterface $fallbackPool): CacheItemPoolInterface
     {
@@ -242,7 +242,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     /**
      * Store an array of cached values.
      *
-     * @param array $values The cached values
+     * @param $values The cached values
      *
      * @return string[] A list of classes to preload on PHP 7.4+
      */

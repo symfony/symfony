@@ -31,9 +31,9 @@ final class SubscribedService
     public array $attributes;
 
     /**
-     * @param string|null       $key        The key to use for the service
+     * @param                   $key        The key to use for the service
      * @param class-string|null $type       The service class
-     * @param bool              $nullable   Whether the service is optional
+     * @param                   $nullable   Whether the service is optional
      * @param object|object[]   $attributes One or more dependency injection attributes to use
      */
     public function __construct(

@@ -23,9 +23,9 @@ class NotNormalizableValueException extends UnexpectedValueException
 
     /**
      * @param list<string|\Stringable> $expectedTypes
-     * @param bool                     $useMessageForUser If the message passed to this exception is something that can be shown
-     *                                                    safely to your user. In other words, avoid catching other exceptions and
-     *                                                    passing their message directly to this class.
+     * @param                          $useMessageForUser If the message passed to this exception is something that can be shown
+     *                                                   safely to your user. In other words, avoid catching other exceptions and
+     *                                                   passing their message directly to this class.
      */
     public static function createForUnexpectedDataType(string $message, mixed $data, array $expectedTypes, ?string $path = null, bool $useMessageForUser = false, int $code = 0, ?\Throwable $previous = null): self
     {

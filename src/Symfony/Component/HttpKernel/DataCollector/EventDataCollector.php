@@ -116,7 +116,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     }
 
     /**
-     * @param array $events An array of orphaned events
+     * @param $events An array of orphaned events
      *
      * @see TraceableEventDispatcher
      */

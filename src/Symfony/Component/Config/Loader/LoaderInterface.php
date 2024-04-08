@@ -28,7 +28,7 @@ interface LoaderInterface
     /**
      * Returns whether this class supports the given resource.
      *
-     * @param mixed $resource A resource
+     * @param $resource A resource
      */
     public function supports(mixed $resource, ?string $type = null): bool;
 

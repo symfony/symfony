@@ -19,7 +19,7 @@ namespace Symfony\Component\Messenger\Stamp;
 final class TransportMessageIdStamp implements StampInterface
 {
     /**
-     * @param mixed $id some "identifier" of the message in a transport
+     * @param $id some "identifier" of the message in a transport
      */
     public function __construct(
         private mixed $id,

@@ -31,8 +31,8 @@ class Section
     private array $children = [];
 
     /**
-     * @param float|null $origin        Set the origin of the events in this section, use null to set their origin to their start time
-     * @param bool       $morePrecision If true, time is stored as float to keep the original microsecond precision
+     * @param $origin        Set the origin of the events in this section, use null to set their origin to their start time
+     * @param $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
     public function __construct(
         private ?float $origin = null,
@@ -57,7 +57,7 @@ class Section
     /**
      * Creates or re-opens a child section.
      *
-     * @param string|null $id Null to create a new section, the identifier to re-open an existing one
+     * @param $id Null to create a new section, the identifier to re-open an existing one
      */
     public function open(?string $id): self
     {

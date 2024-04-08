@@ -425,9 +425,9 @@ class OptionsResolver implements Options
      * passed to the closure is the value of the option after validating it
      * and before normalizing it.
      *
-     * @param string          $package The name of the composer package that is triggering the deprecation
-     * @param string          $version The version of the package that introduced the deprecation
-     * @param string|\Closure $message The deprecation message to use
+     * @param $package The name of the composer package that is triggering the deprecation
+     * @param $version The version of the package that introduced the deprecation
+     * @param $message The deprecation message to use
      *
      * @return $this
      */
@@ -567,7 +567,7 @@ class OptionsResolver implements Options
      * The closure receives the value as argument and should return true to
      * accept the value and false to reject the value.
      *
-     * @param mixed $allowedValues One or more acceptable values/closures
+     * @param $allowedValues One or more acceptable values/closures
      *
      * @return $this
      *
@@ -607,7 +607,7 @@ class OptionsResolver implements Options
      * The closure receives the value as argument and should return true to
      * accept the value and false to reject the value.
      *
-     * @param mixed $allowedValues One or more acceptable values/closures
+     * @param $allowedValues One or more acceptable values/closures
      *
      * @return $this
      *
@@ -911,7 +911,7 @@ class OptionsResolver implements Options
     /**
      * Returns the resolved value of an option.
      *
-     * @param bool $triggerDeprecation Whether to trigger the deprecation or not (true by default)
+     * @param $triggerDeprecation Whether to trigger the deprecation or not (true by default)
      *
      * @throws AccessException           If accessing this method outside of
      *                                   {@link resolve()}

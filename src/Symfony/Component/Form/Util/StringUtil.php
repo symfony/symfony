@@ -39,7 +39,7 @@ class StringUtil
     /**
      * Converts a fully-qualified class name to a block prefix.
      *
-     * @param string $fqcn The fully-qualified class name
+     * @param $fqcn The fully-qualified class name
      */
     public static function fqcnToBlockPrefix(string $fqcn): ?string
     {

@@ -17,13 +17,13 @@ namespace Symfony\Component\BrowserKit;
 class Request
 {
     /**
-     * @param string      $uri        The request URI
-     * @param string      $method     The HTTP method request
-     * @param array       $parameters The request parameters
-     * @param array       $files      An array of uploaded files
-     * @param array       $cookies    An array of cookies
-     * @param array       $server     An array of server parameters
-     * @param string|null $content    The raw body data
+     * @param $uri        The request URI
+     * @param $method     The HTTP method request
+     * @param $parameters The request parameters
+     * @param $files      An array of uploaded files
+     * @param $cookies    An array of cookies
+     * @param $server     An array of server parameters
+     * @param $content    The raw body data
      */
     public function __construct(
         protected string $uri,

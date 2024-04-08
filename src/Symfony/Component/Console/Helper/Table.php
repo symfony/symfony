@@ -105,7 +105,7 @@ class Table
     /**
      * Sets table column style.
      *
-     * @param TableStyle|string $name The style name or a TableStyle instance
+     * @param $name The style name or a TableStyle instance
      *
      * @return $this
      */

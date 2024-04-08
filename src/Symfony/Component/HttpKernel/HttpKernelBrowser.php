@@ -33,7 +33,7 @@ class HttpKernelBrowser extends AbstractBrowser
     private bool $catchExceptions = true;
 
     /**
-     * @param array $server The server parameters (equivalent of $_SERVER)
+     * @param $server The server parameters (equivalent of $_SERVER)
      */
     public function __construct(
         protected HttpKernelInterface $kernel,

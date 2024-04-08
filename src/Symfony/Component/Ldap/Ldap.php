@@ -52,8 +52,8 @@ final class Ldap implements LdapInterface
     /**
      * Creates a new Ldap instance.
      *
-     * @param string $adapter The adapter name
-     * @param array  $config  The adapter's configuration
+     * @param $adapter The adapter name
+     * @param $config  The adapter's configuration
      */
     public static function create(string $adapter, array $config = []): static
     {

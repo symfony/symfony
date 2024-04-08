@@ -26,8 +26,8 @@ class ServerDumper implements DataDumperInterface
     private ?DataDumperInterface $wrappedDumper;
 
     /**
-     * @param string                     $host             The server host
-     * @param DataDumperInterface|null   $wrappedDumper    A wrapped instance used whenever we failed contacting the server
+     * @param                            $host             The server host
+     * @param                            $wrappedDumper    A wrapped instance used whenever we failed contacting the server
      * @param ContextProviderInterface[] $contextProviders Context providers indexed by context name
      */
     public function __construct(string $host, ?DataDumperInterface $wrappedDumper = null, array $contextProviders = [])

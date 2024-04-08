@@ -36,8 +36,8 @@ class HeaderUtils
      *     HeaderUtils::split('da, en-gb;q=0.8', ',;')
      *     // => ['da'], ['en-gb', 'q=0.8']]
      *
-     * @param string $separators List of characters to split on, ordered by
-     *                           precedence, e.g. ',', ';=', or ',;='
+     * @param $separators List of characters to split on, ordered by
+     *                    precedence, e.g. ',', ';=', or ',;='
      *
      * @return array Nested array with as many levels as there are characters in
      *               $separators
@@ -152,11 +152,11 @@ class HeaderUtils
     /**
      * Generates an HTTP Content-Disposition field-value.
      *
-     * @param string $disposition      One of "inline" or "attachment"
-     * @param string $filename         A unicode string
-     * @param string $filenameFallback A string containing only ASCII characters that
-     *                                 is semantically equivalent to $filename. If the filename is already ASCII,
-     *                                 it can be omitted, or just copied from $filename
+     * @param $disposition      One of "inline" or "attachment"
+     * @param $filename         A unicode string
+     * @param $filenameFallback A string containing only ASCII characters that
+     *                          is semantically equivalent to $filename. If the filename is already ASCII,
+     *                          it can be omitted, or just copied from $filename
      *
      * @throws \InvalidArgumentException
      *

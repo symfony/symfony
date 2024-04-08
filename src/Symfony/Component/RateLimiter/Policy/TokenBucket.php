@@ -27,10 +27,10 @@ final class TokenBucket implements LimiterStateInterface
     private float $timer;
 
     /**
-     * @param string     $id            unique identifier for this bucket
-     * @param int        $initialTokens the initial number of tokens in the bucket (i.e. the max burst size)
-     * @param Rate       $rate          the fill rate and time of this bucket
-     * @param float|null $timer         the current timer of the bucket, defaulting to microtime(true)
+     * @param $id            unique identifier for this bucket
+     * @param $initialTokens the initial number of tokens in the bucket (i.e. the max burst size)
+     * @param $rate          the fill rate and time of this bucket
+     * @param $timer         the current timer of the bucket, defaulting to microtime(true)
      */
     public function __construct(string $id, int $initialTokens, Rate $rate, ?float $timer = null)
     {

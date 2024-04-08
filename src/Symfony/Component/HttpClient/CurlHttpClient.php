@@ -60,9 +60,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     private CurlClientState $multi;
 
     /**
-     * @param array $defaultOptions     Default request's options
-     * @param int   $maxHostConnections The maximum number of connections to a single host
-     * @param int   $maxPendingPushes   The maximum number of pushed responses to accept in the queue
+     * @param $defaultOptions     Default request's options
+     * @param $maxHostConnections The maximum number of connections to a single host
+     * @param $maxPendingPushes   The maximum number of pushed responses to accept in the queue
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */

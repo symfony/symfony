@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 final class GoogleChatTransportFactory extends AbstractTransportFactory
 {
     /**
-     * @param Dsn $dsn Format: googlechat://<key>:<token>@default/<space>?thread_key=<thread>
+     * @param $dsn Format: googlechat://<key>:<token>@default/<space>?thread_key=<thread>
      */
     public function create(Dsn $dsn): GoogleChatTransport
     {

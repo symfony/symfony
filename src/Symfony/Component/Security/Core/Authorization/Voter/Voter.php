@@ -67,7 +67,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
      * Return false if your voter doesn't support the given subject type. Symfony will cache
      * that decision and won't call your voter again for that subject type.
      *
-     * @param string $subjectType The type of the subject inferred by `get_class()` or `get_debug_type()`
+     * @param $subjectType The type of the subject inferred by `get_class()` or `get_debug_type()`
      */
     public function supportsType(string $subjectType): bool
     {
@@ -77,7 +77,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
     /**
      * Determines if the attribute and subject are supported by this voter.
      *
-     * @param mixed $subject The subject to secure, e.g. an object the user wants to access or any other PHP type
+     * @param $subject The subject to secure, e.g. an object the user wants to access or any other PHP type
      *
      * @psalm-assert-if-true TSubject $subject
      * @psalm-assert-if-true TAttribute $attribute

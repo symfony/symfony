@@ -80,7 +80,7 @@ trait RedisTrait
      *   - redis:///var/run/redis.sock
      *   - redis://secret@/var/run/redis.sock/13
      *
-     * @param array $options See self::$defaultConnectionOptions
+     * @param $options See self::$defaultConnectionOptions
      *
      * @throws InvalidArgumentException when the DSN is invalid
      */

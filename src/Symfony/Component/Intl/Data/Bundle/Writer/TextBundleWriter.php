@@ -39,7 +39,7 @@ class TextBundleWriter implements BundleWriterInterface
      * Writes a "resourceBundle" node.
      *
      * @param resource $file  The file handle to write to
-     * @param mixed    $value The value of the node
+     * @param          $value The value of the node
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
@@ -56,7 +56,7 @@ class TextBundleWriter implements BundleWriterInterface
      * Writes a "resource" node.
      *
      * @param resource $file  The file handle to write to
-     * @param mixed    $value The value of the node
+     * @param          $value The value of the node
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */

@@ -37,8 +37,8 @@ class Regex extends Constraint
 
     /**
      * @param string|array<string,mixed>|null $pattern     The regular expression to match
-     * @param string|null                     $htmlPattern The pattern to use in the HTML5 pattern attribute
-     * @param bool|null                       $match       Whether to validate the value matches the configured pattern or not (defaults to false)
+     * @param                                 $htmlPattern The pattern to use in the HTML5 pattern attribute
+     * @param                                 $match       Whether to validate the value matches the configured pattern or not (defaults to false)
      * @param string[]|null                   $groups
      * @param array<string,mixed>             $options
      */

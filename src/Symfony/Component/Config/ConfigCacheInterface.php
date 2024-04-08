@@ -36,7 +36,7 @@ interface ConfigCacheInterface
      * Writes the given content into the cache file. Metadata will be stored
      * independently and can be used to check cache freshness at a later time.
      *
-     * @param string                   $content  The content to write into the cache
+     * @param                          $content  The content to write into the cache
      * @param ResourceInterface[]|null $metadata An array of ResourceInterface instances
      *
      * @throws \RuntimeException When the cache file cannot be written

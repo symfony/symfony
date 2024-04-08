@@ -30,8 +30,8 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     private static array $existsCache = [];
 
     /**
-     * @param string    $resource The fully-qualified class name
-     * @param bool|null $exists   Boolean when the existence check has already been done
+     * @param $resource The fully-qualified class name
+     * @param $exists   Boolean when the existence check has already been done
      */
     public function __construct(
         private string $resource,

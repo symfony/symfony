@@ -85,9 +85,9 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     }
 
     /**
-     * @param bool|string $emoji true will use the same locale,
-     *                           false will disable emoji,
-     *                           and a string to use a specific locale
+     * @param $emoji true will use the same locale,
+     *               false will disable emoji,
+     *               and a string to use a specific locale
      */
     public function withEmoji(bool|string $emoji = true): static
     {

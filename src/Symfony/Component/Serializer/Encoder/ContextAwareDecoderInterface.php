@@ -19,7 +19,7 @@ namespace Symfony\Component\Serializer\Encoder;
 interface ContextAwareDecoderInterface extends DecoderInterface
 {
     /**
-     * @param array $context options that decoders have access to
+     * @param $context options that decoders have access to
      */
     public function supportsDecoding(string $format, array $context = []): bool;
 }

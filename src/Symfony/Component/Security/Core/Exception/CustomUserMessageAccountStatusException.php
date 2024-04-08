@@ -36,8 +36,8 @@ class CustomUserMessageAccountStatusException extends AccountStatusException
     /**
      * Sets a message that will be shown to the user.
      *
-     * @param string $messageKey  The message or message key
-     * @param array  $messageData Data to be passed into the translator
+     * @param $messageKey  The message or message key
+     * @param $messageData Data to be passed into the translator
      */
     public function setSafeMessage(string $messageKey, array $messageData = []): void
     {

@@ -123,8 +123,8 @@ class Filesystem
     /**
      * Sets access and modification time of file.
      *
-     * @param int|null $time  The touch time as a Unix timestamp, if not supplied the current system time is used
-     * @param int|null $atime The access time as a Unix timestamp, if not supplied the current system time is used
+     * @param $time  The touch time as a Unix timestamp, if not supplied the current system time is used
+     * @param $atime The access time as a Unix timestamp, if not supplied the current system time is used
      *
      * @throws IOException When touch fails
      */
@@ -202,9 +202,9 @@ class Filesystem
     /**
      * Change mode for an array of files or directories.
      *
-     * @param int  $mode      The new mode (octal)
-     * @param int  $umask     The mode mask (octal)
-     * @param bool $recursive Whether change the mod recursively or not
+     * @param $mode      The new mode (octal)
+     * @param $umask     The mode mask (octal)
+     * @param $recursive Whether change the mod recursively or not
      *
      * @throws IOException When the change fails
      */
@@ -223,8 +223,8 @@ class Filesystem
     /**
      * Change the owner of an array of files or directories.
      *
-     * @param string|int $user      A user name or number
-     * @param bool       $recursive Whether change the owner recursively or not
+     * @param $user      A user name or number
+     * @param $recursive Whether change the owner recursively or not
      *
      * @throws IOException When the change fails
      */
@@ -249,8 +249,8 @@ class Filesystem
     /**
      * Change the group of an array of files or directories.
      *
-     * @param string|int $group     A group name or number
-     * @param bool       $recursive Whether change the group recursively or not
+     * @param $group     A group name or number
+     * @param $recursive Whether change the group recursively or not
      *
      * @throws IOException When the change fails
      */
@@ -382,7 +382,7 @@ class Filesystem
     }
 
     /**
-     * @param string $linkType Name of the link type, typically 'symbolic' or 'hard'
+     * @param $linkType Name of the link type, typically 'symbolic' or 'hard'
      */
     private function linkException(string $origin, string $target, string $linkType): never
     {
@@ -502,12 +502,12 @@ class Filesystem
      *  - existing files in the target directory will be overwritten, except if they are newer (see the `override` option)
      *  - files in the target directory that do not exist in the source directory will not be deleted (see the `delete` option)
      *
-     * @param \Traversable|null $iterator Iterator that filters which files and directories to copy, if null a recursive iterator is created
-     * @param array             $options  An array of boolean options
-     *                                    Valid options are:
-     *                                    - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)
-     *                                    - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink(), defaults to false)
-     *                                    - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
+     * @param $iterator Iterator that filters which files and directories to copy, if null a recursive iterator is created
+     * @param $options  An array of boolean options
+     *                  Valid options are:
+     *                  - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)
+     *                  - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink(), defaults to false)
+     *                  - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @throws IOException When file type is unknown
      */
@@ -584,9 +584,9 @@ class Filesystem
     /**
      * Creates a temporary file with support for custom stream wrappers.
      *
-     * @param string $prefix The prefix of the generated temporary filename
-     *                       Note: Windows uses only the first three characters of prefix
-     * @param string $suffix The suffix of the generated temporary filename
+     * @param $prefix The prefix of the generated temporary filename
+     *                Note: Windows uses only the first three characters of prefix
+     * @param $suffix The suffix of the generated temporary filename
      *
      * @return string The new temporary filename (with path), or throw an exception on failure
      */
@@ -676,7 +676,7 @@ class Filesystem
      * Appends content to an existing file.
      *
      * @param string|resource $content The content to append
-     * @param bool            $lock    Whether the file should be locked when writing to it
+     * @param                 $lock    Whether the file should be locked when writing to it
      *
      * @throws IOException If the file is not writable
      */

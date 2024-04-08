@@ -26,11 +26,11 @@ use Symfony\Component\Process\Exception\RuntimeException;
 class PhpProcess extends Process
 {
     /**
-     * @param string      $script  The PHP script to run (as a string)
-     * @param string|null $cwd     The working directory or null to use the working dir of the current PHP process
-     * @param array|null  $env     The environment variables or null to use the same environment as the current PHP process
-     * @param int         $timeout The timeout in seconds
-     * @param array|null  $php     Path to the PHP binary to use with any additional arguments
+     * @param $script  The PHP script to run (as a string)
+     * @param $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param $env     The environment variables or null to use the same environment as the current PHP process
+     * @param $timeout The timeout in seconds
+     * @param $php     Path to the PHP binary to use with any additional arguments
      */
     public function __construct(string $script, ?string $cwd = null, ?array $env = null, int $timeout = 60, ?array $php = null)
     {

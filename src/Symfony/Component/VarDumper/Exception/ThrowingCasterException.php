@@ -17,7 +17,7 @@ namespace Symfony\Component\VarDumper\Exception;
 class ThrowingCasterException extends \Exception
 {
     /**
-     * @param \Throwable $prev The exception thrown from the caster
+     * @param $prev The exception thrown from the caster
      */
     public function __construct(\Throwable $prev)
     {

@@ -24,11 +24,10 @@ interface BatchHandlerInterface
      *               the result from handling the message otherwise
      */
     // public function __invoke(object $message, ?Acknowledger $ack = null): mixed;
-
     /**
      * Flushes any pending buffers.
      *
-     * @param bool $force Whether flushing is required; it can be skipped if not
+     * @param $force Whether flushing is required; it can be skipped if not
      */
     public function flush(bool $force): void;
 }

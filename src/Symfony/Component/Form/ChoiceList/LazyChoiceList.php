@@ -41,8 +41,8 @@ class LazyChoiceList implements ChoiceListInterface
      * The callable receives the choice as first and the array key as the second
      * argument.
      *
-     * @param callable|null $value The callable creating string values for each choice.
-     *                             If null, choices are cast to strings.
+     * @param $value The callable creating string values for each choice.
+     *               If null, choices are cast to strings.
      */
     public function __construct(
         private ChoiceLoaderInterface $loader,

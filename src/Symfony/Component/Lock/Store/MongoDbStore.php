@@ -62,8 +62,8 @@ class MongoDbStore implements PersistingStoreInterface
 
     /**
      * @param Collection|Client|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
-     * @param array                            $options    See below
-     * @param float                            $initialTtl The expiration delay of locks in seconds
+     * @param                                  $options    See below
+     * @param                                  $initialTtl The expiration delay of locks in seconds
      *
      * @throws InvalidArgumentException If required options are not provided
      * @throws InvalidTtlException      When the initial ttl is not valid
@@ -295,7 +295,7 @@ class MongoDbStore implements PersistingStoreInterface
     /**
      * Update or Insert a Key.
      *
-     * @param float $ttl Expiry in seconds from now
+     * @param $ttl Expiry in seconds from now
      */
     private function upsert(Key $key, float $ttl): void
     {
@@ -351,7 +351,7 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * @param float $seconds Seconds since 1970-01-01T00:00:00.000Z supporting millisecond precision. Defaults to now.
+     * @param $seconds Seconds since 1970-01-01T00:00:00.000Z supporting millisecond precision. Defaults to now.
      */
     private function createMongoDateTime(float $seconds): UTCDateTime
     {
@@ -361,7 +361,7 @@ class MongoDbStore implements PersistingStoreInterface
     /**
      * Retrieves a unique token for the given key namespaced to this store.
      *
-     * @param Key $key lock state container
+     * @param $key lock state container
      */
     private function getUniqueToken(Key $key): string
     {

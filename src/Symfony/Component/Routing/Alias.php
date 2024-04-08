@@ -45,9 +45,9 @@ class Alias
     /**
      * Whether this alias is deprecated, that means it should not be referenced anymore.
      *
-     * @param string $package The name of the composer package that is triggering the deprecation
-     * @param string $version The version of the package that introduced the deprecation
-     * @param string $message The deprecation message to use
+     * @param $package The name of the composer package that is triggering the deprecation
+     * @param $version The version of the package that introduced the deprecation
+     * @param $message The deprecation message to use
      *
      * @return $this
      *
@@ -80,7 +80,7 @@ class Alias
     }
 
     /**
-     * @param string $name Route name relying on this alias
+     * @param $name Route name relying on this alias
      */
     public function getDeprecation(string $name): array
     {

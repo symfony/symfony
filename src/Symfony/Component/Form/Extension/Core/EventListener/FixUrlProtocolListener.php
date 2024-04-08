@@ -23,7 +23,7 @@ use Symfony\Component\Form\FormEvents;
 class FixUrlProtocolListener implements EventSubscriberInterface
 {
     /**
-     * @param string|null $defaultProtocol The URL scheme to add when there is none or null to not modify the data
+     * @param $defaultProtocol The URL scheme to add when there is none or null to not modify the data
      */
     public function __construct(
         private ?string $defaultProtocol = 'http',

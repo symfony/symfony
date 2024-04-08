@@ -33,7 +33,7 @@ class CssSelectorConverter
     private static array $htmlCache = [];
 
     /**
-     * @param bool $html Whether HTML support should be enabled. Disable it for XML documents
+     * @param $html Whether HTML support should be enabled. Disable it for XML documents
      */
     public function __construct(bool $html = true)
     {

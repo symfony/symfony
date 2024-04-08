@@ -52,8 +52,8 @@ class Entry
     /**
      * Returns whether an attribute exists.
      *
-     * @param string $name          The name of the attribute
-     * @param bool   $caseSensitive Whether the check should be case-sensitive
+     * @param $name          The name of the attribute
+     * @param $caseSensitive Whether the check should be case-sensitive
      */
     public function hasAttribute(string $name, bool $caseSensitive = true): bool
     {
@@ -72,8 +72,8 @@ class Entry
      * As LDAP can return multiple values for a single attribute,
      * this value is returned as an array.
      *
-     * @param string $name          The name of the attribute
-     * @param bool   $caseSensitive Whether the attribute name is case-sensitive
+     * @param $name          The name of the attribute
+     * @param $caseSensitive Whether the attribute name is case-sensitive
      */
     public function getAttribute(string $name, bool $caseSensitive = true): ?array
     {

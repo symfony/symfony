@@ -47,7 +47,7 @@ class PathFilterIterator extends MultiplePcreFilterIterator
      *
      * Use only / as directory separator (on Windows also).
      *
-     * @param string $str Pattern: regexp or dirname
+     * @param $str Pattern: regexp or dirname
      */
     protected function toRegex(string $str): string
     {

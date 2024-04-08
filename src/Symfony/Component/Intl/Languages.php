@@ -116,7 +116,7 @@ final class Languages extends ResourceBundle
     }
 
     /**
-     * @param string $language ISO 639-2 three-letter language code
+     * @param $language ISO 639-2 three-letter language code
      */
     public static function alpha3CodeExists(string $language): bool
     {

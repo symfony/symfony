@@ -23,7 +23,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
 class ContainerCommandLoader implements CommandLoaderInterface
 {
     /**
-     * @param array $commandMap An array with command names as keys and service ids as values
+     * @param $commandMap An array with command names as keys and service ids as values
      */
     public function __construct(
         private ContainerInterface $container,

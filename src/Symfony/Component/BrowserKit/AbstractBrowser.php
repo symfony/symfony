@@ -52,7 +52,7 @@ abstract class AbstractBrowser
     private bool $isMainRequest = true;
 
     /**
-     * @param array $server The server parameters (equivalent of $_SERVER)
+     * @param $server The server parameters (equivalent of $_SERVER)
      */
     public function __construct(array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
@@ -252,7 +252,7 @@ abstract class AbstractBrowser
     /**
      * Clicks on a given link.
      *
-     * @param array $serverParameters An array of server parameters
+     * @param $serverParameters An array of server parameters
      */
     public function click(Link $link, array $serverParameters = []): Crawler
     {
@@ -266,8 +266,8 @@ abstract class AbstractBrowser
     /**
      * Clicks the first link (or clickable image) that contains the given text.
      *
-     * @param string $linkText         The text of the link or the alt attribute of the clickable image
-     * @param array  $serverParameters An array of server parameters
+     * @param $linkText         The text of the link or the alt attribute of the clickable image
+     * @param $serverParameters An array of server parameters
      */
     public function clickLink(string $linkText, array $serverParameters = []): Crawler
     {
@@ -279,8 +279,8 @@ abstract class AbstractBrowser
     /**
      * Submits a form.
      *
-     * @param array $values           An array of form field values
-     * @param array $serverParameters An array of server parameters
+     * @param $values           An array of form field values
+     * @param $serverParameters An array of server parameters
      */
     public function submit(Form $form, array $values = [], array $serverParameters = []): Crawler
     {
@@ -293,10 +293,10 @@ abstract class AbstractBrowser
      * Finds the first form that contains a button with the given content and
      * uses it to submit the given form field values.
      *
-     * @param string $button           The text content, id, value or name of the form <button> or <input type="submit">
-     * @param array  $fieldValues      Use this syntax: ['my_form[name]' => '...', 'my_form[email]' => '...']
-     * @param string $method           The HTTP method used to submit the form
-     * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include an HTTP_ prefix as PHP does)
+     * @param $button           The text content, id, value or name of the form <button> or <input type="submit">
+     * @param $fieldValues      Use this syntax: ['my_form[name]' => '...', 'my_form[email]' => '...']
+     * @param $method           The HTTP method used to submit the form
+     * @param $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include an HTTP_ prefix as PHP does)
      */
     public function submitForm(string $button, array $fieldValues = [], string $method = 'POST', array $serverParameters = []): Crawler
     {
@@ -315,13 +315,13 @@ abstract class AbstractBrowser
     /**
      * Calls a URI.
      *
-     * @param string $method        The request method
-     * @param string $uri           The URI to fetch
-     * @param array  $parameters    The Request parameters
-     * @param array  $files         The files
-     * @param array  $server        The server parameters (HTTP headers are referenced with an HTTP_ prefix as PHP does)
+     * @param        $method        The request method
+     * @param        $uri           The URI to fetch
+     * @param        $parameters    The Request parameters
+     * @param        $files         The files
+     * @param        $server        The server parameters (HTTP headers are referenced with an HTTP_ prefix as PHP does)
      * @param string $content       The raw body data
-     * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param        $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      */
     public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], ?string $content = null, bool $changeHistory = true): Crawler
     {
@@ -444,7 +444,7 @@ abstract class AbstractBrowser
     /**
      * Returns the script to execute when the request must be insulated.
      *
-     * @param object $request An origin request instance
+     * @param $request An origin request instance
      *
      * @return string
      *
@@ -644,7 +644,7 @@ abstract class AbstractBrowser
     /**
      * Makes a request from a Request object directly.
      *
-     * @param bool $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      */
     protected function requestFromRequest(Request $request, bool $changeHistory = true): Crawler
     {

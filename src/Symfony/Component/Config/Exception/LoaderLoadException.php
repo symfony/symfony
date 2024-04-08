@@ -19,11 +19,11 @@ namespace Symfony\Component\Config\Exception;
 class LoaderLoadException extends \Exception
 {
     /**
-     * @param mixed           $resource       The resource that could not be imported
-     * @param string|null     $sourceResource The original resource importing the new resource
-     * @param int             $code           The error code
-     * @param \Throwable|null $previous       A previous exception
-     * @param string|null     $type           The type of resource
+     * @param $resource       The resource that could not be imported
+     * @param $sourceResource The original resource importing the new resource
+     * @param $code           The error code
+     * @param $previous       A previous exception
+     * @param $type           The type of resource
      */
     public function __construct(mixed $resource, ?string $sourceResource = null, int $code = 0, ?\Throwable $previous = null, ?string $type = null)
     {

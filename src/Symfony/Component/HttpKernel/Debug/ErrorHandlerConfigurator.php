@@ -27,10 +27,10 @@ class ErrorHandlerConfigurator
     private ?int $throwAt;
 
     /**
-     * @param array|int|null $levels  An array map of E_* to LogLevel::* or an integer bit field of E_* constants
-     * @param int|null       $throwAt Thrown errors in a bit field of E_* constants, or null to keep the current value
-     * @param bool           $scream  Enables/disables screaming mode, where even silenced errors are logged
-     * @param bool           $scope   Enables/disables scoping mode
+     * @param $levels  An array map of E_* to LogLevel::* or an integer bit field of E_* constants
+     * @param $throwAt Thrown errors in a bit field of E_* constants, or null to keep the current value
+     * @param $scream  Enables/disables screaming mode, where even silenced errors are logged
+     * @param $scope   Enables/disables scoping mode
      */
     public function __construct(
         private ?LoggerInterface $logger = null,

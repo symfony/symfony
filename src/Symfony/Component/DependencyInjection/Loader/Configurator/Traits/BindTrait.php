@@ -24,8 +24,8 @@ trait BindTrait
      * injected in the matching parameters (of the constructor, of methods
      * called and of controller actions).
      *
-     * @param string $nameOrFqcn A parameter name with its "$" prefix, or an FQCN
-     * @param mixed  $valueOrRef The value or reference to bind
+     * @param $nameOrFqcn A parameter name with its "$" prefix, or an FQCN
+     * @param $valueOrRef The value or reference to bind
      *
      * @return $this
      */

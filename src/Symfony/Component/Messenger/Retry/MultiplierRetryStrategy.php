@@ -33,11 +33,11 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 class MultiplierRetryStrategy implements RetryStrategyInterface
 {
     /**
-     * @param int   $maxRetries           The maximum number of times to retry
-     * @param int   $delayMilliseconds    Amount of time to delay (or the initial value when multiplier is used)
-     * @param float $multiplier           Multiplier to apply to the delay each time a retry occurs
-     * @param int   $maxDelayMilliseconds Maximum delay to allow (0 means no maximum)
-     * @param float $jitter               Randomness to apply to the delay (between 0 and 1)
+     * @param $maxRetries           The maximum number of times to retry
+     * @param $delayMilliseconds    Amount of time to delay (or the initial value when multiplier is used)
+     * @param $multiplier           Multiplier to apply to the delay each time a retry occurs
+     * @param $maxDelayMilliseconds Maximum delay to allow (0 means no maximum)
+     * @param $jitter               Randomness to apply to the delay (between 0 and 1)
      */
     public function __construct(
         private int $maxRetries = 3,
@@ -64,7 +64,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
     }
 
     /**
-     * @param \Throwable|null $throwable The cause of the failed handling
+     * @param $throwable The cause of the failed handling
      */
     public function isRetryable(Envelope $message, ?\Throwable $throwable = null): bool
     {
@@ -74,7 +74,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
     }
 
     /**
-     * @param \Throwable|null $throwable The cause of the failed handling
+     * @param $throwable The cause of the failed handling
      */
     public function getWaitingTime(Envelope $message, ?\Throwable $throwable = null): int
     {

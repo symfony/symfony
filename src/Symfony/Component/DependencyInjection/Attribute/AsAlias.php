@@ -20,8 +20,8 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 final class AsAlias
 {
     /**
-     * @param string|null $id     The id of the alias
-     * @param bool        $public Whether to declare the alias public
+     * @param $id     The id of the alias
+     * @param $public Whether to declare the alias public
      */
     public function __construct(
         public ?string $id = null,

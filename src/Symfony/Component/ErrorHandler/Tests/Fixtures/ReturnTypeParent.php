@@ -43,7 +43,7 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
     }
 
     /**
-     *  @return resource|null
+     * @return resource|null
      */
     public function oneCommonNonObjectReturnedTypeWithNull()
     {

@@ -46,7 +46,7 @@ final class FakeChatLoggerTransport extends AbstractTransport
     }
 
     /**
-     * @param MessageInterface|ChatMessage $message
+     * @param $message
      */
     protected function doSend(MessageInterface $message): SentMessage
     {

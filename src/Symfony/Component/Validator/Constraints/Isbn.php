@@ -50,7 +50,7 @@ class Isbn extends Constraint
 
     /**
      * @param self::ISBN_*|array<string,mixed>|null $type    The type of ISBN to validate (i.e. {@see Isbn::ISBN_10}, {@see Isbn::ISBN_13} or null to accept both, defaults to null)
-     * @param string|null                           $message If defined, this message has priority over the others
+     * @param                                       $message If defined, this message has priority over the others
      * @param string[]|null                         $groups
      * @param array<string,mixed>                   $options
      */

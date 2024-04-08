@@ -18,9 +18,9 @@ namespace Symfony\Bridge\Twig\Attribute;
 class Template
 {
     /**
-     * @param string        $template The name of the template to render
+     * @param               $template The name of the template to render
      * @param string[]|null $vars     The controller method arguments to pass to the template
-     * @param bool          $stream   Enables streaming the template
+     * @param               $stream   Enables streaming the template
      */
     public function __construct(
         public string $template,

@@ -25,7 +25,7 @@ class ContainerParametersResource implements ResourceInterface
     private array $parameters;
 
     /**
-     * @param array $parameters The container parameters to track
+     * @param $parameters The container parameters to track
      */
     public function __construct(array $parameters)
     {

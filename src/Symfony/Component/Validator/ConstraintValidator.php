@@ -68,7 +68,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * won't know what an "object", "array" or "resource" is and will be
      * confused by the violation message.
      *
-     * @param int $format A bitwise combination of the format constants in this class
+     * @param $format A bitwise combination of the format constants in this class
      */
     protected function formatValue(mixed $value, int $format = 0): string
     {
@@ -130,9 +130,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Each of the values is converted to a string using
      * {@link formatValue()}. The values are then concatenated with commas.
      *
-     * @param array $values A list of values
-     * @param int   $format A bitwise combination of the format
-     *                      constants in this class
+     * @param $values A list of values
+     * @param $format A bitwise combination of the format
+     *                constants in this class
      *
      * @see formatValue()
      */

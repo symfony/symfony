@@ -46,7 +46,7 @@ class SymfonyTestsListenerTrait
     private $checkNumAssertions = false;
 
     /**
-     * @param array $mockedNamespaces List of namespaces, indexed by mocked features (time-sensitive or dns-sensitive)
+     * @param $mockedNamespaces List of namespaces, indexed by mocked features (time-sensitive or dns-sensitive)
      */
     public function __construct(array $mockedNamespaces = [])
     {

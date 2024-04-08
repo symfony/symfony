@@ -39,10 +39,10 @@ class Dumper
     /**
      * Dumps a PHP value to YAML.
      *
-     * @param mixed $input  The PHP value
-     * @param int   $inline The level where you switch to inline YAML
-     * @param int   $indent The level of indentation (used internally)
-     * @param int   $flags  A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
+     * @param $input  The PHP value
+     * @param $inline The level where you switch to inline YAML
+     * @param $indent The level of indentation (used internally)
+     * @param $flags  A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      */
     public function dump(mixed $input, int $inline = 0, int $indent = 0, int $flags = 0): string
     {

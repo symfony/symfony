@@ -25,7 +25,7 @@ class FileResource implements SelfCheckingResourceInterface
     private string $resource;
 
     /**
-     * @param string $resource The file path to the resource
+     * @param $resource The file path to the resource
      *
      * @throws \InvalidArgumentException
      */

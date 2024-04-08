@@ -365,8 +365,8 @@ EOF;
     /**
      * Compiles a regexp tree of subpatterns that matches nested same-prefix routes.
      *
-     * @param \stdClass $state A simple state object that keeps track of the progress of the compilation,
-     *                         and gathers the generated switch's "case" and "default" statements
+     * @param $state A simple state object that keeps track of the progress of the compilation,
+     *               and gathers the generated switch's "case" and "default" statements
      */
     private function compileStaticPrefixCollection(StaticPrefixCollection $tree, \stdClass $state, int $prefixLen, array &$conditions): string
     {

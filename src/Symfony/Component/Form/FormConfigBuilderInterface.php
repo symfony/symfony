@@ -22,9 +22,9 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Adds an event listener to an event on this form.
      *
-     * @param int $priority The priority of the listener. Listeners
-     *                      with a higher priority are called before
-     *                      listeners with a lower priority.
+     * @param $priority The priority of the listener. Listeners
+     *                  with a higher priority are called before
+     *                  listeners with a lower priority.
      *
      * @return $this
      */
@@ -45,7 +45,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * The reverseTransform method of the transformer is used to convert from the
      * view to the normalized format.
      *
-     * @param bool $forcePrepend If set to true, prepend instead of appending
+     * @param $forcePrepend If set to true, prepend instead of appending
      *
      * @return $this
      */
@@ -66,7 +66,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * The reverseTransform method of the transformer is used to convert from the
      * normalized to the model format.
      *
-     * @param bool $forceAppend If set to true, append instead of prepending
+     * @param $forceAppend If set to true, append instead of prepending
      *
      * @return $this
      */
@@ -82,7 +82,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the value for an attribute.
      *
-     * @param mixed $value The value of the attribute
+     * @param $value The value of the attribute
      *
      * @return $this
      */
@@ -112,7 +112,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the data used for the client data when no value is submitted.
      *
-     * @param mixed $emptyData The empty data
+     * @param $emptyData The empty data
      *
      * @return $this
      */
@@ -135,8 +135,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the property path that the form should be mapped to.
      *
-     * @param string|PropertyPathInterface|null $propertyPath The property path or null if the path should be set
-     *                                                        automatically based on the form's name
+     * @param $propertyPath The property path or null if the path should be set
+     *                      automatically based on the form's name
      *
      * @return $this
      */
@@ -183,7 +183,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the initial data of the form.
      *
-     * @param mixed $data The data of the form in model format
+     * @param $data The data of the form in model format
      *
      * @return $this
      */
@@ -236,10 +236,10 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * Should be set to true only for root forms.
      *
-     * @param bool $initialize True to initialize the form automatically,
-     *                         false to suppress automatic initialization.
-     *                         In the second case, you need to call
-     *                         {@link FormInterface::initialize()} manually.
+     * @param $initialize True to initialize the form automatically,
+     *                    false to suppress automatic initialization.
+     *                    In the second case, you need to call
+     *                    {@link FormInterface::initialize()} manually.
      *
      * @return $this
      */

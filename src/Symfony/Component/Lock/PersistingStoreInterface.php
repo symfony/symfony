@@ -43,7 +43,7 @@ interface PersistingStoreInterface
     /**
      * Extends the TTL of a resource.
      *
-     * @param float $ttl amount of seconds to keep the lock in the store
+     * @param $ttl amount of seconds to keep the lock in the store
      *
      * @throws LockConflictedException
      */

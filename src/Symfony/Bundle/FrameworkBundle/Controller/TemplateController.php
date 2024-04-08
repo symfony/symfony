@@ -31,12 +31,12 @@ class TemplateController
     /**
      * Renders a template.
      *
-     * @param string    $template   The template name
-     * @param int|null  $maxAge     Max age for client caching
-     * @param int|null  $sharedAge  Max age for shared (proxy) caching
-     * @param bool|null $private    Whether or not caching should apply for client caches only
-     * @param array     $context    The context (arguments) of the template
-     * @param int       $statusCode The HTTP status code to return with the response (200 "OK" by default)
+     * @param $template   The template name
+     * @param $maxAge     Max age for client caching
+     * @param $sharedAge  Max age for shared (proxy) caching
+     * @param $private    Whether or not caching should apply for client caches only
+     * @param $context    The context (arguments) of the template
+     * @param $statusCode The HTTP status code to return with the response (200 "OK" by default)
      */
     public function templateAction(string $template, ?int $maxAge = null, ?int $sharedAge = null, ?bool $private = null, array $context = [], int $statusCode = 200): Response
     {
@@ -64,7 +64,7 @@ class TemplateController
     }
 
     /**
-     * @param int $statusCode The HTTP status code (200 "OK" by default)
+     * @param $statusCode The HTTP status code (200 "OK" by default)
      */
     public function __invoke(string $template, ?int $maxAge = null, ?int $sharedAge = null, ?bool $private = null, array $context = [], int $statusCode = 200): Response
     {

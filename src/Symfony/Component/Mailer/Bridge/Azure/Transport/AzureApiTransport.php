@@ -29,10 +29,10 @@ final class AzureApiTransport extends AbstractApiTransport
     private const HOST = '%s.communication.azure.com';
 
     /**
-     * @param string $key             User Access Key from Azure Communication Service (Primary or Secondary key)
-     * @param string $resourceName    The endpoint API URL to which to POST emails to Azure https://{acsResourceName}.communication.azure.com/
-     * @param bool   $disableTracking Indicates whether user engagement tracking should be disabled
-     * @param string $apiVersion      The version of API to invoke
+     * @param $key             User Access Key from Azure Communication Service (Primary or Secondary key)
+     * @param $resourceName    The endpoint API URL to which to POST emails to Azure https://{acsResourceName}.communication.azure.com/
+     * @param $disableTracking Indicates whether user engagement tracking should be disabled
+     * @param $apiVersion      The version of API to invoke
      */
     public function __construct(
         #[\SensitiveParameter] private string $key,

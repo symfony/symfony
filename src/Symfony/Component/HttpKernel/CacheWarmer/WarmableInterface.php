@@ -21,8 +21,8 @@ interface WarmableInterface
     /**
      * Warms up the cache.
      *
-     * @param string      $cacheDir Where warm-up artifacts should be stored
-     * @param string|null $buildDir Where read-only artifacts should go; null when called after compile-time
+     * @param $cacheDir Where warm-up artifacts should be stored
+     * @param $buildDir Where read-only artifacts should go; null when called after compile-time
      *
      * @return string[] A list of classes or files to preload
      */

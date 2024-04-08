@@ -19,7 +19,7 @@ final class LogoutRouteLoader
 {
     /**
      * @param array<string, string> $logoutUris    Logout URIs indexed by the corresponding firewall name
-     * @param string                $parameterName Name of the container parameter containing {@see $logoutUris} value
+     * @param                       $parameterName Name of the container parameter containing {@see $logoutUris} value
      */
     public function __construct(
         private readonly array $logoutUris,

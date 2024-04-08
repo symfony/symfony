@@ -46,7 +46,7 @@ final class FakeSmsLoggerTransport extends AbstractTransport
     }
 
     /**
-     * @param MessageInterface|SmsMessage $message
+     * @param $message
      */
     protected function doSend(MessageInterface $message): SentMessage
     {

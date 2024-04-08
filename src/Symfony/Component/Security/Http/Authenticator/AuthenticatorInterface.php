@@ -59,7 +59,7 @@ interface AuthenticatorInterface
      *
      * @see AbstractAuthenticator
      *
-     * @param Passport $passport The passport returned from authenticate()
+     * @param $passport The passport returned from authenticate()
      */
     public function createToken(Passport $passport, string $firewallName): TokenInterface;
 

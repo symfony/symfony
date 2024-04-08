@@ -60,8 +60,8 @@ final class MailerHandler extends AbstractProcessingHandler
     /**
      * Send a mail with the given content.
      *
-     * @param string $content formatted email body to be sent
-     * @param array  $records the array of log records that formed this content
+     * @param $content formatted email body to be sent
+     * @param $records the array of log records that formed this content
      */
     protected function send(string $content, array $records): void
     {
@@ -71,7 +71,7 @@ final class MailerHandler extends AbstractProcessingHandler
     /**
      * Gets the formatter for the Message subject.
      *
-     * @param string $format The format of the subject
+     * @param $format The format of the subject
      */
     protected function getSubjectFormatter(string $format): FormatterInterface
     {
@@ -81,8 +81,8 @@ final class MailerHandler extends AbstractProcessingHandler
     /**
      * Creates instance of Message to be sent.
      *
-     * @param string $content formatted email body to be sent
-     * @param array  $records Log records that formed the content
+     * @param $content formatted email body to be sent
+     * @param $records Log records that formed the content
      */
     protected function buildMessage(string $content, array $records): Email
     {

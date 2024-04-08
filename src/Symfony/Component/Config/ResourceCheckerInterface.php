@@ -35,7 +35,7 @@ interface ResourceCheckerInterface
     /**
      * Validates the resource.
      *
-     * @param int $timestamp The timestamp at which the cache associated with this resource was created
+     * @param $timestamp The timestamp at which the cache associated with this resource was created
      */
     public function isFresh(ResourceInterface $resource, int $timestamp): bool;
 }

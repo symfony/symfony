@@ -80,7 +80,7 @@ class Definition
     /**
      * Sets the tracked changes for the Definition object.
      *
-     * @param array $changes An array of changes for this Definition
+     * @param $changes An array of changes for this Definition
      *
      * @return $this
      */
@@ -94,7 +94,7 @@ class Definition
     /**
      * Sets a factory.
      *
-     * @param string|array|Reference|null $factory A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param $factory A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
@@ -126,8 +126,8 @@ class Definition
     /**
      * Sets the service that this service is decorating.
      *
-     * @param string|null $id        The decorated service id, use null to remove decoration
-     * @param string|null $renamedId The new decorated service id
+     * @param $id        The decorated service id, use null to remove decoration
+     * @param $renamedId The new decorated service id
      *
      * @return $this
      *
@@ -318,9 +318,9 @@ class Definition
     /**
      * Adds a method to call after service initialization.
      *
-     * @param string $method       The method name to call
-     * @param array  $arguments    An array of arguments to pass to the method call
-     * @param bool   $returnsClone Whether the call returns the service instance or not
+     * @param $method       The method name to call
+     * @param $arguments    An array of arguments to pass to the method call
+     * @param $returnsClone Whether the call returns the service instance or not
      *
      * @return $this
      *
@@ -637,9 +637,9 @@ class Definition
      * Whether this definition is deprecated, that means it should not be called
      * anymore.
      *
-     * @param string $package The name of the composer package that is triggering the deprecation
-     * @param string $version The version of the package that introduced the deprecation
-     * @param string $message The deprecation message to use
+     * @param $package The name of the composer package that is triggering the deprecation
+     * @param $version The version of the package that introduced the deprecation
+     * @param $message The deprecation message to use
      *
      * @return $this
      *
@@ -673,7 +673,7 @@ class Definition
     }
 
     /**
-     * @param string $id Service id relying on this definition
+     * @param $id Service id relying on this definition
      */
     public function getDeprecation(string $id): array
     {
@@ -687,7 +687,7 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param string|array|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */

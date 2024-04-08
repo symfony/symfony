@@ -29,7 +29,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @see \DateInterval::format() for supported formats
      *
-     * @param string $format The date format
+     * @param $format The date format
      */
     public function __construct(
         private string $format = 'P%yY%mM%dDT%hH%iM%sS',

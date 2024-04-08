@@ -26,7 +26,7 @@ abstract class FileLoader extends AbstractLoader
     /**
      * Creates a new loader.
      *
-     * @param string $file The mapping file to load
+     * @param $file The mapping file to load
      *
      * @throws MappingException If the file does not exist or is not readable
      */

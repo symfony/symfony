@@ -29,7 +29,7 @@ class PathPackage extends Package
     private string $basePath;
 
     /**
-     * @param string $basePath The base path to be prepended to relative paths
+     * @param $basePath The base path to be prepended to relative paths
      */
     public function __construct(string $basePath, VersionStrategyInterface $versionStrategy, ?ContextInterface $context = null)
     {

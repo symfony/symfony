@@ -24,9 +24,9 @@ interface FragmentUriGeneratorInterface
     /**
      * Generates a fragment URI for a given controller.
      *
-     * @param bool $absolute Whether to generate an absolute URL or not
-     * @param bool $strict   Whether to allow non-scalar attributes or not
-     * @param bool $sign     Whether to sign the URL or not
+     * @param $absolute Whether to generate an absolute URL or not
+     * @param $strict   Whether to allow non-scalar attributes or not
+     * @param $sign     Whether to sign the URL or not
      */
     public function generate(ControllerReference $controller, ?Request $request = null, bool $absolute = false, bool $strict = true, bool $sign = true): string;
 }

@@ -37,7 +37,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     private static \Closure $createCacheItem;
 
     /**
-     * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
+     * @param $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
      */
     public function __construct(
         private int $defaultLifetime = 0,

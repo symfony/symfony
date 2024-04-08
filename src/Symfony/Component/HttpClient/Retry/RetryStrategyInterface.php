@@ -23,7 +23,7 @@ interface RetryStrategyInterface
     /**
      * Returns whether the request should be retried.
      *
-     * @param ?string $responseContent Null is passed when the body did not arrive yet
+     * @param $responseContent Null is passed when the body did not arrive yet
      *
      * @return bool|null Returns null to signal that the body is required to take a decision
      */

@@ -34,8 +34,8 @@ class MetadataBag implements SessionBagInterface
     private int $updateThreshold;
 
     /**
-     * @param string $storageKey      The key used to store bag in the session
-     * @param int    $updateThreshold The time to wait between two UPDATED updates
+     * @param $storageKey      The key used to store bag in the session
+     * @param $updateThreshold The time to wait between two UPDATED updates
      */
     public function __construct(string $storageKey = '_sf2_meta', int $updateThreshold = 0)
     {
@@ -70,10 +70,10 @@ class MetadataBag implements SessionBagInterface
     /**
      * Stamps a new session's metadata.
      *
-     * @param int|null $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                           will leave the system settings unchanged, 0 sets the cookie
-     *                           to expire with browser session. Time is in seconds, and is
-     *                           not a Unix timestamp.
+     * @param $lifetime Sets the cookie lifetime for the session cookie. A null value
+     *                  will leave the system settings unchanged, 0 sets the cookie
+     *                  to expire with browser session. Time is in seconds, and is
+     *                  not a Unix timestamp.
      */
     public function stampNew(?int $lifetime = null): void
     {

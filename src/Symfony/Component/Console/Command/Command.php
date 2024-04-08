@@ -73,7 +73,7 @@ class Command
     }
 
     /**
-     * @param string|null $name The name of the command; passing null means it must be set in configure()
+     * @param $name The name of the command; passing null means it must be set in configure()
      *
      * @throws LogicException When the command name is empty
      */
@@ -301,7 +301,7 @@ class Command
      * If this method is used, it overrides the code defined
      * in the execute() method.
      *
-     * @param callable $code A callable(InputInterface $input, OutputInterface $output)
+     * @param $code A callable(InputInterface $input, OutputInterface $output)
      *
      * @return $this
      *
@@ -337,7 +337,7 @@ class Command
      *
      * This method is not part of public API and should not be used directly.
      *
-     * @param bool $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
+     * @param $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      *
      * @internal
      */
@@ -482,7 +482,7 @@ class Command
     }
 
     /**
-     * @param bool $hidden Whether or not the command should be hidden from the list of commands
+     * @param $hidden Whether or not the command should be hidden from the list of commands
      *
      * @return $this
      */
@@ -596,7 +596,7 @@ class Command
     /**
      * Returns the synopsis for the command.
      *
-     * @param bool $short Whether to show the short version of the synopsis (with options folded) or not
+     * @param $short Whether to show the short version of the synopsis (with options folded) or not
      */
     public function getSynopsis(bool $short = false): string
     {

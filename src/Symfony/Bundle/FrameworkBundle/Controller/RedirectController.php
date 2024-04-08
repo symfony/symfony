@@ -43,10 +43,10 @@ class RedirectController
      * In case the route name is empty, the status code will be 404 when permanent is false
      * and 410 otherwise.
      *
-     * @param string     $route             The route name to redirect to
-     * @param bool       $permanent         Whether the redirection is permanent
-     * @param bool|array $ignoreAttributes  Whether to ignore attributes or an array of attributes to ignore
-     * @param bool       $keepRequestMethod Whether redirect action should keep HTTP request method
+     * @param $route             The route name to redirect to
+     * @param $permanent         Whether the redirection is permanent
+     * @param $ignoreAttributes  Whether to ignore attributes or an array of attributes to ignore
+     * @param $keepRequestMethod Whether redirect action should keep HTTP request method
      *
      * @throws HttpException In case the route name is empty
      */
@@ -94,12 +94,12 @@ class RedirectController
      * In case the path is empty, the status code will be 404 when permanent is false
      * and 410 otherwise.
      *
-     * @param string      $path              The absolute path or URL to redirect to
-     * @param bool        $permanent         Whether the redirect is permanent or not
-     * @param string|null $scheme            The URL scheme (null to keep the current one)
-     * @param int|null    $httpPort          The HTTP port (null to keep the current one for the same scheme or the default configured port)
-     * @param int|null    $httpsPort         The HTTPS port (null to keep the current one for the same scheme or the default configured port)
-     * @param bool        $keepRequestMethod Whether redirect action should keep HTTP request method
+     * @param $path              The absolute path or URL to redirect to
+     * @param $permanent         Whether the redirect is permanent or not
+     * @param $scheme            The URL scheme (null to keep the current one)
+     * @param $httpPort          The HTTP port (null to keep the current one for the same scheme or the default configured port)
+     * @param $httpsPort         The HTTPS port (null to keep the current one for the same scheme or the default configured port)
+     * @param $keepRequestMethod Whether redirect action should keep HTTP request method
      *
      * @throws HttpException In case the path is empty
      */

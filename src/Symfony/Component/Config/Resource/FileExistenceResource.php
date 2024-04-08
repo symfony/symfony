@@ -26,7 +26,7 @@ class FileExistenceResource implements SelfCheckingResourceInterface
     private bool $exists;
 
     /**
-     * @param string $resource The file path to the resource
+     * @param $resource The file path to the resource
      */
     public function __construct(
         private string $resource,

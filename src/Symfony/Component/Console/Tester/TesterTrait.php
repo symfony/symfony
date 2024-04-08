@@ -54,7 +54,7 @@ trait TesterTrait
     /**
      * Gets the output written to STDERR by the application.
      *
-     * @param bool $normalize Whether to normalize end of lines to \n or not
+     * @param $normalize Whether to normalize end of lines to \n or not
      */
     public function getErrorOutput(bool $normalize = false): string
     {
@@ -107,8 +107,8 @@ trait TesterTrait
     /**
      * Sets the user inputs.
      *
-     * @param array $inputs An array of strings representing each input
-     *                      passed to the command input stream
+     * @param $inputs An array of strings representing each input
+     *                passed to the command input stream
      *
      * @return $this
      */

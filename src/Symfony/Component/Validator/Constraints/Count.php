@@ -44,9 +44,9 @@ class Count extends Constraint
 
     /**
      * @param int|array<string,mixed>|null $exactly     The exact expected number of elements
-     * @param int|null                     $min         Minimum expected number of elements
-     * @param int|null                     $max         Maximum expected number of elements
-     * @param int|null                     $divisibleBy The number the collection count should be divisible by
+     * @param                              $min         Minimum expected number of elements
+     * @param                              $max         Maximum expected number of elements
+     * @param                              $divisibleBy The number the collection count should be divisible by
      * @param string[]|null                $groups
      * @param array<mixed,string>          $options
      */

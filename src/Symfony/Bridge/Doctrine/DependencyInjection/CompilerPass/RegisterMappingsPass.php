@@ -75,20 +75,20 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * The $aliasMap parameter can be used to define bundle namespace shortcuts like the
      * DoctrineBundle provides automatically for objects in the default Entity/Document folder.
      *
-     * @param Definition|Reference $driver                  Driver DI definition or reference
-     * @param string[]             $namespaces              List of namespaces handled by $driver
-     * @param string[]             $managerParameters       list of container parameters that could
-     *                                                      hold the manager name
-     * @param string               $driverPattern           Pattern for the metadata driver service name
-     * @param string|false         $enabledParameter        Service container parameter that must be
-     *                                                      present to enable the mapping. Set to false
-     *                                                      to not do any check, optional.
-     * @param string               $configurationPattern    Pattern for the Configuration service name,
-     *                                                      for example 'doctrine.orm.%s_configuration'.
-     * @param string               $registerAliasMethodName Method name to call on the configuration service. This
-     *                                                      depends on the Doctrine implementation.
-     *                                                      For example addEntityNamespace.
-     * @param string[]             $aliasMap                Map of alias to namespace
+     * @param          $driver                  Driver DI definition or reference
+     * @param string[] $namespaces              List of namespaces handled by $driver
+     * @param string[] $managerParameters       list of container parameters that could
+     *                                          hold the manager name
+     * @param          $driverPattern           Pattern for the metadata driver service name
+     * @param          $enabledParameter        Service container parameter that must be
+     *                                         present to enable the mapping. Set to false
+     *                                         to not do any check, optional.
+     * @param          $configurationPattern    Pattern for the Configuration service name,
+     *                                         for example 'doctrine.orm.%s_configuration'.
+     * @param          $registerAliasMethodName Method name to call on the configuration service. This
+     *                                         depends on the Doctrine implementation.
+     *                                         For example addEntityNamespace.
+     * @param string[] $aliasMap                Map of alias to namespace
      */
     public function __construct(
         Definition|Reference $driver,
@@ -155,8 +155,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     /**
      * Create the service definition for the metadata driver.
      *
-     * @param ContainerBuilder $container Passed on in case an extending class
-     *                                    needs access to the container
+     * @param $container Passed on in case an extending class
+     *                   needs access to the container
      */
     protected function getDriver(ContainerBuilder $container): Definition|Reference
     {

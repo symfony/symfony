@@ -30,8 +30,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Initializes output formatter style.
      *
-     * @param string|null $foreground The style foreground color name
-     * @param string|null $background The style background color name
+     * @param $foreground The style foreground color name
+     * @param $background The style background color name
      */
     public function __construct(?string $foreground = null, ?string $background = null, array $options = [])
     {

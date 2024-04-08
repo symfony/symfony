@@ -29,8 +29,8 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 class PropertyMetadata extends MemberMetadata
 {
     /**
-     * @param string $class The class this property is defined on
-     * @param string $name  The name of this property
+     * @param $class The class this property is defined on
+     * @param $name  The name of this property
      *
      * @throws ValidatorException
      */

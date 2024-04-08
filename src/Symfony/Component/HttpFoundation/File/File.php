@@ -25,8 +25,8 @@ class File extends \SplFileInfo
     /**
      * Constructs a new file from the given path.
      *
-     * @param string $path      The path to the file
-     * @param bool   $checkPath Whether to check the path or not
+     * @param $path      The path to the file
+     * @param $checkPath Whether to check the path or not
      *
      * @throws FileNotFoundException If the given path is not a file
      */

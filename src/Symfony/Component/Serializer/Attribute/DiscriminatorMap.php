@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 class DiscriminatorMap
 {
     /**
-     * @param string                      $typeProperty The property holding the type discriminator
+     * @param                             $typeProperty The property holding the type discriminator
      * @param array<string, class-string> $mapping      The mapping between types and classes (i.e. ['admin_user' => AdminUser::class])
      *
      * @throws InvalidArgumentException

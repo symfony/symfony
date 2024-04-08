@@ -48,8 +48,8 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface, Re
     /**
      * Creates a new renderer engine.
      *
-     * @param array $defaultThemes The default themes. The type of these
-     *                             themes is open to the implementation.
+     * @param $defaultThemes The default themes. The type of these
+     *                       themes is open to the implementation.
      */
     public function __construct(
         protected array $defaultThemes = [],

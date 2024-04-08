@@ -58,8 +58,8 @@ class SmtpTransport extends AbstractTransport
      *
      * By default, the threshold is set to 100 (and no sleep at restart).
      *
-     * @param int $threshold The maximum number of messages (0 to disable)
-     * @param int $sleep     The number of seconds to sleep between stopping and re-starting the transport
+     * @param $threshold The maximum number of messages (0 to disable)
+     * @param $sleep     The number of seconds to sleep between stopping and re-starting the transport
      *
      * @return $this
      */
@@ -82,7 +82,7 @@ class SmtpTransport extends AbstractTransport
      *
      * By default, the threshold is set to 100 seconds.
      *
-     * @param int $seconds The minimum number of seconds between two messages required to ping the server
+     * @param $seconds The minimum number of seconds between two messages required to ping the server
      *
      * @return $this
      */

@@ -851,7 +851,7 @@ EOF
      *
      *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
-     * @param \DOMElement $element A \DOMElement instance
+     * @param $element A \DOMElement instance
      */
     public static function convertDomElementToArray(\DOMElement $element): mixed
     {

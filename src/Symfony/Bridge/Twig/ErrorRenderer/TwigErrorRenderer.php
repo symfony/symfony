@@ -29,7 +29,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
     private \Closure|bool $debug;
 
     /**
-     * @param bool|callable $debug The debugging mode as a boolean or a callable that should return it
+     * @param $debug The debugging mode as a boolean or a callable that should return it
      */
     public function __construct(
         private Environment $twig,

@@ -26,10 +26,10 @@ class Form extends Link implements \ArrayAccess
     private ?string $baseHref;
 
     /**
-     * @param \DOMElement $node       A \DOMElement instance
-     * @param string|null $currentUri The URI of the page where the form is embedded
-     * @param string|null $method     The method to use for the link (if null, it defaults to the method defined by the form)
-     * @param string|null $baseHref   The URI of the <base> used for relative links, but not for empty action
+     * @param $node       A \DOMElement instance
+     * @param $currentUri The URI of the page where the form is embedded
+     * @param $method     The method to use for the link (if null, it defaults to the method defined by the form)
+     * @param $baseHref   The URI of the <base> used for relative links, but not for empty action
      *
      * @throws \LogicException if the node is not a button inside a form tag
      */
@@ -52,7 +52,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets the value of the fields.
      *
-     * @param array $values An array of field values
+     * @param $values An array of field values
      *
      * @return $this
      */

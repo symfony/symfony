@@ -162,8 +162,8 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Adds or overrides a node Type.
      *
-     * @param string $type  The name of the type
-     * @param string $class The fully qualified name the node definition class
+     * @param $type  The name of the type
+     * @param $class The fully qualified name the node definition class
      *
      * @return $this
      */

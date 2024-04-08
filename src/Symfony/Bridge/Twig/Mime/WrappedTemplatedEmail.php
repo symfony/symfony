@@ -35,10 +35,10 @@ final class WrappedTemplatedEmail
     }
 
     /**
-     * @param string      $image       A Twig path to the image file. It's recommended to define
-     *                                 some Twig namespace for email images (e.g. '@email/images/logo.png').
-     * @param string|null $contentType The media type (i.e. MIME type) of the image file (e.g. 'image/png').
-     *                                 Some email clients require this to display embedded images.
+     * @param $image       A Twig path to the image file. It's recommended to define
+     *                     some Twig namespace for email images (e.g. '@email/images/logo.png').
+     * @param $contentType The media type (i.e. MIME type) of the image file (e.g. 'image/png').
+     *                     Some email clients require this to display embedded images.
      */
     public function image(string $image, ?string $contentType = null): string
     {
@@ -50,11 +50,11 @@ final class WrappedTemplatedEmail
     }
 
     /**
-     * @param string      $file        A Twig path to the file. It's recommended to define
-     *                                 some Twig namespace for email files (e.g. '@email/files/contract.pdf').
-     * @param string|null $name        A custom file name that overrides the original name of the attached file
-     * @param string|null $contentType The media type (i.e. MIME type) of the file (e.g. 'application/pdf').
-     *                                 Some email clients require this to display attached files.
+     * @param $file        A Twig path to the file. It's recommended to define
+     *                     some Twig namespace for email files (e.g. '@email/files/contract.pdf').
+     * @param $name        A custom file name that overrides the original name of the attached file
+     * @param $contentType The media type (i.e. MIME type) of the file (e.g. 'application/pdf').
+     *                     Some email clients require this to display attached files.
      */
     public function attach(string $file, ?string $name = null, ?string $contentType = null): void
     {

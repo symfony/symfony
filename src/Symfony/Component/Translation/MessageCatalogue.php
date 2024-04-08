@@ -28,7 +28,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     private ?self $parent = null;
 
     /**
-     * @param array $messages An array of messages classified by domain
+     * @param $messages An array of messages classified by domain
      */
     public function __construct(string $locale, array $messages = [])
     {
@@ -286,7 +286,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * Adds current values with the new values.
      *
-     * @param array $values Values to add
+     * @param $values Values to add
      */
     private function addMetadata(array $values): void
     {

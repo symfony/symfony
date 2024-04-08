@@ -42,11 +42,11 @@ class ArrayChoiceList implements ChoiceListInterface
      *
      * The given choice array must have the same array keys as the value array.
      *
-     * @param iterable      $choices The selectable choices
-     * @param callable|null $value   The callable for creating the value
-     *                               for a choice. If `null` is passed,
-     *                               incrementing integers are used as
-     *                               values
+     * @param $choices The selectable choices
+     * @param $value   The callable for creating the value
+     *                 for a choice. If `null` is passed,
+     *                 incrementing integers are used as
+     *                 values
      */
     public function __construct(iterable $choices, ?callable $value = null)
     {
@@ -144,13 +144,13 @@ class ArrayChoiceList implements ChoiceListInterface
     /**
      * Flattens an array into the given output variables.
      *
-     * @param array      $choices          The array to flatten
-     * @param callable   $value            The callable for generating choice values
-     * @param array|null $choicesByValues  The flattened choices indexed by the
-     *                                     corresponding values
-     * @param array|null $keysByValues     The original keys indexed by the
-     *                                     corresponding values
-     * @param array|null $structuredValues The values indexed by the original keys
+     * @param $choices          The array to flatten
+     * @param $value            The callable for generating choice values
+     * @param $choicesByValues  The flattened choices indexed by the
+     *                          corresponding values
+     * @param $keysByValues     The original keys indexed by the
+     *                          corresponding values
+     * @param $structuredValues The values indexed by the original keys
      *
      * @internal
      */

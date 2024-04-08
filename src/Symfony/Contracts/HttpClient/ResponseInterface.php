@@ -35,7 +35,7 @@ interface ResponseInterface
     /**
      * Gets the HTTP headers of the response.
      *
-     * @param bool $throw Whether an exception should be thrown on 3/4/5xx status codes
+     * @param $throw Whether an exception should be thrown on 3/4/5xx status codes
      *
      * @return string[][] The headers of the response keyed by header names in lowercase
      *
@@ -49,7 +49,7 @@ interface ResponseInterface
     /**
      * Gets the response body as a string.
      *
-     * @param bool $throw Whether an exception should be thrown on 3/4/5xx status codes
+     * @param $throw Whether an exception should be thrown on 3/4/5xx status codes
      *
      * @throws TransportExceptionInterface   When a network error occurs
      * @throws RedirectionExceptionInterface On a 3xx when $throw is true and the "max_redirects" option has been reached
@@ -61,7 +61,7 @@ interface ResponseInterface
     /**
      * Gets the response body decoded as array, typically from a JSON payload.
      *
-     * @param bool $throw Whether an exception should be thrown on 3/4/5xx status codes
+     * @param $throw Whether an exception should be thrown on 3/4/5xx status codes
      *
      * @throws DecodingExceptionInterface    When the body cannot be decoded to an array
      * @throws TransportExceptionInterface   When a network error occurs

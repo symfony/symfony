@@ -36,7 +36,7 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
      * PCRE patterns are left unchanged.
      * Glob strings are transformed with Glob::toRegex().
      *
-     * @param string $str Pattern: glob or regexp
+     * @param $str Pattern: glob or regexp
      */
     protected function toRegex(string $str): string
     {

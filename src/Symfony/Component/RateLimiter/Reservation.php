@@ -20,7 +20,7 @@ final class Reservation
     private RateLimit $rateLimit;
 
     /**
-     * @param float $timeToAct Unix timestamp in seconds when this reservation should act
+     * @param $timeToAct Unix timestamp in seconds when this reservation should act
      */
     public function __construct(float $timeToAct, RateLimit $rateLimit)
     {

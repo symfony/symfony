@@ -33,9 +33,9 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 class GetterMetadata extends MemberMetadata
 {
     /**
-     * @param string      $class    The class the getter is defined on
-     * @param string      $property The property which the getter returns
-     * @param string|null $method   The method that is called to retrieve the value being validated (null for auto-detection)
+     * @param $class    The class the getter is defined on
+     * @param $property The property which the getter returns
+     * @param $method   The method that is called to retrieve the value being validated (null for auto-detection)
      *
      * @throws ValidatorException
      */

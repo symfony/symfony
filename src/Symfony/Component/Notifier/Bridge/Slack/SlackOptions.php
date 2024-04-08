@@ -66,7 +66,7 @@ class SlackOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param string $id The hook id (anything after https://hooks.slack.com/services/)
+     * @param $id The hook id (anything after https://hooks.slack.com/services/)
      *
      * @return $this
      */

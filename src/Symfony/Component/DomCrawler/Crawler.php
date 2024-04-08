@@ -198,9 +198,9 @@ class Crawler implements \Countable, \IteratorAggregate
      * and then, get the errors via libxml_get_errors(). Be
      * sure to clear errors with libxml_clear_errors() afterward.
      *
-     * @param int $options Bitwise OR of the libxml option constants
-     *                     LIBXML_PARSEHUGE is dangerous, see
-     *                     http://symfony.com/blog/security-release-symfony-2-0-17-released
+     * @param $options Bitwise OR of the libxml option constants
+     *                 LIBXML_PARSEHUGE is dangerous, see
+     *                 http://symfony.com/blog/security-release-symfony-2-0-17-released
      */
     public function addXmlContent(string $content, string $charset = 'UTF-8', int $options = \LIBXML_NONET): void
     {
@@ -228,7 +228,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Adds a \DOMDocument to the list of nodes.
      *
-     * @param \DOMDocument $dom A \DOMDocument instance
+     * @param $dom A \DOMDocument instance
      */
     public function addDocument(\DOMDocument $dom): void
     {
@@ -240,7 +240,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Adds a \DOMNodeList to the list of nodes.
      *
-     * @param \DOMNodeList $nodes A \DOMNodeList instance
+     * @param $nodes A \DOMNodeList instance
      */
     public function addNodeList(\DOMNodeList $nodes): void
     {
@@ -266,7 +266,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Adds a \DOMNode instance to the list of nodes.
      *
-     * @param \DOMNode $node A \DOMNode instance
+     * @param $node A \DOMNode instance
      */
     public function addNode(\DOMNode $node): void
     {
@@ -312,7 +312,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *         return $node->text();
      *     });
      *
-     * @param \Closure $closure An anonymous function
+     * @param $closure An anonymous function
      *
      * @return array An array of values returned by the anonymous function
      */
@@ -339,7 +339,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * To remove a node from the list, the anonymous function must return false.
      *
-     * @param \Closure $closure An anonymous function
+     * @param $closure An anonymous function
      */
     public function reduce(\Closure $closure): static
     {
@@ -500,7 +500,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the attribute value of the first node of the list.
      *
-     * @param string|null $default When not null: the value to return when the node or attribute is empty
+     * @param $default When not null: the value to return when the node or attribute is empty
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -538,8 +538,8 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * Pass true as the second argument to normalize whitespaces.
      *
-     * @param string|null $default             When not null: the value to return when the current node is empty
-     * @param bool        $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
+     * @param $default             When not null: the value to return when the current node is empty
+     * @param $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -565,7 +565,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns only the inner text that is the direct descendent of the current node, excluding any child nodes.
      *
-     * @param bool $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
+     * @param $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
      */
     public function innerText(bool $normalizeWhitespace = true): string
     {
@@ -587,7 +587,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the first node of the list as HTML.
      *
-     * @param string|null $default When not null: the value to return when the current node is empty
+     * @param $default When not null: the value to return when the current node is empty
      *
      * @throws \InvalidArgumentException When current node is empty
      */

@@ -45,7 +45,7 @@ class IpUtils
     /**
      * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets.
      *
-     * @param string|array $ips List of IPs or subnets (can be a string if only a single one)
+     * @param $ips List of IPs or subnets (can be a string if only a single one)
      */
     public static function checkIp(string $requestIp, string|array $ips): bool
     {
@@ -68,7 +68,7 @@ class IpUtils
      * Compares two IPv4 addresses.
      * In case a subnet is given, it checks if it contains the request IP.
      *
-     * @param string $ip IPv4 address or subnet in CIDR notation
+     * @param $ip IPv4 address or subnet in CIDR notation
      *
      * @return bool Whether the request IP matches the IP, or whether the request IP is within the CIDR subnet
      */
@@ -113,7 +113,7 @@ class IpUtils
      *
      * @see https://github.com/dsp/v6tools
      *
-     * @param string $ip IPv6 address or subnet in CIDR notation
+     * @param $ip IPv6 address or subnet in CIDR notation
      *
      * @throws \RuntimeException When IPV6 support is not enabled
      */

@@ -20,9 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class AsDecorator
 {
     /**
-     * @param string $decorates The service id to decorate
-     * @param int    $priority  The priority of this decoration when multiple decorators are declared for the same service
-     * @param int    $onInvalid The behavior to adopt when the decoration is invalid; must be one of the {@see ContainerInterface} constants
+     * @param $decorates The service id to decorate
+     * @param $priority  The priority of this decoration when multiple decorators are declared for the same service
+     * @param $onInvalid The behavior to adopt when the decoration is invalid; must be one of the {@see ContainerInterface} constants
      */
     public function __construct(
         public string $decorates,

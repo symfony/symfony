@@ -108,7 +108,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Forwards the request to another controller.
      *
-     * @param string $controller The controller name (a string like "App\Controller\PostController::index" or "App\Controller\PostController" if it is invokable)
+     * @param $controller The controller name (a string like "App\Controller\PostController::index" or "App\Controller\PostController" if it is invokable)
      */
     protected function forward(string $controller, array $path = [], array $query = []): Response
     {
@@ -122,7 +122,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Returns a RedirectResponse to the given URL.
      *
-     * @param int $status The HTTP status code (302 "Found" by default)
+     * @param $status The HTTP status code (302 "Found" by default)
      */
     protected function redirect(string $url, int $status = 302): RedirectResponse
     {
@@ -132,7 +132,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Returns a RedirectResponse to the given route with the given parameters.
      *
-     * @param int $status The HTTP status code (302 "Found" by default)
+     * @param $status The HTTP status code (302 "Found" by default)
      */
     protected function redirectToRoute(string $route, array $parameters = [], int $status = 302): RedirectResponse
     {
@@ -142,7 +142,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Returns a JsonResponse that uses the serializer component if enabled, or json_encode.
      *
-     * @param int $status The HTTP status code (200 "OK" by default)
+     * @param $status The HTTP status code (200 "OK" by default)
      */
     protected function json(mixed $data, int $status = 200, array $headers = [], array $context = []): JsonResponse
     {
@@ -354,8 +354,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Checks the validity of a CSRF token.
      *
-     * @param string      $id    The id used when generating the token
-     * @param string|null $token The actual token sent with the request that should be validated
+     * @param $id    The id used when generating the token
+     * @param $token The actual token sent with the request that should be validated
      */
     protected function isCsrfTokenValid(string $id, #[\SensitiveParameter] ?string $token): bool
     {

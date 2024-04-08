@@ -35,13 +35,13 @@ class BinaryFileResponse extends Response
     protected int $chunkSize = 16 * 1024;
 
     /**
-     * @param \SplFileInfo|string $file               The file to stream
-     * @param int                 $status             The response status code (200 "OK" by default)
-     * @param array               $headers            An array of response headers
-     * @param bool                $public             Files are public by default
-     * @param string|null         $contentDisposition The type of Content-Disposition to set automatically with the filename
-     * @param bool                $autoEtag           Whether the ETag header should be automatically set
-     * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
+     * @param $file               The file to stream
+     * @param $status             The response status code (200 "OK" by default)
+     * @param $headers            An array of response headers
+     * @param $public             Files are public by default
+     * @param $contentDisposition The type of Content-Disposition to set automatically with the filename
+     * @param $autoEtag           Whether the ETag header should be automatically set
+     * @param $autoLastModified   Whether the Last-Modified header should be automatically set
      */
     public function __construct(\SplFileInfo|string $file, int $status = 200, array $headers = [], bool $public = true, ?string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
     {
@@ -146,9 +146,9 @@ class BinaryFileResponse extends Response
     /**
      * Sets the Content-Disposition header with the given filename.
      *
-     * @param string $disposition      ResponseHeaderBag::DISPOSITION_INLINE or ResponseHeaderBag::DISPOSITION_ATTACHMENT
-     * @param string $filename         Optionally use this UTF-8 encoded filename instead of the real name of the file
-     * @param string $filenameFallback A fallback filename, containing only ASCII characters. Defaults to an automatically encoded filename
+     * @param $disposition      ResponseHeaderBag::DISPOSITION_INLINE or ResponseHeaderBag::DISPOSITION_ATTACHMENT
+     * @param $filename         Optionally use this UTF-8 encoded filename instead of the real name of the file
+     * @param $filenameFallback A fallback filename, containing only ASCII characters. Defaults to an automatically encoded filename
      *
      * @return $this
      */

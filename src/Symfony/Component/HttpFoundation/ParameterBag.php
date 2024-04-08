@@ -33,7 +33,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameters.
      *
-     * @param string|null $key The name of the parameter to return or null to get them all
+     * @param $key The name of the parameter to return or null to get them all
      */
     public function all(?string $key = null): array
     {
@@ -181,7 +181,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Filter key.
      *
-     * @param int                                     $filter  FILTER_* constant
+     * @param                                         $filter  FILTER_* constant
      * @param int|array{flags?: int, options?: array} $options Flags from FILTER_* constants
      *
      * @see https://php.net/filter-var

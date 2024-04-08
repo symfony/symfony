@@ -19,7 +19,7 @@ interface FormExtensionInterface
     /**
      * Returns a type by name.
      *
-     * @param string $name The name of the type
+     * @param $name The name of the type
      *
      * @throws Exception\InvalidArgumentException if the given type is not supported by this extension
      */
@@ -28,14 +28,14 @@ interface FormExtensionInterface
     /**
      * Returns whether the given type is supported.
      *
-     * @param string $name The name of the type
+     * @param $name The name of the type
      */
     public function hasType(string $name): bool;
 
     /**
      * Returns the extensions for the given type.
      *
-     * @param string $name The name of the type
+     * @param $name The name of the type
      *
      * @return FormTypeExtensionInterface[]
      */
@@ -44,7 +44,7 @@ interface FormExtensionInterface
     /**
      * Returns whether this extension provides type extensions for the given type.
      *
-     * @param string $name The name of the type
+     * @param $name The name of the type
      */
     public function hasTypeExtensions(string $name): bool;
 

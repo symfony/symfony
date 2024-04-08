@@ -36,8 +36,8 @@ class XmlUtils
     /**
      * Parses an XML string.
      *
-     * @param string               $content          An XML string
-     * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
+     * @param $content          An XML string
+     * @param $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
      * @throws XmlParsingException When parsing of XML file returns error
      * @throws InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
@@ -106,8 +106,8 @@ class XmlUtils
     /**
      * Loads an XML file.
      *
-     * @param string               $file             An XML file path
-     * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
+     * @param $file             An XML file path
+     * @param $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
      * @throws \InvalidArgumentException When loading of XML file returns error
      * @throws XmlParsingException       When XML parsing returns any errors
@@ -151,8 +151,8 @@ class XmlUtils
      *
      *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
-     * @param \DOMElement $element     A \DOMElement instance
-     * @param bool        $checkPrefix Check prefix in an element or an attribute name
+     * @param $element     A \DOMElement instance
+     * @param $checkPrefix Check prefix in an element or an attribute name
      */
     public static function convertDomElementToArray(\DOMElement $element, bool $checkPrefix = true): mixed
     {

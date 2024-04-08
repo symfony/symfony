@@ -56,11 +56,11 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
     private AmpClientState $multi;
 
     /**
-     * @param array         $defaultOptions     Default requests' options
-     * @param callable|null $clientConfigurator A callable that builds a {@see DelegateHttpClient} from a {@see PooledHttpClient};
-     *                                          passing null builds an {@see InterceptedHttpClient} with 2 retries on failures
-     * @param int           $maxHostConnections The maximum number of connections to a single host
-     * @param int           $maxPendingPushes   The maximum number of pushed responses to accept in the queue
+     * @param $defaultOptions     Default requests' options
+     * @param $clientConfigurator A callable that builds a {@see DelegateHttpClient} from a {@see PooledHttpClient};
+     *                            passing null builds an {@see InterceptedHttpClient} with 2 retries on failures
+     * @param $maxHostConnections The maximum number of connections to a single host
+     * @param $maxPendingPushes   The maximum number of pushed responses to accept in the queue
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */

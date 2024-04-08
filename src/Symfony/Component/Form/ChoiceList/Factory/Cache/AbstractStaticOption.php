@@ -33,8 +33,8 @@ abstract class AbstractStaticOption
     private bool|string|array|\Closure|ChoiceLoaderInterface $option;
 
     /**
-     * @param mixed $option Any pseudo callable, array, string or bool to define a choice list option
-     * @param mixed $vary   Dynamic data used to compute a unique hash when caching the option
+     * @param $option Any pseudo callable, array, string or bool to define a choice list option
+     * @param $vary   Dynamic data used to compute a unique hash when caching the option
      */
     final public function __construct(FormTypeInterface|FormTypeExtensionInterface $formType, mixed $option, mixed $vary = null)
     {

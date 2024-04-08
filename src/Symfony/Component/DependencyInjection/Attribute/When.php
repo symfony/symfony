@@ -20,7 +20,7 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 class When
 {
     /**
-     * @param string $env The environment under which the class will be registered as a service (i.e. "dev", "test", "prod")
+     * @param $env The environment under which the class will be registered as a service (i.e. "dev", "test", "prod")
      */
     public function __construct(public string $env)
     {

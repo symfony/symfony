@@ -35,7 +35,7 @@ class Time extends Constraint
     /**
      * @param array<string,mixed>|null $options
      * @param string[]|null            $groups
-     * @param bool|null                $withSeconds Whether to allow seconds in the given value (defaults to true)
+     * @param                          $withSeconds Whether to allow seconds in the given value (defaults to true)
      */
     public function __construct(
         ?array $options = null,

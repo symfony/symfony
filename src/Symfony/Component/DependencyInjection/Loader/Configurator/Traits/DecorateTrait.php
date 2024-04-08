@@ -19,7 +19,7 @@ trait DecorateTrait
     /**
      * Sets the service that this service is decorating.
      *
-     * @param string|null $id The decorated service id, use null to remove decoration
+     * @param $id The decorated service id, use null to remove decoration
      *
      * @return $this
      *

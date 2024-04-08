@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 final class HttpCodeActivationStrategy implements ActivationStrategyInterface
 {
     /**
-     * @param array $exclusions each exclusion must have a "code" and "urls" keys
+     * @param $exclusions each exclusion must have a "code" and "urls" keys
      */
     public function __construct(
         private RequestStack $requestStack,

@@ -34,10 +34,10 @@ class StopwatchEvent
     private string $name;
 
     /**
-     * @param float       $origin        The origin time in milliseconds
-     * @param string|null $category      The event category or null to use the default
-     * @param bool        $morePrecision If true, time is stored as float to keep the original microsecond precision
-     * @param string|null $name          The event name or null to define the name as default
+     * @param $origin        The origin time in milliseconds
+     * @param $category      The event category or null to use the default
+     * @param $morePrecision If true, time is stored as float to keep the original microsecond precision
+     * @param $name          The event name or null to define the name as default
      *
      * @throws \InvalidArgumentException When the raw time is not valid
      */

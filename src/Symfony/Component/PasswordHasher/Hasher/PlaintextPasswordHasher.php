@@ -26,7 +26,7 @@ class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
     use CheckPasswordLengthTrait;
 
     /**
-     * @param bool $ignorePasswordCase Compare password case-insensitive
+     * @param $ignorePasswordCase Compare password case-insensitive
      */
     public function __construct(
         private bool $ignorePasswordCase = false,

@@ -31,8 +31,8 @@ class PropertyPathBuilder
     /**
      * Appends a (sub-) path to the current path.
      *
-     * @param int $offset The offset where the appended piece starts in $path
-     * @param int $length The length of the appended piece; if 0, the full path is appended
+     * @param $offset The offset where the appended piece starts in $path
+     * @param $length The length of the appended piece; if 0, the full path is appended
      */
     public function append(PropertyPathInterface|string $path, int $offset = 0, int $length = 0): void
     {
@@ -87,8 +87,8 @@ class PropertyPathBuilder
     /**
      * Replaces a sub-path by a different (sub-) path.
      *
-     * @param int $pathOffset The offset where the inserted piece starts in $path
-     * @param int $pathLength The length of the inserted piece; if 0, the full path is inserted
+     * @param $pathOffset The offset where the inserted piece starts in $path
+     * @param $pathLength The length of the inserted piece; if 0, the full path is inserted
      *
      * @throws OutOfBoundsException If the offset is invalid
      */

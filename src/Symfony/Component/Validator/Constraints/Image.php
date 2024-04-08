@@ -90,31 +90,31 @@ class Image extends File
 
     /**
      * @param array<string,mixed>|null $options
-     * @param int|string|null          $maxSize                     The max size of the underlying file
-     * @param bool|null                $binaryFormat                Pass true to use binary-prefixed units (KiB, MiB, etc.) or false to use SI-prefixed units (kB, MB) in displayed messages. Pass null to guess the format from the maxSize option. (defaults to null)
+     * @param                          $maxSize                     The max size of the underlying file
+     * @param                          $binaryFormat                Pass true to use binary-prefixed units (KiB, MiB, etc.) or false to use SI-prefixed units (kB, MB) in displayed messages. Pass null to guess the format from the maxSize option. (defaults to null)
      * @param string[]|null            $mimeTypes                   Acceptable media types
-     * @param int|null                 $filenameMaxLength           Maximum length of the file name
-     * @param string|null              $disallowEmptyMessage        Enable empty upload validation with this message in case of error
-     * @param string|null              $uploadIniSizeErrorMessage   Message if the file size exceeds the max size configured in php.ini
-     * @param string|null              $uploadFormSizeErrorMessage  Message if the file size exceeds the max size configured in the HTML input field
-     * @param string|null              $uploadPartialErrorMessage   Message if the file is only partially uploaded
-     * @param string|null              $uploadNoTmpDirErrorMessage  Message if there is no upload_tmp_dir in php.ini
-     * @param string|null              $uploadCantWriteErrorMessage Message if the uploaded file can not be stored in the temporary directory
-     * @param string|null              $uploadErrorMessage          Message if an unknown error occurred on upload
+     * @param                          $filenameMaxLength           Maximum length of the file name
+     * @param                          $disallowEmptyMessage        Enable empty upload validation with this message in case of error
+     * @param                          $uploadIniSizeErrorMessage   Message if the file size exceeds the max size configured in php.ini
+     * @param                          $uploadFormSizeErrorMessage  Message if the file size exceeds the max size configured in the HTML input field
+     * @param                          $uploadPartialErrorMessage   Message if the file is only partially uploaded
+     * @param                          $uploadNoTmpDirErrorMessage  Message if there is no upload_tmp_dir in php.ini
+     * @param                          $uploadCantWriteErrorMessage Message if the uploaded file can not be stored in the temporary directory
+     * @param                          $uploadErrorMessage          Message if an unknown error occurred on upload
      * @param string[]|null            $groups
-     * @param int|null                 $minWidth                    Minimum image width
-     * @param int|null                 $maxWidth                    Maximum image width
-     * @param int|null                 $maxHeight                   Maximum image height
-     * @param int|null                 $minHeight                   Minimum image weight
-     * @param int|float|null           $maxRatio                    Maximum image ratio
-     * @param int|float|null           $minRatio                    Minimum image ration
-     * @param int|float|null           $minPixels                   Minimum amount of pixels
-     * @param int|float|null           $maxPixels                   Maximum amount of pixels
-     * @param bool|null                $allowSquare                 Whether to allow a square image (defaults to true)
-     * @param bool|null                $allowLandscape              Whether to allow a landscape image (defaults to true)
-     * @param bool|null                $allowPortrait               Whether to allow a portrait image (defaults to true)
-     * @param bool|null                $detectCorrupted             Whether to validate the image is not corrupted (defaults to false)
-     * @param string|null              $sizeNotDetectedMessage      Message if the system can not determine image size and there is a size constraint to validate
+     * @param                          $minWidth                    Minimum image width
+     * @param                          $maxWidth                    Maximum image width
+     * @param                          $maxHeight                   Maximum image height
+     * @param                          $minHeight                   Minimum image weight
+     * @param                          $maxRatio                    Maximum image ratio
+     * @param                          $minRatio                    Minimum image ration
+     * @param                          $minPixels                   Minimum amount of pixels
+     * @param                          $maxPixels                   Maximum amount of pixels
+     * @param                          $allowSquare                 Whether to allow a square image (defaults to true)
+     * @param                          $allowLandscape              Whether to allow a landscape image (defaults to true)
+     * @param                          $allowPortrait               Whether to allow a portrait image (defaults to true)
+     * @param                          $detectCorrupted             Whether to validate the image is not corrupted (defaults to false)
+     * @param                          $sizeNotDetectedMessage      Message if the system can not determine image size and there is a size constraint to validate
      *
      * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
      */

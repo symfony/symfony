@@ -48,9 +48,9 @@ class StreamedJsonResponse extends StreamedResponse
 
     /**
      * @param mixed[]                        $data            JSON Data containing PHP generators which will be streamed as list of data or a Generator
-     * @param int                            $status          The HTTP status code (200 "OK" by default)
+     * @param                                $status          The HTTP status code (200 "OK" by default)
      * @param array<string, string|string[]> $headers         An array of HTTP headers
-     * @param int                            $encodingOptions Flags for the json_encode() function
+     * @param                                $encodingOptions Flags for the json_encode() function
      */
     public function __construct(
         private readonly iterable $data,

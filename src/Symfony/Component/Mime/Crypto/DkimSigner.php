@@ -33,8 +33,8 @@ final class DkimSigner
     private \OpenSSLAsymmetricKey $key;
 
     /**
-     * @param string $pk         The private key as a string or the path to the file containing the private key, should be prefixed with file:// (in PEM format)
-     * @param string $passphrase A passphrase of the private key (if any)
+     * @param $pk         The private key as a string or the path to the file containing the private key, should be prefixed with file:// (in PEM format)
+     * @param $passphrase A passphrase of the private key (if any)
      */
     public function __construct(
         string $pk,

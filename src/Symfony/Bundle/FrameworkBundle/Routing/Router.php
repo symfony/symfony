@@ -40,7 +40,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
     private \Closure $paramFetcher;
 
     /**
-     * @param mixed $resource The main resource to load
+     * @param $resource The main resource to load
      */
     public function __construct(ContainerInterface $container, mixed $resource, array $options = [], ?RequestContext $context = null, ?ContainerInterface $parameters = null, ?LoggerInterface $logger = null, ?string $defaultLocale = null)
     {

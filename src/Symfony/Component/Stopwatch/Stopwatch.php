@@ -34,7 +34,7 @@ class Stopwatch implements ResetInterface
     private array $activeSections;
 
     /**
-     * @param bool $morePrecision If true, time is stored as float to keep the original microsecond precision
+     * @param $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
     public function __construct(
         private bool $morePrecision = false,
@@ -53,7 +53,7 @@ class Stopwatch implements ResetInterface
     /**
      * Creates a new section or re-opens an existing section.
      *
-     * @param string|null $id The id of the session to re-open, null to create a new one
+     * @param $id The id of the session to re-open, null to create a new one
      *
      * @throws \LogicException When the section to re-open is not reachable
      */

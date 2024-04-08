@@ -156,7 +156,7 @@ class ParameterBag implements ParameterBagInterface
      * @template TValue of array<array|scalar>|scalar
      *
      * @param TValue $value
-     * @param array  $resolving An array of keys that are being resolved (used internally to detect circular references)
+     * @param        $resolving An array of keys that are being resolved (used internally to detect circular references)
      *
      * @psalm-return (TValue is scalar ? array|scalar : array<array|scalar>)
      *
@@ -190,7 +190,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Resolves parameters inside a string.
      *
-     * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
+     * @param $resolving An array of keys that are being resolved (used internally to detect circular references)
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected

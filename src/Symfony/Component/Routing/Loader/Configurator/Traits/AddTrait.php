@@ -30,7 +30,7 @@ trait AddTrait
     /**
      * Adds a route.
      *
-     * @param string|array $path the path, or the localized paths of the route
+     * @param $path the path, or the localized paths of the route
      */
     public function add(string $name, string|array $path): RouteConfigurator
     {
@@ -48,7 +48,7 @@ trait AddTrait
     /**
      * Adds a route.
      *
-     * @param string|array $path the path, or the localized paths of the route
+     * @param $path the path, or the localized paths of the route
      */
     public function __invoke(string $name, string|array $path): RouteConfigurator
     {

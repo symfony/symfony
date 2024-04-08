@@ -31,13 +31,13 @@ final class GoogleChatTransport extends AbstractTransport
     protected const HOST = 'chat.googleapis.com';
 
     /**
-     * @param string      $space       The space name of the webhook url "/v1/spaces/<space>/messages"
-     * @param string      $accessKey   The "key" parameter of the webhook url
-     * @param string      $accessToken The "token" parameter of the webhook url
-     * @param string|null $threadKey   Opaque thread identifier string that can be specified to group messages into a single thread.
-     *                                 If this is the first message with a given thread identifier, a new thread is created.
-     *                                 Subsequent messages with the same thread identifier will be posted into the same thread.
-     *                                 {@see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters}
+     * @param $space       The space name of the webhook url "/v1/spaces/<space>/messages"
+     * @param $accessKey   The "key" parameter of the webhook url
+     * @param $accessToken The "token" parameter of the webhook url
+     * @param $threadKey   Opaque thread identifier string that can be specified to group messages into a single thread.
+     *                     If this is the first message with a given thread identifier, a new thread is created.
+     *                     Subsequent messages with the same thread identifier will be posted into the same thread.
+     *                     {@see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters}
      */
     public function __construct(
         private string $space,

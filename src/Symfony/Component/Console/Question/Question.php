@@ -31,8 +31,8 @@ class Question
     private bool $multiline = false;
 
     /**
-     * @param string                     $question The question to ask to the user
-     * @param string|bool|int|float|null $default  The default answer to return if the user enters nothing
+     * @param $question The question to ask to the user
+     * @param $default  The default answer to return if the user enters nothing
      */
     public function __construct(
         private string $question,

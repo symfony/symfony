@@ -254,7 +254,7 @@ class PassConfig
     /**
      * Sort passes by priority.
      *
-     * @param array $passes CompilerPassInterface instances with their priority as key
+     * @param $passes CompilerPassInterface instances with their priority as key
      *
      * @return CompilerPassInterface[]
      */

@@ -74,9 +74,9 @@ class Security implements AuthorizationCheckerInterface
     }
 
     /**
-     * @param UserInterface    $user              The user to authenticate
-     * @param string|null      $authenticatorName The authenticator name (e.g. "form_login") or service id (e.g. SomeApiKeyAuthenticator::class) - required only if multiple authenticators are configured
-     * @param string|null      $firewallName      The firewall name - required only if multiple firewalls are configured
+     * @param                  $user              The user to authenticate
+     * @param                  $authenticatorName The authenticator name (e.g. "form_login") or service id (e.g. SomeApiKeyAuthenticator::class) - required only if multiple authenticators are configured
+     * @param                  $firewallName      The firewall name - required only if multiple firewalls are configured
      * @param BadgeInterface[] $badges            Badges to add to the user's passport
      *
      * @return Response|null The authenticator success response if any
@@ -104,7 +104,7 @@ class Security implements AuthorizationCheckerInterface
     /**
      * Logout the current user by dispatching the LogoutEvent.
      *
-     * @param bool $validateCsrfToken Whether to look for a valid CSRF token based on the `logout` listener configuration
+     * @param $validateCsrfToken Whether to look for a valid CSRF token based on the `logout` listener configuration
      *
      * @return Response|null The LogoutEvent's Response if any
      *

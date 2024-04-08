@@ -91,7 +91,7 @@ final class TranslationExtension extends AbstractExtension
     }
 
     /**
-     * @param array|string $arguments Can be the locale as a string when $message is a TranslatableInterface
+     * @param $arguments Can be the locale as a string when $message is a TranslatableInterface
      */
     public function trans(string|\Stringable|TranslatableInterface|null $message, array|string $arguments = [], ?string $domain = null, ?string $locale = null, ?int $count = null): string
     {

@@ -33,7 +33,7 @@ class RedisStore implements SharedLockStoreInterface
     private bool $supportTime;
 
     /**
-     * @param float $initialTtl The expiration delay of locks in seconds
+     * @param $initialTtl The expiration delay of locks in seconds
      */
     public function __construct(
         private \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,

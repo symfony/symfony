@@ -26,7 +26,7 @@ use Symfony\Component\Mime\RawMessage;
 class SesSmtpTransport extends EsmtpTransport
 {
     /**
-     * @param string|null $region Amazon SES region
+     * @param $region Amazon SES region
      */
     public function __construct(string $username, #[\SensitiveParameter] string $password, ?string $region = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null, string $host = 'default')
     {

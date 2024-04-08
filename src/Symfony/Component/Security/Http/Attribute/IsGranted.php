@@ -24,11 +24,11 @@ use Symfony\Component\ExpressionLanguage\Expression;
 final class IsGranted
 {
     /**
-     * @param string|Expression            $attribute     The attribute that will be checked against a given authentication token and optional subject
-     * @param array|string|Expression|null $subject       An optional subject - e.g. the current object being voted on
-     * @param string|null                  $message       A custom message when access is not granted
-     * @param int|null                     $statusCode    If set, will throw HttpKernel's HttpException with the given $statusCode; if null, Security\Core's AccessDeniedException will be used
-     * @param int|null                     $exceptionCode If set, will add the exception code to thrown exception
+     * @param $attribute     The attribute that will be checked against a given authentication token and optional subject
+     * @param $subject       An optional subject - e.g. the current object being voted on
+     * @param $message       A custom message when access is not granted
+     * @param $statusCode    If set, will throw HttpKernel's HttpException with the given $statusCode; if null, Security\Core's AccessDeniedException will be used
+     * @param $exceptionCode If set, will add the exception code to thrown exception
      */
     public function __construct(
         public string|Expression $attribute,

@@ -107,7 +107,7 @@ class Notification
     }
 
     /**
-     * @param string $level A PSR Logger log level name
+     * @param $level A PSR Logger log level name
      *
      * @return $this
      */

@@ -53,7 +53,7 @@ final class FakeChatEmailTransport extends AbstractTransport
     }
 
     /**
-     * @param MessageInterface|ChatMessage $message
+     * @param $message
      *
      * @throws TransportExceptionInterface
      */

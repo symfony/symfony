@@ -30,7 +30,7 @@ use Symfony\Component\Validator\ValidatorBuilder;
 class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     /**
-     * @param string $phpArrayFile The PHP file where metadata are cached
+     * @param $phpArrayFile The PHP file where metadata are cached
      */
     public function __construct(
         private ValidatorBuilder $validatorBuilder,

@@ -33,9 +33,9 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
     private int $globBrace;
 
     /**
-     * @param string $prefix    A directory prefix
-     * @param string $pattern   A glob pattern
-     * @param bool   $recursive Whether directories should be scanned recursively or not
+     * @param $prefix    A directory prefix
+     * @param $pattern   A glob pattern
+     * @param $recursive Whether directories should be scanned recursively or not
      *
      * @throws \InvalidArgumentException
      */

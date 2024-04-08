@@ -61,7 +61,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     /**
      * Returns the headers.
      *
-     * @param string|null $key The name of the headers to return or null to get them all
+     * @param $key The name of the headers to return or null to get them all
      *
      * @return ($key is null ? array<string, list<string|null>> : list<string|null>)
      */
@@ -125,7 +125,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      * Sets a header by name.
      *
      * @param string|string[]|null $values  The value or an array of values
-     * @param bool                 $replace Whether to replace the actual value or not (true by default)
+     * @param                      $replace Whether to replace the actual value or not (true by default)
      */
     public function set(string $key, string|array|null $values, bool $replace = true): void
     {

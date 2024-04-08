@@ -284,7 +284,7 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Clones a PHP variable.
      *
-     * @param int $filter A bit field of Caster::EXCLUDE_* constants
+     * @param $filter A bit field of Caster::EXCLUDE_* constants
      */
     public function cloneVar(mixed $var, int $filter = 0): Data
     {
@@ -324,7 +324,7 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Casts an object to an array representation.
      *
-     * @param bool $isNested True if the object is nested in the dumped structure
+     * @param $isNested True if the object is nested in the dumped structure
      */
     protected function castObject(Stub $stub, bool $isNested): array
     {
@@ -381,7 +381,7 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Casts a resource to an array representation.
      *
-     * @param bool $isNested True if the object is nested in the dumped structure
+     * @param $isNested True if the object is nested in the dumped structure
      */
     protected function castResource(Stub $stub, bool $isNested): array
     {

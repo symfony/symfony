@@ -47,7 +47,7 @@ class ImportConfigurator
     /**
      * Sets the prefix to add to the path of all child routes.
      *
-     * @param string|array $prefix the prefix, or the localized prefixes
+     * @param $prefix the prefix, or the localized prefixes
      *
      * @return $this
      */
@@ -73,7 +73,7 @@ class ImportConfigurator
     /**
      * Sets the host to use for all child routes.
      *
-     * @param string|array $host the host, or the localized hosts
+     * @param $host the host, or the localized hosts
      *
      * @return $this
      */

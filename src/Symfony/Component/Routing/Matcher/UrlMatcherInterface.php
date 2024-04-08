@@ -29,7 +29,7 @@ interface UrlMatcherInterface extends RequestContextAwareInterface
      * If the matcher cannot find information, it must throw one of the exceptions documented
      * below.
      *
-     * @param string $pathinfo The path info to be parsed (raw format, i.e. not urldecoded)
+     * @param $pathinfo The path info to be parsed (raw format, i.e. not urldecoded)
      *
      * @throws NoConfigurationException  If no routing configuration could be found
      * @throws ResourceNotFoundException If the resource could not be found

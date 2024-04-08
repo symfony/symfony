@@ -170,7 +170,7 @@ final class ParameterizedHeader extends UnstructuredHeader
     /**
      * Returns the parameter value from the "=" and beyond.
      *
-     * @param string $value to append
+     * @param $value to append
      */
     private function getEndOfParameterValue(string $value, bool $encoded = false, bool $firstLine = false): string
     {

@@ -34,7 +34,7 @@ interface LockInterface
     /**
      * Increase the duration of an acquired lock.
      *
-     * @param float|null $ttl Maximum expected lock duration in seconds
+     * @param $ttl Maximum expected lock duration in seconds
      *
      * @throws LockConflictedException If the lock is acquired by someone else
      * @throws LockAcquiringException  If the lock cannot be refreshed

@@ -119,7 +119,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * This method is applicable to prototype nodes only.
      *
-     * @param int|string|array|null $children The number of children|The child name|The children names to be added
+     * @param $children The number of children|The child name|The children names to be added
      *
      * @return $this
      */
@@ -161,8 +161,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets a normalization rule for XML configurations.
      *
-     * @param string      $singular The key to remap
-     * @param string|null $plural   The plural of the key for irregular plurals
+     * @param $singular The key to remap
+     * @param $plural   The plural of the key for irregular plurals
      *
      * @return $this
      */
@@ -196,8 +196,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * This method is applicable to prototype nodes only.
      *
-     * @param string $name          The name of the key
-     * @param bool   $removeKeyItem Whether or not the key item should be removed
+     * @param $name          The name of the key
+     * @param $removeKeyItem Whether or not the key item should be removed
      *
      * @return $this
      */
@@ -302,7 +302,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * to send an entire configuration array through a special tree that
      * processes only part of the array.
      *
-     * @param bool $remove Whether to remove the extra keys
+     * @param $remove Whether to remove the extra keys
      *
      * @return $this
      */
@@ -488,7 +488,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Finds a node defined by the given $nodePath.
      *
-     * @param string $nodePath The path of the node to find. e.g "doctrine.orm.mappings"
+     * @param $nodePath The path of the node to find. e.g "doctrine.orm.mappings"
      */
     public function find(string $nodePath): NodeDefinition
     {

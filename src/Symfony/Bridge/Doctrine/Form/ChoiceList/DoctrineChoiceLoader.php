@@ -32,7 +32,7 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
      * passed which optimizes the object loading for one of the Doctrine
      * mapper implementations.
      *
-     * @param string $class The class name of the loaded objects
+     * @param $class The class name of the loaded objects
      */
     public function __construct(
         private readonly ObjectManager $manager,

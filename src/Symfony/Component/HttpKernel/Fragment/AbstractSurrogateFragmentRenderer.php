@@ -28,7 +28,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
      * The "fallback" strategy when surrogate is not available should always be an
      * instance of InlineFragmentRenderer.
      *
-     * @param FragmentRendererInterface $inlineStrategy The inline strategy to use when the surrogate is not supported
+     * @param $inlineStrategy The inline strategy to use when the surrogate is not supported
      */
     public function __construct(
         private ?SurrogateInterface $surrogate,

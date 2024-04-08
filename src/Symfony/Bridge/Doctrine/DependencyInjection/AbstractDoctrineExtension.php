@@ -35,7 +35,7 @@ abstract class AbstractDoctrineExtension extends Extension
     protected array $drivers = [];
 
     /**
-     * @param array $objectManager A configured object manager
+     * @param $objectManager A configured object manager
      *
      * @throws \InvalidArgumentException
      */

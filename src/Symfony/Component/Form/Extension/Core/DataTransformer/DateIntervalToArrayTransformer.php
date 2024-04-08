@@ -45,7 +45,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
 
     /**
      * @param string[]|null $fields The date fields
-     * @param bool          $pad    Whether to use padding
+     * @param               $pad    Whether to use padding
      */
     public function __construct(
         ?array $fields = null,

@@ -69,7 +69,7 @@ interface ClassMetadataInterface extends MetadataInterface
     /**
      * Check if there's any metadata attached to the given named property.
      *
-     * @param string $property The property name
+     * @param $property The property name
      */
     public function hasPropertyMetadata(string $property): bool;
 
@@ -79,7 +79,7 @@ interface ClassMetadataInterface extends MetadataInterface
      * If your implementation does not support properties, throw an exception
      * in this method (for example a <tt>BadMethodCallException</tt>).
      *
-     * @param string $property The property name
+     * @param $property The property name
      *
      * @return PropertyMetadataInterface[]
      */

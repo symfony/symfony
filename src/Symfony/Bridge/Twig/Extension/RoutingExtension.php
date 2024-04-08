@@ -66,7 +66,7 @@ final class RoutingExtension extends AbstractExtension
      * - path('route', {'param1': 'value1', 'param2': 'value2'})
      * If param1 and param2 reference placeholder in the route, it would still be safe. But we don't know.
      *
-     * @param Node $argsNode The arguments of the path/url function
+     * @param $argsNode The arguments of the path/url function
      *
      * @return array An array with the contexts the URL is safe
      */

@@ -352,8 +352,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Sets an alias for an existing route.
      *
-     * @param string $name  The alias to create
-     * @param string $alias The route to alias
+     * @param $name  The alias to create
+     * @param $alias The route to alias
      *
      * @throws InvalidArgumentException if the alias is for itself
      */

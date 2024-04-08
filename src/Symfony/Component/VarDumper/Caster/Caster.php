@@ -45,7 +45,7 @@ class Caster
     /**
      * Casts objects to arrays and adds the dynamic property prefix.
      *
-     * @param bool $hasDebugInfo Whether the __debugInfo method exists on $obj or not
+     * @param $hasDebugInfo Whether the __debugInfo method exists on $obj or not
      */
     public static function castObject(object $obj, string $class, bool $hasDebugInfo = false, ?string $debugClass = null): array
     {
@@ -114,10 +114,10 @@ class Caster
      * By default, a single match in the $filter bit field filters properties out, following an "or" logic.
      * When EXCLUDE_STRICT is set, an "and" logic is applied: all bits must match for a property to be removed.
      *
-     * @param array    $a                The array containing the properties to filter
-     * @param int      $filter           A bit field of Caster::EXCLUDE_* constants specifying which properties to filter out
+     * @param          $a                The array containing the properties to filter
+     * @param          $filter           A bit field of Caster::EXCLUDE_* constants specifying which properties to filter out
      * @param string[] $listedProperties List of properties to exclude when Caster::EXCLUDE_VERBOSE is set, and to preserve when Caster::EXCLUDE_NOT_IMPORTANT is set
-     * @param int|null &$count           Set to the number of removed properties
+     * @param          &$count           Set to the number of removed properties
      */
     public static function filter(array $a, int $filter, array $listedProperties = [], ?int &$count = 0): array
     {

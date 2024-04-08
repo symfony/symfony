@@ -29,7 +29,7 @@ final class NativePasswordHasher implements PasswordHasherInterface
     private array $options;
 
     /**
-     * @param string|null $algorithm An algorithm supported by password_hash() or null to use the best available algorithm
+     * @param $algorithm An algorithm supported by password_hash() or null to use the best available algorithm
      */
     public function __construct(?int $opsLimit = null, ?int $memLimit = null, ?int $cost = null, ?string $algorithm = null)
     {

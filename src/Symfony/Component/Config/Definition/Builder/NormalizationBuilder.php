@@ -30,8 +30,8 @@ class NormalizationBuilder
     /**
      * Registers a key to remap to its plural form.
      *
-     * @param string      $key    The key to remap
-     * @param string|null $plural The plural of the key in case of irregular plural
+     * @param $key    The key to remap
+     * @param $plural The plural of the key in case of irregular plural
      *
      * @return $this
      */

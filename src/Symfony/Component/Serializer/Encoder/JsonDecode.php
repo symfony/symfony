@@ -54,9 +54,9 @@ class JsonDecode implements DecoderInterface
     /**
      * Decodes data.
      *
-     * @param string $data    The encoded JSON string to decode
-     * @param string $format  Must be set to JsonEncoder::FORMAT
-     * @param array  $context An optional set of options for the JSON decoder; see below
+     * @param $data    The encoded JSON string to decode
+     * @param $format  Must be set to JsonEncoder::FORMAT
+     * @param $context An optional set of options for the JSON decoder; see below
      *
      * The $context array is a simple key=>value array, with the following supported keys:
      *

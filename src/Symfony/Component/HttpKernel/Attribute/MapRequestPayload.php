@@ -31,7 +31,7 @@ class MapRequestPayload extends ValueResolver
      * @param array<string, mixed>                    $serializationContext       The serialization context to use when deserializing the payload
      * @param string|GroupSequence|array<string>|null $validationGroups           The validation groups to use when validating the query string mapping
      * @param class-string                            $resolver                   The class name of the resolver to use
-     * @param int                                     $validationFailedStatusCode The HTTP code to return if the validation fails
+     * @param                                         $validationFailedStatusCode The HTTP code to return if the validation fails
      * @param class-string|string|null                $type                       The element type for array deserialization
      */
     public function __construct(

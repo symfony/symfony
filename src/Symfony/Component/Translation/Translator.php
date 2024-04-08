@@ -88,7 +88,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * Adds a Loader.
      *
-     * @param string $format The name of the loader (@see addResource())
+     * @param $format The name of the loader (@see addResource())
      */
     public function addLoader(string $format, LoaderInterface $loader): void
     {
@@ -98,8 +98,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * Adds a Resource.
      *
-     * @param string $format   The name of the loader (@see addLoader())
-     * @param mixed  $resource The resource name
+     * @param $format   The name of the loader (@see addLoader())
+     * @param $resource The resource name
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */

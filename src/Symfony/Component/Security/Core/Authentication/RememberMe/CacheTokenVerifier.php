@@ -23,10 +23,10 @@ class CacheTokenVerifier implements TokenVerifierInterface
     private string $cacheKeyPrefix;
 
     /**
-     * @param int $outdatedTokenTtl How long the outdated token should still be considered valid. Defaults
-     *                              to 60, which matches how often the PersistentRememberMeHandler will at
-     *                              most refresh tokens. Increasing to more than that is not recommended,
-     *                              but you may use a lower value.
+     * @param $outdatedTokenTtl How long the outdated token should still be considered valid. Defaults
+     *                          to 60, which matches how often the PersistentRememberMeHandler will at
+     *                          most refresh tokens. Increasing to more than that is not recommended,
+     *                          but you may use a lower value.
      */
     public function __construct(CacheItemPoolInterface $cache, int $outdatedTokenTtl = 60, string $cacheKeyPrefix = 'rememberme-stale-')
     {

@@ -25,10 +25,10 @@ final class TransitionBlocker
     private array $parameters;
 
     /**
-     * @param string $code       Code is a machine-readable string, usually an UUID
-     * @param array  $parameters This is useful if you would like to pass around the condition values, that
-     *                           blocked the transition. E.g. for a condition "distance must be larger than
-     *                           5 miles", you might want to pass around the value of 5.
+     * @param $code       Code is a machine-readable string, usually an UUID
+     * @param $parameters This is useful if you would like to pass around the condition values, that
+     *                    blocked the transition. E.g. for a condition "distance must be larger than
+     *                    5 miles", you might want to pass around the value of 5.
      */
     public function __construct(string $message, string $code, array $parameters = [])
     {

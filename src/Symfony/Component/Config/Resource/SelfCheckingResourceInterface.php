@@ -22,7 +22,7 @@ interface SelfCheckingResourceInterface extends ResourceInterface
     /**
      * Returns true if the resource has not been updated since the given timestamp.
      *
-     * @param int $timestamp The last time the resource was loaded
+     * @param $timestamp The last time the resource was loaded
      */
     public function isFresh(int $timestamp): bool;
 }

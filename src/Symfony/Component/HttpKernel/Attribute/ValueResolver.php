@@ -21,7 +21,7 @@ class ValueResolver
 {
     /**
      * @param class-string<ValueResolverInterface>|string $resolver The class name of the resolver to use
-     * @param bool                                        $disabled Whether this value resolver is disabled; this allows to enable a value resolver globally while disabling it in specific cases
+     * @param                                             $disabled Whether this value resolver is disabled; this allows to enable a value resolver globally while disabling it in specific cases
      */
     public function __construct(
         public string $resolver,

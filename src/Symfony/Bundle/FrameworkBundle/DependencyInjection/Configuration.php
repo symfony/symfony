@@ -57,7 +57,7 @@ use Symfony\Component\Workflow\WorkflowEvents;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * @param bool $debug Whether debugging is enabled or not
+     * @param $debug Whether debugging is enabled or not
      */
     public function __construct(
         private bool $debug,

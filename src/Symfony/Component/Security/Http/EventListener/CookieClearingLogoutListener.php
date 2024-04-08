@@ -26,7 +26,7 @@ class CookieClearingLogoutListener implements EventSubscriberInterface
     private array $cookies;
 
     /**
-     * @param array $cookies An array of cookies (keys are names, values contain path and domain) to unset
+     * @param $cookies An array of cookies (keys are names, values contain path and domain) to unset
      */
     public function __construct(array $cookies)
     {

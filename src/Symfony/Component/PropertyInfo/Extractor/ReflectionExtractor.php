@@ -806,8 +806,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * Searches for add and remove methods.
      *
-     * @param \ReflectionClass $reflClass The reflection class for the given object
-     * @param array            $singulars The singular form of the property name or null
+     * @param $reflClass The reflection class for the given object
+     * @param $singulars The singular form of the property name or null
      *
      * @return array An array containing the adder and remover when found and errors
      */

@@ -48,8 +48,8 @@ class HttpUtils
     /**
      * Creates a redirect Response.
      *
-     * @param string $path   A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
-     * @param int    $status The HTTP status code (302 "Found" by default)
+     * @param $path   A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param $status The HTTP status code (302 "Found" by default)
      */
     public function createRedirectResponse(Request $request, string $path, int $status = 302): RedirectResponse
     {
@@ -66,7 +66,7 @@ class HttpUtils
     /**
      * Creates a Request.
      *
-     * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      */
     public function createRequest(Request $request, string $path): Request
     {
@@ -100,7 +100,7 @@ class HttpUtils
     /**
      * Checks that a given path matches the Request.
      *
-     * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return bool true if the path is the same as the one from the Request, false otherwise
      */
@@ -132,7 +132,7 @@ class HttpUtils
     /**
      * Generates a URI, based on the given path or absolute URL.
      *
-     * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @throws \LogicException
      */

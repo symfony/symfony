@@ -46,8 +46,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     private NativeClientState $multi;
 
     /**
-     * @param array $defaultOptions     Default request's options
-     * @param int   $maxHostConnections The maximum number of connections to open
+     * @param $defaultOptions     Default request's options
+     * @param $maxHostConnections The maximum number of connections to open
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */

@@ -23,7 +23,7 @@ class UriSafeTokenGenerator implements TokenGeneratorInterface
     /**
      * Generates URI-safe CSRF tokens.
      *
-     * @param int $entropy The amount of entropy collected for each token (in bits)
+     * @param $entropy The amount of entropy collected for each token (in bits)
      */
     public function __construct(int $entropy = 256)
     {

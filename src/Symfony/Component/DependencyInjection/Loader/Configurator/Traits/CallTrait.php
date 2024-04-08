@@ -18,9 +18,9 @@ trait CallTrait
     /**
      * Adds a method to call after service initialization.
      *
-     * @param string $method       The method name to call
-     * @param array  $arguments    An array of arguments to pass to the method call
-     * @param bool   $returnsClone Whether the call returns the service instance or not
+     * @param $method       The method name to call
+     * @param $arguments    An array of arguments to pass to the method call
+     * @param $returnsClone Whether the call returns the service instance or not
      *
      * @return $this
      *

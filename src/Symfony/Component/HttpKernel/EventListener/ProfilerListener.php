@@ -39,8 +39,8 @@ class ProfilerListener implements EventSubscriberInterface
     private \SplObjectStorage $parents;
 
     /**
-     * @param bool $onlyException    True if the profiler only collects data when an exception occurs, false otherwise
-     * @param bool $onlyMainRequests True if the profiler only collects data when the request is the main request, false otherwise
+     * @param $onlyException    True if the profiler only collects data when an exception occurs, false otherwise
+     * @param $onlyMainRequests True if the profiler only collects data when the request is the main request, false otherwise
      */
     public function __construct(
         private Profiler $profiler,

@@ -64,8 +64,8 @@ class PrototypedArrayNode extends ArrayNode
      * If you'd like "'id' => 'my_name'" to still be present in the resulting
      * array, then you can set the second argument of this method to false.
      *
-     * @param string $attribute The name of the attribute which value is to be used as a key
-     * @param bool   $remove    Whether or not to remove the key
+     * @param $attribute The name of the attribute which value is to be used as a key
+     * @param $remove    Whether or not to remove the key
      */
     public function setKeyAttribute(string $attribute, bool $remove = true): void
     {
@@ -97,7 +97,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Adds default children when none are set.
      *
-     * @param int|string|array|null $children The number of children|The child name|The children names to be added
+     * @param $children The number of children|The child name|The children names to be added
      */
     public function setAddChildrenIfNoneSet(int|string|array|null $children = ['defaults']): void
     {

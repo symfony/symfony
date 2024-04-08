@@ -23,7 +23,7 @@ class ClassExistsMock
     /**
      * Configures the classes to be checked upon existence.
      *
-     * @param array $classes Mocked class names as keys (case-sensitive, without leading root namespace slash) and booleans as values
+     * @param $classes Mocked class names as keys (case-sensitive, without leading root namespace slash) and booleans as values
      */
     public static function withMockedClasses(array $classes): void
     {
@@ -33,7 +33,7 @@ class ClassExistsMock
     /**
      * Configures the enums to be checked upon existence.
      *
-     * @param array $enums Mocked enums names as keys (case-sensitive, without leading root namespace slash) and booleans as values
+     * @param $enums Mocked enums names as keys (case-sensitive, without leading root namespace slash) and booleans as values
      */
     public static function withMockedEnums(array $enums): void
     {

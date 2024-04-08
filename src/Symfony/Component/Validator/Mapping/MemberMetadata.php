@@ -56,9 +56,9 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     private array $reflMember = [];
 
     /**
-     * @param string $class    The name of the class this member is defined on
-     * @param string $name     The name of the member
-     * @param string $property The property the member belongs to
+     * @param $class    The name of the class this member is defined on
+     * @param $name     The name of the member
+     * @param $property The property the member belongs to
      */
     public function __construct(string $class, string $name, string $property)
     {

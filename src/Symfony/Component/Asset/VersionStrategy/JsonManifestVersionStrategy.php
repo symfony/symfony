@@ -34,8 +34,8 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
     private array $manifestData;
 
     /**
-     * @param string $manifestPath Absolute path to the manifest file
-     * @param bool   $strictMode   Throws an exception for unknown paths
+     * @param $manifestPath Absolute path to the manifest file
+     * @param $strictMode   Throws an exception for unknown paths
      */
     public function __construct(
         private string $manifestPath,

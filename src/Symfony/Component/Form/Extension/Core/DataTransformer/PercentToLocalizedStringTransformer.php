@@ -39,8 +39,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * @see self::$types for a list of supported types
      *
-     * @param int  $roundingMode A value from \NumberFormatter, such as \NumberFormatter::ROUND_HALFUP
-     * @param bool $html5Format  Use an HTML5 specific format, see https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
+     * @param $roundingMode A value from \NumberFormatter, such as \NumberFormatter::ROUND_HALFUP
+     * @param $html5Format  Use an HTML5 specific format, see https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
      *
      * @throws UnexpectedTypeException if the given value of type is unknown
      */

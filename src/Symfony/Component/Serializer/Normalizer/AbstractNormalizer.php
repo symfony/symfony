@@ -206,7 +206,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * Gets attributes to normalize using groups.
      *
-     * @param bool $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
+     * @param $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
      * @return string[]|AttributeMetadataInterface[]|bool
      *
@@ -500,7 +500,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * Validate callbacks set in context.
      *
-     * @param string $contextType Used to specify which context is invalid in exceptions
+     * @param $contextType Used to specify which context is invalid in exceptions
      *
      * @throws InvalidArgumentException
      */

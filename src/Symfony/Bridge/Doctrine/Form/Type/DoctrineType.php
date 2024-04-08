@@ -63,7 +63,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      * a single-column integer ID. In that case, the value of the field is
      * the ID of the object. That ID is also used as field name.
      *
-     * @param string $value The choice value. Corresponds to the object's ID here.
+     * @param $value The choice value. Corresponds to the object's ID here.
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
@@ -78,8 +78,8 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      * For instance in ORM two query builders with an equal SQL string and
      * equal parameters are considered to be equal.
      *
-     * @param object $queryBuilder A query builder, type declaration is not present here as there
-     *                             is no common base class for the different implementations
+     * @param $queryBuilder A query builder, type declaration is not present here as there
+     *                      is no common base class for the different implementations
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.

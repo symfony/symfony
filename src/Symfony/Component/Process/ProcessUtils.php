@@ -32,8 +32,8 @@ class ProcessUtils
     /**
      * Validates and normalizes a Process input.
      *
-     * @param string $caller The name of method call that validates the input
-     * @param mixed  $input  The input to validate
+     * @param $caller The name of method call that validates the input
+     * @param $input  The input to validate
      *
      * @throws InvalidArgumentException In case the input is not valid
      */

@@ -406,8 +406,8 @@ class HtmlSanitizerConfig
     }
 
     /**
-     * @param int $maxInputLength The maximum length of the input string in bytes
-     *                            -1 means no limit
+     * @param $maxInputLength The maximum length of the input string in bytes
+     *                        -1 means no limit
      */
     public function withMaxInputLength(int $maxInputLength): static
     {

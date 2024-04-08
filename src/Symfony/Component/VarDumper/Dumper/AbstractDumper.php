@@ -42,8 +42,8 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
 
     /**
      * @param callable|resource|string|null $output  A line dumper callable, an opened stream or an output path, defaults to static::$defaultOutput
-     * @param string|null                   $charset The default character encoding to use for non-UTF8 strings
-     * @param int                           $flags   A bit field of static::DUMP_* constants to fine tune dumps representation
+     * @param                               $charset The default character encoding to use for non-UTF8 strings
+     * @param                               $flags   A bit field of static::DUMP_* constants to fine tune dumps representation
      */
     public function __construct($output = null, ?string $charset = null, int $flags = 0)
     {
@@ -100,7 +100,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Sets the indentation pad string.
      *
-     * @param string $pad A string that will be prepended to dumped lines, repeated by nesting level
+     * @param $pad A string that will be prepended to dumped lines, repeated by nesting level
      *
      * @return string The previous indent pad
      */
@@ -156,8 +156,8 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Dumps the current line.
      *
-     * @param int $depth The recursive depth in the dumped structure for the line being dumped,
-     *                   or -1 to signal the end-of-dump to the line dumper callable
+     * @param $depth The recursive depth in the dumped structure for the line being dumped,
+     *               or -1 to signal the end-of-dump to the line dumper callable
      */
     protected function dumpLine(int $depth): void
     {

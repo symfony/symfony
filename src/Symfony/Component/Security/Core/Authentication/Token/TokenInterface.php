@@ -62,7 +62,7 @@ interface TokenInterface extends \Stringable
     public function getAttributes(): array;
 
     /**
-     * @param array $attributes The token attributes
+     * @param $attributes The token attributes
      */
     public function setAttributes(array $attributes): void;
 

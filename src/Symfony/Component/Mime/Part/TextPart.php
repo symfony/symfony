@@ -81,7 +81,7 @@ class TextPart extends AbstractPart
     }
 
     /**
-     * @param string $disposition one of attachment, inline, or form-data
+     * @param $disposition one of attachment, inline, or form-data
      *
      * @return $this
      */

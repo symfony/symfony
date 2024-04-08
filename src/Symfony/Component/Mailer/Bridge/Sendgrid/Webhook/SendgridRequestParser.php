@@ -78,12 +78,12 @@ final class SendgridRequestParser extends AbstractRequestParser
     /**
      * Verify signed event webhook requests.
      *
-     * @param string $signature value obtained from the
-     *                          'X-Twilio-Email-Event-Webhook-Signature' header
-     * @param string $timestamp value obtained from the
-     *                          'X-Twilio-Email-Event-Webhook-Timestamp' header
-     * @param string $payload   event payload in the request body
-     * @param string $secret    base64-encoded DER public key
+     * @param $signature value obtained from the
+     *                   'X-Twilio-Email-Event-Webhook-Signature' header
+     * @param $timestamp value obtained from the
+     *                   'X-Twilio-Email-Event-Webhook-Timestamp' header
+     * @param $payload   event payload in the request body
+     * @param $secret    base64-encoded DER public key
      *
      * @see https://docs.sendgrid.com/for-developers/tracking-events/getting-started-event-webhook-security-features
      */

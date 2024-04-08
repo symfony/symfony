@@ -49,7 +49,7 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
     /**
      * Converts string to regexp if necessary.
      *
-     * @param string $str Pattern: string or regexp
+     * @param $str Pattern: string or regexp
      */
     protected function toRegex(string $str): string
     {

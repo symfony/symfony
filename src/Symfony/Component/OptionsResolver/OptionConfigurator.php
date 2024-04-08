@@ -39,7 +39,7 @@ final class OptionConfigurator
     /**
      * Sets allowed values for this option.
      *
-     * @param mixed ...$values One or more acceptable values/closures
+     * @param ...$values One or more acceptable values/closures
      *
      * @return $this
      *
@@ -77,9 +77,9 @@ final class OptionConfigurator
     /**
      * Marks this option as deprecated.
      *
-     * @param string          $package The name of the composer package that is triggering the deprecation
-     * @param string          $version The version of the package that introduced the deprecation
-     * @param string|\Closure $message The deprecation message to use
+     * @param $package The name of the composer package that is triggering the deprecation
+     * @param $version The version of the package that introduced the deprecation
+     * @param $message The deprecation message to use
      *
      * @return $this
      */

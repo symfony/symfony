@@ -349,8 +349,8 @@ class TranslatorTest extends TestCase
     /**
      * We validate only on the plural coverage. Thus the real rules is not tested.
      *
-     * @param string $nplural Plural expected
-     * @param array  $matrix  Containing langcodes and their plural index values
+     * @param $nplural Plural expected
+     * @param $matrix  Containing langcodes and their plural index values
      */
     protected function validateMatrix(string $nplural, array $matrix, bool $expectSuccess = true)
     {

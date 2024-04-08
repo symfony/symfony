@@ -29,7 +29,7 @@ interface ConstraintViolationBuilderInterface
      * The passed path will be appended to the current property path of the
      * execution context.
      *
-     * @param string $path The property path
+     * @param $path The property path
      *
      * @return $this
      */
@@ -38,8 +38,8 @@ interface ConstraintViolationBuilderInterface
     /**
      * Sets a parameter to be inserted into the violation message.
      *
-     * @param string $key   The name of the parameter
-     * @param string $value The value to be inserted in the parameter's place
+     * @param $key   The name of the parameter
+     * @param $value The value to be inserted in the parameter's place
      *
      * @return $this
      */
@@ -48,9 +48,9 @@ interface ConstraintViolationBuilderInterface
     /**
      * Sets all parameters to be inserted into the violation message.
      *
-     * @param array $parameters An array with the parameter names as keys and
-     *                          the values to be inserted in their place as
-     *                          values
+     * @param $parameters An array with the parameter names as keys and
+     *                    the values to be inserted in their place as
+     *                    values
      *
      * @return $this
      */
@@ -65,7 +65,7 @@ interface ConstraintViolationBuilderInterface
      * Sets the translation domain which should be used for translating the
      * violation message.
      *
-     * @param string $translationDomain The translation domain
+     * @param $translationDomain The translation domain
      *
      * @return $this
      *
@@ -84,7 +84,7 @@ interface ConstraintViolationBuilderInterface
      * Sets the number which determines how the plural form of the violation
      * message is chosen when it is translated.
      *
-     * @param int $number The number for determining the plural form
+     * @param $number The number for determining the plural form
      *
      * @return $this
      *
@@ -95,7 +95,7 @@ interface ConstraintViolationBuilderInterface
     /**
      * Sets the violation code.
      *
-     * @param string|null $code The violation code
+     * @param $code The violation code
      *
      * @return $this
      */
@@ -104,7 +104,7 @@ interface ConstraintViolationBuilderInterface
     /**
      * Sets the cause of the violation.
      *
-     * @param mixed $cause The cause of the violation
+     * @param $cause The cause of the violation
      *
      * @return $this
      */

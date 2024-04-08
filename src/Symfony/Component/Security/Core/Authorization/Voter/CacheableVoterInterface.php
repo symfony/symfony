@@ -24,7 +24,7 @@ interface CacheableVoterInterface extends VoterInterface
     public function supportsAttribute(string $attribute): bool;
 
     /**
-     * @param string $subjectType The type of the subject inferred by `get_class` or `get_debug_type`
+     * @param $subjectType The type of the subject inferred by `get_class` or `get_debug_type`
      */
     public function supportsType(string $subjectType): bool;
 }

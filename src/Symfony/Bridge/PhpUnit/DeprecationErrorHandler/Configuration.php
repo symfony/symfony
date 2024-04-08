@@ -62,13 +62,13 @@ class Configuration
     private $logFile;
 
     /**
-     * @param int[]       $thresholds       A hash associating groups to thresholds
-     * @param string      $regex            Will be matched against messages, to decide whether to display a stack trace
-     * @param bool[]      $verboseOutput    Keyed by groups
-     * @param string      $ignoreFile       The path to the ignore deprecation patterns file
-     * @param bool        $generateBaseline Whether to generate or update the baseline file
-     * @param string      $baselineFile     The path to the baseline file
-     * @param string|null $logFile          The path to the log file
+     * @param int[]  $thresholds       A hash associating groups to thresholds
+     * @param        $regex            Will be matched against messages, to decide whether to display a stack trace
+     * @param bool[] $verboseOutput    Keyed by groups
+     * @param        $ignoreFile       The path to the ignore deprecation patterns file
+     * @param        $generateBaseline Whether to generate or update the baseline file
+     * @param        $baselineFile     The path to the baseline file
+     * @param        $logFile          The path to the log file
      */
     private function __construct(array $thresholds = [], string $regex = '', array $verboseOutput = [], string $ignoreFile = '', bool $generateBaseline = false, string $baselineFile = '', ?string $logFile = null)
     {
@@ -305,7 +305,7 @@ class Configuration
     }
 
     /**
-     * @param string $serializedConfiguration An encoded string, for instance max[total]=1234&max[indirect]=42
+     * @param $serializedConfiguration An encoded string, for instance max[total]=1234&max[indirect]=42
      */
     public static function fromUrlEncodedString(string $serializedConfiguration): self
     {

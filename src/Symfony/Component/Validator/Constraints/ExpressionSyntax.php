@@ -33,7 +33,7 @@ class ExpressionSyntax extends Constraint
 
     /**
      * @param array<string,mixed>|null $options
-     * @param string|null              $service          The service used to validate the constraint instead of the default one
+     * @param                          $service          The service used to validate the constraint instead of the default one
      * @param string[]|null            $allowedVariables Restrict the available variables in the expression to these values (defaults to null that allows any variable)
      * @param string[]|null            $groups
      */

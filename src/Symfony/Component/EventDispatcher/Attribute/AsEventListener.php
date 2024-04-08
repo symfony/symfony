@@ -20,10 +20,10 @@ namespace Symfony\Component\EventDispatcher\Attribute;
 class AsEventListener
 {
     /**
-     * @param string|null $event      The event name to listen to
-     * @param string|null $method     The method to run when the listened event is triggered
-     * @param int         $priority   The priority of this listener if several are declared for the same event
-     * @param string|null $dispatcher The service id of the event dispatcher to listen to
+     * @param $event      The event name to listen to
+     * @param $method     The method to run when the listened event is triggered
+     * @param $priority   The priority of this listener if several are declared for the same event
+     * @param $dispatcher The service id of the event dispatcher to listen to
      */
     public function __construct(
         public ?string $event = null,

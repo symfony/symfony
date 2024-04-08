@@ -52,10 +52,10 @@ interface TranslatorInterface
      *
      * @see https://en.wikipedia.org/wiki/ISO_31-11
      *
-     * @param string      $id         The message id (may also be an object that can be cast to string)
-     * @param array       $parameters An array of parameters for the message
-     * @param string|null $domain     The domain for the message or null to use the default
-     * @param string|null $locale     The locale or null to use the default
+     * @param $id         The message id (may also be an object that can be cast to string)
+     * @param $parameters An array of parameters for the message
+     * @param $domain     The domain for the message or null to use the default
+     * @param $locale     The locale or null to use the default
      *
      * @throws \InvalidArgumentException If the locale contains invalid characters
      */

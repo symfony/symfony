@@ -26,7 +26,7 @@ abstract class FormField
     protected bool $disabled = false;
 
     /**
-     * @param \DOMElement $node The node associated with this field
+     * @param $node The node associated with this field
      */
     public function __construct(\DOMElement $node)
     {

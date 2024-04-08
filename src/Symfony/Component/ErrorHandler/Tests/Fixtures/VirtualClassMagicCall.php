@@ -3,7 +3,7 @@
 namespace Symfony\Component\ErrorHandler\Tests\Fixtures;
 
 /**
- * @method string magicMethod()
+ * @method        string magicMethod()
  * @method static string staticMagicMethod()
  */
 class VirtualClassMagicCall

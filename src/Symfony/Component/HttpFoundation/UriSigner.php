@@ -23,8 +23,8 @@ class UriSigner
     private string $expirationParameter;
 
     /**
-     * @param string $hashParameter       Query string parameter to use
-     * @param string $expirationParameter Query string parameter to use for expiration
+     * @param $hashParameter       Query string parameter to use
+     * @param $expirationParameter Query string parameter to use for expiration
      */
     public function __construct(#[\SensitiveParameter] string $secret, string $hashParameter = '_hash', string $expirationParameter = '_expiration')
     {
@@ -43,11 +43,11 @@ class UriSigner
      * The given URI is signed by adding the query string parameter
      * which value depends on the URI and the secret.
      *
-     * @param \DateTimeInterface|\DateInterval|int|null $expiration The expiration for the given URI.
-     *                                                              If $expiration is a \DateTimeInterface, it's expected to be the exact date + time.
-     *                                                              If $expiration is a \DateInterval, the interval is added to "now" to get the date + time.
-     *                                                              If $expiration is an int, it's expected to be a timestamp in seconds of the exact date + time.
-     *                                                              If $expiration is null, no expiration.
+     * @param $expiration The expiration for the given URI.
+     *                    If $expiration is a \DateTimeInterface, it's expected to be the exact date + time.
+     *                    If $expiration is a \DateInterval, the interval is added to "now" to get the date + time.
+     *                    If $expiration is an int, it's expected to be a timestamp in seconds of the exact date + time.
+     *                    If $expiration is null, no expiration.
      *
      * The expiration is added as a query string parameter.
      */

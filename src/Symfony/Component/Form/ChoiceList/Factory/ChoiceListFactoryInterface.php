@@ -31,7 +31,7 @@ interface ChoiceListFactoryInterface
      * The callable receives the choice as only argument.
      * Null may be passed when the choice list contains the empty value.
      *
-     * @param callable|null $filter The callable filtering the choices
+     * @param $filter The callable filtering the choices
      */
     public function createListFromChoices(iterable $choices, ?callable $value = null, ?callable $filter = null): ChoiceListInterface;
 
@@ -42,7 +42,7 @@ interface ChoiceListFactoryInterface
      * The callable receives the choice as only argument.
      * Null may be passed when the choice list contains the empty value.
      *
-     * @param callable|null $filter The callable filtering the choices
+     * @param $filter The callable filtering the choices
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, ?callable $value = null, ?callable $filter = null): ChoiceListInterface;
 
@@ -72,14 +72,14 @@ interface ChoiceListFactoryInterface
      * match the keys of the choices. The values should be arrays of HTML
      * attributes that should be added to the respective choice.
      *
-     * @param array|callable|null $preferredChoices           The preferred choices
-     * @param callable|false|null $label                      The callable generating the choice labels;
-     *                                                        pass false to discard the label
-     * @param array|callable|null $attr                       The callable generating the HTML attributes
-     * @param array|callable      $labelTranslationParameters The parameters used to translate the choice labels
-     * @param bool                $duplicatePreferredChoices  Whether the preferred choices should be duplicated
-     *                                                        on top of the list and in their original position
-     *                                                        or only in the top of the list
+     * @param $preferredChoices           The preferred choices
+     * @param $label                      The callable generating the choice labels;
+     *                                    pass false to discard the label
+     * @param $attr                       The callable generating the HTML attributes
+     * @param $labelTranslationParameters The parameters used to translate the choice labels
+     * @param $duplicatePreferredChoices  Whether the preferred choices should be duplicated
+     *                                    on top of the list and in their original position
+     *                                    or only in the top of the list
      */
     public function createView(ChoiceListInterface $list, array|callable|null $preferredChoices = null, callable|false|null $label = null, ?callable $index = null, ?callable $groupBy = null, array|callable|null $attr = null, array|callable $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView;
 }

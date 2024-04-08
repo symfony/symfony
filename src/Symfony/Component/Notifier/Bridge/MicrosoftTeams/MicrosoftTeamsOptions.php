@@ -75,7 +75,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param string $path The hook path (anything after https://outlook.office.com)
+     * @param $path The hook path (anything after https://outlook.office.com)
      *
      * @return $this
      */
@@ -91,7 +91,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param string $summary Markdown string
+     * @param $summary Markdown string
      *
      * @return $this
      */

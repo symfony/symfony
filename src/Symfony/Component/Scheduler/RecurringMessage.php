@@ -40,7 +40,7 @@ final class RecurringMessage implements MessageProviderInterface
      *  * A relative date format as supported by \DateInterval;
      *  * A \DateInterval instance.
      *
-     * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
+     * @param $message A message provider that yields messages or a static message that will be dispatched on every trigger
      *
      * @see https://en.wikipedia.org/wiki/ISO_8601#Durations
      * @see https://php.net/datetime.formats#datetime.formats.relative
@@ -51,7 +51,7 @@ final class RecurringMessage implements MessageProviderInterface
     }
 
     /**
-     * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
+     * @param $message A message provider that yields messages or a static message that will be dispatched on every trigger
      */
     public static function cron(string $expression, object $message, \DateTimeZone|string|null $timezone = null): self
     {
@@ -67,7 +67,7 @@ final class RecurringMessage implements MessageProviderInterface
     }
 
     /**
-     * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
+     * @param $message A message provider that yields messages or a static message that will be dispatched on every trigger
      */
     public static function trigger(TriggerInterface $trigger, object $message): self
     {

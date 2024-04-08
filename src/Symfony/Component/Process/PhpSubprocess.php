@@ -44,12 +44,12 @@ use Symfony\Component\Process\Exception\RuntimeException;
 class PhpSubprocess extends Process
 {
     /**
-     * @param array       $command The command to run and its arguments listed as separate entries. They will automatically
-     *                             get prefixed with the PHP binary
-     * @param string|null $cwd     The working directory or null to use the working dir of the current PHP process
-     * @param array|null  $env     The environment variables or null to use the same environment as the current PHP process
-     * @param int         $timeout The timeout in seconds
-     * @param array|null  $php     Path to the PHP binary to use with any additional arguments
+     * @param $command The command to run and its arguments listed as separate entries. They will automatically
+     *                 get prefixed with the PHP binary
+     * @param $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param $env     The environment variables or null to use the same environment as the current PHP process
+     * @param $timeout The timeout in seconds
+     * @param $php     Path to the PHP binary to use with any additional arguments
      */
     public function __construct(array $command, ?string $cwd = null, ?array $env = null, int $timeout = 60, ?array $php = null)
     {

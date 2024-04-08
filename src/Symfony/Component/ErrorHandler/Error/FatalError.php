@@ -14,7 +14,7 @@ namespace Symfony\Component\ErrorHandler\Error;
 class FatalError extends \Error
 {
     /**
-     * @param array $error An array as returned by error_get_last()
+     * @param $error An array as returned by error_get_last()
      */
     public function __construct(
         string $message,

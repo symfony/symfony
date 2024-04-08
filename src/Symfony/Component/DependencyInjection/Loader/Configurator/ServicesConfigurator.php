@@ -67,8 +67,8 @@ class ServicesConfigurator extends AbstractConfigurator
     /**
      * Registers a service.
      *
-     * @param string|null $id    The service id, or null to create an anonymous service
-     * @param string|null $class The class of the service, or null when $id is also the class name
+     * @param $id    The service id, or null to create an anonymous service
+     * @param $class The class of the service, or null when $id is also the class name
      */
     final public function set(?string $id, ?string $class = null): ServiceConfigurator
     {

@@ -93,7 +93,7 @@ class ExpressionLanguage
     /**
      * Validates the syntax of an expression.
      *
-     * @param array|null                    $names The list of acceptable variable names in the expression
+     * @param                               $names The list of acceptable variable names in the expression
      * @param int-mask-of<Parser::IGNORE_*> $flags
      *
      * @throws SyntaxError When the passed expression is invalid
@@ -117,8 +117,8 @@ class ExpressionLanguage
     /**
      * Registers a function.
      *
-     * @param callable $compiler  A callable able to compile the function
-     * @param callable $evaluator A callable able to evaluate the function
+     * @param $compiler  A callable able to compile the function
+     * @param $evaluator A callable able to evaluate the function
      *
      * @throws \LogicException when registering a function after calling evaluate(), compile() or parse()
      *

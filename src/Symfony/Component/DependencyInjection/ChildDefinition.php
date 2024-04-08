@@ -24,7 +24,7 @@ class ChildDefinition extends Definition
     private string $parent;
 
     /**
-     * @param string $parent The id of Definition instance to decorate
+     * @param $parent The id of Definition instance to decorate
      */
     public function __construct(string $parent)
     {

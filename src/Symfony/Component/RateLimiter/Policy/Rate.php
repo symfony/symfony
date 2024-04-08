@@ -60,7 +60,7 @@ final class Rate
     }
 
     /**
-     * @param string $string using the format: "%interval_spec%-%rate%", {@see DateInterval}
+     * @param $string using the format: "%interval_spec%-%rate%", {@see DateInterval}
      */
     public static function fromString(string $string): self
     {
@@ -90,7 +90,7 @@ final class Rate
     /**
      * Calculates the number of new free tokens during $duration.
      *
-     * @param float $duration interval in seconds
+     * @param $duration interval in seconds
      */
     public function calculateNewTokensDuringInterval(float $duration): int
     {
@@ -102,7 +102,7 @@ final class Rate
     /**
      * Calculates total amount in seconds of refill intervals during $duration (for maintain strict refill frequency).
      *
-     * @param float $duration interval in seconds
+     * @param $duration interval in seconds
      */
     public function calculateRefillInterval(float $duration): int
     {

@@ -29,9 +29,9 @@ class CsrfTokenBadge implements BadgeInterface
     private ?string $csrfToken;
 
     /**
-     * @param string      $csrfTokenId An arbitrary string used to generate the value of the CSRF token.
-     *                                 Using a different string for each authenticator improves its security.
-     * @param string|null $csrfToken   The CSRF token presented in the request, if any
+     * @param $csrfTokenId An arbitrary string used to generate the value of the CSRF token.
+     *                     Using a different string for each authenticator improves its security.
+     * @param $csrfToken   The CSRF token presented in the request, if any
      */
     public function __construct(string $csrfTokenId, #[\SensitiveParameter] ?string $csrfToken)
     {

@@ -21,7 +21,7 @@ interface TaggedContainerInterface extends ContainerInterface
     /**
      * Returns service ids for a given tag.
      *
-     * @param string $name The tag name
+     * @param $name The tag name
      */
     public function findTaggedServiceIds(string $name): array;
 }

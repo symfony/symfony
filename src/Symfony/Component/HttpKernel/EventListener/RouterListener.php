@@ -44,7 +44,7 @@ class RouterListener implements EventSubscriberInterface
     private RequestContext $context;
 
     /**
-     * @param RequestContext|null $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
+     * @param $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
      *
      * @throws \InvalidArgumentException
      */

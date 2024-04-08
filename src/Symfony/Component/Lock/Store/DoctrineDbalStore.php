@@ -53,10 +53,10 @@ class DoctrineDbalStore implements PersistingStoreInterface
      *  * db_token_col: The column where to store the lock token [default: key_token]
      *  * db_expiration_col: The column where to store the expiration [default: key_expiration].
      *
-     * @param Connection|string $connOrUrl     A DBAL Connection instance or Doctrine URL
-     * @param array             $options       An associative array of options
-     * @param float             $gcProbability Probability expressed as floating number between 0 and 1 to clean old locks
-     * @param int               $initialTtl    The expiration delay of locks in seconds
+     * @param $connOrUrl     A DBAL Connection instance or Doctrine URL
+     * @param $options       An associative array of options
+     * @param $gcProbability Probability expressed as floating number between 0 and 1 to clean old locks
+     * @param $initialTtl    The expiration delay of locks in seconds
      *
      * @throws InvalidArgumentException When namespace contains invalid characters
      * @throws InvalidArgumentException When the initial ttl is not valid

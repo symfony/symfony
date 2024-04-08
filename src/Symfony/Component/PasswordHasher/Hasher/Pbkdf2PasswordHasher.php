@@ -35,10 +35,10 @@ final class Pbkdf2PasswordHasher implements LegacyPasswordHasherInterface
     private int $encodedLength = -1;
 
     /**
-     * @param string $algorithm          The digest algorithm to use
-     * @param bool   $encodeHashAsBase64 Whether to base64 encode the password hash
-     * @param int    $iterations         The number of iterations to use to stretch the password hash
-     * @param int    $length             Length of derived key to create
+     * @param $algorithm          The digest algorithm to use
+     * @param $encodeHashAsBase64 Whether to base64 encode the password hash
+     * @param $iterations         The number of iterations to use to stretch the password hash
+     * @param $length             Length of derived key to create
      */
     public function __construct(
         private string $algorithm = 'sha512',

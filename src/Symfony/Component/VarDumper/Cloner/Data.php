@@ -28,7 +28,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
     private array $context = [];
 
     /**
-     * @param array $data An array as returned by ClonerInterface::cloneVar()
+     * @param $data An array as returned by ClonerInterface::cloneVar()
      */
     public function __construct(array $data)
     {
@@ -64,7 +64,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
     /**
      * Returns a native representation of the original value.
      *
-     * @param array|bool $recursive Whether values should be resolved recursively or not
+     * @param $recursive Whether values should be resolved recursively or not
      *
      * @return string|int|float|bool|array|Data[]|null
      */
@@ -193,7 +193,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
     /**
      * Enables/disables objects' identifiers tracking.
      *
-     * @param bool $useRefHandles False to hide global ref. handles
+     * @param $useRefHandles False to hide global ref. handles
      */
     public function withRefHandles(bool $useRefHandles): static
     {
@@ -281,7 +281,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
     /**
      * Depth-first dumping of items.
      *
-     * @param mixed $item A Stub object or the original value being dumped
+     * @param $item A Stub object or the original value being dumped
      */
     private function dumpItem(DumperInterface $dumper, Cursor $cursor, array &$refs, mixed $item): void
     {

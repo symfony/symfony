@@ -32,9 +32,9 @@ class SignatureHasher
     private ?int $maxUses;
 
     /**
-     * @param array                        $signatureProperties      Properties of the User; the hash is invalidated if these properties change
-     * @param ExpiredSignatureStorage|null $expiredSignaturesStorage If provided, secures a sequence of hashes that are expired
-     * @param int|null                     $maxUses                  Used together with $expiredSignatureStorage to allow a maximum usage of a hash
+     * @param $signatureProperties      Properties of the User; the hash is invalidated if these properties change
+     * @param $expiredSignaturesStorage If provided, secures a sequence of hashes that are expired
+     * @param $maxUses                  Used together with $expiredSignatureStorage to allow a maximum usage of a hash
      */
     public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, #[\SensitiveParameter] string $secret, ?ExpiredSignatureStorage $expiredSignaturesStorage = null, ?int $maxUses = null)
     {
@@ -54,8 +54,8 @@ class SignatureHasher
      *
      * This method must be called before the user object is loaded from a provider.
      *
-     * @param int    $expires The expiry time as a unix timestamp
-     * @param string $hash    The plaintext hash provided by the request
+     * @param $expires The expiry time as a unix timestamp
+     * @param $hash    The plaintext hash provided by the request
      *
      * @throws InvalidSignatureException If the signature does not match the provided parameters
      * @throws ExpiredSignatureException If the signature is no longer valid
@@ -76,8 +76,8 @@ class SignatureHasher
     /**
      * Verifies the hash using the provided user and expire time.
      *
-     * @param int    $expires The expiry time as a unix timestamp
-     * @param string $hash    The plaintext hash provided by the request
+     * @param $expires The expiry time as a unix timestamp
+     * @param $hash    The plaintext hash provided by the request
      *
      * @throws InvalidSignatureException If the signature does not match the provided parameters
      * @throws ExpiredSignatureException If the signature is no longer valid
@@ -104,7 +104,7 @@ class SignatureHasher
     /**
      * Computes the secure hash for the provided user and expire time.
      *
-     * @param int $expires The expiry time as a unix timestamp
+     * @param $expires The expiry time as a unix timestamp
      */
     public function computeSignatureHash(UserInterface $user, int $expires): string
     {

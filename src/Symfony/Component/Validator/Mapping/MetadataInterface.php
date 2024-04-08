@@ -54,7 +54,7 @@ interface MetadataInterface
     /**
      * Returns all constraints for a given validation group.
      *
-     * @param string $group The validation group
+     * @param $group The validation group
      *
      * @return Constraint[]
      */

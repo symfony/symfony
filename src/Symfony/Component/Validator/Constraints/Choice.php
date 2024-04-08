@@ -50,14 +50,14 @@ class Choice extends Constraint
     }
 
     /**
-     * @param array|null           $choices  An array of choices (required unless a callback is specified)
-     * @param callable|string|null $callback Callback method to use instead of the choice option to get the choices
-     * @param bool|null            $multiple Whether to expect the value to be an array of valid choices (defaults to false)
-     * @param bool|null            $strict   This option defaults to true and should not be used
-     * @param int|null             $min      Minimum of valid choices if multiple values are expected
-     * @param int|null             $max      Maximum of valid choices if multiple values are expected
-     * @param string[]|null        $groups
-     * @param bool|null            $match    Whether to validate the values are part of the choices or not (defaults to true)
+     * @param               $choices  An array of choices (required unless a callback is specified)
+     * @param               $callback Callback method to use instead of the choice option to get the choices
+     * @param               $multiple Whether to expect the value to be an array of valid choices (defaults to false)
+     * @param               $strict   This option defaults to true and should not be used
+     * @param               $min      Minimum of valid choices if multiple values are expected
+     * @param               $max      Maximum of valid choices if multiple values are expected
+     * @param string[]|null $groups
+     * @param               $match    Whether to validate the values are part of the choices or not (defaults to true)
      */
     public function __construct(
         string|array $options = [],

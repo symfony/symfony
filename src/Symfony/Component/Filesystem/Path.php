@@ -251,8 +251,8 @@ final class Path
     /**
      * Returns the file name without the extension from a file path.
      *
-     * @param string|null $extension if specified, only that extension is cut
-     *                               off (may contain leading dot)
+     * @param $extension if specified, only that extension is cut
+     *                   off (may contain leading dot)
      */
     public static function getFilenameWithoutExtension(string $path, ?string $extension = null): string
     {
@@ -271,7 +271,7 @@ final class Path
     /**
      * Returns the extension from a file path (without leading dot).
      *
-     * @param bool $forceLowerCase forces the extension to be lower-case
+     * @param $forceLowerCase forces the extension to be lower-case
      */
     public static function getExtension(string $path, bool $forceLowerCase = false): string
     {
@@ -291,13 +291,13 @@ final class Path
     /**
      * Returns whether the path has an (or the specified) extension.
      *
-     * @param string               $path       the path string
+     * @param                      $path       the path string
      * @param string|string[]|null $extensions if null or not provided, checks if
      *                                         an extension exists, otherwise
      *                                         checks for the specified extension
      *                                         or array of extensions (with or
      *                                         without leading dot)
-     * @param bool                 $ignoreCase whether to ignore case-sensitivity
+     * @param                      $ignoreCase whether to ignore case-sensitivity
      */
     public static function hasExtension(string $path, $extensions = null, bool $ignoreCase = false): bool
     {
@@ -331,8 +331,8 @@ final class Path
     /**
      * Changes the extension of a path string.
      *
-     * @param string $path      The path string with filename.ext to change.
-     * @param string $extension new extension (with or without leading dot)
+     * @param $path      The path string with filename.ext to change.
+     * @param $extension new extension (with or without leading dot)
      *
      * @return string the path string with new file extension
      */
@@ -428,7 +428,7 @@ final class Path
      *
      * The result is a canonical path.
      *
-     * @param string $basePath an absolute base path
+     * @param $basePath an absolute base path
      *
      * @throws InvalidArgumentException if the base path is not absolute or if
      *                                  the given path is an absolute path with

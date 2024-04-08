@@ -38,7 +38,7 @@ interface ContextualValidatorInterface
      * If no constraint is passed, the constraint
      * {@link \Symfony\Component\Validator\Constraints\Valid} is assumed.
      *
-     * @param mixed                                                 $value       The value to validate
+     * @param                                                       $value       The value to validate
      * @param Constraint|Constraint[]|null                          $constraints The constraint(s) to validate against
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups      The validation groups to validate. If none is given, "Default" is assumed
      *
@@ -50,7 +50,7 @@ interface ContextualValidatorInterface
      * Validates a property of an object against the constraints specified
      * for this property.
      *
-     * @param string                                                $propertyName The name of the validated property
+     * @param                                                       $propertyName The name of the validated property
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups       The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return $this
@@ -61,9 +61,9 @@ interface ContextualValidatorInterface
      * Validates a value against the constraints specified for an object's
      * property.
      *
-     * @param object|string                                         $objectOrClass The object or its class name
-     * @param string                                                $propertyName  The name of the property
-     * @param mixed                                                 $value         The value to validate against the property's constraints
+     * @param                                                       $objectOrClass The object or its class name
+     * @param                                                       $propertyName  The name of the property
+     * @param                                                       $value         The value to validate against the property's constraints
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups        The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return $this

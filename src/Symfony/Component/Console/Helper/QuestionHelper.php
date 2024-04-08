@@ -396,7 +396,7 @@ class QuestionHelper extends Helper
      * Gets a hidden response from user.
      *
      * @param resource $inputStream The handler resource
-     * @param bool     $trimmable   Is the answer trimmable
+     * @param          $trimmable   Is the answer trimmable
      *
      * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
@@ -455,7 +455,7 @@ class QuestionHelper extends Helper
     /**
      * Validates an attempt.
      *
-     * @param callable $interviewer A callable that will ask for a question and return the result
+     * @param $interviewer A callable that will ask for a question and return the result
      *
      * @throws \Exception In case the max number of attempts has been reached and no valid response has been given
      */
@@ -497,7 +497,7 @@ class QuestionHelper extends Helper
      * Reads one or more lines of input and returns what is read.
      *
      * @param resource $inputStream The handler resource
-     * @param Question $question    The question being asked
+     * @param          $question    The question being asked
      */
     private function readInput($inputStream, Question $question): string|false
     {

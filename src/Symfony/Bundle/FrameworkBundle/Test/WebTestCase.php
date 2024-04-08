@@ -32,8 +32,8 @@ abstract class WebTestCase extends KernelTestCase
     /**
      * Creates a KernelBrowser.
      *
-     * @param array $options An array of options to pass to the createKernel method
-     * @param array $server  An array of server parameters
+     * @param $options An array of options to pass to the createKernel method
+     * @param $server  An array of server parameters
      */
     protected static function createClient(array $options = [], array $server = []): KernelBrowser
     {

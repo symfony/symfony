@@ -105,7 +105,7 @@ class Connection
     }
 
     /**
-     * @param int $delay The delay in milliseconds
+     * @param $delay The delay in milliseconds
      *
      * @return string The inserted id
      */

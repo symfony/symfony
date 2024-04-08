@@ -21,8 +21,8 @@ use Symfony\Component\ExpressionLanguage\Node\Node;
 class SerializedParsedExpression extends ParsedExpression
 {
     /**
-     * @param string $expression An expression
-     * @param string $nodes      The serialized nodes for the expression
+     * @param $expression An expression
+     * @param $nodes      The serialized nodes for the expression
      */
     public function __construct(
         string $expression,

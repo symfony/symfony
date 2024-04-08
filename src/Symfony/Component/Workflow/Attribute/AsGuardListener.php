@@ -24,11 +24,11 @@ final class AsGuardListener extends AsEventListener
     use BuildEventNameTrait;
 
     /**
-     * @param string|null $workflow   The id of the workflow to listen to
-     * @param string|null $transition The transition name to which the listener listens to
-     * @param string|null $method     The method to run when the listened event is triggered
-     * @param int         $priority   The priority of this listener if several are declared for the same transition
-     * @param string|null $dispatcher The service id of the event dispatcher to listen to
+     * @param $workflow   The id of the workflow to listen to
+     * @param $transition The transition name to which the listener listens to
+     * @param $method     The method to run when the listened event is triggered
+     * @param $priority   The priority of this listener if several are declared for the same transition
+     * @param $dispatcher The service id of the event dispatcher to listen to
      */
     public function __construct(
         ?string $workflow = null,

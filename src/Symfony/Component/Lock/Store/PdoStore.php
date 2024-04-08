@@ -56,9 +56,9 @@ class PdoStore implements PersistingStoreInterface
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: []]
      *
-     * @param array $options       An associative array of options
-     * @param float $gcProbability Probability expressed as floating number between 0 and 1 to clean old locks
-     * @param int   $initialTtl    The expiration delay of locks in seconds
+     * @param $options       An associative array of options
+     * @param $gcProbability Probability expressed as floating number between 0 and 1 to clean old locks
+     * @param $initialTtl    The expiration delay of locks in seconds
      *
      * @throws InvalidArgumentException When first argument is not PDO nor Connection nor string
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION

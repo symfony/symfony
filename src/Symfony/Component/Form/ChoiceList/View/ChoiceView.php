@@ -23,11 +23,11 @@ class ChoiceView
     /**
      * Creates a new choice view.
      *
-     * @param mixed                              $data                       The original choice
-     * @param string                             $value                      The view representation of the choice
-     * @param string|TranslatableInterface|false $label                      The label displayed to humans; pass false to discard the label
-     * @param array                              $attr                       Additional attributes for the HTML tag
-     * @param array                              $labelTranslationParameters Additional parameters used to translate the label
+     * @param $data                       The original choice
+     * @param $value                      The view representation of the choice
+     * @param $label                      The label displayed to humans; pass false to discard the label
+     * @param $attr                       Additional attributes for the HTML tag
+     * @param $labelTranslationParameters Additional parameters used to translate the label
      */
     public function __construct(
         public mixed $data,

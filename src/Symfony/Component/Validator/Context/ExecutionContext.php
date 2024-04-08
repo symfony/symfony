@@ -101,7 +101,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * @internal Called by {@link ExecutionContextFactory}. Should not be used in user code.
      *
-     * @param mixed $root the root value of the validated object graph
+     * @param $root the root value of the validated object graph
      */
     public function __construct(
         private ValidatorInterface $validator,

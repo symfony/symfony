@@ -30,7 +30,7 @@ class Connection
     private $socket;
 
     /**
-     * @param string                     $host             The server host
+     * @param                            $host             The server host
      * @param ContextProviderInterface[] $contextProviders Context providers indexed by context name
      */
     public function __construct(string $host, array $contextProviders = [])

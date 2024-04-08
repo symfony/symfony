@@ -34,7 +34,7 @@ class FragmentHandler
 
     /**
      * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances
-     * @param bool                        $debug     Whether the debug mode is enabled or not
+     * @param                             $debug     Whether the debug mode is enabled or not
      */
     public function __construct(
         private RequestStack $requestStack,

@@ -27,11 +27,11 @@ interface NormalizableInterface
      * It is important to understand that the normalize() call should normalize
      * recursively all child objects of the implementor.
      *
-     * @param NormalizerInterface $normalizer The normalizer is given so that you
-     *                                        can use it to normalize objects contained within this object
-     * @param string|null         $format     The format is optionally given to be able to normalize differently
-     *                                        based on different output formats
-     * @param array               $context    Options for normalizing this object
+     * @param $normalizer The normalizer is given so that you
+     *                    can use it to normalize objects contained within this object
+     * @param $format     The format is optionally given to be able to normalize differently
+     *                    based on different output formats
+     * @param $context    Options for normalizing this object
      */
     public function normalize(NormalizerInterface $normalizer, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
 }

@@ -22,8 +22,8 @@ use Symfony\Component\Form\FormEvents;
 class MergeCollectionListener implements EventSubscriberInterface
 {
     /**
-     * @param bool $allowAdd    Whether values might be added to the collection
-     * @param bool $allowDelete Whether values might be removed from the collection
+     * @param $allowAdd    Whether values might be added to the collection
+     * @param $allowDelete Whether values might be removed from the collection
      */
     public function __construct(
         private bool $allowAdd = false,

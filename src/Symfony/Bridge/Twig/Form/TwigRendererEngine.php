@@ -127,11 +127,11 @@ class TwigRendererEngine extends AbstractRendererEngine
     /**
      * Loads the resources for all blocks in a theme.
      *
-     * @param mixed $theme The theme to load the block from. This parameter
-     *                     is passed by reference, because it might be necessary
-     *                     to initialize the theme first. Any changes made to
-     *                     this variable will be kept and be available upon
-     *                     further calls to this method using the same theme.
+     * @param $theme The theme to load the block from. This parameter
+     *               is passed by reference, because it might be necessary
+     *               to initialize the theme first. Any changes made to
+     *               this variable will be kept and be available upon
+     *               further calls to this method using the same theme.
      */
     protected function loadResourcesFromTheme(string $cacheKey, mixed &$theme): void
     {

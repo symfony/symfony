@@ -76,7 +76,7 @@ final class SpotHitTransport extends AbstractTransport
     }
 
     /**
-     * @param MessageInterface|SmsMessage $message
+     * @param $message
      *
      * @throws TransportExceptionInterface
      * @throws ClientExceptionInterface

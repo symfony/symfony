@@ -34,8 +34,8 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
     private string|array|null $subnets;
 
     /**
-     * @param string|array|null $subnets String or array of subnets using CIDR notation that will be used by IpUtils.
-     *                                   If null is passed, the standard private subnets will be used.
+     * @param $subnets String or array of subnets using CIDR notation that will be used by IpUtils.
+     *                 If null is passed, the standard private subnets will be used.
      */
     public function __construct(HttpClientInterface $client, string|array|null $subnets = null)
     {

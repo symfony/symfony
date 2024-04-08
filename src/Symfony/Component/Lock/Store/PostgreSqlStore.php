@@ -43,7 +43,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: []]
      *
-     * @param array $options An associative array of options
+     * @param $options An associative array of options
      *
      * @throws InvalidArgumentException When first argument is not PDO nor Connection nor string
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION

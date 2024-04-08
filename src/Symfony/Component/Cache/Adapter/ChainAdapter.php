@@ -40,7 +40,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 
     /**
      * @param CacheItemPoolInterface[] $adapters        The ordered list of adapters used to fetch cached items
-     * @param int                      $defaultLifetime The default lifetime of items propagated from lower adapters to upper ones
+     * @param                          $defaultLifetime The default lifetime of items propagated from lower adapters to upper ones
      */
     public function __construct(
         array $adapters,

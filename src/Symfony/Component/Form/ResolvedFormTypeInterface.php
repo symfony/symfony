@@ -45,7 +45,7 @@ interface ResolvedFormTypeInterface
     /**
      * Creates a new form builder for this type.
      *
-     * @param string $name The name for the builder
+     * @param $name The name for the builder
      */
     public function createBuilder(FormFactoryInterface $factory, string $name, array $options = []): FormBuilderInterface;
 

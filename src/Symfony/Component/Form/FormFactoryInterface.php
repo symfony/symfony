@@ -26,7 +26,7 @@ interface FormFactoryInterface
      *
      * @see createBuilder()
      *
-     * @param mixed $data The initial data
+     * @param $data The initial data
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -37,7 +37,7 @@ interface FormFactoryInterface
      *
      * @see createNamedBuilder()
      *
-     * @param mixed $data The initial data
+     * @param $data The initial data
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -48,9 +48,9 @@ interface FormFactoryInterface
      *
      * @see createBuilderForProperty()
      *
-     * @param string $class    The fully qualified class name
-     * @param string $property The name of the property to guess for
-     * @param mixed  $data     The initial data
+     * @param $class    The fully qualified class name
+     * @param $property The name of the property to guess for
+     * @param $data     The initial data
      *
      * @throws InvalidOptionsException if any given option is not applicable to the form type
      */
@@ -59,7 +59,7 @@ interface FormFactoryInterface
     /**
      * Returns a form builder.
      *
-     * @param mixed $data The initial data
+     * @param $data The initial data
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -68,7 +68,7 @@ interface FormFactoryInterface
     /**
      * Returns a form builder.
      *
-     * @param mixed $data The initial data
+     * @param $data The initial data
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -80,9 +80,9 @@ interface FormFactoryInterface
      * If any of the 'required' and type options can be guessed,
      * and are not provided in the options argument, the guessed value is used.
      *
-     * @param string $class    The fully qualified class name
-     * @param string $property The name of the property to guess for
-     * @param mixed  $data     The initial data
+     * @param $class    The fully qualified class name
+     * @param $property The name of the property to guess for
+     * @param $data     The initial data
      *
      * @throws InvalidOptionsException if any given option is not applicable to the form type
      */

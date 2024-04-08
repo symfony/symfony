@@ -37,7 +37,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
     private array $baseUris = [];
 
     /**
-     * @param int $maxRetries The maximum number of times to retry
+     * @param $maxRetries The maximum number of times to retry
      */
     public function __construct(HttpClientInterface $client, ?RetryStrategyInterface $strategy = null, int $maxRetries = 3, ?LoggerInterface $logger = null)
     {

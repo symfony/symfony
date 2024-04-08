@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class HttpFoundationFactory implements HttpFoundationFactoryInterface
 {
     /**
-     * @param int $responseBufferMaxLength The maximum output buffering size for each iteration when sending the response
+     * @param $responseBufferMaxLength The maximum output buffering size for each iteration when sending the response
      */
     public function __construct(
         private readonly int $responseBufferMaxLength = 16372,

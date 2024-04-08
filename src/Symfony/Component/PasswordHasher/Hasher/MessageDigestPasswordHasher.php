@@ -27,9 +27,9 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
     private int $hashLength = -1;
 
     /**
-     * @param string $algorithm          The digest algorithm to use
-     * @param bool   $encodeHashAsBase64 Whether to base64 encode the password hash
-     * @param int    $iterations         The number of iterations to use to stretch the password hash
+     * @param $algorithm          The digest algorithm to use
+     * @param $encodeHashAsBase64 Whether to base64 encode the password hash
+     * @param $iterations         The number of iterations to use to stretch the password hash
      */
     public function __construct(
         private string $algorithm = 'sha512',

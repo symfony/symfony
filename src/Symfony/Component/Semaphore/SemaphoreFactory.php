@@ -31,8 +31,8 @@ class SemaphoreFactory implements LoggerAwareInterface
     }
 
     /**
-     * @param float|null $ttlInSecond Maximum expected semaphore duration in seconds
-     * @param bool       $autoRelease Whether to automatically release the semaphore or not when the semaphore instance is destroyed
+     * @param $ttlInSecond Maximum expected semaphore duration in seconds
+     * @param $autoRelease Whether to automatically release the semaphore or not when the semaphore instance is destroyed
      */
     public function createSemaphore(string $resource, int $limit, int $weight = 1, ?float $ttlInSecond = 300.0, bool $autoRelease = true): SemaphoreInterface
     {
@@ -40,8 +40,8 @@ class SemaphoreFactory implements LoggerAwareInterface
     }
 
     /**
-     * @param float|null $ttlInSecond Maximum expected semaphore duration in seconds
-     * @param bool       $autoRelease Whether to automatically release the semaphore or not when the semaphore instance is destroyed
+     * @param $ttlInSecond Maximum expected semaphore duration in seconds
+     * @param $autoRelease Whether to automatically release the semaphore or not when the semaphore instance is destroyed
      */
     public function createSemaphoreFromKey(Key $key, ?float $ttlInSecond = 300.0, bool $autoRelease = true): SemaphoreInterface
     {

@@ -27,10 +27,10 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     private \DateTimeInterface $referenceDate;
 
     /**
-     * @param string|null   $inputTimezone  The input timezone
-     * @param string|null   $outputTimezone The output timezone
+     * @param               $inputTimezone  The input timezone
+     * @param               $outputTimezone The output timezone
      * @param string[]|null $fields         The date fields
-     * @param bool          $pad            Whether to use padding
+     * @param               $pad            Whether to use padding
      */
     public function __construct(
         ?string $inputTimezone = null,

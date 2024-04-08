@@ -157,9 +157,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets the node as deprecated.
      *
-     * @param string $package The name of the composer package that is triggering the deprecation
-     * @param string $version The version of the package that introduced the deprecation
-     * @param string $message the deprecation message to use
+     * @param $package The name of the composer package that is triggering the deprecation
+     * @param $version The version of the package that introduced the deprecation
+     * @param $message the deprecation message to use
      *
      * You can use %node% and %path% placeholders in your message to display,
      * respectively, the node name and its complete path

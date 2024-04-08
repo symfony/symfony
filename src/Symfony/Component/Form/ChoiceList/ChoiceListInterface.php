@@ -129,8 +129,8 @@ interface ChoiceListInterface
      * The values are returned with the same keys and in the same order as the
      * corresponding choices in the given array.
      *
-     * @param array $choices An array of choices. Non-existing choices in this
-     *                       array are ignored
+     * @param $choices An array of choices. Non-existing choices in this
+     *                 array are ignored
      *
      * @return string[]
      */

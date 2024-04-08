@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class AutowireServiceClosure extends Autowire
 {
     /**
-     * @param string $service The service id to wrap in the closure
+     * @param $service The service id to wrap in the closure
      */
     public function __construct(string $service)
     {

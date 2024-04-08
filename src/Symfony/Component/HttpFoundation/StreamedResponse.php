@@ -32,7 +32,7 @@ class StreamedResponse extends Response
     private bool $headersSent = false;
 
     /**
-     * @param int $status The HTTP status code (200 "OK" by default)
+     * @param $status The HTTP status code (200 "OK" by default)
      */
     public function __construct(?callable $callback = null, int $status = 200, array $headers = [])
     {

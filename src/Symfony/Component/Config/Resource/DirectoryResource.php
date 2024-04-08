@@ -23,8 +23,8 @@ class DirectoryResource implements SelfCheckingResourceInterface
     private string $resource;
 
     /**
-     * @param string      $resource The file path to the resource
-     * @param string|null $pattern  A pattern to restrict monitored files
+     * @param $resource The file path to the resource
+     * @param $pattern  A pattern to restrict monitored files
      *
      * @throws \InvalidArgumentException
      */

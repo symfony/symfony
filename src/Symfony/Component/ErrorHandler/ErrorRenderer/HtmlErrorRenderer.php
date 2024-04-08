@@ -42,8 +42,8 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private static string $template = 'views/error.html.php';
 
     /**
-     * @param bool|callable   $debug        The debugging mode as a boolean or a callable that should return it
-     * @param string|callable $outputBuffer The output buffer as a string or a callable that should return it
+     * @param $debug        The debugging mode as a boolean or a callable that should return it
+     * @param $outputBuffer The output buffer as a string or a callable that should return it
      */
     public function __construct(
         bool|callable $debug = false,
@@ -213,8 +213,8 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     /**
      * Formats a file path.
      *
-     * @param string $file An absolute file path
-     * @param int    $line The line number
+     * @param        $file An absolute file path
+     * @param        $line The line number
      * @param string $text Use this text for the link rather than the file path
      */
     private function formatFile(string $file, int $line, ?string $text = null): string
@@ -241,9 +241,9 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     /**
      * Returns an excerpt of a code file around the given line number.
      *
-     * @param string $file       A file path
-     * @param int    $line       The selected line number
-     * @param int    $srcContext The number of displayed lines around or -1 for the whole file
+     * @param $file       A file path
+     * @param $line       The selected line number
+     * @param $srcContext The number of displayed lines around or -1 for the whole file
      */
     private function fileExcerpt(string $file, int $line, int $srcContext = 3): string
     {
@@ -346,7 +346,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     /**
      * Allows overriding the default non-debug template.
      *
-     * @param string $template path to the custom template file to render
+     * @param $template path to the custom template file to render
      */
     public static function setTemplate(string $template): void
     {

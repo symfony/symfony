@@ -18,7 +18,7 @@ namespace Symfony\Component\RemoteEvent\Attribute;
 class AsRemoteEventConsumer
 {
     /**
-     * @param string $name The name of the remote event consumer, used to identify it when defining remote events
+     * @param $name The name of the remote event consumer, used to identify it when defining remote events
      */
     public function __construct(
         public string $name,

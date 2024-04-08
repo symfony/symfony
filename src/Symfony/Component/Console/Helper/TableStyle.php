@@ -152,18 +152,18 @@ class TableStyle
      * 7═══════════════6══════════════════════════6══════════════════5
      * </code>
      *
-     * @param string      $cross          Crossing char (see #0 of example)
-     * @param string      $topLeft        Top left char (see #1 of example)
-     * @param string      $topMid         Top mid char (see #2 of example)
-     * @param string      $topRight       Top right char (see #3 of example)
-     * @param string      $midRight       Mid right char (see #4 of example)
-     * @param string      $bottomRight    Bottom right char (see #5 of example)
-     * @param string      $bottomMid      Bottom mid char (see #6 of example)
-     * @param string      $bottomLeft     Bottom left char (see #7 of example)
-     * @param string      $midLeft        Mid left char (see #8 of example)
-     * @param string|null $topLeftBottom  Top left bottom char (see #8' of example), equals to $midLeft if null
-     * @param string|null $topMidBottom   Top mid bottom char (see #0' of example), equals to $cross if null
-     * @param string|null $topRightBottom Top right bottom char (see #4' of example), equals to $midRight if null
+     * @param $cross          Crossing char (see #0 of example)
+     * @param $topLeft        Top left char (see #1 of example)
+     * @param $topMid         Top mid char (see #2 of example)
+     * @param $topRight       Top right char (see #3 of example)
+     * @param $midRight       Mid right char (see #4 of example)
+     * @param $bottomRight    Bottom right char (see #5 of example)
+     * @param $bottomMid      Bottom mid char (see #6 of example)
+     * @param $bottomLeft     Bottom left char (see #7 of example)
+     * @param $midLeft        Mid left char (see #8 of example)
+     * @param $topLeftBottom  Top left bottom char (see #8' of example), equals to $midLeft if null
+     * @param $topMidBottom   Top mid bottom char (see #0' of example), equals to $cross if null
+     * @param $topRightBottom Top right bottom char (see #4' of example), equals to $midRight if null
      *
      * @return $this
      */

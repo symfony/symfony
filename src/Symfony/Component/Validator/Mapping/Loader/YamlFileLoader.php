@@ -70,7 +70,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses a collection of YAML nodes.
      *
-     * @param array $nodes The YAML nodes
+     * @param $nodes The YAML nodes
      *
      * @return array<array|scalar|Constraint>
      */

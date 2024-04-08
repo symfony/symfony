@@ -24,8 +24,8 @@ class Node
     public array $attributes = [];
 
     /**
-     * @param array $nodes      An array of nodes
-     * @param array $attributes An array of attributes
+     * @param $nodes      An array of nodes
+     * @param $attributes An array of attributes
      */
     public function __construct(array $nodes = [], array $attributes = [])
     {

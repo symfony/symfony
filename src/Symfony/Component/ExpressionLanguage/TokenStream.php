@@ -54,7 +54,7 @@ class TokenStream
     }
 
     /**
-     * @param string|null $message The syntax error message
+     * @param $message The syntax error message
      */
     public function expect(string $type, ?string $value = null, ?string $message = null): void
     {

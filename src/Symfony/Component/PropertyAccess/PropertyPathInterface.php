@@ -50,7 +50,7 @@ interface PropertyPathInterface extends \Traversable, \Stringable
     /**
      * Returns the element at the given index in the property path.
      *
-     * @param int $index The index key
+     * @param $index The index key
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */
@@ -59,7 +59,7 @@ interface PropertyPathInterface extends \Traversable, \Stringable
     /**
      * Returns whether the element at the given index is a property.
      *
-     * @param int $index The index in the property path
+     * @param $index The index in the property path
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */
@@ -68,7 +68,7 @@ interface PropertyPathInterface extends \Traversable, \Stringable
     /**
      * Returns whether the element at the given index is an array index.
      *
-     * @param int $index The index in the property path
+     * @param $index The index in the property path
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */

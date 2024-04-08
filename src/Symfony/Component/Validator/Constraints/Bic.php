@@ -49,8 +49,8 @@ class Bic extends Constraint
 
     /**
      * @param array<string,mixed>|null $options
-     * @param string|null              $iban             An IBAN value to validate that its country code is the same as the BIC's one
-     * @param string|null              $ibanPropertyPath Property path to the IBAN value when validating objects
+     * @param                          $iban             An IBAN value to validate that its country code is the same as the BIC's one
+     * @param                          $ibanPropertyPath Property path to the IBAN value when validating objects
      * @param string[]|null            $groups
      */
     public function __construct(?array $options = null, ?string $message = null, ?string $iban = null, ?string $ibanPropertyPath = null, ?string $ibanMessage = null, ?array $groups = null, mixed $payload = null)

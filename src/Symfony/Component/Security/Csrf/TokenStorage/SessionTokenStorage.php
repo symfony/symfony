@@ -34,7 +34,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
     /**
      * Initializes the storage with a RequestStack object and a session namespace.
      *
-     * @param string $namespace The namespace under which the token is stored in the requestStack
+     * @param $namespace The namespace under which the token is stored in the requestStack
      */
     public function __construct(RequestStack $requestStack, string $namespace = self::SESSION_NAMESPACE)
     {

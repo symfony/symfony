@@ -22,11 +22,11 @@ class MockStream
     /**
      * Opens file or URL.
      *
-     * @param string      $path        Specifies the URL that was passed to the original function
-     * @param string      $mode        The mode used to open the file, as detailed for fopen()
-     * @param int         $options     Holds additional flags set by the streams API
-     * @param string|null $opened_path If the path is opened successfully, and STREAM_USE_PATH is set in options,
-     *                                 opened_path should be set to the full path of the file/resource that was actually opened
+     * @param $path        Specifies the URL that was passed to the original function
+     * @param $mode        The mode used to open the file, as detailed for fopen()
+     * @param $options     Holds additional flags set by the streams API
+     * @param $opened_path If the path is opened successfully, and STREAM_USE_PATH is set in options,
+     *                     opened_path should be set to the full path of the file/resource that was actually opened
      */
     public function stream_open(string $path, string $mode, int $options, ?string &$opened_path = null): bool
     {
@@ -34,8 +34,8 @@ class MockStream
     }
 
     /**
-     * @param string $path  The file path or URL to stat
-     * @param int    $flags Holds additional flags set by the streams API
+     * @param $path  The file path or URL to stat
+     * @param $flags Holds additional flags set by the streams API
      */
     public function url_stat(string $path, int $flags): array
     {

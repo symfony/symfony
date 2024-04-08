@@ -13,11 +13,11 @@ interface InterfaceWithAnnotatedParameters
     public function whereAmI();
 
     /**
-     * @param       $noType with $dollar after
+     * @param                                                 $noType   with $dollar after
      * @param callable(\Throwable|null $reason, mixed $value) $callback and a comment
-     * about this great param
-     * @param string                                          $param (comment with $dollar)
-     * @param $defined
+     *                                                                  about this great param
+     * @param string                                          $param    (comment with $dollar)
+     * @param                                                 $defined
      * @param  callable  ($a,  $b)  $anotherOne
      * @param callable (mixed $a, $b) $definedCallable
      * @param \JustAType

@@ -36,7 +36,7 @@ class MemcachedStore implements PersistingStoreInterface
     }
 
     /**
-     * @param int $initialTtl the expiration delay of locks in seconds
+     * @param $initialTtl the expiration delay of locks in seconds
      */
     public function __construct(\Memcached $memcached, int $initialTtl = 300)
     {

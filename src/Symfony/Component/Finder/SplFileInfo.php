@@ -19,9 +19,9 @@ namespace Symfony\Component\Finder;
 class SplFileInfo extends \SplFileInfo
 {
     /**
-     * @param string $file             The file name
-     * @param string $relativePath     The relative path
-     * @param string $relativePathname The relative path name
+     * @param $file             The file name
+     * @param $relativePath     The relative path
+     * @param $relativePathname The relative path name
      */
     public function __construct(
         string $file,

@@ -37,9 +37,9 @@ final class MethodMarkingStore implements MarkingStoreInterface
     private array $setters = [];
 
     /**
-     * @param string $property Used to determine methods or property to call
-     *                         The `getMarking` method will use `$subject->getProperty()` or `$subject->property`
-     *                         The `setMarking` method will use `$subject->setProperty(string|array $places, array $context = [])` or `$subject->property = string|array $places`
+     * @param $property Used to determine methods or property to call
+     *                  The `getMarking` method will use `$subject->getProperty()` or `$subject->property`
+     *                  The `setMarking` method will use `$subject->setProperty(string|array $places, array $context = [])` or `$subject->property = string|array $places`
      */
     public function __construct(
         private bool $singleState = false,

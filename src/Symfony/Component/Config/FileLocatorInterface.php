@@ -21,9 +21,9 @@ interface FileLocatorInterface
     /**
      * Returns a full path for a given file name.
      *
-     * @param string      $name        The file name to locate
-     * @param string|null $currentPath The current path
-     * @param bool        $first       Whether to return the first occurrence or an array of filenames
+     * @param $name        The file name to locate
+     * @param $currentPath The current path
+     * @param $first       Whether to return the first occurrence or an array of filenames
      *
      * @return string|string[] The full path to the file or an array of file paths
      *

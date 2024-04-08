@@ -221,7 +221,7 @@ abstract class AbstractUnicodeString extends AbstractString
     }
 
     /**
-     * @param string $locale In the format language_region (e.g. tr_TR)
+     * @param $locale In the format language_region (e.g. tr_TR)
      */
     public function localeLower(string $locale): static
     {
@@ -379,7 +379,7 @@ abstract class AbstractUnicodeString extends AbstractString
     }
 
     /**
-     * @param string $locale In the format language_region (e.g. tr_TR)
+     * @param $locale In the format language_region (e.g. tr_TR)
      */
     public function localeTitle(string $locale): static
     {
@@ -481,7 +481,7 @@ abstract class AbstractUnicodeString extends AbstractString
     }
 
     /**
-     * @param string $locale In the format language_region (e.g. tr_TR)
+     * @param $locale In the format language_region (e.g. tr_TR)
      */
     public function localeUpper(string $locale): static
     {

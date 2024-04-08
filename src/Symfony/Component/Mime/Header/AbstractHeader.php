@@ -82,8 +82,8 @@ abstract class AbstractHeader implements HeaderInterface
     /**
      * Produces a compliant, formatted RFC 2822 'phrase' based on the string given.
      *
-     * @param string $string  as displayed
-     * @param bool   $shorten the first line to make remove for header name
+     * @param $string  as displayed
+     * @param $shorten the first line to make remove for header name
      */
     protected function createPhrase(HeaderInterface $header, string $string, string $charset, bool $shorten = false): string
     {

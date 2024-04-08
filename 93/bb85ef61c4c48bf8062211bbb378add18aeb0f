@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-04-06T00:02:10Z
+
+🇫🇷 If you want (i can open a PR if you prefer)
+
+src/Symfony/Component/Validator/Resources/translations/validators.fr.xlf
+
+```xlif
+            <trans-unit id="113">
+                <source>This URL does not contain a TLD.</source>
+                <target>Cette URL ne contient pas de TLD.</target>
+            </trans-unit>
+```

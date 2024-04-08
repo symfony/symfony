@@ -663,7 +663,12 @@ class Command
                     $optionName = $inputOption->getName();
                     $optionValue = $input->getOption($optionName);
                     if (isset($optionValue) && $optionValue !== $inputOption->getDefault()) {
-                        $deprecationMessages[] = sprintf('The option "--%s" is deprecated.', $optionName);
+                        $optionShortcut = $inputOption->getShortcut();
+                        $deprecationMessages[] = sprintf(
+                            'The option "--%s%s" is deprecated.',
+                            $optionName,
+                            $optionShortcut === null ? '' : ('|-' . $optionShortcut)
+                        );
                     }
                 } catch (\InvalidArgumentException $exception) {
                     // option not used, ignore

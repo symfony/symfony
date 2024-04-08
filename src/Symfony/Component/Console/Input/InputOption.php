@@ -51,8 +51,7 @@ class InputOption
     public const VALUE_NEGATABLE = 16;
 
     /**
-     * The option allows to deprecate command option.
-     * Option will be marked as deprecated in help output and a warning is printed when the command is executed.
+     * Mark the option as deprecated in help output. A message is printed when the command is executed.
      */
     public const DEPRECATED = 32;
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-05T10:03:28Z
+
+/cc @yceruto :pray:
+
+---------------------------------------------------------------------------
+
+by stof at 2024-04-05T10:09:31Z
+
+why do we use 2 variables that must contain the same content ? Wouldn't it be simpler to use a single variable (or maybe to do `$transPaths = $dirs` when reaching the end of the common initialization instead ?)

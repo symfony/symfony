@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-03-27T15:30:40Z
+
+I suggest putting a text file in the repo near the mermaid file mentioning the version of mermaid being included as well as how to build it. Otherwise, updating mermaid will be a pain.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-03-27T15:31:32Z
+
+or even better, a script (in a location excluded from the composer archive) that actually generates the file, so that updating mermaid is a matter of updating the version in the script and running it.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-03-27T15:46:13Z
+
+@stof are you thinking of something like [Intl’s compile script](https://github.com/symfony/symfony/blob/e70dcb124ef9d01f3ef5d221e23a5d313a57b4e2/src/Symfony/Component/Intl/Resources/bin/compile)? It’s the only precedent I’m aware of but it comes with the component and require a specific Docker image.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-03-27T16:01:54Z
+
+@MatTheCat no, it is not include in the archives: https://github.com/symfony/symfony/blob/e70dcb124ef9d01f3ef5d221e23a5d313a57b4e2/src/Symfony/Component/Intl/.gitattributes#L3
+
+---------------------------------------------------------------------------
+
+by stof at 2024-03-27T16:03:38Z
+
+regarding requiring a Docker image, this script was implemented this way to simplify things as it requires being run with a specific version of icu to achieve its purpose.
+https://github.com/symfony/symfony/tree/e70dcb124ef9d01f3ef5d221e23a5d313a57b4e2/src/Symfony/Component/Emoji/Resources/bin is not relying on Docker.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-03-28T13:49:13Z
+
+Okay, added a Makefile to generate `mermaid-flowchart-v2.min.js` for a given tag.

@@ -300,7 +300,7 @@ class ConnectionTest extends TestCase
         $platform = $this->createMock(AbstractPlatform::class);
 
         if (!method_exists(QueryBuilder::class, 'forUpdate')) {
-            $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE');
+            $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE SKIP LOCKED');
         }
 
         $configuration = $this->createMock(\Doctrine\DBAL\Configuration::class);
@@ -584,7 +584,7 @@ class ConnectionTest extends TestCase
 
         yield 'SQL Server' => [
             class_exists(SQLServerPlatform::class) && !class_exists(SQLServer2012Platform::class) ? new SQLServerPlatform() : new SQLServer2012Platform(),
-            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK, READPAST) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+            sprintf('SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK%s) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ', method_exists(QueryBuilder::class, 'forUpdate') ? ', READPAST' : ''),
         ];
 
         if (!class_exists(MySQL57Platform::class)) {
@@ -597,7 +597,7 @@ class ConnectionTest extends TestCase
             // DBAL < 4
             yield 'Oracle' => [
                 new OraclePlatform(),
-                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE SKIP LOCKED',
+                sprintf('SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE%s', method_exists(QueryBuilder::class, 'forUpdate') ? ' SKIP LOCKED' : ''),
             ];
         }
     }

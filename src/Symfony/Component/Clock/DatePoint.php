@@ -66,6 +66,27 @@ final class DatePoint extends \DateTimeImmutable
         return parent::createFromMutable($object);
     }
 
+    public static function createFromTimestamp(int|float $timestamp): static
+    {
+        if (\PHP_VERSION_ID >= 80400) {
+            return parent::createFromTimestamp($timestamp);
+        }
+
+        if (\is_int($timestamp) || !$ms = (int) $timestamp - $timestamp) {
+            return static::createFromFormat('U', (string) $timestamp);
+        }
+
+        if (!is_finite($timestamp) || \PHP_INT_MAX + 1.0 <= $timestamp || \PHP_INT_MIN > $timestamp) {
+            throw new \DateRangeError(sprintf('DateTimeImmutable::createFromTimestamp(): Argument #1 ($timestamp) must be a finite number between %s and %s.999999, %s given', \PHP_INT_MIN, \PHP_INT_MAX, $timestamp));
+        }
+
+        if ($timestamp < 0) {
+            $timestamp = (int) $timestamp - 2.0 + $ms;
+        }
+
+        return static::createFromFormat('U.u', sprintf('%.6F', $timestamp));
+    }
+
     public function add(\DateInterval $interval): static
     {
         return parent::add($interval);

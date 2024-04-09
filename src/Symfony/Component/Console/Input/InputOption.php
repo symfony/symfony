@@ -167,7 +167,7 @@ class InputOption
      */
     public function isValueRequired(): bool
     {
-        return $this->hastMode(self::VALUE_REQUIRED);
+        return $this->hasMode(self::VALUE_REQUIRED);
     }
 
     /**
@@ -177,7 +177,7 @@ class InputOption
      */
     public function isValueOptional(): bool
     {
-        return $this->hastMode(self::VALUE_OPTIONAL);
+        return $this->hasMode(self::VALUE_OPTIONAL);
     }
 
     /**
@@ -187,7 +187,7 @@ class InputOption
      */
     public function isArray(): bool
     {
-        return $this->hastMode(self::VALUE_IS_ARRAY);
+        return $this->hasMode(self::VALUE_IS_ARRAY);
     }
 
     /**
@@ -197,7 +197,7 @@ class InputOption
      */
     public function isDeprecated(): bool
     {
-        return $this->hastMode(self::DEPRECATED);
+        return $this->hasMode(self::DEPRECATED);
     }
 
     /**
@@ -207,7 +207,7 @@ class InputOption
      */
     public function isHidden(): bool
     {
-        return $this->hastMode(self::HIDDEN);
+        return $this->hasMode(self::HIDDEN);
     }
 
     /**
@@ -217,7 +217,7 @@ class InputOption
      */
     public function isNegatable(): bool
     {
-        return $this->hastMode(self::VALUE_NEGATABLE);
+        return $this->hasMode(self::VALUE_NEGATABLE);
     }
 
     /**
@@ -300,7 +300,7 @@ class InputOption
      *
      * @return bool true if mode is $mode, false otherwise
      */
-    protected function hastMode(int $mode): bool
+    protected function hasMode(int $mode): bool
     {
         return $mode === ($mode & $this->mode);
     }

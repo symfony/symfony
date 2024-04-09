@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedPropertyException;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Aurélien Pillevesse <aurelienpillevesse@hotmail.fr>
  */
-class CamelCaseToSnakeCaseNameConverter implements AdvancedNameConverterInterface
+class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
 {
     /**
      * Require all properties to be written in snake_case.
@@ -36,7 +36,7 @@ class CamelCaseToSnakeCaseNameConverter implements AdvancedNameConverterInterfac
     ) {
     }
 
-    public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
+    public function normalize(string $propertyName/* , ?string $class = null, ?string $format = null, array $context = [] */): string
     {
         if (null === $this->attributes || \in_array($propertyName, $this->attributes, true)) {
             return strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($propertyName)));
@@ -45,8 +45,12 @@ class CamelCaseToSnakeCaseNameConverter implements AdvancedNameConverterInterfac
         return $propertyName;
     }
 
-    public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
+    public function denormalize(string $propertyName/* , ?string $class = null, ?string $format = null, array $context = [] */): string
     {
+        $class = 1 < \func_num_args() ? func_get_arg(1) : null;
+        $format = 2 < \func_num_args() ? func_get_arg(2) : null;
+        $context = 3 < \func_num_args() ? func_get_arg(3) : [];
+
         if (($context[self::REQUIRE_SNAKE_CASE_PROPERTIES] ?? false) && $propertyName !== $this->normalize($propertyName, $class, $format, $context)) {
             throw new UnexpectedPropertyException($propertyName);
         }

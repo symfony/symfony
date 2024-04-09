@@ -4,6 +4,7 @@ CHANGELOG
 7.1
 ---
 
+ * Add arguments `$class`, `$format` and `$context` to `NameConverterInterface::normalize()` and `NameConverterInterface::denormalize()`
  * Add `DateTimeNormalizer::CAST_KEY` context option
  * Add `Default` and "class name" default groups
  * Add `AbstractNormalizer::FILTER_BOOL` context option

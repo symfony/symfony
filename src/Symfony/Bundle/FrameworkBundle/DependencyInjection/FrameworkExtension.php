@@ -2647,6 +2647,7 @@ class FrameworkExtension extends Extension
         $envelopeListener = $container->getDefinition('mailer.envelope_listener');
         $envelopeListener->setArgument(0, $config['envelope']['sender'] ?? null);
         $envelopeListener->setArgument(1, $config['envelope']['recipients'] ?? null);
+        $envelopeListener->setArgument(2, $config['envelope']['allowed_recipients'] ?? []);
 
         if ($config['headers']) {
             $headers = new Definition(Headers::class);

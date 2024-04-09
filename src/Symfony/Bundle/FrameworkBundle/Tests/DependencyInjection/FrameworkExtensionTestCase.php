@@ -2043,6 +2043,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'mailer_with_dsn',
             ['main' => 'smtp://example.com'],
             ['redirected@example.org'],
+            ['foobar@example\.org'],
         ];
         yield [
             'mailer_with_transports',
@@ -2051,13 +2052,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'transport2' => 'smtp://example2.com',
             ],
             ['redirected@example.org', 'redirected1@example.org'],
+            ['foobar@example\.org', '.*@example\.com'],
         ];
     }
 
     /**
      * @dataProvider provideMailer
      */
-    public function testMailer(string $configFile, array $expectedTransports, array $expectedRecipients)
+    public function testMailer(string $configFile, array $expectedTransports, array $expectedRecipients, array $expectedAllowedRecipients)
     {
         $container = $this->createContainerFromFile($configFile);
 
@@ -2070,6 +2072,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $l = $container->getDefinition('mailer.envelope_listener');
         $this->assertSame('sender@example.org', $l->getArgument(0));
         $this->assertSame($expectedRecipients, $l->getArgument(1));
+        $this->assertSame($expectedAllowedRecipients, $l->getArgument(2));
         $this->assertEquals(new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('mailer.mailer')->getArgument(1));
 
         $this->assertTrue($container->hasDefinition('mailer.message_listener'));

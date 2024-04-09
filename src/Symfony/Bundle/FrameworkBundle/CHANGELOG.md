@@ -13,6 +13,8 @@ CHANGELOG
  * Add `secrets:reveal` command
  * Add `rate_limiter` option to `http_client.default_options` and `http_client.scoped_clients`
  * Attach the workflow's configuration to the `workflow` tag
+ * Add the `allowed_recipients` option for mailer to allow some users to receive
+   emails even if `recipients` is defined.
 
 7.0
 ---

@@ -16,7 +16,7 @@ require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\AssertDeprecationTrait;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -62,7 +62,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use AssertDeprecationTrait;
 
     public function testDefaultRegisteredDefinitions()
     {
@@ -116,9 +116,10 @@ class ContainerBuilderTest extends TestCase
 
         $builder->deprecateParameter('foo', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated.');
-
-        $builder->getParameter('foo');
+        self::assertDeprecation(
+            'Since symfony/test 6.3: The parameter "foo" is deprecated.',
+            static fn () => $builder->getParameter('foo'),
+        );
     }
 
     /**
@@ -134,9 +135,10 @@ class ContainerBuilderTest extends TestCase
 
         $builder->deprecateParameter('bar', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "bar" is deprecated.');
-
-        $builder->compile();
+        self::assertDeprecation(
+            'Since symfony/test 6.3: The parameter "bar" is deprecated.',
+            $builder->compile(...),
+        );
     }
 
     public function testDeprecateParameterThrowsWhenParameterIsUndefined()
@@ -1918,8 +1920,6 @@ class ContainerBuilderTest extends TestCase
      */
     public function testDirectlyAccessingDeprecatedPublicService()
     {
-        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "Symfony\Component\DependencyInjection\Tests\A" service directly from the container is deprecated, use dependency injection instead.');
-
         $container = new ContainerBuilder();
         $container
             ->register(A::class)
@@ -1928,7 +1928,10 @@ class ContainerBuilderTest extends TestCase
 
         $container->compile();
 
-        $container->get(A::class);
+        self::assertDeprecation(
+            'Since foo/bar 3.8: Accessing the "Symfony\Component\DependencyInjection\Tests\A" service directly from the container is deprecated, use dependency injection instead.',
+            static fn () => $container->get(A::class),
+        );
     }
 
     public function testReferencingDeprecatedPublicService()

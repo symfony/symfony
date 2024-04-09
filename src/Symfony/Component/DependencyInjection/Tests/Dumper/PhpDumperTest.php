@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\AssertDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -73,7 +73,7 @@ require_once __DIR__.'/../Fixtures/includes/foo_lazy.php';
 
 class PhpDumperTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use AssertDeprecationTrait;
 
     protected static string $fixturesPath;
 
@@ -482,8 +482,10 @@ class PhpDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
-        $container->compile();
+        self::assertDeprecation(
+            'Since symfony/test 6.3: The parameter "foo_class" is deprecated.',
+            static fn () => $container->compile(),
+        );
 
         $dumper = new PhpDumper($container);
 
@@ -499,8 +501,10 @@ class PhpDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
-        $container->compile();
+        self::assertDeprecation(
+            'Since symfony/test 6.3: The parameter "foo_class" is deprecated.',
+            static fn () => $container->compile(),
+        );
 
         $dumper = new PhpDumper($container);
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
@@ -1699,8 +1703,6 @@ PHP
      */
     public function testDirectlyAccessingDeprecatedPublicService()
     {
-        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
-
         $container = new ContainerBuilder();
         $container
             ->register('bar', \BarClass::class)
@@ -1714,7 +1716,10 @@ PHP
 
         $container = new \Symfony_DI_PhpDumper_Test_Directly_Accessing_Deprecated_Public_Service();
 
-        $container->get('bar');
+        self::assertDeprecation(
+            'Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.',
+            static fn() => $container->get('bar')
+        );
     }
 
     public function testReferencingDeprecatedPublicService()

@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\AssertDeprecationTrait;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class ParameterBagTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use AssertDeprecationTrait;
 
     public function testConstructor()
     {
@@ -138,52 +138,40 @@ class ParameterBagTest extends TestCase
         ];
     }
 
-    /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
-     */
     public function testDeprecate()
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 
         $bag->deprecate('foo', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated.');
-
-        $bag->get('foo');
+        self::assertDeprecation(
+            'Since symfony/test 6.3: The parameter "foo" is deprecated.',
+            static fn () => $bag->get('foo'),
+        );
     }
 
-    /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
-     */
     public function testDeprecateWithMessage()
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 
         $bag->deprecate('foo', 'symfony/test', '6.3', 'The parameter "%s" is deprecated, use "new_foo" instead.');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated, use "new_foo" instead.');
-
-        $bag->get('foo');
+        self::assertDeprecation(
+            'Since symfony/test 6.3: The parameter "foo" is deprecated, use "new_foo" instead.',
+            static fn () => $bag->get('foo'),
+        );
     }
 
-    /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
-     */
     public function testDeprecationIsTriggeredWhenResolved()
     {
         $bag = new ParameterBag(['foo' => '%bar%', 'bar' => 'baz']);
 
         $bag->deprecate('bar', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "bar" is deprecated.');
-
-        $bag->resolve();
+        self::assertDeprecation(
+            'Since symfony/test 6.3: The parameter "bar" is deprecated.',
+            $bag->resolve(...)
+        );
     }
 
     public function testDeprecateThrowsWhenParameterIsUndefined()

@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\AssertDeprecationTrait;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class UrlTypeTest extends TextTypeTest
 {
-    use ExpectDeprecationTrait;
+    use AssertDeprecationTrait;
 
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
 
@@ -25,8 +26,10 @@ class UrlTypeTest extends TextTypeTest
      */
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
-        $this->expectDeprecation('Since symfony/form 7.1: Not configuring the "default_protocol" option when using the UrlType is deprecated. It will default to "null" in 8.0.');
-        $form = $this->factory->create(static::TESTED_TYPE, 'name');
+        $form = self::assertDeprecation(
+            'Since symfony/form 7.1: Not configuring the "default_protocol" option when using the UrlType is deprecated. It will default to "null" in 8.0.',
+            fn (): FormInterface => $this->factory->create(static::TESTED_TYPE, 'name'),
+        );
 
         $form->submit('www.domain.com');
 

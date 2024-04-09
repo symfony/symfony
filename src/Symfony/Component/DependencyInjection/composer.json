@@ -25,7 +25,8 @@
     "require-dev": {
         "symfony/yaml": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",
-        "symfony/expression-language": "^6.4|^7.0"
+        "symfony/expression-language": "^6.4|^7.0",
+        "symfony/phpunit-bridge": "^7.1"
     },
     "conflict": {
         "ext-psr": "<1.1|>=2",

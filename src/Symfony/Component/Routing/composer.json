@@ -25,6 +25,7 @@
         "symfony/yaml": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",
         "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/phpunit-bridge": "^7.1",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {

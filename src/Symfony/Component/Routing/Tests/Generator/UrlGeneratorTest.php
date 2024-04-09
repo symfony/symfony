@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\AssertDeprecationTrait;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlGeneratorTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use AssertDeprecationTrait;
 
     public function testAbsoluteUrlWithPort80()
     {
@@ -806,50 +806,44 @@ class UrlGeneratorTest extends TestCase
         $this->getGenerator($routes)->generate('d');
     }
 
-    /**
-     * @group legacy
-     */
     public function testDeprecatedAlias()
     {
-        $this->expectDeprecation('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
-
         $routes = new RouteCollection();
         $routes->add('a', new Route('/foo'));
         $routes->addAlias('b', 'a')
             ->setDeprecated('foo/bar', '1.0.0', '');
 
-        $this->getGenerator($routes)->generate('b');
+        $this->assertDeprecation(
+            'Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.',
+            fn () => $this->getGenerator($routes)->generate('b'),
+        );
     }
 
-    /**
-     * @group legacy
-     */
     public function testDeprecatedAliasWithCustomMessage()
     {
-        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
-
         $routes = new RouteCollection();
         $routes->add('a', new Route('/foo'));
         $routes->addAlias('b', 'a')
             ->setDeprecated('foo/bar', '1.0.0', 'foo %alias_id%.');
 
-        $this->getGenerator($routes)->generate('b');
+        self::assertDeprecation(
+            'Since foo/bar 1.0.0: foo b.',
+            fn () => $this->getGenerator($routes)->generate('b'),
+        );
     }
 
-    /**
-     * @group legacy
-     */
     public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
     {
-        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
-
         $routes = new RouteCollection();
         $routes->add('a', new Route('/foo'));
         $routes->addAlias('b', 'a')
             ->setDeprecated('foo/bar', '1.0.0', 'foo %alias_id%.');
         $routes->addAlias('c', 'b');
 
-        $this->getGenerator($routes)->generate('c');
+        self::assertDeprecation(
+            'Since foo/bar 1.0.0: foo b.',
+            fn () => $this->getGenerator($routes)->generate('c'),
+        );
     }
 
     public function testCircularReferenceShouldThrowAnException()

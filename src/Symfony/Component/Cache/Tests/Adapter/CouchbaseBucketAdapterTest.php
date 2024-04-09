@@ -12,7 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\AssertDeprecationTrait;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter;
 
@@ -26,7 +26,7 @@ use Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter;
  */
 class CouchbaseBucketAdapterTest extends AdapterTestCase
 {
-    use ExpectDeprecationTrait;
+    use AssertDeprecationTrait;
 
     protected $skippedTests = [
         'testClearPrefix' => 'Couchbase cannot clear by prefix',
@@ -36,11 +36,16 @@ class CouchbaseBucketAdapterTest extends AdapterTestCase
 
     protected function setUp(): void
     {
-        $this->expectDeprecation('Since symfony/cache 7.1: The "Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter" class is deprecated, use "Symfony\Component\Cache\Adapter\CouchbaseCollectionAdapter" instead.');
-
         $this->client = AbstractAdapter::createConnection('couchbase://'.getenv('COUCHBASE_HOST').'/cache',
             ['username' => getenv('COUCHBASE_USER'), 'password' => getenv('COUCHBASE_PASS')]
         );
+
+        if (!class_exists(CouchbaseBucketAdapter::class, false)) {
+            self::assertDeprecation(
+                'Since symfony/cache 7.1: The "Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter" class is deprecated, use "Symfony\Component\Cache\Adapter\CouchbaseCollectionAdapter" instead.',
+                static fn () => class_exists(CouchbaseBucketAdapter::class),
+            );
+        }
     }
 
     public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface

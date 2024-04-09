@@ -32,7 +32,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->removeDefinition('twig.extension.assets');
         }
 
-        if (!class_exists(EmojiTransliterator::class)) {
+        if (!class_exists(\Transliterator::class) || !class_exists(EmojiTransliterator::class)) {
             $container->removeDefinition('twig.extension.emoji');
         }
 

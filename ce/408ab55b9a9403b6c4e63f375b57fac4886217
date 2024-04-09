@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-14T09:04:10Z
+
+I don't understand what's this for, can you please give me a few examples ? The code is fairly intricated for only two options and I'm wondering how this logic is sensible for real world use cases. :pray:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-14T09:27:43Z
+
+Sure, [here is the documentation ](https://symfony.com/doc/4.x/email.html#sending-to-a-specified-address-but-with-exceptions)
+
+And our real world example is for the preproduction:
+
+```yaml
+mailer_recipients: [ 'REDACTED@jolicode.com' ]
+mailer_recipients_allowed: [ '/@jolicode\.com$/', '/^foobar@example\.com$/', '/^baz@example\.com$/' ]
+```
+
+**TL;DR:**
+
+in preprod, we want that all mails to be sent to `'REDACTED@jolicode.com'` except the ones targeting our agency, or some specials client mail addresses
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-15T07:32:40Z
+
+I added some tests for the DIC part. But the configuration was broken in XML. I need #54292 first to be merged
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-15T14:52:11Z
+
+I have rebased, now the PR is to merge
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-21T09:12:08Z
+
+@nicolas-grekas I have addressed your comments
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-04-08T13:47:03Z
+
+@fabpot thanks. Added (+ rebased)

@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -227,6 +229,54 @@ class ApplicationTest extends TestCase
     {
         $result = $this->createEventForSuggestingPackages('server', ['server:run']);
         $this->assertDoesNotMatchRegularExpression('/You may be looking for a command provided by/', $result);
+    }
+
+    public function testSetTimeOptionIsAvailable()
+    {
+        $kernel = $this->getKernel([], true);
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'list']);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('--set-time', $tester->getDisplay());
+    }
+
+    public function testClockHasNotBeenSetIfSetTimeOptionDoesNotExists()
+    {
+        $kernel = $this->getKernel([], true);
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'list']);
+
+        $clock = Clock::get();
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertNotInstanceOf(MockClock::class, $clock);
+        $this->assertEquals(date('Y-m-d H:i:s'), $clock->now()->format('Y-m-d H:i:s'));
+    }
+
+    public function testClockHasBeenSetIfSetTimeOptionExists()
+    {
+        $kernel = $this->getKernel([], true);
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'list', '--set-time' => '2023-01-01 00:00:00']);
+
+        $clock = Clock::get();
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertInstanceOf(MockClock::class, $clock);
+        $this->assertEquals('2023-01-01 00:00:00', $clock->now()->format('Y-m-d H:i:s'));
     }
 
     private function createEventForSuggestingPackages(string $command, array $alternatives = []): string

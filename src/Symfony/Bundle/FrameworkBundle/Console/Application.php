@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\ListCommand;
@@ -42,6 +44,10 @@ class Application extends BaseApplication
         $inputDefinition->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $kernel->getEnvironment()));
         $inputDefinition->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switch off debug mode.'));
         $inputDefinition->addOption(new InputOption('--profile', null, InputOption::VALUE_NONE, 'Enables profiling (requires debug).'));
+
+        if (class_exists(Clock::class)) {
+            $inputDefinition->addOption(new InputOption('--set-time', null, InputOption::VALUE_OPTIONAL, 'Define a custom clock'));
+        }
     }
 
     /**
@@ -88,6 +94,10 @@ class Application extends BaseApplication
                 $this->registrationErrors = [];
                 $renderRegistrationErrors = false;
             }
+        }
+
+        if (class_exists(Clock::class) && $time = $input->getParameterOption('--set-time')) {
+            Clock::set(new MockClock($time));
         }
 
         if ($input->hasParameterOption('--profile')) {

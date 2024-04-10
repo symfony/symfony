@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Accept `ReadableCollection` in `CollectionToArrayTransformer`
+ * Add type aliases support to `EntityValueResolver`
 
 7.1
 ---

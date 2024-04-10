@@ -57,6 +57,11 @@ TwigBundle
 
  * Mark class `TemplateCacheWarmer` as `final`
 
+Validator
+---------
+
+ * Deprecate `Bic::INVALID_BANK_CODE_ERROR`
+
 Workflow
 --------
 

@@ -1035,17 +1035,17 @@ class AbstractObjectNormalizerTest extends TestCase
                 parent::__construct(null, new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader())));
             }
 
-            protected function extractAttributes(object $object, string $format = null, array $context = []): array
+            protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
             {
                 return [];
             }
 
-            protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+            protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
             {
                 return null;
             }
 
-            protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []): void
+            protected function setAttributeValue(object $object, string $attribute, $value, ?string $format = null, array $context = []): void
             {
                 $object->$attribute = $value;
             }

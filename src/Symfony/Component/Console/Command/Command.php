@@ -659,19 +659,12 @@ class Command
         $deprecationMessages = [];
         foreach ($inputDefinition->getOptions() as $inputOption) {
             if ($inputOption->isDeprecated()) {
-                try {
-                    $optionName = $inputOption->getName();
-                    $optionValue = $input->getOption($optionName);
-                    if (isset($optionValue) && $optionValue !== $inputOption->getDefault()) {
-                        $optionShortcut = $inputOption->getShortcut();
-                        $deprecationMessages[] = sprintf(
-                            'The option "--%s%s" is deprecated.',
-                            $optionName,
-                            $optionShortcut === null ? '' : ('|-' . $optionShortcut)
-                        );
-                    }
-                } catch (\InvalidArgumentException $exception) {
-                    // option not used, ignore
+                $optionNames = ['--' . $inputOption->getName()];
+                if (null !== $inputOption->getShortcut()) {
+                    $optionNames[] = '-'.$inputOption->getShortcut();
+                }
+                if ($input->hasParameterOption($optionNames, true)) {
+                    $deprecationMessages[] = sprintf('The option "%s" is deprecated.', implode('|', $optionNames));
                 }
             }
         }

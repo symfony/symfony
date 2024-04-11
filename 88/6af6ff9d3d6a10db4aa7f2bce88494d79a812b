@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-09T19:31:50Z
+
+PR should be ready. I used the .github/sync-translations.php script to create the tags for the new trans unit and asked GPT to generate translations (I made it generate a csv as output and I wrote a small script to populate the files).
+I also fixed the CI job that was supposed to run when a translation file changes but didn't.
+
+---------------------------------------------------------------------------
+
+by thunderer at 2024-04-10T09:00:49Z
+
+@nicolas-grekas will you merge https://github.com/symfony/symfony/pull/54522 before this one, or would you like me to rebase mine afterwards?

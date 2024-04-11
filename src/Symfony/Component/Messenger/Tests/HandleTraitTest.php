@@ -14,11 +14,15 @@ namespace Symfony\Component\Messenger\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Exception\MultipleHandlersForMessageException;
+use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 class HandleTraitTest extends TestCase
 {
@@ -58,7 +62,7 @@ class HandleTraitTest extends TestCase
 
     public function testHandleThrowsOnNoHandledStamp()
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(NoHandlerForMessageException::class);
         $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled zero times. Exactly one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()".');
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
@@ -71,7 +75,7 @@ class HandleTraitTest extends TestCase
 
     public function testHandleThrowsOnMultipleHandledStamps()
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(MultipleHandlersForMessageException::class);
         $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled multiple times. Only one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()", got 2: "FirstDummyHandler::__invoke", "SecondDummyHandler::__invoke".');
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
@@ -82,6 +86,19 @@ class HandleTraitTest extends TestCase
         );
 
         $queryBus->query($query);
+    }
+
+    public function testAllowAsyncHandler()
+    {
+        $command = new DummyMessage('Hello');
+
+        $bus = $this->createMock(MessageBus::class);
+        $bus->expects($this->once())->method('dispatch')->willReturn(
+            new Envelope($command, [new SentStamp(SenderInterface::class, 'async')])
+        );
+        $commandBus = new TestCommandBus($bus);
+
+        self::assertNull($commandBus->dispatch($command));
     }
 }
 
@@ -99,5 +116,21 @@ class TestQueryBus
     public function query($query): string
     {
         return $this->handle($query);
+    }
+}
+
+class TestCommandBus
+{
+    use HandleTrait;
+
+    public function __construct(MessageBusInterface $messageBus)
+    {
+        $this->messageBus = $messageBus;
+        $this->allowAsyncHandling = true;
+    }
+
+    public function dispatch(object $command): mixed
+    {
+        return $this->handle($command);
     }
 }

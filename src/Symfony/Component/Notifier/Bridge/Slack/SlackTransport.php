@@ -70,10 +70,7 @@ final class SlackTransport extends AbstractTransport
 
         $options = $options?->toArray() ?? [];
 
-        if (isset($options['conversation_ids']) 
-            && is_array($options['conversation_ids']) 
-            && count($options['conversation_ids']) > 1
-        ) {
+        if ($options['conversation_ids'] ?? false) {
             $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/conversations.open', [
                 'json' => ['users' => implode(',', $options['conversation_ids'])],
                 'auth_bearer' => $this->accessToken,
@@ -89,7 +86,7 @@ final class SlackTransport extends AbstractTransport
             }
 
             if (200 !== $statusCode) {
-                throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $response->getContent(false)), $response);
+                throw new TransportException('Unable to post the Slack message: '.$response->getContent(false), $response);
             }
 
             $result = $response->toArray(false);
@@ -100,8 +97,8 @@ final class SlackTransport extends AbstractTransport
             }
     
             $options['channel'] = $result['channel']['id'] ?? null;
+            unset($options['conversation_ids']);
         }
-        unset($options['conversation_ids']);
 
         $options['channel'] ??= $message->getRecipientId() ?: $this->channel;
         $options['text'] = $message->getSubject();

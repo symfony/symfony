@@ -37,20 +37,14 @@ class UsageTrackingTokenStorageTest extends TestCase
         $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $sessionLocator);
 
         $this->assertNull($trackingStorage->getToken());
+        $this->assertSame(1, $session->getUsageIndex());
         $token = new NullToken();
 
         $trackingStorage->setToken($token);
-        $this->assertSame($token, $trackingStorage->getToken());
+        $this->assertSame(2, $session->getUsageIndex());
         $this->assertSame($token, $tokenStorage->getToken());
-        $this->assertSame(0, $session->getUsageIndex());
-
-        $trackingStorage->enableUsageTracking();
         $this->assertSame($token, $trackingStorage->getToken());
-        $this->assertSame(1, $session->getUsageIndex());
-
-        $trackingStorage->disableUsageTracking();
-        $this->assertSame($token, $trackingStorage->getToken());
-        $this->assertSame(1, $session->getUsageIndex());
+        $this->assertSame(3, $session->getUsageIndex());
     }
 
     public function testWithoutMainRequest()

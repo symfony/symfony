@@ -1,0 +1,12 @@
+imports:
+  - { resource: ./../config/framework.yml }
+
+security:
+  providers:
+    in_memory:
+      memory:
+        users:
+
+  firewalls:
+    default:
+      lazy: true

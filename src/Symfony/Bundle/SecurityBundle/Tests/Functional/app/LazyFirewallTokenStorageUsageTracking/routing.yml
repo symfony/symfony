@@ -1,0 +1,3 @@
+root:
+  path: /
+  defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GetUserBundle\Controller\RootController::__invoke }

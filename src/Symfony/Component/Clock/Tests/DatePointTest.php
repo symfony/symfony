@@ -57,4 +57,19 @@ class DatePointTest extends TestCase
         $this->expectExceptionMessage('Failed to parse time string (Bad Date)');
         $date->modify('Bad Date');
     }
+
+    /**
+     * @testWith ["2024-04-01 00:00:00.000000", "2024-04"]
+     *           ["2024-04-09 00:00:00.000000", "2024-04-09"]
+     *           ["2024-04-09 03:00:00.000000", "2024-04-09 03:00"]
+     *           ["2024-04-09 00:00:00.123456", "2024-04-09 00:00:00.123456"]
+     */
+    public function testTimeDefaultsToMidnight(string $expected, string $datetime)
+    {
+        $date = new \DateTimeImmutable($datetime);
+        $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));
+
+        $date = new DatePoint($datetime);
+        $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));
+    }
 }

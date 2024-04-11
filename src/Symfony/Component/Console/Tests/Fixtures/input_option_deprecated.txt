@@ -1,1 +1,1 @@
-<fg=gray;>-o, --option_name</fg=gray;>  deprecated option description
+<fg=gray;>-o, --option_name</fg=gray;>  [deprecated] deprecated option description

@@ -440,7 +440,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Deze URL bevat geen top-level domein (TLD).</target>
+                <target>Deze URL bevat geen topleveldomein (TLD).</target>
             </trans-unit>
         </body>
     </file>

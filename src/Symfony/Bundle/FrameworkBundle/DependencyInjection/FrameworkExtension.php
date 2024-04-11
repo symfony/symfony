@@ -165,6 +165,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Bridge as TranslationBridge;
+use Symfony\Component\Translation\Command\TranslationLintCommand as BaseTranslationLintCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Extractor\PhpAstExtractor;
 use Symfony\Component\Translation\LocaleSwitcher;
@@ -243,6 +244,10 @@ class FrameworkExtension extends Extension
             }
             if (!class_exists(BaseYamlLintCommand::class)) {
                 $container->removeDefinition('console.command.yaml_lint');
+            }
+
+            if (!class_exists(BaseTranslationLintCommand::class)) {
+                $container->removeDefinition('console.command.translation_lint');
             }
 
             if (!class_exists(DebugCommand::class)) {
@@ -1413,6 +1418,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.translation_extract');
             $container->removeDefinition('console.command.translation_pull');
             $container->removeDefinition('console.command.translation_push');
+            $container->removeDefinition('console.command.translation_lint');
 
             return;
         }

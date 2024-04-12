@@ -43,7 +43,7 @@ class FeatureFlagPass implements CompilerPassInterface
 
                 $method = $tag['method'] ?? '__invoke';
                 if (!$r->hasMethod($method)) {
-                    throw new \RuntimeException(sprintf('Invalid feature strategy "%s": method "%s::%s()" does not exist.', $serviceId, $r->getName(), $method));
+                    throw new \RuntimeException(sprintf('Invalid feature method "%s": method "%s::%s()" does not exist.', $serviceId, $r->getName(), $method));
                 }
 
                 $features[$featureName] = $container->setDefinition(

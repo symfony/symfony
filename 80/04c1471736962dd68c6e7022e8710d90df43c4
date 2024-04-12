@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-14T14:53:06Z
+
+Can you please make the necessary changes to fix the CI on PHP 7.2+? (that could involve using `@requires PHP 8.0` on test cases of course)

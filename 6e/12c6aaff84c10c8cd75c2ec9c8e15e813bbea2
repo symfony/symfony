@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-03-26T13:32:17Z
+
+What happens if `attributesMetadata` has an entry only for a different attribute ? `null === $maxDepth = $attributesMetadata[$attribute]?->getMaxDepth()` would still trigger a warning in such case.
+
+To me, the right fix would be handle properly the case where there is no `$attribute` key in the array.
+
+---------------------------------------------------------------------------
+
+by jaydiablo at 2024-03-27T15:33:14Z
+
+Regarding the test failure, I'm not sure why that Redis test is failing now, perhaps something in the dependencies updated?
+
+I removed my fix and ran just that test, fails with or without my fix in place, so don't believe it's a result of the change to this PR.
+
+---------------------------------------------------------------------------
+
+by jaydiablo at 2024-03-28T16:38:15Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-04-11T07:36:56Z
+
+@jaydiablo  This PR must be rebased to get rid of the merge commits.
+
+---------------------------------------------------------------------------
+
+by jaydiablo at 2024-04-11T15:58:48Z
+
+@fabpot rebased

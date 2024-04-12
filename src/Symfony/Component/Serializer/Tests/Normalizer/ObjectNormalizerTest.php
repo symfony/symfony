@@ -18,7 +18,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -902,26 +902,26 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame($expected, $this->normalizer->normalize($object));
     }
 
-    public function testNormalizeWithIgnoreAnnotationAndPrivateProperties()
+    public function testNormalizeWithIgnoreAttributeAndPrivateProperties()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory);
 
-        $this->assertSame(['foo' => 'foo'], $normalizer->normalize(new ObjectDummyWithIgnoreAnnotationAndPrivateProperty()));
+        $this->assertSame(['foo' => 'foo'], $normalizer->normalize(new ObjectDummyWithIgnoreAttributeAndPrivateProperty()));
     }
 
-    public function testDenormalizeWithIgnoreAnnotationAndPrivateProperties()
+    public function testDenormalizeWithIgnoreAttributeAndPrivateProperties()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory);
 
         $obj = $normalizer->denormalize([
             'foo' => 'set',
             'ignore' => 'set',
             'private' => 'set',
-        ], ObjectDummyWithIgnoreAnnotationAndPrivateProperty::class);
+        ], ObjectDummyWithIgnoreAttributeAndPrivateProperty::class);
 
-        $expected = new ObjectDummyWithIgnoreAnnotationAndPrivateProperty();
+        $expected = new ObjectDummyWithIgnoreAttributeAndPrivateProperty();
         $expected->foo = 'set';
 
         $this->assertEquals($expected, $obj);
@@ -1199,11 +1199,11 @@ class DummyWithNullableConstructorObject
     }
 }
 
-class ObjectDummyWithIgnoreAnnotationAndPrivateProperty
+class ObjectDummyWithIgnoreAttributeAndPrivateProperty
 {
     public $foo = 'foo';
 
-    /** @Ignore */
+    #[Ignore]
     public $ignored = 'ignored';
 
     private $private = 'private';

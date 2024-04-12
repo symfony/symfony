@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target >Αυτή η IP διεύθυνση δεν είναι έγκυρη.</target>
+                <target>Αυτή η IP διεύθυνση δεν είναι έγκυρη.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target >Αυτός ο αριθμός δεν είναι έγκυρη UUID.</target>
+                <target>Αυτός ο αριθμός δεν είναι έγκυρη UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -437,6 +437,10 @@
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
                 <target>Αυτός ο αριθμός δεν είναι έγκυρη διεύθυνση MAC.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL does not contain a TLD.</source>
+                <target state="needs-review-translation">Αυτή η διεύθυνση URL δεν περιέχει έναν τομέα ανώτατου επιπέδου (TLD).</target>
             </trans-unit>
         </body>
     </file>

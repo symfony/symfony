@@ -438,6 +438,10 @@
                 <source>This value is not a valid MAC address.</source>
                 <target>Nilai ini bukan alamat MAC yang valid.</target>
             </trans-unit>
+            <trans-unit id="113">
+                <source>This URL does not contain a TLD.</source>
+                <target state="needs-review-translation">URL ini tidak mengandung domain tingkat atas (TLD).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

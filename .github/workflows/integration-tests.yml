@@ -124,6 +124,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install system dependencies
         run: |
@@ -218,13 +220,11 @@ jobs:
       - name: Check for changes in translation files
         id: changed-translation-files
         run: |
-          if git diff --quiet HEAD~1 HEAD -- 'src/**/Resources/translations/*.xlf'; then
-            echo "{changed}={true}" >> $GITHUB_OUTPUT
-          else
-            echo "{changed}={false}" >> $GITHUB_OUTPUT
-          fi
+          echo 'changed='$((git diff --quiet HEAD~1 HEAD -- 'src/**/Resources/translations/*.xlf' || (echo 'true' && exit 1)) && echo 'false') >> $GITHUB_OUTPUT
 
       - name: Check Translation Status
         if: steps.changed-translation-files.outputs.changed == 'true'
         run: |
           php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v
+          php .github/sync-translations.php
+          git diff --exit-code src/ || (echo 'Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)

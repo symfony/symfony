@@ -283,7 +283,10 @@ trait RedisTrait
                     }
 
                     if ((null !== $auth && !$redis->auth($auth))
-                        || ($params['dbindex'] && !$redis->select($params['dbindex']))
+                        // Due to a bug in phpredis we must always select the dbindex if persistent pooling is enabled
+                        // @see https://github.com/phpredis/phpredis/issues/1920
+                        // @see https://github.com/symfony/symfony/issues/51578
+                        || (($params['dbindex'] || ('pconnect' === $connect && '0' !== \ini_get('redis.pconnect.pooling_enabled'))) && !$redis->select($params['dbindex']))
                     ) {
                         $e = preg_replace('/^ERR /', '', $redis->getLastError());
                         throw new InvalidArgumentException('Redis connection failed: '.$e.'.');
@@ -403,9 +406,6 @@ trait RedisTrait
         return $redis;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids)
     {
         if (!$ids) {
@@ -439,17 +439,11 @@ trait RedisTrait
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id)
     {
         return (bool) $this->redis->exists($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace)
     {
         if ($this->redis instanceof \Predis\ClientInterface) {
@@ -511,9 +505,6 @@ trait RedisTrait
         return $cleared;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids)
     {
         if (!$ids) {
@@ -548,9 +539,6 @@ trait RedisTrait
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime)
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {

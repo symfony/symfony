@@ -63,7 +63,7 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     public function addExtensions(array $extensions): static
     {
-        $this->extensions = array_merge($this->extensions, $extensions);
+        $this->extensions = [...$this->extensions, ...$extensions];
 
         return $this;
     }
@@ -111,7 +111,7 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     public function addTypeGuessers(array $typeGuessers): static
     {
-        $this->typeGuessers = array_merge($this->typeGuessers, $typeGuessers);
+        $this->typeGuessers = [...$this->typeGuessers, ...$typeGuessers];
 
         return $this;
     }

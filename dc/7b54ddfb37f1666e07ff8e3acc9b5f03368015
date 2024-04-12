@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by kevinpapst at 2024-04-11T09:28:37Z
+
+After managing translations in over 30 languages in a project with thousands of translations I can tell you, there are all kind of weird combinations ...  What happens if you have such a combination (this is a stupid example I know, but you get the point).
+
+English:
+```
+      <trans-unit id="5">
+        <source>Save</source>
+        <target state="needs-translation">Persist</target>
+      </trans-unit>
+```
+
+French:
+```
+      <trans-unit id="5">
+        <source>Save</source>
+        <target state="needs-translation">Save</target>
+      </trans-unit>
+```
+
+Would French now show `Save` or `Persist`? Because previously it would still show `Save`, which is what I would expect as well.  IMO the `needs-translation` state is only for the translator tooling.
+
+May I ask: what was your initial idea for that change? Did you plan to reduce the cache size? Which problem are we trying to solve with ignoring the translations?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-11T10:06:10Z
+
+It will show "Persist" if the fallback language is "en". Possibly "Save" if the key is used as a fallback instead.
+That's fine anyway to me :)
+
+---------------------------------------------------------------------------
+
+by kevinpapst at 2024-04-11T10:25:34Z
+
+Hm, I expected that answer.
+
+> That's fine anyway to me :)
+
+Yep. To me it is not 😁 and it is still breaking behavior.
+Question is: what is the best behavior for the framework.
+Was there ever a complaint about the previous situation?
+
+Currently hundreds of translations are missing throughout two dozen locales and this PR will only fix it partially.
+
+If you skip existing translations based on a flag (that is to me only meant for the tooling) and some assumptions, then I can't use the framework reader any more. I cannot remove the flag from the XLIFF, because it is needed for the translators.
+From my POV the software should show what is inside the translation files. The key is not missing, it is there.
+And you remove it from the catalogue to solve which problem?
+Currently you assume that it is not needed, but my example shows that this might lead to wrong/unexpected results.
+
+If you insist one keeping the behavior, can we make it configurable?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-11T10:55:31Z
+
+The change has been made to allow filling in xliff files with missing keys, while still allow a fallback to the preferred language. We use this since that recent PR to make it easier for translators to spot what's missing.
+That's a nice workflow we want to support (and we use it already for Symfony itself.)
+I thought about using some x- foo state.
+I'm not in favor of yet another flag to configure.
+What would be your proposal?
+
+---------------------------------------------------------------------------
+
+by kevinpapst at 2024-04-11T11:09:13Z
+
+Thanks for not rejecting my arguments immediately 😄
+
+Maybe this is an issue how Weblate handles its translations. I just want to repeat that to explain the problem I have and I doubt that I am the only one using that: if the base translation changes in Weblate, all other languages are flagged as "needs-translation". It does not mean they are suddenly invalid.
+
+Don't get me wrong, this PR will already solve > 95% of my current issues, so I would approve it no matter what.
+But to solve all possible issues I would like to be able to configure if certain states should be skipped from loading into the catalogue. Because the `<source>` is not necessarily what is shown in the fallback language.
+
+I checked the states in the XLIFF RFC and there is also "needs-review" and some other review states, but no matter which one we choose, it might not match the workflow or the used tooling.
+So I would propose to make the "skip" states configurable. Probably allow to pass in a list of states?
+But I also understand that adding more options always complicates things... so I don't mind if you ignore my entire rumbling here 😁

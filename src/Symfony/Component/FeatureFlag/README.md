@@ -14,6 +14,53 @@ but not limited to).
 are not covered by Symfony's
 [Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
 
+Getting Started
+---------------
+
+```bash
+composer require symfony/feature-flag
+```
+
+```php
+use Symfony\Component\FeatureFlag\FeatureChecker;
+use Symfony\Component\FeatureFlag\FeatureRegistry;
+
+// Declare features
+final class XmasFeature
+{
+    public function __invoke(): bool
+    {
+        return date('m-d') === '12-25';
+    }
+}
+
+$features = new FeatureRegistry([
+    'weekend' => fn() => date('N') >= 6,
+    'xmas' => new XmasFeature(), // could be any callable
+    'universe' => fn() => 42,
+    'random' => fn() => random_int(1, 3),
+];
+
+// Create the feature checker
+$featureChecker = new FeatureChecker($features);
+
+// Check if a feature is enabled
+$featureChecker->isEnabled('weekend'); // returns true on weekend
+$featureChecker->isDisabled('weekend'); // returns true from monday to friday
+
+// Check a not existing feature
+$featureChecker->isEnabled('not_a_feature'); // returns false
+
+// Check if a feature is enabled using an expected value
+$featureChecker->isEnabled('universe'); // returns false
+$featureChecker->isEnabled('universe', 7); // returns false
+$featureChecker->isEnabled('universe', 42); // returns true
+
+// Retrieve a feature value
+$featureChecker->getValue('random'); // returns 1, 2 or 3
+$featureChecker->getValue('random'); // returns the same value as above
+```
+
 Resources
 ---------
 

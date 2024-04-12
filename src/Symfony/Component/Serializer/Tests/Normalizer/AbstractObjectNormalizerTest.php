@@ -1053,6 +1053,20 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertSame('scalar', $normalizer->denormalize('scalar', XmlScalarDummy::class, 'xml')->value);
     }
+    
+    public function testNormalizationWithMaxDepthOnStdclassObjectDoesNotThrowWarning()
+    {
+        $object = new \stdClass();
+        $object->string = 'yes';
+
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $normalized = $normalizer->normalize($object, context: [
+            AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
+        ]);
+
+        $this->assertSame(['string' => 'yes'], $normalized);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer

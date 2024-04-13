@@ -81,6 +81,17 @@ class AutowireAttributeNullFallback
     }
 }
 
+class AutowireAttributeEnv
+{
+    public function __construct(
+        #[Autowire(env: 'ENABLED')]
+        public bool $enabled,
+        #[Autowire(env: 'OPTIONAL')]
+        public ?string $optional = null,
+    ) {
+    }
+}
+
 interface AsDecoratorInterface
 {
 }

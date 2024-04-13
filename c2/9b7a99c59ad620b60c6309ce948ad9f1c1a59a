@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-04-10T04:00:02Z
+
+To avoid any redraw and ensure maximum performances, we should implement the reordering directly in CSS
+
+```css
+#menu-profiler {
+  /** ... existing rules */
+  display: flex;
+  flex-direction: column;
+}
+#menu-profiler li:has(span.disabled) {
+    order: 1;
+}
+```
+
+(`:has` is [baseline in 2023](https://caniuse.com/css-has) so this work for more than 95% of users, and the few ones with browsers not implementing `:has` will just see the list as before)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-04-12T13:15:37Z
+
+Simon, you are a genius 🙇 🙇 I did what you suggested: it works perfectly and it solves the remaining performance issues. The profiler pages now feel very snappy. Thanks!
+
+This is now ready for a final review.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-04-12T16:03:32Z
+
+> The profiler pages now feel very snappy.
+
+❤️  Thank _you_ for tackling those issues :)

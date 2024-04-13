@@ -143,6 +143,10 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             throw new BadRequestHttpException(sprintf('The key "%s" must be a non-empty string.', $this->options['password_parameter']));
         }
 
+        if (!\is_string($credentials['csrf_token'] ?? '') && (!\is_object($credentials['csrf_token']) || !method_exists($credentials['csrf_token'], '__toString'))) {
+            throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['csrf_parameter'], \gettype($credentials['csrf_token'])));
+        }
+
         return $credentials;
     }
 

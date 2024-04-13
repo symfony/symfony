@@ -166,7 +166,7 @@ function extractTranslationKeys($filePath): array
 
     foreach ($contents->file->body->{'trans-unit'} as $translationKey) {
         $translationId = (string) $translationKey['id'];
-        $translationKey = (string) $translationKey->source;
+        $translationKey = (string) ($translationKey['resname'] ?? $translationKey->source);
 
         $translationKeys[$translationId] = $translationKey;
     }

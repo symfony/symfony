@@ -19,6 +19,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -916,6 +917,41 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertSame($expected, $this->normalizer->normalize($object));
     }
+
+    public function testNormalizeWithoutSerializerSet()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "foo" because the injected serializer is not a normalizer.');
+
+        $normalizer->normalize(new ObjectConstructorDummy([], [], []));
+    }
+
+    public function testNormalizeWithIgnoreAttributeAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $this->assertSame(['foo' => 'foo'], $normalizer->normalize(new ObjectDummyWithIgnoreAttributeAndPrivateProperty()));
+    }
+
+    public function testDenormalizeWithIgnoreAttributeAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $obj = $normalizer->denormalize([
+            'foo' => 'set',
+            'ignore' => 'set',
+            'private' => 'set',
+        ], ObjectDummyWithIgnoreAttributeAndPrivateProperty::class);
+
+        $expected = new ObjectDummyWithIgnoreAttributeAndPrivateProperty();
+        $expected->foo = 'set';
+
+        $this->assertEquals($expected, $obj);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy
@@ -1187,4 +1223,14 @@ class DummyWithNullableConstructorObject
     {
         return $this->inner;
     }
+}
+
+class ObjectDummyWithIgnoreAttributeAndPrivateProperty
+{
+    public $foo = 'foo';
+
+    #[Ignore]
+    public $ignored = 'ignored';
+
+    private $private = 'private';
 }

@@ -250,9 +250,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
             if (isset($options['normalized_headers']['content-length'][0])) {
                 $curlopts[\CURLOPT_INFILESIZE] = (int) substr($options['normalized_headers']['content-length'][0], \strlen('Content-Length: '));
-            }
-            if (!isset($options['normalized_headers']['transfer-encoding'])) {
-                $curlopts[\CURLOPT_HTTPHEADER][] = 'Transfer-Encoding:'.(isset($curlopts[\CURLOPT_INFILESIZE]) ? '' : ' chunked');
+            } elseif (!isset($options['normalized_headers']['transfer-encoding'])) {
+                $curlopts[\CURLOPT_INFILESIZE] = -1;
             }
 
             if ('POST' !== $method) {

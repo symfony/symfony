@@ -52,8 +52,16 @@ class XliffFileLoaderTest extends TestCase
       </trans-unit>
       <trans-unit id="4">
         <source>test</source>
-        <target>with</target>
+        <target state="needs-translation">with</target>
         <note>note</note>
+      </trans-unit>
+      <trans-unit id="5">
+        <source>baz</source>
+        <target state="needs-translation">baz</target>
+      </trans-unit>
+      <trans-unit id="6" resname="buz">
+        <source>baz</source>
+        <target state="needs-translation">buz</target>
       </trans-unit>
     </body>
   </file>
@@ -65,6 +73,7 @@ XLIFF;
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertSame([], libxml_get_errors());
         $this->assertContainsOnly('string', $catalogue->all('domain1'));
+        $this->assertSame(['foo', 'extra', 'key', 'test'], array_keys($catalogue->all('domain1')));
     }
 
     public function testLoadWithInternalErrorsEnabled()

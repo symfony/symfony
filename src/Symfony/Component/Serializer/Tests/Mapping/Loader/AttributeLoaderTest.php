@@ -173,13 +173,12 @@ class AttributeLoaderTest extends TestCase
 
     public function testCanHandleUnrelatedIgnoredMethods()
     {
-        $this->expectException(MappingException::class);
-        $this->expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', Entity45016::class));
-
         $metadata = new ClassMetadata(Entity45016::class);
         $loader = $this->getLoaderForContextMapping();
 
         $loader->loadClassMetadata($metadata);
+
+        $this->assertSame(['id'], array_keys($metadata->getAttributesMetadata()));
     }
 
     public function testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsUsed()

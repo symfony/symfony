@@ -31,6 +31,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
+use Symfony\Component\HttpKernel\Tests\Fixtures\DataCollector\DummyController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 
 class RegisterControllerArgumentLocatorsPassTest extends TestCase
@@ -291,6 +292,21 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $this->assertTrue($container->getDefinition('foo')->isPublic());
+    }
+
+    public function testControllersAreMadeNonLazy()
+    {
+        $container = new ContainerBuilder();
+        $container->register('argument_resolver.service')->addArgument([]);
+
+        $container->register('foo', DummyController::class)
+            ->addTag('controller.service_arguments')
+            ->setLazy(true);
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $this->assertFalse($container->getDefinition('foo')->isLazy());
     }
 
     /**

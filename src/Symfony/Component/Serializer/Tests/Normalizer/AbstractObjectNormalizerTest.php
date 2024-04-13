@@ -1083,6 +1083,53 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertFalse($normalizer->childContextCacheKey);
     }
+
+    public function testDenormalizeXmlScalar()
+    {
+        $normalizer = new class () extends AbstractObjectNormalizer
+        {
+            public function __construct()
+            {
+                parent::__construct(null, new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader())));
+            }
+
+            protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
+            {
+                return [];
+            }
+
+            protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
+            {
+                return null;
+            }
+
+            protected function setAttributeValue(object $object, string $attribute, $value, ?string $format = null, array $context = []): void
+            {
+                $object->$attribute = $value;
+            }
+
+            public function getSupportedTypes(?string $format): array
+            {
+                return ['*' => false];
+            }
+        };
+
+        $this->assertSame('scalar', $normalizer->denormalize('scalar', XmlScalarDummy::class, 'xml')->value);
+    }
+
+    public function testNormalizationWithMaxDepthOnStdclassObjectDoesNotThrowWarning()
+    {
+        $object = new \stdClass();
+        $object->string = 'yes';
+
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $normalized = $normalizer->normalize($object, context: [
+            AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true,
+        ]);
+
+        $this->assertSame(['string' => 'yes'], $normalized);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -1343,6 +1390,12 @@ class DummyCollection
 class DummyChild
 {
     public $bar;
+}
+
+class XmlScalarDummy
+{
+    #[SerializedName('#')]
+    public $value;
 }
 
 class SerializerCollectionDummy implements SerializerInterface, DenormalizerInterface

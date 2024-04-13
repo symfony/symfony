@@ -114,4 +114,19 @@ class DatePointTest extends TestCase
         $this->expectExceptionMessage('DatePoint::setMicrosecond(): Argument #1 ($microsecond) must be between 0 and 999999, 1000000 given');
         $date->setMicrosecond(1000000);
     }
+
+    /**
+     * @testWith ["2024-04-01 00:00:00.000000", "2024-04"]
+     *           ["2024-04-09 00:00:00.000000", "2024-04-09"]
+     *           ["2024-04-09 03:00:00.000000", "2024-04-09 03:00"]
+     *           ["2024-04-09 00:00:00.123456", "2024-04-09 00:00:00.123456"]
+     */
+    public function testTimeDefaultsToMidnight(string $expected, string $datetime)
+    {
+        $date = new \DateTimeImmutable($datetime);
+        $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));
+
+        $date = new DatePoint($datetime);
+        $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));
+    }
 }

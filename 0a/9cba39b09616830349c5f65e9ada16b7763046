@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-04-12T09:39:24Z
+
+I think, this makes sense. However, this is not the only place where the keys of the options array are not documented properly. For instance, the method `normalizeOptions()` in the very line you quoted does not document its return type either. Do you want to investigate a little bit more?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-04-12T09:47:50Z
+
+> normalizeOptions
+
+normalizeOptions is used in Constraint with
+```
+        $options = $this->normalizeOptions($options);
+        if (null !== $groups) {
+            $options['groups'] = $groups;
+        }
+        $options['payload'] = $payload ?? $options['payload'] ?? null;
+
+        foreach ($options as $name => $value) {
+            $this->$name = $value;
+        }
+```
+notice the `foreach ($options as $name => $value) {`
+which let supposed `array<string, mixed>`.
+
+Also looking at `normalizeOptions` implementation, it's what the method returns.
+
+I updated the phpdoc of `normalizeOptions`.

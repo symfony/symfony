@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-04-03T14:02:56Z
+
+Naming that setting `version` is indeed weird as it is not a version at all. And using the actual names of the concept rather than `PUBLIC` and `PRIVATE` makes sense.
+
+---------------------------------------------------------------------------
+
+by Ninos at 2024-04-03T15:15:19Z
+
+> Naming that setting `version` is indeed weird as it is not a version at all. And using the actual names of the concept rather than `PUBLIC` and `PRIVATE` makes sense.
+
+@stof thank you! I changed the code & naming a bit, think it's a bit cleaner now. Thought about splitting the different types (unicast/multicast & local/universal) into different attributes (don't ask me about possibilities for attribute naming...), but this would increase the complexity a bit, if someone somehow needs to validate e.g. broadcast (`ff:ff:ff:ff:ff:ff`). Currently broadcast is `LOCAL_MULTICAST`, so not fully wrong.
+I just didn't add `BROADCAST`  as additional version, because this needs a bit more coding (we need to format the mac before validation & then check e.g. for `ffffffffffff` or bits/int), haven't found a more elegant/short solution. And normally if someone needs to validate against broadcast, this could be done with `LOCAL_MULTICAST` + may additional Contraint (`EqualTo`?).
+
+PS: May we could also rename `version` to e.g.  `type`, but for me with current naming it's ok now. Just let me know :-)
+
+---------------------------------------------------------------------------
+
+by Ninos at 2024-04-03T17:18:45Z
+
+I added broadcast validation & also renamed `version` to `type` (may in some hundreds years there will be a new mac address version... :D)

@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-16T16:12:45Z
+
+I know this is not a "good" practice, but i have use multiple times the following method to "feature-flag" some services.
+
+```dotenv
+SERVICE_SUPER_KEY=my_super_key
+```
+
+```php
+[Autowire(env: 'SERVICE_SUPER_KEY')] bool $superServiceEnabled
+```
+
+With your PR that would create the opposite problem of your example :|
+
+🤷
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-19T12:58:53Z
+
+@smnandre your use case could be covered if the code for the bool processor were doing this in EnvVarProcessor:
+```php
+filter_var($env, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? filter_var($env, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? filter_var($env, \FILTER_VALIDATE_FLOAT, \FILTER_NULL_ON_FAILURE) ?? true
+```
+
+Worth considering?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-20T16:43:35Z
+
+Similarly, we could also add `default::` to nullable parameters, WDYT?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-02-20T16:46:59Z
+
+> Worth considering?
+
+As i said, this usage was a bit hacky, so we can "ignore it", but that will deserve some warning / upgrade mentions, no ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-02-22T07:41:26Z
+
+It makes sense to me but the changelog should explain a bit more the change and the new behavior.

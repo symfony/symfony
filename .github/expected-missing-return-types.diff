@@ -11632,6 +11632,13 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.
 +    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
      {
          $setter = 'set'.ucfirst($attribute);
+@@ -182,5 +182,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+     }
+
+-    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = [])
++    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
+     {
+         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php
 --- a/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerAwareInterface.php
@@ -11678,6 +11685,13 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php b/
 +    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
      {
          try {
+@@ -189,5 +189,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
+     }
+
+-    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = [])
++    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
+     {
+         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
 diff --git a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php

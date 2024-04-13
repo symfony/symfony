@@ -26,14 +26,14 @@ use Twig\TwigFilter;
 final class CodeExtension extends AbstractExtension
 {
     private string|FileLinkFormatter|array|false $fileLinkFormat;
-    private string $charset;
-    private string $projectDir;
 
-    public function __construct(string|FileLinkFormatter $fileLinkFormat, string $projectDir, string $charset)
-    {
+    public function __construct(
+        string|FileLinkFormatter $fileLinkFormat,
+        private string $projectDir,
+        private string $charset,
+    ) {
         $this->fileLinkFormat = $fileLinkFormat ?: \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->projectDir = str_replace('\\', '/', $projectDir).'/';
-        $this->charset = $charset;
     }
 
     public function getFilters(): array

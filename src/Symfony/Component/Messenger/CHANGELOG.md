@@ -4,6 +4,7 @@ CHANGELOG
 7.1
 ---
 
+ * `InMemoryTransportFactory` creates the `InMemoryTransport` with a clock (if configured in the factory)
  * Add option `redis_sentinel` as an alias for `sentinel_master`
  * Add `--all` option to the `messenger:consume` command
  * Add parameter `$jitter` to `MultiplierRetryStrategy` in order to randomize delay and prevent the thundering herd effect

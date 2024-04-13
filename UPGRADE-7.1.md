@@ -60,6 +60,7 @@ TwigBundle
 Validator
 ---------
 
+ * Deprecate not passing a value for the `requireTld` option to the `Url` constraint (the default value will become `true` in 8.0)
  * Deprecate `Bic::INVALID_BANK_CODE_ERROR`
 
 Workflow

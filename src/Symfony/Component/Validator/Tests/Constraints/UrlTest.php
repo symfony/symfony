@@ -24,7 +24,7 @@ class UrlTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $url = new Url(['normalizer' => 'trim']);
+        $url = new Url(['normalizer' => 'trim', 'requireTld' => true]);
 
         $this->assertEquals('trim', $url->normalizer);
     }
@@ -33,14 +33,14 @@ class UrlTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
-        new Url(['normalizer' => 'Unknown Callable']);
+        new Url(['normalizer' => 'Unknown Callable', 'requireTld' => true]);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
-        new Url(['normalizer' => new \stdClass()]);
+        new Url(['normalizer' => new \stdClass(), 'requireTld' => true]);
     }
 
     public function testAttributes()
@@ -73,17 +73,27 @@ class UrlTest extends TestCase
         self::assertNull($aConstraint->normalizer);
         self::assertTrue($dConstraint->requireTld);
     }
+
+    /**
+     * @group legacy
+     */
+    public function testRequireTldDefaultsToFalse()
+    {
+        $constraint = new Url();
+
+        $this->assertFalse($constraint->requireTld);
+    }
 }
 
 class UrlDummy
 {
-    #[Url]
+    #[Url(requireTld: false)]
     private $a;
 
-    #[Url(message: 'myMessage', protocols: ['ftp', 'gopher'], normalizer: 'trim')]
+    #[Url(message: 'myMessage', protocols: ['ftp', 'gopher'], normalizer: 'trim', requireTld: false)]
     private $b;
 
-    #[Url(relativeProtocol: true, groups: ['my_group'], payload: 'some attached data')]
+    #[Url(relativeProtocol: true, groups: ['my_group'], payload: 'some attached data', requireTld: false)]
     private $c;
 
     #[Url(requireTld: true)]

@@ -1499,10 +1499,15 @@ tr.status-warning td {
     list-style-type: none;
     margin: 0;
     padding: 7px;
+    display: flex;
+    flex-direction: column;
 }
 #menu-profiler li {
     margin-bottom: 0;
     position: relative;
+}
+#menu-profiler li:has(span.disabled) {
+    order: 1;
 }
 #menu-profiler li + li {
     margin-top: 4px;

@@ -4,6 +4,7 @@
         <meta charset="{{ _charset }}" />
         <meta name="robots" content="noindex,nofollow" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="view-transition" content="same-origin">
         <title>{% block title %}Symfony Profiler{% endblock %}</title>
 
         {% set request_collector = profile is defined ? profile.collectors.request|default(null) : null %}

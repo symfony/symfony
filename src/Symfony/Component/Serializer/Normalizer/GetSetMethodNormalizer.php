@@ -98,7 +98,7 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
     private function isSetMethod(\ReflectionMethod $method): bool
     {
         return !$method->isStatic()
-            && (\PHP_VERSION_ID < 80000 || !$method->getAttributes(Ignore::class))
+            && !$method->getAttributes(Ignore::class)
             && 1 === $method->getNumberOfRequiredParameters()
             && str_starts_with($method->name, 'set');
     }

@@ -198,7 +198,7 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringCsrfTokenWithArray($postOnly)
     {
-        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', 'password' => 'bar', '_csrf_token' => []]);
+        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => 'bar', '_csrf_token' => []]);
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
@@ -214,7 +214,7 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringCsrfTokenWithInt($postOnly)
     {
-        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', 'password' => 'bar', '_csrf_token' => 42]);
+        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => 'bar', '_csrf_token' => 42]);
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);
@@ -230,7 +230,7 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringCsrfTokenWithObject($postOnly)
     {
-        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', 'password' => 'bar', '_csrf_token' => new \stdClass()]);
+        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => 'bar', '_csrf_token' => new \stdClass()]);
         $request->setSession($this->createSession());
 
         $this->setUpAuthenticator(['post_only' => $postOnly]);

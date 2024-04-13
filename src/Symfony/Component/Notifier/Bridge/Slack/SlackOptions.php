@@ -202,6 +202,7 @@ class SlackOptions implements MessageOptionsInterface
     }
 
     /**
+     * @param list<string> $ids
      * @return $this
      */
     public function conversations(array $ids): static

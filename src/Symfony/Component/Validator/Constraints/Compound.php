@@ -46,6 +46,8 @@ abstract class Compound extends Composite
     }
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @return Constraint[]
      */
     abstract protected function getConstraints(array $options): array;

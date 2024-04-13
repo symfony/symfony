@@ -121,6 +121,9 @@ abstract class Constraint
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function normalizeOptions(mixed $options): array
     {
         $normalizedOptions = [];

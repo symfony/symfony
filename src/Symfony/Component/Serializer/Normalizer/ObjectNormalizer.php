@@ -201,7 +201,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         $method = $reflection->getMethod($attribute);
 
         return !$method->isStatic()
-            && (\PHP_VERSION_ID < 80000 || !$method->getAttributes(Ignore::class))
+            && !$method->getAttributes(Ignore::class)
             && !$method->getNumberOfRequiredParameters();
     }
 }

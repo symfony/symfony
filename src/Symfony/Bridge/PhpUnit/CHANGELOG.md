@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `ExpectUserDeprecationMessageTrait` with a polyfill of PHPUnit's `expectUserDeprecationMessage()`
+
 6.4
 ---
 

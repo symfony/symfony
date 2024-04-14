@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by alebedev80 at 2024-03-21T07:08:25Z
+
+@OskarStark what's data should be by indexes 0 and 1? method `\Symfony\Component\Notifier\Test\TransportFactoryTestCase::createProvider()`
+
+```
+    /**
+     * @return iterable<array{0: string, 1: string, 2: TransportInterface}>
+     */
+    abstract public static function createProvider(): iterable;
+
+ ```
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-03-21T08:16:06Z
+
+Please have a look at other bridges tests
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2024-03-21T09:08:36Z
+
+@OskarStark i think i fixed everything which you mentioned. I'm sorry if missed something...
+Please review code again.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-04-12T12:12:22Z
+
+Can you please apply the patches by fabbot?
+https://fabbot.io/report/symfony/symfony/54356/6dbf933f5d1a28edd6c972600b6fe3bed6122c75
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2024-04-12T14:07:19Z
+
+@OskarStark  i've fixed everything what could to fix. Please check again
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2024-04-12T17:42:47Z
+
+> After my comments we are good to go 👍 Thank you for your patience
+
+please check again
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2024-04-13T12:21:53Z
+
+@OskarStark please check again
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2024-04-13T16:44:40Z
+
+@OskarStark fixed.
+Please check again
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-04-13T19:08:19Z
+
+Tests are failing
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2024-04-13T19:23:03Z
+
+> Tests are failing
+
+Fixed

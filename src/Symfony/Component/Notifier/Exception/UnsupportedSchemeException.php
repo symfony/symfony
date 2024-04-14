@@ -132,6 +132,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\LinkedIn\LinkedInTransportFactory::class,
             'package' => 'symfony/linked-in-notifier',
         ],
+        'lox24' => [
+            'class' => Bridge\Lox24\Lox24TransportFactory::class,
+            'package' => 'symfony/lox24-notifier',
+        ],
         'mailjet' => [
             'class' => Bridge\Mailjet\MailjetTransportFactory::class,
             'package' => 'symfony/mailjet-notifier',

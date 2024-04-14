@@ -57,6 +57,7 @@ final class Transport
         Bridge\LightSms\LightSmsTransportFactory::class,
         Bridge\LineNotify\LineNotifyTransportFactory::class,
         Bridge\LinkedIn\LinkedInTransportFactory::class,
+        Bridge\Lox24\Lox24TransportFactory::class,
         Bridge\Mailjet\MailjetTransportFactory::class,
         Bridge\Mastodon\MastodonTransportFactory::class,
         Bridge\Mattermost\MattermostTransportFactory::class,

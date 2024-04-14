@@ -55,6 +55,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\LightSms\LightSmsTransportFactory::class => false,
             Bridge\LineNotify\LineNotifyTransportFactory::class => false,
             Bridge\LinkedIn\LinkedInTransportFactory::class => false,
+            Bridge\Lox24\Lox24TransportFactory::class => false,
             Bridge\Mailjet\MailjetTransportFactory::class => false,
             Bridge\Mastodon\MastodonTransportFactory::class => false,
             Bridge\Mattermost\MattermostTransportFactory::class => false,
@@ -143,6 +144,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['lightsms', 'symfony/light-sms-notifier'];
         yield ['linenotify', 'symfony/line-notify-notifier'];
         yield ['linkedin', 'symfony/linked-in-notifier'];
+        yield ['lox24', 'symfony/lox24-notifier'];
         yield ['mailjet', 'symfony/mailjet-notifier'];
         yield ['mastodon', 'symfony/mastodon-notifier'];
         yield ['mattermost', 'symfony/mattermost-notifier'];

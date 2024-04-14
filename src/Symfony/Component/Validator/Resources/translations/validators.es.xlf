@@ -440,7 +440,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Esta URL no contiene un dominio de nivel superior (TLD).</target>
+                <target>Esta URL no contiene una extensión de dominio (TLD).</target>
             </trans-unit>
         </body>
     </file>

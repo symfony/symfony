@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-04-13T18:05:04Z
+
+I updated the message according to @fabpot's suggestion. While at it I also realised that we shouldn't the skip the whole tests but also a single assertion that no longer works. Inside `NativePasswordHasher` we already work around the limitation of bcrypt since #40920.

@@ -56,7 +56,7 @@ class InputOption
     public const DEPRECATED = 32;
 
     /**
-     * The option allows to hide command option from help.
+     * Hide the option from command descriptors.
      */
     public const HIDDEN = 64;
 

@@ -659,7 +659,7 @@ class Command
         $deprecationMessages = [];
         foreach ($inputDefinition->getOptions() as $inputOption) {
             if ($inputOption->isDeprecated()) {
-                $optionNames = ['--' . $inputOption->getName()];
+                $optionNames = ['--'.$inputOption->getName()];
                 if (null !== $inputOption->getShortcut()) {
                     $optionNames[] = '-'.$inputOption->getShortcut();
                 }

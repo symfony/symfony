@@ -75,7 +75,7 @@ class TextDescriptor extends Descriptor
 
         $synopsis = \sprintf('<%1$s>%2$s</%1$s>', $option->isDeprecated() ? 'fg=gray;' : 'info', $synopsis);
 
-        $description = trim(($option->isDeprecated() ? '[deprecated] ' : '') . $option->getDescription());
+        $description = trim(($option->isDeprecated() ? '[deprecated] ' : '').$option->getDescription());
 
         $this->writeText(\sprintf('  %s  %s%s%s%s',
             $synopsis,

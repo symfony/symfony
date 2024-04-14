@@ -103,7 +103,11 @@ class NativePasswordHasherTest extends TestCase
         $hasher = new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT);
         $plainPassword = "a\0b";
 
-        $this->assertFalse($hasher->verify(password_hash($plainPassword, \PASSWORD_BCRYPT, ['cost' => 4]), $plainPassword));
+        if (\PHP_VERSION_ID < 80218 || \PHP_VERSION_ID >= 80300 && \PHP_VERSION_ID < 80305) {
+            // password_hash() does not accept passwords containing NUL bytes since PHP 8.2.18 and 8.3.5
+            $this->assertFalse($hasher->verify(password_hash($plainPassword, \PASSWORD_BCRYPT, ['cost' => 4]), $plainPassword));
+        }
+
         $this->assertTrue($hasher->verify($hasher->hash($plainPassword), $plainPassword));
     }
 

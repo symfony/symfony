@@ -356,7 +356,7 @@ class JsonDescriptor extends Descriptor
             $data['type'] = 'closure';
 
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure')) {
                 return $data;
             }
             $data['name'] = $r->name;

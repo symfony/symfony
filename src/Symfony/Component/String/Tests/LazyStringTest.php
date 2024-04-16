@@ -65,7 +65,7 @@ class LazyStringTest extends TestCase
         $s = LazyString::fromCallable(function () { return []; });
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Return value of '.__NAMESPACE__.'\{closure}() passed to '.LazyString::class.'::fromCallable() must be of the type string, array returned.');
+        $this->expectExceptionMessageMatches('{^Return value of .*\{closure.*\}\(\) passed to '.preg_quote(LazyString::class).'::fromCallable\(\) must be of the type string, array returned\.$}');
 
         (string) $s;
     }

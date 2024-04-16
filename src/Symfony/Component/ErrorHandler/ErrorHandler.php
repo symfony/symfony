@@ -428,7 +428,7 @@ class ErrorHandler
             return false;
         }
 
-        $logMessage = $this->levels[$type].': '.$message;
+        $logMessage = $this->levels[$type].': '.$message. ' at '.$file.' line '.$line;
 
         if (null !== self::$toStringException) {
             $errorAsException = self::$toStringException;

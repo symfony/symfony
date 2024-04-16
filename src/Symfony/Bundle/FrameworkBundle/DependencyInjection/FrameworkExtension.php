@@ -1568,13 +1568,13 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if ([] !== $config['default_parameters']) {
+        if ([] !== $config['globals']) {
             $container
                 ->register('translator.default_parameters', DefaultParametersTranslator::class)
                 ->setDecoratedService('translator', null, -1) // Lower priority than "translator.data_collector"
                 ->setArguments([
                     new Reference('translator.default_parameters.inner'),
-                    $config['default_parameters'],
+                    $config['globals'],
                 ]);
         }
 

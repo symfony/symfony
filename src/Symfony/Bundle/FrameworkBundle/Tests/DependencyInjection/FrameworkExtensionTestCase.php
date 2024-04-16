@@ -1198,18 +1198,18 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNull($options['cache_dir']);
     }
 
-    public function testTranslatorDefaultParameters()
+    public function testTranslatorGlobals()
     {
-        $container = $this->createContainerFromFile('translator_default_parameters');
+        $container = $this->createContainerFromFile('translator_globals');
         $this->assertSame(
             ['%%app_name%%' => 'My application', '{app_version}' => '1.2.3'],
             $container->getDefinition('translator.default_parameters')->getArgument(1),
         );
     }
 
-    public function testTranslatorWithoutDefaultParameters()
+    public function testTranslatorWithoutGlobals()
     {
-        $container = $this->createContainerFromFile('translator_without_default_parameters');
+        $container = $this->createContainerFromFile('translator_without_globals');
         $this->assertFalse($container->hasDefinition('translator.default_parameters'));
     }
 

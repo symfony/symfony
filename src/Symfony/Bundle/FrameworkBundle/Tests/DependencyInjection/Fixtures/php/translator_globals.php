@@ -5,5 +5,10 @@ $container->loadFromExtension('framework', [
     'http_method_override' => false,
     'handle_all_throwables' => true,
     'php_errors' => ['log' => true],
-    'translator' => ['default_parameters' => []],
+    'translator' => [
+        'globals' => [
+            '%%app_name%%' => 'My application',
+            '{app_version}' => '1.2.3',
+        ],
+    ],
 ]);

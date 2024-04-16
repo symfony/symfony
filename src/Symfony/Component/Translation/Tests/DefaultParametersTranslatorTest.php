@@ -26,12 +26,12 @@ class DefaultParametersTranslatorTest extends TestCase
         $translator->addResource('array', ['welcome' => 'Welcome {name}!'], 'en');
         $translator->addResource('array', ['welcome' => 'Bienvenue {name}!'], 'fr');
 
-        $defaultParametersTranslator = new DefaultParametersTranslator($translator, ['{name}' => 'Global name']);
+        $globalsTranslator = new DefaultParametersTranslator($translator, ['{name}' => 'Global name']);
 
-        $this->assertSame('Welcome Global name!', $defaultParametersTranslator->trans('welcome'));
-        $this->assertSame('Bienvenue Global name!', $defaultParametersTranslator->trans('welcome', [], null, 'fr'));
-        $this->assertSame('Welcome John!', $defaultParametersTranslator->trans('welcome', ['{name}' => 'John']));
-        $this->assertSame('Bienvenue Jean!', $defaultParametersTranslator->trans('welcome', ['{name}' => 'Jean'], null, 'fr'));
+        $this->assertSame('Welcome Global name!', $globalsTranslator->trans('welcome'));
+        $this->assertSame('Bienvenue Global name!', $globalsTranslator->trans('welcome', [], null, 'fr'));
+        $this->assertSame('Welcome John!', $globalsTranslator->trans('welcome', ['{name}' => 'John']));
+        $this->assertSame('Bienvenue Jean!', $globalsTranslator->trans('welcome', ['{name}' => 'Jean'], null, 'fr'));
     }
 
     public function testTransICU()
@@ -48,17 +48,17 @@ class DefaultParametersTranslatorTest extends TestCase
             'apples' => '{apples, plural, =0 {There are no apples} one {There is one apple} other {There are # apples}}',
         ], 'en', $domain);
 
-        $defaultParametersTranslator = new DefaultParametersTranslator($translator, ['{apples}' => 42]);
+        $globalsTranslator = new DefaultParametersTranslator($translator, ['{apples}' => 42]);
 
-        $this->assertSame('There are 42 apples', $defaultParametersTranslator->trans('apples', [], $domain));
-        $this->assertSame('There is one apple', $defaultParametersTranslator->trans('apples', ['{apples}' => 1], $domain));
+        $this->assertSame('There are 42 apples', $globalsTranslator->trans('apples', [], $domain));
+        $this->assertSame('There is one apple', $globalsTranslator->trans('apples', ['{apples}' => 1], $domain));
     }
 
     public function testGetLocale()
     {
         $translator = new Translator('en');
-        $defaultParametersTranslator = new DefaultParametersTranslator($translator, []);
+        $globalsTranslator = new DefaultParametersTranslator($translator, []);
 
-        $this->assertSame('en', $defaultParametersTranslator->getLocale());
+        $this->assertSame('en', $globalsTranslator->getLocale());
     }
 }

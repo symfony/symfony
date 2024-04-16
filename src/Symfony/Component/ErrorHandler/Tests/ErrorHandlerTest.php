@@ -493,7 +493,7 @@ class ErrorHandlerTest extends TestCase
 
         $this->assertSame($loggers, $handler->setLoggers([]));
 
-        $handler->handleError(\E_DEPRECATED, 'Foo message', 'foo.php' , 123, []);
+        $handler->handleError(\E_DEPRECATED, 'Foo message', 'foo.php', 123, []);
 
         $logs = $bootLogger->cleanLogs();
 

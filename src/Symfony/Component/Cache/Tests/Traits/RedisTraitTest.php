@@ -32,7 +32,9 @@ class RedisTraitTest extends TestCase
             throw new SkippedTestSuiteError('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
 
-        $mock = self::getObjectForTrait(RedisTrait::class);
+        $mock = new class () {
+            use RedisTrait;
+        };
         $connection = $mock::createConnection($dsn);
 
         self::assertInstanceOf($expectedClass, $connection);
@@ -44,7 +46,9 @@ class RedisTraitTest extends TestCase
             self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
         }
 
-        $mock = self::getObjectForTrait(RedisTrait::class);
+        $mock = new class () {
+            use RedisTrait;
+        };
         $connection = $mock::createConnection('redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST'));
 
         self::assertInstanceOf(\Redis::class, $connection);
@@ -101,7 +105,9 @@ class RedisTraitTest extends TestCase
         }
 
         try {
-            $mock = self::getObjectForTrait(RedisTrait::class);
+            $mock = new class () {
+                use RedisTrait;
+            };
 
             $dsn = 'redis://'.getenv('REDIS_HOST');
 

@@ -40,7 +40,7 @@ class TestClassMagicGet
         }
     }
 
-    public function __isset(string $property)
+    public function __isset(string $property): bool
     {
         return \in_array($property, ['magicProperty', 'constantMagicProperty'], true);
     }

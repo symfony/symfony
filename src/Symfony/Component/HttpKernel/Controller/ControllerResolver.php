@@ -240,7 +240,7 @@ class ControllerResolver implements ControllerResolverInterface
             $r = new \ReflectionFunction($controller);
             $name = $r->name;
 
-            if (str_contains($name, '{closure}')) {
+            if (str_contains($name, '{closure')) {
                 $name = $class = \Closure::class;
             } elseif ($class = $r->getClosureCalledClass()) {
                 $class = $class->name;

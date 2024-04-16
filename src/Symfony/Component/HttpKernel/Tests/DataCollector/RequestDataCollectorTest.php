@@ -118,7 +118,7 @@ class RequestDataCollectorTest extends TestCase
                 'Closure',
                 fn () => 'foo',
                 [
-                    'class' => __NAMESPACE__.'\{closure}',
+                    'class' => \PHP_VERSION_ID >= 80400 ? sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2) : __NAMESPACE__.'\{closure}',
                     'method' => null,
                     'file' => __FILE__,
                     'line' => __LINE__ - 5,

@@ -31,7 +31,7 @@ class Url extends Constraint
     ];
 
     public string $message = 'This value is not a valid URL.';
-    public string $tldMessage = 'This URL does not contain a TLD.';
+    public string $tldMessage = 'This URL is missing a top-level domain.';
     public array $protocols = ['http', 'https'];
     public bool $relativeProtocol = false;
     public bool $requireTld = false;

@@ -989,7 +989,6 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('globals')
                             ->info('Global parameters.')
                             ->example(['app_version' => 3.14])
-                            ->defaultValue([])
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
                             ->prototype('scalar')->end()

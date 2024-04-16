@@ -326,9 +326,6 @@ class Response
 
         // headers
         foreach ($this->headers->allPreserveCaseWithoutCookies() as $name => $values) {
-            $newValues = $values;
-            $replace = false;
-
             // As recommended by RFC 8297, PHP automatically copies headers from previous 103 responses, we need to deal with that if headers changed
             $previousValues = $this->sentHeaders[$name] ?? null;
             if ($previousValues === $values) {

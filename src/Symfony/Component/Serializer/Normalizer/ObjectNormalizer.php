@@ -171,7 +171,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         return $allowedAttributes;
     }
 
-    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
+    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = [])
     {
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
             return false;

@@ -23,12 +23,12 @@ use Twig\Node\Expression\NameExpression;
 use Twig\Node\ModuleNode;
 use Twig\Node\Node;
 use Twig\Node\SetNode;
-use Twig\NodeVisitor\AbstractNodeVisitor;
+use Twig\NodeVisitor\NodeVisitorInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
+final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 {
     private Scope $scope;
 
@@ -37,7 +37,7 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         $this->scope = new Scope();
     }
 
-    protected function doEnterNode(Node $node, Environment $env): Node
+    public function enterNode(Node $node, Environment $env): Node
     {
         if ($node instanceof BlockNode || $node instanceof ModuleNode) {
             $this->scope = $this->scope->enter();
@@ -83,7 +83,7 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    protected function doLeaveNode(Node $node, Environment $env): ?Node
+    public function leaveNode(Node $node, Environment $env): ?Node
     {
         if ($node instanceof TransDefaultDomainNode) {
             return null;

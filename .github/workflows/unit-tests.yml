@@ -34,6 +34,7 @@ jobs:
             mode: low-deps
           - php: '8.3'
           - php: '8.4'
+            extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis
             #mode: experimental
       fail-fast: false
 
@@ -51,7 +52,7 @@ jobs:
           coverage: "none"
           ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
-          extensions: "${{ env.extensions }}"
+          extensions: "${{ matrix.extensions || env.extensions }}"
           tools: flex
 
       - name: Configure environment

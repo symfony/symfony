@@ -9,6 +9,7 @@ CHANGELOG
  * Add `Default` and "class name" default groups
  * Add `AbstractNormalizer::FILTER_BOOL` context option
  * Add `CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES` context option
+ * Deprecate `AbstractNormalizerContextBuilder::withDefaultContructorArguments(?array $defaultContructorArguments)`, use `withDefaultConstructorArguments(?array $defaultConstructorArguments)` instead (note the missing `s` character in Contructor word in deprecated method)
 
 7.0
 ---

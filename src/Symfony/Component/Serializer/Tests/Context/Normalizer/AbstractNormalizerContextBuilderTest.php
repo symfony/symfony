@@ -41,7 +41,7 @@ class AbstractNormalizerContextBuilderTest extends TestCase
             ->withGroups($values[AbstractNormalizer::GROUPS])
             ->withAttributes($values[AbstractNormalizer::ATTRIBUTES])
             ->withAllowExtraAttributes($values[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES])
-            ->withDefaultContructorArguments($values[AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS])
+            ->withDefaultConstructorArguments($values[AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS])
             ->withCallbacks($values[AbstractNormalizer::CALLBACKS])
             ->withCircularReferenceHandler($values[AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER])
             ->withIgnoredAttributes($values[AbstractNormalizer::IGNORED_ATTRIBUTES])

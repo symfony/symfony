@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">Ova vrednost nije validna MAC adresa.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Ovaj URL ne sadrži domen najvišeg nivoa (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Ovom URL nedostaje domen najvišeg nivoa.</target>
             </trans-unit>
         </body>
     </file>

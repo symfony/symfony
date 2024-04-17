@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">Este valor non é un enderezo MAC válido.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Esta URL non contén un dominio de nivel superior (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Esta URL non contén un dominio de nivel superior.</target>
             </trans-unit>
         </body>
     </file>

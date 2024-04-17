@@ -1,0 +1,77 @@
+<div class="status status-compact" id="status-browser-tracking" hidden>
+    <span class="icon">{{ source('@WebProfiler/Icon/settings-follow-main.svg') }}</span>
+
+    Browser is now at token <a href="#" id="status-browser-tracking-link"></a> (<span class="help" id="status-browser-tracking-help"></span>).
+    - <a href="#" id="status-browser-tracking-enable-link">Follow the browser automatically</a>
+</div>
+
+<div class="status status-compact status-warning" id="status-browser-tracking-automatic" hidden>
+    <span class="icon">{{ source('@WebProfiler/Icon/settings-follow-main.svg') }}</span>
+    <span id="status-browser-tracking-reloaded" hidden>This tab was reloaded to follow the browser - <a href="javascript:history.back();">Go back</a></span>
+    <span id="status-browser-tracking-following" hidden>This tab is following the browser</span>
+
+    - <a href="#" id="status-browser-tracking-disable-link">Stop following the browser automatically</a>
+</div>
+
+<script>
+    (function () {
+        if (sessionStorage.getItem('symfony/profiler/follow-without-prompt') === 'on' && localStorage.getItem('symfony/profiler/follow') !== 'follow-nothing') {
+            const automaticReloadPanel = document.getElementById('status-browser-tracking-automatic');
+            const followBrowserDisableLink = document.getElementById('status-browser-tracking-disable-link');
+            const reloadedBrowserMessage = document.getElementById('status-browser-tracking-reloaded');
+            const followingBrowserMessage = document.getElementById('status-browser-tracking-following');
+
+            automaticReloadPanel.hidden = false;
+
+            if (sessionStorage.getItem('symfony/profiler/followed-without-prompt') === 'yes') {
+                sessionStorage.setItem('symfony/profiler/followed-without-prompt', 'no');
+                reloadedBrowserMessage.hidden = false;
+            } else {
+                followingBrowserMessage.hidden = false;
+            }
+
+            followBrowserDisableLink.addEventListener('click', function () {
+                sessionStorage.setItem('symfony/profiler/follow-without-prompt', 'off');
+                automaticReloadPanel.hidden = true;
+            });
+        }
+
+        const followBrowserPanel = document.getElementById('status-browser-tracking');
+        const followBrowserHelp = document.getElementById('status-browser-tracking-help');
+        const followBrowserLink = document.getElementById('status-browser-tracking-link');
+        const followBrowserEnableLink = document.getElementById('status-browser-tracking-enable-link');
+        followBrowserEnableLink.addEventListener('click', function () {
+            sessionStorage.setItem('symfony/profiler/follow-without-prompt', 'on');
+            document.location.href = followBrowserLink.href;
+        });
+
+        (new BroadcastChannel('symfony_profiler')).addEventListener('message', function ({data}) {
+            let types = [];
+            switch (localStorage.getItem('symfony/profiler/follow') || 'follow-main') {
+                case 'follow-nothing':
+                    return;
+                case 'follow-main':
+                    types = ['main'];
+                    break;
+                case 'follow-all':
+                    types = ['main', 'ajax'];
+                    break;
+            }
+            if (types.includes(data.type)) {
+                if (sessionStorage.getItem('symfony/profiler/follow-without-prompt') === 'on') {
+                    sessionStorage.setItem('symfony/profiler/followed-without-prompt', 'yes');
+                    document.location.href = '{{ url('_profiler_home')|escape('js') }}' + data.token + document.location.search;
+                    return;
+                }
+
+                followBrowserPanel.hidden = false;
+                followBrowserLink.href = '{{ url('_profiler_home')|escape('js') }}' + data.token + document.location.search;
+                followBrowserLink.innerText = data.token;
+                followBrowserHelp.innerText = data.help;
+
+
+                setTimeout(() => followBrowserLink.focus(), 30);
+            }
+        });
+    })();
+</script>

@@ -248,6 +248,9 @@
                         }
                     }
                 }
+                else if(request.profile) {
+                    broadCastToken(request.profile, "ajax", request.url);
+                }
 
                 pendingRequests--;
                 var row = request.DOMNode;
@@ -396,6 +399,16 @@
             }
             {% endif %}
 
+            function broadCastToken(token, type, help) {
+                if (!window.hasOwnProperty('BroadcastChannel')) return;
+
+                (new BroadcastChannel('symfony_profiler')).postMessage({
+                    token: token,
+                    type: type,
+                    help: help
+                });
+            }
+
             return {
                 hasClass: hasClass,
 
@@ -510,6 +523,7 @@
 
                         setPreference('toolbar/displayState', 'block');
                     });
+                    broadCastToken(token, 'main', (document.getElementById('sfToolbarMainContent-' + token).querySelector(".sf-toolbar-block-request .sf-toolbar-label")?.innerText ?? "") + (document.getElementById('sfToolbarMainContent-' + token).querySelector(".sf-toolbar-block-request .sf-toolbar-info-piece-additional")?.innerText ?? ""));
                 },
 
                 loadToolbar: function(token, newToken) {

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+* Follow the browser from the profiler to quickly find the profiler token
+
 7.1
 ---
 

@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">Ši vertė nėra galiojantis MAC adresas.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Šis URL neturi aukščiausio lygio domeno (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Šiam URL trūksta aukščiausio lygio domeno.</target>
             </trans-unit>
         </body>
     </file>

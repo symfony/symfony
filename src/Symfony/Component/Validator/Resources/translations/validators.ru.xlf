@@ -439,8 +439,8 @@
                 <target>Это значение не является действительным MAC-адресом.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Этот URL не содержит домен верхнего уровня (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Этому URL не хватает домена верхнего уровня.</target>
             </trans-unit>
         </body>
     </file>

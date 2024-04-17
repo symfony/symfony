@@ -439,8 +439,8 @@
                 <target>Αυτός ο αριθμός δεν είναι έγκυρη διεύθυνση MAC.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Αυτή η διεύθυνση URL δεν περιέχει έναν τομέα ανώτατου επιπέδου (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Αυτή η διεύθυνση URL λείπει ένας τομέας ανώτατου επιπέδου.</target>
             </trans-unit>
         </body>
     </file>

@@ -5,7 +5,8 @@ The ProxyManager bridge provides integration for [ProxyManager][1] with various
 Symfony components.
 
 > [!WARNING]  
-> This bridge is no longer necessary and is thus discontinued; 6.4 is the last version.
+> This bridge is no longer necessary and is thus discontinued; 6.4 is the last version.  
+> The first version of Symfony no longer requiring the ProxyManager bridge for lazy services is 6.2.
 
 Resources
 ---------

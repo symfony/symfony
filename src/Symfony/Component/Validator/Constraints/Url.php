@@ -57,6 +57,10 @@ class Url extends Constraint
     ) {
         parent::__construct($options, $groups, $payload);
 
+        if (null === ($options['requireTld'] ?? $requireTld)) {
+            trigger_deprecation('symfony/validator', '7.1', 'Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".');
+        }
+
         $this->message = $message ?? $this->message;
         $this->protocols = $protocols ?? $this->protocols;
         $this->relativeProtocol = $relativeProtocol ?? $this->relativeProtocol;

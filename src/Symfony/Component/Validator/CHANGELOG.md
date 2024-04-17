@@ -4,6 +4,7 @@ CHANGELOG
 7.1
 ---
 
+ * Deprecate not passing a value for the `requireTld` option to the `Url` constraint (the default value will become `true` in 8.0)
  * Add the calculated strength to violations in `PasswordStrengthValidator`
  * Add support for `Stringable` values when using the `Cidr`, `CssColor`, `ExpressionSyntax` and `PasswordStrength` constraints
  * Add `MacAddress` constraint

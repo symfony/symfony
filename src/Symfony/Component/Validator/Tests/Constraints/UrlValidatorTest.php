@@ -25,21 +25,21 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Url());
+        $this->validator->validate(null, new Url(requireTld: true));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Url());
+        $this->validator->validate('', new Url(requireTld: true));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringFromObjectIsValid()
     {
-        $this->validator->validate(new EmailProvider(), new Url());
+        $this->validator->validate(new EmailProvider(), new Url(requireTld: true));
 
         $this->assertNoViolation();
     }
@@ -47,7 +47,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Url());
+        $this->validator->validate(new \stdClass(), new Url(requireTld: true));
     }
 
     /**
@@ -55,7 +55,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidUrls($url)
     {
-        $this->validator->validate($url, new Url());
+        $this->validator->validate($url, new Url(requireTld: false));
 
         $this->assertNoViolation();
     }
@@ -65,7 +65,10 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidUrlsWithWhitespaces($url)
     {
-        $this->validator->validate($url, new Url(['normalizer' => 'trim']));
+        $this->validator->validate($url, new Url([
+            'normalizer' => 'trim',
+            'requireTld' => true,
+        ]));
 
         $this->assertNoViolation();
     }
@@ -78,6 +81,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Url([
             'relativeProtocol' => true,
+            'requireTld' => false,
         ]);
 
         $this->validator->validate($url, $constraint);
@@ -196,6 +200,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Url([
             'message' => 'myMessage',
+            'requireTld' => false,
         ]);
 
         $this->validator->validate($url, $constraint);
@@ -215,6 +220,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Url([
             'message' => 'myMessage',
             'relativeProtocol' => true,
+            'requireTld' => false,
         ]);
 
         $this->validator->validate($url, $constraint);
@@ -292,10 +298,11 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidCustomUrls
      */
-    public function testCustomProtocolIsValid($url)
+    public function testCustomProtocolIsValid($url, $requireTld)
     {
         $constraint = new Url([
             'protocols' => ['ftp', 'file', 'git'],
+            'requireTld' => $requireTld,
         ]);
 
         $this->validator->validate($url, $constraint);
@@ -306,9 +313,9 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     public static function getValidCustomUrls()
     {
         return [
-            ['ftp://example.com'],
-            ['file://127.0.0.1'],
-            ['git://[::1]/'],
+            ['ftp://example.com', true],
+            ['file://127.0.0.1', false],
+            ['git://[::1]/', false],
         ];
     }
 

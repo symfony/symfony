@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-04-08T15:10:54Z
+
+Unrelated tests failures
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-04-17T12:54:38Z
+
+@fabpot I was waiting for this first one, I'm quite confident about this one and the signature verification code (I get it from the official [Resend PHP SDK](https://github.com/resend/resend-php/blob/main/src/WebhookSignature.php)). Can we merge as it is, and add more webhook tests later if needed?

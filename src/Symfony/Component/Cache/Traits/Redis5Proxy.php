@@ -81,7 +81,7 @@ class Redis5Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->append(...\func_get_args());
     }
 
-    public function auth($auth)
+    public function auth(#[\SensitiveParameter] $auth)
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->auth(...\func_get_args());
     }

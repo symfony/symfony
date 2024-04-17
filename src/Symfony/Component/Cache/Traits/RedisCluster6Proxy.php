@@ -28,7 +28,6 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
     use LazyProxyTrait {
         resetLazyObject as reset;
     }
-    use RedisCluster6ProxyTrait;
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 
@@ -655,6 +654,11 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
     public function pttl($key): \RedisCluster|false|int
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->pttl(...\func_get_args());
+    }
+
+    public function publish($channel, $message): \RedisCluster|bool
+    {
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->publish(...\func_get_args());
     }
 
     public function pubsub($key_or_address, ...$values): mixed

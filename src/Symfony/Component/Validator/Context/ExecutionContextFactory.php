@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @internal version 2.5. Code against ExecutionContextFactoryInterface instead.
+ * @internal
  */
 class ExecutionContextFactory implements ExecutionContextFactoryInterface
 {

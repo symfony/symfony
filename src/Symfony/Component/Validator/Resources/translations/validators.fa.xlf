@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">این مقدار یک آدرس MAC معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">این URL شامل دامنه سطح بالا (TLD) نمی‌شود.</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">این URL فاقد دامنه سطح بالا است.</target>
             </trans-unit>
         </body>
     </file>

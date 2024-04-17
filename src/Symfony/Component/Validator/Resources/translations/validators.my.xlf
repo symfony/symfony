@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">ဤတန်ဖိုးသည် မှန်ကန်သော MAC လိပ်စာ မဟုတ်ပါ။</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">ဤ URL သည် အမြင့်ဆုံးအဆင့်ဒိုမိန်း (TLD) မပါရှိပါ။</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">ဤ URL တွင် အမြင့်ဆုံးအဆင့်ဒိုမိန်း ပါဝင်မရှိပါ။</target>
             </trans-unit>
         </body>
     </file>

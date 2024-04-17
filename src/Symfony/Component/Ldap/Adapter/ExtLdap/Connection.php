@@ -78,7 +78,8 @@ class Connection extends AbstractConnection
                 case self::LDAP_ALREADY_EXISTS:
                     throw new AlreadyExistsException($error);
             }
-            throw new ConnectionException($error);
+            ldap_get_option($this->connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $diagnostic_message);
+            throw new ConnectionException($error.' '.$diagnostic_message);
         }
 
         $this->bound = true;

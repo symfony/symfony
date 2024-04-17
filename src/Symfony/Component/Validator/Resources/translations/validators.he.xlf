@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">ערך זה אינו כתובת MAC תקפה.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">כתובת URL זו אינה מכילה דומיין רמה עליונה (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">לכתובת URL זו חסר דומיין רמה עליונה.</target>
             </trans-unit>
         </body>
     </file>

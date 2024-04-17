@@ -439,8 +439,8 @@
                 <target>Nilai ini bukan alamat MAC yang valid.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">URL ini tidak mengandung domain tingkat atas (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target>URL ini tidak memiliki domain tingkat atas.</target>
             </trans-unit>
         </body>
     </file>

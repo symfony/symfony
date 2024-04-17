@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by connorhu at 2024-04-16T16:24:46Z
+
+To me, as a knowledgeable person, the TLD is more precise and understandable. For the uninitiated (like my parents' generation, or even my wife who is not in IT), they don't know what either of them means.
+
+If I'm making an interface that will be used by incompetent people, I'll describe what's wrong in more detail and with an example (depending on the age group). So I don't use the original translation.
+
+---------------------------------------------------------------------------
+
+by RedactedProfile at 2024-04-16T17:40:48Z
+
+I do agree with @connorhu on a higher level.  Being as this is validation with messages to be displayed, "TLD" may be too obtuse to those who simply don't know what it stands for or means, but also "domain extension" if I'm being honest isn't quite as clear as it could be either to my brother who has a Wix website and may want to submit the URL too in this form and forgets to add the domain extension, he'd probably be reaching out to ask me what that is. But aside from adding a "(eg: .com)" type example bit to the end, not sure the more elegant approach for it to make it as ultra clear as possible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-16T17:54:02Z
+
+The thing is that in other languages, TLD means absolutely nothing.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-04-17T06:52:43Z
+
+Maybe ... " a (top-level) domain extension." ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-17T07:04:42Z
+
+> Is it possible to update all the translation files to keep the existing translation but with the new English wording?
+
+yes, once this one is settled, I'll submit a PR for 5.4

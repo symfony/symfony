@@ -439,8 +439,8 @@
                 <target>See väärtus ei ole kehtiv MAC-aadress.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Sellel URL-il puudub ülataseme domeen (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Sellel URL-il puudub ülataseme domeen.</target>
             </trans-unit>
         </body>
     </file>

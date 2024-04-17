@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">この値は有効なMACアドレスではありません。</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">このURLにはトップレベルドメイン（TLD）が含まれていません。</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">このURLはトップレベルドメインがありません。</target>
             </trans-unit>
         </body>
     </file>

@@ -439,8 +439,8 @@
                 <target>Ez az érték nem érvényes MAC-cím.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Ez az URL nem tartalmaz felső szintű domain-t (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Ennek az URL-nek hiányzik a legfelső szintű domain.</target>
             </trans-unit>
         </body>
     </file>

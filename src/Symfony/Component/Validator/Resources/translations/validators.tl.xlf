@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">Ang halagang ito ay hindi isang wastong MAC address.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Ang URL na ito ay walang top-level domain (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Kulang ang URL na ito sa top-level domain.</target>
             </trans-unit>
         </body>
     </file>

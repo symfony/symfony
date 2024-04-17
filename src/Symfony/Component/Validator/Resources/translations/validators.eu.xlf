@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">Balio hau ez da MAC helbide baliozko bat.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">URL honek ez du goi-mailako domeinurik (TLD) du.</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">URL honek ez du goi-mailako domeinurik.</target>
             </trans-unit>
         </body>
     </file>

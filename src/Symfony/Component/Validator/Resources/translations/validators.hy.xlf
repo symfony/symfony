@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">Այս արժեքը վավեր MAC հասցե չէ։</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Այս URL-ը չունի վերին մակարդակի դոմեյն (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Այս URL-ը չունի վերին մակարդակի դոմեյն:</target>
             </trans-unit>
         </body>
     </file>

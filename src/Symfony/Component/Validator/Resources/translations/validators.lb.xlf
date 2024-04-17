@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">Dëse Wäert ass keng gülteg MAC-Adress.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Dësen URL enthält keng Top-Level-Domain (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Dësen URL feelt eng Top-Level-Domain.</target>
             </trans-unit>
         </body>
     </file>

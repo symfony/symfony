@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">Táto hodnota nie je platnou MAC adresou.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Táto URL neobsahuje doménu najvyššej úrovne (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Tomuto URL chýba doména najvyššej úrovne.</target>
             </trans-unit>
         </body>
     </file>

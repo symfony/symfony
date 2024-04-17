@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">Nid yw'r gwerth hwn yn gyfeiriad MAC dilys.</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Nid yw'r URL hwn yn cynnwys parth lefel uchaf (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Mae'r URL hwn yn colli parth lefel uchaf.</target>
             </trans-unit>
         </body>
     </file>

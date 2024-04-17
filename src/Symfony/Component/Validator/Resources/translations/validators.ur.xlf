@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">یہ قیمت کوئی درست MAC پتہ نہیں ہے۔</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">یہ URL اوپری سطح کے ڈومین (TLD) کو شامل نہیں کرتا۔</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">اس URL میں ٹاپ لیول ڈومین موجود نہیں ہے۔</target>
             </trans-unit>
         </body>
     </file>

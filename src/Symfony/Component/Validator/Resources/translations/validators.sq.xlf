@@ -448,8 +448,8 @@
                 <target>Kjo nuk është një adresë e vlefshme e Kontrollit të Qasjes në Media (MAC).</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">Ky URL nuk përmban një domain nivelin më të lartë (TLD).</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Kësaj URL i mungon një domain i nivelit të lartë.</target>
             </trans-unit>
         </body>
     </file>

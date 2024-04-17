@@ -439,8 +439,8 @@
                 <target state="needs-review-translation">這不是一個有效的MAC地址。</target>
             </trans-unit>
             <trans-unit id="113">
-                <source>This URL does not contain a TLD.</source>
-                <target state="needs-review-translation">此URL不含頂級域名（TLD）。</target>
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">此URL缺少頂級域名。</target>
             </trans-unit>
         </body>
     </file>

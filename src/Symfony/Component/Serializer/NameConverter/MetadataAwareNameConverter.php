@@ -41,7 +41,7 @@ final class MetadataAwareNameConverter implements NameConverterInterface
     ) {
     }
 
-    public function normalize(string $propertyName/* , ?string $class = null, ?string $format = null, array $context = [] */): string
+    public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         $class = 1 < \func_num_args() ? func_get_arg(1) : null;
         $format = 2 < \func_num_args() ? func_get_arg(2) : null;
@@ -58,7 +58,7 @@ final class MetadataAwareNameConverter implements NameConverterInterface
         return self::$normalizeCache[$class][$propertyName] ?? $this->normalizeFallback($propertyName, $class, $format, $context);
     }
 
-    public function denormalize(string $propertyName/* , ?string $class = null, ?string $format = null, array $context = [] */): string
+    public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         $class = 1 < \func_num_args() ? func_get_arg(1) : null;
         $format = 2 < \func_num_args() ? func_get_arg(2) : null;

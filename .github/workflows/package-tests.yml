@@ -101,6 +101,7 @@ jobs:
           done
 
           exit $ok
+
       - name: Verify symfony/deprecation-contracts requirements
         run: |
           set +e
@@ -141,3 +142,9 @@ jobs:
           done
 
           exit $ok
+
+      - name: Verify subtree-splits are auto-closed
+        run: |
+          php .github/sync-packages.php
+          git add src/
+          git diff --staged --exit-code || (echo '::error::Please run "php .github/sync-packages.php".' && exit 1)

@@ -59,6 +59,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const TYPE_CAST_ATTRIBUTES = 'xml_type_cast_attributes';
     public const VERSION = 'xml_version';
     public const CDATA_WRAPPING = 'cdata_wrapping';
+    public const CDATA_WRAPPING_PATTERN = 'cdata_wrapping_pattern';
 
     private array $defaultContext = [
         self::AS_COLLECTION => false,
@@ -70,6 +71,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::ROOT_NODE_NAME => 'response',
         self::TYPE_CAST_ATTRIBUTES => true,
         self::CDATA_WRAPPING => true,
+        self::CDATA_WRAPPING_PATTERN => '/[<>&]/',
     ];
 
     public function __construct(array $defaultContext = [])
@@ -433,7 +435,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     private function needsCdataWrapping(string $val, array $context): bool
     {
-        return ($context[self::CDATA_WRAPPING] ?? $this->defaultContext[self::CDATA_WRAPPING]) && preg_match('/[<>&]/', $val);
+        return ($context[self::CDATA_WRAPPING] ?? $this->defaultContext[self::CDATA_WRAPPING]) && preg_match($context[self::CDATA_WRAPPING_PATTERN] ?? $this->defaultContext[self::CDATA_WRAPPING_PATTERN], $val);
     }
 
     /**

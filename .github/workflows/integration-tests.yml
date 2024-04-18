@@ -210,4 +210,4 @@ jobs:
         run: |
           php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v
           php .github/sync-translations.php
-          git diff --exit-code src/ || (echo 'Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)
+          git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)

@@ -272,12 +272,12 @@ class AbstractNormalizerTest extends TestCase
     {
         $extractor = new PhpDocExtractor();
         $nameConverter = new class() implements NameConverterInterface {
-            public function normalize(string $propertyName): string
+            public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return ucfirst($propertyName);
             }
 
-            public function denormalize(string $propertyName): string
+            public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return lcfirst($propertyName);
             }

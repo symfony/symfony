@@ -36,6 +36,11 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     ) {
     }
 
+    /**
+     * @param class-string|null    $class
+     * @param string|null          $format
+     * @param array<string, mixed> $context
+     */
     public function normalize(string $propertyName/* , ?string $class = null, ?string $format = null, array $context = [] */): string
     {
         if (null === $this->attributes || \in_array($propertyName, $this->attributes, true)) {
@@ -45,6 +50,11 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
         return $propertyName;
     }
 
+    /**
+     * @param class-string|null    $class
+     * @param string|null          $format
+     * @param array<string, mixed> $context
+     */
     public function denormalize(string $propertyName/* , ?string $class = null, ?string $format = null, array $context = [] */): string
     {
         $class = 1 < \func_num_args() ? func_get_arg(1) : null;

@@ -46,6 +46,19 @@ final class BuiltinType extends Type
         return $this->typeIdentifier;
     }
 
+    public function isA(TypeIdentifier|string $subject): bool
+    {
+        if ($subject instanceof TypeIdentifier) {
+            return $this->getTypeIdentifier() === $subject;
+        }
+
+        try {
+            return TypeIdentifier::from($subject) === $this->getTypeIdentifier();
+        } catch (\ValueError) {
+            return false;
+        }
+    }
+
     /**
      * @return self|UnionType<BuiltinType<TypeIdentifier::OBJECT>|BuiltinType<TypeIdentifier::RESOURCE>|BuiltinType<TypeIdentifier::ARRAY>|BuiltinType<TypeIdentifier::STRING>|BuiltinType<TypeIdentifier::FLOAT>|BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::BOOL>>
      */

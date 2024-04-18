@@ -56,6 +56,11 @@ final class GenericType extends Type
         return $this->type;
     }
 
+    public function isA(TypeIdentifier|string $subject): bool
+    {
+        return $this->getType()->isA($subject);
+    }
+
     public function asNonNullable(): self
     {
         return $this;

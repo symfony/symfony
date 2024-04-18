@@ -49,14 +49,9 @@ trait CompositeTypeTrait
         $this->types = array_values(array_unique($types));
     }
 
-    public function isA(TypeIdentifier $typeIdentifier): bool
+    public function isA(TypeIdentifier|string $subject): bool
     {
-        return $this->is(fn (Type $type) => $type->isA($typeIdentifier));
-    }
-
-    public function isNullable(): bool
-    {
-        return $this->is(fn (Type $type) => $type->isNullable());
+        return $this->is(fn (Type $type) => $type->isA($subject));
     }
 
     /**

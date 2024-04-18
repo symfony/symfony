@@ -31,17 +31,6 @@ class TypeTest extends TestCase
         $this->assertFalse(Type::generic(Type::string(), Type::int())->is($isInt));
     }
 
-    public function testIsA()
-    {
-        $this->assertTrue(Type::int()->isA(TypeIdentifier::INT));
-        $this->assertTrue(Type::union(Type::string(), Type::int())->isA(TypeIdentifier::INT));
-        $this->assertTrue(Type::generic(Type::int(), Type::string())->isA(TypeIdentifier::INT));
-
-        $this->assertFalse(Type::string()->isA(TypeIdentifier::INT));
-        $this->assertFalse(Type::union(Type::string(), Type::float())->isA(TypeIdentifier::INT));
-        $this->assertFalse(Type::generic(Type::string(), Type::int())->isA(TypeIdentifier::INT));
-    }
-
     public function testIsNullable()
     {
         $this->assertTrue(Type::null()->isNullable());

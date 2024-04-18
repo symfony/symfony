@@ -298,6 +298,7 @@ class EntityValueResolverTest extends TestCase
 
         $manager->expects($this->once())
             ->method('getRepository')
+            ->with(\stdClass::class)
             ->willReturn($repository);
 
         $language->expects($this->once())
@@ -329,6 +330,7 @@ class EntityValueResolverTest extends TestCase
 
         $manager->expects($this->once())
             ->method('getRepository')
+            ->with(\stdClass::class)
             ->willReturn($repository);
 
         $language->expects($this->once())
@@ -341,6 +343,48 @@ class EntityValueResolverTest extends TestCase
             ->willReturn($object = new \stdClass());
 
         $this->assertSame([$object], $resolver->resolve($request, $argument));
+    }
+
+    public function testExpressionMapsToIterableArgument()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $language = $this->createMock(ExpressionLanguage::class);
+        $resolver = new EntityValueResolver($registry, $language);
+
+        $request = new Request();
+        $request->attributes->set('id', 5);
+        $request->query->set('sort', 'ASC');
+        $request->query->set('limit', 10);
+        $argument = $this->createArgument(
+            'iterable',
+            new MapEntity(
+                class: \stdClass::class,
+                expr: $expr = 'repository.findBy({"author": id}, {"createdAt": request.query.get("sort", "DESC")}, request.query.getInt("limit", 10))',
+            ),
+            'arg1',
+        );
+
+        $repository = $this->createMock(ObjectRepository::class);
+        // find should not be attempted on this repository as a fallback
+        $repository->expects($this->never())
+            ->method('find');
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with(\stdClass::class)
+            ->willReturn($repository);
+
+        $language->expects($this->once())
+            ->method('evaluate')
+            ->with($expr, [
+                'repository' => $repository,
+                'request' => $request,
+                'id' => 5,
+            ])
+            ->willReturn($objects = [new \stdClass(), new \stdClass()]);
+
+        $this->assertSame([$objects], $resolver->resolve($request, $argument));
     }
 
     public function testExpressionSyntaxErrorThrowsException()
@@ -364,6 +408,7 @@ class EntityValueResolverTest extends TestCase
 
         $manager->expects($this->once())
             ->method('getRepository')
+            ->with(\stdClass::class)
             ->willReturn($repository);
 
         $language->expects($this->once())

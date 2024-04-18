@@ -27,6 +27,11 @@ final class IntersectionType extends Type
      */
     use CompositeTypeTrait;
 
+    public function is(callable $callable): bool
+    {
+        return $this->everyTypeIs($callable);
+    }
+
     public function __toString(): string
     {
         $string = '';

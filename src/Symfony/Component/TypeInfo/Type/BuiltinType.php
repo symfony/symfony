@@ -31,6 +31,11 @@ final class BuiltinType extends Type
     ) {
     }
 
+    public function getBaseType(): self|ObjectType
+    {
+        return $this;
+    }
+
     /**
      * @return T
      */

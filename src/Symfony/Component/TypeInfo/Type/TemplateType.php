@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo\Type;
 
+use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -25,6 +26,11 @@ final class TemplateType extends Type
         private readonly string $name,
         private readonly Type $bound,
     ) {
+    }
+
+    public function getBaseType(): BuiltinType|ObjectType
+    {
+        throw new LogicException(sprintf('Cannot get base type on "%s" template type.', $this));
     }
 
     public function getName(): string

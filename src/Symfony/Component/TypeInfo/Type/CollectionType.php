@@ -43,6 +43,11 @@ final class CollectionType extends Type
         }
     }
 
+    public function getBaseType(): BuiltinType|ObjectType
+    {
+        return $this->getType()->getBaseType();
+    }
+
     /**
      * @return T
      */

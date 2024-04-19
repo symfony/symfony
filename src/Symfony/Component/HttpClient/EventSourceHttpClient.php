@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\ServerSentEvent;
 use Symfony\Component\HttpClient\Exception\EventSourceException;
 use Symfony\Component\HttpClient\Response\AsyncContext;
@@ -25,7 +27,7 @@ use Symfony\Contracts\Service\ResetInterface;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
+final class EventSourceHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
     use AsyncDecoratorTrait, HttpClientTrait {
         AsyncDecoratorTrait::withOptions insteadof HttpClientTrait;
@@ -155,5 +157,12 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
                 yield $chunk;
             }
         });
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        if ($this->client instanceof LoggerAwareInterface) {
+            $this->client->setLogger($logger);
+        }
     }
 }

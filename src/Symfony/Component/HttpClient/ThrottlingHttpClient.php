@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -19,7 +21,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Limits the number of requests within a certain period.
  */
-class ThrottlingHttpClient implements HttpClientInterface, ResetInterface
+class ThrottlingHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
     use DecoratorTrait {
         reset as private traitReset;
@@ -47,5 +49,12 @@ class ThrottlingHttpClient implements HttpClientInterface, ResetInterface
     {
         $this->traitReset();
         $this->rateLimiter->reset();
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        if ($this->client instanceof LoggerAwareInterface) {
+            $this->client->setLogger($logger);
+        }
     }
 }

@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenExtractorInterface;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
+use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -158,5 +159,32 @@ class AccessTokenAuthenticatorTest extends TestCase
         $passport = $authenticator->authenticate($request);
 
         $this->assertEquals('test', $passport->getUser()->getUserIdentifier());
+    }
+
+    /**
+     * @dataProvider provideAccessTokenHeaderRegex
+     */
+    public function testAccessTokenHeaderRegex(string $input, ?string $expectedToken)
+    {
+        // Given
+        $extractor = new HeaderAccessTokenExtractor();
+        $request = Request::create('/test', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => $input]);
+
+        // When
+        $token = $extractor->extractAccessToken($request);
+
+        // Then
+        $this->assertEquals($expectedToken, $token);
+    }
+
+    public function provideAccessTokenHeaderRegex(): array
+    {
+        return [
+            ['Bearer token', 'token'],
+            ['Bearer mF_9.B5f-4.1JqM', 'mF_9.B5f-4.1JqM'],
+            ['Bearer d3JvbmdfcmVnZXhwX2V4bWFwbGU=', 'd3JvbmdfcmVnZXhwX2V4bWFwbGU='],
+            ['Bearer Not Valid', null],
+            ['Bearer (NotOK123)', null],
+        ];
     }
 }

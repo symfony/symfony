@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-19T06:50:17Z
+
+Can you please do the same for all decorators? I see that others could need that change.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-19T06:50:17Z
+
+Can you please do the same for all decorators? I see that others could need that change.
+
+---------------------------------------------------------------------------
+
+by yann-eugone at 2024-04-19T06:56:08Z
+
+@nicolas-grekas sure, just did : https://github.com/symfony/symfony/pull/54668/commits/7f2fe9b7db4fcca1b0fe968a4d956d6f08ef77f7

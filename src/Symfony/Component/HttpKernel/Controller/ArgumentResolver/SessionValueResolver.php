@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
@@ -21,30 +21,19 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
-final class SessionValueResolver implements ArgumentValueResolverInterface
+final class SessionValueResolver implements ValueResolverInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         if (!$request->hasSession()) {
-            return false;
+            return [];
         }
 
         $type = $argument->getType();
         if (SessionInterface::class !== $type && !is_subclass_of($type, SessionInterface::class)) {
-            return false;
+            return [];
         }
 
-        return $request->getSession() instanceof $type;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
-    {
-        yield $request->getSession();
+        return $request->getSession() instanceof $type ? [$request->getSession()] : [];
     }
 }

@@ -1,0 +1,36 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    lock: ~
+    scheduler: ~
+    messenger: ~
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummySchedule:
+        autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyTask:
+        autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyTaskWithCustomReceiver:
+        autoconfigure: true
+
+    clock:
+        synthetic: true
+
+    receivers:
+        public: true
+        alias: 'messenger.receiver_locator'
+
+    scheduler_custom_receiver:
+        public: true
+        class: Symfony\Component\Messenger\Transport\TransportInterface
+        factory: [ '@messenger.transport_factory', 'createTransport' ]
+        arguments:
+            - 'schedule://custom_receiver'
+            - { transport_name: 'scheduler_custom_receiver' }
+            - !service
+                class: Symfony\Component\Messenger\Transport\Serialization\Serializer
+        tags:
+            - { name: 'messenger.receiver' }

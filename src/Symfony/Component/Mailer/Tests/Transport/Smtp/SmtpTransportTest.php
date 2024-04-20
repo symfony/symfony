@@ -13,6 +13,8 @@ namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mailer\Event\SentMessageEvent;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
@@ -21,7 +23,10 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\RawMessage;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @group time-sensitive
@@ -103,7 +108,7 @@ class SmtpTransportTest extends TestCase
         $message = new Email();
         $message->to('recipient@example.org');
         $message->from('sender@example.org');
-        $message->attachFromPath('/does_not_exists');
+        $message->addPart(new DataPart(new File('/does_not_exists')));
 
         try {
             $transport->send($message);
@@ -135,6 +140,37 @@ class SmtpTransportTest extends TestCase
         $this->assertContains("RCPT TO:<recipient2@example.org>\r\n", $stream->getCommands());
     }
 
+    public function testMessageIdFromServerIsEmbeddedInSentMessageEvent()
+    {
+        $calls = 0;
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->any())
+            ->method('dispatch')
+            ->with($this->callback(static function ($event) use (&$calls): bool {
+                ++$calls;
+
+                if (1 === $calls && $event instanceof MessageEvent) {
+                    return true;
+                }
+
+                if (2 === $calls && $event instanceof SentMessageEvent && '000501c4054c' === $event->getMessage()->getMessageId()) {
+                    return true;
+                }
+
+                return false;
+            }));
+        $transport = new SmtpTransport(new DummyStream(), $eventDispatcher);
+
+        $email = new Email();
+        $email->from('sender@example.com');
+        $email->to('recipient@example.com');
+        $email->text('.');
+
+        $transport->send($email);
+
+        $this->assertSame(2, $calls);
+    }
+
     public function testAssertResponseCodeNoCodes()
     {
         $this->expectException(LogicException::class);
@@ -160,91 +196,19 @@ class SmtpTransportTest extends TestCase
     {
         $transport = new SmtpTransport($this->getMockForAbstractClass(AbstractStream::class));
         $m = new \ReflectionMethod($transport, 'assertResponseCode');
-        $m->setAccessible(true);
         $m->invoke($transport, $response, $codes);
     }
-}
 
-class DummyStream extends AbstractStream
-{
-    /**
-     * @var string
-     */
-    private $nextResponse;
-
-    /**
-     * @var string[]
-     */
-    private $commands;
-
-    /**
-     * @var bool
-     */
-    private $closed = true;
-
-    public function initialize(): void
+    public function testStop()
     {
-        $this->closed = false;
-        $this->nextResponse = '220 localhost';
-    }
+        $stream = new DummyStream();
+        $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
 
-    public function write(string $bytes, $debug = true): void
-    {
-        if ($this->closed) {
-            throw new TransportException('Unable to write bytes on the wire.');
-        }
+        $transport = new SmtpTransport($stream);
+        $transport->send(new RawMessage('Message 1'), $envelope);
+        $this->assertFalse($stream->isClosed());
 
-        $this->commands[] = $bytes;
-
-        if (str_starts_with($bytes, 'DATA')) {
-            $this->nextResponse = '354 Enter message, ending with "." on a line by itself';
-        } elseif (str_starts_with($bytes, 'QUIT')) {
-            $this->nextResponse = '221 Goodbye';
-        } else {
-            $this->nextResponse = '250 OK';
-        }
-    }
-
-    public function readLine(): string
-    {
-        return $this->nextResponse;
-    }
-
-    public function flush(): void
-    {
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getCommands(): array
-    {
-        return $this->commands;
-    }
-
-    public function clearCommands(): void
-    {
-        $this->commands = [];
-    }
-
-    protected function getReadConnectionDescription(): string
-    {
-        return 'null';
-    }
-
-    public function close(): void
-    {
-        $this->closed = true;
-    }
-
-    public function isClosed(): bool
-    {
-        return $this->closed;
-    }
-
-    public function terminate(): void
-    {
-        parent::terminate();
-        $this->closed = true;
+        $transport->stop();
+        $this->assertTrue($stream->isClosed());
     }
 }

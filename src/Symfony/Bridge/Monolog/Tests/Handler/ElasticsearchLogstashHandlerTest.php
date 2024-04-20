@@ -13,9 +13,10 @@ namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LogstashFormatter;
-use Monolog\Logger;
+use Monolog\Level;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
@@ -47,17 +48,10 @@ EOBODY;
             return new MockResponse();
         };
 
-        $handler = new ElasticsearchLogstashHandlerWithHardCodedHostname('http://es:9200', 'log', new MockHttpClient($responseFactory));
+        $handler = new ElasticsearchLogstashHandler('http://es:9200', 'log', new MockHttpClient($responseFactory));
+        $handler->setFormatter($this->getDefaultFormatter());
 
-        $record = [
-            'message' => 'My info message',
-            'context' => [],
-            'level' => Logger::INFO,
-            'level_name' => Logger::getLevelName(Logger::INFO),
-            'channel' => 'app',
-            'datetime' => new \DateTime('2020-01-01T00:00:00+01:00'),
-            'extra' => [],
-        ];
+        $record = RecordFactory::create(Level::Info, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00'));
 
         $handler->handle($record);
 
@@ -90,24 +84,17 @@ EOBODY;
             return new MockResponse();
         };
 
-        $handler = new ElasticsearchLogstashHandlerWithHardCodedHostname('http://es:9200', 'log', new MockHttpClient($responseFactory), Logger::DEBUG, true, '8.0.0');
+        $handler = new ElasticsearchLogstashHandler('http://es:9200', 'log', new MockHttpClient($responseFactory), Level::Debug, true, '8.0.0');
+        $handler->setFormatter($this->getDefaultFormatter());
 
-        $record = [
-            'message' => 'My info message',
-            'context' => [],
-            'level' => Logger::INFO,
-            'level_name' => Logger::getLevelName(Logger::INFO),
-            'channel' => 'app',
-            'datetime' => new \DateTime('2020-01-01T00:00:00+01:00'),
-            'extra' => [],
-        ];
+        $record = RecordFactory::create(Level::Info, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00'));
 
         $handler->handle($record);
 
         $this->assertSame(1, $callCount);
     }
 
-    public function testBandleBatch()
+    public function testHandleBatch()
     {
         $callCount = 0;
         $responseFactory = function ($method, $url, $options) use (&$callCount) {
@@ -136,38 +123,20 @@ EOBODY;
             return new MockResponse();
         };
 
-        $handler = new ElasticsearchLogstashHandlerWithHardCodedHostname('http://es:9200', 'log', new MockHttpClient($responseFactory));
+        $handler = new ElasticsearchLogstashHandler('http://es:9200', 'log', new MockHttpClient($responseFactory));
+        $handler->setFormatter($this->getDefaultFormatter());
 
         $records = [
-            [
-                'message' => 'My info message',
-                'context' => [],
-                'level' => Logger::INFO,
-                'level_name' => Logger::getLevelName(Logger::INFO),
-                'channel' => 'app',
-                'datetime' => new \DateTime('2020-01-01T00:00:00+01:00'),
-                'extra' => [],
-            ],
-            [
-                'message' => 'My second message',
-                'context' => [],
-                'level' => Logger::WARNING,
-                'level_name' => Logger::getLevelName(Logger::WARNING),
-                'channel' => 'php',
-                'datetime' => new \DateTime('2020-01-01T00:00:01+01:00'),
-                'extra' => [],
-            ],
+            RecordFactory::create(Level::Info, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00')),
+            RecordFactory::create(Level::Warning, 'My second message', 'php', datetime: new \DateTimeImmutable('2020-01-01T00:00:01+01:00')),
         ];
 
         $handler->handleBatch($records);
 
         $this->assertSame(1, $callCount);
     }
-}
 
-class ElasticsearchLogstashHandlerWithHardCodedHostname extends ElasticsearchLogstashHandler
-{
-    protected function getDefaultFormatter(): FormatterInterface
+    private function getDefaultFormatter(): FormatterInterface
     {
         // Monolog 1.X
         if (\defined(LogstashFormatter::class.'::V1')) {

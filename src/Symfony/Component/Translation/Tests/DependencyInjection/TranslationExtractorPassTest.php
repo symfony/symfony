@@ -49,14 +49,16 @@ class TranslationExtractorPassTest extends TestCase
 
     public function testProcessMissingAlias()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The alias for the tag "translation.extractor" of service "foo.id" must be set.');
         $container = new ContainerBuilder();
         $container->register('translation.extractor');
         $container->register('foo.id')
             ->addTag('translation.extractor', []);
 
         $translationDumperPass = new TranslationExtractorPass();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The alias for the tag "translation.extractor" of service "foo.id" must be set.');
+
         $translationDumperPass->process($container);
     }
 }

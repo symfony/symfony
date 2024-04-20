@@ -12,6 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -19,6 +21,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class ParameterBagTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructor()
     {
         $bag = new ParameterBag($parameters = [
@@ -48,6 +52,18 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['bar' => 'bar'], $bag->all(), '->remove() removes a parameter');
     }
 
+    public function testRemoveWithDeprecation()
+    {
+        $bag = new ParameterBag([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ]);
+        $bag->deprecate('foo', 'symfony/test', '6.3');
+        $bag->remove('foo');
+        $this->assertEquals(['bar' => 'bar'], $bag->all(), '->remove() removes a parameter');
+        $this->assertEquals([], $bag->allDeprecated());
+    }
+
     public function testGetSet()
     {
         $bag = new ParameterBag(['foo' => 'bar']);
@@ -64,6 +80,32 @@ class ParameterBagTest extends TestCase
             $this->assertInstanceOf(ParameterNotFoundException::class, $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
             $this->assertEquals('You have requested a non-existent parameter "baba".', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
         }
+    }
+
+    /**
+     * @testWith [1001]
+     *           [10.0]
+     */
+    public function testSetNumericName(int|float $name)
+    {
+        $bag = new ParameterBag();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The parameter name "%s" cannot be numeric.', $name));
+
+        $bag->set($name, 'foo');
+    }
+
+    /**
+     * @testWith [1001]
+     *           [10.0]
+     */
+    public function testConstructorNumericName(int|float $name)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The parameter name "%s" cannot be numeric.', $name));
+
+        new ParameterBag([$name => 'foo']);
     }
 
     /**
@@ -92,7 +134,66 @@ class ParameterBagTest extends TestCase
             ['', 'You have requested a non-existent parameter "".'],
 
             ['fiz.bar.boo', 'You have requested a non-existent parameter "fiz.bar.boo". You cannot access nested array items, do you want to inject "fiz" instead?'],
+            ['.foo', 'Parameter ".foo" not found. It was probably deleted during the compilation of the container. Did you mean this: "foo"?'],
         ];
+    }
+
+    /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
+     * @group legacy
+     */
+    public function testDeprecate()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+
+        $bag->deprecate('foo', 'symfony/test', '6.3');
+
+        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated.');
+
+        $bag->get('foo');
+    }
+
+    /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
+     * @group legacy
+     */
+    public function testDeprecateWithMessage()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+
+        $bag->deprecate('foo', 'symfony/test', '6.3', 'The parameter "%s" is deprecated, use "new_foo" instead.');
+
+        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated, use "new_foo" instead.');
+
+        $bag->get('foo');
+    }
+
+    /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
+     * @group legacy
+     */
+    public function testDeprecationIsTriggeredWhenResolved()
+    {
+        $bag = new ParameterBag(['foo' => '%bar%', 'bar' => 'baz']);
+
+        $bag->deprecate('bar', 'symfony/test', '6.3');
+
+        $this->expectDeprecation('Since symfony/test 6.3: The parameter "bar" is deprecated.');
+
+        $bag->resolve();
+    }
+
+    public function testDeprecateThrowsWhenParameterIsUndefined()
+    {
+        $bag = new ParameterBag();
+
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage('You have requested a non-existent parameter "foo".');
+
+        $bag->deprecate('foo', 'symfony/test', '6.3');
     }
 
     public function testHas()

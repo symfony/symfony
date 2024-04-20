@@ -12,11 +12,15 @@
             "choice_translation_parameters",
             "choice_value",
             "choices",
+            "duplicate_preferred_choices",
             "expanded",
             "group_by",
             "multiple",
             "placeholder",
-            "preferred_choices"
+            "placeholder_attr",
+            "preferred_choices",
+            "separator",
+            "separator_html"
         ],
         "overridden": {
             "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [

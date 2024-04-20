@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Tests\Validator\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class UserPasswordTest extends TestCase
 {
@@ -37,25 +37,18 @@ class UserPasswordTest extends TestCase
     {
         yield 'Doctrine style' => [new UserPassword(['service' => 'my_service'])];
 
-        if (\PHP_VERSION_ID < 80000) {
-            return;
-        }
-
-        yield 'named arguments' => [eval('return new \Symfony\Component\Security\Core\Validator\Constraints\UserPassword(service: "my_service");')];
+        yield 'named arguments' => [new UserPassword(service: 'my_service')];
 
         $metadata = new ClassMetadata(UserPasswordDummy::class);
-        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+        self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
         yield 'attribute' => [$metadata->properties['b']->constraints[0]];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(UserPasswordDummy::class);
-        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+        self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);

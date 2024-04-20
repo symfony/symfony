@@ -17,8 +17,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class AuthenticationUtilsTest extends TestCase
 {
@@ -26,7 +26,7 @@ class AuthenticationUtilsTest extends TestCase
     {
         $authenticationError = new AuthenticationException();
         $request = Request::create('/');
-        $request->attributes->set(Security::AUTHENTICATION_ERROR, $authenticationError);
+        $request->attributes->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $authenticationError);
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
@@ -42,7 +42,7 @@ class AuthenticationUtilsTest extends TestCase
         $request = Request::create('/');
 
         $session = new Session(new MockArraySessionStorage());
-        $session->set(Security::AUTHENTICATION_ERROR, $authenticationError);
+        $session->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $authenticationError);
         $request->setSession($session);
 
         $requestStack = new RequestStack();
@@ -50,7 +50,7 @@ class AuthenticationUtilsTest extends TestCase
 
         $utils = new AuthenticationUtils($requestStack);
         $this->assertSame($authenticationError, $utils->getLastAuthenticationError());
-        $this->assertFalse($session->has(Security::AUTHENTICATION_ERROR));
+        $this->assertFalse($session->has(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
     public function testLastAuthenticationErrorInSessionWithoutClearing()
@@ -60,7 +60,7 @@ class AuthenticationUtilsTest extends TestCase
         $request = Request::create('/');
 
         $session = new Session(new MockArraySessionStorage());
-        $session->set(Security::AUTHENTICATION_ERROR, $authenticationError);
+        $session->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $authenticationError);
         $request->setSession($session);
 
         $requestStack = new RequestStack();
@@ -68,13 +68,13 @@ class AuthenticationUtilsTest extends TestCase
 
         $utils = new AuthenticationUtils($requestStack);
         $this->assertSame($authenticationError, $utils->getLastAuthenticationError(false));
-        $this->assertTrue($session->has(Security::AUTHENTICATION_ERROR));
+        $this->assertTrue($session->has(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
     public function testLastUserNameIsDefinedButNull()
     {
         $request = Request::create('/');
-        $request->attributes->set(Security::LAST_USERNAME, null);
+        $request->attributes->set(SecurityRequestAttributes::LAST_USERNAME, null);
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
@@ -86,7 +86,7 @@ class AuthenticationUtilsTest extends TestCase
     public function testLastUserNameIsDefined()
     {
         $request = Request::create('/');
-        $request->attributes->set(Security::LAST_USERNAME, 'user');
+        $request->attributes->set(SecurityRequestAttributes::LAST_USERNAME, 'user');
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
@@ -100,7 +100,7 @@ class AuthenticationUtilsTest extends TestCase
         $request = Request::create('/');
 
         $session = new Session(new MockArraySessionStorage());
-        $session->set(Security::LAST_USERNAME, null);
+        $session->set(SecurityRequestAttributes::LAST_USERNAME, null);
         $request->setSession($session);
 
         $requestStack = new RequestStack();
@@ -115,7 +115,7 @@ class AuthenticationUtilsTest extends TestCase
         $request = Request::create('/');
 
         $session = new Session(new MockArraySessionStorage());
-        $session->set(Security::LAST_USERNAME, 'user');
+        $session->set(SecurityRequestAttributes::LAST_USERNAME, 'user');
         $request->setSession($session);
 
         $requestStack = new RequestStack();

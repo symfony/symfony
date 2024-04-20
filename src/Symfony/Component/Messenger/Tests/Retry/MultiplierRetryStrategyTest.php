@@ -54,7 +54,7 @@ class MultiplierRetryStrategyTest extends TestCase
      */
     public function testGetWaitTime(int $delay, float $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
     {
-        $strategy = new MultiplierRetryStrategy(10, $delay, $multiplier, $maxDelay);
+        $strategy = new MultiplierRetryStrategy(10, $delay, $multiplier, $maxDelay, 0);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp($previousRetries)]);
 
         $this->assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
@@ -88,5 +88,40 @@ class MultiplierRetryStrategyTest extends TestCase
         yield [1000, 1.5555, 5000, 0, 1000];
         yield [1000, 1.5555, 5000, 1, 1556];
         yield [1000, 1.5555, 5000, 2, 2420];
+    }
+
+    /**
+     * @dataProvider getJitterTest
+     */
+    public function testJitter(float $jitter, int $maxMin, int $maxMax)
+    {
+        $strategy = new MultiplierRetryStrategy(3, 1000, 1, 0, $jitter);
+        $envelope = new Envelope(new \stdClass());
+
+        $min = 1000;
+        $max = 1000;
+        for ($i = 0; $i < 100; ++$i) {
+            $delay = $strategy->getWaitingTime($envelope);
+            $min = min($min, $delay);
+            $max = max($max, $delay);
+        }
+
+        $this->assertGreaterThanOrEqual($maxMin, $min);
+        $this->assertLessThanOrEqual($maxMax, $max);
+    }
+
+    public static function getJitterTest(): iterable
+    {
+        yield [1.0, 0, 2000];
+        yield [0.9, 100, 1900];
+        yield [0.8, 200, 1800];
+        yield [0.7, 300, 1700];
+        yield [0.6, 400, 1600];
+        yield [0.5, 500, 1500];
+        yield [0.4, 600, 1400];
+        yield [0.3, 700, 1300];
+        yield [0.2, 800, 1200];
+        yield [0.1, 900, 1100];
+        yield [0.0, 1000, 1000];
     }
 }

@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\LightSms\Tests;
 
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class LightSmsTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return LightSmsTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): LightSmsTransportFactory
     {
         return new LightSmsTransportFactory();
     }

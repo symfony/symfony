@@ -19,7 +19,7 @@ class UserBadgeTest extends TestCase
 {
     public function testUserNotFound()
     {
-        $badge = new UserBadge('dummy', function () { return null; });
+        $badge = new UserBadge('dummy', fn () => null);
         $this->expectException(UserNotFoundException::class);
         $badge->getUser();
     }

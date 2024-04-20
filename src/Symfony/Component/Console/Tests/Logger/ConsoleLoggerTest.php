@@ -26,10 +26,7 @@ use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
  */
 class ConsoleLoggerTest extends TestCase
 {
-    /**
-     * @var DummyOutput
-     */
-    protected $output;
+    protected DummyOutput $output;
 
     public function getLogger(): LoggerInterface
     {
@@ -140,8 +137,7 @@ class ConsoleLoggerTest extends TestCase
     public function testThrowsOnInvalidLevel()
     {
         $this->expectException(InvalidArgumentException::class);
-        $logger = $this->getLogger();
-        $logger->log('invalid level', 'Foo');
+        $this->getLogger()->log('invalid level', 'Foo');
     }
 
     public function testContextReplacement()
@@ -177,7 +173,7 @@ class ConsoleLoggerTest extends TestCase
             'int' => 0,
             'float' => 0.5,
             'nested' => ['with object' => new DummyTest()],
-            'object' => new \DateTime(),
+            'object' => new \DateTimeImmutable(),
             'resource' => fopen('php://memory', 'r'),
         ];
 

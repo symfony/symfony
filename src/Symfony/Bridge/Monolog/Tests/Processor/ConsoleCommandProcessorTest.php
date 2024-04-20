@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\ConsoleCommandProcessor;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +30,7 @@ class ConsoleCommandProcessorTest extends TestCase
         $processor = new ConsoleCommandProcessor();
         $processor->addCommandData($this->getConsoleEvent());
 
-        $record = $processor(['extra' => []]);
+        $record = $processor(RecordFactory::create());
 
         $this->assertArrayHasKey('command', $record['extra']);
         $this->assertEquals(
@@ -43,7 +44,7 @@ class ConsoleCommandProcessorTest extends TestCase
         $processor = new ConsoleCommandProcessor(true, true);
         $processor->addCommandData($this->getConsoleEvent());
 
-        $record = $processor(['extra' => []]);
+        $record = $processor(RecordFactory::create());
 
         $this->assertArrayHasKey('command', $record['extra']);
         $this->assertEquals(
@@ -56,8 +57,8 @@ class ConsoleCommandProcessorTest extends TestCase
     {
         $processor = new ConsoleCommandProcessor(true, true);
 
-        $record = $processor(['extra' => []]);
-        $this->assertEquals(['extra' => []], $record);
+        $record = $processor(RecordFactory::create());
+        $this->assertEquals([], $record['extra']);
     }
 
     private function getConsoleEvent(): ConsoleEvent

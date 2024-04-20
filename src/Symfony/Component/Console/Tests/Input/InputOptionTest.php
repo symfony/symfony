@@ -12,6 +12,10 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputOption;
 
 class InputOptionTest extends TestCase
@@ -174,17 +178,21 @@ class InputOptionTest extends TestCase
 
     public function testDefaultValueWithValueNoneMode()
     {
+        $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot set a default value when using InputOption::VALUE_NONE mode.');
-        $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
+
         $option->setDefault('default');
     }
 
     public function testDefaultValueWithIsArrayMode()
     {
+        $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A default value for an array option must be an array.');
-        $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
+
         $option->setDefault('default');
     }
 
@@ -209,5 +217,43 @@ class InputOptionTest extends TestCase
         $option = new InputOption('foo', 'f', null, 'Some description');
         $option2 = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, 'Some description');
         $this->assertFalse($option->equals($option2));
+    }
+
+    public function testSuggestedValuesErrorIfNoValue()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot set suggested values if the option does not accept a value.');
+
+        new InputOption('foo', null, InputOption::VALUE_NONE, '', null, ['foo']);
+    }
+
+    public function testCompleteArray()
+    {
+        $values = ['foo', 'bar'];
+        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, $values);
+        $this->assertTrue($option->hasCompletion());
+        $suggestions = new CompletionSuggestions();
+        $option->complete(new CompletionInput(), $suggestions);
+        $this->assertSame($values, array_map(fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
+    }
+
+    public function testCompleteClosure()
+    {
+        $values = ['foo', 'bar'];
+        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, fn (CompletionInput $input): array => $values);
+        $this->assertTrue($option->hasCompletion());
+        $suggestions = new CompletionSuggestions();
+        $option->complete(new CompletionInput(), $suggestions);
+        $this->assertSame($values, array_map(fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
+    }
+
+    public function testCompleteClosureReturnIncorrectType()
+    {
+        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Closure for option "foo" must return an array. Got "string".');
+
+        $option->complete(new CompletionInput(), new CompletionSuggestions());
     }
 }

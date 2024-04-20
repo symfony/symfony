@@ -48,16 +48,25 @@ class WebProfilerBundleKernel extends Kernel
         $routes->add('_', '/')->controller('kernel::homepageController');
     }
 
-    protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader): void
+    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
     {
-        $containerBuilder->loadFromExtension('framework', [
+        $config = [
+            'annotations' => false,
+            'http_method_override' => false,
+            'php_errors' => ['log' => true],
             'secret' => 'foo-secret',
             'profiler' => ['only_exceptions' => false],
-            'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
+            'session' => ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file', 'cookie-secure' => 'auto', 'cookie-samesite' => 'lax'],
             'router' => ['utf8' => true],
-        ]);
+        ];
 
-        $containerBuilder->loadFromExtension('web_profiler', [
+        if (Kernel::VERSION_ID >= 60400) {
+            $config['handle_all_throwables'] = true;
+        }
+
+        $container->loadFromExtension('framework', $config);
+
+        $container->loadFromExtension('web_profiler', [
             'toolbar' => true,
             'intercept_redirects' => false,
         ]);
@@ -73,13 +82,13 @@ class WebProfilerBundleKernel extends Kernel
         return sys_get_temp_dir().'/log-'.spl_object_hash($this);
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         $container->register('data_collector.dump', DumpDataCollector::class);
         $container->register('logger', NullLogger::class);
     }
 
-    public function homepageController()
+    public function homepageController(): Response
     {
         return new Response('<html><head></head><body>Homepage Controller.</body></html>');
     }

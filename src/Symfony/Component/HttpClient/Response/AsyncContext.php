@@ -25,14 +25,19 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class AsyncContext
 {
+    /** @var callable|null */
     private $passthru;
-    private $client;
-    private $response;
-    private $info = [];
+    private HttpClientInterface $client;
+    private ResponseInterface $response;
+    private array $info = [];
+    /** @var resource|null */
     private $content;
-    private $offset;
+    private int $offset;
 
-    public function __construct(&$passthru, HttpClientInterface $client, ResponseInterface &$response, array &$info, $content, int $offset)
+    /**
+     * @param resource|null $content
+     */
+    public function __construct(?callable &$passthru, HttpClientInterface $client, ResponseInterface &$response, array &$info, $content, int $offset)
     {
         $this->passthru = &$passthru;
         $this->client = $client;
@@ -111,7 +116,7 @@ final class AsyncContext
     /**
      * Returns the current info of the response.
      */
-    public function getInfo(?string $type = null)
+    public function getInfo(?string $type = null): mixed
     {
         if (null !== $type) {
             return $this->info[$type] ?? $this->response->getInfo($type);
@@ -125,7 +130,7 @@ final class AsyncContext
      *
      * @return $this
      */
-    public function setInfo(string $type, $value): self
+    public function setInfo(string $type, mixed $value): static
     {
         if ('canceled' === $type && $value !== $this->info['canceled']) {
             throw new \LogicException('You cannot set the "canceled" info directly.');

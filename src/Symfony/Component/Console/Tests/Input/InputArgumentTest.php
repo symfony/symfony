@@ -12,6 +12,10 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 
 class InputArgumentTest extends TestCase
@@ -82,25 +86,61 @@ class InputArgumentTest extends TestCase
 
     public function testSetDefaultWithRequiredArgument()
     {
+        $argument = new InputArgument('foo', InputArgument::REQUIRED);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
-        $argument = new InputArgument('foo', InputArgument::REQUIRED);
+
         $argument->setDefault('default');
     }
 
     public function testSetDefaultWithRequiredArrayArgument()
     {
+        $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
-        $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
+
         $argument->setDefault([]);
     }
 
     public function testSetDefaultWithArrayArgument()
     {
+        $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A default value for an array argument must be an array.');
-        $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
+
         $argument->setDefault('default');
+    }
+
+    public function testCompleteArray()
+    {
+        $values = ['foo', 'bar'];
+        $argument = new InputArgument('foo', null, '', null, $values);
+        $this->assertTrue($argument->hasCompletion());
+        $suggestions = new CompletionSuggestions();
+        $argument->complete(new CompletionInput(), $suggestions);
+        $this->assertSame($values, array_map(fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
+    }
+
+    public function testCompleteClosure()
+    {
+        $values = ['foo', 'bar'];
+        $argument = new InputArgument('foo', null, '', null, fn (CompletionInput $input): array => $values);
+        $this->assertTrue($argument->hasCompletion());
+        $suggestions = new CompletionSuggestions();
+        $argument->complete(new CompletionInput(), $suggestions);
+        $this->assertSame($values, array_map(fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
+    }
+
+    public function testCompleteClosureReturnIncorrectType()
+    {
+        $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Closure for argument "foo" must return an array. Got "string".');
+
+        $argument->complete(new CompletionInput(), new CompletionSuggestions());
     }
 }

@@ -25,5 +25,7 @@ class TokenStorageTest extends TestCase
         $token = new UsernamePasswordToken(new InMemoryUser('username', 'password'), 'provider');
         $tokenStorage->setToken($token);
         $this->assertSame($token, $tokenStorage->getToken());
+        $tokenStorage->setToken(null);
+        $this->assertNull($tokenStorage->getToken());
     }
 }

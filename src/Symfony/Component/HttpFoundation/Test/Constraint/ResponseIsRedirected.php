@@ -17,8 +17,12 @@ use Symfony\Component\HttpFoundation\Response;
 final class ResponseIsRedirected extends Constraint
 {
     /**
-     * {@inheritdoc}
+     * @param bool $verbose If true, the entire response is printed on failure. If false, the response body is omitted.
      */
+    public function __construct(private readonly bool $verbose = true)
+    {
+    }
+
     public function toString(): string
     {
         return 'is redirected';
@@ -26,8 +30,6 @@ final class ResponseIsRedirected extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function matches($response): bool
     {
@@ -36,8 +38,6 @@ final class ResponseIsRedirected extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($response): string
     {
@@ -46,11 +46,9 @@ final class ResponseIsRedirected extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function additionalFailureDescription($response): string
     {
-        return (string) $response;
+        return $this->verbose ? (string) $response : explode("\r\n\r\n", (string) $response)[0];
     }
 }

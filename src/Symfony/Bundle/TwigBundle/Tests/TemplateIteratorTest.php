@@ -19,15 +19,25 @@ class TemplateIteratorTest extends TestCase
 {
     public function testGetIterator()
     {
-        $bundle = $this->createMock(BundleInterface::class);
-        $bundle->expects($this->any())->method('getName')->willReturn('BarBundle');
-        $bundle->expects($this->any())->method('getPath')->willReturn(__DIR__.'/Fixtures/templates/BarBundle');
+        $iterator = new TemplateIterator($this->createKernelMock(), [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
 
-        $kernel = $this->createMock(Kernel::class);
-        $kernel->expects($this->any())->method('getBundles')->willReturn([
-            $bundle,
-        ]);
-        $iterator = new TemplateIterator($kernel, [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
+        $sorted = iterator_to_array($iterator);
+        sort($sorted);
+        $this->assertEquals(
+            [
+                '@Bar/index.html.twig',
+                '@Bar/layout.html.twig',
+                '@Foo/index.html.twig',
+                '@Foo/not-twig.js',
+                'layout.html.twig',
+            ],
+            $sorted
+        );
+    }
+
+    public function testGetIteratorWithFileNameFilter()
+    {
+        $iterator = new TemplateIterator($this->createKernelMock(), [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates', ['*.twig']);
 
         $sorted = iterator_to_array($iterator);
         sort($sorted);
@@ -40,5 +50,19 @@ class TemplateIteratorTest extends TestCase
             ],
             $sorted
         );
+    }
+
+    private function createKernelMock(): Kernel
+    {
+        $bundle = $this->createMock(BundleInterface::class);
+        $bundle->expects($this->any())->method('getName')->willReturn('BarBundle');
+        $bundle->expects($this->any())->method('getPath')->willReturn(__DIR__.'/Fixtures/templates/BarBundle');
+
+        $kernel = $this->createMock(Kernel::class);
+        $kernel->expects($this->any())->method('getBundles')->willReturn([
+            $bundle,
+        ]);
+
+        return $kernel;
     }
 }

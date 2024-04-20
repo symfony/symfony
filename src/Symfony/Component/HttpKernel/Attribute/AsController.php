@@ -12,9 +12,13 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 /**
- * Service tag to autoconfigure controllers.
+ * Autoconfigures controllers as services by applying
+ * the `controller.service_arguments` tag to them.
+ *
+ * This enables injecting services as method arguments in addition
+ * to other conventional dependency injection strategies.
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_FUNCTION)]
 class AsController
 {
     public function __construct()

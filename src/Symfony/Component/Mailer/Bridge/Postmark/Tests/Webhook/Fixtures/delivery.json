@@ -1,0 +1,14 @@
+{
+    "RecordType": "Delivery",
+    "ServerID": 23,
+    "MessageStream": "outbound",
+    "MessageID": "00000000-0000-0000-0000-000000000000",
+    "Recipient": "john@example.com",
+    "Tag": "welcome-email",
+    "DeliveredAt": "2022-09-02T11:49:27Z",
+    "Details": "Test delivery webhook details",
+    "Metadata": {
+      "example": "value",
+      "example_2": "value"
+    }
+}

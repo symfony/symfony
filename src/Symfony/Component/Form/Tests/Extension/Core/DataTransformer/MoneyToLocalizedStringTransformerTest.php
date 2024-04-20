@@ -18,8 +18,8 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class MoneyToLocalizedStringTransformerTest extends TestCase
 {
-    private $previousLocale;
-    private $defaultLocale;
+    private string|false $previousLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -117,5 +117,14 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
         \Locale::setDefault('de_AT');
 
         $this->assertSame('0,0035', $transformer->transform(12 / 34));
+    }
+
+    public function testHighIntNumberConversion()
+    {
+        $transformer = new MoneyToLocalizedStringTransformer(4, null, null, 100);
+
+        $this->expectException(TransformationFailedException::class);
+
+        $transformer->reverseTransform(111111111111111110.00);
     }
 }

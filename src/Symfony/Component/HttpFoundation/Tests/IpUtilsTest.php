@@ -12,13 +12,10 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\IpUtils;
 
 class IpUtilsTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testSeparateCachesPerProtocol()
     {
         $ip = '192.168.52.1';
@@ -98,33 +95,6 @@ class IpUtilsTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testIpTriggersDeprecationOnNull()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 5.4: Passing null as $requestIp to "Symfony\Component\HttpFoundation\IpUtils::checkIp()" is deprecated, pass an empty string instead.');
-        $this->assertFalse(IpUtils::checkIp(null, '192.168.1.1'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testIp4TriggersDeprecationOnNull()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 5.4: Passing null as $requestIp to "Symfony\Component\HttpFoundation\IpUtils::checkIp4()" is deprecated, pass an empty string instead.');
-        $this->assertFalse(IpUtils::checkIp4(null, '192.168.1.1'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testIp6TriggersDeprecationOnNull()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 5.4: Passing null as $requestIp to "Symfony\Component\HttpFoundation\IpUtils::checkIp6()" is deprecated, pass an empty string instead.');
-        $this->assertFalse(IpUtils::checkIp6(null, '2a01:198:603:0::/65'));
-    }
-
-    /**
      * @requires extension sockets
      */
     public function testAnIpv6WithOptionDisabledIpv6()
@@ -195,5 +165,55 @@ class IpUtilsTest extends TestCase
             [true, '1.2.3.4', '192.168.1.0/0'],
             [false, '1.2.3.4', '256.256.256/0'], // invalid CIDR notation
         ];
+    }
+
+    /**
+     * @dataProvider getIsPrivateIpData
+     */
+    public function testIsPrivateIp(string $ip, bool $matches)
+    {
+        $this->assertSame($matches, IpUtils::isPrivateIp($ip));
+    }
+
+    public static function getIsPrivateIpData(): array
+    {
+        return [
+            // private
+            ['127.0.0.1',       true],
+            ['10.0.0.1',        true],
+            ['192.168.0.1',     true],
+            ['172.16.0.1',      true],
+            ['169.254.0.1',     true],
+            ['0.0.0.1',         true],
+            ['240.0.0.1',       true],
+            ['::1',             true],
+            ['fc00::1',         true],
+            ['fe80::1',         true],
+            ['::ffff:0:1',      true],
+            ['fd00::1',         true],
+
+            // public
+            ['104.26.14.6',             false],
+            ['2606:4700:20::681a:e06',  false],
+        ];
+    }
+
+    public function testCacheSizeLimit()
+    {
+        $ref = new \ReflectionClass(IpUtils::class);
+
+        /** @var array */
+        $checkedIps = $ref->getStaticPropertyValue('checkedIps');
+        $this->assertIsArray($checkedIps);
+
+        $maxCheckedIps = 1000;
+
+        for ($i = 1; $i < $maxCheckedIps * 1.5; ++$i) {
+            $ip = '192.168.1.'.str_pad((string) $i, 3, '0');
+
+            IpUtils::checkIp4($ip, '127.0.0.1');
+        }
+
+        $this->assertLessThan($maxCheckedIps, \count($checkedIps));
     }
 }

@@ -20,9 +20,9 @@ use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyGetter;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyGetterInterface;
 
@@ -109,14 +109,17 @@ class LazyLoadingMetadataFactoryTest extends TestCase
 
     public function testNonClassNameStringValues()
     {
-        $this->expectException(NoSuchMetadataException::class);
         $testedValue = 'error@example.com';
         $loader = $this->createMock(LoaderInterface::class);
         $cache = $this->createMock(CacheItemPoolInterface::class);
-        $factory = new LazyLoadingMetadataFactory($loader, $cache);
         $cache
             ->expects($this->never())
             ->method('getItem');
+
+        $factory = new LazyLoadingMetadataFactory($loader, $cache);
+
+        $this->expectException(NoSuchMetadataException::class);
+
         $factory->getMetadataFor($testedValue);
     }
 

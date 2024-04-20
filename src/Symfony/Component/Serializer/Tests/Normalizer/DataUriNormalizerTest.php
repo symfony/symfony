@@ -27,10 +27,7 @@ class DataUriNormalizerTest extends TestCase
     private const TEST_TXT_DATA = 'data:text/plain,K%C3%A9vin%20Dunglas%0A';
     private const TEST_TXT_CONTENT = "Kévin Dunglas\n";
 
-    /**
-     * @var DataUriNormalizer
-     */
-    private $normalizer;
+    private DataUriNormalizer $normalizer;
 
     protected function setUp(): void
     {
@@ -124,7 +121,7 @@ class DataUriNormalizerTest extends TestCase
     /**
      * @dataProvider invalidUriProvider
      */
-    public function testInvalidData($uri)
+    public function testInvalidData(?string $uri)
     {
         $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize($uri, 'SplFileObject');
@@ -151,7 +148,7 @@ class DataUriNormalizerTest extends TestCase
     /**
      * @dataProvider validUriProvider
      */
-    public function testValidData($uri)
+    public function testValidData(string $uri)
     {
         $this->assertInstanceOf(\SplFileObject::class, $this->normalizer->denormalize($uri, 'SplFileObject'));
     }

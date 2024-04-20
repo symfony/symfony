@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\Transition;
 
 trait WorkflowBuilderTrait
 {
-    private static function createComplexWorkflowDefinition()
+    private static function createComplexWorkflowDefinition(): Definition
     {
         $places = range('a', 'g');
 
@@ -52,7 +52,7 @@ trait WorkflowBuilderTrait
         //           +----+                          +----+     +----+     +----+
     }
 
-    private static function createSimpleWorkflowDefinition()
+    private static function createSimpleWorkflowDefinition(): Definition
     {
         $places = range('a', 'c');
 
@@ -87,7 +87,7 @@ trait WorkflowBuilderTrait
         // +---+     +----+     +---+     +----+     +---+
     }
 
-    private static function createWorkflowWithSameNameTransition()
+    private static function createWorkflowWithSameNameTransition(): Definition
     {
         $places = range('a', 'c');
 
@@ -115,7 +115,7 @@ trait WorkflowBuilderTrait
         //   +--------------------------------------------------------------------+
     }
 
-    private static function createComplexStateMachineDefinition()
+    private static function createComplexStateMachineDefinition(): Definition
     {
         $places = ['a', 'b', 'c', 'd'];
 
@@ -157,5 +157,44 @@ EOTXT;
         //             +-----+              |
         //             |  d  | -------------+
         //             +-----+
+    }
+
+    private static function createWorkflowWithSameNameBackTransition(): Definition
+    {
+        $places = range('a', 'c');
+
+        $transitions = [];
+        $transitions[] = new Transition('a_to_bc', 'a', ['b', 'c']);
+        $transitions[] = new Transition('back1', 'b', 'a');
+        $transitions[] = new Transition('back1', 'c', 'b');
+        $transitions[] = new Transition('back2', 'c', 'b');
+        $transitions[] = new Transition('back2', 'b', 'a');
+        $transitions[] = new Transition('c_to_cb', 'c', ['b', 'c']);
+
+        return new Definition($places, $transitions);
+
+        // The graph looks like:
+        //   +-----------------------------------------------------------------+
+        //   |                                                                 |
+        //   |                                                                 |
+        //   |         +---------------------------------------------+         |
+        //   v         |                                             v         |
+        // +---+     +---------+     +-------+     +---------+     +---+     +-------+
+        // | a | --> | a_to_bc | --> |       | --> |  back2  | --> |   | --> | back2 |
+        // +---+     +---------+     |       |     +---------+     |   |     +-------+
+        //   ^                       |       |                     |   |
+        //   |                       |   c   | <-----+             | b |
+        //   |                       |       |       |             |   |
+        //   |                       |       |     +---------+     |   |     +-------+
+        //   |                       |       | --> | c_to_cb | --> |   | --> | back1 |
+        //   |                       +-------+     +---------+     +---+     +-------+
+        //   |                         |                             ^         |
+        //   |                         |                             |         |
+        //   |                         v                             |         |
+        //   |                       +-------+                       |         |
+        //   |                       | back1 | ----------------------+         |
+        //   |                       +-------+                                 |
+        //   |                                                                 |
+        //   +-----------------------------------------------------------------+
     }
 }

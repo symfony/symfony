@@ -14,8 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is of a specific data type.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -24,19 +23,19 @@ class Type extends Constraint
 {
     public const INVALID_TYPE_ERROR = 'ba785a8c-82cb-4283-967c-3cf342181b40';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_TYPE_ERROR => 'INVALID_TYPE_ERROR',
     ];
 
-    public $message = 'This value should be of type {{ type }}.';
-    public $type;
+    public string $message = 'This value should be of type {{ type }}.';
+    public string|array|null $type = null;
 
     /**
-     * {@inheritdoc}
-     *
-     * @param string|array $type One ore multiple types to validate against or a set of options
+     * @param string|string[]|array<string,mixed>|null $type    The type(s) to enforce on the value
+     * @param string[]|null                            $groups
+     * @param array<string,mixed>                      $options
      */
-    public function __construct($type, ?string $message = null, ?array $groups = null, $payload = null, array $options = [])
+    public function __construct(string|array|null $type, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($type) && \is_string(key($type))) {
             $options = array_merge($type, $options);
@@ -49,18 +48,12 @@ class Type extends Constraint
         $this->message = $message ?? $this->message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'type';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['type'];
     }

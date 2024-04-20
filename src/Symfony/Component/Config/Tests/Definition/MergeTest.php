@@ -20,7 +20,6 @@ class MergeTest extends TestCase
 {
     public function testForbiddenOverwrite()
     {
-        $this->expectException(ForbiddenOverwriteException::class);
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
             ->getRootNode()
@@ -40,6 +39,8 @@ class MergeTest extends TestCase
         $b = [
             'foo' => 'moo',
         ];
+
+        $this->expectException(ForbiddenOverwriteException::class);
 
         $tree->merge($a, $b);
     }
@@ -94,7 +95,6 @@ class MergeTest extends TestCase
 
     public function testDoesNotAllowNewKeysInSubsequentConfigs()
     {
-        $this->expectException(InvalidConfigurationException::class);
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
             ->getRootNode()
@@ -123,6 +123,8 @@ class MergeTest extends TestCase
                 'b' => ['value' => 'foo'],
             ],
         ];
+
+        $this->expectException(InvalidConfigurationException::class);
 
         $tree->merge($a, $b);
     }

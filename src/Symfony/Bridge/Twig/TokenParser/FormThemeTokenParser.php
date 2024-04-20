@@ -24,9 +24,6 @@ use Twig\TokenParser\AbstractTokenParser;
  */
 final class FormThemeTokenParser extends AbstractTokenParser
 {
-    /**
-     * {@inheritdoc}
-     */
     public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
@@ -54,9 +51,6 @@ final class FormThemeTokenParser extends AbstractTokenParser
         return new FormThemeNode($form, $resources, $lineno, $this->getTag(), $only);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTag(): string
     {
         return 'form_theme';

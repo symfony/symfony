@@ -7,7 +7,7 @@
         http://symfony.com/schema/dic/security
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
-    <config enable-authenticator-manager="true">
+    <config>
         <firewall name="main">
             <required-badge>Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge</required-badge>
             <required-badge>RememberMeBadge</required-badge>

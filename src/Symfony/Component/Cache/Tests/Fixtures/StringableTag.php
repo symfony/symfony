@@ -13,10 +13,7 @@ namespace Symfony\Component\Cache\Tests\Fixtures;
 
 class StringableTag
 {
-    /**
-     * @var string
-     */
-    private $tag;
+    private string $tag;
 
     public function __construct(string $tag)
     {

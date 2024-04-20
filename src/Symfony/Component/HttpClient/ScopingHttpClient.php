@@ -28,9 +28,9 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
 {
     use HttpClientTrait;
 
-    private $client;
-    private $defaultOptionsByRegexp;
-    private $defaultRegexp;
+    private HttpClientInterface $client;
+    private array $defaultOptionsByRegexp;
+    private ?string $defaultRegexp;
 
     public function __construct(HttpClientInterface $client, array $defaultOptionsByRegexp, ?string $defaultRegexp = null)
     {
@@ -45,18 +45,13 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
 
     public static function forBaseUri(HttpClientInterface $client, string $baseUri, array $defaultOptions = [], ?string $regexp = null): self
     {
-        if (null === $regexp) {
-            $regexp = preg_quote(implode('', self::resolveUrl(self::parseUrl('.'), self::parseUrl($baseUri))));
-        }
+        $regexp ??= preg_quote(implode('', self::resolveUrl(self::parseUrl('.'), self::parseUrl($baseUri))));
 
         $defaultOptions['base_uri'] = $baseUri;
 
         return new self($client, [$regexp => $defaultOptions], $regexp);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $e = null;
@@ -93,24 +88,18 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
         return $this->client->request($method, $url, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function stream($responses, ?float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         return $this->client->stream($responses, $timeout);
     }
 
-    public function reset()
+    public function reset(): void
     {
         if ($this->client instanceof ResetInterface) {
             $this->client->reset();
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLogger(LoggerInterface $logger): void
     {
         if ($this->client instanceof LoggerAwareInterface) {
@@ -118,10 +107,7 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function withOptions(array $options): self
+    public function withOptions(array $options): static
     {
         $clone = clone $this;
         $clone->client = $this->client->withOptions($options);

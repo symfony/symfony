@@ -19,10 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 trait ValidatorExtensionTrait
 {
-    /**
-     * @var ValidatorInterface|null
-     */
-    protected $validator;
+    protected ValidatorInterface $validator;
 
     protected function getValidatorExtension(): ValidatorExtension
     {

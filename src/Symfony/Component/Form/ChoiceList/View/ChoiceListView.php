@@ -22,29 +22,24 @@ namespace Symfony\Component\Form\ChoiceList\View;
  */
 class ChoiceListView
 {
-    public $choices;
-    public $preferredChoices;
-
     /**
      * Creates a new choice list view.
      *
-     * @param ChoiceGroupView[]|ChoiceView[] $choices          The choice views
-     * @param ChoiceGroupView[]|ChoiceView[] $preferredChoices the preferred choice views
+     * @param array<ChoiceGroupView|ChoiceView> $choices          The choice views
+     * @param array<ChoiceGroupView|ChoiceView> $preferredChoices the preferred choice views
      */
-    public function __construct(array $choices = [], array $preferredChoices = [])
-    {
-        $this->choices = $choices;
-        $this->preferredChoices = $preferredChoices;
+    public function __construct(
+        public array $choices = [],
+        public array $preferredChoices = [],
+    ) {
     }
 
     /**
      * Returns whether a placeholder is in the choices.
      *
      * A placeholder must be the first child element, not be in a group and have an empty value.
-     *
-     * @return bool
      */
-    public function hasPlaceholder()
+    public function hasPlaceholder(): bool
     {
         if ($this->preferredChoices) {
             $firstChoice = reset($this->preferredChoices);

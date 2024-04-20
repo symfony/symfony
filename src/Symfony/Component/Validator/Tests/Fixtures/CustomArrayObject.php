@@ -15,7 +15,7 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
  * This class is a hand written simplified version of PHP native `ArrayObject`
  * class, to show that it behaves differently than the PHP native implementation.
  */
-class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
+class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     private $array;
 
@@ -29,13 +29,7 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
         return \array_key_exists($offset, $this->array);
     }
 
-    /**
-     * @param mixed $offset
-     *
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->array[$offset];
     }
@@ -69,18 +63,8 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
         return $this->array;
     }
 
-    public function serialize(): string
-    {
-        return serialize($this->__serialize());
-    }
-
     public function __unserialize(array $data): void
     {
         $this->array = $data;
-    }
-
-    public function unserialize($serialized)
-    {
-        $this->__unserialize((array) unserialize((string) $serialized));
     }
 }

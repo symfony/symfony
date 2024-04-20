@@ -24,10 +24,8 @@ trait ExpiringStoreTestTrait
      * Amount of microseconds used as a delay to test expiration. Should be
      * small enough not to slow the test suite too much, and high enough not to
      * fail because of race conditions.
-     *
-     * @return int
      */
-    abstract protected function getClockDelay();
+    abstract protected function getClockDelay(): int;
 
     /**
      * @see AbstractStoreTestCase::getStore()

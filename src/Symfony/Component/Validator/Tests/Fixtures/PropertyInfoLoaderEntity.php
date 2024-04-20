@@ -25,34 +25,24 @@ class PropertyInfoLoaderEntity
     public $collection;
     public $collectionOfUnknown;
 
-    /**
-     * @Assert\Type(type="int")
-     */
+    #[Assert\Type(type: 'int')]
     public $alreadyMappedType;
 
-    /**
-     * @Assert\NotNull
-     */
+    #[Assert\NotNull]
     public $alreadyMappedNotNull;
 
-    /**
-     * @Assert\NotBlank
-     */
+    #[Assert\NotBlank]
     public $alreadyMappedNotBlank;
 
-    /**
-     * @Assert\All({
-     *     @Assert\Type(type="string"),
-     *     @Assert\Iban
-     * })
-     */
+    #[Assert\All([
+        new Assert\Type(type: 'string'),
+        new Assert\Iban(),
+    ])]
     public $alreadyPartiallyMappedCollection;
 
     public $readOnly;
 
-    /**
-     * @Assert\DisableAutoMapping
-     */
+    #[Assert\DisableAutoMapping]
     public $noAutoMapping;
 
     public function setNonExistentField()

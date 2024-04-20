@@ -24,8 +24,8 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  */
 class HtmlDescriptor implements DumpDescriptorInterface
 {
-    private $dumper;
-    private $initialized = false;
+    private HtmlDumper $dumper;
+    private bool $initialized = false;
 
     public function __construct(HtmlDumper $dumper)
     {

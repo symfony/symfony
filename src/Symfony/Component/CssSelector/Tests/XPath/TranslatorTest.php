@@ -38,56 +38,68 @@ class TranslatorTest extends TestCase
 
     public function testCssToXPathPseudoElement()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->cssToXPath('e::first-line');
     }
 
     public function testGetExtensionNotExistsExtension()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->getExtension('fake');
     }
 
     public function testAddCombinationNotExistsExtension()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $parser = new Parser();
         $xpath = $parser->parse('*')[0];
         $combinedXpath = $parser->parse('*')[0];
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->addCombination('fake', $xpath, $combinedXpath);
     }
 
     public function testAddFunctionNotExistsFunction()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
         $function = new FunctionNode(new ElementNode(), 'fake');
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->addFunction($xpath, $function);
     }
 
     public function testAddPseudoClassNotExistsClass()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->addPseudoClass($xpath, 'fake');
     }
 
     public function testAddAttributeMatchingClassNotExistsClass()
     {
-        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
+
+        $this->expectException(ExpressionErrorException::class);
+
         $translator->addAttributeMatching($xpath, '', '', '');
     }
 
@@ -219,6 +231,10 @@ HTML
             ['e + f', "e/following-sibling::*[(name() = 'f') and (position() = 1)]"],
             ['e ~ f', 'e/following-sibling::f'],
             ['div#container p', "div[@id = 'container']/descendant-or-self::*/p"],
+            [':scope > div[dataimg="<testmessage>"]', "*[1]/div[@dataimg = '<testmessage>']"],
+            [':scope', '*[1]'],
+            ['e:is(section, article) h1', "e[(name() = 'section') or (name() = 'article')]/descendant-or-self::*/h1"],
+            ['e:where(section, article) h1', "e[(name() = 'section') or (name() = 'article')]/descendant-or-self::*/h1"],
         ];
     }
 
@@ -263,7 +279,7 @@ HTML
             ['div[foobar~="cd"]', []],
             ['*[lang|="En"]', ['second-li']],
             ['[lang|="En-us"]', ['second-li']],
-            // Attribute values are case sensitive
+            // Attribute values are case-sensitive
             ['*[lang|="en"]', []],
             ['[lang|="en-US"]', []],
             ['*[lang|="e"]', []],
@@ -320,7 +336,7 @@ HTML
             ['* :root', []],
             ['*:contains("link")', ['html', 'nil', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
             [':CONtains("link")', ['html', 'nil', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
-            ['*:contains("LInk")', []],  // case sensitive
+            ['*:contains("LInk")', []],  // case-sensitive
             ['*:contains("e")', ['html', 'nil', 'outer-div', 'first-ol', 'first-li', 'paragraph', 'p-em']],
             ['*:contains("E")', []],  // case-sensitive
             ['.a', ['first-ol']],
@@ -353,6 +369,17 @@ HTML
             [':not(*)', []],
             ['a:not([href])', ['name-anchor']],
             ['ol :Not(li[class])', ['first-li', 'second-li', 'li-div', 'fifth-li', 'sixth-li', 'seventh-li']],
+            [':is(#first-li, #second-li)', ['first-li', 'second-li']],
+            ['a:is(#name-anchor, #tag-anchor)', ['name-anchor', 'tag-anchor']],
+            [':is(.c)', ['first-ol', 'third-li', 'fourth-li']],
+            ['a:is(:not(#name-anchor))', ['tag-anchor', 'nofollow-anchor']],
+            ['a:not(:is(#name-anchor))', ['tag-anchor', 'nofollow-anchor']],
+            [':where(#first-li, #second-li)', ['first-li', 'second-li']],
+            ['a:where(#name-anchor, #tag-anchor)', ['name-anchor', 'tag-anchor']],
+            [':where(.c)', ['first-ol', 'third-li', 'fourth-li']],
+            ['a:where(:not(#name-anchor))', ['tag-anchor', 'nofollow-anchor']],
+            ['a:not(:where(#name-anchor))', ['tag-anchor', 'nofollow-anchor']],
+            ['a:where(:is(#name-anchor), :where(#tag-anchor))', ['name-anchor', 'tag-anchor']],
             // HTML-specific
             [':link', ['link-href', 'tag-anchor', 'nofollow-anchor', 'area-href']],
             [':visited', []],
@@ -411,6 +438,10 @@ HTML
             ['div[class|=dialog]', 50], // ? Seems right
             ['div[class!=madeup]', 243], // ? Seems right
             ['div[class~=dialog]', 51], // ? Seems right
+            [':scope > div', 1],
+            [':scope > div > div[class=dialog]', 1],
+            [':scope > div div', 242],
+            ['div:is(div#test .dialog) .direction', 4],
         ];
     }
 }

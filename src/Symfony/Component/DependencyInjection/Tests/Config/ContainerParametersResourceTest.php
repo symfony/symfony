@@ -16,8 +16,7 @@ use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 
 class ContainerParametersResourceTest extends TestCase
 {
-    /** @var ContainerParametersResource */
-    private $resource;
+    private ContainerParametersResource $resource;
 
     protected function setUp(): void
     {
@@ -26,7 +25,7 @@ class ContainerParametersResourceTest extends TestCase
 
     public function testToString()
     {
-        $this->assertSame('container_parameters_9893d3133814ab03cac3490f36dece77', (string) $this->resource);
+        $this->assertSame('container_parameters_f2f012423c221eddf6c9a6305f965327', (string) $this->resource);
     }
 
     public function testSerializeUnserialize()

@@ -1,0 +1,19 @@
+force-login:
+    path: /main/force-login
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\ForceLoginController::welcome
+
+logged-in:
+    path: /main/logged-in
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\LoggedInController
+
+force-logout:
+    path: /main/force-logout
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\LogoutController::logout
+
+second-force-login:
+    path: /second/force-login
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\ForceLoginController::welcome
+
+second-logged-in:
+    path: /second/logged-in
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\LoggedInController

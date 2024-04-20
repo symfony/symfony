@@ -23,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['7.2', '8.0']
+        php: ['8.2']
       fail-fast: false
 
     services:
@@ -110,6 +110,16 @@ jobs:
           KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
           KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
           KAFKA_ADVERTISED_PORT: 9092
+      frankenphp:
+        image: dunglas/frankenphp:1.1.0
+        ports:
+          - 80:80
+        volumes:
+          - ${{ github.workspace }}:/symfony
+        env:
+          SERVER_NAME: 'http://localhost'
+          CADDY_SERVER_EXTRA_DIRECTIVES: |
+            root * /symfony/src/Symfony/Component/HttpFoundation/Tests/Fixtures/response-functional/
 
     steps:
       - name: Checkout
@@ -132,18 +142,26 @@ jobs:
           sudo service redis-server restart
           echo "::endgroup::"
 
+      - name: Install pgbouncer
+        run: |
+          sudo apt-get install -y pgbouncer
+          sudo cp src/Symfony/Component/Messenger/Bridge/Doctrine/Tests/Fixtures/pgbouncer/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini
+          sudo cp src/Symfony/Component/Messenger/Bridge/Doctrine/Tests/Fixtures/pgbouncer/userlist.txt /etc/pgbouncer/userlist.txt
+          sudo service pgbouncer restart
+          sudo su - postgres -c "PGPASSWORD=password psql -Atq -h localhost -p 5432 -U postgres -d postgres -c \"SELECT usename, passwd FROM pg_shadow\""
+
       - name: Configure Couchbase
         run: |
-          curl -s -u 'username=Administrator&password=111111' -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex%2Cfts'
-          curl -s -X POST http://localhost:8091/settings/web -d 'username=Administrator&password=111111&port=SAME'
-          curl -s -u Administrator:111111 -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
-          curl -s -u Administrator:111111 -X POST  http://localhost:8091/pools/default -d 'memoryQuota=256'
+          curl -s -u 'username=Administrator&password=111111@' -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex%2Cfts'
+          curl -s -X POST http://localhost:8091/settings/web -d 'username=Administrator&password=111111%40&port=SAME'
+          curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
+          curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default -d 'memoryQuota=256'
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          extensions: "json,couchbase-3.2.2,memcached,mongodb-1.10.0,redis-5.3.4,rdkafka,xsl,ldap"
+          extensions: "json,couchbase-3.2.2,memcached,mongodb-1.12.0,redis,rdkafka,xsl,ldap,relay"
           ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
           tools: pecl
@@ -165,10 +183,8 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
           echo COMPOSER_ROOT_VERSION=$COMPOSER_ROOT_VERSION >> $GITHUB_ENV
-          [[ "${{ matrix.php }}" < '8.0' ]] && echo SYMFONY_DEPRECATIONS_HELPER="baselineFile=$(pwd)/.github/deprecations-baseline.json" >> $GITHUB_ENV
 
           echo "::group::composer update"
-          composer require --dev --no-update mongodb/mongodb
           composer update --no-progress --ansi
           echo "::endgroup::"
 
@@ -182,7 +198,7 @@ jobs:
           REDIS_HOST: 'localhost:16379'
           REDIS_AUTHENTICATED_HOST: 'localhost:16380'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
-          REDIS_SENTINEL_HOSTS: 'localhost:26379 localhost:26379 localhost:26379'
+          REDIS_SENTINEL_HOSTS: 'unreachable-host:26379 localhost:26379 localhost:26379'
           REDIS_SENTINEL_SERVICE: redis_sentinel
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
@@ -190,13 +206,14 @@ jobs:
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:4566/messages.fifo?sslmode=disable&poll_timeout=0.01"
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
+          PGBOUNCER_HOST: localhost:6432
 
       #- name: Run HTTP push tests
-      #  if: matrix.php == '8.0'
+      #  if: matrix.php == '8.2'
       #  run: |
       #    [ -d .phpunit ] && mv .phpunit .phpunit.bak
       #    wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin
-      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.0-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
+      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.1-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
 

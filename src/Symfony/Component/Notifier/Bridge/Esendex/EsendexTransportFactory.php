@@ -14,14 +14,10 @@ namespace Symfony\Component\Notifier\Bridge\Esendex;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 final class EsendexTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return EsendexTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): EsendexTransport
     {
         $scheme = $dsn->getScheme();
 

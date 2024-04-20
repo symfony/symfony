@@ -30,16 +30,13 @@ final class SmscTransport extends AbstractTransport
 {
     protected const HOST = 'smsc.ru';
 
-    private $login;
-    private $password;
-    private $from;
-
-    public function __construct(string $login, string $password, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->password = $password;
-        $this->from = $from;
-
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $password,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -62,7 +59,7 @@ final class SmscTransport extends AbstractTransport
         $body = [
             'login' => $this->login,
             'psw' => $this->password,
-            'sender' => $this->from,
+            'sender' => $message->getFrom() ?: $this->from,
             'phones' => $message->getPhone(),
             'mes' => $message->getSubject(),
             'fmt' => 3, // response as JSON

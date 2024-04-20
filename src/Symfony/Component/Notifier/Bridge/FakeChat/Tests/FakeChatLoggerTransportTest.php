@@ -20,12 +20,11 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Fixtures\TestOptions;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeChatLoggerTransportTest extends TransportTestCase
 {
-    public static function createTransport(?HttpClientInterface $client = null, ?LoggerInterface $logger = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?LoggerInterface $logger = null): FakeChatLoggerTransport
     {
         return new FakeChatLoggerTransport($logger ?? new NullLogger(), $client ?? new MockHttpClient());
     }

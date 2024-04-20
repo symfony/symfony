@@ -24,6 +24,6 @@ class IcuResFileDumperTest extends TestCase
 
         $dumper = new IcuResFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/resourcebundle/res/en.res', $dumper->formatCatalogue($catalogue, 'messages'));
+        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/resourcebundle/res/en.res', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 }

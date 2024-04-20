@@ -116,7 +116,7 @@ class RequestDataCollectorTest extends TestCase
 
             [
                 'Closure',
-                function () { return 'foo'; },
+                fn () => 'foo',
                 [
                     'class' => \PHP_VERSION_ID >= 80400 ? sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2) : __NAMESPACE__.'\{closure}',
                     'method' => null,
@@ -127,7 +127,7 @@ class RequestDataCollectorTest extends TestCase
 
             [
                 'First-class callable closure',
-                \PHP_VERSION_ID >= 80100 ? eval('return $controller->regularCallable(...);') : [$controller, 'regularCallable'],
+                $controller->regularCallable(...),
                 [
                     'class' => DummyController::class,
                     'method' => 'regularCallable',
@@ -387,7 +387,7 @@ class RequestDataCollectorTest extends TestCase
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('X-Foo-Bar', null);
         $response->headers->setCookie(new Cookie('foo', 'bar', 1, '/foo', 'localhost', true, true, false, null));
-        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTime('@946684800'), '/', null, false, true, false, null));
+        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTimeImmutable('@946684800'), '/', null, false, true, false, null));
         $response->headers->setCookie(new Cookie('bazz', 'foo', '2000-12-12', '/', null, false, true, false, null));
 
         return $response;

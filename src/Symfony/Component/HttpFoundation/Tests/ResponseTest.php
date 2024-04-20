@@ -20,18 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseTest extends ResponseTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testCreate()
-    {
-        $response = Response::create('foo', 301, ['Foo' => 'bar']);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('bar', $response->headers->get('foo'));
-    }
-
     public function testToString()
     {
         $response = new Response();
@@ -52,6 +40,17 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $headers = $response->sendHeaders();
         $this->assertSame($response, $headers);
+    }
+
+    public function testSendInformationalResponse()
+    {
+        $response = new Response();
+        $response->sendHeaders(103);
+
+        // Informational responses must not override the main status code
+        $this->assertSame(200, $response->getStatusCode());
+
+        $response->sendHeaders();
     }
 
     public function testSend()
@@ -352,6 +351,44 @@ class ResponseTest extends ResponseTestCase
 
         $cacheControl = $response->headers->get('Cache-Control');
         $this->assertEquals('public, s-maxage=20', $cacheControl);
+    }
+
+    public function testSetStaleIfError()
+    {
+        $response = new Response();
+        $response->setSharedMaxAge(20);
+        $response->setStaleIfError(86400);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('public, s-maxage=20, stale-if-error=86400', $cacheControl);
+    }
+
+    public function testSetStaleWhileRevalidate()
+    {
+        $response = new Response();
+        $response->setSharedMaxAge(20);
+        $response->setStaleWhileRevalidate(300);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('public, s-maxage=20, stale-while-revalidate=300', $cacheControl);
+    }
+
+    public function testSetStaleIfErrorWithoutSharedMaxAge()
+    {
+        $response = new Response();
+        $response->setStaleIfError(86400);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('stale-if-error=86400, private', $cacheControl);
+    }
+
+    public function testSetStaleWhileRevalidateWithoutSharedMaxAge()
+    {
+        $response = new Response();
+        $response->setStaleWhileRevalidate(300);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('stale-while-revalidate=300, private', $cacheControl);
     }
 
     public function testIsPrivate()
@@ -764,17 +801,17 @@ class ResponseTest extends ResponseTestCase
     public function testSetDate()
     {
         $response = new Response();
-        $response->setDate(\DateTime::createFromFormat(\DateTime::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
+        $response->setDate(\DateTime::createFromFormat(\DateTimeInterface::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
 
-        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTime::ATOM));
+        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTimeInterface::ATOM));
     }
 
     public function testSetDateWithImmutable()
     {
         $response = new Response();
-        $response->setDate(\DateTimeImmutable::createFromFormat(\DateTime::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
+        $response->setDate(\DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
 
-        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTime::ATOM));
+        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTimeInterface::ATOM));
     }
 
     public function testSetExpires()
@@ -852,7 +889,6 @@ class ResponseTest extends ResponseTestCase
         $response->setStatusCode($code, $text);
 
         $statusText = new \ReflectionProperty($response, 'statusText');
-        $statusText->setAccessible(true);
 
         $this->assertEquals($expectedText, $statusText->getValue($response));
     }
@@ -964,7 +1000,7 @@ class ResponseTest extends ResponseTestCase
     public function testSetEtag()
     {
         $response = new Response('', 200, ['ETag' => '"12345"']);
-        $response->setEtag();
+        $response->setEtag(null);
 
         $this->assertNull($response->headers->get('Etag'), '->setEtag() removes Etags when call with null');
     }

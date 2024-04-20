@@ -24,47 +24,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 class FailedMessagesRetryCommandTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testBasicRun()
-    {
-        $series = [
-            [[10], new Envelope(new \stdClass())],
-            [[12], new Envelope(new \stdClass())],
-        ];
-
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->exactly(2))->method('find')
-            ->willReturnCallback(function (...$args) use (&$series) {
-                [$expectedArgs, $return] = array_shift($series);
-                $this->assertSame($expectedArgs, $args);
-
-                return $return;
-            })
-        ;
-
-        // message will eventually be ack'ed in Worker
-        $receiver->expects($this->exactly(2))->method('ack');
-
-        $dispatcher = new EventDispatcher();
-        $bus = $this->createMock(MessageBusInterface::class);
-        // the bus should be called in the worker
-        $bus->expects($this->exactly(2))->method('dispatch')->willReturn(new Envelope(new \stdClass()));
-
-        $command = new FailedMessagesRetryCommand(
-            'failure_receiver',
-            $receiver,
-            $bus,
-            $dispatcher
-        );
-
-        $tester = new CommandTester($command);
-        $tester->execute(['id' => [10, 12], '--force' => true]);
-
-        $this->assertStringContainsString('[OK]', $tester->getDisplay());
-    }
-
     public function testBasicRunWithServiceLocator()
     {
         $series = [

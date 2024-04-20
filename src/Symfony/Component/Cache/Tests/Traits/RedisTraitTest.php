@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Traits;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
@@ -26,10 +25,10 @@ class RedisTraitTest extends TestCase
     public function testCreateConnection(string $dsn, string $expectedClass)
     {
         if (!class_exists($expectedClass)) {
-            throw new SkippedTestSuiteError(sprintf('The "%s" class is required.', $expectedClass));
+            self::markTestSkipped(sprintf('The "%s" class is required.', $expectedClass));
         }
         if (!getenv('REDIS_CLUSTER_HOSTS')) {
-            throw new SkippedTestSuiteError('REDIS_CLUSTER_HOSTS env var is not defined.');
+            self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
 
         $mock = new class () {
@@ -57,7 +56,7 @@ class RedisTraitTest extends TestCase
 
     public static function provideCreateConnection(): array
     {
-        $hosts = array_map(function ($host) { return sprintf('host[%s]', $host); }, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
+        $hosts = array_map(fn ($host) => sprintf('host[%s]', $host), explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
 
         return [
             [

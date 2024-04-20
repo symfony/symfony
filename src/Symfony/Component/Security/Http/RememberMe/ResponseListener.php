@@ -30,7 +30,7 @@ class ResponseListener implements EventSubscriberInterface
      */
     public const COOKIE_ATTR_NAME = '_security_remember_me_cookie';
 
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;
@@ -44,9 +44,6 @@ class ResponseListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [KernelEvents::RESPONSE => 'onKernelResponse'];

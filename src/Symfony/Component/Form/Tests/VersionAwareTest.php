@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 trait VersionAwareTest
 {
-    protected static $supportedFeatureSetVersion = 404;
+    protected static int $supportedFeatureSetVersion = 404;
 
     protected function requiresFeatureSet(int $requiredFeatureSetVersion)
     {

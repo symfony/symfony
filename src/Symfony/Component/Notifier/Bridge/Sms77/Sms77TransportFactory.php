@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Sms77;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author André Matthies <matthiez@gmail.com>
  */
 final class Sms77TransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return Sms77Transport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): Sms77Transport
     {
         $scheme = $dsn->getScheme();
 

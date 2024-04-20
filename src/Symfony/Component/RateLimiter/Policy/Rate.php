@@ -20,8 +20,8 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  */
 final class Rate
 {
-    private $refillTime;
-    private $refillAmount;
+    private \DateInterval $refillTime;
+    private int $refillAmount;
 
     public function __construct(\DateInterval $refillTime, int $refillAmount = 1)
     {

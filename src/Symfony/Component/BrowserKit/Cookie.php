@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
+use Symfony\Component\BrowserKit\Exception\UnexpectedValueException;
+
 /**
  * Cookie represents an HTTP cookie.
  *
@@ -32,15 +35,10 @@ class Cookie
         'D M d H:i:s Y T',
     ];
 
-    protected $name;
-    protected $value;
-    protected $expires;
-    protected $path;
-    protected $domain;
-    protected $secure;
-    protected $httponly;
-    protected $rawValue;
-    private $samesite;
+    protected string $value;
+    protected ?string $expires = null;
+    protected string $path;
+    protected string $rawValue;
 
     /**
      * Sets a cookie.
@@ -55,26 +53,30 @@ class Cookie
      * @param bool        $encodedValue Whether the value is encoded or not
      * @param string|null $samesite     The cookie samesite attribute
      */
-    public function __construct(string $name, ?string $value, ?string $expires = null, ?string $path = null, string $domain = '', bool $secure = false, bool $httponly = true, bool $encodedValue = false, ?string $samesite = null)
-    {
+    public function __construct(
+        private string $name,
+        ?string $value,
+        ?string $expires = null,
+        ?string $path = null,
+        private string $domain = '',
+        private bool $secure = false,
+        private bool $httponly = true,
+        bool $encodedValue = false,
+        private ?string $samesite = null,
+    ) {
         if ($encodedValue) {
-            $this->value = urldecode($value);
-            $this->rawValue = $value;
+            $this->rawValue = $value ?? '';
+            $this->value = urldecode($this->rawValue);
         } else {
-            $this->value = $value;
-            $this->rawValue = rawurlencode($value ?? '');
+            $this->value = $value ?? '';
+            $this->rawValue = rawurlencode($this->value);
         }
-        $this->name = $name;
-        $this->path = empty($path) ? '/' : $path;
-        $this->domain = $domain;
-        $this->secure = $secure;
-        $this->httponly = $httponly;
-        $this->samesite = $samesite;
+        $this->path = $path ?: '/';
 
         if (null !== $expires) {
-            $timestampAsDateTime = \DateTime::createFromFormat('U', $expires);
+            $timestampAsDateTime = \DateTimeImmutable::createFromFormat('U', $expires);
             if (false === $timestampAsDateTime) {
-                throw new \UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.', $expires));
+                throw new UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.', $expires));
             }
 
             $this->expires = $timestampAsDateTime->format('U');
@@ -83,15 +85,13 @@ class Cookie
 
     /**
      * Returns the HTTP representation of the Cookie.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $cookie = sprintf('%s=%s', $this->name, $this->rawValue);
 
         if (null !== $this->expires) {
-            $dateTime = \DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
+            $dateTime = \DateTimeImmutable::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
             $cookie .= '; expires='.str_replace('+0000', '', $dateTime->format(self::DATE_FORMATS[0]));
         }
 
@@ -121,16 +121,14 @@ class Cookie
     /**
      * Creates a Cookie instance from a Set-Cookie header value.
      *
-     * @return static
-     *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public static function fromString(string $cookie, ?string $url = null)
+    public static function fromString(string $cookie, ?string $url = null): static
     {
         $parts = explode(';', $cookie);
 
         if (!str_contains($parts[0], '=')) {
-            throw new \InvalidArgumentException(sprintf('The cookie string "%s" is not valid.', $parts[0]));
+            throw new InvalidArgumentException(sprintf('The cookie string "%s" is not valid.', $parts[0]));
         }
 
         [$name, $value] = explode('=', array_shift($parts), 2);
@@ -149,7 +147,7 @@ class Cookie
 
         if (null !== $url) {
             if ((false === $urlParts = parse_url($url)) || !isset($urlParts['host'])) {
-                throw new \InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
+                throw new InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
             }
 
             $values['domain'] = $urlParts['host'];
@@ -161,7 +159,7 @@ class Cookie
 
             if ('secure' === strtolower($part)) {
                 // Ignore the secure flag if the original URI is not given or is not HTTPS
-                if (!$url || !isset($urlParts['scheme']) || 'https' != $urlParts['scheme']) {
+                if (!$url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
                     continue;
                 }
 
@@ -206,13 +204,13 @@ class Cookie
         }
 
         foreach (self::DATE_FORMATS as $dateFormat) {
-            if (false !== $date = \DateTime::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
+            if (false !== $date = \DateTimeImmutable::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
                 return $date->format('U');
             }
         }
 
         // attempt a fallback for unusual formatting
-        if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
+        if (false !== $date = date_create_immutable($dateValue, new \DateTimeZone('GMT'))) {
             return $date->format('U');
         }
 
@@ -221,90 +219,72 @@ class Cookie
 
     /**
      * Gets the name of the cookie.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
      * Gets the value of the cookie.
-     *
-     * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
 
     /**
      * Gets the raw value of the cookie.
-     *
-     * @return string
      */
-    public function getRawValue()
+    public function getRawValue(): string
     {
         return $this->rawValue;
     }
 
     /**
      * Gets the expires time of the cookie.
-     *
-     * @return string|null
      */
-    public function getExpiresTime()
+    public function getExpiresTime(): ?string
     {
         return $this->expires;
     }
 
     /**
      * Gets the path of the cookie.
-     *
-     * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
     /**
      * Gets the domain of the cookie.
-     *
-     * @return string
      */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
     /**
      * Returns the secure flag of the cookie.
-     *
-     * @return bool
      */
-    public function isSecure()
+    public function isSecure(): bool
     {
         return $this->secure;
     }
 
     /**
      * Returns the httponly flag of the cookie.
-     *
-     * @return bool
      */
-    public function isHttpOnly()
+    public function isHttpOnly(): bool
     {
         return $this->httponly;
     }
 
     /**
      * Returns true if the cookie has expired.
-     *
-     * @return bool
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return null !== $this->expires && 0 != $this->expires && $this->expires <= time();
     }

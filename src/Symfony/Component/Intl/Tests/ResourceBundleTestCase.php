@@ -743,8 +743,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'zh_TW' => 'zh_Hant_TW',
     ];
 
-    private static $rootLocales;
-    private $defaultLocale;
+    private static ?array $rootLocales = null;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -758,48 +758,46 @@ abstract class ResourceBundleTestCase extends TestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    public function provideLocales()
+    public static function provideLocales()
     {
         return array_map(
-            function ($locale) { return [$locale]; },
-            $this->getLocales()
+            fn ($locale) => [$locale],
+            self::getLocales()
         );
     }
 
-    public function provideLocaleAliases()
+    public static function provideLocaleAliases()
     {
         return array_map(
-            function ($alias, $ofLocale) { return [$alias, $ofLocale]; },
-            array_keys($this->getLocaleAliases()),
-            $this->getLocaleAliases()
+            fn ($alias, $ofLocale) => [$alias, $ofLocale],
+            array_keys(self::getLocaleAliases()),
+            self::getLocaleAliases()
         );
     }
 
-    public function provideRootLocales()
+    public static function provideRootLocales()
     {
         return array_map(
-            function ($locale) { return [$locale]; },
-            $this->getRootLocales()
+            fn ($locale) => [$locale],
+            self::getRootLocales()
         );
     }
 
-    protected function getLocales()
+    protected static function getLocales()
     {
         return self::LOCALES;
     }
 
-    protected function getLocaleAliases()
+    protected static function getLocaleAliases()
     {
         return self::LOCALE_ALIASES;
     }
 
-    protected function getRootLocales()
+    protected static function getRootLocales()
     {
         if (null === self::$rootLocales) {
-            self::$rootLocales = array_filter($this->getLocales(), function ($locale) {
-                // no locales for which fallback is possible (e.g "en_GB")
-                return !str_contains($locale, '_');
-            });
+            // ignore locales for which fallback is possible (e.g "en_GB")
+            self::$rootLocales = array_filter(self::getLocales(), fn ($locale) => !str_contains($locale, '_'));
         }
 
         return self::$rootLocales;

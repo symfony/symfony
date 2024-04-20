@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -20,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testConstructor()
     {
         $def = new Definition('stdClass');
@@ -121,9 +118,11 @@ class DefinitionTest extends TestCase
 
     public function testExceptionOnEmptyMethodCall()
     {
+        $def = new Definition('stdClass');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Method name cannot be empty.');
-        $def = new Definition('stdClass');
+
         $def->addMethodCall('');
     }
 
@@ -188,32 +187,18 @@ class DefinitionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
-        $def = new Definition('stdClass');
-        $def->setDeprecated(true, '%service_id%');
-
-        $deprecation = $def->getDeprecation('deprecated_service');
-        $this->assertSame('deprecated_service', $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
-    }
-
-    /**
      * @dataProvider invalidDeprecationMessageProvider
      */
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
     {
-        $this->expectException(InvalidArgumentException::class);
         $def = new Definition('stdClass');
+
+        $this->expectException(InvalidArgumentException::class);
+
         $def->setDeprecated('vendor/package', '1.1', $message);
     }
 
-    public static function invalidDeprecationMessageProvider()
+    public static function invalidDeprecationMessageProvider(): array
     {
         return [
             "With \rs" => ["invalid \r message %service_id%"],
@@ -293,29 +278,44 @@ class DefinitionTest extends TestCase
 
     public function testGetArgumentShouldCheckBounds()
     {
-        $this->expectException(\OutOfBoundsException::class);
         $def = new Definition('stdClass');
-
         $def->addArgument('foo');
+
+        $this->expectException(\OutOfBoundsException::class);
+
         $def->getArgument(1);
     }
 
     public function testReplaceArgumentShouldCheckBounds()
     {
-        $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('The index "1" is not in the range [0, 0] of the arguments of class "stdClass".');
         $def = new Definition('stdClass');
-
         $def->addArgument('foo');
+
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('The argument "1" doesn\'t exist in class "stdClass".');
+
         $def->replaceArgument(1, 'bar');
     }
 
     public function testReplaceArgumentWithoutExistingArgumentsShouldCheckBounds()
     {
+        $def = new Definition('stdClass');
+
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Cannot replace arguments for class "stdClass" if none have been configured yet.');
-        $def = new Definition('stdClass');
+
         $def->replaceArgument(0, 'bar');
+    }
+
+    public function testReplaceArgumentWithNonConsecutiveIntIndex()
+    {
+        $def = new Definition('stdClass');
+
+        $def->setArguments([1 => 'foo']);
+        $this->assertSame([1 => 'foo'], $def->getArguments());
+
+        $def->replaceArgument(1, 'bar');
+        $this->assertSame([1 => 'bar'], $def->getArguments());
     }
 
     public function testSetGetProperties()

@@ -28,11 +28,9 @@ class ApplicationTester
 {
     use TesterTrait;
 
-    private $application;
-
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
+    public function __construct(
+        private Application $application,
+    ) {
     }
 
     /**
@@ -47,7 +45,7 @@ class ApplicationTester
      *
      * @return int The command exit code
      */
-    public function run(array $input, array $options = [])
+    public function run(array $input, array $options = []): int
     {
         $prevShellVerbosity = getenv('SHELL_VERBOSITY');
 

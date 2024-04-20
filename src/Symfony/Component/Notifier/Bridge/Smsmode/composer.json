@@ -1,0 +1,36 @@
+{
+    "name": "symfony/smsmode-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Smsmode Notifier Bridge",
+    "keywords": [
+        "smsmode",
+        "notifier"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "gnito-org",
+            "homepage": "https://github.com/gnito-org"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^6.4|^7.0"
+    },
+    "require-dev": {
+        "symfony/event-dispatcher": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": {"Symfony\\Component\\Notifier\\Bridge\\Smsmode\\": ""},
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

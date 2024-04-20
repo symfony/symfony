@@ -18,7 +18,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class SecurityController implements ServiceSubscriberInterface
 {
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -30,9 +30,6 @@ class SecurityController implements ServiceSubscriberInterface
         return new Response('Welcome '.$this->container->get('security.token_storage')->getToken()->getUserIdentifier().'!');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices(): array
     {
         return [

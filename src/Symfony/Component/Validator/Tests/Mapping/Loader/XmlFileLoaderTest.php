@@ -24,10 +24,14 @@ use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
+use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
+use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
+use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 
 class XmlFileLoaderTest extends TestCase
 {
@@ -98,6 +102,19 @@ class XmlFileLoaderTest extends TestCase
         $this->assertFalse($constraints[0]->match);
     }
 
+    public function testLoadClassMetadataWithRequiredArguments()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/constraint-mapping-required-arg.xml');
+        $metadata = new ClassMetadata(Entity_81::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata(Entity_81::class);
+        $expected->addPropertyConstraint('title', new ConstraintWithRequiredArgument('X'));
+
+        $this->assertEquals($expected, $metadata);
+    }
+
     public function testLoadGroupSequenceProvider()
     {
         $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
@@ -106,6 +123,20 @@ class XmlFileLoaderTest extends TestCase
         $loader->loadClassMetadata($metadata);
 
         $expected = new ClassMetadata(GroupSequenceProviderEntity::class);
+        $expected->setGroupSequenceProvider(true);
+
+        $this->assertEquals($expected, $metadata);
+    }
+
+    public function testLoadGroupProvider()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
+        $metadata = new ClassMetadata(GroupProviderDto::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata(GroupProviderDto::class);
+        $expected->setGroupProvider(DummyGroupProvider::class);
         $expected->setGroupSequenceProvider(true);
 
         $this->assertEquals($expected, $metadata);

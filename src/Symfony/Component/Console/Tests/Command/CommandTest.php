@@ -28,7 +28,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {
@@ -85,6 +85,16 @@ class CommandTest extends TestCase
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->addArgument() adds an argument to the command');
     }
 
+    public function testAddArgumentFull()
+    {
+        $command = new \TestCommand();
+        $command->addArgument('foo', InputArgument::OPTIONAL, 'Description', 'default', ['a', 'b']);
+        $argument = $command->getDefinition()->getArgument('foo');
+        $this->assertSame('Description', $argument->getDescription());
+        $this->assertSame('default', $argument->getDefault());
+        $this->assertTrue($argument->hasCompletion());
+    }
+
     public function testAddOption()
     {
         $command = new \TestCommand();
@@ -93,10 +103,21 @@ class CommandTest extends TestCase
         $this->assertTrue($command->getDefinition()->hasOption('foo'), '->addOption() adds an option to the command');
     }
 
+    public function testAddOptionFull()
+    {
+        $command = new \TestCommand();
+        $command->addOption('foo', ['f'], InputOption::VALUE_OPTIONAL, 'Description', 'default', ['a', 'b']);
+        $option = $command->getDefinition()->getOption('foo');
+        $this->assertSame('f', $option->getShortcut());
+        $this->assertSame('Description', $option->getDescription());
+        $this->assertSame('default', $option->getDefault());
+        $this->assertTrue($option->hasCompletion());
+    }
+
     public function testSetHidden()
     {
         $command = new \TestCommand();
-        $command->setHidden(true);
+        $command->setHidden();
         $this->assertTrue($command->isHidden());
     }
 
@@ -120,11 +141,10 @@ class CommandTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Command name "%s" is invalid.', $name));
 
-        $command = new \TestCommand();
-        $command->setName($name);
+        (new \TestCommand())->setName($name);
     }
 
-    public static function provideInvalidCommandNames()
+    public static function provideInvalidCommandNames(): array
     {
         return [
             [''],
@@ -212,8 +232,7 @@ class CommandTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot retrieve helper "formatter" because there is no HelperSet defined.');
-        $command = new \TestCommand();
-        $command->getHelper('formatter');
+        (new \TestCommand())->getHelper('formatter');
     }
 
     public function testMergeApplicationDefinition()
@@ -227,7 +246,6 @@ class CommandTest extends TestCase
 
         $r = new \ReflectionObject($command);
         $m = $r->getMethod('mergeApplicationDefinition');
-        $m->setAccessible(true);
         $m->invoke($command);
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
         $this->assertTrue($command->getDefinition()->hasArgument('bar'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
@@ -249,7 +267,6 @@ class CommandTest extends TestCase
 
         $r = new \ReflectionObject($command);
         $m = $r->getMethod('mergeApplicationDefinition');
-        $m->setAccessible(true);
         $m->invoke($command, false);
         $this->assertTrue($command->getDefinition()->hasOption('bar'), '->mergeApplicationDefinition(false) merges the application and the command options');
         $this->assertFalse($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition(false) does not merge the application arguments');
@@ -283,16 +300,17 @@ class CommandTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You must override the execute() method in the concrete command class.');
-        $command = new Command('foo');
-        $command->run(new StringInput(''), new NullOutput());
+        (new Command('foo'))->run(new StringInput(''), new NullOutput());
     }
 
     public function testRunWithInvalidOption()
     {
-        $this->expectException(InvalidOptionException::class);
-        $this->expectExceptionMessage('The "--bar" option does not exist.');
         $command = new \TestCommand();
         $tester = new CommandTester($command);
+
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage('The "--bar" option does not exist.');
+
         $tester->execute(['--bar' => true]);
     }
 
@@ -383,7 +401,7 @@ class CommandTest extends TestCase
     public function testSetCodeWithNonClosureCallable()
     {
         $command = new \TestCommand();
-        $ret = $command->setCode([$this, 'callableMethodCommand']);
+        $ret = $command->setCode($this->callableMethodCommand(...));
         $this->assertEquals($command, $ret, '->setCode() implements a fluent interface');
         $tester = new CommandTester($command);
         $tester->execute([]);
@@ -407,9 +425,6 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'not bound'.\PHP_EOL, $tester->getDisplay());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testCommandAttribute()
     {
         $this->assertSame('|foo|f', Php8Command::getDefaultName());
@@ -423,21 +438,27 @@ class CommandTest extends TestCase
         $this->assertSame(['f'], $command->getAliases());
     }
 
-    /**
-     * @requires PHP 8
-     */
+    public function testAttributeOverridesProperty()
+    {
+        $this->assertSame('my:command', MyAnnotatedCommand::getDefaultName());
+        $this->assertSame('This is a command I wrote all by myself', MyAnnotatedCommand::getDefaultDescription());
+
+        $command = new MyAnnotatedCommand();
+
+        $this->assertSame('my:command', $command->getName());
+        $this->assertSame('This is a command I wrote all by myself', $command->getDescription());
+    }
+
     public function testDefaultCommand()
     {
         $apl = new Application();
         $apl->setDefaultCommand(Php8Command::getDefaultName());
         $property = new \ReflectionProperty($apl, 'defaultCommand');
-        $property->setAccessible(true);
 
         $this->assertEquals('foo', $property->getValue($apl));
 
         $apl->setDefaultCommand(Php8Command2::getDefaultName());
         $property = new \ReflectionProperty($apl, 'defaultCommand');
-        $property->setAccessible(true);
 
         $this->assertEquals('foo2', $property->getValue($apl));
     }
@@ -460,4 +481,12 @@ class Php8Command extends Command
 #[AsCommand(name: 'foo2', description: 'desc2', hidden: true)]
 class Php8Command2 extends Command
 {
+}
+
+#[AsCommand(name: 'my:command', description: 'This is a command I wrote all by myself')]
+class MyAnnotatedCommand extends Command
+{
+    protected static $defaultName = 'i-shall-be-ignored';
+
+    protected static $defaultDescription = 'This description should be ignored.';
 }

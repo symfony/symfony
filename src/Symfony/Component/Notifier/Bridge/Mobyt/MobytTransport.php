@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mobyt;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -29,18 +28,17 @@ final class MobytTransport extends AbstractTransport
 {
     protected const HOST = 'app.mobyt.fr';
 
-    private $accountSid;
-    private $authToken;
-    private $from;
-    private $typeQuality;
+    private string $typeQuality;
 
-    public function __construct(string $accountSid, string $authToken, string $from, ?string $typeQuality = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->accountSid = $accountSid;
-        $this->authToken = $authToken;
-        $this->from = $from;
-
-        $typeQuality = $typeQuality ?? MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
+    public function __construct(
+        private string $accountSid,
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?string $typeQuality = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
+        $typeQuality ??= MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
         MobytOptions::validateMessageType($typeQuality);
 
         $this->typeQuality = $typeQuality;
@@ -55,7 +53,7 @@ final class MobytTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof MobytOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -64,23 +62,16 @@ final class MobytTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof MobytOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, MobytOptions::class));
-        }
-
-        $options = $message->getOptions() ? $message->getOptions()->toArray() : [];
-        $options['message_type'] = $options['message_type'] ?? $this->typeQuality;
-
-        $options['message'] = $options['message'] ?? $message->getSubject();
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['message_type'] ??= $this->typeQuality;
+        $options['message'] = $message->getSubject();
         $options['recipient'] = [$message->getPhone()];
-
-        $options['sender'] = $options['sender'] ?? $this->from;
+        $options['sender'] = $message->getFrom() ?: $this->from;
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/API/v1.0/REST/sms', [
             'headers' => [
-                'Content-type: application/json',
-                'user_key: '.$this->accountSid,
-                'Access_token: '.$this->authToken,
+                'user_key' => $this->accountSid,
+                'Access_token' => $this->authToken,
             ],
             'json' => array_filter($options),
         ]);

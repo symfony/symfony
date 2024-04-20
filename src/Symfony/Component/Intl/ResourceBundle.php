@@ -23,7 +23,7 @@ use Symfony\Component\Intl\Data\Bundle\Reader\PhpBundleReader;
  */
 abstract class ResourceBundle
 {
-    private static $entryReader;
+    private static BundleEntryReader $entryReader;
 
     abstract protected static function getPath(): string;
 
@@ -43,9 +43,9 @@ abstract class ResourceBundle
      * @return mixed returns an array or {@link \ArrayAccess} instance for
      *               complex data and a scalar value for simple data
      */
-    final protected static function readEntry(array $indices, ?string $locale = null, bool $fallback = true)
+    final protected static function readEntry(array $indices, ?string $locale = null, bool $fallback = true): mixed
     {
-        if (null === self::$entryReader) {
+        if (!isset(self::$entryReader)) {
             self::$entryReader = new BundleEntryReader(new BufferedBundleReader(
                 new PhpBundleReader(),
                 Intl::BUFFER_SIZE

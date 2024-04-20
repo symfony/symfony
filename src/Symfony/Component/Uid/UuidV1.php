@@ -16,11 +16,11 @@ namespace Symfony\Component\Uid;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class UuidV1 extends Uuid
+class UuidV1 extends Uuid implements TimeBasedUidInterface
 {
     protected const TYPE = 1;
 
-    private static $clockSeq;
+    private static string $clockSeq;
 
     public function __construct(?string $uuid = null)
     {
@@ -38,7 +38,19 @@ class UuidV1 extends Uuid
 
     public function getNode(): string
     {
-        return uuid_mac($this->uid);
+        return substr($this->uid, -12);
+    }
+
+    public function toV6(): UuidV6
+    {
+        $uuid = $this->uid;
+
+        return new UuidV6(substr($uuid, 15, 3).substr($uuid, 9, 4).$uuid[0].'-'.substr($uuid, 1, 4).'-6'.substr($uuid, 5, 3).substr($uuid, 18, 6).substr($uuid, 24));
+    }
+
+    public function toV7(): UuidV7
+    {
+        return $this->toV6()->toV7();
     }
 
     public static function generate(?\DateTimeInterface $time = null, ?Uuid $node = null): string
@@ -49,13 +61,13 @@ class UuidV1 extends Uuid
             if ($node) {
                 // use clock_seq from the node
                 $seq = substr($node->uid, 19, 4);
-            } else {
+            } elseif (!$seq = self::$clockSeq ?? '') {
                 // generate a static random clock_seq to prevent any collisions with the real one
                 $seq = substr($uuid, 19, 4);
 
-                while (null === self::$clockSeq || $seq === self::$clockSeq) {
+                do {
                     self::$clockSeq = sprintf('%04x', random_int(0, 0x3FFF) | 0x8000);
-                }
+                } while ($seq === self::$clockSeq);
 
                 $seq = self::$clockSeq;
             }

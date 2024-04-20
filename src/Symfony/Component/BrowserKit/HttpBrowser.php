@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\LogicException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\DataPart;
@@ -26,12 +27,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class HttpBrowser extends AbstractBrowser
 {
-    private $client;
+    private HttpClientInterface $client;
 
     public function __construct(?HttpClientInterface $client = null, ?History $history = null, ?CookieJar $cookieJar = null)
     {
         if (!$client && !class_exists(HttpClient::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
+            throw new LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
         }
 
         $this->client = $client ?? HttpClient::create();
@@ -66,7 +67,7 @@ class HttpBrowser extends AbstractBrowser
         }
 
         if (!class_exists(AbstractPart::class)) {
-            throw new \LogicException('You cannot pass non-empty bodies as the Mime component is not installed. Try running "composer require symfony/mime".');
+            throw new LogicException('You cannot pass non-empty bodies as the Mime component is not installed. Try running "composer require symfony/mime".');
         }
 
         if (null !== $content = $request->getContent()) {
@@ -87,7 +88,7 @@ class HttpBrowser extends AbstractBrowser
             return [$part->bodyToIterable(), $part->getPreparedHeaders()->toArray()];
         }
 
-        if (empty($fields)) {
+        if (!$fields) {
             return ['', []];
         }
 

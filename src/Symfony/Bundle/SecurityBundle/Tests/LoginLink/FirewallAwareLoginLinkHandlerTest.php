@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\LoginLink;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\LoginLink\FirewallAwareLoginLinkHandler;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -66,17 +66,11 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
 
     private function createLocator(array $linkers)
     {
-        $locator = $this->createMock(ContainerInterface::class);
-        $locator->expects($this->any())
-            ->method('has')
-            ->willReturnCallback(function ($firewallName) use ($linkers) {
-                return isset($linkers[$firewallName]);
-            });
-        $locator->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(function ($firewallName) use ($linkers) {
-                return $linkers[$firewallName];
-            });
+        $locator = new Container();
+
+        foreach ($linkers as $class => $service) {
+            $locator->set($class, $service);
+        }
 
         return $locator;
     }

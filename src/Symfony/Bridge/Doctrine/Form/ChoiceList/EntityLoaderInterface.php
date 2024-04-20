@@ -20,15 +20,11 @@ interface EntityLoaderInterface
 {
     /**
      * Returns an array of entities that are valid choices in the corresponding choice list.
-     *
-     * @return array
      */
-    public function getEntities();
+    public function getEntities(): array;
 
     /**
      * Returns an array of entities matching the given identifiers.
-     *
-     * @return array
      */
-    public function getEntitiesByIds(string $identifier, array $values);
+    public function getEntitiesByIds(string $identifier, array $values): array;
 }

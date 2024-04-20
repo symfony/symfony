@@ -1,22 +1,28 @@
 framework:
+    annotations: false
+    http_method_override: false
+    handle_all_throwables: true
     secret: test
     router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
-    validation: { enabled: true, enable_annotations: true }
+    validation: { enabled: true, enable_attributes: true, email_validation_mode: html5 }
     csrf_protection: true
     form:
         enabled: true
-        legacy_error_messages: false
     test: ~
     default_locale: en
     session:
+        handler_id: null
         storage_factory_id: session.storage.factory.mock_file
+        cookie_secure: auto
+        cookie_samesite: lax
+    php_errors:
+        log: true
     profiler: { only_exceptions: false }
 
 services:
     logger: { class: Psr\Log\NullLogger }
 
 security:
-    enable_authenticator_manager: true
     firewalls:
         secure:
             pattern: ^/secure/

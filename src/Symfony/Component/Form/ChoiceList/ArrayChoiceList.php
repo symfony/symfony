@@ -24,27 +24,18 @@ namespace Symfony\Component\Form\ChoiceList;
  */
 class ArrayChoiceList implements ChoiceListInterface
 {
-    /**
-     * The choices in the list.
-     *
-     * @var array
-     */
-    protected $choices;
+    protected array $choices;
 
     /**
      * The values indexed by the original keys.
-     *
-     * @var array
      */
-    protected $structuredValues;
+    protected array $structuredValues;
 
     /**
      * The original keys of the choices array.
-     *
-     * @var int[]|string[]
      */
-    protected $originalKeys;
-    protected $valueCallback;
+    protected array $originalKeys;
+    protected ?\Closure $valueCallback = null;
 
     /**
      * Creates a list with the given choices and values.
@@ -64,18 +55,17 @@ class ArrayChoiceList implements ChoiceListInterface
         }
 
         if (null === $value && $this->castableToString($choices)) {
-            $value = function ($choice) {
-                return false === $choice ? '0' : (string) $choice;
-            };
+            $value = static fn ($choice) => false === $choice ? '0' : (string) $choice;
         }
 
         if (null !== $value) {
             // If a deterministic value generator was passed, use it later
-            $this->valueCallback = $value;
+            $this->valueCallback = $value(...);
         } else {
             // Otherwise generate incrementing integers as values
-            $i = 0;
-            $value = function () use (&$i) {
+            $value = static function () {
+                static $i = 0;
+
                 return $i++;
             };
         }
@@ -90,42 +80,27 @@ class ArrayChoiceList implements ChoiceListInterface
         $this->structuredValues = $structuredValues;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getChoices()
+    public function getChoices(): array
     {
         return $this->choices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValues()
+    public function getValues(): array
     {
         return array_map('strval', array_keys($this->choices));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getStructuredValues()
+    public function getStructuredValues(): array
     {
         return $this->structuredValues;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOriginalKeys()
+    public function getOriginalKeys(): array
     {
         return $this->originalKeys;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getChoicesForValues(array $values)
+    public function getChoicesForValues(array $values): array
     {
         $choices = [];
 
@@ -138,10 +113,7 @@ class ArrayChoiceList implements ChoiceListInterface
         return $choices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValuesForChoices(array $choices)
+    public function getValuesForChoices(array $choices): array
     {
         $values = [];
 
@@ -182,7 +154,7 @@ class ArrayChoiceList implements ChoiceListInterface
      *
      * @internal
      */
-    protected function flatten(array $choices, callable $value, ?array &$choicesByValues, ?array &$keysByValues, ?array &$structuredValues)
+    protected function flatten(array $choices, callable $value, ?array &$choicesByValues, ?array &$keysByValues, ?array &$structuredValues): void
     {
         if (null === $choicesByValues) {
             $choicesByValues = [];

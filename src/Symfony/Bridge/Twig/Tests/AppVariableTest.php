@@ -20,13 +20,11 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Translation\LocaleSwitcher;
 
 class AppVariableTest extends TestCase
 {
-    /**
-     * @var AppVariable
-     */
-    protected $appVariable;
+    protected AppVariable $appVariable;
 
     protected function setUp(): void
     {
@@ -104,14 +102,21 @@ class AppVariableTest extends TestCase
         $this->assertEquals($user, $this->appVariable->getUser());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetUserWithUsernameAsTokenUser()
+    public function testGetLocale()
     {
-        $this->setTokenStorage('username');
+        $localeSwitcher = $this->createMock(LocaleSwitcher::class);
+        $this->appVariable->setLocaleSwitcher($localeSwitcher);
 
-        $this->assertNull($this->appVariable->getUser());
+        $localeSwitcher->method('getLocale')->willReturn('fr');
+
+        self::assertEquals('fr', $this->appVariable->getLocale());
+    }
+
+    public function testGetEnabledLocales()
+    {
+        $this->appVariable->setEnabledLocales(['en', 'fr']);
+
+        self::assertSame(['en', 'fr'], $this->appVariable->getEnabled_locales());
     }
 
     public function testGetTokenWithNoToken()
@@ -164,6 +169,20 @@ class AppVariableTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getSession();
+    }
+
+    public function testGetLocaleWithLocaleSwitcherNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The "app.locale" variable is not available.');
+        $this->appVariable->getLocale();
+    }
+
+    public function testGetEnabledLocalesWithEnabledLocalesNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The "app.enabled_locales" variable is not available.');
+        $this->appVariable->getEnabled_locales();
     }
 
     public function testGetFlashesWithNoRequest()
@@ -238,12 +257,49 @@ class AppVariableTest extends TestCase
         );
     }
 
-    protected function setRequestStack($request)
+    public function testGetCurrentRoute()
     {
-        $requestStackMock = $this->createMock(RequestStack::class);
-        $requestStackMock->method('getCurrentRequest')->willReturn($request);
+        $this->setRequestStack(new Request(attributes: ['_route' => 'some_route']));
 
-        $this->appVariable->setRequestStack($requestStackMock);
+        $this->assertSame('some_route', $this->appVariable->getCurrent_route());
+    }
+
+    public function testGetCurrentRouteWithRequestStackNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->appVariable->getCurrent_route();
+    }
+
+    public function testGetCurrentRouteParameters()
+    {
+        $routeParams = ['some_param' => true];
+        $this->setRequestStack(new Request(attributes: ['_route_params' => $routeParams]));
+
+        $this->assertSame($routeParams, $this->appVariable->getCurrent_route_parameters());
+    }
+
+    public function testGetCurrentRouteParametersWithoutAttribute()
+    {
+        $this->setRequestStack(new Request());
+
+        $this->assertSame([], $this->appVariable->getCurrent_route_parameters());
+    }
+
+    public function testGetCurrentRouteParametersWithRequestStackNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->appVariable->getCurrent_route_parameters();
+    }
+
+    protected function setRequestStack(?Request $request)
+    {
+        $requestStack = new RequestStack();
+
+        if (null !== $request) {
+            $requestStack->push($request);
+        }
+
+        $this->appVariable->setRequestStack($requestStack);
     }
 
     protected function setTokenStorage($user)

@@ -12,11 +12,13 @@
 namespace Symfony\Component\Serializer\Tests\NameConverter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\UnexpectedPropertyException;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Aurélien Pillevesse <aurelienpillevesse@hotmail.fr>
  */
 class CamelCaseToSnakeCaseNameConverterTest extends TestCase
 {
@@ -54,5 +56,21 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
             ['_kevin_dunglas', '_kevinDunglas', false],
             ['this_is_a_test', 'ThisIsATest', false],
         ];
+    }
+
+    public function testDenormalizeWithContext()
+    {
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, true);
+        $denormalizedValue = $nameConverter->denormalize('last_name', null, null, [CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES]);
+
+        $this->assertSame($denormalizedValue, 'lastName');
+    }
+
+    public function testErrorDenormalizeWithContext()
+    {
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, true);
+
+        $this->expectException(UnexpectedPropertyException::class);
+        $nameConverter->denormalize('lastName', null, null, [CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES => true]);
     }
 }

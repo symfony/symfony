@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -27,11 +28,10 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
 class LoginLinkAuthenticatorTest extends TestCase
 {
-    private $loginLinkHandler;
-    private $successHandler;
-    private $failureHandler;
-    /** @var LoginLinkAuthenticator */
-    private $authenticator;
+    private MockObject&LoginLinkHandlerInterface $loginLinkHandler;
+    private MockObject&AuthenticationSuccessHandlerInterface $successHandler;
+    private MockObject&AuthenticationFailureHandlerInterface $failureHandler;
+    private LoginLinkAuthenticator $authenticator;
 
     protected function setUp(): void
     {
@@ -79,7 +79,6 @@ class LoginLinkAuthenticatorTest extends TestCase
 
     public function testUnsuccessfulAuthenticate()
     {
-        $this->expectException(InvalidLoginLinkAuthenticationException::class);
         $this->setUpAuthenticator();
 
         $request = Request::create('/login/link/check?stuff=1&user=weaverryan');
@@ -89,19 +88,23 @@ class LoginLinkAuthenticatorTest extends TestCase
             ->willThrowException(new ExpiredLoginLinkException());
 
         $passport = $this->authenticator->authenticate($request);
+
+        $this->expectException(InvalidLoginLinkAuthenticationException::class);
+
         // trigger the user loader to try to load the user
         $passport->getBadge(UserBadge::class)->getUser();
     }
 
     public function testMissingUser()
     {
-        $this->expectException(InvalidLoginLinkAuthenticationException::class);
         $this->setUpAuthenticator();
 
         $request = Request::create('/login/link/check?stuff=1');
         $this->createMock(UserInterface::class);
         $this->loginLinkHandler->expects($this->never())
             ->method('consumeLoginLink');
+
+        $this->expectException(InvalidLoginLinkAuthenticationException::class);
 
         $this->authenticator->authenticate($request);
     }

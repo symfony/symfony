@@ -22,15 +22,12 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  */
 class StopWorkerOnFailureLimitListener implements EventSubscriberInterface
 {
-    private $maximumNumberOfFailures;
-    private $logger;
-    private $failedMessages = 0;
+    private int $failedMessages = 0;
 
-    public function __construct(int $maximumNumberOfFailures, ?LoggerInterface $logger = null)
-    {
-        $this->maximumNumberOfFailures = $maximumNumberOfFailures;
-        $this->logger = $logger;
-
+    public function __construct(
+        private int $maximumNumberOfFailures,
+        private ?LoggerInterface $logger = null,
+    ) {
         if ($maximumNumberOfFailures <= 0) {
             throw new InvalidArgumentException('Failure limit must be greater than zero.');
         }
@@ -47,9 +44,7 @@ class StopWorkerOnFailureLimitListener implements EventSubscriberInterface
             $this->failedMessages = 0;
             $event->getWorker()->stop();
 
-            if (null !== $this->logger) {
-                $this->logger->info('Worker stopped due to limit of {count} failed message(s) is reached', ['count' => $this->maximumNumberOfFailures]);
-            }
+            $this->logger?->info('Worker stopped due to limit of {count} failed message(s) is reached', ['count' => $this->maximumNumberOfFailures]);
         }
     }
 

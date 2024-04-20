@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Marshaller\SodiumMarshaller;
  */
 class SodiumMarshallerTest extends TestCase
 {
-    private $decryptionKey;
+    private string $decryptionKey;
 
     protected function setUp(): void
     {

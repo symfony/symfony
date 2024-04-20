@@ -25,7 +25,6 @@ class ArgvInputTest extends TestCase
         $input = new ArgvInput();
         $r = new \ReflectionObject($input);
         $p = $r->getProperty('tokens');
-        $p->setAccessible(true);
 
         $this->assertEquals(['foo'], $p->getValue($input), '__construct() automatically get its input from the argv server variable');
     }
@@ -243,8 +242,7 @@ class ArgvInputTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $input = new ArgvInput($argv);
-        $input->bind($definition);
+        (new ArgvInput($argv))->bind($definition);
     }
 
     /**
@@ -255,11 +253,10 @@ class ArgvInputTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $input = new ArgvInput($argv);
-        $input->bind($definition);
+        (new ArgvInput($argv))->bind($definition);
     }
 
-    public static function provideInvalidInput()
+    public static function provideInvalidInput(): array
     {
         return [
             [
@@ -330,7 +327,7 @@ class ArgvInputTest extends TestCase
         ];
     }
 
-    public static function provideInvalidNegatableInput()
+    public static function provideInvalidNegatableInput(): array
     {
         return [
             [
@@ -564,5 +561,32 @@ class ArgvInputTest extends TestCase
         $input->bind(new InputDefinition([new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL), new InputArgument('name', InputArgument::OPTIONAL)]));
         $this->assertEquals(['foo' => '0'], $input->getOptions(), '->parse() parses optional options with empty value as null');
         $this->assertEquals(['name' => 'bar'], $input->getArguments(), '->parse() parses optional arguments');
+    }
+
+    public function testGetRawTokensFalse()
+    {
+        $input = new ArgvInput(['cli.php', '--foo', 'bar']);
+        $this->assertSame(['--foo', 'bar'], $input->getRawTokens());
+    }
+
+    /**
+     * @dataProvider provideGetRawTokensTrueTests
+     */
+    public function testGetRawTokensTrue(array $argv, array $expected)
+    {
+        $input = new ArgvInput($argv);
+        $this->assertSame($expected, $input->getRawTokens(true));
+    }
+
+    public static function provideGetRawTokensTrueTests(): iterable
+    {
+        yield [['app/console', 'foo:bar'], []];
+        yield [['app/console', 'foo:bar', '--env=prod'], ['--env=prod']];
+        yield [['app/console', 'foo:bar', '--env', 'prod'], ['--env', 'prod']];
+        yield [['app/console', '--no-ansi', 'foo:bar', '--env', 'prod'], ['--env', 'prod']];
+        yield [['app/console', '--no-ansi', 'foo:bar', '--env', 'prod'], ['--env', 'prod']];
+        yield [['app/console', '--no-ansi', 'foo:bar', 'argument'], ['argument']];
+        yield [['app/console', '--no-ansi', 'foo:bar', 'foo:bar'], ['foo:bar']];
+        yield [['app/console', '--no-ansi', 'foo:bar', '--', 'argument'], ['--', 'argument']];
     }
 }

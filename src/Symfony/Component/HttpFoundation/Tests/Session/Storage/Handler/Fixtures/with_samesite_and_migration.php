@@ -12,4 +12,4 @@ $_SESSION = ['foo' => 'bar'];
 
 $storage->regenerate(true);
 
-ob_start(function ($buffer) { return preg_replace('~_sf2_meta.*$~m', '', str_replace(session_id(), 'random_session_id', $buffer)); });
+ob_start(fn ($buffer) => preg_replace('~_sf2_meta.*$~m', '', str_replace(session_id(), 'random_session_id', $buffer)));

@@ -30,18 +30,15 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  */
 class FunctionExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctionTranslators(): array
     {
         return [
-            'nth-child' => [$this, 'translateNthChild'],
-            'nth-last-child' => [$this, 'translateNthLastChild'],
-            'nth-of-type' => [$this, 'translateNthOfType'],
-            'nth-last-of-type' => [$this, 'translateNthLastOfType'],
-            'contains' => [$this, 'translateContains'],
-            'lang' => [$this, 'translateLang'],
+            'nth-child' => $this->translateNthChild(...),
+            'nth-last-child' => $this->translateNthLastChild(...),
+            'nth-of-type' => $this->translateNthOfType(...),
+            'nth-last-of-type' => $this->translateNthLastOfType(...),
+            'contains' => $this->translateContains(...),
+            'lang' => $this->translateLang(...),
         ];
     }
 
@@ -161,9 +158,6 @@ class FunctionExtension extends AbstractExtension
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'function';

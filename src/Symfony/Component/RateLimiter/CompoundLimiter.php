@@ -18,7 +18,7 @@ use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
  */
 final class CompoundLimiter implements LimiterInterface
 {
-    private $limiters;
+    private array $limiters;
 
     /**
      * @param LimiterInterface[] $limiters
@@ -42,7 +42,11 @@ final class CompoundLimiter implements LimiterInterface
         foreach ($this->limiters as $limiter) {
             $rateLimit = $limiter->consume($tokens);
 
-            if (null === $minimalRateLimit || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
+            if (
+                null === $minimalRateLimit
+                || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()
+                || ($minimalRateLimit->isAccepted() && !$rateLimit->isAccepted())
+            ) {
                 $minimalRateLimit = $rateLimit;
             }
         }

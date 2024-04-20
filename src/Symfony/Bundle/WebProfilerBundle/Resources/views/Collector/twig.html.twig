@@ -1,14 +1,66 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #twig-dump pre {
+            font-size: var(--font-size-monospace);
+            line-height: 1.7;
+            background-color: var(--page-background);
+            border: var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 0 1px rgba(128, 128, 128, .2);
+        }
+        #twig-dump span {
+            border-radius: 2px;
+            padding: 1px 2px;
+        }
+        #twig-dump .status-error { background: transparent; color: var(--color-error); }
+        #twig-dump .status-warning { background: rgba(240, 181, 24, 0.3); }
+        #twig-dump .status-success { background: rgba(100, 189, 99, 0.2); }
+        #twig-dump .status-info { background: var(--info-background); }
+        .theme-dark #twig-dump .status-warning { color: var(--yellow-200); }
+        .theme-dark #twig-dump .status-success { color: var(--green-200); }
+
+        #twig-table tbody td {
+            position: relative;
+        }
+        #twig-table tbody td div {
+            margin: 0;
+        }
+        #twig-table .template-file-path {
+            color: var(--color-muted);
+            display: block;
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% set time = collector.templatecount ? '%0.0f'|format(collector.time) : 'n/a' %}
     {% set icon %}
-        {{ include('@WebProfiler/Icon/twig.svg') }}
+        {{ source('@WebProfiler/Icon/twig.svg') }}
         <span class="sf-toolbar-value">{{ time }}</span>
         <span class="sf-toolbar-label">ms</span>
     {% endset %}
 
     {% set text %}
+        {% set template = collector.templates|keys|first %}
+        {% set file = collector.templatePaths[template]|default(false) %}
+        {% set link = file ? file|file_link(1) : false %}
+        <div class="sf-toolbar-info-piece">
+            <b>Entry View</b>
+            <span>
+                 {% if link %}
+                     <a href="{{ link }}" title="{{ file }}">
+                         {{ template }}
+                     </a>
+                 {% else %}
+                     {{ template }}
+                 {% endif %}
+            </span>
+        </div>
         <div class="sf-toolbar-info-piece">
             <b>Render Time</b>
             <span>{{ time }} ms</span>
@@ -32,7 +84,7 @@
 
 {% block menu %}
     <span class="label {{ 0 == collector.templateCount ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/twig.svg') }}</span>
         <strong>Twig</strong>
     </span>
 {% endblock %}
@@ -41,8 +93,8 @@
     {% if collector.templatecount == 0 %}
         <h2>Twig</h2>
 
-        <div class="empty">
-            <p>No Twig templates were rendered for this request.</p>
+        <div class="empty empty-panel">
+            <p>No Twig templates were rendered.</p>
         </div>
     {% else %}
         <h2>Twig Metrics</h2>
@@ -53,19 +105,23 @@
                 <span class="label">Render time</span>
             </div>
 
-            <div class="metric">
-                <span class="value">{{ collector.templatecount }}</span>
-                <span class="label">Template calls</span>
-            </div>
+            <div class="metric-divider"></div>
 
-            <div class="metric">
-                <span class="value">{{ collector.blockcount }}</span>
-                <span class="label">Block calls</span>
-            </div>
+            <div class="metric-group">
+                <div class="metric">
+                    <span class="value">{{ collector.templatecount }}</span>
+                    <span class="label">Template calls</span>
+                </div>
 
-            <div class="metric">
-                <span class="value">{{ collector.macrocount }}</span>
-                <span class="label">Macro calls</span>
+                <div class="metric">
+                    <span class="value">{{ collector.blockcount }}</span>
+                    <span class="label">Block calls</span>
+                </div>
+
+                <div class="metric">
+                    <span class="value">{{ collector.macrocount }}</span>
+                    <span class="label">Macro calls</span>
+                </div>
             </div>
         </div>
 
@@ -85,17 +141,14 @@
             <tbody>
             {% for template, count in collector.templates %}
                 <tr>
-                    {%- set file = collector.templatePaths[template]|default(false) -%}
-                    {%- set link = file ? file|file_link(1) : false -%}
-                    <td>
-                        <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+                    {% set file = collector.templatePaths[template]|default(false) %}
+                    {% set link = file ? file|file_link(1) : false %}
+                    <td class="font-normal">
                         {% if link %}
-                            <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
-                            <div>
-                                <a class="text-muted" href="{{ link }}" title="{{ file }}">
-                                    {{ file|file_relative|default(file) }}
-                                </a>
-                            </div>
+                            <a href="{{ link }}" title="{{ file }}" class="stretched-link">
+                                {{ template }}
+                                <span class="template-file-path">{{ file|file_relative|default(file) }}</span>
+                            </a>
                         {% else %}
                             {{ template }}
                         {% endif %}

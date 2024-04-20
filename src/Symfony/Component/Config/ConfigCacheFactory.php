@@ -22,20 +22,15 @@ namespace Symfony\Component\Config;
  */
 class ConfigCacheFactory implements ConfigCacheFactoryInterface
 {
-    private $debug;
-
     /**
      * @param bool $debug The debug flag to pass to ConfigCache
      */
-    public function __construct(bool $debug)
-    {
-        $this->debug = $debug;
+    public function __construct(
+        private bool $debug,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function cache(string $file, callable $callback)
+    public function cache(string $file, callable $callback): ConfigCacheInterface
     {
         $cache = new ConfigCache($file, $this->debug);
         if (!$cache->isFresh()) {

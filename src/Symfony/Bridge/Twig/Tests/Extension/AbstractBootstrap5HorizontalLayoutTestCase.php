@@ -28,9 +28,9 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
 {
     public function testRow()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
-        $form->addError(new FormError('[trans]Error![/trans]'));
-        $html = $this->renderRow($form->createView());
+        $form = $this->factory->createNamed('')->add('name', TextType::class);
+        $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
+        $html = $this->renderRow($form->get('name')->createView());
 
         $this->assertMatchesXpath($html,
             '/div
@@ -55,9 +55,9 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
 
     public function testRowWithCustomClass()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
-        $form->addError(new FormError('[trans]Error![/trans]'));
-        $html = $this->renderRow($form->createView(), [
+        $form = $this->factory->createNamed('')->add('name', TextType::class);
+        $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
+        $html = $this->renderRow($form->get('name')->createView(), [
             'row_attr' => [
                 'class' => 'mb-5',
             ],
@@ -86,7 +86,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
 
     public function testLabelOnForm()
     {
-        $form = $this->factory->createNamed('name', DateType::class);
+        $form = $this->factory->createNamed('name', DateType::class, null, ['widget' => 'choice']);
         $view = $form->createView();
         $this->renderWidget($view, ['label' => 'foo']);
         $html = $this->renderLabel($view);
@@ -245,7 +245,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         ./div[@class="col-sm-2" or @class="col-sm-10"]
         /following-sibling::div[@class="col-sm-2" or @class="col-sm-10"]
         [
-            ./p
+            ./div
                 [@class="form-text mb-0 help-text"]
                 [.="[trans]really helpful text[/trans]"]
         ]
@@ -266,7 +266,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         ./div[@class="col-sm-2" or @class="col-sm-10"]
         /following-sibling::div[@class="col-sm-2" or @class="col-sm-10"]
         [
-            ./p
+            ./div
                 [@class="form-text mb-0 help-text"]
                 [.="[trans]really helpful text[/trans]"]
         ]

@@ -18,7 +18,7 @@ trait DateTimeEqualsTrait
 {
     public static function assertDateTimeEquals($expected, $actual)
     {
-        if ($expected instanceof \DateTime && $actual instanceof \DateTime) {
+        if ($expected instanceof \DateTimeInterface && $actual instanceof \DateTimeInterface) {
             $expected = $expected->format('c');
             $actual = $actual->format('c');
         }

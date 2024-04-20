@@ -29,7 +29,7 @@ class TraceableControllerResolverTest extends TestCase
         $stopwatch->method('start')->willReturn($stopwatchEvent);
 
         $resolver = new class() implements ControllerResolverInterface {
-            public function getController(Request $request)
+            public function getController(Request $request): callable|false
             {
                 throw new \Exception();
             }

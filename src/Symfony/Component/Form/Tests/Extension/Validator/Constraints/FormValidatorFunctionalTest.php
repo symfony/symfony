@@ -23,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Expression;
@@ -34,11 +35,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormValidatorFunctionalTest extends TestCase
 {
-    private $validator;
-    private $formFactory;
+    private ValidatorInterface $validator;
+    private FormFactoryInterface $formFactory;
 
     protected function setUp(): void
     {
@@ -439,9 +441,9 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertTrue($form->isSubmitted());
         $this->assertFalse($form->isValid());
         $this->assertCount(2, $form->getErrors());
-        $this->assertSame('This value is not valid.', $form->getErrors()[0]->getMessage());
+        $this->assertSame('Please enter a valid date.', $form->getErrors()[0]->getMessage());
         $this->assertSame($form->get('year'), $form->getErrors()[0]->getOrigin());
-        $this->assertSame('This value is not valid.', $form->getErrors()[1]->getMessage());
+        $this->assertSame('Please enter a valid date.', $form->getErrors()[1]->getMessage());
         $this->assertSame($form->get('month'), $form->getErrors()[1]->getOrigin());
     }
 
@@ -486,7 +488,7 @@ class Foo
     public $bar;
     public $baz;
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('bar', new NotBlank());
     }
@@ -494,7 +496,7 @@ class Foo
 
 class FooType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('bar')
@@ -504,7 +506,7 @@ class FooType extends AbstractType
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', Foo::class);
     }
@@ -516,7 +518,7 @@ class Review
     public $title;
     public $author;
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('title', new NotBlank());
         $metadata->addPropertyConstraint('rating', new NotBlank());
@@ -525,7 +527,7 @@ class Review
 
 class ReviewType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('rating', IntegerType::class, [
@@ -538,7 +540,7 @@ class ReviewType extends AbstractType
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', Review::class);
     }
@@ -548,7 +550,7 @@ class Customer
 {
     public $email;
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('email', new NotBlank());
     }
@@ -556,14 +558,14 @@ class Customer
 
 class CustomerType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('email')
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', Customer::class);
     }

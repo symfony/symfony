@@ -12,6 +12,8 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
@@ -59,7 +61,7 @@ class CliDumperTest extends TestCase
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
-array:24 [
+array:25 [
   "number" => 1
   0 => &1 null
   "const" => 1.1
@@ -74,6 +76,7 @@ array:24 [
     é\\x01test\\t\\n
     ing
     """
+  "bo\\u{FEFF}m" => "te\\u{FEFF}st"
   "[]" => []
   "res" => stream resource {@{$res}
 %A  wrapper_type: "plainfile"
@@ -206,28 +209,6 @@ EOTXT;
         yield [$expected, CliDumper::DUMP_TRAILING_COMMA];
     }
 
-    /**
-     * @requires extension xml
-     * @requires PHP < 8.0
-     */
-    public function testXmlResource()
-    {
-        $var = xml_parser_create();
-
-        $this->assertDumpMatchesFormat(
-            <<<'EOTXT'
-xml resource {
-  current_byte_index: %i
-  current_column_number: %i
-  current_line_number: 1
-  error_code: XML_ERROR_NONE
-}
-EOTXT
-            ,
-            $var
-        );
-    }
-
     public function testJsonCast()
     {
         $var = (array) json_decode('{"0":{},"1":null}');
@@ -323,9 +304,6 @@ EOTXT
         putenv('DUMP_STRING_LENGTH=');
     }
 
-    /**
-     * @requires function Twig\Template::getSourceContext
-     */
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+');
@@ -407,75 +385,6 @@ EOTXT
   +"foo": &1 "foo"
   +"bar": &1 "foo"
 }
-
-EOTXT
-            ,
-            $out
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @requires PHP < 8.1
-     */
-    public function testSpecialVars56()
-    {
-        $var = $this->getSpecialVars();
-
-        $this->assertDumpEquals(
-            <<<'EOTXT'
-array:3 [
-  0 => array:1 [
-    0 => &1 array:1 [
-      0 => &1 array:1 [&1]
-    ]
-  ]
-  1 => array:1 [
-    "GLOBALS" => & array:1 [ …1]
-  ]
-  2 => &3 array:1 [
-    "GLOBALS" => &3 array:1 [&3]
-  ]
-]
-EOTXT
-            ,
-            $var
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @requires PHP < 8.1
-     */
-    public function testGlobals()
-    {
-        $var = $this->getSpecialVars();
-        unset($var[0]);
-        $out = '';
-
-        $dumper = new CliDumper(function ($line, $depth) use (&$out) {
-            if ($depth >= 0) {
-                $out .= str_repeat('  ', $depth).$line."\n";
-            }
-        });
-        $dumper->setColors(false);
-        $cloner = new VarCloner();
-
-        $data = $cloner->cloneVar($var);
-        $dumper->dump($data);
-
-        $this->assertSame(
-            <<<'EOTXT'
-array:2 [
-  1 => array:1 [
-    "GLOBALS" => & array:1 [ …1]
-  ]
-  2 => &2 array:1 [
-    "GLOBALS" => &2 array:1 [&2]
-  ]
-]
 
 EOTXT
             ,
@@ -591,21 +500,33 @@ EOTXT
         );
     }
 
-    private function getSpecialVars()
+    public function testFileLinkFormat()
     {
-        foreach (array_keys($GLOBALS) as $var) {
-            if ('GLOBALS' !== $var) {
-                unset($GLOBALS[$var]);
-            }
+        if (!class_exists(FileLinkFormatter::class)) {
+            $this->markTestSkipped(sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
         }
 
-        $var = function &() {
-            $var = [];
-            $var[] = &$var;
+        $data = new Data([
+            [
+                new ClassStub(self::class),
+            ],
+        ]);
 
-            return $var;
-        };
+        $ide = $_ENV['SYMFONY_IDE'] ?? null;
+        $_ENV['SYMFONY_IDE'] = 'vscode';
 
-        return eval('return [$var(), $GLOBALS, &$GLOBALS];');
+        try {
+            $dumper = new CliDumper();
+            $dumper->setColors(true);
+            $dump = $dumper->dump($data, true);
+
+            $this->assertStringMatchesFormat('%svscode:%sCliDumperTest%s', $dump);
+        } finally {
+            if (null === $ide) {
+                unset($_ENV['SYMFONY_IDE']);
+            } else {
+                $_ENV['SYMFONY_IDE'] = $ide;
+            }
+        }
     }
 }

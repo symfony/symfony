@@ -24,7 +24,7 @@ class NotNormalizableDummy implements DenormalizableInterface
     {
     }
 
-    public function denormalize(DenormalizerInterface $denormalizer, $data, ?string $format = null, array $context = [])
+    public function denormalize(DenormalizerInterface $denormalizer, $data, ?string $format = null, array $context = []): void
     {
         throw new NotNormalizableValueException();
     }

@@ -23,6 +23,8 @@ interface FirewallListenerFactoryInterface
     /**
      * Creates the firewall listener services for the provided configuration.
      *
+     * @param array<string, mixed> $config
+     *
      * @return string[] The listener service IDs to be used by the firewall
      */
     public function createListeners(ContainerBuilder $container, string $firewallName, array $config): array;

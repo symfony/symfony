@@ -10,6 +10,11 @@ exec('find src/ -name composer.json', $packages);
 
 foreach ($packages as $package) {
     $package = dirname($package);
+
+    if (str_contains($package, '/Resources/')) {
+        continue;
+    }
+
     $c = file_get_contents($package.'/.gitattributes');
     $c = preg_replace('{^/\.git.*+\n}m', '', $c);
     $c .= "/.git* export-ignore\n";

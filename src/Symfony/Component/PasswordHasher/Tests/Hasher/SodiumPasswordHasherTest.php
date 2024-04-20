@@ -52,8 +52,8 @@ class SodiumPasswordHasherTest extends TestCase
     public function testHashLength()
     {
         $this->expectException(InvalidPasswordException::class);
-        $hasher = new SodiumPasswordHasher();
-        $hasher->hash(str_repeat('a', 4097));
+
+        (new SodiumPasswordHasher())->hash(str_repeat('a', 4097));
     }
 
     public function testCheckPasswordLength()

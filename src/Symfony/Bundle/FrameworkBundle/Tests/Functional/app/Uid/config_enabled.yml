@@ -1,0 +1,8 @@
+imports:
+    - { resource: "../config/default.yml" }
+
+framework:
+    http_method_override: false
+    uid:
+        default_uuid_version: 7
+        time_based_uuid_version: 7

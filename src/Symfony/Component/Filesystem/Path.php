@@ -42,12 +42,9 @@ final class Path
      *
      * @var array<string, string>
      */
-    private static $buffer = [];
+    private static array $buffer = [];
 
-    /**
-     * @var int
-     */
-    private static $bufferSize = 0;
+    private static int $bufferSize = 0;
 
     /**
      * Canonicalizes the given path.
@@ -349,13 +346,13 @@ final class Path
         $extension = ltrim($extension, '.');
 
         // No extension for paths
-        if ('/' === substr($path, -1)) {
+        if (str_ends_with($path, '/')) {
             return $path;
         }
 
         // No actual extension in path
-        if (empty($actualExtension)) {
-            return $path.('.' === substr($path, -1) ? '' : '.').$extension;
+        if (!$actualExtension) {
+            return $path.(str_ends_with($path, '.') ? '' : '.').$extension;
         }
 
         return substr($path, 0, -\strlen($actualExtension)).$extension;
@@ -574,7 +571,7 @@ final class Path
      */
     public static function isLocal(string $path): bool
     {
-        return '' !== $path && false === strpos($path, '://');
+        return '' !== $path && !str_contains($path, '://');
     }
 
     /**
@@ -638,7 +635,7 @@ final class Path
 
                 // Prevent false positives for common prefixes
                 // see isBasePath()
-                if (0 === strpos($path.'/', $basePath.'/')) {
+                if (str_starts_with($path.'/', $basePath.'/')) {
                     // next path
                     continue 2;
                 }
@@ -666,12 +663,12 @@ final class Path
             if (null === $finalPath) {
                 // For first part we keep slashes, like '/top', 'C:\' or 'phar://'
                 $finalPath = $path;
-                $wasScheme = (false !== strpos($path, '://'));
+                $wasScheme = str_contains($path, '://');
                 continue;
             }
 
             // Only add slash if previous part didn't end with '/' or '\'
-            if (!\in_array(substr($finalPath, -1), ['/', '\\'])) {
+            if (!\in_array(substr($finalPath, -1), ['/', '\\'], true)) {
                 $finalPath .= '/';
             }
 
@@ -717,7 +714,7 @@ final class Path
         // Don't append a slash for the root "/", because then that root
         // won't be discovered as common prefix ("//" is not a prefix of
         // "/foobar/").
-        return 0 === strpos($ofPath.'/', rtrim($basePath, '/').'/');
+        return str_starts_with($ofPath.'/', rtrim($basePath, '/').'/');
     }
 
     /**
@@ -786,7 +783,7 @@ final class Path
         $length = \strlen($path);
 
         // Remove and remember root directory
-        if (0 === strpos($path, '/')) {
+        if (str_starts_with($path, '/')) {
             $root .= '/';
             $path = $length > 1 ? substr($path, 1) : '';
         } elseif ($length > 1 && ctype_alpha($path[0]) && ':' === $path[1]) {

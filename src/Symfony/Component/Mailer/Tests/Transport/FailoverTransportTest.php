@@ -157,11 +157,9 @@ class FailoverTransportTest extends TestCase
     private function assertTransports(RoundRobinTransport $transport, int $cursor, array $deadTransports)
     {
         $p = new \ReflectionProperty(RoundRobinTransport::class, 'cursor');
-        $p->setAccessible(true);
         $this->assertSame($cursor, $p->getValue($transport));
 
         $p = new \ReflectionProperty(RoundRobinTransport::class, 'deadTransports');
-        $p->setAccessible(true);
         $this->assertSame($deadTransports, iterator_to_array($p->getValue($transport)));
     }
 }

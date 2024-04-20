@@ -29,8 +29,8 @@ final class TranslationNodeVisitor implements NodeVisitorInterface
 {
     public const UNDEFINED_DOMAIN = '_undefined';
 
-    private $enabled = false;
-    private $messages = [];
+    private bool $enabled = false;
+    private array $messages = [];
 
     public function enable(): void
     {
@@ -56,9 +56,9 @@ final class TranslationNodeVisitor implements NodeVisitorInterface
         }
 
         if (
-            $node instanceof FilterExpression &&
-            'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof ConstantExpression
+            $node instanceof FilterExpression
+            && 'trans' === $node->getNode('filter')->getAttribute('value')
+            && $node->getNode('node') instanceof ConstantExpression
         ) {
             // extract constant nodes with a trans filter
             $this->messages[] = [
@@ -66,8 +66,8 @@ final class TranslationNodeVisitor implements NodeVisitorInterface
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
             ];
         } elseif (
-            $node instanceof FunctionExpression &&
-            't' === $node->getAttribute('name')
+            $node instanceof FunctionExpression
+            && 't' === $node->getAttribute('name')
         ) {
             $nodeArguments = $node->getNode('arguments');
 
@@ -84,10 +84,10 @@ final class TranslationNodeVisitor implements NodeVisitorInterface
                 $node->hasNode('domain') ? $this->getReadDomainFromNode($node->getNode('domain')) : null,
             ];
         } elseif (
-            $node instanceof FilterExpression &&
-            'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof ConcatBinary &&
-            $message = $this->getConcatValueFromNode($node->getNode('node'), null)
+            $node instanceof FilterExpression
+            && 'trans' === $node->getNode('filter')->getAttribute('value')
+            && $node->getNode('node') instanceof ConcatBinary
+            && $message = $this->getConcatValueFromNode($node->getNode('node'), null)
         ) {
             $this->messages[] = [
                 $message,
@@ -103,9 +103,6 @@ final class TranslationNodeVisitor implements NodeVisitorInterface
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return 0;

@@ -70,14 +70,14 @@ class HttpBasicLdapFactory extends HttpBasicFactory
         return [$provider, $listenerId, $entryPointId];
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         parent::addConfiguration($node);
 
         $node
             ->children()
                 ->scalarNode('service')->defaultValue('ldap')->end()
-                ->scalarNode('dn_string')->defaultValue('{username}')->end()
+                ->scalarNode('dn_string')->defaultValue('{user_identifier}')->end()
                 ->scalarNode('query_string')->end()
                 ->scalarNode('search_dn')->defaultValue('')->end()
                 ->scalarNode('search_password')->defaultValue('')->end()

@@ -1,0 +1,5 @@
+imports:
+    - { resource: './third_c.yaml' }
+
+third:
+    foo: b

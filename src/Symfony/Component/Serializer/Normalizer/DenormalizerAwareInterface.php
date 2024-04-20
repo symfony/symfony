@@ -19,5 +19,5 @@ interface DenormalizerAwareInterface
     /**
      * Sets the owning Denormalizer object.
      */
-    public function setDenormalizer(DenormalizerInterface $denormalizer);
+    public function setDenormalizer(DenormalizerInterface $denormalizer): void;
 }

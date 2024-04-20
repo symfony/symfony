@@ -27,30 +27,18 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
  */
 final class HandledStamp implements StampInterface
 {
-    private $result;
-    private $handlerName;
-
-    /**
-     * @param mixed $result The returned value of the message handler
-     */
-    public function __construct($result, string $handlerName)
-    {
-        $this->result = $result;
-        $this->handlerName = $handlerName;
+    public function __construct(
+        private mixed $result,
+        private string $handlerName,
+    ) {
     }
 
-    /**
-     * @param mixed $result The returned value of the message handler
-     */
-    public static function fromDescriptor(HandlerDescriptor $handler, $result): self
+    public static function fromDescriptor(HandlerDescriptor $handler, mixed $result): self
     {
         return new self($result, $handler->getName());
     }
 
-    /**
-     * @return mixed
-     */
-    public function getResult()
+    public function getResult(): mixed
     {
         return $this->result;
     }

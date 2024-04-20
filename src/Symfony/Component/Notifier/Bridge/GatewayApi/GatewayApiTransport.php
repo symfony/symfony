@@ -28,14 +28,12 @@ final class GatewayApiTransport extends AbstractTransport
 {
     protected const HOST = 'gatewayapi.com';
 
-    private $authToken;
-    private $from;
-
-    public function __construct(string $authToken, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -46,7 +44,7 @@ final class GatewayApiTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof GatewayApiOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -55,15 +53,16 @@ final class GatewayApiTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['sender'] = $message->getFrom() ?: $this->from;
+        $options['recipients'] = [['msisdn' => $message->getPhone()]];
+        $options['message'] = $message->getSubject();
+
         $endpoint = sprintf('https://%s/rest/mtsms', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->authToken, ''],
-            'json' => [
-                'sender' => $this->from,
-                'recipients' => [['msisdn' => $message->getPhone()]],
-                'message' => $message->getSubject(),
-            ],
+            'json' => array_filter($options),
         ]);
 
         try {

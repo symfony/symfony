@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 
 class LocalizedFormFailureHandler implements AuthenticationFailureHandlerInterface
 {
-    private $router;
+    private RouterInterface $router;
 
     public function __construct(RouterInterface $router)
     {

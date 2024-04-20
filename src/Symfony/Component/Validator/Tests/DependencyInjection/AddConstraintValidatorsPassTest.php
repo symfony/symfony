@@ -41,14 +41,12 @@ class AddConstraintValidatorsPassTest extends TestCase
             Validator1::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
             'my_constraint_validator_alias1' => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
             Validator2::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service2')),
-        ]]))->addTag('container.service_locator')->setPublic(false);
-        $this->assertEquals($expected, $locator->setPublic(false));
+        ]]))->addTag('container.service_locator');
+        $this->assertEquals($expected, $locator);
     }
 
     public function testAbstractConstraintValidator()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "my_abstract_constraint_validator" tagged "validator.constraint_validator" must not be abstract.');
         $container = new ContainerBuilder();
         $container->register('validator.validator_factory')
             ->addArgument([]);
@@ -58,6 +56,10 @@ class AddConstraintValidatorsPassTest extends TestCase
             ->addTag('validator.constraint_validator');
 
         $addConstraintValidatorsPass = new AddConstraintValidatorsPass();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The service "my_abstract_constraint_validator" tagged "validator.constraint_validator" must not be abstract.');
+
         $addConstraintValidatorsPass->process($container);
     }
 

@@ -18,12 +18,13 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @extends BaseDateTimeTransformer<array>
  */
 class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 {
-    private $pad;
-    private $fields;
-    private $referenceDate;
+    private array $fields;
+    private \DateTimeInterface $referenceDate;
 
     /**
      * @param string|null   $inputTimezone  The input timezone
@@ -31,12 +32,16 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @param string[]|null $fields         The date fields
      * @param bool          $pad            Whether to use padding
      */
-    public function __construct(?string $inputTimezone = null, ?string $outputTimezone = null, ?array $fields = null, bool $pad = false, ?\DateTimeInterface $referenceDate = null)
-    {
+    public function __construct(
+        ?string $inputTimezone = null,
+        ?string $outputTimezone = null,
+        ?array $fields = null,
+        private bool $pad = false,
+        ?\DateTimeInterface $referenceDate = null,
+    ) {
         parent::__construct($inputTimezone, $outputTimezone);
 
         $this->fields = $fields ?? ['year', 'month', 'day', 'hour', 'minute', 'second'];
-        $this->pad = $pad;
         $this->referenceDate = $referenceDate ?? new \DateTimeImmutable('1970-01-01 00:00:00');
     }
 
@@ -45,11 +50,9 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return array
-     *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
-    public function transform($dateTime)
+    public function transform(mixed $dateTime): array
     {
         if (null === $dateTime) {
             return array_intersect_key([
@@ -67,10 +70,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         if ($this->inputTimezone !== $this->outputTimezone) {
-            if (!$dateTime instanceof \DateTimeImmutable) {
-                $dateTime = clone $dateTime;
-            }
-
+            $dateTime = \DateTimeImmutable::createFromInterface($dateTime);
             $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
         }
 
@@ -100,12 +100,10 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param array $value Localized date
      *
-     * @return \DateTime|null
-     *
      * @throws TransformationFailedException If the given value is not an array,
      *                                       if the value could not be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): ?\DateTime
     {
         if (null === $value) {
             return null;

@@ -7,10 +7,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 final class TestLegacyPasswordAuthenticatedUser implements LegacyPasswordAuthenticatedUserInterface, UserInterface
 {
-    private $username;
-    private $password;
-    private $salt;
-    private $roles;
+    private string $username;
+    private ?string $password;
+    private ?string $salt;
+    private array $roles;
 
     public function __construct(string $username, ?string $password = null, ?string $salt = null, array $roles = [])
     {
@@ -39,11 +39,6 @@ final class TestLegacyPasswordAuthenticatedUser implements LegacyPasswordAuthent
     {
         // Do nothing
         return;
-    }
-
-    public function getUsername(): string
-    {
-        return $this->username;
     }
 
     public function getUserIdentifier(): string

@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\Serializer\Tests\NameConverter;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 
 /**
@@ -36,9 +38,9 @@ final class MetadataAwareNameConverterTest extends TestCase
     /**
      * @dataProvider attributeProvider
      */
-    public function testNormalize($propertyName, $expected)
+    public function testNormalize(string|int $propertyName, string|int $expected)
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
@@ -48,16 +50,14 @@ final class MetadataAwareNameConverterTest extends TestCase
     /**
      * @dataProvider fallbackAttributeProvider
      */
-    public function testNormalizeWithFallback($propertyName, $expected)
+    public function testNormalizeWithFallback(string|int $propertyName, string|int $expected)
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $fallback = $this->createMock(NameConverterInterface::class);
         $fallback
             ->method('normalize')
-            ->willReturnCallback(function ($propertyName) {
-                return strtoupper($propertyName);
-            })
+            ->willReturnCallback(static fn ($propertyName) => strtoupper($propertyName))
         ;
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);
@@ -68,9 +68,9 @@ final class MetadataAwareNameConverterTest extends TestCase
     /**
      * @dataProvider attributeProvider
      */
-    public function testDenormalize($expected, $propertyName)
+    public function testDenormalize(string|int $expected, string|int $propertyName)
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
@@ -80,16 +80,14 @@ final class MetadataAwareNameConverterTest extends TestCase
     /**
      * @dataProvider fallbackAttributeProvider
      */
-    public function testDenormalizeWithFallback($expected, $propertyName)
+    public function testDenormalizeWithFallback(string|int $expected, string|int $propertyName)
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $fallback = $this->createMock(NameConverterInterface::class);
         $fallback
             ->method('denormalize')
-            ->willReturnCallback(function ($propertyName) {
-                return strtolower($propertyName);
-            })
+            ->willReturnCallback(static fn ($propertyName) => strtolower($propertyName))
         ;
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);
@@ -120,9 +118,9 @@ final class MetadataAwareNameConverterTest extends TestCase
     /**
      * @dataProvider attributeAndContextProvider
      */
-    public function testNormalizeWithGroups($propertyName, $expected, $context = [])
+    public function testNormalizeWithGroups(string $propertyName, string $expected, array $context = [])
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
@@ -132,16 +130,16 @@ final class MetadataAwareNameConverterTest extends TestCase
     /**
      * @dataProvider attributeAndContextProvider
      */
-    public function testDenormalizeWithGroups($expected, $propertyName, $context = [])
+    public function testDenormalizeWithGroups(string $expected, string $propertyName, array $context = [])
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
         $this->assertEquals($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
-    public static function attributeAndContextProvider()
+    public static function attributeAndContextProvider(): array
     {
         return [
             ['buz', 'buz', ['groups' => ['a']]],
@@ -150,12 +148,13 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['buzForExport', 'buz', ['groups' => 'b']],
             ['buz', 'buz', ['groups' => ['c']]],
             ['buz', 'buz', []],
+            ['buzForExport', 'buz', ['groups' => ['*']]],
         ];
     }
 
     public function testDenormalizeWithCacheContext()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
@@ -163,4 +162,28 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals('buzForExport', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['b']]));
         $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class));
     }
+
+    public function testDenormalizeWithNestedPathAndName()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Found SerializedName and SerializedPath attributes on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
+        $nameConverter->denormalize('foo', NestedPathAndName::class);
+    }
+
+    public function testNormalizeWithNestedPathAndName()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Found SerializedName and SerializedPath attributes on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
+        $nameConverter->normalize('foo', NestedPathAndName::class);
+    }
+}
+
+class NestedPathAndName
+{
+    #[SerializedName('five'), SerializedPath('[one][two][three]')]
+    public $foo;
 }

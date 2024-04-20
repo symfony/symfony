@@ -38,9 +38,6 @@ class DataCollectorTest extends TestCase
         $this->assertSame($filePath, $c->getData()[0]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testClassPublicObjectProperty()
     {
         $parent = new WithPublicObjectProperty();
@@ -54,9 +51,6 @@ class DataCollectorTest extends TestCase
         $this->assertNotNull($c->getData()->parent);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testClassPublicObjectPropertyAsReference()
     {
         $parent = new WithPublicObjectProperty();
@@ -70,9 +64,6 @@ class DataCollectorTest extends TestCase
         $this->assertNotNull($c->getData()->parent);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testClassUsePropertyInDestruct()
     {
         $parent = new UsePropertyInDestruct();
@@ -86,9 +77,6 @@ class DataCollectorTest extends TestCase
         $this->assertNotNull($c->getData()->parent);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testClassUsePropertyAsReferenceInDestruct()
     {
         $parent = new UsePropertyInDestruct();

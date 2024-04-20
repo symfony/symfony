@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Lock\Store;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -37,14 +35,12 @@ class PdoStore implements PersistingStoreInterface
     use DatabaseTableTrait;
     use ExpiringStoreTrait;
 
-    private $conn;
-    private $dsn;
-    private $driver;
-    private $username = null;
-    private $password = null;
-    private $connectionOptions = [];
-
-    private $dbalStore;
+    private \PDO $conn;
+    private string $dsn;
+    private string $driver;
+    private ?string $username = null;
+    private ?string $password = null;
+    private array $connectionOptions = [];
 
     /**
      * You can either pass an existing database connection as PDO instance
@@ -60,24 +56,16 @@ class PdoStore implements PersistingStoreInterface
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: []]
      *
-     * @param \PDO|string $connOrDsn     A \PDO instance or DSN string or null
-     * @param array       $options       An associative array of options
-     * @param float       $gcProbability Probability expressed as floating number between 0 and 1 to clean old locks
-     * @param int         $initialTtl    The expiration delay of locks in seconds
+     * @param array $options       An associative array of options
+     * @param float $gcProbability Probability expressed as floating number between 0 and 1 to clean old locks
+     * @param int   $initialTtl    The expiration delay of locks in seconds
      *
      * @throws InvalidArgumentException When first argument is not PDO nor Connection nor string
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
-    public function __construct($connOrDsn, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
+    public function __construct(#[\SensitiveParameter] \PDO|string $connOrDsn, #[\SensitiveParameter] array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
-        if ($connOrDsn instanceof Connection || (\is_string($connOrDsn) && str_contains($connOrDsn, '://'))) {
-            trigger_deprecation('symfony/lock', '5.4', 'Usage of a DBAL Connection with "%s" is deprecated and will be removed in symfony 6.0. Use "%s" instead.', __CLASS__, DoctrineDbalStore::class);
-            $this->dbalStore = new DoctrineDbalStore($connOrDsn, $options, $gcProbability, $initialTtl);
-
-            return;
-        }
-
         $this->init($options, $gcProbability, $initialTtl);
 
         if ($connOrDsn instanceof \PDO) {
@@ -86,10 +74,8 @@ class PdoStore implements PersistingStoreInterface
             }
 
             $this->conn = $connOrDsn;
-        } elseif (\is_string($connOrDsn)) {
-            $this->dsn = $connOrDsn;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, get_debug_type($connOrDsn)));
+            $this->dsn = $connOrDsn;
         }
 
         $this->username = $options['db_username'] ?? $this->username;
@@ -97,17 +83,8 @@ class PdoStore implements PersistingStoreInterface
         $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
-        if (isset($this->dbalStore)) {
-            $this->dbalStore->save($key);
-
-            return;
-        }
-
         $key->reduceLifetime($this->initialTtl);
 
         $sql = "INSERT INTO $this->table ($this->idCol, $this->tokenCol, $this->expirationCol) VALUES (:id, :token, {$this->getCurrentTimestampStatement()} + $this->initialTtl)";
@@ -115,7 +92,7 @@ class PdoStore implements PersistingStoreInterface
         try {
             $stmt = $conn->prepare($sql);
         } catch (\PDOException $e) {
-            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->getDriver(), ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
             }
             $stmt = $conn->prepare($sql);
@@ -127,12 +104,12 @@ class PdoStore implements PersistingStoreInterface
         try {
             $stmt->execute();
         } catch (\PDOException $e) {
-            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($this->getDriver(), ['pgsql', 'sqlite', 'sqlsrv'], true))) {
                 $this->createTable();
 
                 try {
                     $stmt->execute();
-                } catch (\PDOException $e) {
+                } catch (\PDOException) {
                     $this->putOffExpiration($key, $this->initialTtl);
                 }
             } else {
@@ -145,17 +122,8 @@ class PdoStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
-        if (isset($this->dbalStore)) {
-            $this->dbalStore->putOffExpiration($key, $ttl);
-
-            return;
-        }
-
         if ($ttl < 1) {
             throw new InvalidTtlException(sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
         }
@@ -179,17 +147,8 @@ class PdoStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
-        if (isset($this->dbalStore)) {
-            $this->dbalStore->delete($key);
-
-            return;
-        }
-
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";
         $stmt = $this->getConnection()->prepare($sql);
 
@@ -198,15 +157,8 @@ class PdoStore implements PersistingStoreInterface
         $stmt->execute();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
-        if (isset($this->dbalStore)) {
-            return $this->dbalStore->exists($key);
-        }
-
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $stmt = $this->getConnection()->prepare($sql);
 
@@ -219,7 +171,7 @@ class PdoStore implements PersistingStoreInterface
 
     private function getConnection(): \PDO
     {
-        if (null === $this->conn) {
+        if (!isset($this->conn)) {
             $this->conn = new \PDO($this->dsn, $this->username, $this->password, $this->connectionOptions);
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
@@ -235,53 +187,16 @@ class PdoStore implements PersistingStoreInterface
      */
     public function createTable(): void
     {
-        if (isset($this->dbalStore)) {
-            $this->dbalStore->createTable();
+        $sql = match ($driver = $this->getDriver()) {
+            'mysql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(44) NOT NULL, $this->expirationCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB",
+            'sqlite' => "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->tokenCol TEXT NOT NULL, $this->expirationCol INTEGER)",
+            'pgsql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)",
+            'oci' => "CREATE TABLE $this->table ($this->idCol VARCHAR2(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR2(64) NOT NULL, $this->expirationCol INTEGER)",
+            'sqlsrv' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)",
+            default => throw new \DomainException(sprintf('Creating the lock table is currently not implemented for platform "%s".', $driver)),
+        };
 
-            return;
-        }
-
-        // connect if we are not yet
-        $conn = $this->getConnection();
-        $driver = $this->getDriver();
-
-        switch ($driver) {
-            case 'mysql':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(44) NOT NULL, $this->expirationCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB";
-                break;
-            case 'sqlite':
-                $sql = "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->tokenCol TEXT NOT NULL, $this->expirationCol INTEGER)";
-                break;
-            case 'pgsql':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)";
-                break;
-            case 'oci':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR2(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR2(64) NOT NULL, $this->expirationCol INTEGER)";
-                break;
-            case 'sqlsrv':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)";
-                break;
-            default:
-                throw new \DomainException(sprintf('Creating the lock table is currently not implemented for platform "%s".', $driver));
-        }
-
-        $conn->exec($sql);
-    }
-
-    /**
-     * Adds the Table to the Schema if it doesn't exist.
-     *
-     * @deprecated since symfony/lock 5.4 use DoctrineDbalStore instead
-     */
-    public function configureSchema(Schema $schema): void
-    {
-        if (isset($this->dbalStore)) {
-            $this->dbalStore->configureSchema($schema);
-
-            return;
-        }
-
-        throw new \BadMethodCallException(sprintf('"%s::%s()" is only supported when using a doctrine/dbal Connection.', __CLASS__, __METHOD__));
+        $this->getConnection()->exec($sql);
     }
 
     /**
@@ -296,14 +211,7 @@ class PdoStore implements PersistingStoreInterface
 
     private function getDriver(): string
     {
-        if (null !== $this->driver) {
-            return $this->driver;
-        }
-
-        $conn = $this->getConnection();
-        $this->driver = $conn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-
-        return $this->driver;
+        return $this->driver ??= $this->getConnection()->getAttribute(\PDO::ATTR_DRIVER_NAME);
     }
 
     /**
@@ -311,20 +219,14 @@ class PdoStore implements PersistingStoreInterface
      */
     private function getCurrentTimestampStatement(): string
     {
-        switch ($this->getDriver()) {
-            case 'mysql':
-                return 'UNIX_TIMESTAMP()';
-            case 'sqlite':
-                return 'strftime(\'%s\',\'now\')';
-            case 'pgsql':
-                return 'CAST(EXTRACT(epoch FROM NOW()) AS INT)';
-            case 'oci':
-                return '(SYSDATE - TO_DATE(\'19700101\',\'yyyymmdd\'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone), 1, 3))*3600';
-            case 'sqlsrv':
-                return 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())';
-            default:
-                return (string) time();
-        }
+        return match ($this->getDriver()) {
+            'mysql' => 'UNIX_TIMESTAMP()',
+            'sqlite' => 'strftime(\'%s\',\'now\')',
+            'pgsql' => 'CAST(EXTRACT(epoch FROM NOW()) AS INT)',
+            'oci' => '(SYSDATE - TO_DATE(\'19700101\',\'yyyymmdd\'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone), 1, 3))*3600',
+            'sqlsrv' => 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())',
+            default => (string) time(),
+        };
     }
 
     private function isTableMissing(\PDOException $exception): bool
@@ -332,15 +234,13 @@ class PdoStore implements PersistingStoreInterface
         $driver = $this->getDriver();
         [$sqlState, $code] = $exception->errorInfo ?? [null, $exception->getCode()];
 
-        switch (true) {
-            case 'pgsql' === $driver && '42P01' === $sqlState:
-            case 'sqlite' === $driver && str_contains($exception->getMessage(), 'no such table:'):
-            case 'oci' === $driver && 942 === $code:
-            case 'sqlsrv' === $driver && 208 === $code:
-            case 'mysql' === $driver && 1146 === $code:
-                return true;
-            default:
-                return false;
-        }
+        return match ($driver) {
+            'pgsql' => '42P01' === $sqlState,
+            'sqlite' => str_contains($exception->getMessage(), 'no such table:'),
+            'oci' => 942 === $code,
+            'sqlsrv' => 208 === $code,
+            'mysql' => 1146 === $code,
+            default => false,
+        };
     }
 }

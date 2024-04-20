@@ -21,20 +21,18 @@ jobs:
     name: Unit Tests
 
     env:
-      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis-5.3.4
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis,relay
 
     strategy:
       matrix:
         include:
-          - php: '7.2'
-          - php: '7.4'
+          - php: '8.2'
           - php: '8.2'
             mode: high-deps
           - php: '8.2'
             mode: low-deps
           - php: '8.3'
           - php: '8.4'
-            extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis
             #mode: experimental
       fail-fast: false
 
@@ -62,13 +60,14 @@ jobs:
           git config --global init.defaultBranch main
           git config --global advice.detachedHead false
 
+          (php --ri relay 2>&1 > /dev/null) || sudo rm -f /etc/php/*/cli/conf.d/20-relay.ini
+
           COMPOSER_HOME="$(composer config home)"
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
           echo COLUMNS=120 >> $GITHUB_ENV
           echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data,integration" >> $GITHUB_ENV
           echo COMPOSER_UP='composer update --no-progress --ansi'$([[ "${{ matrix.mode }}" != low-deps ]] && echo ' --ignore-platform-req=php+') >> $GITHUB_ENV
-          echo SYMFONY_DEPRECATIONS_HELPER="baselineFile=$(pwd)/.github/deprecations-baseline.json" >> $GITHUB_ENV
 
           SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
           SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | cut -d "'" -f2 | cut -d '.' -f 1-2)
@@ -97,7 +96,7 @@ jobs:
             echo SYMFONY_DEPRECATIONS_HELPER=weak >> $GITHUB_ENV
             cp composer.json composer.json.orig
             echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json
-            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n')
+            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | grep -v src/Symfony/Component/Emoji/Resources/bin)
             mv composer.json composer.json.phpunit
             mv composer.json.orig composer.json
           fi
@@ -127,8 +126,12 @@ jobs:
 
           echo SYMFONY_VERSION=$SYMFONY_VERSION >> $GITHUB_ENV
           echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
-          echo SYMFONY_REQUIRE=">=$([ '${{ matrix.mode }}' = low-deps ] && echo 4.4 || echo $SYMFONY_VERSION)" >> $GITHUB_ENV
+          echo SYMFONY_REQUIRE=">=$([ '${{ matrix.mode }}' = low-deps ] && echo 5.4 || echo $SYMFONY_VERSION)" >> $GITHUB_ENV
           [[ "${{ matrix.mode }}" = *-deps ]] && mv composer.json.phpunit composer.json || true
+
+          if [[ "${{ matrix.mode }}" = low-deps ]]; then
+            echo SYMFONY_PHPUNIT_REQUIRE="nikic/php-parser:^4.18" >> $GITHUB_ENV
+          fi
 
       - name: Install dependencies
         run: |
@@ -141,15 +144,21 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "matrix.php == '8.1' && ! matrix.mode"
+        if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
-          sed -i 's/"\*\*\/Tests\/"//' composer.json
+          patch -sp1 < .github/expected-missing-return-types.diff
           git add .
-          composer install -q --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=1&php=7.2' php .github/patch-types.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=1&php=7.2' php .github/patch-types.php # ensure the script is idempotent
+          composer install -q --optimize-autoloader || composer install --optimize-autoloader
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.2' php .github/patch-types.php
+          git checkout src/Symfony/Contracts/Service/ResetInterface.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.2' php .github/patch-types.php # ensure the script is idempotent
+          git checkout src/Symfony/Contracts/Service/ResetInterface.php
           git diff --exit-code
-          echo PHPUNIT="$PHPUNIT,legacy" >> $GITHUB_ENV
+
+      - name: Check return types
+        if: "matrix.php == '8.2' && ! matrix.mode"
+        run: |
+          php .github/patch-types.php lint
 
       - name: Run tests
         run: |
@@ -187,19 +196,14 @@ jobs:
             exit 0
           fi
 
-          (cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
-          (cd src/Symfony/Component/Lock; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
-
           # matrix.mode = high-deps
           echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} 'cd {} && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
 
           # get a list of the patched components (relies on .github/build-packages.php being called in the previous step)
-          (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
-          (cd src/Symfony/Component/Lock; mv composer.bak composer.json)
           PATCHED_COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
-          # for 5.4 LTS, checkout and test previous major with the patched components (only for patched components)
-          if [[ $PATCHED_COMPONENTS && $SYMFONY_VERSION = 5.4 ]]; then
+          # for 6.4 LTS, checkout and test previous major with the patched components (only for patched components)
+          if [[ $PATCHED_COMPONENTS && $SYMFONY_VERSION = 6.4 ]]; then
               export FLIP='^'
               SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
               echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
@@ -208,8 +212,6 @@ jobs:
               git fetch --depth=2 origin $SYMFONY_VERSION
               git checkout -m FETCH_HEAD
               PATCHED_COMPONENTS=$(echo "$PATCHED_COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort || true)
-              (cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
-              (cd src/Symfony/Component/Lock; composer require --dev --no-update mongodb/mongodb)
               if [[ $PATCHED_COMPONENTS ]]; then
                 echo "::group::install phpunit"
                 ./phpunit install
@@ -226,12 +228,14 @@ jobs:
             script -e -c './phpunit --group tty' /dev/null
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "matrix.php == '7.2' && ! matrix.mode"
+        if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.2.5-pcntl-sigchild.tar.bz2
-          tar -xjf php-7.2.5-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.2.0-pcntl-sigchild.tar.bz2
           cd ..
 
+          mkdir -p /opt/php/lib
+          echo memory_limit=-1 > /opt/php/lib/php.ini
           ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

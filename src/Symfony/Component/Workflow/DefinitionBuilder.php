@@ -22,10 +22,10 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
  */
 class DefinitionBuilder
 {
-    private $places = [];
-    private $transitions = [];
-    private $initialPlaces;
-    private $metadataStore;
+    private array $places = [];
+    private array $transitions = [];
+    private string|array|null $initialPlaces = null;
+    private ?MetadataStoreInterface $metadataStore = null;
 
     /**
      * @param string[]     $places
@@ -37,10 +37,7 @@ class DefinitionBuilder
         $this->addTransitions($transitions);
     }
 
-    /**
-     * @return Definition
-     */
-    public function build()
+    public function build(): Definition
     {
         return new Definition($this->places, $this->transitions, $this->initialPlaces, $this->metadataStore);
     }
@@ -50,7 +47,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function clear()
+    public function clear(): static
     {
         $this->places = [];
         $this->transitions = [];
@@ -65,7 +62,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function setInitialPlaces($initialPlaces)
+    public function setInitialPlaces(string|array|null $initialPlaces): static
     {
         $this->initialPlaces = $initialPlaces;
 
@@ -75,7 +72,7 @@ class DefinitionBuilder
     /**
      * @return $this
      */
-    public function addPlace(string $place)
+    public function addPlace(string $place): static
     {
         if (!$this->places) {
             $this->initialPlaces = $place;
@@ -91,7 +88,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function addPlaces(array $places)
+    public function addPlaces(array $places): static
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -105,7 +102,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function addTransitions(array $transitions)
+    public function addTransitions(array $transitions): static
     {
         foreach ($transitions as $transition) {
             $this->addTransition($transition);
@@ -117,7 +114,7 @@ class DefinitionBuilder
     /**
      * @return $this
      */
-    public function addTransition(Transition $transition)
+    public function addTransition(Transition $transition): static
     {
         $this->transitions[] = $transition;
 
@@ -127,7 +124,7 @@ class DefinitionBuilder
     /**
      * @return $this
      */
-    public function setMetadataStore(MetadataStoreInterface $metadataStore)
+    public function setMetadataStore(MetadataStoreInterface $metadataStore): static
     {
         $this->metadataStore = $metadataStore;
 

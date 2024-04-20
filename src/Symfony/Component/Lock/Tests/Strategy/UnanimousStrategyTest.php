@@ -19,8 +19,7 @@ use Symfony\Component\Lock\Strategy\UnanimousStrategy;
  */
 class UnanimousStrategyTest extends TestCase
 {
-    /** @var UnanimousStrategy */
-    private $strategy;
+    private UnanimousStrategy $strategy;
 
     protected function setUp(): void
     {

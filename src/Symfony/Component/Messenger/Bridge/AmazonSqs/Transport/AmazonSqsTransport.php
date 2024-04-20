@@ -28,62 +28,42 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class AmazonSqsTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ResetInterface
 {
-    private $serializer;
-    private $connection;
-    private $receiver;
-    private $sender;
+    private SerializerInterface $serializer;
 
-    public function __construct(Connection $connection, ?SerializerInterface $serializer = null, ?ReceiverInterface $receiver = null, ?SenderInterface $sender = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+        private (ReceiverInterface&MessageCountAwareInterface)|null $receiver = null,
+        private ?SenderInterface $sender = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
-        $this->receiver = $receiver;
-        $this->sender = $sender;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
-        return ($this->receiver ?? $this->getReceiver())->get();
+        return $this->getReceiver()->get();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->ack($envelope);
+        $this->getReceiver()->ack($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->reject($envelope);
+        $this->getReceiver()->reject($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
-        return ($this->receiver ?? $this->getReceiver())->getMessageCount();
+        return $this->getReceiver()->getMessageCount();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
-        return ($this->sender ?? $this->getSender())->send($envelope);
+        return $this->getSender()->send($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setup(): void
     {
         try {
@@ -93,7 +73,7 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
         }
     }
 
-    public function reset()
+    public function reset(): void
     {
         try {
             $this->connection->reset();
@@ -102,13 +82,13 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
         }
     }
 
-    private function getReceiver(): AmazonSqsReceiver
+    private function getReceiver(): MessageCountAwareInterface&ReceiverInterface
     {
-        return $this->receiver = new AmazonSqsReceiver($this->connection, $this->serializer);
+        return $this->receiver ??= new AmazonSqsReceiver($this->connection, $this->serializer);
     }
 
-    private function getSender(): AmazonSqsSender
+    private function getSender(): SenderInterface
     {
-        return $this->sender = new AmazonSqsSender($this->connection, $this->serializer);
+        return $this->sender ??= new AmazonSqsSender($this->connection, $this->serializer);
     }
 }

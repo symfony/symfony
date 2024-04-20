@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 
 class ChainCacheClearerTest extends TestCase
 {
-    protected static $cacheDir;
+    protected static string $cacheDir;
 
     public static function setUpBeforeClass(): void
     {

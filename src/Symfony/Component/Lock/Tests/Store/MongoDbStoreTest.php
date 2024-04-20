@@ -12,12 +12,17 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use MongoDB\Client;
+use MongoDB\Collection;
+use MongoDB\Database;
+use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\ConnectionTimeoutException;
-use PHPUnit\Framework\SkippedTestSuiteError;
+use MongoDB\Driver\Manager;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\MongoDbStore;
+
+require_once __DIR__.'/stubs/mongodb.php';
 
 /**
  * @author Joe Bennett <joe@assimtech.com>
@@ -32,21 +37,18 @@ class MongoDbStoreTest extends AbstractStoreTestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!class_exists(Client::class)) {
-            throw new SkippedTestSuiteError('The mongodb/mongodb package is required.');
-        }
-
-        $client = self::getMongoClient();
+        $manager = self::getMongoManager();
         try {
-            $client->listDatabases();
+            $server = $manager->selectServer();
+            $server->executeCommand('admin', new Command(['ping' => 1]));
         } catch (ConnectionTimeoutException $e) {
-            throw new SkippedTestSuiteError('MongoDB server not found.');
+            self::markTestSkipped('MongoDB server not found.');
         }
     }
 
-    private static function getMongoClient(): Client
+    private static function getMongoManager(): Manager
     {
-        return new Client('mongodb://'.getenv('MONGODB_HOST'));
+        return new Manager('mongodb://'.getenv('MONGODB_HOST'));
     }
 
     protected function getClockDelay(): int
@@ -54,12 +56,9 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         return 250000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
-        return new MongoDbStore(self::getMongoClient(), [
+        return new MongoDbStore(self::getMongoManager(), [
             'database' => 'test',
             'collection' => 'lock',
         ]);
@@ -70,14 +69,12 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $store = $this->getStore();
         $store->createTtlIndex();
 
-        $client = self::getMongoClient();
-        $collection = $client->selectCollection(
-            'test',
-            'lock'
-        );
+        $manager = self::getMongoManager();
+        $result = $manager->executeReadCommand('test', new Command(['listIndexes' => 'lock']));
+
         $indexes = [];
-        foreach ($collection->listIndexes() as $index) {
-            $indexes[] = $index->getName();
+        foreach ($result as $index) {
+            $indexes[] = $index->name;
         }
         $this->assertContains('expires_at_1', $indexes);
     }
@@ -100,21 +97,53 @@ class MongoDbStoreTest extends AbstractStoreTestCase
 
     public static function provideConstructorArgs()
     {
-        $client = self::getMongoClient();
-        yield [$client, ['database' => 'test', 'collection' => 'lock']];
-
-        $collection = $client->selectCollection('test', 'lock');
-        yield [$collection, []];
-
+        yield [self::getMongoManager(), ['database' => 'test', 'collection' => 'lock']];
         yield ['mongodb://localhost/test?collection=lock', []];
         yield ['mongodb://localhost/test', ['collection' => 'lock']];
         yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock']];
     }
 
+    public function testConstructWithClient()
+    {
+        $client = $this->createMock(Client::class);
+        $client->expects($this->once())
+            ->method('getManager')
+            ->willReturn(self::getMongoManager());
+
+        $this->testConstructionMethods($client, ['database' => 'test', 'collection' => 'lock']);
+    }
+
+    public function testConstructWithDatabase()
+    {
+        $database = $this->createMock(Database::class);
+        $database->expects($this->once())
+            ->method('getManager')
+            ->willReturn(self::getMongoManager());
+        $database->expects($this->once())
+            ->method('getDatabaseName')
+            ->willReturn('test');
+
+        $this->testConstructionMethods($database, ['collection' => 'lock']);
+    }
+
+    public function testConstructWithCollection()
+    {
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->once())
+            ->method('getManager')
+            ->willReturn(self::getMongoManager());
+        $collection->expects($this->once())
+            ->method('getDatabaseName')
+            ->willReturn('test');
+        $collection->expects($this->once())
+            ->method('getCollectionName')
+            ->willReturn('lock');
+
+        $this->testConstructionMethods($collection, []);
+    }
+
     public function testUriPrecedence()
     {
-        $client = self::getMongoClient();
-
         $store = new MongoDbStore('mongodb://localhost/test_uri?collection=lock_uri', [
             'database' => 'test_option',
             'collection' => 'lock_option',
@@ -122,7 +151,6 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $storeReflection = new \ReflectionObject($store);
 
         $optionsProperty = $storeReflection->getProperty('options');
-        $optionsProperty->setAccessible(true);
         $options = $optionsProperty->getValue($store);
 
         $this->assertSame('test_uri', $options['database']);
@@ -141,9 +169,9 @@ class MongoDbStoreTest extends AbstractStoreTestCase
 
     public static function provideInvalidConstructorArgs()
     {
-        $client = self::getMongoClient();
-        yield [$client, ['collection' => 'lock']];
-        yield [$client, ['database' => 'test']];
+        $manager = self::getMongoManager();
+        yield [$manager, ['collection' => 'lock']];
+        yield [$manager, ['database' => 'test']];
 
         yield ['mongodb://localhost/?collection=lock', []];
         yield ['mongodb://localhost/test', []];
@@ -155,13 +183,10 @@ class MongoDbStoreTest extends AbstractStoreTestCase
      */
     public function testUriCollectionStrip(string $uri, array $options, string $driverUri)
     {
-        $client = self::getMongoClient();
-
         $store = new MongoDbStore($uri, $options);
         $storeReflection = new \ReflectionObject($store);
 
         $uriProperty = $storeReflection->getProperty('uri');
-        $uriProperty->setAccessible(true);
         $uri = $uriProperty->getValue($store);
         $this->assertSame($driverUri, $uri);
     }

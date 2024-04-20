@@ -28,7 +28,7 @@ class FunctionNode extends Node
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $arguments = [];
         foreach ($this->nodes['arguments']->nodes as $node) {
@@ -40,7 +40,7 @@ class FunctionNode extends Node
         $compiler->raw($function['compiler'](...$arguments));
     }
 
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): mixed
     {
         $arguments = [$values];
         foreach ($this->nodes['arguments']->nodes as $node) {
@@ -50,7 +50,7 @@ class FunctionNode extends Node
         return $functions[$this->attributes['name']]['evaluator'](...$arguments);
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         $array = [];
         $array[] = $this->attributes['name'];

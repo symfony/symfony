@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add option `delay[arguments]` in the transport definition
+
+6.0
+---
+
+ * Remove option `prefetch_count`
+ * Using invalid options will throw a `LogicException`
+
 5.3
 ---
 

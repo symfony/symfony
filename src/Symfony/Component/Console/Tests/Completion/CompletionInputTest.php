@@ -119,7 +119,6 @@ class CompletionInputTest extends TestCase
         $input = CompletionInput::fromString($inputStr, 1);
 
         $tokensProperty = (new \ReflectionClass($input))->getProperty('tokens');
-        $tokensProperty->setAccessible(true);
 
         $this->assertEquals($expectedTokens, $tokensProperty->getValue($input));
     }

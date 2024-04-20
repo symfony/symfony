@@ -23,21 +23,16 @@ use Twig\TwigFunction;
  */
 final class HttpFoundationExtension extends AbstractExtension
 {
-    private $urlHelper;
-
-    public function __construct(UrlHelper $urlHelper)
-    {
-        $this->urlHelper = $urlHelper;
+    public function __construct(
+        private UrlHelper $urlHelper,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('absolute_url', [$this, 'generateAbsoluteUrl']),
-            new TwigFunction('relative_path', [$this, 'generateRelativePath']),
+            new TwigFunction('absolute_url', $this->generateAbsoluteUrl(...)),
+            new TwigFunction('relative_path', $this->generateRelativePath(...)),
         ];
     }
 

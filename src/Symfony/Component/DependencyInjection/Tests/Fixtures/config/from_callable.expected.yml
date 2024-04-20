@@ -1,0 +1,12 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    from_callable:
+        class: stdClass
+        public: true
+        lazy: true
+        arguments: [[!service { class: stdClass }, do]]
+        factory: [Closure, fromCallable]

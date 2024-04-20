@@ -58,7 +58,7 @@ final class MessageConverter
                 throw new RuntimeException(sprintf('Unable to create an Email from an instance of "%s" as the body is too complex.', get_debug_type($message)));
             }
 
-            return self::attachParts($email, \array_slice($parts, 1));
+            return self::addParts($email, \array_slice($parts, 1));
         }
 
         throw new RuntimeException(sprintf('Unable to create an Email from an instance of "%s" as the body is too complex.', get_debug_type($message)));
@@ -80,9 +80,9 @@ final class MessageConverter
     {
         $parts = $part->getParts();
         if (
-            2 === \count($parts) &&
-            $parts[0] instanceof TextPart && 'text' === $parts[0]->getMediaType() && 'plain' === $parts[0]->getMediaSubtype() &&
-            $parts[1] instanceof TextPart && 'text' === $parts[1]->getMediaType() && 'html' === $parts[1]->getMediaSubtype()
+            2 === \count($parts)
+            && $parts[0] instanceof TextPart && 'text' === $parts[0]->getMediaType() && 'plain' === $parts[0]->getMediaSubtype()
+            && $parts[1] instanceof TextPart && 'text' === $parts[1]->getMediaType() && 'html' === $parts[1]->getMediaSubtype()
         ) {
             return (new Email(clone $message->getHeaders()))
                 ->text($parts[0]->getBody(), $parts[0]->getPreparedHeaders()->getHeaderParameter('Content-Type', 'charset') ?: 'utf-8')
@@ -104,20 +104,17 @@ final class MessageConverter
             throw new RuntimeException(sprintf('Unable to create an Email from an instance of "%s" as the body is too complex.', get_debug_type($message)));
         }
 
-        return self::attachParts($email, \array_slice($parts, 1));
+        return self::addParts($email, \array_slice($parts, 1));
     }
 
-    private static function attachParts(Email $email, array $parts): Email
+    private static function addParts(Email $email, array $parts): Email
     {
         foreach ($parts as $part) {
             if (!$part instanceof DataPart) {
                 throw new RuntimeException(sprintf('Unable to create an Email from an instance of "%s" as the body is too complex.', get_debug_type($email)));
             }
 
-            $headers = $part->getPreparedHeaders();
-            $method = 'inline' === $headers->getHeaderBody('Content-Disposition') ? 'embed' : 'attach';
-            $name = $headers->getHeaderParameter('Content-Disposition', 'filename');
-            $email->$method($part->getBody(), $name, $part->getMediaType().'/'.$part->getMediaSubtype());
+            $email->addPart($part);
         }
 
         return $email;

@@ -13,8 +13,10 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
+use Symfony\Component\HttpKernel\Tests\Fixtures\AcmeFooBundle\AcmeFooBundle;
 
 class MergeExtensionConfigurationPassTest extends TestCase
 {
@@ -31,11 +33,32 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('loaded.foo'));
         $this->assertTrue($container->hasDefinition('not_loaded.bar'));
     }
+
+    public function testFooBundle()
+    {
+        $bundle = new AcmeFooBundle();
+
+        $container = new ContainerBuilder(new ParameterBag([
+            'kernel.environment' => 'test',
+            'kernel.build_dir' => sys_get_temp_dir(),
+        ]));
+        $container->registerExtension(new LoadedExtension());
+        $container->registerExtension($bundle->getContainerExtension());
+
+        $configPass = new MergeExtensionConfigurationPass(['loaded', 'acme_foo']);
+        $configPass->process($container);
+
+        $this->assertSame([['bar' => 'baz'], []], $container->getExtensionConfig('loaded'), '->prependExtension() prepends an extension config');
+        $this->assertTrue($container->hasDefinition('acme_foo.foo'), '->loadExtension() registers a service');
+        $this->assertTrue($container->hasDefinition('acme_foo.bar'), '->loadExtension() imports a service');
+        $this->assertTrue($container->hasParameter('acme_foo.config'), '->loadExtension() sets a parameter');
+        $this->assertSame(['foo' => 'bar', 'ping' => 'pong'], $container->getParameter('acme_foo.config'), '->loadConfiguration() defines and loads configurations');
+    }
 }
 
 class LoadedExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $container->register('loaded.foo');
     }
@@ -43,7 +66,7 @@ class LoadedExtension extends Extension
 
 class NotLoadedExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $container->register('not_loaded.bar');
     }

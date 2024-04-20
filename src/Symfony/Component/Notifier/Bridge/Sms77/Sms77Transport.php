@@ -28,24 +28,18 @@ final class Sms77Transport extends AbstractTransport
 {
     protected const HOST = 'gateway.sms77.io';
 
-    private $apiKey;
-    private $from;
-
-    public function __construct(string $apiKey, ?string $from = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $apiKey,
+        private ?string $from = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        if (null === $this->from) {
-            return sprintf('sms77://%s', $this->getEndpoint());
-        }
-
-        return sprintf('sms77://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('sms77://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -67,7 +61,7 @@ final class Sms77Transport extends AbstractTransport
                 'X-Api-Key' => $this->apiKey,
             ],
             'json' => [
-                'from' => $this->from,
+                'from' => $message->getFrom() ?: $this->from,
                 'json' => 1,
                 'text' => $message->getSubject(),
                 'to' => $message->getPhone(),

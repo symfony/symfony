@@ -31,7 +31,7 @@ class NormalizationTest extends TestCase
                     ->node('encoders', 'array')
                         ->useAttributeAsKey('class')
                         ->prototype('array')
-                            ->beforeNormalization()->ifString()->then(function ($v) { return ['algorithm' => $v]; })->end()
+                            ->beforeNormalization()->ifString()->then(fn ($v) => ['algorithm' => $v])->end()
                             ->children()
                                 ->node('algorithm', 'scalar')->end()
                             ->end()
@@ -88,9 +88,7 @@ class NormalizationTest extends TestCase
             ],
         ];
 
-        return array_map(function ($v) {
-            return [$v];
-        }, $configs);
+        return array_map(fn ($v) => [$v], $configs);
     }
 
     /**
@@ -136,7 +134,7 @@ class NormalizationTest extends TestCase
             ],
         ];
 
-        return array_map(function ($v) { return [$v]; }, $configs);
+        return array_map(fn ($v) => [$v], $configs);
     }
 
     /**
@@ -167,18 +165,19 @@ class NormalizationTest extends TestCase
             ],
         ];
 
-        return array_map(function ($v) { return [$v]; }, $configs);
+        return array_map(fn ($v) => [$v], $configs);
     }
 
     public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The attribute "id" must be set for path "root.thing".');
         $denormalized = [
             'thing' => [
                 ['foo', 'bar'], ['baz', 'qux'],
             ],
         ];
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The attribute "id" must be set for path "root.thing".');
 
         $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, []);
     }

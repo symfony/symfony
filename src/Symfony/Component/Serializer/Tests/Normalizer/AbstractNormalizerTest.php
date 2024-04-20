@@ -15,6 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
@@ -27,7 +28,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithWithVariadicParameterConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
@@ -44,15 +45,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDumm
  */
 class AbstractNormalizerTest extends TestCase
 {
-    /**
-     * @var AbstractNormalizerDummy
-     */
-    private $normalizer;
-
-    /**
-     * @var MockObject&ClassMetadataFactoryInterface
-     */
-    private $classMetadata;
+    private AbstractNormalizerDummy $normalizer;
+    private MockObject&ClassMetadataFactoryInterface $classMetadata;
 
     protected function setUp(): void
     {
@@ -170,6 +164,15 @@ class AbstractNormalizerTest extends TestCase
         $this->assertNull($dummy->getFoo());
     }
 
+    public function testObjectWithNullableNonOptionalConstructorArgumentWithoutInputAndRequireAllProperties()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $this->expectException(MissingConstructorArgumentsException::class);
+
+        $normalizer->denormalize([], NullableConstructorArgumentDummy::class, null, [AbstractNormalizer::REQUIRE_ALL_PROPERTIES => true]);
+    }
+
     /**
      * @dataProvider getNormalizer
      * @dataProvider getNormalizerWithCustomNameConverter
@@ -207,8 +210,6 @@ class AbstractNormalizerTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @dataProvider getNormalizer
      */
     public function testVariadicSerializationWithPreservingKeys(AbstractNormalizer $normalizer)
@@ -271,12 +272,12 @@ class AbstractNormalizerTest extends TestCase
     {
         $extractor = new PhpDocExtractor();
         $nameConverter = new class() implements NameConverterInterface {
-            public function normalize(string $propertyName): string
+            public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return ucfirst($propertyName);
             }
 
-            public function denormalize(string $propertyName): string
+            public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return lcfirst($propertyName);
             }
@@ -302,9 +303,6 @@ class AbstractNormalizerTest extends TestCase
         $this->assertSame([], $normalizer->normalize($dummy));
     }
 
-    /**
-     * @requires PHP 8.1.2
-     */
     public function testDenormalizeWhenObjectNotInstantiable()
     {
         $this->expectException(NotNormalizableValueException::class);

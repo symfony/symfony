@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,30 +22,21 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
+#[AsCommand(name: 'cache:pool:list', description: 'List available cache pools')]
 final class CachePoolListCommand extends Command
 {
-    protected static $defaultName = 'cache:pool:list';
-    protected static $defaultDescription = 'List available cache pools';
-
-    private $poolNames;
-
     /**
      * @param string[] $poolNames
      */
-    public function __construct(array $poolNames)
-    {
+    public function __construct(
+        private array $poolNames,
+    ) {
         parent::__construct();
-
-        $this->poolNames = $poolNames;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lists all available cache pools.
 EOF
@@ -52,16 +44,11 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->table(['Pool name'], array_map(function ($pool) {
-            return [$pool];
-        }, $this->poolNames));
+        $io->table(['Pool name'], array_map(fn ($pool) => [$pool], $this->poolNames));
 
         return 0;
     }

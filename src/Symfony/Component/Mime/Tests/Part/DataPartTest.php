@@ -138,7 +138,7 @@ class DataPartTest extends TestCase
 
     public function testFromPathWithUrl()
     {
-        if (!\in_array('http', stream_get_wrappers())) {
+        if (!\in_array('http', stream_get_wrappers(), true)) {
             $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
 
@@ -175,6 +175,40 @@ class DataPartTest extends TestCase
         $this->assertFalse($p->hasContentId());
         $p->getContentId();
         $this->assertTrue($p->hasContentId());
+    }
+
+    public function testSetContentId()
+    {
+        $p = new DataPart('content');
+        $p->setContentId('test@test');
+        $this->assertTrue($p->hasContentId());
+        $this->assertSame('test@test', $p->getContentId());
+    }
+
+    public function testSetContentIdInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $p = new DataPart('content');
+        $p->setContentId('test');
+    }
+
+    public function testGetFilename()
+    {
+        $p = new DataPart('content', null);
+        self::assertNull($p->getFilename());
+
+        $p = new DataPart('content', 'filename');
+        self::assertSame('filename', $p->getFilename());
+    }
+
+    public function testGetContentType()
+    {
+        $p = new DataPart('content');
+        self::assertSame('application/octet-stream', $p->getContentType());
+
+        $p = new DataPart('content', null, 'application/pdf');
+        self::assertSame('application/pdf', $p->getContentType());
     }
 
     public function testSerialize()

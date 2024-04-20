@@ -20,7 +20,7 @@ jobs:
     runs-on: Ubuntu-20.04
 
     env:
-      php-version: '8.1'
+      php-version: '8.2'
     steps:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -43,14 +43,17 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
           composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
-          composer require --no-progress --ansi --no-plugins psalm/phar:@stable phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb jetbrains/phpstorm-stubs
+          composer require --no-progress --ansi --no-plugins psalm/phar:@stable phpunit/phpunit:^9.6 php-http/discovery psr/event-dispatcher mongodb/mongodb jetbrains/phpstorm-stubs
 
       - name: Generate Psalm baseline
         run: |
           git checkout composer.json
           git checkout -m ${{ github.base_ref }}
-          cat .github/psalm/stubs/SetUpTearDownTrait.php > src/Symfony/Bridge/PhpUnit/SetUpTearDownTrait.php
 
+          # @todo intersection types are broken in Psalm
+          # @see https://github.com/vimeo/psalm/issues/7520
+          sed -i 's/Uuid&/Uuid|/' src/Symfony/Component/Uid/Factory/TimeBasedUuidFactory.php
+          sed -i 's/Interface&/Interface|/' src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MigratingSessionHandler.php
           ./vendor/bin/psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
           git checkout -m FETCH_HEAD
 

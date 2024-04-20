@@ -19,30 +19,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 abstract class AbstractTypeExtension implements FormTypeExtensionInterface
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function configureOptions(OptionsResolver $resolver): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
     }
 }

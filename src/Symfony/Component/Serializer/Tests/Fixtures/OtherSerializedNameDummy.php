@@ -11,17 +11,15 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
 class OtherSerializedNameDummy
 {
-    /**
-     * @Groups({"a"})
-     */
+    #[Groups(['a'])]
     private $buz;
 
     public function setBuz($buz)
@@ -34,10 +32,7 @@ class OtherSerializedNameDummy
         return $this->buz;
     }
 
-    /**
-     * @Groups({"b"})
-     * @SerializedName("buz")
-     */
+    #[Groups(['b']), SerializedName('buz')]
     public function getBuzForExport()
     {
         return $this->buz.' Rocks';

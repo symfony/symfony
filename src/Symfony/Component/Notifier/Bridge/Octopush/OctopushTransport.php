@@ -28,18 +28,14 @@ final class OctopushTransport extends AbstractTransport
 {
     protected const HOST = 'www.octopush-dm.com';
 
-    private $userLogin;
-    private $apiKey;
-    private $from;
-    private $type;
-
-    public function __construct(string $userLogin, string $apiKey, string $from, string $type, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->userLogin = $userLogin;
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-        $this->type = $type;
-
+    public function __construct(
+        private string $userLogin,
+        #[\SensitiveParameter] private string $apiKey,
+        private string $from,
+        private string $type,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -59,18 +55,17 @@ final class OctopushTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/api/sms/json', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
-            'headers' => [
-                'content_type' => 'multipart/form-data',
-            ],
             'body' => [
                 'user_login' => $this->userLogin,
                 'api_key' => $this->apiKey,
                 'sms_text' => $message->getSubject(),
                 'sms_recipients' => $message->getPhone(),
-                'sms_sender' => $this->from,
+                'sms_sender' => $from,
                 'sms_type' => $this->type,
             ],
         ]);

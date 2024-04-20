@@ -14,18 +14,20 @@ namespace Symfony\Component\Console\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 
 class LockableTraitTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {
         self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/FooLockCommand.php';
         require_once self::$fixturesPath.'/FooLock2Command.php';
+        require_once self::$fixturesPath.'/FooLock3Command.php';
     }
 
     public function testLockIsReleased()
@@ -62,6 +64,20 @@ class LockableTraitTest extends TestCase
         $command = new \FooLock2Command();
 
         $tester = new CommandTester($command);
+        $this->assertSame(1, $tester->execute([]));
+    }
+
+    public function testCustomLockFactoryIsUsed()
+    {
+        $lockFactory = $this->createMock(LockFactory::class);
+        $command = new \FooLock3Command($lockFactory);
+
+        $tester = new CommandTester($command);
+
+        $lock = $this->createMock(SharedLockInterface::class);
+        $lock->method('acquire')->willReturn(false);
+
+        $lockFactory->expects(static::once())->method('createLock')->willReturn($lock);
         $this->assertSame(1, $tester->execute([]));
     }
 }

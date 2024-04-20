@@ -17,17 +17,18 @@ use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\TraceStub;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
@@ -44,35 +45,12 @@ abstract class AbstractFailedMessagesCommand extends Command
 {
     protected const DEFAULT_TRANSPORT_OPTION = 'choose';
 
-    protected $failureTransports;
-
-    private $globalFailureReceiverName;
-
-    /**
-     * @param ServiceProviderInterface $failureTransports
-     */
-    public function __construct(?string $globalFailureReceiverName, $failureTransports)
-    {
-        $this->failureTransports = $failureTransports;
-        if (!$failureTransports instanceof ServiceProviderInterface) {
-            trigger_deprecation('symfony/messenger', '5.3', 'Passing a receiver as 2nd argument to "%s()" is deprecated, pass a service locator instead.', __METHOD__);
-
-            if (null === $globalFailureReceiverName) {
-                throw new InvalidArgumentException(sprintf('The argument "globalFailureReceiver" from method "%s()" must be not null if 2nd argument is not a ServiceLocator.', __METHOD__));
-            }
-
-            $this->failureTransports = new ServiceLocator([$globalFailureReceiverName => static function () use ($failureTransports) { return $failureTransports; }]);
-        }
-        $this->globalFailureReceiverName = $globalFailureReceiverName;
-
+    public function __construct(
+        private ?string $globalFailureReceiverName,
+        protected ServiceProviderInterface $failureTransports,
+        protected ?PhpSerializer $phpSerializer = null,
+    ) {
         parent::__construct();
-    }
-
-    protected function getReceiverName(): string
-    {
-        trigger_deprecation('symfony/messenger', '5.3', 'The method "%s()" is deprecated, use getGlobalFailureReceiverName() instead.', __METHOD__);
-
-        return $this->globalFailureReceiverName;
     }
 
     protected function getGlobalFailureReceiverName(): ?string
@@ -80,18 +58,15 @@ abstract class AbstractFailedMessagesCommand extends Command
         return $this->globalFailureReceiverName;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getMessageId(Envelope $envelope)
+    protected function getMessageId(Envelope $envelope): mixed
     {
         /** @var TransportMessageIdStamp $stamp */
         $stamp = $envelope->last(TransportMessageIdStamp::class);
 
-        return null !== $stamp ? $stamp->getId() : null;
+        return $stamp?->getId();
     }
 
-    protected function displaySingleMessage(Envelope $envelope, SymfonyStyle $io)
+    protected function displaySingleMessage(Envelope $envelope, SymfonyStyle $io): void
     {
         $io->title('Failed Message Details');
 
@@ -101,10 +76,11 @@ abstract class AbstractFailedMessagesCommand extends Command
         $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
         /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
         $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
-        $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
+        /** @var MessageDecodingFailedStamp|null $lastMessageDecodingFailedStamp */
+        $lastMessageDecodingFailedStamp = $envelope->last(MessageDecodingFailedStamp::class);
 
         $rows = [
-            ['Class', \get_class($envelope->getMessage())],
+            ['Class', $envelope->getMessage()::class],
         ];
 
         if (null !== $id = $this->getMessageId($envelope)) {
@@ -127,12 +103,6 @@ abstract class AbstractFailedMessagesCommand extends Command
                 $errorMessage = $lastErrorDetailsStamp->getExceptionMessage();
                 $errorCode = $lastErrorDetailsStamp->getExceptionCode();
                 $errorClass = $lastErrorDetailsStamp->getExceptionClass();
-            } elseif (null !== $lastRedeliveryStampWithException) {
-                // Try reading the errorMessage for messages that are still in the queue without the new ErrorDetailStamps.
-                $errorMessage = $lastRedeliveryStampWithException->getExceptionMessage();
-                if (null !== $lastRedeliveryStampWithException->getFlattenException()) {
-                    $errorClass = $lastRedeliveryStampWithException->getFlattenException()->getClass();
-                }
             }
 
             $rows = array_merge($rows, [
@@ -156,22 +126,23 @@ abstract class AbstractFailedMessagesCommand extends Command
 
         if ($io->isVeryVerbose()) {
             $io->title('Message:');
+            if (null !== $lastMessageDecodingFailedStamp) {
+                $io->error('The message could not be decoded. See below an APPROXIMATIVE representation of the class.');
+            }
             $dump = new Dumper($io, null, $this->createCloner());
             $io->writeln($dump($envelope->getMessage()));
             $io->title('Exception:');
-            $flattenException = null;
-            if (null !== $lastErrorDetailsStamp) {
-                $flattenException = $lastErrorDetailsStamp->getFlattenException();
-            } elseif (null !== $lastRedeliveryStampWithException) {
-                $flattenException = $lastRedeliveryStampWithException->getFlattenException();
-            }
+            $flattenException = $lastErrorDetailsStamp?->getFlattenException();
             $io->writeln(null === $flattenException ? '(no data)' : $dump($flattenException));
         } else {
+            if (null !== $lastMessageDecodingFailedStamp) {
+                $io->error('The message could not be decoded.');
+            }
             $io->writeln(' Re-run command with <info>-vv</info> to see more message & error details.');
         }
     }
 
-    protected function printPendingMessagesMessage(ReceiverInterface $receiver, SymfonyStyle $io)
+    protected function printPendingMessagesMessage(ReceiverInterface $receiver, SymfonyStyle $io): void
     {
         if ($receiver instanceof MessageCountAwareInterface) {
             if (1 === $receiver->getMessageCount()) {
@@ -182,17 +153,9 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    /**
-     * @param string|null $name
-     */
-    protected function getReceiver(/* ?string $name = null */): ReceiverInterface
+    protected function getReceiver(?string $name = null): ReceiverInterface
     {
-        if (1 > \func_num_args() && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
-            trigger_deprecation('symfony/messenger', '5.3', 'The "%s()" method will have a new "string $name" argument in version 6.0, not defining it is deprecated.', __METHOD__);
-        }
-        $name = \func_num_args() > 0 ? func_get_arg(0) : null;
-
-        if (null === $name = $name ?? $this->globalFailureReceiverName) {
+        if (null === $name ??= $this->globalFailureReceiverName) {
             throw new InvalidArgumentException(sprintf('No default failure transport is defined. Available transports are: "%s".', implode('", "', array_keys($this->failureTransports->getProvidedServices()))));
         }
 
@@ -201,27 +164,6 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
 
         return $this->failureTransports->get($name);
-    }
-
-    protected function getLastRedeliveryStampWithException(Envelope $envelope): ?RedeliveryStamp
-    {
-        if (null === \func_get_args()[1]) {
-            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "getLastRedeliveryStampWithException" method in the "%s" class is deprecated, use the "Envelope::last(%s)" instead.', self::class, ErrorDetailsStamp::class));
-        }
-
-        // Use ErrorDetailsStamp instead if it is available
-        if (null !== $envelope->last(ErrorDetailsStamp::class)) {
-            return null;
-        }
-
-        /** @var RedeliveryStamp $stamp */
-        foreach (array_reverse($envelope->all(RedeliveryStamp::class)) as $stamp) {
-            if (null !== $stamp->getExceptionMessage()) {
-                return $stamp;
-            }
-        }
-
-        return null;
     }
 
     private function createCloner(): ?ClonerInterface
@@ -260,7 +202,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    protected function interactiveChooseFailureTransport(SymfonyStyle $io)
+    protected function interactiveChooseFailureTransport(SymfonyStyle $io): string
     {
         $failedTransports = array_keys($this->failureTransports->getProvidedServices());
         $question = new ChoiceQuestion('Select failed transport:', $failedTransports, 0);

@@ -24,5 +24,5 @@ interface BundleCompilerInterface
      * Compiles a resource bundle at the given source to the given target
      * directory.
      */
-    public function compile(string $sourcePath, string $targetDir);
+    public function compile(string $sourcePath, string $targetDir): void;
 }

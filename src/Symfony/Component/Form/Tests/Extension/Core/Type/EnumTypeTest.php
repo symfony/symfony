@@ -16,12 +16,12 @@ use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\Answer;
 use Symfony\Component\Form\Tests\Fixtures\Number;
 use Symfony\Component\Form\Tests\Fixtures\Suit;
+use Symfony\Component\Form\Tests\Fixtures\TranslatableTextAlign;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
-/**
- * @requires PHP 8.1
- */
 class EnumTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = EnumType::class;
@@ -94,13 +94,13 @@ class EnumTypeTest extends BaseTypeTestCase
 
         yield 'string backed' => [
             Suit::class,
-            (Suit::Spades)->value,
+            Suit::Spades->value,
             Suit::Spades,
         ];
 
         yield 'integer backed' => [
             Number::class,
-            (string) (Number::Two)->value,
+            (string) Number::Two->value,
             Number::Two,
         ];
     }
@@ -134,7 +134,7 @@ class EnumTypeTest extends BaseTypeTestCase
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
     {
-        $emptyData = (Suit::Hearts)->value;
+        $emptyData = Suit::Hearts->value;
 
         $form = $this->factory->create($this->getTestedType(), null, [
             'class' => Suit::class,
@@ -154,7 +154,7 @@ class EnumTypeTest extends BaseTypeTestCase
             'multiple' => true,
             'expanded' => false,
             'class' => Suit::class,
-            'empty_data' => [(Suit::Diamonds)->value],
+            'empty_data' => [Suit::Diamonds->value],
         ]);
 
         $form->submit(null);
@@ -168,7 +168,7 @@ class EnumTypeTest extends BaseTypeTestCase
             'multiple' => false,
             'expanded' => true,
             'class' => Suit::class,
-            'empty_data' => (Suit::Hearts)->value,
+            'empty_data' => Suit::Hearts->value,
         ]);
 
         $form->submit(null);
@@ -182,7 +182,7 @@ class EnumTypeTest extends BaseTypeTestCase
             'multiple' => true,
             'expanded' => true,
             'class' => Suit::class,
-            'empty_data' => [(Suit::Spades)->value],
+            'empty_data' => [Suit::Spades->value],
         ]);
 
         $form->submit(null);
@@ -236,13 +236,13 @@ class EnumTypeTest extends BaseTypeTestCase
 
         yield 'string backed' => [
             Suit::class,
-            [(Suit::Hearts)->value, (Suit::Spades)->value],
+            [Suit::Hearts->value, Suit::Spades->value],
             [Suit::Hearts, Suit::Spades],
         ];
 
         yield 'integer backed' => [
             Number::class,
-            [(string) (Number::Two)->value, (string) (Number::Three)->value],
+            [(string) Number::Two->value, (string) Number::Three->value],
             [Number::Two, Number::Three],
         ];
     }
@@ -258,6 +258,20 @@ class EnumTypeTest extends BaseTypeTestCase
         $view = $form->createView();
 
         $this->assertSame('Yes', $view->children[0]->vars['label']);
+    }
+
+    public function testChoiceLabelTranslatable()
+    {
+        $form = $this->factory->create($this->getTestedType(), null, [
+            'multiple' => false,
+            'expanded' => true,
+            'class' => TranslatableTextAlign::class,
+        ]);
+
+        $view = $form->createView();
+
+        $this->assertInstanceOf(TranslatableInterface::class, $view->children[0]->vars['label']);
+        $this->assertEquals('Left', $view->children[0]->vars['label']->trans(new IdentityTranslator()));
     }
 
     protected function getTestOptions(): array

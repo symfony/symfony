@@ -30,18 +30,14 @@ interface DecoderInterface
      * are encouraged to document which formats they support in a non-inherited
      * phpdoc comment.
      *
-     * @return mixed
-     *
      * @throws UnexpectedValueException
      */
-    public function decode(string $data, string $format, array $context = []);
+    public function decode(string $data, string $format, array $context = []): mixed;
 
     /**
      * Checks whether the deserializer can decode from given format.
      *
      * @param string $format Format name
-     *
-     * @return bool
      */
-    public function supportsDecoding(string $format);
+    public function supportsDecoding(string $format): bool;
 }

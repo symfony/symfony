@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definition class="Full\Qualified\Class2" public="false" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file="/path/to/file">
+<definition class="Full\Qualified\Class2" public="false" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">
   <factory service="factory.service" method="get"/>
   <calls>
     <call method="setMailer"/>
@@ -13,5 +13,8 @@
       <parameter name="attr3">val3</parameter>
     </tag>
     <tag name="tag2"/>
+    <tag name="tag3">
+      <parameter name="array_attr">["foo","bar",[[[["ccc"]]]]]</parameter>
+    </tag>
   </tags>
 </definition>

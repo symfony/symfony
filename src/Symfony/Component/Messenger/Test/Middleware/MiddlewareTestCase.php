@@ -38,9 +38,7 @@ abstract class MiddlewareTestCase extends TestCase
         $nextMiddleware
             ->expects($this->once())
             ->method('handle')
-            ->willReturnCallback(function (Envelope $envelope, StackInterface $stack): Envelope {
-                return $envelope;
-            })
+            ->willReturnCallback(fn (Envelope $envelope, StackInterface $stack): Envelope => $envelope)
         ;
 
         return new StackMiddleware($nextMiddleware);

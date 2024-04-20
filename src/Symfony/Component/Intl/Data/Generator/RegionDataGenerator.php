@@ -61,14 +61,41 @@ class RegionDataGenerator extends AbstractDataGenerator
         'ZZ' => true, // Unknown Region
     ];
 
+    // @see https://en.wikipedia.org/wiki/ISO_3166-1_numeric#Withdrawn_codes
+    private const WITHDRAWN_CODES = [
+        128, //	Canton and Enderbury Islands
+        200, //	Czechoslovakia
+        216, //	Dronning Maud Land
+        230, //	Ethiopia
+        249, //	France, Metropolitan
+        278, //	German Democratic Republic
+        280, //	Germany, Federal Republic of
+        396, //	Johnston Island
+        488, //	Midway Islands
+        530, //	Netherlands Antilles
+        532, //	Netherlands Antilles
+        536, //	Neutral Zone
+        582, //	Pacific Islands (Trust Territory)
+        590, //	Panama
+        658, //	Saint Kitts-Nevis-Anguilla
+        720, //	Yemen, Democratic
+        736, //	Sudan
+        810, //	USSR
+        849, //	United States Miscellaneous Pacific Islands
+        872, //	Wake Island
+        886, //	Yemen Arab Republic
+        890, //	Yugoslavia, Socialist Federal Republic of
+        891, //	Serbia and Montenegro
+    ];
+
     /**
      * Collects all available language codes.
      *
      * @var string[]
      */
-    private $regionCodes = [];
+    private array $regionCodes = [];
 
-    public static function isValidCountryCode($region)
+    public static function isValidCountryCode(int|string|null $region): bool
     {
         if (isset(self::DENYLIST[$region])) {
             return false;
@@ -82,34 +109,22 @@ class RegionDataGenerator extends AbstractDataGenerator
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function scanLocales(LocaleScanner $scanner, string $sourceDir): array
     {
         return $scanner->scanLocales($sourceDir.'/region');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
+    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir): void
     {
         $compiler->compile($sourceDir.'/region', $tempDir);
         $compiler->compile($sourceDir.'/misc/metadata.txt', $tempDir);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function preGenerate()
+    protected function preGenerate(): void
     {
         $this->regionCodes = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForLocale(BundleEntryReaderInterface $reader, string $tempDir, string $displayLocale): ?array
     {
         $localeBundle = $reader->read($tempDir, $displayLocale);
@@ -128,17 +143,11 @@ class RegionDataGenerator extends AbstractDataGenerator
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         $metadataBundle = $reader->read($tempDir, 'metadata');
@@ -151,10 +160,21 @@ class RegionDataGenerator extends AbstractDataGenerator
         $alpha3ToAlpha2 = array_flip($alpha2ToAlpha3);
         asort($alpha3ToAlpha2);
 
+        $alpha2ToNumeric = $this->generateAlpha2ToNumericMapping($metadataBundle);
+        $numericToAlpha2 = [];
+        foreach ($alpha2ToNumeric as $alpha2 => $numeric) {
+            // Add underscore prefix to force keys with leading zeros to remain as string keys.
+            $numericToAlpha2['_'.$numeric] = $alpha2;
+        }
+
+        asort($numericToAlpha2);
+
         return [
             'Regions' => $this->regionCodes,
             'Alpha2ToAlpha3' => $alpha2ToAlpha3,
             'Alpha3ToAlpha2' => $alpha3ToAlpha2,
+            'Alpha2ToNumeric' => $alpha2ToNumeric,
+            'NumericToAlpha2' => $numericToAlpha2,
         ];
     }
 
@@ -177,10 +197,12 @@ class RegionDataGenerator extends AbstractDataGenerator
     private function generateAlpha2ToAlpha3Mapping(array $countries, ArrayAccessibleResourceBundle $metadataBundle): array
     {
         $aliases = iterator_to_array($metadataBundle['alias']['territory']);
+
         $alpha2ToAlpha3 = [];
 
         foreach ($aliases as $alias => $data) {
             $country = $data['replacement'];
+
             if (2 === \strlen($country) && 3 === \strlen($alias) && 'overlong' === $data['reason']) {
                 if (isset(self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$country])) {
                     // Validate to prevent typos
@@ -207,5 +229,36 @@ class RegionDataGenerator extends AbstractDataGenerator
         asort($alpha2ToAlpha3);
 
         return $alpha2ToAlpha3;
+    }
+
+    private function generateAlpha2ToNumericMapping(ArrayAccessibleResourceBundle $metadataBundle): array
+    {
+        $aliases = iterator_to_array($metadataBundle['alias']['territory']);
+
+        $alpha2ToNumeric = [];
+
+        foreach ($aliases as $alias => $data) {
+            if (!is_numeric($alias)) {
+                continue;
+            }
+
+            if (\in_array($alias, self::WITHDRAWN_CODES, true)) {
+                continue;
+            }
+
+            if (isset(self::DENYLIST[$data['replacement']])) {
+                continue;
+            }
+
+            if ('deprecated' === $data['reason']) {
+                continue;
+            }
+
+            $alpha2ToNumeric[$data['replacement']] = (string) $alias;
+        }
+
+        ksort($alpha2ToNumeric);
+
+        return $alpha2ToNumeric;
     }
 }

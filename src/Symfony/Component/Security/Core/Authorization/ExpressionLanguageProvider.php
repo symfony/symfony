@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
 /**
  * Define some ExpressionLanguage functions.
@@ -22,41 +21,16 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new ExpressionFunction('is_anonymous', function () {
-                return 'trigger_deprecation("symfony/security-core", "5.4", "The \"is_anonymous()\" expression function is deprecated.") || ($token && $auth_checker->isGranted("IS_ANONYMOUS"))';
-            }, function (array $variables) {
-                trigger_deprecation('symfony/security-core', '5.4', 'The "is_anonymous()" expression function is deprecated.');
+            new ExpressionFunction('is_authenticated', fn () => '$auth_checker->isGranted("IS_AUTHENTICATED")', fn (array $variables) => $variables['auth_checker']->isGranted('IS_AUTHENTICATED')),
 
-                return $variables['token'] && $variables['auth_checker']->isGranted('IS_ANONYMOUS');
-            }),
+            new ExpressionFunction('is_fully_authenticated', fn () => '$token && $auth_checker->isGranted("IS_AUTHENTICATED_FULLY")', fn (array $variables) => $variables['token'] && $variables['auth_checker']->isGranted('IS_AUTHENTICATED_FULLY')),
 
-            // @deprecated remove the ternary and always use IS_AUTHENTICATED in 6.0
-            new ExpressionFunction('is_authenticated', function () {
-                return 'defined("'.AuthenticatedVoter::class.'::IS_AUTHENTICATED") ? $auth_checker->isGranted("IS_AUTHENTICATED") : ($token && !$auth_checker->isGranted("IS_ANONYMOUS"))';
-            }, function (array $variables) {
-                return \defined(AuthenticatedVoter::class.'::IS_AUTHENTICATED') ? $variables['auth_checker']->isGranted('IS_AUTHENTICATED') : ($variables['token'] && !$variables['auth_checker']->isGranted('IS_ANONYMOUS'));
-            }),
+            new ExpressionFunction('is_granted', fn ($attributes, $object = 'null') => sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object), fn (array $variables, $attributes, $object = null) => $variables['auth_checker']->isGranted($attributes, $object)),
 
-            new ExpressionFunction('is_fully_authenticated', function () {
-                return '$token && $auth_checker->isGranted("IS_AUTHENTICATED_FULLY")';
-            }, function (array $variables) {
-                return $variables['token'] && $variables['auth_checker']->isGranted('IS_AUTHENTICATED_FULLY');
-            }),
-
-            new ExpressionFunction('is_granted', function ($attributes, $object = 'null') {
-                return sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object);
-            }, function (array $variables, $attributes, $object = null) {
-                return $variables['auth_checker']->isGranted($attributes, $object);
-            }),
-
-            new ExpressionFunction('is_remember_me', function () {
-                return '$token && $auth_checker->isGranted("IS_REMEMBERED")';
-            }, function (array $variables) {
-                return $variables['token'] && $variables['auth_checker']->isGranted('IS_REMEMBERED');
-            }),
+            new ExpressionFunction('is_remember_me', fn () => '$token && $auth_checker->isGranted("IS_REMEMBERED")', fn (array $variables) => $variables['token'] && $variables['auth_checker']->isGranted('IS_REMEMBERED')),
         ];
     }
 }

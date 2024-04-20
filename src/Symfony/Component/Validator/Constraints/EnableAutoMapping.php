@@ -17,16 +17,17 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 /**
  * Enables auto mapping.
  *
- * Using the annotations on a property has higher precedence than using it on a class,
+ * Using the attribute on a property has higher precedence than using it on a class,
  * which has higher precedence than any configuration that might be defined outside the class.
- *
- * @Annotation
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS)]
 class EnableAutoMapping extends Constraint
 {
+    /**
+     * @param array<string,mixed>|null $options
+     */
     public function __construct(?array $options = null)
     {
         if (\is_array($options) && \array_key_exists('groups', $options)) {
@@ -36,10 +37,7 @@ class EnableAutoMapping extends Constraint
         parent::__construct($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT];
     }

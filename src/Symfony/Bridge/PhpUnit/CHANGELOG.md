@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Allow setting the locale using `SYMFONY_PHPUNIT_LOCALE` env var
+
+6.3
+---
+
+ * Add support for mocking the `enum_exists` function
+ * Enable reporting of deprecations triggered by Doctrine by default
+
+6.2
+---
+
+ * Add support for mocking the `hrtime()` function
+
+6.1
+---
+
+ * Add option `ignoreFile` to configure a file that lists deprecation messages to ignore
+
+6.0
+---
+
+ * Remove `SetUpTearDownTrait`
+
 5.3
 ---
 

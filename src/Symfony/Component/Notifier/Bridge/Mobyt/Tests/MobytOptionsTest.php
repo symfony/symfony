@@ -50,30 +50,6 @@ final class MobytOptionsTest extends TestCase
         $this->assertSame(MobytOptions::MESSAGE_TYPE_QUALITY_HIGH, $options['message_type']);
     }
 
-    public function testGetRecipientIdWhenSet()
-    {
-        $mobytOptions = new MobytOptions([
-            'recipient' => 'foo',
-        ]);
-
-        $this->assertSame('foo', $mobytOptions->getRecipientId());
-    }
-
-    public function testGetRecipientIdWhenNotSet()
-    {
-        $this->assertNull((new MobytOptions())->getRecipientId());
-    }
-
-    public function testToArray()
-    {
-        $mobytOptions = new MobytOptions([
-            'message' => 'foo',
-            'recipient' => 'bar',
-        ]);
-
-        $this->assertEmpty($mobytOptions->toArray());
-    }
-
     /**
      * @dataProvider validMessageTypes
      */

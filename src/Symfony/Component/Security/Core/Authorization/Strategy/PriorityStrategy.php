@@ -25,16 +25,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 final class PriorityStrategy implements AccessDecisionStrategyInterface, \Stringable
 {
-    private $allowIfAllAbstainDecisions;
+    private bool $allowIfAllAbstainDecisions;
 
     public function __construct(bool $allowIfAllAbstainDecisions = false)
     {
         $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decide(\Traversable $results): bool
     {
         foreach ($results as $result) {

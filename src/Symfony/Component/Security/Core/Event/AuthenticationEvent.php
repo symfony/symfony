@@ -21,14 +21,14 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class AuthenticationEvent extends Event
 {
-    private $authenticationToken;
+    private TokenInterface $authenticationToken;
 
     public function __construct(TokenInterface $token)
     {
         $this->authenticationToken = $token;
     }
 
-    public function getAuthenticationToken()
+    public function getAuthenticationToken(): TokenInterface
     {
         return $this->authenticationToken;
     }

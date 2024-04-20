@@ -23,44 +23,33 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ConsoleEvent extends Event
 {
-    protected $command;
-
-    private $input;
-    private $output;
-
-    public function __construct(?Command $command, InputInterface $input, OutputInterface $output)
-    {
-        $this->command = $command;
-        $this->input = $input;
-        $this->output = $output;
+    public function __construct(
+        protected ?Command $command,
+        private InputInterface $input,
+        private OutputInterface $output,
+    ) {
     }
 
     /**
      * Gets the command that is executed.
-     *
-     * @return Command|null
      */
-    public function getCommand()
+    public function getCommand(): ?Command
     {
         return $this->command;
     }
 
     /**
      * Gets the input instance.
-     *
-     * @return InputInterface
      */
-    public function getInput()
+    public function getInput(): InputInterface
     {
         return $this->input;
     }
 
     /**
      * Gets the output instance.
-     *
-     * @return OutputInterface
      */
-    public function getOutput()
+    public function getOutput(): OutputInterface
     {
         return $this->output;
     }

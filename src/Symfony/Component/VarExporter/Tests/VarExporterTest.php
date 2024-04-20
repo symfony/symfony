@@ -70,13 +70,10 @@ class VarExporterTest extends TestCase
 
         yield [$a];
 
-        // This test segfaults on the final PHP 7.2 release
-        if (\PHP_VERSION_ID !== 70234) {
-            $a = [null, $h];
-            $a[0] = &$a;
+        $a = [null, $h];
+        $a[0] = &$a;
 
-            yield [$a];
-        }
+        yield [$a];
     }
 
     /**
@@ -96,15 +93,7 @@ class VarExporterTest extends TestCase
         $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
 
-        if (\PHP_VERSION_ID < 80200 && 'datetime' === $testName) {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
-        } elseif (\PHP_VERSION_ID >= 70406 || !\in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
-        } elseif (\PHP_VERSION_ID < 70400) {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
-        } else {
-            $this->markTestSkipped('PHP >= 7.4.6 required.');
-        }
+        $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
         if ('incomplete-class' === $testName || 'external-references' === $testName) {
@@ -134,11 +123,11 @@ class VarExporterTest extends TestCase
             \DateTime::createFromFormat('U', 0),
             \DateTimeImmutable::createFromFormat('U', 0),
             $tz = new \DateTimeZone('Europe/Paris'),
-            $interval = ($start = new \DateTime('2009-10-11', $tz))->diff(new \DateTime('2009-10-18', $tz)),
+            $interval = ($start = new \DateTimeImmutable('2009-10-11', $tz))->diff(new \DateTimeImmutable('2009-10-18', $tz)),
             new \DatePeriod($start, $interval, 4),
         ]];
 
-        $value = \PHP_VERSION_ID >= 70406 ? new ArrayObject() : new \ArrayObject();
+        $value = new ArrayObject();
         $value[0] = 1;
         $value->foo = new \ArrayObject();
         $value[1] = $value;
@@ -196,13 +185,10 @@ class VarExporterTest extends TestCase
 
         yield ['hard-references', $value];
 
-        // This test segfaults on the final PHP 7.2 release
-        if (\PHP_VERSION_ID !== 70234) {
-            $value = [];
-            $value[0] = &$value;
+        $value = [];
+        $value[0] = &$value;
 
-            yield ['hard-references-recursive', $value];
-        }
+        yield ['hard-references-recursive', $value];
 
         static $value = [123];
 
@@ -213,11 +199,9 @@ class VarExporterTest extends TestCase
         $value = new \Error();
 
         $rt = new \ReflectionProperty(\Error::class, 'trace');
-        $rt->setAccessible(true);
         $rt->setValue($value, ['file' => __FILE__, 'line' => 123]);
 
         $rl = new \ReflectionProperty(\Error::class, 'line');
-        $rl->setAccessible(true);
         $rl->setValue($value, 234);
 
         yield ['error', $value];
@@ -249,10 +233,6 @@ class VarExporterTest extends TestCase
 
         yield ['__serialize-but-no-__unserialize', new __SerializeButNo__Unserialize()];
 
-        if (\PHP_VERSION_ID < 80100) {
-            return;
-        }
-
         yield ['unit-enum', [FooUnitEnum::Bar], true];
         yield ['readonly', new FooReadonly('k', 'v')];
     }
@@ -275,7 +255,7 @@ class MyWakeup
         return ['sub', 'baz'];
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (123 === $this->sub) {
             $this->bis = 123;
@@ -431,7 +411,7 @@ class Php74Serializable implements \Serializable
         return [$this->foo = new \stdClass()];
     }
 
-    public function __unserialize(array $data)
+    public function __unserialize(array $data): void
     {
         [$this->foo] = $data;
     }
@@ -441,7 +421,7 @@ class Php74Serializable implements \Serializable
         throw new \BadMethodCallException();
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException();
     }

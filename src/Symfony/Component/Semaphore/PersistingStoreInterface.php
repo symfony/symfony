@@ -26,14 +26,14 @@ interface PersistingStoreInterface
      *
      * @throws SemaphoreAcquiringException
      */
-    public function save(Key $key, float $ttlInSecond);
+    public function save(Key $key, float $ttlInSecond): void;
 
     /**
      * Removes a resource from the storage.
      *
      * @throws SemaphoreReleasingException
      */
-    public function delete(Key $key);
+    public function delete(Key $key): void;
 
     /**
      * Returns whether or not the resource exists in the storage.
@@ -45,5 +45,5 @@ interface PersistingStoreInterface
      *
      * @throws SemaphoreExpiredException
      */
-    public function putOffExpiration(Key $key, float $ttlInSecond);
+    public function putOffExpiration(Key $key, float $ttlInSecond): void;
 }

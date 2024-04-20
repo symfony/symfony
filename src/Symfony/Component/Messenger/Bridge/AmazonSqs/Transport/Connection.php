@@ -42,6 +42,7 @@ class Connection
         'auto_setup' => true,
         'access_key' => null,
         'secret_key' => null,
+        'session_token' => null,
         'endpoint' => 'https://sqs.eu-west-1.amazonaws.com',
         'region' => 'eu-west-1',
         'queue_name' => 'messages',
@@ -50,15 +51,12 @@ class Connection
         'debug' => null,
     ];
 
-    private $configuration;
-    private $client;
-
-    /** @var ReceiveMessageResult */
-    private $currentResponse;
+    private array $configuration;
+    private SqsClient $client;
+    private ?ReceiveMessageResult $currentResponse = null;
     /** @var array[] */
-    private $buffer = [];
-    /** @var string|null */
-    private $queueUrl;
+    private array $buffer = [];
+    private ?string $queueUrl;
 
     public function __construct(array $configuration, ?SqsClient $client = null, ?string $queueUrl = null)
     {
@@ -72,7 +70,7 @@ class Connection
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -93,6 +91,7 @@ class Connection
      * * account: identifier of the AWS account
      * * access_key: AWS access key
      * * secret_key: AWS secret key
+     * * session_token: AWS session token (required only when using temporary credentials)
      * * buffer_size: number of messages to prefetch (Default: 9)
      * * wait_time: long polling duration in seconds (Default: 20)
      * * poll_timeout: amount of seconds the transport should wait for new message
@@ -101,7 +100,7 @@ class Connection
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      * * debug: Log all HTTP requests and responses as LoggerInterface::DEBUG (Default: false)
      */
-    public static function fromDsn(string $dsn, array $options = [], ?HttpClientInterface $client = null, ?LoggerInterface $logger = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], ?HttpClientInterface $client = null, ?LoggerInterface $logger = null): self
     {
         if (false === $params = parse_url($dsn)) {
             throw new InvalidArgumentException('The given Amazon SQS DSN is invalid.');
@@ -130,7 +129,7 @@ class Connection
             'wait_time' => (int) $options['wait_time'],
             'poll_timeout' => $options['poll_timeout'],
             'visibility_timeout' => null !== $options['visibility_timeout'] ? (int) $options['visibility_timeout'] : null,
-            'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOLEAN),
+            'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOL),
             'queue_name' => (string) $options['queue_name'],
         ];
 
@@ -139,6 +138,9 @@ class Connection
             'accessKeyId' => rawurldecode($params['user'] ?? '') ?: $options['access_key'] ?? self::DEFAULT_OPTIONS['access_key'],
             'accessKeySecret' => rawurldecode($params['pass'] ?? '') ?: $options['secret_key'] ?? self::DEFAULT_OPTIONS['secret_key'],
         ];
+        if (null !== $options['session_token']) {
+            $clientConfiguration['sessionToken'] = $options['session_token'];
+        }
         if (isset($options['debug'])) {
             $clientConfiguration['debug'] = $options['debug'];
         }
@@ -154,7 +156,7 @@ class Connection
         }
 
         $parsedPath = explode('/', ltrim($params['path'] ?? '/', '/'));
-        if (\count($parsedPath) > 0 && !empty($queueName = end($parsedPath))) {
+        if (\count($parsedPath) > 0 && ($queueName = end($parsedPath))) {
             $configuration['queue_name'] = $queueName;
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
@@ -200,7 +202,7 @@ class Connection
      */
     private function getPendingMessages(): \Generator
     {
-        while (!empty($this->buffer)) {
+        while ($this->buffer) {
             yield array_shift($this->buffer);
         }
     }
@@ -330,7 +332,7 @@ class Connection
 
         $specialHeaders = [];
         foreach ($headers as $name => $value) {
-            if ('.' === $name[0] || self::MESSAGE_ATTRIBUTE_NAME === $name || \strlen($name) > 256 || '.' === substr($name, -1) || 'AWS.' === substr($name, 0, \strlen('AWS.')) || 'Amazon.' === substr($name, 0, \strlen('Amazon.')) || preg_match('/([^a-zA-Z0-9_\.-]+|\.\.)/', $name)) {
+            if ('.' === $name[0] || self::MESSAGE_ATTRIBUTE_NAME === $name || \strlen($name) > 256 || str_ends_with($name, '.') || str_starts_with($name, 'AWS.') || str_starts_with($name, 'Amazon.') || preg_match('/([^a-zA-Z0-9_\.-]+|\.\.)/', $name)) {
                 $specialHeaders[$name] = $value;
 
                 continue;
@@ -342,7 +344,7 @@ class Connection
             ]);
         }
 
-        if (!empty($specialHeaders)) {
+        if ($specialHeaders) {
             $parameters['MessageAttributes'][self::MESSAGE_ATTRIBUTE_NAME] = new MessageAttributeValue([
                 'DataType' => 'String',
                 'StringValue' => json_encode($specialHeaders),
@@ -357,8 +359,8 @@ class Connection
         }
 
         if (self::isFifoQueue($this->configuration['queue_name'])) {
-            $parameters['MessageGroupId'] = null !== $messageGroupId ? $messageGroupId : __METHOD__;
-            $parameters['MessageDeduplicationId'] = null !== $messageDeduplicationId ? $messageDeduplicationId : sha1(json_encode(['body' => $body, 'headers' => $headers]));
+            $parameters['MessageGroupId'] = $messageGroupId ?? __METHOD__;
+            $parameters['MessageDeduplicationId'] = $messageDeduplicationId ?? sha1(json_encode(['body' => $body, 'headers' => $headers]));
             unset($parameters['DelaySeconds']);
         }
 
@@ -398,6 +400,6 @@ class Connection
 
     private static function isFifoQueue(string $queueName): bool
     {
-        return self::AWS_SQS_FIFO_SUFFIX === substr($queueName, -\strlen(self::AWS_SQS_FIFO_SUFFIX));
+        return str_ends_with($queueName, self::AWS_SQS_FIFO_SUFFIX);
     }
 }

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class WorkflowDumpCommandTest extends TestCase
 {
@@ -24,7 +25,7 @@ class WorkflowDumpCommandTest extends TestCase
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $application = new Application();
-        $application->add(new WorkflowDumpCommand([]));
+        $application->add(new WorkflowDumpCommand(new ServiceLocator([])));
 
         $tester = new CommandCompletionTester($application->find('workflow:dump'));
         $suggestions = $tester->complete($input, 2);

@@ -20,7 +20,6 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -29,10 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class FirebaseTransportTest extends TransportTestCase
 {
-    /**
-     * @return FirebaseTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): FirebaseTransport
     {
         return new FirebaseTransport('username:password', $client ?? new MockHttpClient());
     }
@@ -60,9 +56,7 @@ final class FirebaseTransportTest extends TransportTestCase
     {
         $this->expectException(TransportException::class);
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
         $options = new class('recipient-id', []) extends FirebaseOptions {};
 
         $transport = self::createTransport($client);

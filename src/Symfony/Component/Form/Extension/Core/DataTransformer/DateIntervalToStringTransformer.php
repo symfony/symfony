@@ -19,11 +19,11 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * Transforms between a date string and a DateInterval object.
  *
  * @author Steffen Roßkamp <steffen.rosskamp@gimmickmedia.de>
+ *
+ * @implements DataTransformerInterface<\DateInterval, string>
  */
 class DateIntervalToStringTransformer implements DataTransformerInterface
 {
-    private $format;
-
     /**
      * Transforms a \DateInterval instance to a string.
      *
@@ -31,9 +31,9 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param string $format The date format
      */
-    public function __construct(string $format = 'P%yY%mM%dDT%hH%iM%sS')
-    {
-        $this->format = $format;
+    public function __construct(
+        private string $format = 'P%yY%mM%dDT%hH%iM%sS',
+    ) {
     }
 
     /**
@@ -41,11 +41,9 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param \DateInterval|null $value A DateInterval object
      *
-     * @return string
-     *
      * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
      */
-    public function transform($value)
+    public function transform(mixed $value): string
     {
         if (null === $value) {
             return '';
@@ -62,12 +60,10 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param string $value An ISO 8601 or date string like date interval presentation
      *
-     * @return \DateInterval|null
-     *
      * @throws UnexpectedTypeException       if the given value is not a string
      * @throws TransformationFailedException if the date interval could not be parsed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): ?\DateInterval
     {
         if (null === $value) {
             return null;

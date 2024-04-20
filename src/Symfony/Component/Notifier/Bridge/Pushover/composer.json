@@ -1,0 +1,36 @@
+{
+    "name": "symfony/pushover-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Pushover Notifier Bridge",
+    "keywords": [
+        "pushover",
+        "notifier"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "mocodo",
+            "homepage": "https://github.com/mocodo"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^6.4|^7.0"
+    },
+    "require-dev": {
+        "symfony/event-dispatcher": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": {"Symfony\\Component\\Notifier\\Bridge\\Pushover\\": ""},
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

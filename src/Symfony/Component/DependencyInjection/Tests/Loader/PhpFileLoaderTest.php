@@ -14,19 +14,21 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 require_once __DIR__.'/../Fixtures/includes/AcmeExtension.php';
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 
 class PhpFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
@@ -43,6 +45,21 @@ class PhpFileLoaderTest extends TestCase
         $loader->load(__DIR__.'/../Fixtures/php/simple.php');
 
         $this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a PHP file resource');
+    }
+
+    public function testPrependExtensionConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $container->prependExtensionConfig('acme', ['foo' => 'bar']);
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()), true);
+        $loader->load('config/config_builder.php');
+
+        $expected = [
+            ['color' => 'blue'],
+            ['foo' => 'bar'],
+        ];
+        $this->assertSame($expected, $container->getExtensionConfig('acme'));
     }
 
     public function testConfigServices()
@@ -100,6 +117,13 @@ class PhpFileLoaderTest extends TestCase
         yield ['inline_binding'];
         yield ['remove'];
         yield ['config_builder'];
+        yield ['expression_factory'];
+        yield ['static_constructor'];
+        yield ['inline_static_constructor'];
+        yield ['instanceof_static_constructor'];
+        yield ['closure'];
+        yield ['from_callable'];
+        yield ['env_param'];
     }
 
     public function testAutoConfigureAndChildDefinition()
@@ -165,16 +189,17 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedWithoutPackageAndVersion()
+    public function testEnumeration()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Loader\Configurator\Traits\DeprecateTrait::deprecate()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
         $fixtures = realpath(__DIR__.'/../Fixtures');
-        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
-        $loader->load($fixtures.'/config/deprecated_without_package_version.php');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator($fixtures.'/config'));
+        $loader->load('services_with_enumeration.php');
+
+        $container->compile();
+
+        $definition = $container->getDefinition(FooClassWithEnumAttribute::class);
+        $this->assertSame([FooUnitEnum::BAR], $definition->getArguments());
     }
 
     public function testNestedBundleConfigNotAllowed()
@@ -189,15 +214,33 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/nested_bundle_config.php');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWhenEnv()
     {
+        $this->expectNotToPerformAssertions();
+
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator(), 'dev', new ConfigBuilderGenerator(sys_get_temp_dir()));
 
         $loader->load($fixtures.'/config/when_env.php');
+    }
+
+    public function testServiceWithServiceLocatorArgument()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/services_with_service_locator_argument.php');
+
+        $values = ['foo' => new Reference('foo_service'), 'bar' => new Reference('bar_service')];
+        $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_service_indexed')->getArguments());
+
+        $values = [new Reference('foo_service'), new Reference('bar_service')];
+        $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_service_not_indexed')->getArguments());
+
+        $values = ['foo' => new Reference('foo_service'), 0 => new Reference('bar_service')];
+        $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_service_mixed')->getArguments());
+
+        $values = ['foo' => new Definition(\stdClass::class), 'bar' => new Definition(\stdClass::class)];
+        $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_inline_service')->getArguments());
     }
 }

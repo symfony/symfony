@@ -28,16 +28,6 @@ class RememberMeTokenTest extends TestCase
         $this->assertSame($user, $token->getUser());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testIsAuthenticated()
-    {
-        $user = $this->getUser();
-        $token = new RememberMeToken($user, 'fookey', 'foo');
-        $this->assertTrue($token->isAuthenticated());
-    }
-
     public function testConstructorSecretCannotBeEmptyString()
     {
         $this->expectException(\InvalidArgumentException::class);

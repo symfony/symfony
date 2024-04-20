@@ -21,36 +21,16 @@ use Symfony\Component\String\UnicodeString;
  */
 abstract class Helper implements HelperInterface
 {
-    protected $helperSet = null;
+    protected ?HelperSet $helperSet = null;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setHelperSet(?HelperSet $helperSet = null)
+    public function setHelperSet(?HelperSet $helperSet): void
     {
         $this->helperSet = $helperSet;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getHelperSet()
+    public function getHelperSet(): ?HelperSet
     {
         return $this->helperSet;
-    }
-
-    /**
-     * Returns the length of a string, using mb_strwidth if it is available.
-     *
-     * @deprecated since Symfony 5.3
-     *
-     * @return int
-     */
-    public static function strlen(?string $string)
-    {
-        trigger_deprecation('symfony/console', '5.3', 'Method "%s()" is deprecated and will be removed in Symfony 6.0. Use Helper::width() or Helper::length() instead.', __METHOD__);
-
-        return self::width($string);
     }
 
     /**
@@ -59,7 +39,7 @@ abstract class Helper implements HelperInterface
      */
     public static function width(?string $string): int
     {
-        $string ?? $string = '';
+        $string ??= '';
 
         if (preg_match('//u', $string)) {
             return (new UnicodeString($string))->width(false);
@@ -78,7 +58,7 @@ abstract class Helper implements HelperInterface
      */
     public static function length(?string $string): int
     {
-        $string ?? $string = '';
+        $string ??= '';
 
         if (preg_match('//u', $string)) {
             return (new UnicodeString($string))->length();
@@ -93,12 +73,10 @@ abstract class Helper implements HelperInterface
 
     /**
      * Returns the subset of a string, using mb_substr if it is available.
-     *
-     * @return string
      */
-    public static function substr(?string $string, int $from, ?int $length = null)
+    public static function substr(?string $string, int $from, ?int $length = null): string
     {
-        $string ?? $string = '';
+        $string ??= '';
 
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return substr($string, $from, $length);
@@ -107,36 +85,47 @@ abstract class Helper implements HelperInterface
         return mb_substr($string, $from, $length, $encoding);
     }
 
-    public static function formatTime($secs)
+    public static function formatTime(int|float $secs, int $precision = 1): string
     {
+        $secs = (int) floor($secs);
+
+        if (0 === $secs) {
+            return '< 1 sec';
+        }
+
         static $timeFormats = [
-            [0, '< 1 sec'],
-            [1, '1 sec'],
-            [2, 'secs', 1],
-            [60, '1 min'],
-            [120, 'mins', 60],
-            [3600, '1 hr'],
-            [7200, 'hrs', 3600],
-            [86400, '1 day'],
-            [172800, 'days', 86400],
+            [1, '1 sec', 'secs'],
+            [60, '1 min', 'mins'],
+            [3600, '1 hr', 'hrs'],
+            [86400, '1 day', 'days'],
         ];
 
+        $times = [];
         foreach ($timeFormats as $index => $format) {
-            if ($secs >= $format[0]) {
-                if ((isset($timeFormats[$index + 1]) && $secs < $timeFormats[$index + 1][0])
-                    || $index == \count($timeFormats) - 1
-                ) {
-                    if (2 == \count($format)) {
-                        return $format[1];
-                    }
+            $seconds = isset($timeFormats[$index + 1]) ? $secs % $timeFormats[$index + 1][0] : $secs;
 
-                    return floor($secs / $format[2]).' '.$format[1];
-                }
+            if (isset($times[$index - $precision])) {
+                unset($times[$index - $precision]);
             }
+
+            if (0 === $seconds) {
+                continue;
+            }
+
+            $unitCount = ($seconds / $format[0]);
+            $times[$index] = 1 === $unitCount ? $format[1] : $unitCount.' '.$format[2];
+
+            if ($secs === $seconds) {
+                break;
+            }
+
+            $secs -= $seconds;
         }
+
+        return implode(', ', array_reverse($times));
     }
 
-    public static function formatMemory(int $memory)
+    public static function formatMemory(int $memory): string
     {
         if ($memory >= 1024 * 1024 * 1024) {
             return sprintf('%.1f GiB', $memory / 1024 / 1024 / 1024);
@@ -153,17 +142,7 @@ abstract class Helper implements HelperInterface
         return sprintf('%d B', $memory);
     }
 
-    /**
-     * @deprecated since Symfony 5.3
-     */
-    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, ?string $string)
-    {
-        trigger_deprecation('symfony/console', '5.3', 'Method "%s()" is deprecated and will be removed in Symfony 6.0. Use Helper::removeDecoration() instead.', __METHOD__);
-
-        return self::width(self::removeDecoration($formatter, $string));
-    }
-
-    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
+    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string): string
     {
         $isDecorated = $formatter->isDecorated();
         $formatter->setDecorated(false);

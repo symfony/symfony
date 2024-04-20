@@ -38,7 +38,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class SimpleFormTest_Countable implements \Countable
 {
-    private $count;
+    private int $count;
 
     public function __construct($count)
     {
@@ -53,7 +53,7 @@ class SimpleFormTest_Countable implements \Countable
 
 class SimpleFormTest_Traversable implements \IteratorAggregate
 {
-    private $iterator;
+    private \ArrayIterator $iterator;
 
     public function __construct($count)
     {
@@ -68,7 +68,7 @@ class SimpleFormTest_Traversable implements \IteratorAggregate
 
 class SimpleFormTest extends TestCase
 {
-    private $form;
+    private Form $form;
 
     protected function setUp(): void
     {
@@ -1112,12 +1112,12 @@ class SimpleFormTest extends TestCase
     {
         $config = new FormConfigBuilder('foo', null, new EventDispatcher());
 
-        $config->setIsEmptyCallback(function ($modelData): bool { return 'ccc' === $modelData; });
+        $config->setIsEmptyCallback(fn ($modelData): bool => 'ccc' === $modelData);
         $form = new Form($config);
         $form->setData('ccc');
         $this->assertTrue($form->isEmpty());
 
-        $config->setIsEmptyCallback(function (): bool { return false; });
+        $config->setIsEmptyCallback(fn (): bool => false);
         $form = new Form($config);
         $form->setData(null);
         $this->assertFalse($form->isEmpty());

@@ -53,15 +53,8 @@ class EntityTypeTest extends BaseTypeTestCase
     private const COMPOSITE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity';
     private const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity';
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var MockObject&ManagerRegistry
-     */
-    private $emRegistry;
+    private EntityManager $em;
+    private MockObject&ManagerRegistry $emRegistry;
 
     protected function setUp(): void
     {
@@ -91,14 +84,6 @@ class EntityTypeTest extends BaseTypeTestCase
             $schemaTool->createSchema($classes);
         } catch (\Exception $e) {
         }
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->em = null;
-        $this->emRegistry = null;
     }
 
     protected function getExtensions()
@@ -233,12 +218,10 @@ class EntityTypeTest extends BaseTypeTestCase
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => function () {
-                return new \stdClass();
-            },
+            'query_builder' => fn () => new \stdClass(),
         ]);
     }
 
@@ -1076,10 +1059,8 @@ class EntityTypeTest extends BaseTypeTestCase
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => function (EntityRepository $repository) {
-                return $repository->createQueryBuilder('e')
-                    ->where('e.id IN (1, 2)');
-            },
+            'query_builder' => fn (EntityRepository $repository) => $repository->createQueryBuilder('e')
+                ->where('e.id IN (1, 2)'),
             'choice_label' => 'name',
         ]);
 
@@ -1100,10 +1081,8 @@ class EntityTypeTest extends BaseTypeTestCase
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
-            'query_builder' => function (EntityRepository $repository) {
-                return $repository->createQueryBuilder('e')
-                    ->where('e.id1 IN (10, 50)');
-            },
+            'query_builder' => fn (EntityRepository $repository) => $repository->createQueryBuilder('e')
+                ->where('e.id1 IN (10, 50)'),
             'choice_label' => 'name',
         ]);
 
@@ -1218,17 +1197,13 @@ class EntityTypeTest extends BaseTypeTestCase
         $formBuilder->add('property2', static::TESTED_TYPE, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => function (EntityRepository $repo) {
-                return $repo->createQueryBuilder('e')->where('e.id IN (1, 2)');
-            },
+            'query_builder' => fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id IN (1, 2)'),
         ]);
 
         $formBuilder->add('property3', static::TESTED_TYPE, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => function (EntityRepository $repo) {
-                return $repo->createQueryBuilder('e')->where('e.id IN (1, 2)');
-            },
+            'query_builder' => fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id IN (1, 2)'),
         ]);
 
         $form = $formBuilder->getForm();
@@ -1278,17 +1253,13 @@ class EntityTypeTest extends BaseTypeTestCase
         $formBuilder->add('property2', static::TESTED_TYPE, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => function (EntityRepository $repo) {
-                return $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1);
-            },
+            'query_builder' => fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1),
         ]);
 
         $formBuilder->add('property3', static::TESTED_TYPE, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => function (EntityRepository $repo) {
-                return $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1);
-            },
+            'query_builder' => fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1),
         ]);
 
         $form = $formBuilder->getForm();
@@ -1308,10 +1279,7 @@ class EntityTypeTest extends BaseTypeTestCase
         $this->assertSame($choiceList1, $choiceList3);
     }
 
-    /**
-     * @return MockObject&ManagerRegistry
-     */
-    protected function createRegistryMock($name, $em): ManagerRegistry
+    protected function createRegistryMock($name, $em): MockObject&ManagerRegistry
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
@@ -1779,9 +1747,7 @@ class EntityTypeTest extends BaseTypeTestCase
             ->add('entity_two', self::TESTED_TYPE, [
                 'em' => 'default',
                 'class' => self::SINGLE_IDENT_CLASS,
-                'choice_value' => function ($choice) {
-                    return $choice ? $choice->name : '';
-                },
+                'choice_value' => fn ($choice) => $choice ? $choice->name : '',
             ])
             ->createView()
         ;

@@ -16,29 +16,14 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class FilesystemTestCase extends TestCase
 {
-    private $umask;
+    protected array $longPathNamesWindows = [];
+    protected Filesystem $filesystem;
+    protected string $workspace;
 
-    protected $longPathNamesWindows = [];
+    private int $umask;
 
-    /**
-     * @var Filesystem
-     */
-    protected $filesystem = null;
-
-    /**
-     * @var string
-     */
-    protected $workspace = null;
-
-    /**
-     * @var bool|null Flag for hard links on Windows
-     */
-    private static $linkOnWindows = null;
-
-    /**
-     * @var bool|null Flag for symbolic links on Windows
-     */
-    private static $symlinkOnWindows = null;
+    private static ?bool $linkOnWindows = null;
+    private static ?bool $symlinkOnWindows = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -80,7 +65,7 @@ class FilesystemTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        if (!empty($this->longPathNamesWindows)) {
+        if ($this->longPathNamesWindows) {
             foreach ($this->longPathNamesWindows as $path) {
                 exec('DEL '.$path);
             }

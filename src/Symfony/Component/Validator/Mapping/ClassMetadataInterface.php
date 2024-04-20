@@ -30,6 +30,8 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
  * @see GroupSequence
  * @see GroupSequenceProviderInterface
  * @see TraversalStrategy
+ *
+ * @method string|null getGroupProvider()
  */
 interface ClassMetadataInterface extends MetadataInterface
 {
@@ -38,24 +40,20 @@ interface ClassMetadataInterface extends MetadataInterface
      *
      * @return string[]
      */
-    public function getConstrainedProperties();
+    public function getConstrainedProperties(): array;
 
     /**
      * Returns whether the "Default" group is overridden by a group sequence.
      *
      * If it is, you can access the group sequence with {@link getGroupSequence()}.
-     *
-     * @return bool
      */
-    public function hasGroupSequence();
+    public function hasGroupSequence(): bool;
 
     /**
      * Returns the group sequence that overrides the "Default" group for this
      * class.
-     *
-     * @return GroupSequence|null
      */
-    public function getGroupSequence();
+    public function getGroupSequence(): ?GroupSequence;
 
     /**
      * Returns whether the "Default" group is overridden by a dynamic group
@@ -65,19 +63,15 @@ interface ClassMetadataInterface extends MetadataInterface
      * {@link GroupSequenceProviderInterface}.
      * This interface will be used to obtain the group sequence when an object
      * of this class is validated.
-     *
-     * @return bool
      */
-    public function isGroupSequenceProvider();
+    public function isGroupSequenceProvider(): bool;
 
     /**
      * Check if there's any metadata attached to the given named property.
      *
      * @param string $property The property name
-     *
-     * @return bool
      */
-    public function hasPropertyMetadata(string $property);
+    public function hasPropertyMetadata(string $property): bool;
 
     /**
      * Returns all metadata instances for the given named property.
@@ -89,12 +83,10 @@ interface ClassMetadataInterface extends MetadataInterface
      *
      * @return PropertyMetadataInterface[]
      */
-    public function getPropertyMetadata(string $property);
+    public function getPropertyMetadata(string $property): array;
 
     /**
      * Returns the name of the backing PHP class.
-     *
-     * @return string
      */
-    public function getClassName();
+    public function getClassName(): string;
 }

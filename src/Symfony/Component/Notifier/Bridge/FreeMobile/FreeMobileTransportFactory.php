@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\FreeMobile;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Antoine Makdessi <amakdessi@me.com>
  */
 final class FreeMobileTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return FreeMobileTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): FreeMobileTransport
     {
         $scheme = $dsn->getScheme();
 

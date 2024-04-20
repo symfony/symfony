@@ -18,20 +18,13 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
  */
 class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverInterface
 {
-    /**
-     * @var ClassMetadataFactoryInterface
-     */
-    private $classMetadataFactory;
-    private $mappingForMappedObjectCache = [];
+    private array $mappingForMappedObjectCache = [];
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory)
-    {
-        $this->classMetadataFactory = $classMetadataFactory;
+    public function __construct(
+        private readonly ClassMetadataFactoryInterface $classMetadataFactory,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMappingForClass(string $class): ?ClassDiscriminatorMapping
     {
         if ($this->classMetadataFactory->hasMetadataFor($class)) {
@@ -41,10 +34,7 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMappingForMappedObject($object): ?ClassDiscriminatorMapping
+    public function getMappingForMappedObject(object|string $object): ?ClassDiscriminatorMapping
     {
         if ($this->classMetadataFactory->hasMetadataFor($object)) {
             $metadata = $this->classMetadataFactory->getMetadataFor($object);
@@ -54,7 +44,7 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
             }
         }
 
-        $cacheKey = \is_object($object) ? \get_class($object) : $object;
+        $cacheKey = \is_object($object) ? $object::class : $object;
         if (!\array_key_exists($cacheKey, $this->mappingForMappedObjectCache)) {
             $this->mappingForMappedObjectCache[$cacheKey] = $this->resolveMappingForMappedObject($object);
         }
@@ -62,10 +52,7 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
         return $this->mappingForMappedObjectCache[$cacheKey];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTypeForMappedObject($object): ?string
+    public function getTypeForMappedObject(object|string $object): ?string
     {
         if (null === $mapping = $this->getMappingForMappedObject($object)) {
             return null;
@@ -74,7 +61,7 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
         return $mapping->getMappedObjectType($object);
     }
 
-    private function resolveMappingForMappedObject($object)
+    private function resolveMappingForMappedObject(object|string $object): ?ClassDiscriminatorMapping
     {
         $reflectionClass = new \ReflectionClass($object);
         if ($parentClass = $reflectionClass->getParentClass()) {

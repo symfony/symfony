@@ -120,9 +120,7 @@ class CollectionTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => AuthorType::class,
             'allow_delete' => true,
-            'delete_empty' => function (?Author $obj = null) {
-                return null === $obj || empty($obj->firstName);
-            },
+            'delete_empty' => fn (?Author $obj = null) => null === $obj || !$obj->firstName,
         ]);
 
         $form->setData([new Author('Bob'), new Author('Alice')]);
@@ -143,9 +141,7 @@ class CollectionTypeTest extends BaseTypeTestCase
             'entry_options' => ['data_class' => null],
             'allow_add' => true,
             'allow_delete' => true,
-            'delete_empty' => function ($author) {
-                return empty($author['firstName']);
-            },
+            'delete_empty' => fn ($author) => empty($author['firstName']),
         ]);
         $form->setData([['firstName' => 'first', 'lastName' => 'last']]);
         $form->submit([
@@ -428,6 +424,46 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertFalse($parent->createView()->vars['required'], 'Parent is not required');
         $this->assertFalse($child->createView()->vars['required'], 'Child is not required');
         $this->assertFalse($child->createView()->vars['prototype']->vars['required'], '"Prototype" should not be required');
+    }
+
+    public function testPrototypeOptionsOverrideEntryOptions()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
+            'allow_add' => true,
+            'prototype' => true,
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'entry_options' => [
+                'help' => null,
+            ],
+            'prototype_options' => [
+                'help' => 'foo',
+            ],
+        ]);
+
+        $this->assertSame('foo', $form->createView()->vars['prototype']->vars['help']);
+    }
+
+    public function testPrototypeOptionsAppliedToNewFields()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['first'], [
+            'allow_add' => true,
+            'prototype' => true,
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'entry_options' => [
+                'disabled' => true,
+            ],
+            'prototype_options' => [
+                'disabled' => false,
+            ],
+        ]);
+
+        $form->submit(['first_changed', 'second']);
+
+        $this->assertTrue($form->has('0'));
+        $this->assertTrue($form->has('1'));
+        $this->assertSame('first', $form[0]->getData());
+        $this->assertSame('second', $form[1]->getData());
+        $this->assertSame(['first', 'second'], $form->getData());
     }
 
     public function testEntriesBlockPrefixes()

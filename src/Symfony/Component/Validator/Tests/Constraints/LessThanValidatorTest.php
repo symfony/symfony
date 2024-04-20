@@ -23,7 +23,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
 {
     use IcuCompatibilityTrait;
 
-    protected function createValidator()
+    protected function createValidator(): LessThanValidator
     {
         return new LessThanValidator();
     }
@@ -38,9 +38,6 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         return LessThan::TOO_HIGH_ERROR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -54,9 +51,6 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -64,9 +58,6 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [

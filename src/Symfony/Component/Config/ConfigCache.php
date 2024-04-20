@@ -25,22 +25,22 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
  */
 class ConfigCache extends ResourceCheckerConfigCache
 {
-    private $debug;
-
     /**
-     * @param string $file  The absolute cache path
-     * @param bool   $debug Whether debugging is enabled or not
+     * @param string      $file     The absolute cache path
+     * @param bool        $debug    Whether debugging is enabled or not
+     * @param string|null $metaFile The absolute path to the meta file
      */
-    public function __construct(string $file, bool $debug)
-    {
-        $this->debug = $debug;
-
+    public function __construct(
+        string $file,
+        private bool $debug,
+        ?string $metaFile = null,
+    ) {
         $checkers = [];
         if (true === $this->debug) {
             $checkers = [new SelfCheckingResourceChecker()];
         }
 
-        parent::__construct($file, $checkers);
+        parent::__construct($file, $checkers, $metaFile);
     }
 
     /**
@@ -48,10 +48,8 @@ class ConfigCache extends ResourceCheckerConfigCache
      *
      * This implementation always returns true when debug is off and the
      * cache file exists.
-     *
-     * @return bool
      */
-    public function isFresh()
+    public function isFresh(): bool
     {
         if (!$this->debug && is_file($this->getPath())) {
             return true;

@@ -1,0 +1,37 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    dunglas: { password: foo, roles: [ROLE_USER] }
+
+    firewalls:
+        main:
+            pattern: ^/
+            access_token:
+                token_handler: access_token.access_token_handler
+                success_handler: access_token.success_handler
+                failure_handler: access_token.failure_handler
+                token_extractors: 'custom_extractor'
+
+    access_control:
+        - { path: ^/foo, roles: ROLE_USER }
+
+services:
+    custom_extractor:
+        class: Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor
+        arguments:
+            - 'X-AUTH-TOKEN'
+            - ''
+    access_token.access_token_handler:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AccessTokenBundle\Security\Handler\AccessTokenHandler
+    access_token.success_handler:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AccessTokenBundle\Security\Http\JsonAuthenticationSuccessHandler
+    access_token.failure_handler:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AccessTokenBundle\Security\Http\JsonAuthenticationFailureHandler

@@ -36,11 +36,11 @@ final class LifecycleStateShare extends AbstractLinkedInShare
         self::PUBLISHED_EDITED,
     ];
 
-    private $lifecycleState;
+    private string $lifecycleState;
 
     public function __construct(string $lifecycleState = self::PUBLISHED)
     {
-        if (!\in_array($lifecycleState, self::AVAILABLE_LIFECYCLE)) {
+        if (!\in_array($lifecycleState, self::AVAILABLE_LIFECYCLE, true)) {
             throw new LogicException(sprintf('"%s" is not a valid value, available lifecycle are "%s".', $lifecycleState, implode(', ', self::AVAILABLE_LIFECYCLE)));
         }
 

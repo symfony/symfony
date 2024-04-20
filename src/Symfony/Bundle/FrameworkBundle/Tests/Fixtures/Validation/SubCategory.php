@@ -6,8 +6,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation;
 
 class SubCategory extends Category
 {
-    /**
-     * @Assert\Type("string")
-     */
+    #[Assert\Type("string")]
     public $main;
 }

@@ -21,27 +21,18 @@ namespace Symfony\Component\PropertyAccess;
  */
 class PropertyPathIterator extends \ArrayIterator implements PropertyPathIteratorInterface
 {
-    protected $path;
-
-    public function __construct(PropertyPathInterface $path)
-    {
+    public function __construct(
+        protected PropertyPathInterface $path,
+    ) {
         parent::__construct($path->getElements());
-
-        $this->path = $path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isIndex()
+    public function isIndex(): bool
     {
         return $this->path->isIndex($this->key());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isProperty()
+    public function isProperty(): bool
     {
         return $this->path->isProperty($this->key());
     }

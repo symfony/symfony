@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Smsapi\Tests;
 
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return SmsapiTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): SmsapiTransportFactory
     {
         return new SmsapiTransportFactory();
     }
@@ -28,14 +24,64 @@ final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
     public static function createProvider(): iterable
     {
         yield [
+            'smsapi://host.test',
+            'smsapi://token@host.test',
+        ];
+
+        yield [
             'smsapi://host.test?from=testFrom',
             'smsapi://token@host.test?from=testFrom',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom',
+            'smsapi://token@host.test?from=testFrom&test=0',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom',
+            'smsapi://token@host.test?from=testFrom&fast=0',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom',
+            'smsapi://token@host.test?from=testFrom&test=false',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom',
+            'smsapi://token@host.test?from=testFrom&fast=false',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&test=1',
+            'smsapi://token@host.test?from=testFrom&test=1',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&fast=1',
+            'smsapi://token@host.test?from=testFrom&fast=1',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&test=1',
+            'smsapi://token@host.test?from=testFrom&test=true',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&fast=1',
+            'smsapi://token@host.test?from=testFrom&fast=true',
         ];
     }
 
     public static function supportsProvider(): iterable
     {
+        yield [true, 'smsapi://host'];
+        yield [true, 'smsapi://host?fast=1'];
+        yield [true, 'smsapi://host?test=1'];
         yield [true, 'smsapi://host?from=testFrom'];
+        yield [true, 'smsapi://host?from=testFrom&fast=1'];
+        yield [true, 'smsapi://host?from=testFrom&test=1'];
         yield [false, 'somethingElse://host?from=testFrom'];
     }
 
@@ -44,14 +90,8 @@ final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
         yield 'missing token' => ['smsapi://host.test?from=testFrom'];
     }
 
-    public static function missingRequiredOptionProvider(): iterable
-    {
-        yield 'missing option: from' => ['smsapi://token@host'];
-    }
-
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host?from=testFrom'];
-        yield ['somethingElse://token@host']; // missing "from" option
     }
 }

@@ -1,0 +1,16 @@
+{
+    "RecordType": "SubscriptionChange",
+    "MessageID": "00000000-0000-0000-0000-000000000000",
+    "ServerID": 23,
+    "MessageStream": "outbound",
+    "ChangedAt": "2022-09-02T14:32:30Z",
+    "Recipient": "john@example.com",
+    "Origin": "Recipient",
+    "SuppressSending": true,
+    "SuppressionReason": "HardBounce",
+    "Tag": "welcome-email",
+    "Metadata": {
+      "example": "value",
+      "example_2": "value"
+    }
+}

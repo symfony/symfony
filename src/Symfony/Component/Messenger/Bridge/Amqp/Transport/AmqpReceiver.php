@@ -27,26 +27,20 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 {
-    private $serializer;
-    private $connection;
+    private SerializerInterface $serializer;
 
-    public function __construct(Connection $connection, ?SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         yield from $this->getFromQueues($this->connection->getQueueNames());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFromQueues(array $queueNames): iterable
     {
         foreach ($queueNames as $queueName) {
@@ -58,6 +52,16 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
     {
         try {
             $amqpEnvelope = $this->connection->get($queueName);
+        } catch (\AMQPConnectionException) {
+            // Try to reconnect once to accommodate need for one of the nodes in cluster needing to stop serving the
+            // traffic. This may happen for example when one of the nodes in cluster is going into maintenance node.
+            // see https://github.com/php-amqplib/php-amqplib/issues/1161
+            try {
+                $this->connection->queue($queueName)->getConnection()->reconnect();
+                $amqpEnvelope = $this->connection->get($queueName);
+            } catch (\AMQPException $exception) {
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            }
         } catch (\AMQPException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -83,9 +87,6 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
         yield $envelope->with(new AmqpReceivedStamp($amqpEnvelope, $queueName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         try {
@@ -100,9 +101,6 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         $stamp = $this->findAmqpStamp($envelope);
@@ -113,9 +111,6 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
         try {
@@ -143,8 +138,4 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 
         return $amqpReceivedStamp;
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver::class, false)) {
-    class_alias(AmqpReceiver::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver::class);
 }

@@ -1,0 +1,49 @@
+{
+    "name": "symfony/psr-http-message-bridge",
+    "type": "symfony-bridge",
+    "description": "PSR HTTP message bridge",
+    "keywords": ["http", "psr-7", "psr-17", "http-message"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/http-message": "^1.0|^2.0",
+        "symfony/http-foundation": "^6.4|^7.0"
+    },
+    "require-dev": {
+        "symfony/browser-kit": "^6.4|^7.0",
+        "symfony/config": "^6.4|^7.0",
+        "symfony/event-dispatcher": "^6.4|^7.0",
+        "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4|^7.0",
+        "nyholm/psr7": "^1.1",
+        "php-http/discovery": "^1.15",
+        "psr/log": "^1.1.4|^2|^3"
+    },
+    "conflict": {
+        "php-http/discovery": "<1.15",
+        "symfony/http-kernel": "<6.4"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Bridge\\PsrHttpMessage\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

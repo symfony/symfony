@@ -16,14 +16,13 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageTyped;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 class PhpSerializerTest extends TestCase
 {
     public function testEncodedIsDecodable()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $envelope = new Envelope(new DummyMessage('Hello'));
 
@@ -34,7 +33,7 @@ class PhpSerializerTest extends TestCase
 
     public function testDecodingFailsWithMissingBodyKey()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessage('Encoded envelope should have at least a "body", or maybe you should implement your own serializer');
@@ -44,7 +43,7 @@ class PhpSerializerTest extends TestCase
 
     public function testDecodingFailsWithBadFormat()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessageMatches('/Could not decode/');
@@ -56,7 +55,7 @@ class PhpSerializerTest extends TestCase
 
     public function testDecodingFailsWithBadBase64Body()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessageMatches('/Could not decode/');
@@ -68,7 +67,7 @@ class PhpSerializerTest extends TestCase
 
     public function testDecodingFailsWithBadClass()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessageMatches('/class "ReceivedSt0mp" not found/');
@@ -78,9 +77,22 @@ class PhpSerializerTest extends TestCase
         ]);
     }
 
+    public function testDecodingFailsForPropertyTypeMismatch()
+    {
+        $serializer = $this->createPhpSerializer();
+        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('true')));
+        // Simulate a change of property type in the code base
+        $encodedEnvelope['body'] = str_replace('s:4:\"true\"', 'b:1', $encodedEnvelope['body']);
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessageMatches('/Could not decode/');
+
+        $serializer->decode($encodedEnvelope);
+    }
+
     public function testEncodedSkipsNonEncodeableStamps()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $envelope = new Envelope(new DummyMessage('Hello'), [
             new DummyPhpSerializerNonSendableStamp(),
@@ -92,7 +104,7 @@ class PhpSerializerTest extends TestCase
 
     public function testNonUtf8IsBase64Encoded()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $envelope = new Envelope(new DummyMessage("\xE9"));
 
@@ -101,20 +113,9 @@ class PhpSerializerTest extends TestCase
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
-    public function testDecodingFailsForPropertyTypeMismatch()
+    protected function createPhpSerializer(): PhpSerializer
     {
-        $serializer = new PhpSerializer();
-        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessageTyped('true')));
-        // Simulate a change of property type in the code base
-        $encodedEnvelope['body'] = str_replace('s:4:\"true\"', 'b:1', $encodedEnvelope['body']);
-
-        $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessageMatches('/Could not decode/');
-
-        $serializer->decode($encodedEnvelope);
+        return new PhpSerializer();
     }
 }
 

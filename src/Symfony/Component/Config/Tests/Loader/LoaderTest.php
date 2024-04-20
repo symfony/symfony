@@ -48,7 +48,6 @@ class LoaderTest extends TestCase
 
     public function testResolveWhenResolverCannotFindLoader()
     {
-        $this->expectException(LoaderLoadException::class);
         $resolver = $this->createMock(LoaderResolverInterface::class);
         $resolver->expects($this->once())
             ->method('resolve')
@@ -57,6 +56,8 @@ class LoaderTest extends TestCase
 
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
+
+        $this->expectException(LoaderLoadException::class);
 
         $loader->resolve('FOOBAR');
     }
@@ -104,11 +105,11 @@ class LoaderTest extends TestCase
 
 class ProjectLoader1 extends Loader
 {
-    public function load($resource, ?string $type = null)
+    public function load(mixed $resource, ?string $type = null): mixed
     {
     }
 
-    public function supports($resource, ?string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return \is_string($resource) && 'foo' === pathinfo($resource, \PATHINFO_EXTENSION);
     }

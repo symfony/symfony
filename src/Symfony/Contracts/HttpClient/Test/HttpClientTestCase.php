@@ -141,7 +141,7 @@ abstract class HttpClientTestCase extends TestCase
 
         $this->assertSame($firstContent, $secondContent);
 
-        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () { return false; }]);
+        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => fn () => false]);
         $response->getContent();
 
         $this->expectException(TransportExceptionInterface::class);
@@ -232,13 +232,13 @@ abstract class HttpClientTestCase extends TestCase
         try {
             $response->getHeaders();
             $this->fail(ClientExceptionInterface::class.' expected');
-        } catch (ClientExceptionInterface $e) {
+        } catch (ClientExceptionInterface) {
         }
 
         try {
             $response->getContent();
             $this->fail(ClientExceptionInterface::class.' expected');
-        } catch (ClientExceptionInterface $e) {
+        } catch (ClientExceptionInterface) {
         }
 
         $this->assertSame(404, $response->getStatusCode());
@@ -252,7 +252,7 @@ abstract class HttpClientTestCase extends TestCase
                 $this->assertTrue($chunk->isFirst());
             }
             $this->fail(ClientExceptionInterface::class.' expected');
-        } catch (ClientExceptionInterface $e) {
+        } catch (ClientExceptionInterface) {
         }
     }
 
@@ -272,14 +272,14 @@ abstract class HttpClientTestCase extends TestCase
         try {
             $response->getStatusCode();
             $this->fail(TransportExceptionInterface::class.' expected');
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface) {
             $this->addToAssertionCount(1);
         }
 
         try {
             $response->getStatusCode();
             $this->fail(TransportExceptionInterface::class.' still expected');
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface) {
             $this->addToAssertionCount(1);
         }
 
@@ -289,7 +289,7 @@ abstract class HttpClientTestCase extends TestCase
             foreach ($client->stream($response) as $r => $chunk) {
             }
             $this->fail(TransportExceptionInterface::class.' expected');
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface) {
             $this->addToAssertionCount(1);
         }
 
@@ -443,7 +443,7 @@ abstract class HttpClientTestCase extends TestCase
         try {
             $response->getHeaders();
             $this->fail(RedirectionExceptionInterface::class.' expected');
-        } catch (RedirectionExceptionInterface $e) {
+        } catch (RedirectionExceptionInterface) {
         }
 
         $this->assertSame(302, $response->getStatusCode());
@@ -865,7 +865,7 @@ abstract class HttpClientTestCase extends TestCase
                 try {
                     $response->getContent();
                     $this->fail(TransportExceptionInterface::class.' expected');
-                } catch (TransportExceptionInterface $e) {
+                } catch (TransportExceptionInterface) {
                 }
             }
             $responses = [];
@@ -898,7 +898,7 @@ abstract class HttpClientTestCase extends TestCase
                 try {
                     unset($response);
                     $this->fail(TransportExceptionInterface::class.' expected');
-                } catch (TransportExceptionInterface $e) {
+                } catch (TransportExceptionInterface) {
                 }
             }
 
@@ -1124,7 +1124,7 @@ abstract class HttpClientTestCase extends TestCase
 
         try {
             $response->getContent();
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface) {
             $this->addToAssertionCount(1);
         }
 
@@ -1136,14 +1136,10 @@ abstract class HttpClientTestCase extends TestCase
     public function testWithOptions()
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        if (!method_exists($client, 'withOptions')) {
-            $this->markTestSkipped(sprintf('Not implementing "%s::withOptions()" is deprecated.', get_debug_type($client)));
-        }
-
         $client2 = $client->withOptions(['base_uri' => 'http://localhost:8057/']);
 
         $this->assertNotSame($client, $client2);
-        $this->assertSame(\get_class($client), \get_class($client2));
+        $this->assertSame($client::class, $client2::class);
 
         $response = $client2->request('GET', '/');
         $this->assertSame(200, $response->getStatusCode());

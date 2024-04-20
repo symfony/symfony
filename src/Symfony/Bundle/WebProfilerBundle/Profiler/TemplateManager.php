@@ -24,25 +24,19 @@ use Twig\Environment;
  */
 class TemplateManager
 {
-    protected $twig;
-    protected $templates;
-    protected $profiler;
-
-    public function __construct(Profiler $profiler, Environment $twig, array $templates)
-    {
-        $this->profiler = $profiler;
-        $this->twig = $twig;
-        $this->templates = $templates;
+    public function __construct(
+        protected Profiler $profiler,
+        protected Environment $twig,
+        protected array $templates,
+    ) {
     }
 
     /**
      * Gets the template name for a given panel.
      *
-     * @return mixed
-     *
      * @throws NotFoundHttpException
      */
-    public function getName(Profile $profile, string $panel)
+    public function getName(Profile $profile, string $panel): mixed
     {
         $templates = $this->getNames($profile);
 

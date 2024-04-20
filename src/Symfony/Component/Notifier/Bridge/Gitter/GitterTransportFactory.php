@@ -14,14 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Gitter;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Christin Gruber <c.gruber@touchdesign.de>
  */
 final class GitterTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): GitterTransport
     {
         $scheme = $dsn->getScheme();
 

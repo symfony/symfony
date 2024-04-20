@@ -173,31 +173,16 @@ class UploadedFileTest extends TestCase
      */
     public function testMoveFailed(UploadedFile $file)
     {
-        switch ($file->getError()) {
-            case \UPLOAD_ERR_INI_SIZE:
-                $exceptionClass = IniSizeFileException::class;
-                break;
-            case \UPLOAD_ERR_FORM_SIZE:
-                $exceptionClass = FormSizeFileException::class;
-                break;
-            case \UPLOAD_ERR_PARTIAL:
-                $exceptionClass = PartialFileException::class;
-                break;
-            case \UPLOAD_ERR_NO_FILE:
-                $exceptionClass = NoFileException::class;
-                break;
-            case \UPLOAD_ERR_CANT_WRITE:
-                $exceptionClass = CannotWriteFileException::class;
-                break;
-            case \UPLOAD_ERR_NO_TMP_DIR:
-                $exceptionClass = NoTmpDirFileException::class;
-                break;
-            case \UPLOAD_ERR_EXTENSION:
-                $exceptionClass = ExtensionFileException::class;
-                break;
-            default:
-                $exceptionClass = FileException::class;
-        }
+        $exceptionClass = match ($file->getError()) {
+            \UPLOAD_ERR_INI_SIZE => IniSizeFileException::class,
+            \UPLOAD_ERR_FORM_SIZE => FormSizeFileException::class,
+            \UPLOAD_ERR_PARTIAL => PartialFileException::class,
+            \UPLOAD_ERR_NO_FILE => NoFileException::class,
+            \UPLOAD_ERR_CANT_WRITE => CannotWriteFileException::class,
+            \UPLOAD_ERR_NO_TMP_DIR => NoTmpDirFileException::class,
+            \UPLOAD_ERR_EXTENSION => ExtensionFileException::class,
+            default => FileException::class,
+        };
 
         $this->expectException($exceptionClass);
 
@@ -336,5 +321,27 @@ class UploadedFileTest extends TestCase
         if (0 === (int) \ini_get('post_max_size') && 0 === (int) \ini_get('upload_max_filesize')) {
             $this->assertSame(\PHP_INT_MAX, $size);
         }
+    }
+
+    public function testgetClientOriginalPath()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'test.gif',
+            'image/gif'
+        );
+
+        $this->assertEquals('test.gif', $file->getClientOriginalPath());
+    }
+
+    public function testgetClientOriginalPathWebkitDirectory()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/webkitdirectory/test.txt',
+            'webkitdirectory/test.txt',
+            'text/plain',
+        );
+
+        $this->assertEquals('webkitdirectory/test.txt', $file->getClientOriginalPath());
     }
 }

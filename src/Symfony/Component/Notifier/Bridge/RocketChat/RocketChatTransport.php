@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\RocketChat;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -29,25 +28,18 @@ final class RocketChatTransport extends AbstractTransport
 {
     protected const HOST = 'rocketchat.com';
 
-    private $accessToken;
-    private $chatChannel;
-
-    public function __construct(string $accessToken, ?string $chatChannel = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->accessToken = $accessToken;
-        $this->chatChannel = $chatChannel;
-        $this->client = $client;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $accessToken,
+        private ?string $chatChannel = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        if (null === $this->chatChannel) {
-            return sprintf('rocketchat://%s', $this->getEndpoint());
-        }
-
-        return sprintf('rocketchat://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
+        return sprintf('rocketchat://%s%s', $this->getEndpoint(), null !== $this->chatChannel ? '?channel='.$this->chatChannel : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -63,23 +55,15 @@ final class RocketChatTransport extends AbstractTransport
         if (!$message instanceof ChatMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
-        if ($message->getOptions() && !$message->getOptions() instanceof RocketChatOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, RocketChatOptions::class));
-        }
 
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
-        if (!isset($options['channel'])) {
-            $options['channel'] = $message->getRecipientId() ?: $this->chatChannel;
-        }
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['channel'] ??= $message->getRecipientId() ?: $this->chatChannel;
         $options['text'] = $message->getSubject();
 
-        $response = $this->client->request(
-            'POST',
-            sprintf('https://%s/hooks/%s', $this->getEndpoint(), $this->accessToken),
-            [
-                'json' => array_filter($options),
-            ]
-        );
+        $endpoint = sprintf('https://%s/hooks/%s', $this->getEndpoint(), $this->accessToken);
+        $response = $this->client->request('POST', $endpoint, [
+            'json' => array_filter($options),
+        ]);
 
         try {
             $statusCode = $response->getStatusCode();

@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\AllMySms\Tests;
 
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class AllMySmsTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return AllMySmsTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): AllMySmsTransportFactory
     {
         return new AllMySmsTransportFactory();
     }

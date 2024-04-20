@@ -23,9 +23,11 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {
-    private $serviceLocatorContextIds = [];
+    protected bool $skipScalars = true;
 
-    public function process(ContainerBuilder $container)
+    private array $serviceLocatorContextIds = [];
+
+    public function process(ContainerBuilder $container): void
     {
         $this->serviceLocatorContextIds = [];
         foreach ($container->findTaggedServiceIds('container.service_locator_context') as $id => $tags) {
@@ -34,18 +36,18 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         }
 
         try {
-            return parent::process($container);
+            parent::process($container);
         } finally {
             $this->serviceLocatorContextIds = [];
         }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Reference) {
             return parent::processValue($value, $isRoot);
         }
-        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE < $value->getInvalidBehavior() || $this->container->has($id = (string) $value)) {
+        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE < $value->getInvalidBehavior() || $this->container->has((string) $value)) {
             return $value;
         }
 
@@ -81,30 +83,27 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         $this->throwServiceNotFoundException($value, $currentId, $value);
     }
 
-    private function throwServiceNotFoundException(Reference $ref, string $sourceId, $value): void
+    private function throwServiceNotFoundException(Reference $ref, string $sourceId, mixed $value): void
     {
         $id = (string) $ref;
         $alternatives = [];
         foreach ($this->container->getServiceIds() as $knownId) {
-            if ('' === $knownId || '.' === $knownId[0]) {
+            if ('' === $knownId || '.' === $knownId[0] || $knownId === $this->currentId) {
                 continue;
             }
 
             $lev = levenshtein($id, $knownId);
-            if ($lev <= \strlen($id) / 3 || false !== strpos($knownId, $id)) {
+            if ($lev <= \strlen($id) / 3 || str_contains($knownId, $id)) {
                 $alternatives[] = $knownId;
             }
         }
 
         $pass = new class() extends AbstractRecursivePass {
-            public $ref;
-            public $sourceId;
-            public $alternatives;
+            public Reference $ref;
+            public string $sourceId;
+            public array $alternatives;
 
-            /**
-             * @return mixed
-             */
-            public function processValue($value, bool $isRoot = false)
+            public function processValue(mixed $value, bool $isRoot = false): mixed
             {
                 if ($this->ref !== $value) {
                     return parent::processValue($value, $isRoot);

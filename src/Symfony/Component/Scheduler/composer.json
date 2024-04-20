@@ -1,0 +1,42 @@
+{
+    "name": "symfony/scheduler",
+    "type": "library",
+    "description": "Provides scheduling through Symfony Messenger",
+    "keywords": ["scheduler", "schedule", "cron"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sergey Rabochiy",
+            "email": "upyx.00@gmail.com"
+        },
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/clock": "^6.4|^7.0"
+    },
+    "require-dev": {
+        "dragonmantank/cron-expression": "^3.1",
+        "symfony/cache": "^6.4|^7.0",
+        "symfony/console": "^6.4|^7.0",
+        "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/event-dispatcher": "^6.4|^7.0",
+        "symfony/lock": "^6.4|^7.0",
+        "symfony/messenger": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Scheduler\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

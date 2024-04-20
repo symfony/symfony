@@ -1,7 +1,6 @@
 <?php
 
 $container->loadFromExtension('security', [
-    'enable_authenticator_manager' => true,
     'access_decision_manager' => [
         'service' => 'app.access_decision_manager',
         'strategy' => 'affirmative',

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PasswordHasher\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -34,29 +35,19 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
  *
  * @final
  */
+#[AsCommand(name: 'security:hash-password', description: 'Hash a user password')]
 class UserPasswordHashCommand extends Command
 {
-    protected static $defaultName = 'security:hash-password';
-    protected static $defaultDescription = 'Hash a user password';
-
-    private $hasherFactory;
-    private $userClasses;
-
-    public function __construct(PasswordHasherFactoryInterface $hasherFactory, array $userClasses = [])
-    {
-        $this->hasherFactory = $hasherFactory;
-        $this->userClasses = $userClasses;
-
+    public function __construct(
+        private PasswordHasherFactoryInterface $hasherFactory,
+        private array $userClasses = [],
+    ) {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addArgument('password', InputArgument::OPTIONAL, 'The plain password to hash.')
             ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the hasher used to hash the password.')
             ->addOption('empty-salt', null, InputOption::VALUE_NONE, 'Do not generate a salt or let the hasher generate one.')
@@ -102,9 +93,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -151,7 +139,7 @@ EOF
         $hashedPassword = $hasher->hash($password, $salt);
 
         $rows = [
-            ['Hasher used', \get_class($hasher)],
+            ['Hasher used', $hasher::class],
             ['Password hash', $hashedPassword],
         ];
         if (!$emptySalt) {

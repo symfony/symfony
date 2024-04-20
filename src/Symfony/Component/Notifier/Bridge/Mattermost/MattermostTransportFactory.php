@@ -14,14 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Mattermost;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Emanuele Panzeri <thepanz@gmail.com>
  */
 final class MattermostTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MattermostTransport
     {
         $scheme = $dsn->getScheme();
 

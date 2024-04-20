@@ -25,7 +25,7 @@ class FakeMetadataFactory implements MetadataFactoryInterface
 
         if (\is_object($class)) {
             $hash = spl_object_hash($class);
-            $class = \get_class($class);
+            $class = $class::class;
         }
 
         if (!\is_string($class)) {
@@ -49,7 +49,7 @@ class FakeMetadataFactory implements MetadataFactoryInterface
 
         if (\is_object($class)) {
             $hash = spl_object_hash($class);
-            $class = \get_class($class);
+            $class = $class::class;
         }
 
         if (!\is_string($class)) {

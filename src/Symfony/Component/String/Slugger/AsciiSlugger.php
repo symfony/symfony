@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\String\Slugger;
 
+use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\String\AbstractUnicodeString;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -54,69 +55,73 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         'zh' => 'Han-Latin',
     ];
 
-    private $defaultLocale;
-    private $symbolsMap = [
+    private \Closure|array $symbolsMap = [
         'en' => ['@' => 'at', '&' => 'and'],
     ];
+    private bool|string $emoji = false;
 
     /**
      * Cache of transliterators per locale.
      *
      * @var \Transliterator[]
      */
-    private $transliterators = [];
+    private array $transliterators = [];
 
-    /**
-     * @param array|\Closure|null $symbolsMap
-     */
-    public function __construct(?string $defaultLocale = null, $symbolsMap = null)
-    {
-        if (null !== $symbolsMap && !\is_array($symbolsMap) && !$symbolsMap instanceof \Closure) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be array, Closure or null, "%s" given.', __METHOD__, \gettype($symbolsMap)));
-        }
-
-        $this->defaultLocale = $defaultLocale;
+    public function __construct(
+        private ?string $defaultLocale = null,
+        array|\Closure|null $symbolsMap = null,
+    ) {
         $this->symbolsMap = $symbolsMap ?? $this->symbolsMap;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setLocale($locale)
+    public function setLocale(string $locale): void
     {
         $this->defaultLocale = $locale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->defaultLocale;
     }
 
     /**
-     * {@inheritdoc}
+     * @param bool|string $emoji true will use the same locale,
+     *                           false will disable emoji,
+     *                           and a string to use a specific locale
      */
+    public function withEmoji(bool|string $emoji = true): static
+    {
+        if (false !== $emoji && !class_exists(EmojiTransliterator::class)) {
+            throw new \LogicException(sprintf('You cannot use the "%s()" method as the "symfony/emoji" package is not installed. Try running "composer require symfony/emoji".', __METHOD__));
+        }
+
+        $new = clone $this;
+        $new->emoji = $emoji;
+
+        return $new;
+    }
+
     public function slug(string $string, string $separator = '-', ?string $locale = null): AbstractUnicodeString
     {
-        $locale = $locale ?? $this->defaultLocale;
+        $locale ??= $this->defaultLocale;
 
         $transliterator = [];
-        if ($locale && ('de' === $locale || 0 === strpos($locale, 'de_'))) {
+        if ($locale && ('de' === $locale || str_starts_with($locale, 'de_'))) {
             // Use the shortcut for German in UnicodeString::ascii() if possible (faster and no requirement on intl)
             $transliterator = ['de-ASCII'];
         } elseif (\function_exists('transliterator_transliterate') && $locale) {
             $transliterator = (array) $this->createTransliterator($locale);
         }
 
+        if ($emojiTransliterator = $this->createEmojiTransliterator($locale)) {
+            $transliterator[] = $emojiTransliterator;
+        }
+
         if ($this->symbolsMap instanceof \Closure) {
             // If the symbols map is passed as a closure, there is no need to fallback to the parent locale
             // as the closure can just provide substitutions for all locales of interest.
             $symbolsMap = $this->symbolsMap;
-            array_unshift($transliterator, static function ($s) use ($symbolsMap, $locale) {
-                return $symbolsMap($s, $locale);
-            });
+            array_unshift($transliterator, static fn ($s) => $symbolsMap($s, $locale));
         }
 
         $unicodeString = (new UnicodeString($string))->ascii($transliterator);
@@ -166,6 +171,25 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         }
 
         return $this->transliterators[$locale] = $this->transliterators[$parent] = $transliterator ?? null;
+    }
+
+    private function createEmojiTransliterator(?string $locale): ?EmojiTransliterator
+    {
+        if (\is_string($this->emoji)) {
+            $locale = $this->emoji;
+        } elseif (!$this->emoji) {
+            return null;
+        }
+
+        while (null !== $locale) {
+            try {
+                return EmojiTransliterator::create("emoji-$locale");
+            } catch (\IntlException) {
+                $locale = self::getParentLocale($locale);
+            }
+        }
+
+        return null;
     }
 
     private static function getParentLocale(?string $locale): ?string

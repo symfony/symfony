@@ -29,12 +29,27 @@ class LazyStringTest extends TestCase
         $this->assertSame(1, $count);
     }
 
+    /**
+     * @runInSeparateProcess
+     */
+    public function testReturnTypeError()
+    {
+        ErrorHandler::register();
+
+        $s = LazyString::fromCallable(fn () => []);
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessageMatches('{^Return value of .*\{closure.*\}\(\) passed to '.preg_quote(LazyString::class).'::fromCallable\(\) must be of the type string, array returned\.$}');
+
+        (string) $s;
+    }
+
     public function testLazyCallable()
     {
         $count = 0;
         $s = LazyString::fromCallable([function () use (&$count) {
             return new class($count) {
-                private $count;
+                private int $count;
 
                 public function __construct(int &$count)
                 {
@@ -53,21 +68,6 @@ class LazyStringTest extends TestCase
         $this->assertSame(1, $count);
         $this->assertSame('1', (string) $s); // ensure the value is memoized
         $this->assertSame(1, $count);
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
-    public function testReturnTypeError()
-    {
-        ErrorHandler::register();
-
-        $s = LazyString::fromCallable(function () { return []; });
-
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageMatches('{^Return value of .*\{closure.*\}\(\) passed to '.preg_quote(LazyString::class).'::fromCallable\(\) must be of the type string, array returned\.$}');
-
-        (string) $s;
     }
 
     public function testFromStringable()

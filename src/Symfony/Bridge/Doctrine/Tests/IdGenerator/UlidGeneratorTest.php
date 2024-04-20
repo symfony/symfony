@@ -30,9 +30,6 @@ class UlidGeneratorTest extends TestCase
         $this->assertTrue(Ulid::isValid($ulid));
     }
 
-    /**
-     * @requires function \Symfony\Component\Uid\Factory\UlidFactory::create
-     */
     public function testUlidFactory()
     {
         $ulid = new Ulid('00000000000000000000000000');

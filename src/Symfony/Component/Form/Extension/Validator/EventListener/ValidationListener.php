@@ -23,25 +23,18 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ValidationListener implements EventSubscriberInterface
 {
-    private $validator;
-
-    private $violationMapper;
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [FormEvents::POST_SUBMIT => 'validateForm'];
     }
 
-    public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
-    {
-        $this->validator = $validator;
-        $this->violationMapper = $violationMapper;
+    public function __construct(
+        private ValidatorInterface $validator,
+        private ViolationMapperInterface $violationMapper,
+    ) {
     }
 
-    public function validateForm(FormEvent $event)
+    public function validateForm(FormEvent $event): void
     {
         $form = $event->getForm();
 

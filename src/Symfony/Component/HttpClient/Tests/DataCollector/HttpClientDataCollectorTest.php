@@ -169,6 +169,268 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertEquals(0, $sut->getRequestCount());
     }
 
+    /**
+     * @dataProvider provideCurlRequests
+     */
+    public function testItGeneratesCurlCommandsAsExpected(array $request, string $expectedCurlCommand)
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([$request]));
+        $sut->lateCollect();
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+
+        $isWindows = '\\' === \DIRECTORY_SEPARATOR;
+        self::assertEquals(sprintf($expectedCurlCommand, $isWindows ? '"' : "'", $isWindows ? '' : "'"), $curlCommand);
+    }
+
+    public static function provideCurlRequests(): iterable
+    {
+        yield 'GET' => [
+            [
+                'method' => 'GET',
+                'url' => 'http://localhost:8057/json',
+            ],
+            'curl \\
+  --compressed \\
+  --request GET \\
+  --url %1$shttp://localhost:8057/json%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
+        ];
+        yield 'GET with base uri' => [
+            [
+                'method' => 'GET',
+                'url' => '1',
+                'options' => [
+                    'base_uri' => 'http://localhost:8057/json/',
+                ],
+            ],
+            'curl \\
+  --compressed \\
+  --request GET \\
+  --url %1$shttp://localhost:8057/json/1%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
+        ];
+        yield 'GET with resolve' => [
+            [
+                'method' => 'GET',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'resolve' => [
+                        'localhost' => '127.0.0.1',
+                        'example.com' => null,
+                    ],
+                ],
+            ],
+            'curl \\
+  --compressed \\
+  --resolve %1$slocalhost:8057:127.0.0.1%1$s \\
+  --request GET \\
+  --url %1$shttp://localhost:8057/json%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
+        ];
+        yield 'POST with string body' => [
+            [
+                'method' => 'POST',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'body' => 'foo bar baz',
+                ],
+            ],
+            'curl \\
+  --compressed \\
+  --request POST \\
+  --url %1$shttp://localhost:8057/json%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sContent-Length: 11%1$s \\
+  --header %1$sContent-Type: application/x-www-form-urlencoded%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
+  --data-raw %1$sfoo bar baz%1$s',
+        ];
+        yield 'POST with array body' => [
+            [
+                'method' => 'POST',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'body' => [
+                        'foo' => 'fooval',
+                        'bar' => 'barval',
+                        'baz' => 'bazval',
+                        'foobar' => [
+                            'baz' => 'bazval',
+                            'qux' => 'quxval',
+                        ],
+                        'bazqux' => ['bazquxval1', 'bazquxval2'],
+                        'object' => (object) [
+                            'fooprop' => 'foopropval',
+                            'barprop' => 'barpropval',
+                        ],
+                        'tostring' => new class() {
+                            public function __toString(): string
+                            {
+                                return 'tostringval';
+                            }
+                        },
+                    ],
+                ],
+            ],
+            'curl \\
+  --compressed \\
+  --request POST \\
+  --url %1$shttp://localhost:8057/json%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sContent-Type: application/x-www-form-urlencoded%1$s \\
+  --header %1$sContent-Length: 211%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
+  --data-raw %2$sfoo=fooval%2$s --data-raw %2$sbar=barval%2$s --data-raw %2$sbaz=bazval%2$s --data-raw %2$sfoobar[baz]=bazval%2$s --data-raw %2$sfoobar[qux]=quxval%2$s --data-raw %2$sbazqux[0]=bazquxval1%2$s --data-raw %2$sbazqux[1]=bazquxval2%2$s --data-raw %2$sobject[fooprop]=foopropval%2$s --data-raw %2$sobject[barprop]=barpropval%2$s --data-raw %2$stostring=tostringval%2$s',
+        ];
+
+        // escapeshellarg on Windows replaces double quotes & percent signs with spaces
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            yield 'GET with query' => [
+                [
+                    'method' => 'GET',
+                    'url' => 'http://localhost:8057/?foo=fooval&bar=barval',
+                    'options' => [
+                        'query' => [
+                            'bar' => 'newbarval',
+                            'foobar' => [
+                                'baz' => 'bazval',
+                                'qux' => 'quxval',
+                            ],
+                            'bazqux' => ['bazquxval1', 'bazquxval2'],
+                        ],
+                    ],
+                ],
+                'curl \\
+  --compressed \\
+  --request GET \\
+  --url %1$shttp://localhost:8057/?foo=fooval&bar=newbarval&foobar[baz]=bazval&foobar[qux]=quxval&bazqux[0]=bazquxval1&bazqux[1]=bazquxval2%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
+            ];
+            yield 'POST with json' => [
+                [
+                    'method' => 'POST',
+                    'url' => 'http://localhost:8057/json',
+                    'options' => [
+                        'json' => [
+                            'foo' => [
+                                'bar' => 'baz',
+                                'qux' => [1.10, 1.0],
+                                'fred' => ['<foo>', "'bar'", '"baz"', '&blong&'],
+                            ],
+                        ],
+                    ],
+                ],
+                'curl \\
+  --compressed \\
+  --request POST \\
+  --url %1$shttp://localhost:8057/json%1$s \\
+  --header %1$sContent-Type: application/json%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sContent-Length: 120%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
+  --data-raw %1$s{"foo":{"bar":"baz","qux":[1.1,1.0],"fred":["\u003Cfoo\u003E","\u0027bar\u0027","\u0022baz\u0022","\u0026blong\u0026"]}}%1$s',
+            ];
+        }
+    }
+
+    public function testItDoesNotFollowRedirectionsWhenGeneratingCurlCommands()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+            [
+                'method' => 'GET',
+                'url' => 'http://localhost:8057/301',
+                'options' => [
+                    'auth_basic' => 'foo:bar',
+                ],
+            ],
+        ]));
+        $sut->lateCollect();
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertEquals(sprintf('curl \\
+  --compressed \\
+  --request GET \\
+  --url %1$shttp://localhost:8057/301%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAuthorization: Basic Zm9vOmJhcg==%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand
+        );
+    }
+
+    public function testItDoesNotGeneratesCurlCommandsForUnsupportedBodyType()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+            [
+                'method' => 'GET',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'body' => static fn (int $size): string => '',
+                ],
+            ],
+        ]));
+        $sut->lateCollect();
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertNull($curlCommand);
+    }
+
+    public function testItDoesGenerateCurlCommandsForBigData()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+            [
+                'method' => 'POST',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'body' => str_repeat('1', 257000),
+                ],
+            ],
+        ]));
+        $sut->lateCollect();
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertNotNull($curlCommand);
+    }
+
+    public function testItDoesNotGeneratesCurlCommandsForUploadedFiles()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+            [
+                'method' => 'POST',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'body' => ['file' => fopen('data://text/plain,', 'r')],
+                ],
+            ],
+        ]));
+        $sut->lateCollect();
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertNull($curlCommand);
+    }
+
     private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient
     {
         $httpClient = new TraceableHttpClient(new NativeHttpClient());

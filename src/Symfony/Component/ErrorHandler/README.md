@@ -6,8 +6,8 @@ The ErrorHandler component provides tools to manage errors and ease debugging PH
 Getting Started
 ---------------
 
-```
-$ composer require symfony/error-handler
+```bash
+composer require symfony/error-handler
 ```
 
 ```php

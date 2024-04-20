@@ -26,9 +26,9 @@ final class Connection extends AbstractConnectionMiddleware
 {
     public function __construct(
         ConnectionInterface $connection,
-        private DebugDataHolder $debugDataHolder,
-        private ?Stopwatch $stopwatch,
-        private string $connectionName,
+        private readonly DebugDataHolder $debugDataHolder,
+        private readonly ?Stopwatch $stopwatch,
+        private readonly string $connectionName,
     ) {
         parent::__construct($connection);
     }

@@ -2,6 +2,8 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
+    http_method_override: false
+    translator: true
     serializer:
         enabled: true
         circular_reference_handler: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serializer\CircularReferenceHandler
@@ -38,6 +40,10 @@ services:
 
     serializer.normalizer.uid.alias:
         alias: serializer.normalizer.uid
+        public: true
+
+    serializer.normalizer.translatable.alias:
+        alias: serializer.normalizer.translatable
         public: true
 
     serializer.normalizer.property.alias:

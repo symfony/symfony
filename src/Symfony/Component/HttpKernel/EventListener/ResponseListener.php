@@ -24,19 +24,16 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ResponseListener implements EventSubscriberInterface
 {
-    private $charset;
-    private $addContentLanguageHeader;
-
-    public function __construct(string $charset, bool $addContentLanguageHeader = false)
-    {
-        $this->charset = $charset;
-        $this->addContentLanguageHeader = $addContentLanguageHeader;
+    public function __construct(
+        private string $charset,
+        private bool $addContentLanguageHeader = false,
+    ) {
     }
 
     /**
      * Filters the Response.
      */
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;

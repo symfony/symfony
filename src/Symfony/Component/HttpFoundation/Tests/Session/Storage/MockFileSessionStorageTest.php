@@ -23,15 +23,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
  */
 class MockFileSessionStorageTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $sessionDir;
+    protected MockFileSessionStorage $storage;
 
-    /**
-     * @var MockFileSessionStorage
-     */
-    protected $storage;
+    private string $sessionDir;
 
     protected function setUp(): void
     {
@@ -45,8 +39,6 @@ class MockFileSessionStorageTest extends TestCase
         if (is_dir($this->sessionDir)) {
             @rmdir($this->sessionDir);
         }
-        $this->sessionDir = null;
-        $this->storage = null;
     }
 
     public function testStart()

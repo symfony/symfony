@@ -19,7 +19,6 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
-use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
@@ -131,7 +130,6 @@ class PasswordHasherFactoryTest extends TestCase
 
     public function testGetInvalidNamedHasherForHasherAware()
     {
-        $this->expectException(\RuntimeException::class);
         $factory = new PasswordHasherFactory([
             HasherAwareUser::class => new MessageDigestPasswordHasher('sha1'),
             'hasher_name' => new MessageDigestPasswordHasher('sha256'),
@@ -139,6 +137,9 @@ class PasswordHasherFactoryTest extends TestCase
 
         $user = new HasherAwareUser();
         $user->hasherName = 'invalid_hasher_name';
+
+        $this->expectException(\RuntimeException::class);
+
         $factory->getPasswordHasher($user);
     }
 
@@ -174,49 +175,20 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
     }
 
-    public function testMigrateFromWithCustomInstance()
+    public function testMissingClass()
     {
-        if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Sodium is not available');
-        }
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"class" must be set in {"arguments":[]}');
 
-        $sodium = new SodiumPasswordHasher();
-
-        $factory = new PasswordHasherFactory([
-            'digest_hasher' => $digest = new MessageDigestPasswordHasher('sha256'),
-            SomeUser::class => ['instance' => $sodium, 'migrate_from' => ['bcrypt', 'digest_hasher']],
-        ]);
-
-        $hasher = $factory->getPasswordHasher(SomeUser::class);
-        $this->assertInstanceOf(MigratingPasswordHasher::class, $hasher);
-
-        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo'), 'foo', null));
-        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo'), 'foo', null));
-        $this->assertTrue($hasher->verify($digest->hash('foo', null), 'foo', null));
-        $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
+        (new PasswordHasherFactory([SomeUser::class => ['arguments' => []]]))->getPasswordHasher(SomeUser::class);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testMigrateFromLegacy()
+    public function testMissingArguments()
     {
-        if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Sodium is not available');
-        }
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"arguments" must be set in {"class":"stdClass"}');
 
-        $factory = new PasswordHasherFactory([
-            'plaintext_encoder' => $plaintext = new PlaintextPasswordEncoder(),
-            SomeUser::class => ['algorithm' => 'sodium', 'migrate_from' => ['bcrypt', 'plaintext_encoder']],
-        ]);
-
-        $hasher = $factory->getPasswordHasher(SomeUser::class);
-        $this->assertInstanceOf(MigratingPasswordHasher::class, $hasher);
-
-        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo'), 'foo', null));
-        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo'), 'foo', null));
-        $this->assertTrue($hasher->verify($plaintext->encodePassword('foo', null), 'foo', null));
-        $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
+        (new PasswordHasherFactory([SomeUser::class => ['class' => \stdClass::class]]))->getPasswordHasher(SomeUser::class);
     }
 
     public function testDefaultMigratingHashers()
@@ -241,22 +213,26 @@ class PasswordHasherFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyEncoderObject()
+    public function testMigrateFromWithCustomInstance()
     {
-        $factory = new PasswordHasherFactory([SomeUser::class => new PlaintextPasswordEncoder()]);
-        self::assertSame('foo{bar}', $factory->getPasswordHasher(SomeUser::class)->hash('foo', 'bar'));
-    }
+        if (!SodiumPasswordHasher::isSupported()) {
+            $this->markTestSkipped('Sodium is not available');
+        }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyEncoderClass()
-    {
-        $factory = new PasswordHasherFactory([SomeUser::class => ['class' => PlaintextPasswordEncoder::class, 'arguments' => []]]);
-        self::assertSame('foo{bar}', $factory->getPasswordHasher(SomeUser::class)->hash('foo', 'bar'));
+        $sodium = new SodiumPasswordHasher();
+
+        $factory = new PasswordHasherFactory([
+            'digest_hasher' => $digest = new MessageDigestPasswordHasher('sha256'),
+            SomeUser::class => ['instance' => $sodium, 'migrate_from' => ['bcrypt', 'digest_hasher']],
+        ]);
+
+        $hasher = $factory->getPasswordHasher(SomeUser::class);
+        $this->assertInstanceOf(MigratingPasswordHasher::class, $hasher);
+
+        $this->assertTrue($hasher->verify((new SodiumPasswordHasher())->hash('foo', null), 'foo', null));
+        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT))->hash('foo', null), 'foo', null));
+        $this->assertTrue($hasher->verify($digest->hash('foo', null), 'foo', null));
+        $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
     }
 }
 
@@ -271,10 +247,6 @@ class SomeUser implements PasswordAuthenticatedUserInterface
     }
 
     public function getSalt(): ?string
-    {
-    }
-
-    public function getUsername(): string
     {
     }
 
@@ -293,7 +265,7 @@ class SomeChildUser extends SomeUser
 
 class HasherAwareUser extends SomeUser implements PasswordHasherAwareInterface
 {
-    public $hasherName = 'hasher_name';
+    public ?string $hasherName = 'hasher_name';
 
     public function getPasswordHasherName(): ?string
     {

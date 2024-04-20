@@ -13,7 +13,6 @@ namespace Symfony\Component\Semaphore;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 use Symfony\Component\Semaphore\Exception\RuntimeException;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
@@ -30,20 +29,14 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    private $store;
-    private $key;
-    private $ttlInSecond;
-    private $autoRelease;
-    private $dirty = false;
+    private bool $dirty = false;
 
-    public function __construct(Key $key, PersistingStoreInterface $store, float $ttlInSecond = 300.0, bool $autoRelease = true)
-    {
-        $this->store = $store;
-        $this->key = $key;
-        $this->ttlInSecond = $ttlInSecond;
-        $this->autoRelease = $autoRelease;
-
-        $this->logger = new NullLogger();
+    public function __construct(
+        private Key $key,
+        private PersistingStoreInterface $store,
+        private float $ttlInSecond = 300.0,
+        private bool $autoRelease = true,
+    ) {
     }
 
     public function __sleep(): array
@@ -51,7 +44,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -68,9 +61,6 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         $this->release();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function acquire(): bool
     {
         try {
@@ -79,29 +69,23 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
             $this->key->reduceLifetime($this->ttlInSecond);
             $this->dirty = true;
 
-            $this->logger->debug('Successfully acquired the "{resource}" semaphore.', ['resource' => $this->key]);
+            $this->logger?->debug('Successfully acquired the "{resource}" semaphore.', ['resource' => $this->key]);
 
             return true;
-        } catch (SemaphoreAcquiringException $e) {
-            $this->logger->notice('Failed to acquire the "{resource}" semaphore. Someone else already acquired the semaphore.', ['resource' => $this->key]);
+        } catch (SemaphoreAcquiringException) {
+            $this->logger?->notice('Failed to acquire the "{resource}" semaphore. Someone else already acquired the semaphore.', ['resource' => $this->key]);
 
             return false;
         } catch (\Exception $e) {
-            $this->logger->notice('Failed to acquire the "{resource}" semaphore.', ['resource' => $this->key, 'exception' => $e]);
+            $this->logger?->notice('Failed to acquire the "{resource}" semaphore.', ['resource' => $this->key, 'exception' => $e]);
 
             throw new RuntimeException(sprintf('Failed to acquire the "%s" semaphore.', $this->key), 0, $e);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function refresh(?float $ttlInSecond = null)
+    public function refresh(?float $ttlInSecond = null): void
     {
-        if (null === $ttlInSecond) {
-            $ttlInSecond = $this->ttlInSecond;
-        }
-        if (!$ttlInSecond) {
+        if (!$ttlInSecond ??= $this->ttlInSecond) {
             throw new InvalidArgumentException('You have to define an expiration duration.');
         }
 
@@ -112,31 +96,25 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
 
             $this->dirty = true;
 
-            $this->logger->debug('Expiration defined for "{resource}" semaphore for "{ttlInSecond}" seconds.', ['resource' => $this->key, 'ttlInSecond' => $ttlInSecond]);
+            $this->logger?->debug('Expiration defined for "{resource}" semaphore for "{ttlInSecond}" seconds.', ['resource' => $this->key, 'ttlInSecond' => $ttlInSecond]);
         } catch (SemaphoreExpiredException $e) {
             $this->dirty = false;
-            $this->logger->notice('Failed to define an expiration for the "{resource}" semaphore, the semaphore has expired.', ['resource' => $this->key]);
+            $this->logger?->notice('Failed to define an expiration for the "{resource}" semaphore, the semaphore has expired.', ['resource' => $this->key]);
 
             throw $e;
         } catch (\Exception $e) {
-            $this->logger->notice('Failed to define an expiration for the "{resource}" semaphore.', ['resource' => $this->key, 'exception' => $e]);
+            $this->logger?->notice('Failed to define an expiration for the "{resource}" semaphore.', ['resource' => $this->key, 'exception' => $e]);
 
             throw new RuntimeException(sprintf('Failed to define an expiration for the "%s" semaphore.', $this->key), 0, $e);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAcquired(): bool
     {
         return $this->dirty = $this->store->exists($this->key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function release()
+    public function release(): void
     {
         try {
             $this->store->delete($this->key);
@@ -144,23 +122,17 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         } catch (SemaphoreReleasingException $e) {
             throw $e;
         } catch (\Exception $e) {
-            $this->logger->notice('Failed to release the "{resource}" semaphore.', ['resource' => $this->key]);
+            $this->logger?->notice('Failed to release the "{resource}" semaphore.', ['resource' => $this->key]);
 
             throw new RuntimeException(sprintf('Failed to release the "%s" semaphore.', $this->key), 0, $e);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isExpired(): bool
     {
         return $this->key->isExpired();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRemainingLifetime(): ?float
     {
         return $this->key->getRemainingLifetime();

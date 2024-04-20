@@ -21,10 +21,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 class CustomNormalizerTest extends TestCase
 {
-    /**
-     * @var CustomNormalizer
-     */
-    private $normalizer;
+    private CustomNormalizer $normalizer;
 
     protected function setUp(): void
     {
@@ -50,11 +47,11 @@ class CustomNormalizerTest extends TestCase
 
     public function testDeserialize()
     {
-        $obj = $this->normalizer->denormalize('foo', \get_class(new ScalarDummy()), 'xml');
+        $obj = $this->normalizer->denormalize('foo', (new ScalarDummy())::class, 'xml');
         $this->assertEquals('foo', $obj->xmlFoo);
         $this->assertNull($obj->foo);
 
-        $obj = $this->normalizer->denormalize('foo', \get_class(new ScalarDummy()), 'json');
+        $obj = $this->normalizer->denormalize('foo', (new ScalarDummy())::class, 'json');
         $this->assertEquals('foo', $obj->foo);
         $this->assertNull($obj->xmlFoo);
     }

@@ -20,10 +20,7 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class AuthenticationCredentialsNotFoundException extends AuthenticationException
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Authentication credentials could not be found.';
     }

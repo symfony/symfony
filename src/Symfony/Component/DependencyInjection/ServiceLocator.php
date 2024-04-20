@@ -16,29 +16,28 @@ use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Contracts\Service\ServiceCollectionInterface;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @template-covariant T of mixed
+ *
+ * @implements ServiceCollectionInterface<T>
  */
-class ServiceLocator implements ServiceProviderInterface
+class ServiceLocator implements ServiceCollectionInterface
 {
     use ServiceLocatorTrait {
         get as private doGet;
     }
 
-    private $externalId;
-    private $container;
+    private ?string $externalId = null;
+    private ?Container $container = null;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    public function get(string $id)
+    public function get(string $id): mixed
     {
         if (!$this->externalId) {
             return $this->doGet($id);
@@ -55,30 +54,39 @@ class ServiceLocator implements ServiceProviderInterface
             }
 
             $r = new \ReflectionProperty($e, 'message');
-            $r->setAccessible(true);
             $r->setValue($e, $message);
 
             throw $e;
         }
     }
 
-    public function __invoke(string $id)
+    public function __invoke(string $id): mixed
     {
         return isset($this->factories[$id]) ? $this->get($id) : null;
     }
 
     /**
      * @internal
-     *
-     * @return static
      */
-    public function withContext(string $externalId, Container $container): self
+    public function withContext(string $externalId, Container $container): static
     {
         $locator = clone $this;
         $locator->externalId = $externalId;
         $locator->container = $container;
 
         return $locator;
+    }
+
+    public function count(): int
+    {
+        return \count($this->getProvidedServices());
+    }
+
+    public function getIterator(): \Traversable
+    {
+        foreach ($this->getProvidedServices() as $id => $config) {
+            yield $id => $this->get($id);
+        }
     }
 
     private function createNotFoundException(string $id): NotFoundExceptionInterface
@@ -90,7 +98,7 @@ class ServiceLocator implements ServiceProviderInterface
         }
 
         $class = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 4);
-        $class = isset($class[3]['object']) ? \get_class($class[3]['object']) : null;
+        $class = isset($class[3]['object']) ? $class[3]['object']::class : null;
         $externalId = $this->externalId ?: $class;
 
         $msg = [];

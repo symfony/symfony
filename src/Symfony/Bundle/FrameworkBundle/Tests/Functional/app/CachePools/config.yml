@@ -6,6 +6,7 @@ parameters:
     env(LIFETIME_EXPRESSION): '13 seconds'
 
 framework:
+    http_method_override: false
     cache:
         pools:
             cache.pool1:

@@ -11,22 +11,16 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 class TypedPropertiesObject
 {
-    /**
-     * @Groups({"foo"})
-     */
+    #[Groups(['foo'])]
     public string $unInitialized;
 
-    /**
-     * @Groups({"foo"})
-     */
+    #[Groups(['foo'])]
     public string $initialized = 'value';
 
-    /**
-     * @Groups({"bar"})
-     */
+    #[Groups(['bar'])]
     public string $initialized2 = 'value';
 }

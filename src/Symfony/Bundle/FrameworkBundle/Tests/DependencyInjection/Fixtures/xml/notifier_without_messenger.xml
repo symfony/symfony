@@ -5,7 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
-    <framework:config>
+    <framework:config http-method-override="false" handle-all-throwables="true">
+        <framework:annotations enabled="false" />
+        <framework:php-errors log="true" />
         <framework:mailer dsn="smtp://example.com" />
         <framework:messenger enabled="false" />
         <framework:notifier enabled="true" notification-on-failed-messages="true">
@@ -17,5 +19,6 @@
                 <framework:admin-recipient email="test@test.de" phone="+490815" />
             </framework:admin-recipients>
         </framework:notifier>
+        <framework:scheduler enabled="false" />
     </framework:config>
 </container>

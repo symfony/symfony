@@ -1,0 +1,4 @@
+imports:
+  - { resource: ../config/default.yml }
+  - { resource: services_auto_configured.yml }
+  - { resource: services_manually_configured.yml }

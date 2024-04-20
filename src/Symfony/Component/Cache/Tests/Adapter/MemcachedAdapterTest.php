@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
@@ -28,19 +27,19 @@ class MemcachedAdapterTest extends AdapterTestCase
         'testClearPrefix' => 'Memcached cannot clear by prefix',
     ];
 
-    protected static $client;
+    protected static \Memcached $client;
 
     public static function setUpBeforeClass(): void
     {
         if (!MemcachedAdapter::isSupported()) {
-            throw new SkippedTestSuiteError('Extension memcached '.(\PHP_VERSION_ID >= 80100 ? '> 3.1.5' : '>= 2.2.0').' required.');
+            self::markTestSkipped('Extension memcached > 3.1.5 required.');
         }
         self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['binary_protocol' => false]);
         self::$client->get('foo');
         $code = self::$client->getResultCode();
 
         if (\Memcached::RES_SUCCESS !== $code && \Memcached::RES_NOTFOUND !== $code) {
-            throw new SkippedTestSuiteError('Memcached error: '.strtolower(self::$client->getResultMessage()));
+            self::markTestSkipped('Memcached error: '.strtolower(self::$client->getResultMessage()));
         }
     }
 
@@ -73,13 +72,8 @@ class MemcachedAdapterTest extends AdapterTestCase
      */
     public function testBadOptions($name, $value)
     {
-        if (\PHP_VERSION_ID < 80000) {
-            $this->expectException(\ErrorException::class);
-            $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
-        } else {
-            $this->expectException(\Error::class);
-            $this->expectExceptionMessage('Undefined constant Memcached::');
-        }
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Undefined constant Memcached::');
 
         MemcachedAdapter::createConnection([], [$name => $value]);
     }
@@ -107,11 +101,12 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function testOptionSerializer()
     {
-        $this->expectException(CacheException::class);
-        $this->expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
         if (!\Memcached::HAVE_JSON) {
             $this->markTestSkipped('Memcached::HAVE_JSON required');
         }
+
+        $this->expectException(CacheException::class);
+        $this->expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
 
         new MemcachedAdapter(MemcachedAdapter::createConnection([], ['serializer' => 'json']));
     }
@@ -129,7 +124,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             'port' => $port,
         ];
 
-        $f = function ($s) { return ['host' => $s['host'], 'port' => $s['port']]; };
+        $f = fn ($s) => ['host' => $s['host'], 'port' => $s['port']];
         $this->assertSame([$expect], array_map($f, $client1->getServerList()));
         $this->assertSame([$expect], array_map($f, $client2->getServerList()));
         $this->assertSame([$expect], array_map($f, $client3->getServerList()));
@@ -147,7 +142,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             'localhost',
             11222,
         ];
-        if (filter_var(\ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(\ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOL)) {
             yield [
                 'memcached://user:password@127.0.0.1?weight=50',
                 '127.0.0.1',
@@ -164,7 +159,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             '/var/local/run/memcached.socket',
             0,
         ];
-        if (filter_var(\ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(\ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOL)) {
             yield [
                 'memcached://user:password@/var/local/run/memcached.socket?weight=25',
                 '/var/local/run/memcached.socket',

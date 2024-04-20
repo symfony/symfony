@@ -30,7 +30,7 @@ use Twig\NodeVisitor\NodeVisitorInterface;
  */
 final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 {
-    private $scope;
+    private Scope $scope;
 
     public function __construct()
     {
@@ -96,9 +96,6 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return -10;
@@ -117,6 +114,6 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 
     private function getVarName(): string
     {
-        return sprintf('__internal_%s', hash('sha256', uniqid(mt_rand(), true), false));
+        return sprintf('__internal_%s', hash('xxh128', uniqid(mt_rand(), true)));
     }
 }

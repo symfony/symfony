@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\TurboSms\Tests;
 
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class TurboSmsTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return TurboSmsTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): TurboSmsTransportFactory
     {
         return new TurboSmsTransportFactory();
     }

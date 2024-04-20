@@ -13,7 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailchimp\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -59,7 +59,6 @@ class MandrillApiTransportTest extends TestCase
 
         $transport = new MandrillApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('message', $payload);
@@ -84,7 +83,7 @@ class MandrillApiTransportTest extends TestCase
             $this->assertSame('Hello!', $message['subject']);
             $this->assertSame('Hello There!', $message['text']);
 
-            return new MockResponse(json_encode([['_id' => 'foobar']]), [
+            return new JsonMockResponse([['_id' => 'foobar']], [
                 'http_code' => 200,
             ]);
         });
@@ -104,11 +103,9 @@ class MandrillApiTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['status' => 'error', 'message' => 'i\'m a teapot', 'code' => 418]), [
-                'http_code' => 418,
-            ]);
-        });
+        $client = new MockHttpClient(fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['status' => 'error', 'message' => 'i\'m a teapot', 'code' => 418], [
+            'http_code' => 418,
+        ]));
 
         $transport = new MandrillApiTransport('KEY', $client);
 
@@ -133,7 +130,6 @@ class MandrillApiTransportTest extends TestCase
 
         $transport = new MandrillApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('message', $payload);
@@ -153,7 +149,6 @@ class MandrillApiTransportTest extends TestCase
 
         $transport = new MandrillApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('message', $payload);

@@ -18,16 +18,12 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TwilioTransportTest extends TransportTestCase
 {
-    /**
-     * @return TwilioTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null, string $from = 'from'): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'from'): TwilioTransport
     {
         return new TwilioTransport('accountSid', 'authToken', $from, $client ?? new MockHttpClient());
     }
@@ -59,6 +55,19 @@ final class TwilioTransportTest extends TransportTestCase
         $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
+    }
+
+    /**
+     * @dataProvider invalidFromProvider
+     */
+    public function testInvalidArgumentExceptionIsThrownIfSmsMessageFromIsInvalid(string $from)
+    {
+        $transport = $this->createTransport();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+
+        $transport->send(new SmsMessage('+33612345678', 'Hello!', $from));
     }
 
     public static function invalidFromProvider(): iterable

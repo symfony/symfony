@@ -14,6 +14,7 @@ namespace Symfony\Component\BrowserKit\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
+use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\BrowserKit\Response;
@@ -282,6 +283,19 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
     }
 
+    public function testClickPreserveHeaders()
+    {
+        $client = $this->getBrowser();
+        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $client->click($crawler->filter('a')->link(), ['X-Special-Header' => 'Special Header Value']);
+
+        $server = $client->getRequest()->getServer();
+        $this->assertArrayHasKey('X-Special-Header', $server);
+        $this->assertSame('Special Header Value', $server['X-Special-Header']);
+    }
+
     public function testClickLink()
     {
         $client = $this->getBrowser();
@@ -298,12 +312,20 @@ class AbstractBrowserTest extends TestCase
         $client->setNextResponse(new Response('<html><a href="/foo">foobar</a></html>'));
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
-        try {
-            $client->clickLink('foo');
-            $this->fail('->clickLink() throws a \InvalidArgumentException if the link could not be found');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->clickLink() throws a \InvalidArgumentException if the link could not be found');
-        }
+        $this->expectException(\InvalidArgumentException::class);
+        $client->clickLink('foo');
+    }
+
+    public function testClickLinkPreserveHeaders()
+    {
+        $client = $this->getBrowser();
+        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $client->clickLink('foo', ['X-Special-Header' => 'Special Header Value']);
+
+        $server = $client->getRequest()->getServer();
+        $this->assertArrayHasKey('X-Special-Header', $server);
+        $this->assertSame('Special Header Value', $server['X-Special-Header']);
     }
 
     public function testClickForm()
@@ -315,6 +337,19 @@ class AbstractBrowserTest extends TestCase
         $client->click($crawler->filter('input')->form());
 
         $this->assertSame('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() Form submit forms');
+    }
+
+    public function testClickFormPreserveHeaders()
+    {
+        $client = $this->getBrowser();
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $client->click($crawler->filter('input')->form(), ['X-Special-Header' => 'Special Header Value']);
+
+        $server = $client->getRequest()->getServer();
+        $this->assertArrayHasKey('X-Special-Header', $server);
+        $this->assertSame('Special Header Value', $server['X-Special-Header']);
     }
 
     public function testSubmit()
@@ -354,15 +389,14 @@ class AbstractBrowserTest extends TestCase
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
-        try {
-            $client->submitForm('Register', [
-                'username' => 'username',
-                'password' => 'password',
-            ], 'POST');
-            $this->fail('->submitForm() throws a \InvalidArgumentException if the form could not be found');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->submitForm() throws a \InvalidArgumentException if the form could not be found');
-        }
+        $this->expectExceptionObject(
+            new InvalidArgumentException('There is no button with "Register" as its content, id, value or name.')
+        );
+
+        $client->submitForm('Register', [
+            'username' => 'username',
+            'password' => 'password',
+        ], 'POST');
     }
 
     public function testSubmitPreserveAuth()

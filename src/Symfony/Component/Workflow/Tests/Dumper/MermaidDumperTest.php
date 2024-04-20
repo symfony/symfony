@@ -104,8 +104,7 @@ class MermaidDumperTest extends TestCase
             ."transition4-->place6\n"
             ."transition5[\"t6\"]\n"
             ."place5-->transition5\n"
-            ."transition5-->place6"
-
+            ."transition5-->place6",
         ];
         yield [
             self::createWorkflowWithSameNameTransition(),
@@ -125,8 +124,7 @@ class MermaidDumperTest extends TestCase
             ."transition2-->place0\n"
             ."transition3[\"to_a\"]\n"
             ."place2-->transition3\n"
-            ."transition3-->place0"
-
+            ."transition3-->place0",
         ];
         yield [
             self::createSimpleWorkflowDefinition(),
@@ -142,7 +140,7 @@ class MermaidDumperTest extends TestCase
             ."linkStyle 1 stroke:Grey\n"
             ."transition1[\"t2\"]\n"
             ."place1-->transition1\n"
-            ."transition1-->place2"
+            ."transition1-->place2",
         ];
     }
 
@@ -171,8 +169,7 @@ class MermaidDumperTest extends TestCase
             ."place1-->transition0\n"
             ."transition1[\"t1\"]\n"
             ."place2-->transition1\n"
-            ."transition1-->place3"
-
+            ."transition1-->place3",
         ];
     }
 
@@ -189,8 +186,7 @@ class MermaidDumperTest extends TestCase
             ."place3-->|\"My custom transition label 3\"|place1\n"
             ."linkStyle 1 stroke:Grey\n"
             ."place1-->|\"t2\"|place2\n"
-            ."place1-->|\"t3\"|place3"
-
+            ."place1-->|\"t3\"|place3",
         ];
     }
 
@@ -216,8 +212,7 @@ class MermaidDumperTest extends TestCase
             ."linkStyle 1 stroke:Grey\n"
             ."transition1[\"t2\"]\n"
             ."place1-->transition1\n"
-            ."transition1-->place2"
-
+            ."transition1-->place2",
         ];
     }
 }

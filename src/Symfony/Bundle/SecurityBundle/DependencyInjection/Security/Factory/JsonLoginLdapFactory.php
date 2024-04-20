@@ -12,10 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Security\Core\Exception\LogicException;
 
 /**
  * JsonLoginLdapFactory creates services for json login ldap authentication.
@@ -26,38 +22,14 @@ class JsonLoginLdapFactory extends JsonLoginFactory
 {
     use LdapFactoryTrait;
 
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
-    {
-        $provider = 'security.authentication.provider.ldap_bind.'.$id;
-        $definition = $container
-            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.ldap_bind'))
-            ->replaceArgument(0, new Reference($userProviderId))
-            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
-            ->replaceArgument(2, $id)
-            ->replaceArgument(3, new Reference($config['service']))
-            ->replaceArgument(4, $config['dn_string'])
-            ->replaceArgument(6, $config['search_dn'])
-            ->replaceArgument(7, $config['search_password'])
-        ;
-
-        if (!empty($config['query_string'])) {
-            if ('' === $config['search_dn'] || '' === $config['search_password']) {
-                throw new LogicException('Using the "query_string" config without using a "search_dn" and a "search_password" is not supported.');
-            }
-            $definition->addMethodCall('setQueryString', [$config['query_string']]);
-        }
-
-        return $provider;
-    }
-
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         parent::addConfiguration($node);
 
         $node
             ->children()
                 ->scalarNode('service')->defaultValue('ldap')->end()
-                ->scalarNode('dn_string')->defaultValue('{username}')->end()
+                ->scalarNode('dn_string')->defaultValue('{user_identifier}')->end()
                 ->scalarNode('query_string')->end()
                 ->scalarNode('search_dn')->defaultValue('')->end()
                 ->scalarNode('search_password')->defaultValue('')->end()

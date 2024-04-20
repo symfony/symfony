@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -38,22 +38,14 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        ];
-    }
-
     /**
      * Gets the public 'foo' shared service.
      *
      * @return \Foo
      */
-    protected function getFooService()
+    protected static function getFooService($container)
     {
-        return $this->services['foo'] = new \Foo();
+        return $container->services['foo'] = new \Foo();
     }
 
     /**
@@ -61,11 +53,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar
      */
-    protected function getServiceClosureService()
+    protected static function getServiceClosureService($container)
     {
-        return $this->services['service_closure'] = new \Bar(function () {
-            return ($this->services['foo'] ?? ($this->services['foo'] = new \Foo()));
-        });
+        return $container->services['service_closure'] = new \Bar(#[\Closure(name: 'foo', class: 'Foo')] fn () => ($container->services['foo'] ??= new \Foo()));
     }
 
     /**
@@ -73,10 +63,8 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar
      */
-    protected function getServiceClosureInvalidService()
+    protected static function getServiceClosureInvalidService($container)
     {
-        return $this->services['service_closure_invalid'] = new \Bar(function () {
-            return NULL;
-        });
+        return $container->services['service_closure_invalid'] = new \Bar(fn () => NULL);
     }
 }

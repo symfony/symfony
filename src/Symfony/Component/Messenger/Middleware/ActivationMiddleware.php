@@ -20,21 +20,15 @@ use Symfony\Component\Messenger\Envelope;
  */
 class ActivationMiddleware implements MiddlewareInterface
 {
-    private $inner;
-    private $activated;
+    private \Closure|bool $activated;
 
-    /**
-     * @param bool|callable $activated
-     */
-    public function __construct(MiddlewareInterface $inner, $activated)
-    {
-        $this->inner = $inner;
-        $this->activated = $activated;
+    public function __construct(
+        private MiddlewareInterface $inner,
+        bool|callable $activated,
+    ) {
+        $this->activated = \is_bool($activated) ? $activated : $activated(...);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         if (\is_callable($this->activated) ? ($this->activated)($envelope) : $this->activated) {

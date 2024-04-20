@@ -5,8 +5,6 @@ Array
 namespace Container%s;
 
 return [
-    'Psr\\Container\\ContainerInterface' => true,
-    'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
     'bar' => true,
 ];
 
@@ -15,6 +13,7 @@ return [
 namespace Container%s;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -31,9 +30,7 @@ class getClosureService extends ProjectServiceContainer
     {
         $container->services['closure'] = $instance = new \stdClass();
 
-        $instance->closures = [0 => function () use ($container): ?\stdClass {
-            return ($container->services['foo'] ?? null);
-        }];
+        $instance->closures = [#[\Closure(name: 'foo', class: 'FooClass')] fn (): ?\stdClass => ($container->services['foo'] ?? null)];
 
         return $instance;
     }
@@ -46,8 +43,8 @@ namespace Container%s;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -57,15 +54,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class ProjectServiceContainer extends Container
 {
-    protected $containerDir;
     protected $targetDir;
     protected $parameters = [];
-    private $buildParameters;
 
-    public function __construct(array $buildParameters = [], $containerDir = __DIR__)
+    public function __construct(private array $buildParameters = [], protected string $containerDir = __DIR__)
     {
-        $this->buildParameters = $buildParameters;
-        $this->containerDir = $containerDir;
         $this->targetDir = \dirname($containerDir);
         $this->services = $this->privates = [];
         $this->methodMap = [
@@ -93,7 +86,7 @@ class ProjectServiceContainer extends Container
         return require $this->containerDir.\DIRECTORY_SEPARATOR.'removed-ids.php';
     }
 
-    protected function load($file, $lazyLoad = true)
+    protected function load($file, $lazyLoad = true): mixed
     {
         if (class_exists($class = __NAMESPACE__.'\\'.$file, false)) {
             return $class::do($this, $lazyLoad);
@@ -115,9 +108,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \FooClass
      */
-    protected function getFooService()
+    protected static function getFooService($container)
     {
-        return $this->services['foo'] = new \FooClass(new \stdClass());
+        return $container->services['foo'] = new \FooClass(new \stdClass());
     }
 }
 
@@ -128,7 +121,7 @@ class ProjectServiceContainer extends Container
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     return;
 }
 
@@ -162,6 +155,7 @@ return new \Container%s\ProjectServiceContainer([
     'container.build_hash' => '%s',
     'container.build_id' => '%s',
     'container.build_time' => %d,
+    'container.runtime_mode' => \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\DIRECTORY_SEPARATOR.'Container%s');
 
 )

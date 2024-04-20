@@ -25,10 +25,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  */
 class PropertyAccessDecoratorTest extends TestCase
 {
-    /**
-     * @var PropertyAccessDecorator
-     */
-    private $factory;
+    private PropertyAccessDecorator $factory;
 
     protected function setUp(): void
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Uid\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -22,23 +23,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\Uuid;
 
+#[AsCommand(name: 'uuid:generate', description: 'Generate a UUID')]
 class GenerateUuidCommand extends Command
 {
-    protected static $defaultName = 'uuid:generate';
-    protected static $defaultDescription = 'Generate a UUID';
-
-    private $factory;
-
-    public function __construct(?UuidFactory $factory = null)
-    {
-        $this->factory = $factory ?? new UuidFactory();
-
+    public function __construct(
+        private UuidFactory $factory = new UuidFactory(),
+    ) {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -49,9 +42,8 @@ class GenerateUuidCommand extends Command
                 new InputOption('namespace', null, InputOption::VALUE_REQUIRED, 'The UUID to use at the namespace for named-based UUIDs, predefined namespaces keywords "dns", "url", "oid" and "x500" are accepted'),
                 new InputOption('random-based', null, InputOption::VALUE_NONE, 'To generate a random-based UUID'),
                 new InputOption('count', 'c', InputOption::VALUE_REQUIRED, 'The number of UUID to generate', 1),
-                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'The UUID output format: rfc4122, base58 or base32', 'rfc4122'),
+                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, sprintf('The UUID output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'rfc4122'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> generates a UUID.
 
@@ -89,10 +81,7 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
@@ -140,9 +129,7 @@ EOF
                     return 1;
                 }
 
-                $create = function () use ($node, $time): Uuid {
-                    return $this->factory->timeBased($node)->create(new \DateTimeImmutable($time));
-                };
+                $create = fn (): Uuid => $this->factory->timeBased($node)->create(new \DateTimeImmutable($time));
                 break;
 
             case null !== $name:
@@ -159,7 +146,7 @@ EOF
                 $create = function () use ($namespace, $name): Uuid {
                     try {
                         $factory = $this->factory->nameBased($namespace);
-                    } catch (\LogicException $e) {
+                    } catch (\LogicException) {
                         throw new \InvalidArgumentException('Missing namespace: use the "--namespace" option or configure a default namespace in the underlying factory.');
                     }
 
@@ -168,20 +155,20 @@ EOF
                 break;
 
             case $random:
-                $create = [$this->factory->randomBased(), 'create'];
+                $create = $this->factory->randomBased()->create(...);
                 break;
 
             default:
-                $create = [$this->factory, 'create'];
+                $create = $this->factory->create(...);
                 break;
         }
 
         $formatOption = $input->getOption('format');
 
-        if (\in_array($formatOption, $this->getAvailableFormatOptions())) {
+        if (\in_array($formatOption, $this->getAvailableFormatOptions(), true)) {
             $format = 'to'.ucfirst($formatOption);
         } else {
-            $io->error(sprintf('Invalid format "%s", did you mean "base32", "base58" or "rfc4122"?', $formatOption));
+            $io->error(sprintf('Invalid format "%s", supported formats are "%s".', $formatOption, implode('", "', $this->getAvailableFormatOptions())));
 
             return 1;
         }

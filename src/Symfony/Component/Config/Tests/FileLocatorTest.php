@@ -25,7 +25,6 @@ class FileLocatorTest extends TestCase
         $loader = new FileLocator([]);
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('isAbsolutePath');
-        $m->setAccessible(true);
 
         $this->assertTrue($m->invoke($loader, $path), '->isAbsolutePath() returns true for an absolute path');
     }
@@ -89,26 +88,29 @@ class FileLocatorTest extends TestCase
 
     public function testLocateThrowsAnExceptionIfTheFileDoesNotExists()
     {
+        $loader = new FileLocator([__DIR__.'/Fixtures']);
+
         $this->expectException(FileLocatorFileNotFoundException::class);
         $this->expectExceptionMessage('The file "foobar.xml" does not exist');
-        $loader = new FileLocator([__DIR__.'/Fixtures']);
 
         $loader->locate('foobar.xml', __DIR__);
     }
 
     public function testLocateThrowsAnExceptionIfTheFileDoesNotExistsInAbsolutePath()
     {
-        $this->expectException(FileLocatorFileNotFoundException::class);
         $loader = new FileLocator([__DIR__.'/Fixtures']);
+
+        $this->expectException(FileLocatorFileNotFoundException::class);
 
         $loader->locate(__DIR__.'/Fixtures/foobar.xml', __DIR__);
     }
 
     public function testLocateEmpty()
     {
+        $loader = new FileLocator([__DIR__.'/Fixtures']);
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('An empty file name is not valid to be located.');
-        $loader = new FileLocator([__DIR__.'/Fixtures']);
 
         $loader->locate('', __DIR__);
     }

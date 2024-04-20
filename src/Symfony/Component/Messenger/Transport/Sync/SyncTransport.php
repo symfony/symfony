@@ -25,21 +25,14 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class SyncTransport implements TransportInterface
 {
-    private $messageBus;
-
-    public function __construct(MessageBusInterface $messageBus)
-    {
-        $this->messageBus = $messageBus;
+    public function __construct(
+        private MessageBusInterface $messageBus,
+    ) {
     }
 
     public function get(): iterable
     {
         throw new InvalidArgumentException('You cannot receive messages from the Messenger SyncTransport.');
-    }
-
-    public function stop(): void
-    {
-        throw new InvalidArgumentException('You cannot call stop() on the Messenger SyncTransport.');
     }
 
     public function ack(Envelope $envelope): void

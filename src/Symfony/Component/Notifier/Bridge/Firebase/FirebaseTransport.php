@@ -29,14 +29,11 @@ final class FirebaseTransport extends AbstractTransport
 {
     protected const HOST = 'fcm.googleapis.com/fcm/send';
 
-    /** @var string */
-    private $token;
-
-    public function __construct(string $token, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
-        $this->client = $client;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -47,7 +44,7 @@ final class FirebaseTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof ChatMessage;
+        return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof FirebaseOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -57,16 +54,14 @@ final class FirebaseTransport extends AbstractTransport
         }
 
         $endpoint = sprintf('https://%s', $this->getEndpoint());
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
-        if (!isset($options['to'])) {
-            $options['to'] = $message->getRecipientId();
-        }
-        if (null === $options['to']) {
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['to'] = $message->getRecipientId();
+
+        if (!$options['to']) {
             throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
-        $options['notification'] = $options['notification'] ?? [];
         $options['notification']['body'] = $message->getSubject();
-        $options['data'] = $options['data'] ?? [];
+        $options['data'] ??= [];
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
@@ -82,7 +77,7 @@ final class FirebaseTransport extends AbstractTransport
         }
 
         $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-        $jsonContents = 0 === strpos($contentType, 'application/json') ? $response->toArray(false) : null;
+        $jsonContents = str_starts_with($contentType, 'application/json') ? $response->toArray(false) : null;
         $errorMessage = null;
 
         if ($jsonContents && isset($jsonContents['results'][0]['error'])) {

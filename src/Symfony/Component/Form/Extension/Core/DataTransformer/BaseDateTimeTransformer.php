@@ -14,9 +14,14 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
+/**
+ * @template TTransformedValue
+ *
+ * @implements DataTransformerInterface<\DateTimeInterface, TTransformedValue>
+ */
 abstract class BaseDateTimeTransformer implements DataTransformerInterface
 {
-    protected static $formats = [
+    protected static array $formats = [
         \IntlDateFormatter::NONE,
         \IntlDateFormatter::FULL,
         \IntlDateFormatter::LONG,
@@ -24,9 +29,8 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
         \IntlDateFormatter::SHORT,
     ];
 
-    protected $inputTimezone;
-
-    protected $outputTimezone;
+    protected string $inputTimezone;
+    protected string $outputTimezone;
 
     /**
      * @param string|null $inputTimezone  The name of the input timezone

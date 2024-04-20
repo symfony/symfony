@@ -24,7 +24,7 @@ class RouterDataCollector extends DataCollector
     /**
      * @var \SplObjectStorage<Request, callable>
      */
-    protected $controllers;
+    protected \SplObjectStorage $controllers;
 
     public function __construct()
     {
@@ -32,11 +32,9 @@ class RouterDataCollector extends DataCollector
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @final
      */
-    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         if ($response instanceof RedirectResponse) {
             $this->data['redirect'] = true;
@@ -50,7 +48,7 @@ class RouterDataCollector extends DataCollector
         unset($this->controllers[$request]);
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->controllers = new \SplObjectStorage();
 
@@ -61,7 +59,7 @@ class RouterDataCollector extends DataCollector
         ];
     }
 
-    protected function guessRoute(Request $request, $controller)
+    protected function guessRoute(Request $request, string|object|array $controller): string
     {
         return 'n/a';
     }
@@ -69,7 +67,7 @@ class RouterDataCollector extends DataCollector
     /**
      * Remembers the controller associated to each request.
      */
-    public function onKernelController(ControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }
@@ -77,31 +75,22 @@ class RouterDataCollector extends DataCollector
     /**
      * @return bool Whether this request will result in a redirect
      */
-    public function getRedirect()
+    public function getRedirect(): bool
     {
         return $this->data['redirect'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTargetUrl()
+    public function getTargetUrl(): ?string
     {
         return $this->data['url'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTargetRoute()
+    public function getTargetRoute(): ?string
     {
         return $this->data['route'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'router';
     }

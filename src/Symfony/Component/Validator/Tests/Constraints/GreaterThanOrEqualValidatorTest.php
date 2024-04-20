@@ -23,7 +23,7 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
 {
     use IcuCompatibilityTrait;
 
-    protected function createValidator()
+    protected function createValidator(): GreaterThanOrEqualValidator
     {
         return new GreaterThanOrEqualValidator();
     }
@@ -38,9 +38,6 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
         return GreaterThanOrEqual::TOO_LOW_ERROR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -58,9 +55,6 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -69,9 +63,6 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [

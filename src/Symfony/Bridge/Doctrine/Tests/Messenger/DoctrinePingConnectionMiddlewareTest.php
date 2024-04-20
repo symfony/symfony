@@ -26,11 +26,11 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 {
-    private $connection;
-    private $entityManager;
-    private $managerRegistry;
-    private $middleware;
-    private $entityManagerName = 'default';
+    private Connection&MockObject $connection;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private DoctrinePingConnectionMiddleware $middleware;
+    private string $entityManagerName = 'default';
 
     protected function setUp(): void
     {
@@ -112,13 +112,6 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewareNoPingInNonWorkerContext()
     {
-        // This method has been removed in DBAL 3.0
-        if (method_exists(Connection::class, 'ping')) {
-            $this->connection->expects($this->never())
-                ->method('ping')
-                ->willReturn(false);
-        }
-
         $this->connection->expects($this->never())
             ->method('close')
         ;
@@ -127,8 +120,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         $this->middleware->handle($envelope, $this->getStackMock());
     }
 
-    /** @return AbstractPlatform&MockObject */
-    private function mockPlatform(): AbstractPlatform
+    private function mockPlatform(): AbstractPlatform&MockObject
     {
         $platform = $this->createMock(AbstractPlatform::class);
         $platform->method('getDummySelectSQL')->willReturn('SELECT 1');

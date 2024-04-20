@@ -27,7 +27,6 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -35,9 +34,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransportTest extends TransportTestCase
 {
-    public static function createTransport(?HttpClientInterface $client = null, ?HubInterface $hub = null, string $hubId = 'hubId', $topics = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?HubInterface $hub = null, string $hubId = 'hubId', $topics = null): MercureTransport
     {
-        $hub = $hub ?? new DummyHub();
+        $hub ??= new DummyHub();
 
         return new MercureTransport($hub, $hubId, $topics);
     }
@@ -160,9 +159,7 @@ final class MercureTransportTest extends TransportTestCase
     {
         $messageId = 'urn:uuid:a7045be0-a75d-4d40-8bd2-29fa4e5dd10b';
 
-        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update) use ($messageId): string {
-            return $messageId;
-        });
+        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), fn (Update $update): string => $messageId);
 
         $sentMessage = self::createTransport(null, $hub)->send(new ChatMessage('subject'));
         $this->assertSame($messageId, $sentMessage->getMessageId());

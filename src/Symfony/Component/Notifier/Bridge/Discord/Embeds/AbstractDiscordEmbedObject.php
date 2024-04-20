@@ -16,7 +16,7 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
  */
 abstract class AbstractDiscordEmbedObject implements DiscordEmbedObjectInterface
 {
-    protected $options = [];
+    protected array $options = [];
 
     public function toArray(): array
     {

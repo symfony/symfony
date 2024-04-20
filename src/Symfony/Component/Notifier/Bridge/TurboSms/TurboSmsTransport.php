@@ -34,15 +34,13 @@ final class TurboSmsTransport extends AbstractTransport
     private const SUBJECT_CYRILLIC_LIMIT = 661;
     private const SENDER_LIMIT = 20;
 
-    private $authToken;
-    private $from;
-
-    public function __construct(string $authToken, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         $this->assertValidFrom($from);
-
-        $this->authToken = $authToken;
-        $this->from = $from;
 
         parent::__construct($client, $dispatcher);
     }
@@ -65,12 +63,21 @@ final class TurboSmsTransport extends AbstractTransport
 
         $this->assertValidSubject($message->getSubject());
 
+        $fromMessage = $message->getFrom();
+
+        if ($fromMessage) {
+            $this->assertValidFrom($fromMessage);
+            $from = $fromMessage;
+        } else {
+            $from = $this->from;
+        }
+
         $endpoint = sprintf('https://%s/message/send.json', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [
                 'sms' => [
-                    'sender' => $this->from,
+                    'sender' => $from,
                     'recipients' => [$message->getPhone()],
                     'text' => $message->getSubject(),
                 ],
@@ -101,7 +108,7 @@ final class TurboSmsTransport extends AbstractTransport
     private function assertValidSubject(string $subject): void
     {
         // Detect if there is at least one cyrillic symbol in the text
-        if (1 === preg_match("/\p{Cyrillic}/u", $subject)) {
+        if (preg_match("/\p{Cyrillic}/u", $subject)) {
             $subjectLimit = self::SUBJECT_CYRILLIC_LIMIT;
             $symbols = 'cyrillic';
         } else {

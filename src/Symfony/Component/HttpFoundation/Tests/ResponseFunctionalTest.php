@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class ResponseFunctionalTest extends TestCase
 {
+    /** @var resource|false */
     private static $server;
 
     public static function setUpBeforeClass(): void
@@ -25,7 +27,7 @@ class ResponseFunctionalTest extends TestCase
             2 => ['file', '/dev/null', 'w'],
         ];
         if (!self::$server = @proc_open('exec '.\PHP_BINARY.' -S localhost:8054', $spec, $pipes, __DIR__.'/Fixtures/response-functional')) {
-            throw new SkippedTestSuiteError('PHP server unable to start.');
+            self::markTestSkipped('PHP server unable to start.');
         }
         sleep(1);
     }
@@ -43,19 +45,39 @@ class ResponseFunctionalTest extends TestCase
      */
     public function testCookie($fixture)
     {
-        if (\PHP_VERSION_ID >= 80000 && 'cookie_max_age' === $fixture) {
-            $this->markTestSkipped('This fixture produces a fatal error on PHP 8.');
-        }
-
         $result = file_get_contents(sprintf('http://localhost:8054/%s.php', $fixture));
-        $result = preg_replace_callback('/expires=[^;]++/', function ($m) { return str_replace('-', ' ', $m[0]); }, $result);
+        $result = preg_replace_callback('/expires=[^;]++/', fn ($m) => str_replace('-', ' ', $m[0]), $result);
         $this->assertStringMatchesFormatFile(__DIR__.sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
     }
 
     public static function provideCookie()
     {
         foreach (glob(__DIR__.'/Fixtures/response-functional/*.php') as $file) {
-            yield [pathinfo($file, \PATHINFO_FILENAME)];
+            if (str_contains($file, 'cookie')) {
+                yield [pathinfo($file, \PATHINFO_FILENAME)];
+            }
         }
+    }
+
+    /**
+     * @group integration
+     */
+    public function testInformationalResponse()
+    {
+        if (!(new ExecutableFinder())->find('curl')) {
+            $this->markTestSkipped('curl is not installed');
+        }
+
+        if (!($fp = @fsockopen('localhost', 80, $errorCode, $errorMessage, 2))) {
+            $this->markTestSkipped('FrankenPHP is not running');
+        }
+        fclose($fp);
+
+        $p = new Process(['curl', '-v', 'http://localhost/early_hints.php']);
+        $p->run();
+        $output = $p->getErrorOutput();
+
+        $this->assertSame(3, preg_match_all('#Link: </css/style\.css>; rel="preload"; as="style"#', $output));
+        $this->assertSame(2, preg_match_all('#Link: </js/app\.js>; rel="preload"; as="script"#', $output));
     }
 }

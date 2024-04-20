@@ -16,56 +16,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTest;
 
 class ControllerResolverTest extends ContainerControllerResolverTest
 {
-    public function testGetControllerOnContainerAware()
-    {
-        $resolver = $this->createControllerResolver();
-        $request = Request::create('/');
-        $request->attributes->set('_controller', 'Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction');
-
-        $controller = $resolver->getController($request);
-
-        $this->assertInstanceOf(ContainerAwareController::class, $controller[0]);
-        $this->assertInstanceOf(ContainerInterface::class, $controller[0]->getContainer());
-        $this->assertSame('testAction', $controller[1]);
-    }
-
-    public function testGetControllerOnContainerAwareInvokable()
-    {
-        $resolver = $this->createControllerResolver();
-        $request = Request::create('/');
-        $request->attributes->set('_controller', 'Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController');
-
-        $controller = $resolver->getController($request);
-
-        $this->assertInstanceOf(ContainerAwareController::class, $controller);
-        $this->assertInstanceOf(ContainerInterface::class, $controller->getContainer());
-    }
-
-    public function testContainerAwareControllerGetsContainerWhenNotSet()
-    {
-        class_exists(AbstractControllerTest::class);
-
-        $controller = new ContainerAwareController();
-
-        $container = new Container();
-        $container->set(TestAbstractController::class, $controller);
-
-        $resolver = $this->createControllerResolver(null, $container);
-
-        $request = Request::create('/');
-        $request->attributes->set('_controller', TestAbstractController::class.'::testAction');
-
-        $this->assertSame([$controller, 'testAction'], $resolver->getController($request));
-        $this->assertSame($container, $controller->getContainer());
-    }
-
     public function testAbstractControllerGetsContainerWhenNotSet()
     {
         $this->expectException(\LogicException::class);
@@ -151,7 +106,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
     protected function createControllerResolver(?LoggerInterface $logger = null, ?Psr11ContainerInterface $container = null)
     {
         if (!$container) {
-            $container = $this->createMockContainer();
+            $container = new Container();
         }
 
         return new ControllerResolver($container, $logger);
@@ -161,39 +116,11 @@ class ControllerResolverTest extends ContainerControllerResolverTest
     {
         return $this->createMock(ControllerNameParser::class);
     }
-
-    protected function createMockContainer()
-    {
-        return $this->createMock(ContainerInterface::class);
-    }
-}
-
-class ContainerAwareController implements ContainerAwareInterface
-{
-    private $container;
-
-    public function setContainer(?ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    public function testAction()
-    {
-    }
-
-    public function __invoke()
-    {
-    }
 }
 
 class DummyController extends AbstractController
 {
-    public function getContainer()
+    public function getContainer(): Psr11ContainerInterface
     {
         return $this->container;
     }

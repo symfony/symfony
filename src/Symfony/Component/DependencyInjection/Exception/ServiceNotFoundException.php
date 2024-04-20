@@ -20,9 +20,9 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class ServiceNotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
 {
-    private $id;
-    private $sourceId;
-    private $alternatives;
+    private string $id;
+    private ?string $sourceId;
+    private array $alternatives;
 
     public function __construct(string $id, ?string $sourceId = null, ?\Throwable $previous = null, array $alternatives = [], ?string $msg = null)
     {
@@ -50,17 +50,17 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
         $this->alternatives = $alternatives;
     }
 
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function getSourceId()
+    public function getSourceId(): ?string
     {
         return $this->sourceId;
     }
 
-    public function getAlternatives()
+    public function getAlternatives(): array
     {
         return $this->alternatives;
     }

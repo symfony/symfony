@@ -22,10 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocaleType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
@@ -35,34 +32,22 @@ class LocaleType extends AbstractType
 
                 $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {
-                    return array_flip(Locales::getNames($choiceTranslationLocale));
-                }), $choiceTranslationLocale);
+                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(static fn () => array_flip(Locales::getNames($choiceTranslationLocale))), $choiceTranslationLocale);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid locale.';
-            },
+            'invalid_message' => 'Please select a valid locale.',
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'locale';
     }

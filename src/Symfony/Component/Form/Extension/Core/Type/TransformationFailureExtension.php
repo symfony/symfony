@@ -21,23 +21,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TransformationFailureExtension extends AbstractTypeExtension
 {
-    private $translator;
-
-    public function __construct(?TranslatorInterface $translator = null)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!isset($options['constraints'])) {
             $builder->addEventSubscriber(new TransformationFailureListener($this->translator));
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];

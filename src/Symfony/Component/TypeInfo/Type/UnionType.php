@@ -78,4 +78,24 @@ final class UnionType extends Type
 
         return $string;
     }
+
+    /**
+     * Proxies all method calls to the original non-nullable type.
+     *
+     * @param list<mixed> $arguments
+     */
+    public function __call(string $method, array $arguments): mixed
+    {
+        $nonNullableType = $this->asNonNullable();
+
+        if (!$nonNullableType instanceof self) {
+            if (!method_exists($nonNullableType, $method)) {
+                throw new LogicException(sprintf('Method "%s" doesn\'t exist on "%s" type.', $method, $nonNullableType));
+            }
+
+            return $nonNullableType->{$method}(...$arguments);
+        }
+
+        throw new LogicException(sprintf('Cannot call "%s" on "%s" compound type.', $method, $this));
+    }
 }

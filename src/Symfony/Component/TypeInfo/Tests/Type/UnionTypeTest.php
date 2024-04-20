@@ -123,4 +123,23 @@ class UnionTypeTest extends TestCase
         $type = new UnionType(Type::string(), Type::intersection(Type::int(), Type::int()));
         $this->assertTrue($type->isA(TypeIdentifier::INT));
     }
+
+    public function testProxiesMethodsToNonNullableType()
+    {
+        $this->assertEquals(Type::string(), (new UnionType(Type::list(Type::string()), Type::null()))->getCollectionValueType());
+
+        try {
+            (new UnionType(Type::int(), Type::null()))->getCollectionValueType();
+            $this->fail();
+        } catch (LogicException) {
+            $this->addToAssertionCount(1);
+        }
+
+        try {
+            (new UnionType(Type::list(Type::string()), Type::string()))->getCollectionValueType();
+            $this->fail();
+        } catch (LogicException) {
+            $this->addToAssertionCount(1);
+        }
+    }
 }

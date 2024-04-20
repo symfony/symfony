@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo;
 
+use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 
@@ -44,5 +45,15 @@ abstract class Type implements \Stringable
     public function isNullable(): bool
     {
         return $this->is(fn (Type $t): bool => $t->isA(TypeIdentifier::NULL) || $t->isA(TypeIdentifier::MIXED));
+    }
+
+    /**
+     * Graceful fallback for unexisting methods.
+     *
+     * @param list<mixed> $arguments
+     */
+    public function __call(string $method, array $arguments): mixed
+    {
+        throw new LogicException(sprintf('Cannot call "%s" on "%s" type.', $method, $this));
     }
 }

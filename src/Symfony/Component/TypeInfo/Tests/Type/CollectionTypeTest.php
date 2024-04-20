@@ -108,4 +108,10 @@ class CollectionTypeTest extends TestCase
         $this->assertTrue($type->isA(TypeIdentifier::OBJECT));
         $this->assertTrue($type->isA(self::class));
     }
+
+    public function testProxiesMethodsToBaseType()
+    {
+        $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool()));
+        $this->assertEquals([Type::string(), Type::bool()], $type->getVariableTypes());
+    }
 }

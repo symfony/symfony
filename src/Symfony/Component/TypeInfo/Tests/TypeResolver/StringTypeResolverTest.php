@@ -40,6 +40,23 @@ class StringTypeResolverTest extends TestCase
     }
 
     /**
+     * @dataProvider resolveDataProvider
+     */
+    public function testResolveStringable(Type $expectedType, string $string, ?TypeContext $typeContext = null)
+    {
+        $this->assertEquals($expectedType, $this->resolver->resolve(new class($string) implements \Stringable {
+            public function __construct(private string $value)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return $this->value;
+            }
+        }, $typeContext));
+    }
+
+    /**
      * @return iterable<array{0: Type, 1: string, 2?: TypeContext}>
      */
     public function resolveDataProvider(): iterable

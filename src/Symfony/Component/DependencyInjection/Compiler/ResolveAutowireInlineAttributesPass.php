@@ -12,13 +12,15 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarExporter\ProxyHelper;
 
 /**
- * Inspects existing autowired services for {@see AutowireInline} attribute and registers the definitions for reuse.
+ * Inspects existing autowired services for {@see AutowireInline} attributes and registers the definitions for reuse.
  *
  * @author Ismail Özgün Turan <oezguen.turan@dadadev.com>
  */
@@ -30,36 +32,110 @@ class ResolveAutowireInlineAttributesPass extends AbstractRecursivePass
     {
         $value = parent::processValue($value, $isRoot);
 
-        if (!$value instanceof Definition || !$value->isAutowired() || $value->isAbstract() || !$value->getClass()) {
+        if (!$value instanceof Definition || !$value->isAutowired() || !$value->getClass() || $value->hasTag('container.ignore_attributes')) {
             return $value;
         }
+
+        $isChildDefinition = $value instanceof ChildDefinition;
 
         try {
             $constructor = $this->getConstructor($value, false);
         } catch (RuntimeException) {
-            $this->container->log($this, sprintf('Skipping service "%s": Class or interface "%s" cannot be loaded.', $this->currentId, $value->getClass()));
-
             return $value;
         }
 
-        if ($constructor === null) {
-            return $value;
-        }
+        if ($constructor) {
+            $arguments = $this->registerAutowireInlineAttributes($constructor, $value->getArguments(), $isChildDefinition);
 
-        $reflectionParameters = $constructor->getParameters();
-        foreach ($reflectionParameters as $reflectionParameter) {
-            $autowireInlineAttributes = $reflectionParameter->getAttributes(AutowireInline::class, \ReflectionAttribute::IS_INSTANCEOF);
-            foreach ($autowireInlineAttributes as $autowireInlineAttribute) {
-                /** @var AutowireInline $autowireInlineAttributeInstance */
-                $autowireInlineAttributeInstance = $autowireInlineAttribute->newInstance();
-
-                $type = ProxyHelper::exportType($reflectionParameter, true);
-                $definition = $autowireInlineAttributeInstance->buildDefinition($autowireInlineAttributeInstance->value, $type, $reflectionParameter);
-
-                $this->container->setDefinition('.autowire_inline.'.ContainerBuilder::hash($definition), $definition);
+            if ($arguments !== $value->getArguments()) {
+                $value->setArguments($arguments);
             }
         }
 
+        $dummy = $value;
+        while (null === $dummy->getClass() && $dummy instanceof ChildDefinition) {
+            $dummy = $this->container->findDefinition($dummy->getParent());
+        }
+
+        $methodCalls = $value->getMethodCalls();
+
+        foreach ($methodCalls as $i => $call) {
+            [$method, $arguments] = $call;
+
+            try {
+                $method = $this->getReflectionMethod($dummy, $method);
+            } catch (RuntimeException) {
+                continue;
+            }
+
+            $arguments = $this->registerAutowireInlineAttributes($method, $arguments, $isChildDefinition);
+
+            if ($arguments !== $call[1]) {
+                $methodCalls[$i][1] = $arguments;
+            }
+        }
+
+        if ($methodCalls !== $value->getMethodCalls()) {
+            $value->setMethodCalls($methodCalls);
+        }
+
         return $value;
+    }
+
+    private function registerAutowireInlineAttributes(\ReflectionFunctionAbstract $method, array $arguments, bool $isChildDefinition): array
+    {
+        $parameters = $method->getParameters();
+
+        if ($method->isVariadic()) {
+            array_pop($parameters);
+        }
+        $dummyContainer = new ContainerBuilder($this->container->getParameterBag());
+
+        foreach ($parameters as $index => $parameter) {
+            if ($isChildDefinition) {
+                $index = 'index_'.$index;
+            }
+
+            $name = '$'.$parameter->name;
+            if (\array_key_exists($name, $arguments)) {
+                $arguments[$index] = $arguments[$name];
+                unset($arguments[$name]);
+            }
+            if (\array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
+                continue;
+            }
+            if (!$attribute = $parameter->getAttributes(AutowireInline::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null) {
+                continue;
+            }
+
+            $type = ProxyHelper::exportType($parameter, true);
+
+            if (!$type && isset($arguments[$index])) {
+                continue;
+            }
+
+            $attribute = $attribute->newInstance();
+            $definition = $attribute->buildDefinition($attribute->value, $type, $parameter);
+
+            $dummyContainer->setDefinition('.autowire_inline', $definition);
+            (new ResolveParameterPlaceHoldersPass(false, false))->process($dummyContainer);
+
+            $id = '.autowire_inline.'.ContainerBuilder::hash([$this->currentId, $method->class ?? null, $method->name, (string) $parameter]);
+
+            $this->container->setDefinition($id, $definition);
+            $arguments[$index] = new Reference($id);
+
+            if ($definition->isAutowired()) {
+                $currentId = $this->currentId;
+                try {
+                    $this->currentId = $id;
+                    $this->processValue($definition, true);
+                } finally {
+                    $this->currentId = $currentId;
+                }
+            }
+        }
+
+        return $arguments;
     }
 }

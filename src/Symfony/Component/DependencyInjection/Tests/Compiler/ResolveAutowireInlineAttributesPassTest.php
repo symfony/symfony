@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveAutowireInlineAttributesPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
-use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -26,24 +25,32 @@ class ResolveAutowireInlineAttributesPassTest extends TestCase
     public function testAttribute()
     {
         $container = new ContainerBuilder();
-        $container->register(Foo::class)->setAutowired(true);
+        $container->register(Foo::class, Foo::class)
+            ->setAutowired(true);
 
         $container->register('autowire_inline1', AutowireInlineAttributes1::class)
             ->setAutowired(true);
 
         $container->register('autowire_inline2', AutowireInlineAttributes2::class)
+            ->setArgument(1, 234)
             ->setAutowired(true);
 
-        (new ResolveNamedArgumentsPass())->process($container);
-        (new ResolveClassPass())->process($container);
-        (new ResolveChildDefinitionsPass())->process($container);
+        $container->register('autowire_inline3', AutowireInlineAttributes3::class)
+            ->setAutowired(true);
+
         (new ResolveAutowireInlineAttributesPass())->process($container);
+        (new ResolveChildDefinitionsPass())->process($container);
+        (new ResolveNamedArgumentsPass())->process($container);
         (new AutowirePass())->process($container);
 
-        $autowireInlineAttributes1 = $container->get('autowire_inline1');
-        self::assertInstanceOf(AutowireInlineAttributes1::class, $autowireInlineAttributes1);
+        $a = $container->get('autowire_inline1');
+        self::assertInstanceOf(AutowireInlineAttributes1::class, $a);
 
-        $autowireInlineAttributes2 = $container->get('autowire_inline2');
-        self::assertInstanceOf(AutowireInlineAttributes2::class, $autowireInlineAttributes2);
+        $a = $container->get('autowire_inline2');
+        self::assertInstanceOf(AutowireInlineAttributes2::class, $a);
+
+        $a = $container->get('autowire_inline3');
+        self::assertInstanceOf(AutowireInlineAttributes2::class, $a->inlined);
+        self::assertSame(345, $a->inlined->bar);
     }
 }

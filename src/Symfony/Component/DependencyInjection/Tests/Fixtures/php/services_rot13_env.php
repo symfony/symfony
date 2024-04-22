@@ -40,13 +40,6 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-            '.service_locator.DyWBOhJ' => true,
-        ];
-    }
-
     /**
      * Gets the public 'Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor' shared service.
      *

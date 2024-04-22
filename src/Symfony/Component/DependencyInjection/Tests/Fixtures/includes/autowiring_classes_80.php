@@ -164,8 +164,8 @@ class AutowireInlineAttributes1
 {
     public function __construct(
         #[AutowireInline(AutowireInlineAttributesBar::class, [
-            '$foo' => Foo::class,
             '$someString' => 'testString',
+            '$foo' => new Foo(),
         ])]
         public AutowireInlineAttributesBar $inlined,
     ) {
@@ -176,9 +176,25 @@ class AutowireInlineAttributes2
 {
     public function __construct(
         #[AutowireInline(AutowireInlineAttributesBar::class, [
-            '$someString' => 'testString',
+            new Foo(),
+            'testString',
         ])]
         public AutowireInlineAttributesBar $inlined,
+        public int $bar,
+    ) {
+    }
+}
+
+class AutowireInlineAttributes3
+{
+    public function __construct(
+        #[AutowireInline(
+            parent: 'autowire_inline2',
+            arguments: [
+                'index_1' => 345,
+            ],
+        )]
+        public AutowireInlineAttributes2 $inlined,
     ) {
     }
 }

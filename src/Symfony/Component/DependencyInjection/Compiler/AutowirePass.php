@@ -333,7 +333,7 @@ class AutowirePass extends AbstractRecursivePass
 
                     if ($attribute instanceof AutowireInline) {
                         $value = $attribute->buildDefinition($value, $type, $parameter);
-                        $value = new Reference('.autowire_inline.'.ContainerBuilder::hash($value));
+                        $value = $this->doProcessValue($value);
                     } elseif ($lazy = $attribute->lazy) {
                         $definition = (new Definition($type))
                             ->setFactory('current')

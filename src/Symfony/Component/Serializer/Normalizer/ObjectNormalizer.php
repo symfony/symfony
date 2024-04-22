@@ -57,7 +57,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     public function getSupportedTypes(?string $format): array
     {
-        return ['object' => __CLASS__ === static::class || $this->hasCacheableSupportsMethod()];
+        return ['object' => __CLASS__ === static::class];
     }
 
     /**

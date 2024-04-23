@@ -1476,13 +1476,13 @@ EOT
 data: !!binary |
     SGVsbG8gd29ybGQ=
 EOT
-    ],
+            ],
             'containing spaces in block scalar' => [
                 <<<'EOT'
 data: !!binary |
     SGVs bG8gd 29ybGQ=
 EOT
-    ],
+            ],
         ];
     }
 
@@ -2947,6 +2947,11 @@ YAML;
             'within_string' => 'a　b',
             'regular_space' => 'a b',
         ], $this->parser->parse($expected));
+    }
+
+    public function testSkipBlankLines()
+    {
+        $this->assertSame(['foo' => [null]], (new Parser())->parse("foo:\n-\n\n"));
     }
 
     private function assertSameData($expected, $actual)

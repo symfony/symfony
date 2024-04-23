@@ -123,7 +123,7 @@ final class CacheItem implements ItemInterface
     /**
      * Validates a cache key according to PSR-6.
      *
-     * @param mixed $key The key to validate
+     * @param mixed  $key           The key to validate
      * @param string $reservedChars Can be used to override the list of reserved characters
      *
      * @throws InvalidArgumentException When $key is not valid

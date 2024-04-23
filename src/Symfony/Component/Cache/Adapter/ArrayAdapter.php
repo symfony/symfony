@@ -55,7 +55,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         private float $maxLifetime = 0,
         private int $maxItems = 0,
     ) {
-        if (static::$reservedChars === null) {
+        if (null === static::$reservedChars) {
             static::$reservedChars = str_replace(self::NS_SEPARATOR, '', CacheItem::RESERVED_CHARACTERS);
         }
 

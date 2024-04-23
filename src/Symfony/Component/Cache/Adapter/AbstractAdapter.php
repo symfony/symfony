@@ -42,7 +42,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
-        if (static::$reservedChars === null) {
+        if (null === static::$reservedChars) {
             static::$reservedChars = str_replace(self::NS_SEPARATOR, '', CacheItem::RESERVED_CHARACTERS);
         }
         $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace, static::$reservedChars).static::NS_SEPARATOR;

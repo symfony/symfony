@@ -42,9 +42,17 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
      */
     protected const NS_SEPARATOR = ':';
 
+    /**
+     * @internal
+     */
+    protected static ?string $reservedChars = null;
+
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
-        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace, static::NS_SEPARATOR).static::NS_SEPARATOR;
+        if (static::$reservedChars === null) {
+            static::$reservedChars = str_replace(self::NS_SEPARATOR, '', CacheItem::RESERVED_CHARACTERS);
+        }
+        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace, static::$reservedChars).static::NS_SEPARATOR;
         $this->defaultLifetime = $defaultLifetime;
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s").', $this->maxIdLength - 24, \strlen($namespace), $namespace));

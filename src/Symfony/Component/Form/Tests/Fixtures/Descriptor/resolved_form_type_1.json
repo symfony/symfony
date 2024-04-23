@@ -76,6 +76,7 @@
                 "csrf_message",
                 "csrf_protection",
                 "csrf_token_id",
+                "csrf_token_lazy",
                 "csrf_token_manager"
             ]
         },

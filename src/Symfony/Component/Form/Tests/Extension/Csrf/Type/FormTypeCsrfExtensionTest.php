@@ -122,6 +122,26 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertEquals('token', $view['csrf']->vars['value']);
     }
 
+    public function testGenerateLazyCsrfToken()
+    {
+        $this->tokenManager->expects($this->once())
+            ->method('getToken')
+            ->with('TOKEN_ID')
+            ->willReturn(new CsrfToken('TOKEN_ID', 'token'));
+
+        $view = $this->factory
+            ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+                'csrf_field_name' => 'csrf',
+                'csrf_token_manager' => $this->tokenManager,
+                'csrf_token_id' => 'TOKEN_ID',
+                'csrf_token_lazy' => true,
+                'compound' => true,
+            ])
+            ->createView();
+
+        $this->assertEquals('token', '');
+    }
+
     public function testGenerateCsrfTokenUsesFormNameAsIntentionByDefault()
     {
         $this->tokenManager->expects($this->once())

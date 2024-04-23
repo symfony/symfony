@@ -11,8 +11,8 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   choice_loader                   data_class           allow_file_upload              csrf_message           
   choice_name                     empty_data           attr                           csrf_protection        
   choice_translation_domain       error_bubbling       attr_translation_parameters    csrf_token_id          
-  choice_translation_parameters   invalid_message      auto_initialize                csrf_token_manager     
-  choice_value                    trim                 block_name                                            
+  choice_translation_parameters   invalid_message      auto_initialize                csrf_token_lazy        
+  choice_value                    trim                 block_name                     csrf_token_manager     
   choices                                              block_prefix                                          
   duplicate_preferred_choices                          by_reference                                          
   expanded                                             data                                                  

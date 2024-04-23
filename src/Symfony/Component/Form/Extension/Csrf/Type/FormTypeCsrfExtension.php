@@ -68,7 +68,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
             $factory = $form->getConfig()->getFormFactory();
             $tokenId = $options['csrf_token_id'] ?: ($form->getName() ?: $form->getConfig()->getType()->getInnerType()::class);
-            $data = (string) $options['csrf_token_manager']->getToken($tokenId);
+            $data = $options['csrf_token_lazy'] ? '' : (string) $options['csrf_token_manager']->getToken($tokenId);
 
             $csrfForm = $factory->createNamed($options['csrf_field_name'], HiddenType::class, $data, [
                 'block_prefix' => 'csrf_token',
@@ -87,6 +87,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
             'csrf_token_manager' => $this->defaultTokenManager,
             'csrf_token_id' => null,
+            'csrf_token_lazy' => false,
         ]);
     }
 

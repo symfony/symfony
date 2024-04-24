@@ -71,7 +71,9 @@ final class StringTypeResolver implements TypeResolverInterface
 
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
-        if (!\is_string($subject)) {
+        if ($subject instanceof \Stringable) {
+            $subject = (string) $subject;
+        } elseif (!\is_string($subject)) {
             throw new UnsupportedException(sprintf('Expected subject to be a "string", "%s" given.', get_debug_type($subject)), $subject);
         }
 

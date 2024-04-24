@@ -21,6 +21,6 @@ $wh->setMetadata([
     ],
 ]);
 $wh->setReason('');
-$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u\Z', '2024-04-08T09:43:09.500000Z'));
+$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', '2024-04-08T09:43:09.500000Z'));
 
 return $wh;

@@ -43,7 +43,7 @@ final class MailerSendPayloadConverter implements PayloadConverterInterface
             $event = new MailerEngagementEvent($name, $this->getMessageId($payload), $payload);
         }
 
-        if (!$date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u\Z', $payload['created_at'])) {
+        if (!$date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', $payload['created_at'])) {
             throw new ParseException(sprintf('Invalid date "%s".', $payload['created_at']));
         }
 

@@ -84,8 +84,8 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
             ->create(FormTypeTest::TESTED_TYPE, null, ['validation_groups' => new GroupSequence(['First', 'Second'])])
             ->add('field', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'groups' => ['First']]),
-                    new NotBlank(['groups' => ['Second']]),
+                    new Length(min: 10, groups: ['First']),
+                    new NotBlank(groups: ['Second']),
                 ],
             ])
         ;
@@ -102,7 +102,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $formMetadata = new ClassMetadata(Form::class);
         $authorMetadata = (new ClassMetadata(Author::class))
-            ->addPropertyConstraint('firstName', new NotBlank(['groups' => 'Second']))
+            ->addPropertyConstraint('firstName', new NotBlank(groups: ['Second']))
         ;
         $metadataFactory = $this->createMock(MetadataFactoryInterface::class);
         $metadataFactory->expects($this->any())
@@ -131,12 +131,12 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
             ->add('firstName', TextTypeTest::TESTED_TYPE)
             ->add('lastName', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'groups' => ['First']]),
+                    new Length(min: 10, groups: ['First']),
                 ],
             ])
             ->add('australian', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new NotBlank(['groups' => ['Second']]),
+                    new NotBlank(groups: ['Second']),
                 ],
             ])
         ;

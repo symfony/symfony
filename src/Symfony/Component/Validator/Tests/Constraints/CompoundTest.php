@@ -19,6 +19,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class CompoundTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testItCannotRedefineConstraintsOption()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -72,7 +75,7 @@ class ForwardingOptionCompound extends Compound
     protected function getConstraints(array $options): array
     {
         return [
-            new Length(['min' => $options['min'] ?? null]),
+            new Length(min: $options['min'] ?? null),
         ];
     }
 }

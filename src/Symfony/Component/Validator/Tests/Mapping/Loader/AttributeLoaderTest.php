@@ -66,29 +66,29 @@ class AttributeLoaderTest extends TestCase
         $expected->addConstraint(new Sequentially([
             new Expression('this.getFirstName() != null'),
         ]));
-        $expected->addConstraint(new Callback(['callback' => 'validateMe', 'payload' => 'foo']));
+        $expected->addConstraint(new Callback(callback: 'validateMe', payload: 'foo'));
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addPropertyConstraint('firstName', new NotNull());
-        $expected->addPropertyConstraint('firstName', new Range(['min' => 3]));
-        $expected->addPropertyConstraint('firstName', new All([new NotNull(), new Range(['min' => 3])]));
-        $expected->addPropertyConstraint('firstName', new All(['constraints' => [new NotNull(), new Range(['min' => 3])]]));
-        $expected->addPropertyConstraint('firstName', new Collection([
-            'foo' => [new NotNull(), new Range(['min' => 3])],
-            'bar' => new Range(['min' => 5]),
+        $expected->addPropertyConstraint('firstName', new Range(min: 3));
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new Collection(fields: [
+            'foo' => [new NotNull(), new Range(min: 3)],
+            'bar' => new Range(min: 5),
             'baz' => new Required([new Email()]),
             'qux' => new Optional([new NotBlank()]),
-        ], null, null, true));
-        $expected->addPropertyConstraint('firstName', new Choice([
-            'message' => 'Must be one of %choices%',
-            'choices' => ['A', 'B'],
-        ]));
+        ], allowExtraFields: true));
+        $expected->addPropertyConstraint('firstName', new Choice(
+            message: 'Must be one of %choices%',
+            choices: ['A', 'B'],
+        ));
         $expected->addPropertyConstraint('firstName', new AtLeastOneOf([
             new NotNull(),
-            new Range(['min' => 3]),
+            new Range(min: 3),
         ], null, null, 'foo', null, false));
         $expected->addPropertyConstraint('firstName', new Sequentially([
             new NotBlank(),
-            new Range(['min' => 5]),
+            new Range(min: 5),
         ]));
         $expected->addPropertyConstraint('childA', new Valid());
         $expected->addPropertyConstraint('childB', new Valid());
@@ -152,29 +152,29 @@ class AttributeLoaderTest extends TestCase
         $expected->addConstraint(new Sequentially([
             new Expression('this.getFirstName() != null'),
         ]));
-        $expected->addConstraint(new Callback(['callback' => 'validateMe', 'payload' => 'foo']));
+        $expected->addConstraint(new Callback(callback: 'validateMe', payload: 'foo'));
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addPropertyConstraint('firstName', new NotNull());
-        $expected->addPropertyConstraint('firstName', new Range(['min' => 3]));
-        $expected->addPropertyConstraint('firstName', new All([new NotNull(), new Range(['min' => 3])]));
-        $expected->addPropertyConstraint('firstName', new All(['constraints' => [new NotNull(), new Range(['min' => 3])]]));
-        $expected->addPropertyConstraint('firstName', new Collection([
-            'foo' => [new NotNull(), new Range(['min' => 3])],
-            'bar' => new Range(['min' => 5]),
+        $expected->addPropertyConstraint('firstName', new Range(min: 3));
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new Collection(fields: [
+            'foo' => [new NotNull(), new Range(min: 3)],
+            'bar' => new Range(min: 5),
             'baz' => new Required([new Email()]),
             'qux' => new Optional([new NotBlank()]),
-        ], null, null, true));
-        $expected->addPropertyConstraint('firstName', new Choice([
-            'message' => 'Must be one of %choices%',
-            'choices' => ['A', 'B'],
-        ]));
+        ], allowExtraFields: true));
+        $expected->addPropertyConstraint('firstName', new Choice(
+            message: 'Must be one of %choices%',
+            choices: ['A', 'B'],
+        ));
         $expected->addPropertyConstraint('firstName', new AtLeastOneOf([
             new NotNull(),
-            new Range(['min' => 3]),
+            new Range(min: 3),
         ], null, null, 'foo', null, false));
         $expected->addPropertyConstraint('firstName', new Sequentially([
             new NotBlank(),
-            new Range(['min' => 5]),
+            new Range(min: 5),
         ]));
         $expected->addPropertyConstraint('childA', new Valid());
         $expected->addPropertyConstraint('childB', new Valid());

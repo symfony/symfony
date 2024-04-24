@@ -23,6 +23,9 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class DisableAutoMappingTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testGroups()
     {
         $this->expectException(ConstraintDefinitionException::class);

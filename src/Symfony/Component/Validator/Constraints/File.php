@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -89,6 +90,7 @@ class File extends Constraint
      *
      * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
      */
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         int|string|null $maxSize = null,
@@ -116,6 +118,10 @@ class File extends Constraint
         array|string|null $extensions = null,
         ?string $extensionsMessage = null,
     ) {
+        if ($options) {
+            trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->maxSize = $maxSize ?? $this->maxSize;

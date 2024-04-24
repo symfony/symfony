@@ -95,7 +95,7 @@ interface ExecutionContextInterface
      *     {
      *         $validator = $this->context->getValidator();
      *
-     *         $violations = $validator->validate($value, new Length(['min' => 3]));
+     *         $violations = $validator->validate($value, new Length(min: 3));
      *
      *         if (count($violations) > 0) {
      *             // ...

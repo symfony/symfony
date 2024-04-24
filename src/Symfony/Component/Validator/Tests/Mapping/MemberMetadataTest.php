@@ -84,7 +84,7 @@ class MemberMetadataTest extends TestCase
 
     public function testSerializeCollectionCascaded()
     {
-        $this->metadata->addConstraint(new Valid(['traverse' => true]));
+        $this->metadata->addConstraint(new Valid(traverse: true));
 
         $metadata = unserialize(serialize($this->metadata));
 
@@ -93,7 +93,7 @@ class MemberMetadataTest extends TestCase
 
     public function testSerializeCollectionNotCascaded()
     {
-        $this->metadata->addConstraint(new Valid(['traverse' => false]));
+        $this->metadata->addConstraint(new Valid(traverse: false));
 
         $metadata = unserialize(serialize($this->metadata));
 

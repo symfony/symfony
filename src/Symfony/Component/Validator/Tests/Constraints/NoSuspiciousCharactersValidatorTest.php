@@ -32,7 +32,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
      */
     public function testNonSuspiciousStrings(string $string, array $options = [])
     {
-        $this->validator->validate($string, new NoSuspiciousCharacters($options));
+        $this->validator->validate($string, new NoSuspiciousCharacters(...$options));
 
         $this->assertNoViolation();
     }
@@ -58,7 +58,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
      */
     public function testSuspiciousStrings(string $string, array $options, array $errors)
     {
-        $this->validator->validate($string, new NoSuspiciousCharacters($options));
+        $this->validator->validate($string, new NoSuspiciousCharacters(...$options));
 
         $violations = null;
 

@@ -63,9 +63,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValues($value, $expectedMessageParam, string $expectedErrorPath)
     {
-        $constraint = new Unique([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Unique(message: 'myMessage');
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
@@ -120,9 +118,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         $value = [$object1, $object2, $object3];
 
-        $this->validator->validate($value, new Unique([
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate($value, new Unique(normalizer: $callback));
 
         $this->assertNoViolation();
     }
@@ -146,10 +142,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         $value = [$object1, $object2, $object3];
 
-        $this->validator->validate($value, new Unique([
-            'message' => 'myMessage',
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate($value, new Unique(
+            message: 'myMessage',
+            normalizer: $callback,
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
@@ -171,10 +167,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsInvalidNonStrictComparison()
     {
-        $this->validator->validate([1, '1', 1.0, '1.0'], new Unique([
-            'message' => 'myMessage',
-            'normalizer' => 'intval',
-        ]));
+        $this->validator->validate([1, '1', 1.0, '1.0'], new Unique(
+            message: 'myMessage',
+            normalizer: 'intval',
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '1')
@@ -187,9 +183,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     {
         $callback = static fn ($item) => (int) $item;
 
-        $this->validator->validate([1, '2', 3, '4.0'], new Unique([
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate([1, '2', 3, '4.0'], new Unique(normalizer: $callback));
 
         $this->assertNoViolation();
     }
@@ -198,10 +192,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     {
         $callback = static fn ($item) => mb_strtolower($item);
 
-        $this->validator->validate(['Hello', 'hello', 'HELLO', 'hellO'], new Unique([
-            'message' => 'myMessage',
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate(['Hello', 'hello', 'HELLO', 'hellO'], new Unique(
+            message: 'myMessage',
+            normalizer: $callback,
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"hello"')
@@ -214,9 +208,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     {
         $callback = static fn ($item) => mb_strtolower($item);
 
-        $this->validator->validate(['Hello', 'World'], new Unique([
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate(['Hello', 'World'], new Unique(normalizer: $callback));
 
         $this->assertNoViolation();
     }
@@ -253,9 +245,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidCollectionValues(array $value, array $fields, string $expectedMessageParam, string $expectedErrorPath)
     {
-        $this->validator->validate($value, new Unique([
-            'message' => 'myMessage',
-        ], fields: $fields));
+        $this->validator->validate($value, new Unique(
+            message: 'myMessage',
+            fields: $fields,
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $expectedMessageParam)

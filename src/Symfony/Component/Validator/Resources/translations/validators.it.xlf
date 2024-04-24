@@ -440,7 +440,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target state="needs-review-translation">Questo URL è privo di un dominio di primo livello.</target>
+                <target>Questo URL è privo di un dominio di primo livello.</target>
             </trans-unit>
         </body>
     </file>
